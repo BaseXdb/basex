@@ -20,9 +20,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(1, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(ceiling(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(10.5) eq 11",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(-10.5) eq -10",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -116,10 +140,14 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:unsignedShort(.)) instance of xs:integer",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -133,10 +161,14 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:int(.)) instance of xs:integer",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -150,10 +182,14 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:short(.)) instance of xs:integer",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -167,10 +203,14 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:byte(.)) instance of xs:integer",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -184,10 +224,14 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:unsignedLong(.)) instance of xs:integer",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -201,10 +245,14 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:unsignedInt(.)) instance of xs:integer",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -218,10 +266,14 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:unsignedByte(.)) instance of xs:integer",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -235,10 +287,14 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:positiveInteger(.)) instance of xs:integer",
       ctx);
-    query.context(node(file("fn/abs/e1.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e1.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -252,10 +308,14 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:nonPositiveInteger(.)) instance of xs:integer",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -269,10 +329,14 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:nonNegativeInteger(.)) instance of xs:integer",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -286,10 +350,14 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:negativeInteger(.)) instance of xs:integer",
       ctx);
-    query.context(node(file("fn/abs/e-1.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e-1.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -303,10 +371,14 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:long(.)) instance of xs:integer",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -326,9 +398,13 @@ public class FnCeiling extends QT3TestSet {
       "           else error()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"integer\", \"decimal\", \"float\", \"double\"")
     );
@@ -342,9 +418,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(12.5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("13.0")
@@ -362,9 +442,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(12.9)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("13.0")
@@ -382,9 +466,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(0.000000001)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1.0")
@@ -402,9 +490,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(0.0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0.0")
@@ -422,9 +514,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(-0.1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0.0")
@@ -442,9 +538,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(-12345678.567890)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12345678")
@@ -462,9 +562,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(-1234567891234567.2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-1234567891234567.0")
@@ -482,9 +586,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(12.5e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("13.0e0")
@@ -502,9 +610,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:double('-INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "-INF")
@@ -522,9 +634,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:double('-0'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-0")
@@ -542,9 +658,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(12.9e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("13.0e0")
@@ -562,9 +682,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(0.000000001e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1.0e0")
@@ -582,9 +706,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(0.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0.0e0")
@@ -602,9 +730,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(-0.1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-0.0e0")
@@ -624,9 +756,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(-12345678.567890e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12345678e0")
@@ -644,9 +780,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(-1234567891234567.2e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-1234567891234567.0e0")
@@ -664,9 +804,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:double('NaN'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "NaN")
@@ -684,9 +828,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:double('INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "INF")
@@ -704,9 +852,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:float(12.5e0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("13.0e0")
@@ -724,9 +876,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:float(xs:float('-INF')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "-INF")
@@ -744,9 +900,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:float(xs:float('-0')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-0")
@@ -764,9 +924,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:float(12.9e0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("13.0e0")
@@ -784,9 +948,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:float(0.000000001e0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1.0e0")
@@ -804,9 +972,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:float(0.0e0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0.0e0")
@@ -824,9 +996,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:float(-0.1e0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0.0e0")
@@ -846,9 +1022,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:float(-12345678.1e0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12345678e0")
@@ -866,9 +1046,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:float(-1234567.2e0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-1234567e0")
@@ -886,9 +1070,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:float(xs:float('NaN')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "NaN")
@@ -906,9 +1094,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "ceiling(xs:float(xs:float('INF')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "INF")
@@ -926,9 +1118,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:double(\"-1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1.7976931348623157E308")
     );
@@ -942,9 +1138,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:double(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -958,9 +1158,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:double(\"1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.7976931348623157E308")
     );
@@ -974,9 +1178,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:decimal(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -990,9 +1198,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:decimal(\"617375191608514839\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("617375191608514839")
     );
@@ -1006,9 +1218,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:decimal(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1022,9 +1238,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:float(\"-3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-3.4028235E38")
     );
@@ -1038,9 +1258,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:float(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1054,9 +1278,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:float(\"3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3.4028235E38")
     );
@@ -1070,9 +1298,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:int(\"-2147483648\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1086,9 +1318,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:int(\"-1873914410\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1873914410")
     );
@@ -1102,9 +1338,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:int(\"2147483647\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2147483647")
     );
@@ -1118,9 +1358,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:integer(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1134,9 +1378,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:integer(\"830993497117024304\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("830993497117024304")
     );
@@ -1150,9 +1398,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:integer(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1166,9 +1418,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:long(\"-92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -1182,9 +1438,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:long(\"-47175562203048468\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-47175562203048468")
     );
@@ -1198,9 +1458,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:long(\"92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547758")
     );
@@ -1214,9 +1478,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:negativeInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1230,9 +1498,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:negativeInteger(\"-297014075999096793\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-297014075999096793")
     );
@@ -1246,9 +1518,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:negativeInteger(\"-1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1262,9 +1538,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:nonNegativeInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1278,9 +1558,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:nonNegativeInteger(\"303884545991464527\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -1294,9 +1578,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:nonNegativeInteger(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1310,9 +1598,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:nonPositiveInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1326,9 +1618,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:nonPositiveInteger(\"-475688437271870490\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-475688437271870490")
     );
@@ -1342,9 +1638,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:nonPositiveInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1358,9 +1658,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:positiveInteger(\"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1374,9 +1678,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:positiveInteger(\"52704602390610033\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610033")
     );
@@ -1390,9 +1698,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:positiveInteger(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1406,9 +1718,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:short(\"-32768\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -1422,9 +1738,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:short(\"-5324\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5324")
     );
@@ -1438,9 +1758,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:short(\"32767\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("32767")
     );
@@ -1454,9 +1778,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:unsignedLong(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1470,9 +1798,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:unsignedLong(\"130747108607674654\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -1486,9 +1818,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:unsignedLong(\"184467440737095516\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -1502,9 +1838,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:unsignedShort(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1518,9 +1858,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:unsignedShort(\"44633\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -1534,9 +1878,13 @@ public class FnCeiling extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ceiling(xs:unsignedShort(\"65535\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );

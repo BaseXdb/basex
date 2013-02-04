@@ -30,6 +30,8 @@ import org.basex.util.*;
 public final class QT3TS {
   /** Test suite id. */
   private final String testid = "qt3ts";
+  /** Path to the test suite. */
+  private String basePath = "";
 
   /** Maximum length of result output. */
   private int maxout = 2000;
@@ -98,7 +100,7 @@ public final class QT3TS {
     ctx.prop.set(Prop.CHOP, false);
     ctx.prop.set(Prop.INTPARSE, false);
 
-    final XQuery qdoc = new XQuery("doc(' " + CATALOG + "')", ctx);
+    final XQuery qdoc = new XQuery("doc('" + file(null, CATALOG) + "')", ctx);
     final XdmValue doc = qdoc.value();
     final String version = asString("*:catalog/@version", doc);
     Util.outln(NL + "QT3 Test Suite " + version);
@@ -158,7 +160,7 @@ public final class QT3TS {
    * @throws Exception exception
    */
   private void testSet(final String name) throws Exception {
-    final XQuery qdoc = new XQuery("doc(' " + name + "')", ctx);
+    final XQuery qdoc = new XQuery("doc(' " + file(null, name) + "')", ctx);
     final XdmValue doc = qdoc.value();
     final XQuery qset = new XQuery("*:test-set", ctx).context(doc);
     final XdmValue set = qset.value();
@@ -287,7 +289,7 @@ public final class QT3TS {
         // bind documents
         for(final HashMap<String, String> src : e.sources) {
           // add document reference
-          final String file = (b != null ? b : "") + src.get(FILE);
+          final String file = file(b, src.get(FILE));
           query.addDocument(src.get(URI), file);
           final String role = src.get(ROLE);
           if(role == null) continue;
@@ -297,7 +299,7 @@ public final class QT3TS {
         }
         // bind resources
         for(final HashMap<String, String> src : e.resources) {
-          query.addResource(src.get(URI), (b != null ? b : "") + src.get(FILE));
+          query.addResource(src.get(URI), file(b, src.get(FILE)));
         }
         // bind collections
         query.addCollection(e.collURI, e.collSources.toArray());
@@ -757,6 +759,16 @@ public final class QT3TS {
   }
 
   /**
+   * Returns the path to a given file.
+   * @param b base path, possibly {@code null}
+   * @param file file name
+   * @return path to the file
+   */
+  private String file(final String b, final String file) {
+    return new File(b != null ? b : basePath, file).getAbsolutePath();
+  }
+
+  /**
    * Calculates the percentage of correct queries.
    * @param v value
    * @param t total value
@@ -787,6 +799,7 @@ public final class QT3TS {
         " -d  debugging mode" + NL +
         " -e  ignore error codes" + NL +
         " -i  also save ignored files" + NL +
+        " -p  path to the test suite" + NL +
         " -s  print slow queries" + NL +
         " -v  verbose output",
         Util.info(Text.CONSOLE, Util.name(this)));
@@ -806,6 +819,10 @@ public final class QT3TS {
           errors = false;
         } else if(c == 's') {
           slow = new TreeMap<Long, String>();
+        } else if(c == 'p') {
+          final File f = new File(arg.string());
+          if(!f.isDirectory()) arg.usage();
+          basePath = f.getCanonicalPath();
         } else {
           arg.usage();
         }

@@ -16,13 +16,77 @@ public class XsDateTimeStamp extends QT3TestSet {
    * Make sure the value returned by current-dateTime() includes a timezone.
    */
   @org.junit.Test
+  public void fnXsDateTimeStamp1() {
+    final XQuery query = new XQuery(
+      "exists(fn:timezone-from-dateTime(fn:current-dateTime()))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("true()")
+    );
+  }
+
+  /**
+   * Make sure xs:dateTimeStamp() has a timezone.
+   */
+  @org.junit.Test
+  public void fnXsDateTimeStamp2() {
+    final XQuery query = new XQuery(
+      "exists(fn:timezone-from-dateTime(xs:dateTimeStamp(\"2011-07-28T12:34:56-08:00\")))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("true()")
+    );
+  }
+
+  /**
+   * Make sure an attempt to create an xs:dateTimeStamp() w/o a timezone fails.
+   */
+  @org.junit.Test
+  public void fnXsDateTimeStamp3() {
+    final XQuery query = new XQuery(
+      "xs:dateTimeStamp(\"2011-07-28T12:34:56\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0080")
+    );
+  }
+
+  /**
+   * Make sure the value returned by current-dateTime() includes a timezone.
+   */
+  @org.junit.Test
   public void xsDateTimeStamp1() {
     final XQuery query = new XQuery(
       "exists(fn:timezone-from-dateTime(fn:current-dateTime()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("true()")
     );
@@ -36,9 +100,13 @@ public class XsDateTimeStamp extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(fn:timezone-from-dateTime(xs:dateTimeStamp(\"2011-07-28T12:34:56-08:00\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("true()")
     );
@@ -52,9 +120,13 @@ public class XsDateTimeStamp extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTimeStamp(\"2011-07-28T12:34:56\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );

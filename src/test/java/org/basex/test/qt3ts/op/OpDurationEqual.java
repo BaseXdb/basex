@@ -20,9 +20,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT08H34M12.143S\") eq xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"PT0S\") eq xs:dayTimeDuration(\"PT0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:dayTimeDuration(\"P3DT08H34M12.043S\") eq xs:dayTimeDuration(\"P3DT08H34M12.143S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"PT08H34M12.143S\") ne xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:dayTimeDuration(\"P3DT08H34M12.143S\") ne xs:dayTimeDuration(\"P3DT08H34M12.143S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"-PT0S\") eq xs:dayTimeDuration(\"PT0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"-P2DT5H\") ne xs:dayTimeDuration(\"P2DT5H\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P6DT16H34M59.613999S\") eq xs:dayTimeDuration(\"P6DT16H34M59.613999S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1999Y10M3DT08H34M12.143S\") eq xs:duration(\"P1999Y10M3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"-P1Y3M4DT08H4M33S\") ne xs:duration(\"P1Y3M4DT08H4M33S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1999Y10M3DT08H34M12.142S\") lt xs:duration(\"P1999Y10M3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -196,9 +240,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1999Y10M3DT08H34M12.143S\") le xs:duration(\"P1999Y10M3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -212,9 +260,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1999Y10M3DT08H34M12.144S\") gt xs:duration(\"P1999Y10M3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -228,9 +280,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1999Y10M3DT08H34M12.143S\") ge xs:duration(\"P1999Y10M3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -244,9 +300,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"PT0S\") eq xs:dayTimeDuration(\"PT0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"PT0S\") eq xs:duration(\"PT0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0M\") eq xs:duration(\"PT0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"PT0S\") eq xs:yearMonthDuration(\"P0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0M\") eq xs:dayTimeDuration(\"PT0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -324,9 +400,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"PT0S\") eq xs:duration(\"PT0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"PT0S\") eq xs:yearMonthDuration(\"P0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +440,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1DT2H\") eq xs:dayTimeDuration(\"P1DT2H\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +460,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P1DT2H\") eq xs:duration(\"P1DT2H\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +480,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1M1DT2H\") ne xs:dayTimeDuration(\"P1DT2H\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,9 +500,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P1DT2H\") ne xs:duration(\"P1M1DT2H\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -420,9 +520,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0M\") eq xs:dayTimeDuration(\"PT0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -436,9 +540,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"PT0S\") eq xs:yearMonthDuration(\"P0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -452,9 +560,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y12M\") eq xs:duration(\"P1Y12M0D\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -468,9 +580,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y12M0D\") eq xs:yearMonthDuration(\"P1Y12M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -484,9 +600,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1M\") ne xs:duration(\"P31D\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -500,9 +620,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:duration(\"P1999Y10M3DT08H34M12.043S\") eq xs:duration(\"P1999Y10M3DT08H34M12.143S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -516,9 +640,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P31D\") ne xs:yearMonthDuration(\"P1M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -532,9 +660,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1M\") ne xs:dayTimeDuration(\"P31D\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -548,9 +680,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P31D\") ne xs:yearMonthDuration(\"P1M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -564,9 +700,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1999Y10M3DT08H34M12.143S\") ge xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -580,9 +720,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1999Y10M3DT08H34M12.143S\") gt xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -596,9 +740,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1999Y10M3DT08H34M12.143S\") lt xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -612,9 +760,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1999Y10M3DT08H34M12.143S\") le xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -628,9 +780,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT08H34M12.143S\") ge xs:duration(\"P1999Y10M3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -644,9 +800,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT08H34M12.143S\") gt xs:duration(\"P1999Y10M3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -660,9 +820,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT08H34M12.143S\") lt xs:duration(\"P1999Y10M3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -676,9 +840,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1999Y01M3DT08H34M12.143S\") ne xs:duration(\"P1999Y10M3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -692,9 +860,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT08H34M12.143S\") le xs:duration(\"P1999Y10M3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -708,9 +880,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") ge xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -724,9 +900,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") gt xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -740,9 +920,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") lt xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -756,9 +940,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") le xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -772,9 +960,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT08H34M12.143S\") ge xs:yearMonthDuration(\"P1999Y10M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -788,9 +980,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT08H34M12.143S\") gt xs:yearMonthDuration(\"P1999Y10M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -804,9 +1000,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT08H34M12.143S\") lt xs:yearMonthDuration(\"P1999Y10M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -820,9 +1020,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT08H34M12.143S\") le xs:yearMonthDuration(\"P1999Y10M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -836,9 +1040,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") ge xs:duration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -852,9 +1060,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:duration(\"P1999Y10M3DT08H34M12.143S\") ne xs:duration(\"P1999Y10M3DT08H34M12.143S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -868,9 +1080,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") gt xs:duration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -884,9 +1100,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") lt xs:duration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -900,9 +1120,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") le xs:duration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -916,9 +1140,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") ge xs:duration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -932,9 +1160,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") gt xs:duration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -948,9 +1180,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") lt xs:duration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -964,9 +1200,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") le xs:duration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -980,9 +1220,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P3DT08H34M12.143S\") ge xs:yearMonthDuration(\"P1999Y10M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -996,9 +1240,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P3DT08H34M12.143S\") gt xs:yearMonthDuration(\"P1999Y10M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1012,9 +1260,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P3DT08H34M12.143S\") lt xs:yearMonthDuration(\"P1999Y10M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1028,9 +1280,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y\") ne xs:duration(\"P365D\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1044,9 +1300,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P3DT08H34M12.143S\") le xs:yearMonthDuration(\"P1999Y10M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1060,9 +1320,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y\") eq xs:duration(\"P12M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1076,9 +1340,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1M\") ne xs:duration(\"P31D\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1092,9 +1360,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"-PT0S\") eq xs:duration(\"PT0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1108,9 +1380,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y10M\") eq xs:yearMonthDuration(\"P1999Y10M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1124,9 +1400,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0M\") eq xs:yearMonthDuration(\"P0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1140,9 +1420,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:yearMonthDuration(\"P1999Y\") eq xs:yearMonthDuration(\"P1999Y10M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1156,9 +1440,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1999Y01M\") ne xs:yearMonthDuration(\"P1999Y10M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1172,9 +1460,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:yearMonthDuration(\"P1999Y10M\") ne xs:yearMonthDuration(\"P1999Y10M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1188,9 +1480,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"-P3Y8M\") ne xs:yearMonthDuration(\"P3Y8M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1204,11 +1500,299 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"-P3Y8M\") ne xs:yearMonthDuration(\"P3Y8M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of dayTimeDurations .
+   */
+  @org.junit.Test
+  public void cbclDayTimeDurationEqual001() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($days as xs:integer, $hours as xs:integer ) { xs:dayTimeDuration(concat('P', $days, 'DT', $hours, 'H')) }; not(local:dayTimeDuration(1, 1) eq xs:dayTimeDuration(\"P0D\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of dayTimeDurations .
+   */
+  @org.junit.Test
+  public void cbclDayTimeDurationEqual002() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($days as xs:integer, $hours as xs:integer ) { xs:dayTimeDuration(concat('P', $days, 'DT', $hours, 'H')) }; not(local:dayTimeDuration(1, 1) ne xs:dayTimeDuration(\"P0D\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:dayTimeDuration .
+   */
+  @org.junit.Test
+  public void cbclDayTimeDurationEqual003() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($dayTimeDuration as xs:dayTimeDuration, $null as xs:boolean) { if ($null) then () else $dayTimeDuration }; exists(local:dayTimeDuration(xs:dayTimeDuration(\"P0D\"), fn:true()) eq xs:dayTimeDuration(\"P0D\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:dayTimeDuration .
+   */
+  @org.junit.Test
+  public void cbclDayTimeDurationEqual004() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($dayTimeDuration as xs:dayTimeDuration, $null as xs:boolean) { if ($null) then () else $dayTimeDuration }; local:dayTimeDuration(xs:dayTimeDuration(\"P0D\"), fn:false()) eq xs:dayTimeDuration(\"P0D\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:dayTimeDuration .
+   */
+  @org.junit.Test
+  public void cbclDayTimeDurationEqual005() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($dayTimeDuration as xs:dayTimeDuration, $null as xs:boolean) { if ($null) then () else $dayTimeDuration }; exists(local:dayTimeDuration(xs:dayTimeDuration(\"P0D\"), fn:true()) ne xs:dayTimeDuration(\"P0D\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:dayTimeDuration .
+   */
+  @org.junit.Test
+  public void cbclDayTimeDurationEqual006() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($dayTimeDuration as xs:dayTimeDuration, $null as xs:boolean) { if ($null) then () else $dayTimeDuration }; local:dayTimeDuration(xs:dayTimeDuration(\"P0D\"), fn:false()) ne xs:dayTimeDuration(\"P0D\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of dayTimeDurations .
+   */
+  @org.junit.Test
+  public void cbclDurationEqual001() {
+    final XQuery query = new XQuery(
+      "declare function local:duration($days as xs:integer, $hours as xs:integer) { xs:duration(concat('P', $days, 'DT', $hours, 'H')) }; not(local:duration(1, 1) eq xs:dayTimeDuration(\"P0D\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of dayTimeDurations .
+   */
+  @org.junit.Test
+  public void cbclDurationEqual002() {
+    final XQuery query = new XQuery(
+      "declare function local:duration($days as xs:integer, $hours as xs:integer) { xs:duration(concat('P', $days, 'DT', $hours, 'H')) }; not(local:duration(1, 1) ne xs:dayTimeDuration(\"P0D\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:duration .
+   */
+  @org.junit.Test
+  public void cbclDurationEqual003() {
+    final XQuery query = new XQuery(
+      "declare function local:duration($duration as xs:duration, $null as xs:boolean) { if ($null) then () else $duration }; exists(local:duration(xs:duration(\"P1DT1H\"), fn:true()) eq xs:duration(\"P1DT1H\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:duration .
+   */
+  @org.junit.Test
+  public void cbclDurationEqual004() {
+    final XQuery query = new XQuery(
+      "declare function local:duration($duration as xs:duration, $null as xs:boolean) { if ($null) then () else $duration }; local:duration(xs:duration(\"P1DT1H\"), fn:false()) eq xs:duration(\"P1DT1H\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:duration .
+   */
+  @org.junit.Test
+  public void cbclDurationEqual005() {
+    final XQuery query = new XQuery(
+      "declare function local:duration($duration as xs:duration, $null as xs:boolean) { if ($null) then () else $duration }; exists(local:duration(xs:duration(\"P1DT1H\"), fn:true()) ne xs:duration(\"P1DT1H\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:duration .
+   */
+  @org.junit.Test
+  public void cbclDurationEqual006() {
+    final XQuery query = new XQuery(
+      "declare function local:duration($duration as xs:duration, $null as xs:boolean) { if ($null) then () else $duration }; local:duration(xs:duration(\"P1DT1H\"), fn:false()) ne xs:duration(\"P1DT1H\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test equality of xs:yearMonthDuration .
+   */
+  @org.junit.Test
+  public void cbclYearMonthDurationEqual001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:yearMonthDuration($years as xs:integer, $months as xs:integer ) { xs:yearMonthDuration(concat('P', $years, 'Y', $months, 'M')) };\n" +
+      "        not(local:yearMonthDuration(1, 1) eq xs:yearMonthDuration(\"P0Y\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test equality of xs:yearMonthDuration .
+   */
+  @org.junit.Test
+  public void cbclYearMonthDurationEqual002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:yearMonthDuration($years as xs:integer, $months as xs:integer ) { xs:yearMonthDuration(concat('P', $years, 'Y', $months, 'M')) };\n" +
+      "        not(local:yearMonthDuration(1, 1) ne xs:yearMonthDuration(\"P0Y\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -1220,9 +1804,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:yearMonthDuration('P0Y'), xs:dayTimeDuration('P0D')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "P0M")
@@ -1240,9 +1828,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:distinct-values((xs:yearMonthDuration('P1Y'), xs:dayTimeDuration('P365D')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "P1Y P365D")
@@ -1260,9 +1852,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") eq xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1276,9 +1872,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") ne xs:dayTimeDuration(\"P31DT23H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1292,9 +1892,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") le xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1308,9 +1912,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P15DT11H59M59S\") le xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1324,9 +1932,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P31DT23H59M59S\") le xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1340,9 +1952,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") le xs:dayTimeDuration(\"P15DT11H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1356,9 +1972,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") le xs:dayTimeDuration(\"P31DT23H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1372,9 +1992,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") ge xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1388,9 +2012,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P15DT11H59M59S\") ge xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1404,9 +2032,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P31DT23H59M59S\") ge xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1420,9 +2052,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") ge xs:dayTimeDuration(\"P15DT11H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1436,9 +2072,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P15DT11H59M59S\") eq xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1452,9 +2092,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") ge xs:dayTimeDuration(\"P31DT23H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1468,9 +2112,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P31DT23H59M59S\") eq xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1484,9 +2132,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") eq xs:dayTimeDuration(\"P15DT11H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1500,9 +2152,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") eq xs:dayTimeDuration(\"P31DT23H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1516,9 +2172,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") ne xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1532,9 +2192,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P15DT11H59M59S\") ne xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1548,9 +2212,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P31DT23H59M59S\") ne xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1564,9 +2232,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") ne xs:dayTimeDuration(\"P15DT11H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1580,9 +2252,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y\") eq xs:duration(\"P12M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1596,9 +2272,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P365D\") eq xs:duration(\"P365D\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1612,9 +2292,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P365D\") ne xs:duration(\"P365D\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1628,9 +2312,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P36D\") eq xs:duration(\"P39D\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1644,9 +2332,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P36D\") ne xs:duration(\"P39D\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1660,9 +2352,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:duration(\"P36D\") eq xs:duration(\"P36D\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1676,9 +2372,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:duration(\"P36D\") ne xs:duration(\"P36D\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1692,9 +2392,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(xs:duration(\"P36D\") eq xs:duration(\"P36D\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1708,9 +2412,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(xs:duration(\"P36D\") ne xs:duration(\"P36D\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1724,9 +2432,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:duration(\"P36D\") eq xs:duration(\"P36D\")) and fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1740,9 +2452,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:duration(\"P36D\") ne xs:duration(\"P36D\")) and fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1756,9 +2472,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"PT24H\") eq xs:duration(\"P1D\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1772,9 +2492,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:duration(\"P36D\") eq xs:duration(\"P36D\")) or fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1788,9 +2512,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:duration(\"P36D\") ne xs:duration(\"P36D\")) or fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1804,9 +2532,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:duration(\"P36D\") eq xs:duration(\"P36D\")) and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1820,9 +2552,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:duration(\"P36D\") ne xs:duration(\"P36D\")) and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1836,9 +2572,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:duration(\"P36D\") eq xs:duration(\"P36D\")) or fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1852,9 +2592,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:duration(\"P36D\") ne xs:duration(\"P36D\")) or fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1868,9 +2612,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration('P0Y') eq xs:dayTimeDuration('P0D')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1884,9 +2632,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration('P1Y') eq xs:dayTimeDuration('P365D')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1900,9 +2652,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y\") eq xs:duration(\"P365D\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1916,9 +2672,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y\") eq xs:duration(\"P1Y\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1932,9 +2692,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y\") ne xs:duration(\"P1Y\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1948,9 +2712,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"PT24H\") eq xs:duration(\"PT24H\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1964,9 +2732,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"PT24H\") ne xs:duration(\"PT24H\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1980,9 +2752,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P12M\") eq xs:duration(\"P12M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1996,9 +2772,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P12M\") ne xs:duration(\"P12M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2012,9 +2792,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") eq xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2028,9 +2812,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") ne xs:yearMonthDuration(\"P2030Y12M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2044,9 +2832,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") le xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2060,9 +2852,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1000Y6M\") le xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2076,9 +2872,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P2030Y12M\") le xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2092,9 +2892,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") le xs:yearMonthDuration(\"P1000Y6M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2108,9 +2912,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") le xs:yearMonthDuration(\"P2030Y12M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2124,9 +2932,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") ge xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2140,9 +2952,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1000Y6M\") ge xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2156,9 +2972,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P2030Y12M\") ge xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2172,9 +2992,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") ge xs:yearMonthDuration(\"P1000Y6M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2188,9 +3012,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1000Y6M\") eq xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2204,9 +3032,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") ge xs:yearMonthDuration(\"P2030Y12M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2220,9 +3052,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P2030Y12M\") eq xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2236,9 +3072,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") eq xs:yearMonthDuration(\"P1000Y6M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2252,9 +3092,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") eq xs:yearMonthDuration(\"P2030Y12M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2268,9 +3112,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") ne xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2284,9 +3132,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1000Y6M\") ne xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2300,9 +3152,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P2030Y12M\") ne xs:yearMonthDuration(\"P0Y0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2316,9 +3172,13 @@ public class OpDurationEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P0Y0M\") ne xs:yearMonthDuration(\"P1000Y6M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

@@ -20,9 +20,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(123, '1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'123'")
     );
@@ -36,9 +40,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(123, '001')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'123'")
     );
@@ -52,9 +60,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(123, '00001')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'00123'")
     );
@@ -68,9 +80,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(-123, '9')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'-123'")
     );
@@ -84,9 +100,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(-123, '999')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'-123'")
     );
@@ -100,9 +120,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(-123, '99999')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'-00123'")
     );
@@ -116,9 +140,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(0, '0')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'0'")
     );
@@ -132,9 +160,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(0, '000')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'000'")
     );
@@ -148,9 +180,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(0, '00000')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'00000'")
     );
@@ -164,9 +200,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 4 return format-integer($i, 'a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'abcd'")
     );
@@ -180,9 +220,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 4 return format-integer($i, 'A'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'ABCD'")
     );
@@ -196,9 +240,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 20 return format-integer($i, 'i'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii|xiii|xiv|xv|xvi|xvii|xviii|xix|xx'")
     );
@@ -212,9 +260,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 20 return format-integer($i, 'I'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV|XVI|XVII|XVIII|XIX|XX'")
     );
@@ -228,9 +280,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 20 return format-integer($i, '١'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'١|٢|٣|٤|٥|٦|٧|٨|٩|١٠|١١|١٢|١٣|١٤|١٥|١٦|١٧|١٨|١٩|٢٠'")
     );
@@ -244,9 +300,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 20 return format-integer($i, '٩'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'١|٢|٣|٤|٥|٦|٧|٨|٩|١٠|١١|١٢|١٣|١٤|١٥|١٦|١٧|١٨|١٩|٢٠'")
     );
@@ -260,9 +320,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 10 return format-integer($i, 'Ww'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten'")
     );
@@ -276,9 +340,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 10 return format-integer($i, 'W'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|EIGHT|NINE|TEN'")
     );
@@ -292,9 +360,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 10 return format-integer($i, 'w'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'one|two|three|four|five|six|seven|eight|nine|ten'")
     );
@@ -308,9 +380,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(a, 'w')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -324,11 +400,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1, '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      error("FODF1310")
     );
   }
 
@@ -340,9 +420,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1500000, '0,000')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'1,500,000'")
     );
@@ -356,9 +440,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1500000, '#,###,000')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'1,500,000'")
     );
@@ -372,11 +460,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1500000, '0,000,')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      error("FODF1310")
     );
   }
 
@@ -388,11 +480,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1500000, '11#0,000')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      error("FODF1310")
     );
   }
 
@@ -404,11 +500,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1500000, '#')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      assertEq("'1500000'")
     );
   }
 
@@ -420,11 +520,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1500000, '#a')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      assertEq("'1500000'")
     );
   }
 
@@ -436,11 +540,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1500000, ',123')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      error("FODF1310")
     );
   }
 
@@ -452,11 +560,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1500000, '0,00,,000')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      error("FODF1310")
     );
   }
 
@@ -468,9 +580,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1500000, '###\ud800\udd000,00')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'1500\ud800\udd000,00'")
     );
@@ -484,9 +600,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(602347826, '#(000)000-000')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'(602)347-826'")
     );
@@ -500,27 +620,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(2, 'W;o')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'SECOND'")
-    );
-  }
-
-  /**
-   * format-integer - Ordinal number output request.
-   */
-  @org.junit.Test
-  public void formatInteger032() {
-    final XQuery query = new XQuery(
-      "format-integer(1, 'Ww;o(-er)', 'de' cast as xs:language)",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      assertEq("'Erster'")
     );
   }
 
@@ -532,9 +640,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1, '1;o(-en)')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'1st'")
     );
@@ -546,13 +658,17 @@ public class FnFormatInteger extends QT3TestSet {
   @org.junit.Test
   public void formatInteger034() {
     final XQuery query = new XQuery(
-      "format-integer(1, '1;o(-er)a')",
+      "format-integer(1, '1;o(-er)z')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      error("FODF1310")
     );
   }
 
@@ -564,9 +680,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1, 'Ww;t')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'One'")
     );
@@ -580,9 +700,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer((), 'Ww')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("''")
@@ -600,13 +724,17 @@ public class FnFormatInteger extends QT3TestSet {
   @org.junit.Test
   public void formatInteger037() {
     final XQuery query = new XQuery(
-      "format-integer(1234, 'Ww;o())')",
+      "format-integer(1234, 'Ww;o()(')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      error("FODF1310")
     );
   }
 
@@ -618,11 +746,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1234, '()Ww;o')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      assertStringValue(false, "1234")
     );
   }
 
@@ -635,11 +767,15 @@ public class FnFormatInteger extends QT3TestSet {
       "format-integer(1234, '\n" +
       "')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      assertStringValue(false, "1234")
     );
   }
 
@@ -651,11 +787,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1234, '123١')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      error("FODF1310")
     );
   }
 
@@ -667,9 +807,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1234, '#,𐒠𐒠𐒠')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'𐒡,𐒢𐒣𐒤'")
     );
@@ -683,9 +827,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1234, 'ﯴ')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'1234'")
     );
@@ -699,9 +847,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(-85, '1;o')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'-85th'")
     );
@@ -715,9 +867,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(-5, 'Ww;o')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'-Fifth'")
     );
@@ -731,9 +887,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(0, 'Ww')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'Zero'")
     );
@@ -747,9 +907,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 5 return format-integer($i, '①'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'①|②|③|④|⑤'")
     );
@@ -763,9 +927,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 5 return format-integer($i, '⑴'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'⑴|⑵|⑶|⑷|⑸'")
     );
@@ -779,9 +947,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 5 return format-integer($i, '⒈'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'⒈|⒉|⒊|⒋|⒌'")
     );
@@ -795,9 +967,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 5 return format-integer($i, 'Α'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'Α|Β|Γ|Δ|Ε'")
     );
@@ -811,9 +987,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $i in 1 to 5 return format-integer($i,'α'), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'α|β|γ|δ|ε'")
     );
@@ -827,9 +1007,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(12345678901,'# 000')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'12 345 678 901'")
     );
@@ -845,9 +1029,13 @@ public class FnFormatInteger extends QT3TestSet {
       "                for $i in (1 to 23, 151, 302, 469, 2025) \n" +
       "                return concat($i, '=',  format-integer($i, '一')), '|')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'1=一|2=二|3=三|4=四|5=五|6=六|7=七|8=八|9=九|10=十|11=十一|12=十二|13=十三|14=十四|15=十五|16=十六|17=十七|18=十八|19=十九|20=二十|21=二十一|22=二十二|23=二十三|151=百五十一|302=三百二|469=四百六十九|2025=二千二十五'")
     );
@@ -861,9 +1049,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(123,'#0')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'123'")
     );
@@ -877,11 +1069,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(123,'0#')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      error("FODF1310")
     );
   }
 
@@ -893,11 +1089,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1,'b;o')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("'b'")
+      assertType("xs:string")
     );
   }
 
@@ -909,11 +1109,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1,'o;o')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      assertType("xs:string")
     );
   }
 
@@ -925,11 +1129,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1,'bo;o')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      assertType("xs:string")
     );
   }
 
@@ -941,11 +1149,15 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1,'bb')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("'b'")
+      assertType("xs:string")
     );
   }
 
@@ -957,9 +1169,13 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1,'001;')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'001'")
     );
@@ -973,27 +1189,76 @@ public class FnFormatInteger extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-integer(1234,'#;##1;')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("'1;234'")
     );
   }
 
   /**
-   * format-integer - Error case with lone semicolon.
+   * format-integer - Lone semicolon 
+   *                      (unrecognized format token, defaults to "1").
    */
   @org.junit.Test
   public void formatInteger061() {
     final XQuery query = new XQuery(
       "format-integer(1, ';')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE0030")
+      error("FODF1310")
+    );
+  }
+
+  /**
+   * Third argument as a string in the form of a language code.
+   */
+  @org.junit.Test
+  public void formatInteger062() {
+    final XQuery query = new XQuery(
+      "format-integer(11, 'Ww', 'en')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("'Eleven'")
+    );
+  }
+
+  /**
+   * Third argument as a string not in the form of a language code.
+   */
+  @org.junit.Test
+  public void formatInteger063() {
+    final XQuery query = new XQuery(
+      "format-integer(11, 'Ww', '@*!+%')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("'Eleven'")
     );
   }
 }

@@ -20,9 +20,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "encode-for-uri()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "encode-for-uri(\"http://example.com/\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "encode-for-uri(()) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat(\"http://www.example.com/\", encode-for-uri(\"~bébé\")) eq \"http://www.example.com/~b%C3%A9b%C3%A9\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat(\"http://www.example.com/\", encode-for-uri(\"100% organic\")) eq \"http://www.example.com/100%25%20organic\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(encode-for-uri((\"some string\", current-time())[1] treat as xs:string))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "some%20string")
     );
@@ -116,9 +140,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example")
     );
@@ -132,9 +160,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples(example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples%28example")
     );
@@ -148,9 +180,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples)example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples%29example")
     );
@@ -164,9 +200,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples0123456789example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples0123456789example")
     );
@@ -180,9 +220,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples%20example")
     );
@@ -196,9 +240,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples/example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples%2Fexample")
     );
@@ -212,9 +260,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"http:examples\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http%3Aexamples")
     );
@@ -228,9 +280,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"http%20examples\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http%2520examples")
     );
@@ -244,9 +300,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples#example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples%23example")
     );
@@ -260,9 +320,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples-example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples-example")
     );
@@ -276,9 +340,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples_example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples_example")
     );
@@ -292,9 +360,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples.example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples.example")
     );
@@ -308,9 +380,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples!example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples%21example")
     );
@@ -324,9 +400,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples~example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples~example")
     );
@@ -340,9 +420,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples*example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples%2Aexample")
     );
@@ -356,9 +440,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:encode-for-uri(\"examples'example\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "examples%27example")
     );
@@ -372,9 +460,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:encode-for-uri (\"http://www.example.com/00/Weather/CA/Los%20Angeles#ocean\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http%3A%2F%2Fwww.example.com%2F00%2FWeather%2FCA%2FLos%2520Angeles%23ocean")
     );
@@ -388,9 +480,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "encode-for-uri(\"~bébé\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "~b%C3%A9b%C3%A9")
     );
@@ -404,9 +500,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "encode-for-uri(\"100% organic\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "100%25%20organic")
     );
@@ -420,9 +520,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "encode-for-uri('')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -436,9 +540,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "encode-for-uri(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -452,9 +560,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "encode-for-uri(12)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -468,9 +580,13 @@ public class FnEncodeForUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "encode-for-uri('',())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );

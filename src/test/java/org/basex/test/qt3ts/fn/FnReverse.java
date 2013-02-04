@@ -20,9 +20,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "reverse()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(reverse((1, 2, 3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -52,9 +60,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(reverse((1, 2, 3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -68,9 +80,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((3, 2, 1), reverse(1 to 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((3, 2, 1), reverse((1, 2, 3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1), reverse(((), (), 1, 2, (3, 4), (5), (6, (7, 8), 9), 10, (), 11, ())))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "reverse(error())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -132,9 +160,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "reverse((1, 2, 3))[last()] eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "reverse((1, 2, 3))[last() - 2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -164,9 +200,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "reverse((1, 2, 3))[last() - 1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -180,9 +220,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((3, 2, 1), reverse((1, 2, 3))[true()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "reverse(1, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -212,9 +260,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "reverse((1, 2, current-time(), 3))[last() - 1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -228,9 +280,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "reverse((1, 2, current-time(), 3))[last() - 0]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -244,9 +300,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(reverse(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -264,9 +324,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(empty(reverse((1))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -280,9 +344,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(reverse(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -300,9 +368,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(exists(reverse(())))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -320,9 +392,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(reverse((1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -336,9 +412,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "reverse((1, current-time())[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -352,9 +432,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(reverse((1, 2, 3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -368,9 +452,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "reverse((<a> <b> <c/> <d/> </b> <e/> </a> , <f/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<f/><a><b><c/><d/></b><e/></a>", false)
     );
@@ -384,9 +472,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar := unordered{ordered{unordered{fn:reverse((<a/>, <b/>))}}}; deep-equal($myVar, (<a/>, <b/>)) or deep-equal($myVar, (<b/>, <a/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -400,9 +492,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $myVar := unordered(fn:reverse((<a/>, <b/>))); deep-equal($myVar, (<a/>, <b/>)) or deep-equal($myVar, (<b/>, <a/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -416,9 +512,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse(1, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -432,9 +532,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -448,11 +552,39 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering unordered; reverse((1, 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("2, 1")
+    );
+  }
+
+  /**
+   *  Test condition "If $arg is the empty sequence, the empty sequence is returned." .
+   */
+  @org.junit.Test
+  public void cbclReverse1() {
+    final XQuery query = new XQuery(
+      "empty(reverse( () ))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("XPST0005")
+      )
     );
   }
 
@@ -464,9 +596,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -480,9 +616,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:double(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -496,9 +636,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:double(\"1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.7976931348623157E308")
     );
@@ -512,9 +656,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -528,9 +676,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:decimal(\"617375191608514839\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("617375191608514839")
     );
@@ -544,9 +696,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:decimal(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -560,9 +716,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -576,9 +736,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:float(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -592,9 +756,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:float(\"3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"3.4028235E38\")")
     );
@@ -608,9 +776,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -624,9 +796,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:int(\"-1873914410\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1873914410")
     );
@@ -640,9 +816,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:int(\"2147483647\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2147483647")
     );
@@ -656,9 +836,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -672,9 +856,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:integer(\"830993497117024304\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("830993497117024304")
     );
@@ -688,9 +876,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:integer(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -704,9 +896,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -720,9 +916,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:long(\"-47175562203048468\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-47175562203048468")
     );
@@ -736,9 +936,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:long(\"92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547758")
     );
@@ -752,9 +956,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -768,9 +976,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:negativeInteger(\"-297014075999096793\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-297014075999096793")
     );
@@ -784,9 +996,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:negativeInteger(\"-1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -800,9 +1016,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -816,9 +1036,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:nonNegativeInteger(\"303884545991464527\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -832,9 +1056,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:nonNegativeInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -848,9 +1076,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -864,9 +1096,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:nonPositiveInteger(\"-475688437271870490\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-475688437271870490")
     );
@@ -880,9 +1116,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:nonPositiveInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -896,9 +1136,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -912,9 +1156,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:positiveInteger(\"52704602390610033\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610033")
     );
@@ -928,9 +1176,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:positiveInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -944,9 +1196,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -960,9 +1216,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:short(\"-5324\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5324")
     );
@@ -976,9 +1236,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:short(\"32767\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("32767")
     );
@@ -992,9 +1256,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1008,9 +1276,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:unsignedLong(\"130747108607674654\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -1024,9 +1296,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:unsignedLong(\"184467440737095516\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -1040,9 +1316,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1056,9 +1336,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:unsignedShort(\"44633\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -1072,9 +1356,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse((xs:unsignedShort(\"65535\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );
@@ -1088,9 +1376,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse(1 to 10)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("10, 9, 8, 7, 6, 5, 4, 3, 2, 1")
     );
@@ -1104,9 +1396,13 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -1120,15 +1416,19 @@ public class FnReverse extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(reverse(((//*:Open)[1])/ancestor-or-self::*/local-name()), '~')",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"Open~Schedule~Auction~AuctionWatchList\"")
     );

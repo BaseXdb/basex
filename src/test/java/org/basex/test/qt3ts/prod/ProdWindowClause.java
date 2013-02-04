@@ -23,9 +23,13 @@ public class ProdWindowClause extends QT3TestSet {
       "      end at $e when $e - $s eq 1\n" +
       "      return $w",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("(1, 2, 2, 3, 3, 4, 4)")
     );
@@ -42,9 +46,13 @@ public class ProdWindowClause extends QT3TestSet {
       "      only end at $e when $e - $s eq 1\n" +
       "      return $w",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("(1, 2, 2, 3, 3, 4)")
     );
@@ -61,9 +69,13 @@ public class ProdWindowClause extends QT3TestSet {
       "      only end $s at $s previous $s when $s - $s eq 1\n" +
       "      return $w",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XQST0089")
@@ -84,9 +96,13 @@ public class ProdWindowClause extends QT3TestSet {
       "      only end $s at $ps previous $pps when $ps - $ps eq 1\n" +
       "      return $w",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0103")
     );
@@ -103,9 +119,13 @@ public class ProdWindowClause extends QT3TestSet {
       "      end at $e  when $s - $e eq 1\n" +
       "      return $s",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("$result[1] instance of xs:integer")
     );
@@ -124,9 +144,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return string-join($w!string(), ' ')\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"1 2 3 4 14 13 12 11\", \"2 3 4 14 13 12\", \"3 4 14 13\", \"4 14\"")
     );
@@ -145,9 +169,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return string-join($w!string(), ' ')\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"1 2\", \"2\", \"3 4\", \"4\"")
     );
@@ -166,9 +194,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return string-join($w!string(), ' ')\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -189,9 +221,13 @@ public class ProdWindowClause extends QT3TestSet {
       "            )\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.5")
     );
@@ -210,9 +246,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1</window><window>2</window><window>3</window><window>4</window><window>5</window><window>6</window><window>7</window><window>8</window><window>9</window><window>10</window>", false)
     );
@@ -231,9 +271,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3</window><window>2 3 4</window><window>3 4 5</window><window>4 5 6</window><window>5 6 7</window><window>6 7 8</window><window>7 8 9</window><window>8 9 10</window><window>9 10</window><window>10</window>", false)
     );
@@ -252,9 +296,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3</window><window>2 3 4</window><window>3 4 5</window><window>4 5 6</window><window>5 6 7</window><window>6 7 8</window><window>7 8 9</window><window>8 9 10</window><window>9 10</window><window>10</window>", false)
     );
@@ -273,9 +321,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3</window><window>2 3 4</window><window>3 4 5</window><window>4 5 6</window><window>5 6 7</window><window>6 7 8</window><window>7 8 9</window><window>8 9 10</window>", false)
     );
@@ -294,9 +346,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -315,9 +371,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3 4 5 6 7 8 9 10</window><window>2 3 4 5 6 7 8 9 10</window><window>3 4 5 6 7 8 9 10</window><window>4 5 6 7 8 9 10</window><window>5 6 7 8 9 10</window><window>6 7 8 9 10</window><window>7 8 9 10</window><window>8 9 10</window><window>9 10</window><window>10</window>", false)
     );
@@ -338,9 +398,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$window:w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3 4 5 6 7 8 9 10</window><window>2 3 4 5 6 7 8 9 10</window><window>3 4 5 6 7 8 9 10</window><window>4 5 6 7 8 9 10</window><window>5 6 7 8 9 10</window><window>6 7 8 9 10</window><window>7 8 9 10</window><window>8 9 10</window><window>9 10</window><window>10</window>", false)
     );
@@ -365,9 +429,13 @@ public class ProdWindowClause extends QT3TestSet {
       "            )}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3 4 5 6 7 8 9 10 1 1 2 10 10 9</window><window>2 3 4 5 6 7 8 9 10 2 2 1 3 10 10 9</window><window>3 4 5 6 7 8 9 10 3 3 2 4 10 10 9</window><window>4 5 6 7 8 9 10 4 4 3 5 10 10 9</window><window>5 6 7 8 9 10 5 5 4 6 10 10 9</window><window>6 7 8 9 10 6 6 5 7 10 10 9</window><window>7 8 9 10 7 7 6 8 10 10 9</window><window>8 9 10 8 8 7 9 10 10 9</window><window>9 10 9 9 8 10 10 10 9</window><window>10 10 10 9 10 10 9</window>", false)
     );
@@ -386,9 +454,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -408,9 +480,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return true()\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -442,9 +518,13 @@ public class ProdWindowClause extends QT3TestSet {
       "            )\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("1 2 3 4 5 6 7 8 9 10 1 1 2 10 10 9 2 3 4 5 6 7 8 9 10 2 2 1 3 10 10 9 3 4 5 6 7 8 9 10 3 3 2 4 10 10 9 4 5 6 7 8 9 10 4 4 3 5 10 10 9 5 6 7 8 9 10 5 5 4 6 10 10 9 6 7 8 9 10 6 6 5 7 10 10 9 7 8 9 10 7 7 6 8 10 10 9 8 9 10 8 8 7 9 10 10 9 9 10 9 9 8 10 10 10 9 10 10 10 9 10 10 9", false)
     );
@@ -465,9 +545,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window num=\"{$r}\">{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window num=\"1\">1 2 3</window><window num=\"2\">2 3 4</window>", false)
     );
@@ -489,9 +573,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window num=\"{$r}\">{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window num=\"1\">1 2 3</window><window num=\"1\">2 3 4</window><window num=\"2\">1 2 3</window><window num=\"2\">2 3 4</window><window num=\"2\">3 4 5</window><window num=\"3\">2 3 4</window><window num=\"3\">3 4 5</window><window num=\"3\">4 5 6</window>", false)
     );
@@ -511,9 +599,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>8 9 10</window><window>7 8 9</window><window>6 7 8</window><window>5 6 7</window><window>4 5 6</window><window>3 4 5</window><window>2 3 4</window><window>1 2 3</window>", false)
     );
@@ -538,9 +630,13 @@ public class ProdWindowClause extends QT3TestSet {
       "            }</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window num=\"1\">3 2 1</window><window num=\"2\">4 3 2</window><window num=\"3\">5 4 3</window><window num=\"4\">6 5 4</window><window num=\"5\">7 6 5</window><window num=\"6\">8 7 6</window><window num=\"7\">9 8 7</window><window num=\"8\">10 9 8</window>", false)
     );
@@ -559,9 +655,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3</window><window>2 3</window><window>3</window>", false)
     );
@@ -578,9 +678,13 @@ public class ProdWindowClause extends QT3TestSet {
       "      only end $s at $s previous $s when $s - $s eq 1\n" +
       "      return $w",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0103")
     );
@@ -597,9 +701,13 @@ public class ProdWindowClause extends QT3TestSet {
       "      only end $s at $ps previous $pps when $ps - $ps eq 1\n" +
       "      return $w",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0103")
     );
@@ -616,9 +724,13 @@ public class ProdWindowClause extends QT3TestSet {
       "      end at $e  when $s - $e eq 1\n" +
       "      return $s",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("$result[1] instance of xs:integer")
     );
@@ -637,9 +749,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return string-join($w!string(), ' ')\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"1 2\", \"3 4\"")
     );
@@ -658,9 +774,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return string-join($w!string(), ' ')\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -681,9 +801,13 @@ public class ProdWindowClause extends QT3TestSet {
       "            )\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -702,9 +826,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1</window><window>2</window><window>3</window><window>4</window><window>5</window><window>6</window><window>7</window><window>8</window><window>9</window><window>10</window>", false)
     );
@@ -723,9 +851,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3</window><window>4 5 6</window><window>7 8 9</window><window>10</window>", false)
     );
@@ -744,9 +876,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3</window><window>4 5 6</window><window>7 8 9</window><window>10</window>", false)
     );
@@ -765,9 +901,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3</window><window>4 5 6</window><window>7 8 9</window>", false)
     );
@@ -786,9 +926,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -807,9 +951,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3 4 5 6 7 8 9 10</window>", false)
     );
@@ -830,9 +978,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$window:w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3 4 5 6 7 8 9 10</window>", false)
     );
@@ -853,9 +1005,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$window:w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3 4 5 6 7 8 9 10</window>", false)
     );
@@ -880,9 +1036,13 @@ public class ProdWindowClause extends QT3TestSet {
       "            )}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3 4 5 6 7 8 9 10 1 1 2 10 10 9</window>", false)
     );
@@ -909,9 +1069,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          }</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3 4 5 6 7 8 9 10 1 1 2 10 10 9</window>", false)
     );
@@ -930,9 +1094,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -951,9 +1119,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0103")
     );
@@ -972,9 +1144,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0103")
     );
@@ -993,9 +1169,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0103")
     );
@@ -1014,9 +1194,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0103")
     );
@@ -1035,9 +1219,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0103")
     );
@@ -1056,9 +1244,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0103")
     );
@@ -1077,9 +1269,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0103")
     );
@@ -1098,9 +1294,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0103")
     );
@@ -1119,9 +1319,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0103")
     );
@@ -1141,9 +1345,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return true()\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1162,9 +1370,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return ($w, $s, $x, $sp, $sn, $e, $y, $ep, $en)\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -1182,9 +1394,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{ $w }</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>6 8 10</window><window>12 14</window>", false)
     );
@@ -1205,9 +1421,13 @@ public class ProdWindowClause extends QT3TestSet {
       "        }</o>  \n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<o><window>6 8 10</window><window>12 14</window></o>", false)
     );
@@ -1226,9 +1446,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{ $w }</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>6 8 10</window><window>12 14</window><window>6 8 10</window><window>12 14</window>", false)
     );
@@ -1247,9 +1471,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{ $y }</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1</window><window>1</window><window>1</window><window>1</window><window>1</window><window>1</window><window>1</window><window>2</window><window>2</window><window>2</window><window>2</window><window>2</window><window>2</window><window>2</window>", false)
     );
@@ -1281,9 +1509,13 @@ public class ProdWindowClause extends QT3TestSet {
       "            )\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("1 2 3 4 5 6 7 8 9 10 1 1 2 10 10 9", false)
     );
@@ -1301,9 +1533,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1321,9 +1557,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1357,9 +1597,13 @@ public class ProdWindowClause extends QT3TestSet {
       "             </run-up>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<run-up><start-date>2008-01-02</start-date><start-price>101</start-price><end-date>2008-01-04</end-date><end-price>103</end-price></run-up><run-up><start-date>2008-01-05</start-date><start-price>102</start-price><end-date>2008-01-06</end-date><end-price>104</end-price></run-up>", false)
     );
@@ -1379,9 +1623,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window num=\"{$r}\">{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window num=\"1\">1 2 3</window><window num=\"2\">4 5 6</window><window num=\"3\">7 8 9</window><window num=\"4\">10</window>", false)
     );
@@ -1402,9 +1650,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window num=\"{$r}\">{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window num=\"1\">1 2 3</window><window num=\"2\">4 5 6</window>", false)
     );
@@ -1426,9 +1678,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window num=\"{$r}\">{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window num=\"1\">1 2 3</window><window num=\"2\">1 2 3</window><window num=\"3\">4 5 6</window>", false)
     );
@@ -1448,9 +1704,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>7 8 9</window><window>4 5 6</window><window>1 2 3</window>", false)
     );
@@ -1473,9 +1733,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w2}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1498,9 +1762,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w1}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3</window><window>4 5 6</window><window>7 8 9</window>", false)
     );
@@ -1525,9 +1793,13 @@ public class ProdWindowClause extends QT3TestSet {
       "            }</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window num=\"1\">3 2 1</window><window num=\"2\">6 5 4</window><window num=\"3\">9 8 7</window>", false)
     );
@@ -1569,9 +1841,13 @@ public class ProdWindowClause extends QT3TestSet {
       "             </run-up>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<run-up symbol=\"ABC\"><start-date>2008-01-02</start-date><start-price>101</start-price><end-date>2008-01-04</end-date><end-price>103</end-price></run-up><run-up symbol=\"ABC\"><start-date>2008-01-05</start-date><start-price>101</start-price><end-date>2008-01-06</end-date><end-price>104</end-price></run-up><run-up symbol=\"DEF\"><start-date>2008-01-02</start-date><start-price>054</start-price><end-date>2008-01-03</end-date><end-price>056</end-price></run-up><run-up symbol=\"DEF\"><start-date>2008-01-04</start-date><start-price>052</start-price><end-date>2008-01-06</end-date><end-price>059</end-price></run-up>", false)
@@ -1599,9 +1875,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          local:window()\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3 4</window><window>5 6 7 8</window><window>9 10</window>", false)
     );
@@ -1620,9 +1900,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1641,9 +1925,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1662,9 +1950,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1 2 3</window>", false)
     );
@@ -1683,9 +1975,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return $w instance of xs:integer\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("false false false false false", false)
     );
@@ -1716,9 +2012,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          local:window(1 to 10)\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1</window><window>5</window><window>9</window>", false)
     );
@@ -1751,9 +2051,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          local:window()\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<window>1</window><window>5</window><window>9</window>", false)
     );
@@ -1785,11 +2089,15 @@ public class ProdWindowClause extends QT3TestSet {
       "          local:window()\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("foobar<window>1</window><window>2</window><window>3</window><window>4</window><window>5</window>", false)
+      assertSerialization("<window>1</window><window>2</window><window>3</window><window>4</window><window>5</window>", false)
     );
   }
 
@@ -1814,9 +2122,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          local:window()\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -1835,9 +2147,13 @@ public class ProdWindowClause extends QT3TestSet {
       "          return <window>{$w}</window>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1863,10 +2179,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</table>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/arrange_rows.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/arrange_rows.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<table><tr><td>Green</td><td>Pink</td><td>Lilac</td></tr><tr><td>Turquoise</td><td>Peach</td><td>Opal</td></tr><tr><td>Champagne</td></tr></table>", false)
     );
@@ -1892,10 +2212,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</chapter>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/head_para.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/head_para.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<chapter><section title=\"heading1\"><para>para1</para><para>para2</para></section><section title=\"heading2\"><para>para3</para><para>para4</para><para>para5</para></section></chapter>", false)
     );
@@ -1919,10 +2243,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</doc>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/term_def_list.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/term_def_list.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<doc><term><dt>XML</dt><dd>Extensible Markup Language</dd></term><term><dt>XSLT</dt><dt>XSL Transformations</dt><dd>A language for transforming XML</dd><dd>A specification produced by W3C</dd></term></doc>", false)
     );
@@ -1946,10 +2274,14 @@ public class ProdWindowClause extends QT3TestSet {
       "  avg( $w/@temp )\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/temp_events.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/temp_events.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("8 9 17 18", false)
     );
@@ -1973,12 +2305,16 @@ public class ProdWindowClause extends QT3TestSet {
       "      (1 - $SMOOTH_CONST) * data($w[1]/@temp) ), 2)\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/temp_events.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/temp_events.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("8.88 8.68 12.52 15.6 24.72", false)
+      assertSerialization("8.88 8.68 12.32 15.24 23.92", false)
     );
   }
 
@@ -1998,10 +2334,14 @@ public class ProdWindowClause extends QT3TestSet {
       "  return <alarm>Outlier detected. Event id:{data($next/@time)}</alarm>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/temp_events.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/temp_events.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<alarm>Outlier detected. Event id:5</alarm>", false)
     );
@@ -2027,10 +2367,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</result>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/person_events.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/person_events.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><warning time=\"2006-01-01T11:00:00-00:00\">Barbara: Anton arrived 1h ago</warning></result>", false)
     );
@@ -2056,10 +2400,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</result>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/person_events.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/person_events.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><working-time><person>Anton</person><time>PT4H30M</time></working-time><working-time><person>Barbara</person><time>PT3H</time></working-time><working-time><person>Clara</person><time>PT1H</time></working-time><working-time><person>Anton</person><time>PT5H</time></working-time><working-time><person>Clara</person><time>PT10M</time></working-time><working-time><person>Clara</person><time>PT5M</time></working-time><working-time><person>Clara</person><time>PT15M</time></working-time><working-time><person>Clara</person><time>PT2H15M</time></working-time></result>", false)
     );
@@ -2089,10 +2437,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</result>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/person_events.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/person_events.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><working-time><person>Anton</person><time>PT9H30M</time></working-time><working-time><person>Barbara</person><time>PT3H</time></working-time><working-time><person>Clara</person><time>PT3H45M</time></working-time></result>", false)
     );
@@ -2115,10 +2467,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</result>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/person_events.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/person_events.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><alert date=\"2006-01-02Z\">Barbara did not come to work</alert></result>", false)
     );
@@ -2144,10 +2500,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</results>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/person_events.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/person_events.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<results><result time=\"2006-01-01T11:15:00-00:00\">Barbara</result><result time=\"2006-01-02T12:00:00-00:00\"/><result time=\"2006-01-02T12:15:00-00:00\">Clara</result><result time=\"2006-01-02T12:25:00-00:00\">Clara</result><result time=\"2006-01-02T14:00:00-00:00\"/></results>", false)
     );
@@ -2170,10 +2530,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</result>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/person_events.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/person_events.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><alert time=\"2006-01-01T11:15:00Z\">Anton and Barbara just arrived</alert></result>", false)
     );
@@ -2197,10 +2561,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</result>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/person_events.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/person_events.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><alert time=\"2006-01-02T14:00:00-00:00\">Clara is suspicious</alert></result>", false)
     );
@@ -2224,10 +2592,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</result>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/rss.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/rss.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><annoying-author><author>rokas@e-mail.de</author></annoying-author></result>", false)
     );
@@ -2256,10 +2628,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</result>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/rss.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/rss.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><item><date>2003-06-03</date><title>Extending XQuery with Window Functions</title><title>XQueryP: A new programming language is born</title></item><item><date>2003-06-04</date></item></result>", false)
     );
@@ -2293,10 +2669,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</result>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/rss.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/rss.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><item><date>2003-06-03</date><author name=\"rokas@e-mail.de\"><titles><title>Why use cases are important Part 1.</title><title>Why use cases are important Part 2.</title><title>Why use cases are important Part 3.</title></titles></author><author name=\"tim@e-mail.de\"><titles><title>Extending XQuery with Window Functions</title></titles></author><author name=\"david@e-mail.de\"><titles><title>XQueryP: A new programming language is born</title></titles></author></item><item><date>2003-06-04</date><author name=\"rokas@e-mail.de\"><titles><title>Why use cases are annoying to write.</title></titles></author></item></result>", false)
     );
@@ -2328,10 +2708,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</result>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/cxml.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/cxml.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><mostValuableCustomer endOfDay=\"2006-01-01T00:00:00Z\"><amount company=\"ACME1\">1100</amount></mostValuableCustomer><mostValuableCustomer endOfDay=\"2006-01-02T00:00:00Z\"><amount company=\"ACME1\">10000</amount></mostValuableCustomer><mostValuableCustomer endOfDay=\"2006-01-03T00:00:00Z\"/><mostValuableCustomer endOfDay=\"2006-01-04T00:00:00Z\"/><mostValuableCustomer endOfDay=\"2006-01-05T00:00:00Z\"/><mostValuableCustomer endOfDay=\"2006-01-06T00:00:00Z\"><amount company=\"ACME2\">100</amount></mostValuableCustomer><mostValuableCustomer endOfDay=\"2006-01-07T00:00:00Z\"/></result>", false)
     );
@@ -2356,10 +2740,14 @@ public class ProdWindowClause extends QT3TestSet {
       "}</result>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/cxml.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/cxml.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result><timeToShip orderID=\"OID01\">P3DT22H</timeToShip><timeToShip orderID=\"OID03\">P2DT19H</timeToShip></result>", false)
     );
@@ -2394,12 +2782,16 @@ public class ProdWindowClause extends QT3TestSet {
       "}</result>\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/WindowClause/cxml.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/WindowClause/cxml.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<result><bundleWith orderId=\"OID01\"><OrderRequest billTo=\"ACME1\" date=\"2006-01-02T14:00:00-00:00\" orderID=\"OID03\" shipTo=\"ACME1\" total=\"10000\" type=\"new\"><Item partID=\"ID3\" quantity=\"100\" unitPrice=\"100\"/></OrderRequest></bundleWith><bundleWith orderId=\"OID03\"/></result>", false)
+      assertSerialization("<result><bundleWith orderId=\"OID01\"><OrderRequest billTo=\"ACME1\" date=\"2006-01-02T14:00:00-00:00\" orderID=\"OID03\" shipTo=\"ACME1\" total=\"10000\" type=\"new\">\n    <Item partID=\"ID3\" quantity=\"100\" unitPrice=\"100\"/>\n  </OrderRequest></bundleWith><bundleWith orderId=\"OID03\"/></result>", false)
     );
   }
 }

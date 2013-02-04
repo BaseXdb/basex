@@ -20,9 +20,13 @@ public class FnDefaultCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "default-collation(.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnDefaultCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "default-collation(1, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,53 @@ public class FnDefaultCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "default-collation() eq \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  test evalaution of fn:default-collation Author: Tim Mills .
+   */
+  @org.junit.Test
+  public void cbclDefaultCollation001() {
+    final XQuery query = new XQuery(
+      "fn:count(fn:default-collation())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1")
+    );
+  }
+
+  /**
+   *  test evalaution of fn:boolean on fn:default-collation Author: Tim Mills .
+   */
+  @org.junit.Test
+  public void cbclDefaultCollation002() {
+    final XQuery query = new XQuery(
+      "fn:boolean(fn:default-collation())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +120,13 @@ public class FnDefaultCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:default-collation(\"An Argument\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +140,13 @@ public class FnDefaultCollation extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:default-collation()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xpath-functions/collation/codepoint")
     );

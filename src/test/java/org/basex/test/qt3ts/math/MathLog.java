@@ -20,9 +20,14 @@ public class MathLog extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:log(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -36,9 +41,14 @@ public class MathLog extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:log(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:double('-INF')")
     );
@@ -52,9 +62,14 @@ public class MathLog extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:log(math:exp(1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e0")
     );
@@ -68,9 +83,14 @@ public class MathLog extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:log(1.0e-3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-6.907755278982137e0")
     );
@@ -84,9 +104,14 @@ public class MathLog extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:log(2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.6931471805599453e0")
     );
@@ -100,9 +125,14 @@ public class MathLog extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:log(-1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -116,9 +146,14 @@ public class MathLog extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:log(xs:double('NaN'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -132,9 +167,14 @@ public class MathLog extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:log(xs:double('INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:double('INF')")
     );
@@ -148,9 +188,14 @@ public class MathLog extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:log(xs:double('-INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );

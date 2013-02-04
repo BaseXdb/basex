@@ -27,9 +27,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT08H34M12.142S\") lt xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:dayTimeDuration(\"P3DT08H34M12.143S\") lt xs:dayTimeDuration(\"P3DT08H34M12.143S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:dayTimeDuration(\"P3DT08H34M12.144S\") lt xs:dayTimeDuration(\"P3DT08H34M12.143S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -96,9 +108,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT08H34M12.143S\") le xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -119,9 +135,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT08H34M12.143S\") le xs:dayTimeDuration(\"P3DT08H34M12.143S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -142,11 +162,399 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:dayTimeDuration(\"P3DT08H34M12.143S\") le xs:dayTimeDuration(\"P3DT08H34M12.142S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of dayTimeDurations .
+   */
+  @org.junit.Test
+  public void cbclDayTimeDurationLessThan001() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($days as xs:integer, $hours as xs:integer ) { xs:dayTimeDuration(concat('P', $days, 'DT', $hours, 'H')) }; not(local:dayTimeDuration(1, 1) lt xs:dayTimeDuration(\"P0D\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of dayTimeDurations .
+   */
+  @org.junit.Test
+  public void cbclDayTimeDurationLessThan002() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($days as xs:integer, $hours as xs:integer ) { xs:dayTimeDuration(concat('P', $days, 'DT', $hours, 'H')) }; not(local:dayTimeDuration(1, 1) le xs:dayTimeDuration(\"P0D\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:dayTimeDuration .
+   */
+  @org.junit.Test
+  public void cbclDayTimeDurationLessThan003() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($dayTimeDuration as xs:dayTimeDuration, $null as xs:boolean) { if ($null) then () else $dayTimeDuration }; exists(local:dayTimeDuration(xs:dayTimeDuration(\"P0D\"), fn:true()) lt xs:dayTimeDuration(\"P0D\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:dayTimeDuration .
+   */
+  @org.junit.Test
+  public void cbclDayTimeDurationLessThan004() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($dayTimeDuration as xs:dayTimeDuration, $null as xs:boolean) { if ($null) then () else $dayTimeDuration }; local:dayTimeDuration(xs:dayTimeDuration(\"P0D\"), fn:false()) lt xs:dayTimeDuration(\"P0D\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:dayTimeDuration .
+   */
+  @org.junit.Test
+  public void cbclDayTimeDurationLessThan005() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($dayTimeDuration as xs:dayTimeDuration, $null as xs:boolean) { if ($null) then () else $dayTimeDuration }; exists(local:dayTimeDuration(xs:dayTimeDuration(\"P0D\"), fn:true()) le xs:dayTimeDuration(\"P0D\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:dayTimeDuration .
+   */
+  @org.junit.Test
+  public void cbclDayTimeDurationLessThan006() {
+    final XQuery query = new XQuery(
+      "declare function local:dayTimeDuration($dayTimeDuration as xs:dayTimeDuration, $null as xs:boolean) { if ($null) then () else $dayTimeDuration }; local:dayTimeDuration(xs:dayTimeDuration(\"P0D\"), fn:false()) le xs:dayTimeDuration(\"P0D\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test behaviour of the overloaded less equal value comparison operator when presented with an expression with static type xs:duration. .
+   */
+  @org.junit.Test
+  public void cbclValueLessEqual001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(false()) le xs:yearMonthDuration(\"P1Y\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test behaviour of the overloaded less equal value comparison operator when presented with an expression with static type xs:duration. .
+   */
+  @org.junit.Test
+  public void cbclValueLessEqual002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(true()) le xs:yearMonthDuration(\"P1Y\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of the overloaded less equal value comparison operator when presented with an expression with static type xs:duration. .
+   */
+  @org.junit.Test
+  public void cbclValueLessEqual003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:dayTimeDuration(\"PT1H\") };\n" +
+      "        local:f(false()) le xs:dayTimeDuration(\"P1D\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test behaviour of the overloaded less equal value comparison operator when presented with an expression with static type xs:duration. .
+   */
+  @org.junit.Test
+  public void cbclValueLessEqual004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:dayTimeDuration(\"PT1H\") };\n" +
+      "        local:f(true()) le xs:dayTimeDuration(\"P1D\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of the overloaded less equal value comparison operator when presented with an expression with static type xs:duration. .
+   */
+  @org.junit.Test
+  public void cbclValueLessEqual005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        xs:yearMonthDuration(\"P1Y\") le local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Test behaviour of the overloaded less equal value comparison operator when presented with an expression with static type xs:duration. .
+   */
+  @org.junit.Test
+  public void cbclValueLessEqual006() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        xs:yearMonthDuration(\"P1Y\") le local:f(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of the overloaded less equal value comparison operator when presented with an expression with static type xs:duration. .
+   */
+  @org.junit.Test
+  public void cbclValueLessEqual007() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:dayTimeDuration(\"PT1H\") };\n" +
+      "        xs:dayTimeDuration(\"P1D\") le local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Test behaviour of the overloaded less equal value comparison operator when presented with an expression with static type xs:duration. .
+   */
+  @org.junit.Test
+  public void cbclValueLessEqual008() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:dayTimeDuration(\"PT1H\") };\n" +
+      "        xs:dayTimeDuration(\"P1D\") le local:f(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of the overloaded less equal value comparison operator when presented with an expression with static type xs:duration. .
+   */
+  @org.junit.Test
+  public void cbclValueLessEqual009() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(false()) le local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test behaviour of the overloaded less equal value comparison operator when presented with an expression with static type xs:duration. .
+   */
+  @org.junit.Test
+  public void cbclValueLessEqual010() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:yearMonthDuration(\"P1M\") };\n" +
+      "        local:f(true()) le local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test behaviour of the overloaded less equal value comparison operator when presented with an expression with static type xs:duration. .
+   */
+  @org.junit.Test
+  public void cbclValueLessEqual011() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:dayTimeDuration(\"PT1H\") };\n" +
+      "        local:f(false()) le local:f(false())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test behaviour of the overloaded less equal value comparison operator when presented with an expression with static type xs:duration. .
+   */
+  @org.junit.Test
+  public void cbclValueLessEqual012() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:f($x) { if ($x) then xs:duration(\"P1M\") else xs:dayTimeDuration(\"PT1H\") };\n" +
+      "        local:f(false()) le local:f(true())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
     );
   }
 
@@ -166,9 +574,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P10DT01H\") le xs:dayTimeDuration(\"P09DT06H\")) or (xs:dayTimeDuration(\"P15DT01H\") le xs:dayTimeDuration(\"P02DT04H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -190,9 +602,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P10DT02H\") lt xs:dayTimeDuration(\"P01DT10H\")) or (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -214,9 +630,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P10DT01H\") le xs:dayTimeDuration(\"P09DT05H\")) or (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -238,9 +658,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P30DT10H\") lt xs:dayTimeDuration(\"P01DT02H\")) or (fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -262,9 +686,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P10DT05H\") le xs:dayTimeDuration(\"P20DT10H\")) or (fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -286,9 +714,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not((xs:dayTimeDuration(\"P13DT12H\") lt xs:dayTimeDuration(\"P14DT11H\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -310,9 +742,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:dayTimeDuration(\"P10DT110H\") le xs:dayTimeDuration(\"P10DT11H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -334,9 +770,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:dayTimeDuration(\"P10DT10H\") lt xs:dayTimeDuration(\"P9DT09H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -358,9 +798,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:dayTimeDuration(\"P10DT09H\") le xs:dayTimeDuration(\"P09DT09H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -382,9 +826,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P10DT09H\") lt xs:dayTimeDuration(\"P09DT10H\")) and (xs:dayTimeDuration(\"P10DT01H\") lt xs:dayTimeDuration(\"P08DT06H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -406,9 +854,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P10DT09H\") le xs:dayTimeDuration(\"P10DT01H\")) and (xs:dayTimeDuration(\"P02DT04H\") le xs:dayTimeDuration(\"P09DT07H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -430,9 +882,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:dayTimeDuration(\"P10DT08H\") lt xs:dayTimeDuration(\"P10DT07H\")) or (xs:dayTimeDuration(\"P10DT09H\") lt xs:dayTimeDuration(\"P10DT09H\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -456,9 +912,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") lt xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -482,9 +942,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") ge xs:dayTimeDuration(\"P31DT23H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -508,9 +972,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P15DT11H59M59S\") lt xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -534,9 +1002,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P31DT23H59M59S\") lt xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -560,9 +1032,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") lt xs:dayTimeDuration(\"P15DT11H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -586,9 +1062,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") lt xs:dayTimeDuration(\"P31DT23H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -612,9 +1092,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") ge xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -638,9 +1122,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P15DT11H59M59S\") ge xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -664,9 +1152,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P31DT23H59M59S\") ge xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -690,9 +1182,13 @@ public class OpDayTimeDurationLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P0DT0H0M0S\") ge xs:dayTimeDuration(\"P15DT11H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

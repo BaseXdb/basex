@@ -20,9 +20,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered{}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -36,9 +40,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered{}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -52,9 +60,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered{true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered{true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,10 +100,14 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {//part[@partid < 2]}",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<part partid=\"0\" name=\"car\"/><part partid=\"1\" partof=\"0\" name=\"engine\"/>", false)
     );
@@ -101,10 +121,14 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered {//part[@partof = 1] union //part[@partid = 1] }",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<part partid=\"1\" partof=\"0\" name=\"engine\"/><part partid=\"3\" partof=\"1\" name=\"piston\"/>", false)
@@ -122,10 +146,14 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {//part[@partof < 2] intersect //part[@partid = 1 or @partid > 2] }",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<part partid=\"1\" partof=\"0\" name=\"engine\"/><part partid=\"3\" partof=\"1\" name=\"piston\"/>", false)
     );
@@ -139,10 +167,14 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered {//part[@partof < 2] intersect //part[@partid = 1 or @partid > 2] }",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<part partid=\"1\" partof=\"0\" name=\"engine\"/><part partid=\"3\" partof=\"1\" name=\"piston\"/>", false)
@@ -160,10 +192,14 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {//part[@partof < 2] except //part[@partid = 2] }",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<part partid=\"1\" partof=\"0\" name=\"engine\"/><part partid=\"3\" partof=\"1\" name=\"piston\"/>", false)
     );
@@ -177,10 +213,14 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered {//part[@partof < 2] except //part[@partid = 2] }",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<part partid=\"1\" partof=\"0\" name=\"engine\"/><part partid=\"3\" partof=\"1\" name=\"piston\"/>", false)
@@ -198,9 +238,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {fn:subsequence((1,2,3,4),2,2)}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 3")
     );
@@ -214,9 +258,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered {fn:subsequence((1,2,3,4),2,2)}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "2 3")
@@ -234,9 +282,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {fn:reverse((3,2))}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 3")
     );
@@ -250,9 +302,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered {fn:reverse((2,3))}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "2 3")
@@ -270,10 +326,14 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered { for $i in (//part[@partid = 1], //part[@partid = 2]), $j in (//part[@partof = $i/@partid]) where ($i/@partid + $j/@partid) < 7 return $i/@partid + $j/@partid }",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "4 6")
     );
@@ -287,10 +347,14 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered {//part[@partid < 2]}",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<part partid=\"0\" name=\"car\"/><part partid=\"1\" partof=\"0\" name=\"engine\"/>", false)
@@ -308,10 +372,14 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered { for $i in (//part[@partid = 1], //part[@partid = 2]), $j in (//part[@partof = $i/@partid]) where ($i/@partid + $j/@partid) < 7 return $i/@partid + $j/@partid }",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "4 6")
@@ -329,10 +397,14 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {//part[@partid < 2][2]}",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<part partid=\"1\" partof=\"0\" name=\"engine\"/>", false)
     );
@@ -346,10 +418,14 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered {//part[@partid < 2][2]}",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<part partid=\"1\" partof=\"0\" name=\"engine\"/>", false)
@@ -367,10 +443,14 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {//part[@partof = 1] union //part[@partid = 1] }",
       ctx);
-    query.context(node(file("docs/partlist.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/partlist.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<part partid=\"1\" partof=\"0\" name=\"engine\"/><part partid=\"3\" partof=\"1\" name=\"piston\"/>", false)
     );
@@ -384,9 +464,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {if (fn:true()) then (0,1,2,3,4) else (\"A\",\"B\",\"C\")}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0 1 2 3 4")
     );
@@ -400,9 +484,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {if (1 eq 1 and 2 eq 2) then (0,1,2,3,4) else (\"a\",\"b\")}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0 1 2 3 4")
     );
@@ -416,9 +504,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {if (1 eq 1 or 2 eq 3) then (0,1,2,3,4) else (\"a\",\"b\")}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0 1 2 3 4")
     );
@@ -432,9 +524,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {if (some $x in (1, 2, 3), $y in (2, 3, 4) satisfies $x + $y = 4) then (0,1,2,3,4) else (\"a\",\"b\")}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0 1 2 3 4")
     );
@@ -448,9 +544,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {if (every $x in (1, 2, 3) satisfies $x < 4) then (0,1,2,3,4) else (\"a\",\"b\")}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0 1 2 3 4")
     );
@@ -464,9 +564,13 @@ public class ProdUnorderedExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordered {typeswitch(123) case $i as xs:string return (\"a\",\"b\",\"c\") case $i as xs:double return (\"a\",\"b\",\"c\") case $i as xs:integer return (1,2,3,4) default return (\"a\",\"b\",\"c\") }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4")
     );

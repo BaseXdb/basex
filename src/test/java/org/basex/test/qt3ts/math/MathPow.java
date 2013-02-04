@@ -20,9 +20,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow((), 93.7)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -36,9 +41,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8.0e0")
     );
@@ -52,9 +62,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-8.0e0")
     );
@@ -68,9 +83,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-2, -3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0.125e0")
     );
@@ -84,9 +104,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(2, 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e0")
     );
@@ -100,9 +125,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(0, 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e0")
     );
@@ -116,9 +146,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(xs:double('INF'), 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e0")
     );
@@ -132,9 +167,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(xs:double('NaN'), 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e0")
     );
@@ -148,9 +188,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-math:pi(), 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e0")
     );
@@ -164,9 +209,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(0e0, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.0e0")
     );
@@ -180,9 +230,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(0e0, 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.0e0")
     );
@@ -196,9 +251,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-0e0, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0.0e0")
     );
@@ -212,9 +272,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(0, 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.0e0")
     );
@@ -228,9 +293,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(0e0, -3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:double('INF')")
     );
@@ -244,9 +314,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(0e0, -4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:double('INF')")
     );
@@ -260,9 +335,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-0e0, -3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:double('-INF')")
     );
@@ -276,9 +356,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(0, -4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:double('INF')")
     );
@@ -292,9 +377,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(16, 0.5e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4.0e0")
     );
@@ -308,9 +398,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(16, 0.25e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2.0e0")
     );
@@ -324,9 +419,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(0e0, -3.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:double('INF')")
     );
@@ -340,9 +440,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-0e0, -3.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:double('-INF')")
     );
@@ -356,9 +461,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(0e0, -3.1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:double('INF')")
     );
@@ -372,9 +482,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-0e0, -3.1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:double('INF')")
     );
@@ -388,9 +503,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(0e0, 3.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.0e0")
     );
@@ -404,9 +524,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-0e0, 3.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0.0e0")
     );
@@ -420,9 +545,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(0e0, 3.1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.0e0")
     );
@@ -436,9 +566,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-0e0, 3.1e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.0e0")
     );
@@ -452,9 +587,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-1, xs:double('INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e0")
     );
@@ -468,9 +608,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-1, xs:double('-INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e0")
     );
@@ -484,9 +629,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(1, xs:double('INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e0")
     );
@@ -500,9 +650,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(1, xs:double('-INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e0")
     );
@@ -516,9 +671,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(1, xs:double('NaN'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.0e0")
     );
@@ -532,9 +692,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-2.5e0, 2.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6.25e0")
     );
@@ -548,9 +713,14 @@ public class MathPow extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:pow(-2.5e0, 2.00000001e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );

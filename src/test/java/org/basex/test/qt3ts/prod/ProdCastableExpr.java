@@ -20,9 +20,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"INF\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"0.0E0\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"INF\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"0.0E0\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-0.0E0\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"NaN\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"1e-5\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-10000000\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -196,9 +240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-0.0E0\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"NaN\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"1e-5\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-10000000\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -276,9 +340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-0.0E0\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -292,9 +360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"NaN\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -308,9 +380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"1e-5\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -324,9 +400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"5.5432\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -356,9 +440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-0.0E0\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -372,9 +460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"NaN\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -388,9 +480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"1e-5\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -404,9 +500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-1.1234\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -420,9 +520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -436,9 +540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"P1Y2M3DT10H30M23S\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -452,9 +560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-P1Y1M1DT1H1M1.123S\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -468,9 +580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -484,9 +600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-P1Y1M1DT1H1M1.123S\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -500,9 +620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"P24M\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -516,9 +640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-P21M\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -532,9 +660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -548,9 +680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-P1Y1M1DT1H1M1.123S\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -564,9 +700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"P3DT10H30M\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -580,9 +720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-PT100M\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -596,9 +740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -612,9 +760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"1999-05-31T13:20:00\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -628,9 +780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-1999-05-31T13:20:00+14:00\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -644,9 +800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"2000-01-16T00:00:00Z\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -660,9 +820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -676,9 +840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"13:20:00-05:00\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -692,9 +860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"13:20:02.123\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -708,9 +880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"13:20:00Z\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -724,9 +900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -740,9 +920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"1999-05-31\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -756,9 +940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-0012-12-03-05:00\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -772,9 +960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"1999-05-31Z\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -788,9 +980,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -804,9 +1000,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"1999-05\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -820,9 +1020,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-0012-12-05:00\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -836,9 +1040,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"1999-05Z\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -852,9 +1060,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -868,9 +1080,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"1999\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -884,9 +1100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"-0012-05:00\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -900,9 +1120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"1999Z\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -916,9 +1140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -932,9 +1160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"--05-31\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -948,9 +1180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"--05-31+14:00\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -964,9 +1200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"--05-31Z\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -980,9 +1220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -996,9 +1240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"---31\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1012,9 +1260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"---03-05:00\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1028,9 +1280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"---31Z\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1044,9 +1300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1060,9 +1320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"--05\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1076,9 +1340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"--12-05:00\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1092,9 +1360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"--05Z\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1108,9 +1380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1124,9 +1400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"0.0\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1140,9 +1420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"0\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1156,9 +1440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1172,9 +1460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1188,9 +1480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"00000000\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1204,9 +1500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"D74D35D35D35\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1220,9 +1520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1236,9 +1540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"010010101\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1252,9 +1560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"0fb7\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1268,9 +1580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"D74D35D35D35\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1284,9 +1600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"http://www.example.com/~b%C3%A9b%C3%A9\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1300,9 +1620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1316,9 +1640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1332,9 +1660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"INF\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1348,9 +1680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"0.0E0\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1364,9 +1700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1380,9 +1720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"INF\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1396,9 +1740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"0.0E0\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1412,9 +1760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1428,9 +1780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-0.0E0\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1444,9 +1800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"NaN\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1460,9 +1820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"1e-5\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1476,9 +1840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-10000000\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1492,9 +1860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1508,9 +1880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-0.0E0\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1524,9 +1900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"NaN\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1540,9 +1920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"1e-5\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1556,9 +1940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-10000000\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1572,9 +1960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1588,9 +1980,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-0.0E0\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1604,9 +2000,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"NaN\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1620,9 +2020,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"1e-5\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1636,9 +2040,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"5.5432\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1652,9 +2060,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1668,9 +2080,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-0.0E0\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1684,9 +2100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"NaN\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1700,9 +2120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"1e-5\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1716,9 +2140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-1.1234\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1732,9 +2160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1748,9 +2180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"P1Y2M3DT10H30M23S\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1764,9 +2200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-P1Y1M1DT1H1M1.123S\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1780,9 +2220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1796,9 +2240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-P1Y1M1DT1H1M1.123S\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1812,9 +2260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"P24M\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1828,9 +2280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-P21M\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1844,9 +2300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1860,9 +2320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-P1Y1M1DT1H1M1.123S\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1876,9 +2340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"P3DT10H30M\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1892,9 +2360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-PT100M\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1908,9 +2380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1924,9 +2400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"1999-05-31T13:20:00\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1940,9 +2420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-1999-05-31T13:20:00+14:00\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1956,9 +2440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"2000-01-16T00:00:00Z\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1972,9 +2460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1988,9 +2480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"13:20:00-05:00\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2004,9 +2500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"13:20:02.123\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2020,9 +2520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"13:20:00Z\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2036,9 +2540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2052,9 +2560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"1999-05-31\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2068,9 +2580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-0012-12-03-05:00\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2084,9 +2600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"1999-05-31Z\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2100,9 +2620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2116,9 +2640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"1999-05\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2132,9 +2660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-0012-12-05:00\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2148,9 +2680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"1999-05Z\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2164,9 +2700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2180,9 +2720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"1999\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2196,9 +2740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"-0012-05:00\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2212,9 +2760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"1999Z\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2228,9 +2780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2244,9 +2800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"--05-31\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2260,9 +2820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"--05-31+14:00\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2276,9 +2840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"--05-31Z\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2292,9 +2860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2308,9 +2880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"---31\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2324,9 +2900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"---03-05:00\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2340,9 +2920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"---31Z\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2356,9 +2940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2372,9 +2960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"--05\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2388,9 +2980,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"--12-05:00\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2404,9 +3000,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"--05Z\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2420,9 +3020,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2436,9 +3040,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"0.0\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2452,9 +3060,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"0\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2468,9 +3080,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2484,9 +3100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2500,9 +3120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"00000000\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2516,9 +3140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"D74D35D35D35\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2532,9 +3160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2548,9 +3180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"010010101\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2564,9 +3200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"0fb7\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2580,9 +3220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"D74D35D35D35\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2596,9 +3240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"http://www.example.com/~b%C3%A9b%C3%A9\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2612,9 +3260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"true\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2628,9 +3280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2644,9 +3300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"1e5\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2660,9 +3320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-INF\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2676,9 +3340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-0.0E0\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2692,9 +3360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"NaN\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2708,9 +3380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2724,9 +3400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-1.75e-3\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2740,9 +3420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"INF\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2756,9 +3440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-0.0E0\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2772,9 +3460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-INF\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2788,9 +3480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-0.0E0\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2804,9 +3500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2820,9 +3520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"1e5\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2836,9 +3540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-1.75e-3\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2852,9 +3560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-0.0E0\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2868,9 +3580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"1e5\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2884,9 +3600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"INF\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2900,9 +3620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-1.75e-3\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2916,9 +3640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2932,9 +3660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2948,9 +3680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2964,9 +3700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2980,9 +3720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2996,9 +3740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3012,9 +3760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3028,9 +3780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3044,9 +3800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3060,9 +3820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3076,9 +3840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-0.0E0\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3092,9 +3860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"1e5\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3108,9 +3880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-INF\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3124,9 +3900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"NaN\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3140,9 +3920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3156,9 +3940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3172,9 +3960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"5.4321E-100\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3188,9 +3980,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3204,9 +4000,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"INF\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3220,9 +4020,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e8\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3236,9 +4040,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"INF\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3252,9 +4060,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-0.0E0\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3268,9 +4080,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"5.4321E-1001\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3284,9 +4100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3300,9 +4120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.75e-3\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3316,9 +4140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"NaN\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3332,9 +4160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3348,9 +4180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"INF\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3364,9 +4200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-0.0E0\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3380,9 +4220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"5.4321E-1001\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3396,9 +4240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.75e-3\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3412,9 +4260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"INF\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3428,9 +4280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-0.0E0\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3444,9 +4300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3460,9 +4320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.75e-3\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3476,9 +4340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"INF\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3492,9 +4360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"NaN\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3508,9 +4380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3524,9 +4400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3540,9 +4420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3556,9 +4440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3572,9 +4460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3588,9 +4480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3604,9 +4500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3620,9 +4520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3636,9 +4540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3652,9 +4560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3668,9 +4580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3684,9 +4600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3700,9 +4620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3716,9 +4640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3732,9 +4660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1e5\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3748,9 +4680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3764,9 +4700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3780,9 +4720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3796,9 +4740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3812,9 +4760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3828,9 +4780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3844,9 +4800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"5.5432\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3860,9 +4820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3876,9 +4840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3892,9 +4860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3908,9 +4880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3924,9 +4900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3940,9 +4920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3956,9 +4940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3972,9 +4960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3988,9 +4980,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4004,9 +5000,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4020,9 +5020,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4036,9 +5040,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4052,9 +5060,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4068,9 +5080,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4084,9 +5100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-1.1234\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4100,9 +5120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"1\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4116,9 +5140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4132,9 +5160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4148,9 +5180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4164,9 +5200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4180,9 +5220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4196,9 +5240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4212,9 +5260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4228,9 +5280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4244,9 +5300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4260,9 +5320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4276,9 +5340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4292,9 +5360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4308,9 +5380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4324,9 +5400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4340,9 +5420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4356,9 +5440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4372,9 +5460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4388,9 +5480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4404,9 +5500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4420,9 +5520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-100\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4436,9 +5540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4452,9 +5560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4468,9 +5580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4484,9 +5600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4500,9 +5620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4516,9 +5640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4532,9 +5660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4548,9 +5680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"PT10H\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4564,9 +5700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4580,9 +5720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"PT10H\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4596,9 +5740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P24M\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4612,9 +5760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4628,9 +5780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"PT10H\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4644,9 +5800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P24M\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4660,9 +5820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4676,9 +5840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4692,9 +5860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4708,9 +5880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4724,9 +5900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4740,9 +5920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4756,9 +5940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4772,9 +5960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4788,9 +5980,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4804,9 +6000,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4820,9 +6020,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4836,9 +6040,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:duration(\"P1Y2M3DT10H30M23S\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4852,9 +6060,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4868,9 +6080,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4884,9 +6100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4900,9 +6120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4916,9 +6140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4932,9 +6160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4948,9 +6180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4964,9 +6200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4980,9 +6220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"-P21M\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4996,9 +6240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5012,9 +6260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5028,9 +6280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5044,9 +6300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5060,9 +6320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5076,9 +6340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5092,9 +6360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5108,9 +6380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5124,9 +6400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5140,9 +6420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5156,9 +6440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5172,9 +6460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5188,9 +6480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:yearMonthDuration(\"P1Y2M\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5204,9 +6500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5220,9 +6520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"-PT100M\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5236,9 +6540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5252,9 +6560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"-PT100M\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5268,9 +6580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5284,9 +6600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5300,9 +6620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5316,9 +6640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5332,9 +6660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5348,9 +6680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"PT24H\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5364,9 +6700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"-PT100M\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5380,9 +6720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5396,9 +6740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5412,9 +6760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P14D\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5428,9 +6780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"-PT100M\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5444,9 +6800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5460,9 +6820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5476,9 +6840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5492,9 +6860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5508,9 +6880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5524,9 +6900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5540,9 +6920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5556,9 +6940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5572,9 +6960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5588,9 +6980,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5604,9 +7000,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5620,9 +7020,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3DT10H30M\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5636,9 +7040,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5652,9 +7060,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"-1999-05-31T13:20:00+14:00\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5668,9 +7080,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5684,9 +7100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"-1999-05-31T13:20:00+14:00\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5700,9 +7120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5716,9 +7140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2000-01-16T00:00:00Z\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5732,9 +7160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5748,9 +7180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5764,9 +7200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5780,9 +7220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5796,9 +7240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5812,9 +7260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5828,9 +7280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5844,9 +7300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"-1999-05-31T13:20:00+14:00\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5860,9 +7320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5876,9 +7340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"-1999-05-31T13:20:00+14:00\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5892,9 +7360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5908,9 +7380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"-1999-05-31T13:20:00+14:00\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5924,9 +7400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5940,9 +7420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"-1999-05-31T13:20:00+14:00\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5956,9 +7440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5972,9 +7460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"-1999-05-31T13:20:00+14:00\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5988,9 +7480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6004,9 +7500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"-1999-05-31T13:20:00+14:00\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6020,9 +7520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6036,9 +7540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"-1999-05-31T13:20:00+14:00\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6052,9 +7560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6068,9 +7580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6084,9 +7600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6100,9 +7620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-05-31T13:20:00\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6116,9 +7640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6132,9 +7660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6148,9 +7680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6164,9 +7700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6180,9 +7720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6196,9 +7740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6212,9 +7760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6228,9 +7780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6244,9 +7800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6260,9 +7820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6276,9 +7840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6292,9 +7860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:02.123\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6308,9 +7880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00Z\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6324,9 +7900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6340,9 +7920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6356,9 +7940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6372,9 +7960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6388,9 +7980,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6404,9 +8000,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6420,9 +8020,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6436,9 +8040,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6452,9 +8060,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6468,9 +8080,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:00-05:00\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6484,9 +8100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6500,9 +8120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"-0012-12-03-05:00\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6516,9 +8140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6532,9 +8160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"-0012-12-03-05:00\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6548,9 +8180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6564,9 +8200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6580,9 +8220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31Z\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6596,9 +8240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6612,9 +8260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6628,9 +8280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6644,9 +8300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6660,9 +8320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6676,9 +8340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6692,9 +8360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6708,9 +8380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"-0012-12-03-05:00\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6724,9 +8400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31Z\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6740,9 +8420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6756,9 +8440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6772,9 +8460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"-0012-12-03-05:00\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6788,9 +8480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31Z\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6804,9 +8500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6820,9 +8520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"-0012-12-03-05:00\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6836,9 +8540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31Z\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6852,9 +8560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31Z\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6868,9 +8580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"-0012-12-03-05:00\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6884,9 +8600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31Z\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6900,9 +8620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6916,9 +8640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6932,9 +8660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6948,9 +8680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-05-31\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6964,9 +8700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6980,9 +8720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6996,9 +8740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7012,9 +8760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7028,9 +8780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7044,9 +8800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7060,9 +8820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7076,9 +8840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7092,9 +8860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7108,9 +8880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7124,9 +8900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7140,9 +8920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7156,9 +8940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7172,9 +8960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7188,9 +8980,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"-0012-12-05:00\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7204,9 +9000,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7220,9 +9020,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7236,9 +9040,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7252,9 +9060,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7268,9 +9080,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7284,9 +9100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7300,9 +9120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7316,9 +9140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7332,9 +9160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYearMonth(\"1999-05Z\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7348,9 +9180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7364,9 +9200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7380,9 +9220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7396,9 +9240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7412,9 +9260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7428,9 +9280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7444,9 +9300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7460,9 +9320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7476,9 +9340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7492,9 +9360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7508,9 +9380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7524,9 +9400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7540,9 +9420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7556,9 +9440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"-0012-05:00\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7572,9 +9460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999Z\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7588,9 +9480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7604,9 +9500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7620,9 +9520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7636,9 +9540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7652,9 +9560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7668,9 +9580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7684,9 +9600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gYear(\"1999\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7700,9 +9620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7716,9 +9640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7732,9 +9660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7748,9 +9680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7764,9 +9700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7780,9 +9720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7796,9 +9740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7812,9 +9760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7828,9 +9780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7844,9 +9800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7860,9 +9820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7876,9 +9840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7892,9 +9860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7908,9 +9880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7924,9 +9900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7940,9 +9920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--12-03-05:00\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7956,9 +9940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31Z\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7972,9 +9960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7988,9 +9980,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8004,9 +10000,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8020,9 +10020,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8036,9 +10040,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8052,9 +10060,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonthDay(\"--05-31\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8068,9 +10080,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8084,9 +10100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8100,9 +10120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8116,9 +10140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8132,9 +10160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8148,9 +10180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8164,9 +10200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8180,9 +10220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8196,9 +10240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8212,9 +10260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8228,9 +10280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8244,9 +10300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8260,9 +10320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8276,9 +10340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8292,9 +10360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8308,9 +10380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8324,9 +10400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---03-05:00\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8340,9 +10420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31Z\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8356,9 +10440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8372,9 +10460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8388,9 +10480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8404,9 +10500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8420,9 +10520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8436,9 +10540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8452,9 +10560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8468,9 +10580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8484,9 +10600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8500,9 +10620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8516,9 +10640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8532,9 +10660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8548,9 +10680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8564,9 +10700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8580,9 +10720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8596,9 +10740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8612,9 +10760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8628,9 +10780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8644,9 +10800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8660,9 +10820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8676,9 +10840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8692,9 +10860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8708,9 +10880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--12-05:00\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8724,9 +10900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05Z\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8740,9 +10920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8756,9 +10940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8772,9 +10960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8788,9 +10980,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--05\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8804,9 +11000,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8820,9 +11020,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8836,9 +11040,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8852,9 +11060,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8868,9 +11080,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8884,9 +11100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8900,9 +11120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8916,9 +11140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8932,9 +11160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8948,9 +11180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8964,9 +11200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8980,9 +11220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8996,9 +11240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9012,9 +11260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9028,9 +11280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9044,9 +11300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9060,9 +11320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9076,9 +11340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9092,9 +11360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9108,9 +11380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9124,9 +11400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9140,9 +11420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9156,9 +11440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9172,9 +11460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9188,9 +11480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9204,9 +11500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9220,9 +11520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"01001010\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9236,9 +11540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"0FB7\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9252,9 +11560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"01001010\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9268,9 +11580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"0FB7\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9284,9 +11600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9300,9 +11620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9316,9 +11640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9332,9 +11660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9348,9 +11680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9364,9 +11700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9380,9 +11720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9396,9 +11740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9412,9 +11760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9428,9 +11780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9444,9 +11800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9460,9 +11820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9476,9 +11840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9492,9 +11860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9508,9 +11880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9524,9 +11900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9540,9 +11920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"01001010\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9556,9 +11940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"0FB7\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9572,9 +11960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"00000000\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9588,9 +11980,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9604,9 +12000,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"aA+zZ/09\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9620,9 +12020,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"0FB7\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9636,9 +12040,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:base64Binary(\"10010101\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9652,9 +12060,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9668,9 +12080,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9684,9 +12100,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9700,9 +12120,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9716,9 +12140,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9732,9 +12160,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9748,9 +12180,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9764,9 +12200,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9780,9 +12220,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9796,9 +12240,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9812,9 +12260,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9828,9 +12280,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9844,9 +12300,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9860,9 +12320,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9876,9 +12340,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9892,9 +12360,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9908,9 +12380,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9924,9 +12400,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9940,9 +12420,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9956,9 +12440,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"0fb7\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9972,9 +12460,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9988,9 +12480,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"d74d35d35d35\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10004,9 +12500,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:hexBinary(\"D74D35D35D35\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10020,9 +12520,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10036,9 +12540,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10052,9 +12560,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10068,9 +12580,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10084,9 +12600,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10100,9 +12620,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10116,9 +12640,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:duration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10132,9 +12660,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10148,9 +12680,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10164,9 +12700,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10180,9 +12720,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10196,9 +12740,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10212,9 +12760,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:gYearMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10228,9 +12780,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:gYear",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10244,9 +12800,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:gMonthDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10260,9 +12820,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:gDay",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10276,9 +12840,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:gMonth",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10292,9 +12860,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10308,9 +12880,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:base64Binary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10324,9 +12900,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:hexBinary",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -10340,9 +12920,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.ietf.org/rfc/rfc2396.txt\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10356,9 +12940,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"ABC\" castable as xs:QName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10372,9 +12960,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $var := \"ABC\" return $var castable as xs:QName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10388,10 +12980,14 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(//employee[salary castable as xs:integer][xs:integer(salary) gt 65000])",
       ctx);
-    query.context(node(file("op/union/acme_corp.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/acme_corp.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -10405,10 +13001,14 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(//employee[if (salary castable as xs:integer) then xs:integer(salary) gt 65000 else false()])",
       ctx);
-    query.context(node(file("op/union/acme_corp.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/acme_corp.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -10422,9 +13022,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "'string' castable as xs:string*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -10438,9 +13042,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"notation is abstract\" castable as xs:NOTATION",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0080")
     );
@@ -10454,9 +13062,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "() castable as xs:NOTATION",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0080")
     );
@@ -10466,13 +13078,17 @@ public class ProdCastableExpr extends QT3TestSet {
    *  An invalid type for 'castable as' is specified. .
    */
   @org.junit.Test
-  public void kSeqExprCastable12() {
+  public void kSeqExprCastable12a() {
     final XQuery query = new XQuery(
       "(xs:double(1), xs:double(2), xs:double(3)) castable as xs:double*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -10486,18 +13102,22 @@ public class ProdCastableExpr extends QT3TestSet {
    *  An invalid type for 'castable as' is specified, leading to a syntax error. .
    */
   @org.junit.Test
-  public void kSeqExprCastable13() {
+  public void kSeqExprCastable13a() {
     final XQuery query = new XQuery(
       "'string' castable as item()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
       ||
-        error("XPST0051")
+        error("XQST0052")
       )
     );
   }
@@ -10510,9 +13130,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "'string' castable as node()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -10530,9 +13154,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "'string' castable as attribute()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -10550,9 +13178,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "'string' castable as empty-sequence()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -10570,9 +13202,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(QName(\"\", \"lname\") castable as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10586,9 +13222,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"\", \"lname\") castable as xs:QName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10602,9 +13242,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"ncname\" castable as xs:QName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10618,9 +13262,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "'string' castable as xs:string+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -10634,9 +13282,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(() castable as xs:QName)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10650,9 +13302,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "() castable as xs:QName?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10666,9 +13322,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:untypedAtomic(\"ncname\") castable as xs:QName)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -10686,9 +13346,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not((\"one\", \"two\") castable as xs:string?)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10702,9 +13366,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not('string' castable as xs:boolean)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10718,9 +13386,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "'true' castable as xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10734,9 +13406,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(1) castable as xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10750,9 +13426,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(1) castable as xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10766,9 +13446,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(1) castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10782,9 +13466,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:anyURI(\"example.com/\") castable as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10798,9 +13486,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"one\", \"two\") castable as xs:string+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -10814,9 +13506,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"three\" castable as xs:float)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10830,9 +13526,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"three\" castable as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10846,9 +13546,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"three\" castable as xs:decimal)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10862,9 +13566,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"three\" castable as xs:double)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10878,9 +13586,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not((1, 2, 3) castable as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10894,9 +13606,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(() castable as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10910,9 +13626,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "() castable as xs:integer?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10926,9 +13646,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1) castable as xs:integer?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10942,9 +13666,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not((\"one\", \"two\") castable as xs:string?)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -10954,18 +13682,22 @@ public class ProdCastableExpr extends QT3TestSet {
    *  '+' nor '?' is allowed as a cardinality specifier in 'castable as'. .
    */
   @org.junit.Test
-  public void kSeqExprCastable4() {
+  public void kSeqExprCastable4a() {
     final XQuery query = new XQuery(
       "'string' castable as xs:anyType*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
       ||
-        error("XPST0051")
+        error("XQST0052")
       )
     );
   }
@@ -10974,15 +13706,19 @@ public class ProdCastableExpr extends QT3TestSet {
    *  An invalid type for 'castable as' is specified. .
    */
   @org.junit.Test
-  public void kSeqExprCastable5() {
+  public void kSeqExprCastable5a() {
     final XQuery query = new XQuery(
       "'string' castable as xs:anySimpleType",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0051")
+      error("XPST0080")
     );
   }
 
@@ -10990,15 +13726,19 @@ public class ProdCastableExpr extends QT3TestSet {
    *  An invalid type for 'castable as' is specified. .
    */
   @org.junit.Test
-  public void kSeqExprCastable6() {
+  public void kSeqExprCastable6a() {
     final XQuery query = new XQuery(
       "'string' castable as xs:untyped",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0051")
+      error("XQST0052")
     );
   }
 
@@ -11010,9 +13750,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "'string' castable as xs:anyAtomicType",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0080")
     );
@@ -11026,9 +13770,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"notation is abstract\" castable as xs:NOTATION?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0080")
     );
@@ -11042,9 +13790,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "() castable as xs:NOTATION?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0080")
     );
@@ -11058,9 +13810,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(QName(\"http://example.com/ANamespace\", \"ncname\"), QName(\"http://example.com/ANamespace\", \"ncname2\"), QName(\"http://example.com/ANamespace\", \"ncname3\")) castable as xs:QName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -11074,9 +13830,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(QName(\"http://example.com/ANamespace\", \"ncname\"), QName(\"http://example.com/ANamespace\", \"ncname2\"), QName(\"http://example.com/ANamespace\", \"ncname3\")) castable as xs:QName?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -11090,9 +13850,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 div 0) castable as xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -11110,9 +13874,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "concat(\"2007-01-3\", 1 div 0) castable as xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -11126,9 +13894,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"52\") castable as xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -11142,9 +13914,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"%\" castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -11158,9 +13934,13 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"%\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -11174,15 +13954,1872 @@ public class ProdCastableExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"http:\\\\invalid>URI\\someURI\") castable as xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
       ||
         assertBoolean(true)
       )
+    );
+  }
+
+  /**
+   *  test castable to xs:byte of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableByte001() {
+    final XQuery query = new XQuery(
+      "128 castable as xs:byte",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:byte of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableByte002() {
+    final XQuery query = new XQuery(
+      "-129 castable as xs:byte",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:byte of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableByte003() {
+    final XQuery query = new XQuery(
+      "\"128\" castable as xs:byte",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:byte of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableByte004() {
+    final XQuery query = new XQuery(
+      "\"-129\" castable as xs:byte",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:date with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableDate001() {
+    final XQuery query = new XQuery(
+      "\"-25252734927766555-06-06\" castable as xs:date",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:date with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableDate002() {
+    final XQuery query = new XQuery(
+      "\"25252734927766555-07-29\" castable as xs:date",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:dateTime with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableDateTime001() {
+    final XQuery query = new XQuery(
+      "\"-25252734927766555-06-06T00:00:00Z\" castable as xs:dateTime",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:dateTime with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableDateTime002() {
+    final XQuery query = new XQuery(
+      "\"25252734927766555-07-29T00:00:00Z\" castable as xs:dateTime",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:dayTimeDuration with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableDayTimeDuration001() {
+    final XQuery query = new XQuery(
+      "\"P11768614336404564651D\" castable as xs:dayTimeDuration",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:dayTimeDuration with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableDayTimeDuration002() {
+    final XQuery query = new XQuery(
+      "\"-P11768614336404564651D\" castable as xs:duration",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castability of xs:float('NaN') as xs:decimal .
+   */
+  @org.junit.Test
+  public void cbclCastableDecimal001() {
+    final XQuery query = new XQuery(
+      "xs:float('NaN') castable as xs:decimal",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castability of xs:float('-INF') as xs:decimal .
+   */
+  @org.junit.Test
+  public void cbclCastableDecimal002() {
+    final XQuery query = new XQuery(
+      "xs:float('-INF') castable as xs:decimal",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castability of xs:float('INF') as xs:decimal .
+   */
+  @org.junit.Test
+  public void cbclCastableDecimal003() {
+    final XQuery query = new XQuery(
+      "xs:float('INF') castable as xs:decimal",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castability of xs:double('NaN') as xs:double .
+   */
+  @org.junit.Test
+  public void cbclCastableDecimal004() {
+    final XQuery query = new XQuery(
+      "xs:double('NaN') castable as xs:decimal",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castability of xs:double('-INF') as xs:decimal .
+   */
+  @org.junit.Test
+  public void cbclCastableDecimal005() {
+    final XQuery query = new XQuery(
+      "xs:double('-INF') castable as xs:decimal",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castability of xs:double('INF') as xs:decimal .
+   */
+  @org.junit.Test
+  public void cbclCastableDecimal006() {
+    final XQuery query = new XQuery(
+      "xs:double('INF') castable as xs:decimal",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable as xs:decimal of large double value .
+   */
+  @org.junit.Test
+  public void cbclCastableDecimal007() {
+    final XQuery query = new XQuery(
+      "1.7976931348623157E+308 castable as xs:decimal",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        assertBoolean(true)
+      )
+    );
+  }
+
+  /**
+   *  test castable as xs:decimal of large negative double value .
+   */
+  @org.junit.Test
+  public void cbclCastableDecimal008() {
+    final XQuery query = new XQuery(
+      "-1.7976931348623157E+308 castable as xs:decimal",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        assertBoolean(true)
+      )
+    );
+  }
+
+  /**
+   *  test castable as xs:decimal of large float value .
+   */
+  @org.junit.Test
+  public void cbclCastableDecimal009() {
+    final XQuery query = new XQuery(
+      "xs:float('3.402823e38') castable as xs:decimal",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        assertBoolean(true)
+      )
+    );
+  }
+
+  /**
+   *  test castable to xs:decimal of large negative float value .
+   */
+  @org.junit.Test
+  public void cbclCastableDecimal010() {
+    final XQuery query = new XQuery(
+      "xs:float('-3.402823e38') castable as xs:decimal",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        assertBoolean(true)
+      )
+    );
+  }
+
+  /**
+   *  test castable to xs:duration with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableDuration001() {
+    final XQuery query = new XQuery(
+      "\"-P768614336404564651Y\" castable as xs:duration",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:duration with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableDuration002() {
+    final XQuery query = new XQuery(
+      "\"P768614336404564651Y\" castable as xs:duration",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test cast to xs:gYear with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableGYear001() {
+    final XQuery query = new XQuery(
+      "\"99999999999999999999999999999\" castable as xs:gYear",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test casting 0000 to xs:gYear .
+   */
+  @org.junit.Test
+  public void cbclCastableGYear002() {
+    final XQuery query = new XQuery(
+      "\"0000\" castable as xs:gYear",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test casting -0000 to xs:gYear .
+   */
+  @org.junit.Test
+  public void cbclCastableGYear003() {
+    final XQuery query = new XQuery(
+      "\"-0000\" castable as xs:gYear",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test cast to xs:gYearMonth with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableGYearMonth001() {
+    final XQuery query = new XQuery(
+      "\"99999999999999999999999999999-01\" castable as xs:gYearMonth",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test cast to xs:gYearMonth with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableGYearMonth002() {
+    final XQuery query = new XQuery(
+      "\"99999999999999999999999999999-XX\" castable as xs:gYearMonth",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test cast year 0000 xs:gYearMonth .
+   */
+  @org.junit.Test
+  public void cbclCastableGYearMonth003() {
+    final XQuery query = new XQuery(
+      "\"0000-05\" castable as xs:gYearMonth",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test cast year 0000 xs:gYearMonth .
+   */
+  @org.junit.Test
+  public void cbclCastableGYearMonth004() {
+    final XQuery query = new XQuery(
+      "\"-0000-05\" castable as xs:gYearMonth",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:int of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableInt001() {
+    final XQuery query = new XQuery(
+      "2147483648 castable as xs:int",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:int of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableInt002() {
+    final XQuery query = new XQuery(
+      "-2147483649 castable as xs:int",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:int of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableInt003() {
+    final XQuery query = new XQuery(
+      "\"2147483648\" castable as xs:int",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:int of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableInt004() {
+    final XQuery query = new XQuery(
+      "\"-2147483649\" castable as xs:int",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable as xs:integer of large double value .
+   */
+  @org.junit.Test
+  public void cbclCastableInteger001() {
+    final XQuery query = new XQuery(
+      "1.7976931348623157E+308 castable as xs:integer",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        assertBoolean(true)
+      )
+    );
+  }
+
+  /**
+   *  test castable as xs:integer of large negative double value .
+   */
+  @org.junit.Test
+  public void cbclCastableInteger002() {
+    final XQuery query = new XQuery(
+      "-1.7976931348623157E+308 castable as xs:integer",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        assertBoolean(true)
+      )
+    );
+  }
+
+  /**
+   *  test castable as xs:integer of large float value .
+   */
+  @org.junit.Test
+  public void cbclCastableInteger003() {
+    final XQuery query = new XQuery(
+      "xs:float('3.402823e38') castable as xs:integer",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        assertBoolean(true)
+      )
+    );
+  }
+
+  /**
+   *  test castable to xs:integer of large negative float value .
+   */
+  @org.junit.Test
+  public void cbclCastableInteger004() {
+    final XQuery query = new XQuery(
+      "xs:float('-3.402823e38') castable as xs:integer",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(false)
+      ||
+        assertBoolean(true)
+      )
+    );
+  }
+
+  /**
+   *  test castable to xs:language .
+   */
+  @org.junit.Test
+  public void cbclCastableLanguage001() {
+    final XQuery query = new XQuery(
+      "xs:language('en-gb') castable as xs:language",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable to xs:language from a type which can only fail .
+   */
+  @org.junit.Test
+  public void cbclCastableLanguage002() {
+    final XQuery query = new XQuery(
+      "1.0 castable as xs:language",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:language .
+   */
+  @org.junit.Test
+  public void cbclCastableLanguage003() {
+    final XQuery query = new XQuery(
+      "'en-gb' castable as xs:language",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable to xs:language .
+   */
+  @org.junit.Test
+  public void cbclCastableLanguage004() {
+    final XQuery query = new XQuery(
+      "\"gobbledygook\" castable as xs:language",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:long of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableLong001() {
+    final XQuery query = new XQuery(
+      "9223372036854775808 castable as xs:long",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:long of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableLong002() {
+    final XQuery query = new XQuery(
+      "-9223372036854775809 castable as xs:long",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:long of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableLong003() {
+    final XQuery query = new XQuery(
+      "\"9223372036854775808\" castable as xs:long",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:long of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableLong004() {
+    final XQuery query = new XQuery(
+      "\"-9223372036854775809\" castable as xs:long",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable as xs:Name from a subtype of xs:Name .
+   */
+  @org.junit.Test
+  public void cbclCastableName001() {
+    final XQuery query = new XQuery(
+      "xs:NCName('NCName') castable as xs:Name",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable as xs:Name from a type which will always fail .
+   */
+  @org.junit.Test
+  public void cbclCastableName002() {
+    final XQuery query = new XQuery(
+      "fn:current-time() castable as xs:Name",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable as xs:Name .
+   */
+  @org.junit.Test
+  public void cbclCastableName003() {
+    final XQuery query = new XQuery(
+      "'NCName' castable as xs:Name",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable as xs:Name .
+   */
+  @org.junit.Test
+  public void cbclCastableName004() {
+    final XQuery query = new XQuery(
+      "'N A M E' castable as xs:Name",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable as xs:NCName from a subtype of xs:NCName .
+   */
+  @org.junit.Test
+  public void cbclCastableNcname001() {
+    final XQuery query = new XQuery(
+      "xs:ID('id') castable as xs:NCName",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable as xs:NCName from a type which will always fail .
+   */
+  @org.junit.Test
+  public void cbclCastableNcname002() {
+    final XQuery query = new XQuery(
+      "fn:current-time() castable as xs:NCName",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable as xs:NCName .
+   */
+  @org.junit.Test
+  public void cbclCastableNcname003() {
+    final XQuery query = new XQuery(
+      "'NCName' castable as xs:NCName",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable as xs:NCName .
+   */
+  @org.junit.Test
+  public void cbclCastableNcname004() {
+    final XQuery query = new XQuery(
+      "'NC:Name' castable as xs:NCName",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:negativeInteger of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableNegativeInteger001() {
+    final XQuery query = new XQuery(
+      "0 castable as xs:negativeInteger",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:negativeInteger of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableNegativeInteger002() {
+    final XQuery query = new XQuery(
+      "\"0\" castable as xs:negativeInteger",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable as xs:NMTOKEN from a subtype of xs:NMTOKEN .
+   */
+  @org.junit.Test
+  public void cbclCastableNmtoken001() {
+    final XQuery query = new XQuery(
+      "xs:NMTOKEN('NMTOKEN') castable as xs:NMTOKEN",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test cast to xs:NMTOKEN .
+   */
+  @org.junit.Test
+  public void cbclCastableNmtoken002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        \"&#xD;&#xA;&#x9; foobar &#xA;&#xD;&#x9;\" castable as xs:NMTOKEN",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable to xs:nonNegativeInteger of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableNonNegativeInteger001() {
+    final XQuery query = new XQuery(
+      "-1 castable as xs:nonNegativeInteger",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:nonNegativeInteger of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableNonNegativeInteger002() {
+    final XQuery query = new XQuery(
+      "\"-1\" castable as xs:nonNegativeInteger",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Ensure that "-00" is a valid lexical value for xs:nonNegativeInteger .
+   */
+  @org.junit.Test
+  public void cbclCastableNonNegativeInteger003() {
+    final XQuery query = new XQuery(
+      "\"-00\" castable as xs:nonNegativeInteger",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable to xs:nonPositiveInteger of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableNonPositiveInteger001() {
+    final XQuery query = new XQuery(
+      "1 castable as xs:nonPositiveInteger",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:nonPositiveInteger of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableNonPositiveInteger002() {
+    final XQuery query = new XQuery(
+      "\"1\" castable as xs:nonPositiveInteger",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Ensure that "+00" is a valid lexical value for xs:nonPositiveInteger .
+   */
+  @org.junit.Test
+  public void cbclCastableNonPositiveInteger003() {
+    final XQuery query = new XQuery(
+      "\"+00\" castable as xs:nonPositiveInteger",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable to xs:positiveInteger of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastablePositiveInteger001() {
+    final XQuery query = new XQuery(
+      "0 castable as xs:positiveInteger",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:positiveInteger of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastablePositiveInteger002() {
+    final XQuery query = new XQuery(
+      "\"0\" castable as xs:positiveInteger",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:short of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableShort001() {
+    final XQuery query = new XQuery(
+      "32768 castable as xs:short",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:short of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableShort002() {
+    final XQuery query = new XQuery(
+      "-32769 castable as xs:short",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:short of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableShort003() {
+    final XQuery query = new XQuery(
+      "\"32769\" castable as xs:short",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:short of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableShort004() {
+    final XQuery query = new XQuery(
+      "\"-32769\" castable as xs:short",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedByte of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedByte001() {
+    final XQuery query = new XQuery(
+      "256 castable as xs:unsignedByte",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedByte of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedByte002() {
+    final XQuery query = new XQuery(
+      "-1 castable as xs:unsignedByte",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedByte of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedByte003() {
+    final XQuery query = new XQuery(
+      "\"256\" castable as xs:unsignedByte",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedByte of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedByte004() {
+    final XQuery query = new XQuery(
+      "\"-1\" castable as xs:unsignedByte",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Ensure that "-00" is a valid lexical value for xs:unsignedByte .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedByte005() {
+    final XQuery query = new XQuery(
+      "\"-00\" castable as xs:unsignedByte",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedInt of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedInt001() {
+    final XQuery query = new XQuery(
+      "4294967296 castable as xs:unsignedInt",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedInt of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedInt002() {
+    final XQuery query = new XQuery(
+      "-1 castable as xs:unsignedInt",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedInt of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedInt003() {
+    final XQuery query = new XQuery(
+      "\"4294967296\" castable as xs:unsignedInt",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedInt of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedInt004() {
+    final XQuery query = new XQuery(
+      "\"-1\" castable as xs:unsignedInt",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Ensure that "-00" is a valid lexical value for xs:unsignedInt .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedInt005() {
+    final XQuery query = new XQuery(
+      "\"-00\" castable as xs:unsignedInt",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedLong of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedLong001() {
+    final XQuery query = new XQuery(
+      "18446744073709551616 castable as xs:unsignedLong",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedLong of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedLong002() {
+    final XQuery query = new XQuery(
+      "-1 castable as xs:unsignedLong",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedLong of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedLong003() {
+    final XQuery query = new XQuery(
+      "\"18446744073709551616\" castable as xs:unsignedLong",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedLong of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedLong004() {
+    final XQuery query = new XQuery(
+      "\"-1\" castable as xs:unsignedLong",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Ensure that "-00" is a valid lexical value for xs:unsignedLong .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedLong005() {
+    final XQuery query = new XQuery(
+      "\"-00\" castable as xs:unsignedLong",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedShort of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedShort001() {
+    final XQuery query = new XQuery(
+      "65536 castable as xs:unsignedShort",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedShort of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedShort002() {
+    final XQuery query = new XQuery(
+      "-1 castable as xs:unsignedShort",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedShort of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedShort003() {
+    final XQuery query = new XQuery(
+      "\"65536\" castable as xs:unsignedShort",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:unsignedShort of out-of-range value .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedShort004() {
+    final XQuery query = new XQuery(
+      "\"-1\" castable as xs:unsignedShort",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Ensure that "-00" is a valid lexical value for xs:unsignedShort .
+   */
+  @org.junit.Test
+  public void cbclCastableUnsignedShort005() {
+    final XQuery query = new XQuery(
+      "\"-00\" castable as xs:unsignedShort",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test castable to xs:yearMonthDuration with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableYearMonthDuration001() {
+    final XQuery query = new XQuery(
+      "\"-P768614336404564651Y\" castable as xs:yearMonthDuration",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test castable to xs:yearMonthDuration with overflow .
+   */
+  @org.junit.Test
+  public void cbclCastableYearMonthDuration002() {
+    final XQuery query = new XQuery(
+      "\"P768614336404564651Y\" castable as xs:yearMonthDuration",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 }

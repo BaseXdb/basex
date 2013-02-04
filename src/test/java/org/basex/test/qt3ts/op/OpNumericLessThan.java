@@ -27,9 +27,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(-1) lt xs:integer(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-INF\") lt 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(-1) lt xs:float(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -96,9 +108,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(-1) le xs:float(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -119,9 +135,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:double(\"NaN\") lt 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -142,9 +162,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:float(\"NaN\") lt 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -165,9 +189,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:double(\"NaN\") le 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -188,9 +216,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:float(\"NaN\") le 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -211,9 +243,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 lt xs:double(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -234,9 +270,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 lt xs:float(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -257,9 +297,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 le xs:double(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -280,9 +324,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(-1) le xs:integer(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -303,9 +351,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 le xs:float(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -326,9 +378,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 le count((1, 2, 3, timezone-from-time(current-time()), 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -349,9 +405,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 lt count((1, 2, 3, timezone-from-time(current-time()), 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +432,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(-1) lt xs:decimal(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -395,9 +459,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(-1) le xs:decimal(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -418,9 +486,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 lt xs:double(\"INF\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -441,9 +513,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-INF\") lt 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -464,9 +540,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(-1) lt xs:double(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -487,9 +567,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(-1) le xs:double(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -510,9 +594,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "0 lt xs:float(\"INF\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -533,9 +621,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"100\") lt xs:unsignedLong(\"18446744073709551615\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -556,9 +648,593 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"18446744073709551615\") lt xs:unsignedLong(\"100\")",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  test comparison of xs:double .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan001() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:double) as xs:double { $arg * $arg }; not( local:square(1e0) lt local:square(2e0) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:float .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan002() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:float) as xs:float { $arg * $arg }; not( local:square(xs:float(1e0)) lt local:square(xs:float(2e0)) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:decimal .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan003() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; not( local:square(1.0) lt local:square(2.0) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:integer .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan004() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; not( local:square(1) lt local:square(2) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:double .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan005() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:double) as xs:double { $arg * $arg }; not( local:square(1e0) ge local:square(2e0) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:float .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan006() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:float) as xs:float { $arg * $arg }; not( local:square(xs:float(1e0)) ge local:square(xs:float(2e0)) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:decimal .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan007() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; not( local:square(1.0) ge local:square(2.0) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:integer .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan008() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; not( local:square(1) ge local:square(2) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:double .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan009() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:double) as xs:double { $arg * $arg }; not(not( local:square(1e0) lt local:square(2e0) ))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:float .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan010() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:float) as xs:float { $arg * $arg }; not(not( local:square(xs:float(1e0)) lt local:square(xs:float(2e0)) ))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of xs:double .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan011() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:double) as xs:double { $arg * $arg }; not(not( local:square(1e0) ge local:square(2e0) ))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of xs:float .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan012() {
+    final XQuery query = new XQuery(
+      "declare function local:square($arg as xs:float) as xs:float { $arg * $arg }; not(not( local:square(xs:float(1e0)) ge local:square(xs:float(2e0)) ))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan013() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return $x + 1 lt 121",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan014() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return $x - 1 lt 121",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan015() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 lt $x + 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan016() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 lt 1 + $x",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan017() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return $x + 1 ge 121",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan018() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return $x - 1 ge 121",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan019() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 ge $x + 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan020() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 ge 1 + $x",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan021() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return $x + 2 lt 121",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan022() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return $x - 2 lt 12",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan023() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 lt $x + 2",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan024() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 lt 2 + $x",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan025() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return $x + 2 ge 121",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan026() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return $x - 2 ge 12",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan027() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 ge $x + 2",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan028() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 ge $x + 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of integers .
+   */
+  @org.junit.Test
+  public void cbclNumericLessThan029() {
+    final XQuery query = new XQuery(
+      "declare function local:factorial($arg as xs:integer) as xs:integer { if ($arg lt 1) then 1 else $arg * local:factorial($arg - 1) }; let $x := local:factorial(5) return 121 ge 2 + $x",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -582,9 +1258,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.7976931348623157E308\") lt xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -608,9 +1288,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.7976931348623157E308\") ge xs:double(\"1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -634,9 +1318,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"0\") lt xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -660,9 +1348,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1.7976931348623157E308\") lt xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -686,9 +1378,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.7976931348623157E308\") lt xs:double(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -712,9 +1408,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.7976931348623157E308\") lt xs:double(\"1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -738,9 +1438,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.7976931348623157E308\") ge xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -764,9 +1468,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"0\") ge xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -790,9 +1498,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1.7976931348623157E308\") ge xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -816,9 +1528,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.7976931348623157E308\") ge xs:double(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -842,9 +1558,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") lt xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -868,9 +1588,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") ge xs:decimal(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -894,9 +1618,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"617375191608514839\") lt xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -920,9 +1648,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"999999999999999999\") lt xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -946,9 +1678,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") lt xs:decimal(\"617375191608514839\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -972,9 +1708,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") lt xs:decimal(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -998,9 +1738,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") ge xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1024,9 +1768,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"617375191608514839\") ge xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1050,9 +1798,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"999999999999999999\") ge xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1076,9 +1828,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") ge xs:decimal(\"617375191608514839\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1102,9 +1858,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.4028235E38\") lt xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1128,9 +1888,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.4028235E38\") ge xs:float(\"3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1154,9 +1918,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"0\") lt xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1180,9 +1948,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"3.4028235E38\") lt xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1206,9 +1978,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.4028235E38\") lt xs:float(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1232,9 +2008,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.4028235E38\") lt xs:float(\"3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1258,9 +2038,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.4028235E38\") ge xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1284,9 +2068,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"0\") ge xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1310,9 +2098,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"3.4028235E38\") ge xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1336,9 +2128,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.4028235E38\") ge xs:float(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1362,9 +2158,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") lt xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1388,9 +2188,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") ge xs:int(\"2147483647\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1414,9 +2218,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-1873914410\") lt xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1440,9 +2248,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"2147483647\") lt xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1466,9 +2278,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") lt xs:int(\"-1873914410\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1492,9 +2308,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") lt xs:int(\"2147483647\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1518,9 +2338,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") ge xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1544,9 +2368,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-1873914410\") ge xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1570,9 +2398,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"2147483647\") ge xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1596,9 +2428,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") ge xs:int(\"-1873914410\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1622,9 +2458,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") lt xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1648,9 +2488,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") ge xs:integer(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1674,9 +2518,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"830993497117024304\") lt xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1700,9 +2548,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"999999999999999999\") lt xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1726,9 +2578,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") lt xs:integer(\"830993497117024304\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1752,9 +2608,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") lt xs:integer(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1778,9 +2638,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") ge xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1804,9 +2668,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"830993497117024304\") ge xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1830,9 +2698,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"999999999999999999\") ge xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1856,9 +2728,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") ge xs:integer(\"830993497117024304\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1882,9 +2758,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") lt xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1908,9 +2788,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") ge xs:long(\"92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1934,9 +2818,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-47175562203048468\") lt xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1960,9 +2848,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"92233720368547758\") lt xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1986,9 +2878,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") lt xs:long(\"-47175562203048468\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2012,9 +2908,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") lt xs:long(\"92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2038,9 +2938,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") ge xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2064,9 +2968,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-47175562203048468\") ge xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2090,9 +2998,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"92233720368547758\") ge xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2116,9 +3028,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") ge xs:long(\"-47175562203048468\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2142,9 +3058,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") lt xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2168,9 +3088,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") ge xs:negativeInteger(\"-1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2194,9 +3118,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-297014075999096793\") lt xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2220,9 +3148,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-1\") lt xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2246,9 +3178,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") lt xs:negativeInteger(\"-297014075999096793\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2272,9 +3208,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") lt xs:negativeInteger(\"-1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2298,9 +3238,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") ge xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2324,9 +3268,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-297014075999096793\") ge xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2350,9 +3298,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-1\") ge xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2376,9 +3328,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") ge xs:negativeInteger(\"-297014075999096793\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2402,9 +3358,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") lt xs:nonNegativeInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2428,9 +3388,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") ge xs:nonNegativeInteger(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2454,9 +3418,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"303884545991464527\") lt xs:nonNegativeInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2480,9 +3448,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"999999999999999999\") lt xs:nonNegativeInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2506,9 +3478,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") lt xs:nonNegativeInteger(\"303884545991464527\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2532,9 +3508,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") lt xs:nonNegativeInteger(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2558,9 +3538,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") ge xs:nonNegativeInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2584,9 +3568,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"303884545991464527\") ge xs:nonNegativeInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2610,9 +3598,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"999999999999999999\") ge xs:nonNegativeInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2636,9 +3628,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") ge xs:nonNegativeInteger(\"303884545991464527\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2662,9 +3658,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") lt xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2688,9 +3688,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") ge xs:nonPositiveInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2714,9 +3718,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-475688437271870490\") lt xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2740,9 +3748,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"0\") lt xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2766,9 +3778,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") lt xs:nonPositiveInteger(\"-475688437271870490\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2792,9 +3808,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") lt xs:nonPositiveInteger(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2818,9 +3838,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") ge xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2844,9 +3868,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-475688437271870490\") ge xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2870,9 +3898,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"0\") ge xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2896,9 +3928,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") ge xs:nonPositiveInteger(\"-475688437271870490\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2922,9 +3958,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") lt xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2948,9 +3988,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") ge xs:positiveInteger(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2974,9 +4018,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"52704602390610033\") lt xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3000,9 +4048,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"999999999999999999\") lt xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3026,9 +4078,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") lt xs:positiveInteger(\"52704602390610033\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3052,9 +4108,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") lt xs:positiveInteger(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3078,9 +4138,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") ge xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3104,9 +4168,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"52704602390610033\") ge xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3130,9 +4198,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"999999999999999999\") ge xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3156,9 +4228,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") ge xs:positiveInteger(\"52704602390610033\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3182,9 +4258,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") lt xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3208,9 +4288,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") ge xs:short(\"32767\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3234,9 +4318,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-5324\") lt xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3260,9 +4348,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"32767\") lt xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3286,9 +4378,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") lt xs:short(\"-5324\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3312,9 +4408,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") lt xs:short(\"32767\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3338,9 +4438,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") ge xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3364,9 +4468,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-5324\") ge xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3390,9 +4498,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"32767\") ge xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3416,9 +4528,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") ge xs:short(\"-5324\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3442,9 +4558,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") lt xs:unsignedLong(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3468,9 +4588,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") ge xs:unsignedLong(\"184467440737095516\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3494,9 +4618,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"130747108607674654\") lt xs:unsignedLong(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3520,9 +4648,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"184467440737095516\") lt xs:unsignedLong(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3546,9 +4678,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") lt xs:unsignedLong(\"130747108607674654\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3572,9 +4708,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") lt xs:unsignedLong(\"184467440737095516\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3598,9 +4738,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") ge xs:unsignedLong(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3624,9 +4768,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"130747108607674654\") ge xs:unsignedLong(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3650,9 +4798,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"184467440737095516\") ge xs:unsignedLong(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3676,9 +4828,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") ge xs:unsignedLong(\"130747108607674654\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3702,9 +4858,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") lt xs:unsignedShort(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3728,9 +4888,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") ge xs:unsignedShort(\"65535\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3754,9 +4918,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"44633\") lt xs:unsignedShort(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3780,9 +4948,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"65535\") lt xs:unsignedShort(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3806,9 +4978,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") lt xs:unsignedShort(\"44633\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3832,9 +5008,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") lt xs:unsignedShort(\"65535\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3858,9 +5038,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") ge xs:unsignedShort(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3884,9 +5068,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"44633\") ge xs:unsignedShort(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3910,9 +5098,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"65535\") ge xs:unsignedShort(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3936,9 +5128,13 @@ public class OpNumericLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") ge xs:unsignedShort(\"44633\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

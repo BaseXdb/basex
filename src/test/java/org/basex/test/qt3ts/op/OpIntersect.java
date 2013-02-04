@@ -20,9 +20,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3) intersect (1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -36,9 +40,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect document))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect if))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect then))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect mod))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect div))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect empty-sequence))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect schema-attribute))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect schema-element))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect attribute {\"name\"} {()}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect attribute name {()}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect text))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect element {\"name\"} {()}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -232,9 +284,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect element name {()}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -252,9 +308,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect processing-instruction {\"name\"} {()}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -268,9 +328,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect processing-instruction name {}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -284,9 +348,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect comment {()}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -300,9 +368,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect text {()}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -316,9 +388,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect descendant))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -332,9 +408,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect attribute))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -348,9 +428,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect self))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -364,9 +448,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect descendant-or-self))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -380,9 +468,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect node))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -396,9 +488,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect following-sibling))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -412,9 +508,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect following))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -428,9 +528,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect preceding-sibling))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -444,9 +548,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect preceding))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -460,9 +568,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect parent))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -476,9 +588,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect ancestor))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -492,9 +608,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect ancestor))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -508,9 +628,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect ancestor-or-self))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -524,9 +648,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(a intersect declare))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -540,10 +668,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "boolean(//employee[location = \"Denver\"] intersect //employee[last()])",
       ctx);
-    query.context(node(file("op/union/acme_corp.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/acme_corp.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -557,9 +689,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect element))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -573,10 +709,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "//(employee[location = \"Denver\"] intersect //employee[last()])/./location",
       ctx);
-    query.context(node(file("op/union/acme_corp.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/acme_corp.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -590,9 +730,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "<r> { let $i := <e> <a/> <b/> <c/> </e>/a , $t := $i/following-sibling::b return (($i intersect ($i, $i)), (($t, $t) intersect $t)) } </r>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<r><a/><b/></r>", false)
     );
@@ -609,9 +753,13 @@ public class OpIntersect extends QT3TestSet {
       "         empty(local:function(document{()}))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -625,9 +773,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 intersect 2 intersect 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -641,9 +793,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 except 2 except 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -657,9 +813,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect attribute))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -673,9 +833,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect document-node))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -689,9 +853,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect comment))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -705,9 +873,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect processing-instruction))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -721,9 +893,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(author intersect item))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -737,9 +913,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((<a>0</a>,<a>1</a>) intersect (<a>3</a>,<a>4</a>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -753,9 +933,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(() intersect ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -773,10 +957,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in ( (//hours) intersect (//hours[xs:integer(.) gt 12])) order by number($h) return $h",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>40</hours><hours>40</hours><hours>40</hours><hours>80</hours><hours>80</hours><hours>80</hours>", false)
     );
@@ -790,11 +978,15 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in ( ($works//hours) intersect ($works//hours, $staff//grade)) order by number($h) return $h",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>12</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>40</hours><hours>40</hours><hours>40</hours><hours>80</hours><hours>80</hours><hours>80</hours>", false)
     );
@@ -808,10 +1000,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/bib/book[1]/title intersect /bib/book[1]/title)/string()",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "TCP/IP Illustrated")
     );
@@ -825,10 +1021,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "/bib/book/title intersect /bib/book[1]/title",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "TCP/IP Illustrated")
     );
@@ -842,10 +1042,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "/bib/book[3]/title intersect root(exactly-one(/bib/book[3]/title))",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -859,10 +1063,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "/bib/book[3]/title/text() intersect /bib/book/title/text()",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Data on the Web")
     );
@@ -876,10 +1084,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/processing-instruction() intersect /processing-instruction())/name()",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PI1 PI2")
     );
@@ -893,10 +1105,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/processing-instruction(PI1) intersect /processing-instruction())/name()",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PI1")
     );
@@ -910,10 +1126,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join((/comment() intersect /comment()), \"|\")",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " this file is a copy of bib.xml; just adds a few comments and PI nodes for testing | Comment 1 | Comment 2 ")
     );
@@ -927,10 +1147,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "/bib/book[3]/title/text() intersect /bib/book/title/text()",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Data on the Web")
     );
@@ -944,10 +1168,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "/processing-instruction() intersect /bib/book[2]/title",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -961,10 +1189,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "/processing-instruction(PI1) intersect /bib/book",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -978,10 +1210,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/bib/book intersect /bib/book)/string(@year)",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1994 1992 2000 1999")
     );
@@ -995,10 +1231,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "//author intersect //nonexisting",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -1012,10 +1252,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "//author intersect ()",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -1029,9 +1273,13 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "() intersect ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEmpty()
@@ -1049,10 +1297,14 @@ public class OpIntersect extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $node in ((//price/text()) , (//price/text())) intersect ((//price/text()) , (//price/text())) return <a> {$node} </a>",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a> 65.95</a><a>65.95</a><a> 39.95</a><a>129.95</a>", false)
     );

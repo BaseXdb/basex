@@ -20,10 +20,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[5 * /])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -37,10 +41,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[if (doclevel) then / else /*])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -54,10 +62,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $a := . return fn:count(.[/ is $a])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -71,10 +83,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[/ instance of document-node(schema-element(x))])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -88,10 +104,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[let $doc := / return $doc/*])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -105,10 +125,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[/<a/>])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -122,10 +146,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[/-5])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -139,10 +167,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $a := . return fn:count(.[/=$a])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -156,10 +188,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[(/) * 5])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -173,10 +209,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[/ * 5])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -190,10 +230,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[(/) < 5])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -207,10 +251,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[/ < 5])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -224,10 +272,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[5</])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -241,10 +293,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[/ < a])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -258,10 +314,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[/ < /b])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -275,10 +335,14 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(.[/<a div 3])",
       ctx);
-    query.context(node(file("prod/PathExpr/OneTopElement.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/PathExpr/OneTopElement.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -292,9 +356,13 @@ public class ProdPathExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>1</a>,<b>2</b>)/(if(position() eq 1) then . else data(.))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0018")
     );

@@ -3,7 +3,7 @@ import module namespace qt3ts='http://www.basex.org/modules/qt3ts' at 'qt3ts/qt3
 declare option db:chop "off";
 declare option db:intparse "off";
 
-declare variable $QT3TS as xs:string external;
+declare variable $QT3TS external;
 
 qt3ts:to-junit(
   $QT3TS,
@@ -25,11 +25,15 @@ qt3ts:to-junit(
           case 'staticTyping' return false()
           case 'namespace-axis' return false()
           case 'schema-location-hint' return false()
+          case 'higherOrderFunctions' return true()
           default return (qt3ts:debug('Unknown feature', $vals), true())
       case 'xml-version'
         return some $v in $vals satisfies tokenize($v, ':')[1] = '1.0'
       case 'default-language'
+      case 'language'
         return $vals = 'en'
+      case 'unicode-normalization-form'
+        return $vals = ('NFD', 'NFC', 'NFKD', 'NFKC')
       default
         return (qt3ts:debug('Unknown dependency', $type), true())
   }

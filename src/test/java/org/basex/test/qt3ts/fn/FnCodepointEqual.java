@@ -22,9 +22,13 @@ public class FnCodepointEqual extends QT3TestSet {
       "                            lower-case(concat(\"b string\", current-time())))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -40,9 +44,13 @@ public class FnCodepointEqual extends QT3TestSet {
       "                            upper-case(concat(\"b string\", current-time())))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -57,9 +65,13 @@ public class FnCodepointEqual extends QT3TestSet {
       "codepoint-equal(lower-case(concat(\"B STRING\", current-time())), \n" +
       "                            lower-case(concat(\"no match\", current-time())))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -75,9 +87,13 @@ public class FnCodepointEqual extends QT3TestSet {
       "                            upper-case(concat(\"no match\", current-time())))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -93,9 +109,13 @@ public class FnCodepointEqual extends QT3TestSet {
       "                            lower-case(concat(\"no match\", current-time())))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -111,11 +131,141 @@ public class FnCodepointEqual extends QT3TestSet {
       "                            upper-case(concat(\"no match\", current-time())))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:codepoint-equal with empty $arg1 .
+   */
+  @org.junit.Test
+  public void cbclCodepointEqual001() {
+    final XQuery query = new XQuery(
+      "declare function local:yes-empty($arg as xs:boolean) as xs:string? { if ($arg) then 'yes' else () }; \n" +
+      "      empty(fn:codepoint-equal( local:yes-empty(fn:false()), local:yes-empty(fn:true()) ) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:codepoint-equal with empty $arg2 .
+   */
+  @org.junit.Test
+  public void cbclCodepointEqual002() {
+    final XQuery query = new XQuery(
+      "declare function local:yes-empty($arg as xs:boolean) as xs:string? { if ($arg) then 'yes' else () }; \n" +
+      "      empty(fn:codepoint-equal( local:yes-empty(fn:true()), local:yes-empty(fn:false()) ) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:codepoint-equal with non-empty arguments .
+   */
+  @org.junit.Test
+  public void cbclCodepointEqual003() {
+    final XQuery query = new XQuery(
+      "declare function local:yes-no($arg as xs:boolean) as xs:string { if ($arg) then 'yes' else 'no' }; \n" +
+      "      fn:codepoint-equal( local:yes-no(fn:true()), local:yes-no(fn:false()) ) = false()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:boolean on fn:codepoint-equal with empty $arg2 .
+   */
+  @org.junit.Test
+  public void cbclCodepointEqual004() {
+    final XQuery query = new XQuery(
+      "declare function local:yes-empty($arg as xs:boolean) as xs:string? { if ($arg) then 'yes' else () }; \n" +
+      "      boolean(fn:codepoint-equal( local:yes-empty(fn:true()), local:yes-empty(fn:false()) ) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:boolean on fn:codepoint-equal with empty $arg1 .
+   */
+  @org.junit.Test
+  public void cbclCodepointEqual005() {
+    final XQuery query = new XQuery(
+      "declare function local:yes-empty($arg as xs:boolean) as xs:string? { if ($arg) then 'yes' else () }; \n" +
+      "      boolean(fn:codepoint-equal( local:yes-empty(fn:false()), local:yes-empty(fn:true()) ) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:codepoint-equal evaluate to item .
+   */
+  @org.junit.Test
+  public void cbclCodepointEqual006() {
+    final XQuery query = new XQuery(
+      "declare function local:yes-no($arg as xs:boolean) as xs:string { if ($arg) then 'yes' else 'no' }; \n" +
+      "      fn:index-of( (fn:true(), fn:false()), fn:codepoint-equal( local:yes-no(fn:false()), local:yes-no(fn:true()) ) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
     );
   }
 
@@ -127,9 +277,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -143,9 +297,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(xs:integer(1),xs:integer(1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -159,9 +317,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"aa\",xs:integer(1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -175,9 +337,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"aa\",\"AA\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -191,9 +357,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"aa\",fn:lower-case(\"AA\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -207,9 +377,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"aa\",fn:upper-case(\"aa\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -223,9 +397,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(fn:codepoint-equal(\"aa\",\"aa\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -239,9 +417,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"aa\",\"aa\") and fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -255,9 +437,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"aa\",\"aa\") and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -271,9 +457,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"aa\",\"aa\") or fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -287,9 +477,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"aa\",\"aa\") or fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -303,9 +497,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal((),())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -319,9 +517,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"aa\",\"aa\") and fn:codepoint-equal(\"aa\",\"aa\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -335,9 +537,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"aa\",\"aa\") or fn:codepoint-equal(\"aa\",\"aa\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -351,9 +557,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(normalize-unicode(\"garçon\", \"NFC\"), normalize-unicode(\"garçon\", \"NFD\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -367,9 +577,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"abc\",())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -383,9 +597,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal((), \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -399,9 +617,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"\",\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -415,9 +637,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"a\",\"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -431,9 +657,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(\"a\",\"b\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -447,9 +677,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:codepoint-equal(\"a\",\"b\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -463,9 +697,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:codepoint-equal(\"a\",\"a\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -479,9 +717,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(fn:string(1),fn:string(1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -495,9 +737,13 @@ public class FnCodepointEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:codepoint-equal(fn:string(\"aa\"),fn:string(\"aa\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

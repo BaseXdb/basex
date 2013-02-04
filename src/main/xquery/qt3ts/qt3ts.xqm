@@ -116,14 +116,16 @@ declare function qt3ts:test-case(
               )
           else qt3ts:environment($env, $file)
         else map{},
-      $test := if($test-case/test/@file)
-        then qt3ts:read-test($test-set, $test-case)
+      $is_file := exists($test-case/test/@file),
+      $test := if($is_file)
+        then replace(base-uri($test-case), '[^/]+$', $test-case/test/@file)
         else $test-case/test/string(),
       $result := qt3ts:result($test-case/result/*, $file, $root)
   return map{
     'description' := $desc,
     'modules'     := $mods,
     'environment' := $map,
+    'is_file'     := $is_file,
     'test'        := $test,
     'result'      := $result
   }
@@ -152,26 +154,22 @@ declare function qt3ts:result(
       case 'assert-count' return xs:integer($assert/string())
       case 'error' return $assert/@code/string()
       case 'assert-serialization-error' return $assert/@code/string()
-      case 'assert-serialization' return map{
+      case 'assert-xml' return map{
           'ignore-prefixes' := $assert/@ignore-prefixes = ('true', '1'),
           'result' := if($assert/@file)
             then
               let $path := $root || $file($assert/@file)
-              return unparsed-text($path, 'UTF-8')
+              return file:read-text($path, 'UTF-8')
             else $assert/string()
+        }
+      case 'serialization-matches' return map{
+          'flags' := ($assert/@flags/string(), '')[1],
+          'regex' := $assert/text()/string()
         }
       case 'all-of' return map(qt3ts:result(?, $file, $root), $assert/*)
       case 'any-of' return map(qt3ts:result(?, $file, $root), $assert/*)
       default return qt3ts:debug('Unknown assertion', $name)
   )
-};
-
-declare function qt3ts:read-test(
-  $test-set as element(test-set),
-  $test-case as element(test-case)
-) as xs:string {
-  let $path := replace(base-uri($test-case), '[^/]+$', $test-case/test/@file)
-  return unparsed-text($path, 'UTF-8')
 };
 
 declare function qt3ts:environments(
@@ -252,8 +250,10 @@ declare function qt3ts:environment(
         'as' := $env/@as/string(),
         'declared' := $env/@declared != 'false'
       })
+    case 'context-item'
+      return map:entry($name, $env/@select/string())
     default
-      return qt3ts:debug('Unknown environment parameter:', $env)
+      return qt3ts:debug('Unknown environment parameter', $env)
 };
 
 declare function qt3ts:get-files(
@@ -295,5 +295,5 @@ declare function qt3ts:debug(
   $msg as xs:string,
   $itm as item()
 ) as empty-sequence() {
-  trace($itm, $msg)[2]
+  trace($itm, $msg || ': ')[2]
 };

@@ -27,9 +27,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"example.com/\", \"p:ncname\") eq QName(\"example.com/\", \"p:ncname\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"example.com/\", \"p:ncname\") ge QName(\"example.com/\", \"p:ncname\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -73,9 +81,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"example.com/\", \"p:ncname\") eq QName(\"example.com/\", \"pdifferent:ncname\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -96,9 +108,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"example.com/\", \"p:ncname\") ne QName(\"example.com/Nope\", \"p:ncname\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -119,9 +135,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"example.com/\", \"p:ncname\") ne QName(\"example.com/\", \"p:ncnameNope\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -142,9 +162,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"example.com/\", \"p:ncname\") lt 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -165,9 +189,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"example.com/\", \"p:ncname\") eq xs:anyURI(\"org\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -188,9 +216,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"example.com/\", \"p:ncname\") lt QName(\"example.com/\", \"p:ncname\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -211,9 +243,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"example.com/\", \"p:ncname\") le QName(\"example.com/\", \"p:ncname\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -234,11 +270,59 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"example.com/\", \"p:ncname\") gt QName(\"example.com/\", \"p:ncname\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
+    );
+  }
+
+  /**
+   *  test equality of xs:QName .
+   */
+  @org.junit.Test
+  public void cbclQNameEqual001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:QName-value($arg as xs:boolean) as xs:QName { if ($arg) then QName(\"example.com/\", \"p:ncname\") else QName(\"example.com/\", \"q:ncname\") };\n" +
+      "        not(local:QName-value(true()) eq local:QName-value(false()))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test equality of xs:QName .
+   */
+  @org.junit.Test
+  public void cbclQNameEqual002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:QName-value($arg as xs:boolean) as xs:QName { if ($arg) then QName(\"example.com/\", \"p:ncname\") else QName(\"example.com/\", \"q:ncname\") };\n" +
+      "        not(local:QName-value(true()) ne local:QName-value(false()))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -253,9 +337,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"person\") eq fn:QName(\"http://www.example.com/example\", \"person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -273,9 +361,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"px1:person\") ne fn:QName(\"http://www.example.com/example\",\"px2:person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -293,9 +385,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"px1:person1\") eq fn:QName(\"http://www.example.com/example\",\"px2:person2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -313,9 +409,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"px1:person1\") ne fn:QName(\"http://www.example.com/example\",\"px2:person2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -333,9 +433,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example1\", \"px1:person1\") eq fn:QName(\"http://www.example.com/example2\",\"px2:person2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -353,9 +457,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example1\", \"px1:person1\") ne fn:QName(\"http://www.example.com/example2\",\"px2:person2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +480,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"\", \"person\") eq fn:QName(\"http://www.example.com/example\",\"person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -391,9 +503,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"\", \"person\") ne fn:QName(\"http://www.example.com/example\",\"person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -410,9 +526,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"person\") eq fn:QName(\"\",\"person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -429,9 +549,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"person\") ne fn:QName(\"\",\"person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -448,9 +572,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"\", \"person\") eq fn:QName(\"\",\"person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -467,9 +595,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"person\") ne fn:QName(\"http://www.example.com/example\", \"person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -486,9 +618,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"\", \"person\") ne fn:QName(\"\",\"person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -506,9 +642,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:QName(\"http://www.example.com/example\", \"px1:person1\") eq fn:QName(\"http://www.example.com/example\",\"px2:person2\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -526,9 +666,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:QName(\"http://www.example.com/example\", \"px1:person1\") ne fn:QName(\"http://www.example.com/example\",\"px2:person2\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -546,9 +690,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:QName(\"http://www.example.com/example\", \"px:person\") eq fn:QName(\"http://www.example.com/example\",\"px:person\")) and fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -566,9 +714,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:QName(\"http://www.example.com/example\", \"px:person\") ne fn:QName(\"http://www.example.com/example\",\"px:person\")) and fn:true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -585,9 +737,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example1\", \"person\") eq fn:QName(\"http://www.example.com/example2\", \"person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -604,9 +760,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example1\", \"person\") ne fn:QName(\"http://www.example.com/example2\", \"person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -623,9 +783,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"person1\") eq fn:QName(\"http://www.example.com/example\",\"person2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -642,9 +806,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"person1\") ne fn:QName(\"http://www.example.com/example\",\"person2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -661,9 +829,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"px1:person\") eq fn:QName(\"http://www.example.com/example\",\"px1:person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -680,9 +852,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"px1:person\") ne fn:QName(\"http://www.example.com/example\",\"px1:person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -700,9 +876,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"px1:person\") eq fn:QName(\"http://www.example.com/example\",\"px2:person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -720,9 +900,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"example.org/\") eq xs:anyURI(\"example.org/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -740,9 +924,13 @@ public class OpQNameEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"example.org/\") ne xs:anyURI(\"example.org/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

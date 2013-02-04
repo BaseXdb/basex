@@ -20,9 +20,13 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:myFunc() { .. }; local:myFunc()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -36,10 +40,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[4]) return $h/hours/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "20 40")
     );
@@ -53,10 +61,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h//hours/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "40 70 20 80 20 40 20 30 12 40 80 20 20 20 40 80")
     );
@@ -70,10 +82,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h//overtime/day/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Monday Tuesday")
     );
@@ -87,10 +103,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/.//day/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Monday Tuesday")
     );
@@ -104,10 +124,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[12]/overtime) return $h/../@name",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "John Doe 12")
     );
@@ -121,10 +145,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[@name=\"Jane Doe 11\"]/@name",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 11")
     );
@@ -138,10 +166,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[@gender=\"female\"][5]/@name",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 9")
     );
@@ -155,10 +187,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[5][@gender=\"female\"]/@name",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 5")
     );
@@ -172,10 +208,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[status=\"active\"]/@name",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 13")
     );
@@ -189,10 +229,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[2]) return $h/text()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(true, "Text data from Employee[2]")
     );
@@ -206,10 +250,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[overtime]/@name",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "John Doe 12")
     );
@@ -223,10 +271,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[@name and @type]/@name",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 13")
     );
@@ -240,10 +292,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee/(status|overtime)/day/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Monday Tuesday")
     );
@@ -260,10 +316,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee/(status union overtime)/day/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Monday Tuesday")
     );
@@ -279,10 +339,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[@name = \"Jane Doe 13\" or @type=\"FT\"]/@name",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 13")
     );
@@ -296,9 +360,13 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $in := <a><b>ABC</b><b>XYZ</b></a> return $in//string-to-codepoints(.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "65 66 67 88 89 90 65 66 67 65 66 67 88 89 90 88 89 90")
     );
@@ -312,10 +380,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[10]) return $h/@name",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "John Doe 10")
     );
@@ -329,10 +401,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[1]/@name",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 1")
     );
@@ -346,10 +422,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[fn:last()]/@name",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 13")
     );
@@ -363,10 +443,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/*/hours/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "40 70 20 80 20 40 20 30 12 40 80 20 20 20 40 80")
     );
@@ -380,10 +464,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "/works/employee[5]/hours[2]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "30")
     );
@@ -397,10 +485,14 @@ public class ProdAxisStepAbbr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee//hours/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "40 70 20 80 20 40 20 30 12 40 80 20 20 20 40 80")
     );

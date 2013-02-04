@@ -20,9 +20,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "remove()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(remove((1, \"two\", 3), 2)) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(remove((1, 2, \"three\"), 3)) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "remove((3.1, \"four\"), 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"four\"")
     );
@@ -84,9 +100,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "remove(error(), 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FOER0000")
@@ -104,9 +124,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "remove((5, 1e0), 2) eq 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -124,9 +148,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "5 eq remove((5, 1e0), 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -144,9 +172,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2), (1, 2)[remove((true(), \"a string\"), 2)]) eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -160,9 +192,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "remove((4, xs:untypedAtomic(\"4\")), 1) eq 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -176,9 +212,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "4 eq remove((4, xs:untypedAtomic(\"1\")), 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -192,9 +232,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(remove(current-time(), 1)) eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -208,9 +252,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "remove(1, 2, \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -224,9 +272,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(remove(current-time(), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -240,9 +292,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "remove((1, 2, 3, current-time()), 4)[last()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -256,9 +312,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "remove((1, 2, 3, current-time()), 4)[last() - 1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -272,9 +332,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "remove((1, 2, 3, current-time()), 9)[last() - 1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -288,9 +352,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(remove((1, 2, 3, current-time()), 9)[last() - 10])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -304,9 +372,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(remove((1, 2, 3), 0)) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -320,9 +392,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(remove((1, 2, 3), -4)) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -336,9 +412,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(remove((), 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -356,9 +436,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "remove((\"one\", 2, 3), 1) instance of xs:integer+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +456,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "remove((1, \"two\", 3), 2) instance of xs:integer+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +476,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "remove((1, 2, \"three\"), 3) instance of xs:integer+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,11 +496,97 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(remove((\"one\", 2, 3), 1)) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Tests with non-value position .
+   */
+  @org.junit.Test
+  public void cbclFnRemove001() {
+    final XQuery query = new XQuery(
+      "remove(1 to 10,exactly-one((1 to 10)[. div 2 = 2]))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1 2 3 5 6 7 8 9 10")
+    );
+  }
+
+  /**
+   *  Tests removal from range value .
+   */
+  @org.junit.Test
+  public void cbclFnRemove002() {
+    final XQuery query = new XQuery(
+      "remove(1 to 10,4)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1 2 3 5 6 7 8 9 10")
+    );
+  }
+
+  /**
+   *  Tests removal from non-range value .
+   */
+  @org.junit.Test
+  public void cbclFnRemove003() {
+    final XQuery query = new XQuery(
+      "remove((1 to 10)[. mod 2 = 0],4)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2 4 6 10")
+    );
+  }
+
+  /**
+   *  Tests removal from a sequence of values .
+   */
+  @org.junit.Test
+  public void cbclFnRemove004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        remove(((1 to 10)[. mod 2 = 0],\"blah\",(1 to 10)[. mod 2 = 0]),4)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2 4 6 10 blah 2 4 6 8 10")
     );
   }
 
@@ -420,9 +598,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove ( (\"a\", \"b\", \"c\"), 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"b\", \"c\"")
     );
@@ -436,9 +618,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove ( (\"a\", \"b\", \"c\"), 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", \"b\", \"c\"")
     );
@@ -452,9 +638,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove ( (\"a\", \"b\", \"c\", true()), 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", \"b\", true()")
     );
@@ -468,9 +658,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove ( (xs:string(\"xyz\"), (), (), \"a\" , \"b\"), 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"xyz\", \"b\"")
     );
@@ -484,9 +678,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:anyURI(\"www.example.com\"), \"a\", (\"\"), \"b\"), 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"www.example.com\", \"\", \"b\"")
     );
@@ -500,9 +698,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:anyURI(\"www.example.com\"), \"a\", (\"\"), \"b\"), 10)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"www.example.com\", \"a\", \"\",  \"b\"")
     );
@@ -516,9 +718,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:anyURI(\"www.example.com\"), \"a\", (\"\"), \"b\"), -20)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"www.example.com\", \"a\", \"\",  \"b\"")
     );
@@ -532,9 +738,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:integer(\"100\"), xs:string(\"abc\")), 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"abc\"")
     );
@@ -548,9 +758,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:decimal(\"1.01\"), xs:integer(\"12\"), xs:anyURI(\"www.example.com\")),3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1.01, 12")
     );
@@ -564,9 +778,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:float(\"1.01\"), xs:string(\"a\")), 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.01")
     );
@@ -580,9 +798,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:float(\"NaN\"), 100, (), 2), 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("xs:float('NaN'), 2")
     );
@@ -596,9 +818,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:float(\"-INF\"), xs:decimal(\"2.34\"), \"abc\"), 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("xs:float(\"-INF\"), \"abc\"")
     );
@@ -612,9 +838,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:double(\"1.34\"), xs:float(\"INF\"), true()), 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("xs:float(\"INF\"), true()")
     );
@@ -628,9 +858,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:double(\"INF\"), 2, 3), 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("xs:double(\"INF\"), 3")
     );
@@ -644,9 +878,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:double(\"NaN\"), \"a\", \"b\"), 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("xs:double(\"NaN\"), \"a\"")
     );
@@ -660,9 +898,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:boolean(\"1\"), xs:double(\"-INF\"), \"s\"), 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("true(), xs:double(\"-INF\")")
     );
@@ -676,9 +918,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:boolean(\"0\")), 2 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -692,9 +938,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:boolean(\"true\"), xs:date(\"1993-03-31\"), 4, \"a\"),3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("true(), xs:date('1993-03-31'), \"a\"")
     );
@@ -708,9 +958,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:dateTime(\"1972-12-31T00:00:00\"), xs:boolean(\"false\"), (), (\" \")) ,3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("xs:dateTime(\"1972-12-31T00:00:00\"), false()")
     );
@@ -724,9 +978,13 @@ public class FnRemove extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:remove( (xs:time(\"12:30:00\"), xs:decimal(\"2.000003\"), 2), 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("xs:time(\"12:30:00\"), 2")
     );

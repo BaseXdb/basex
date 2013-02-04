@@ -20,9 +20,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "ends-with()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(ends-with ((), \"a string\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "ends-with(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -68,9 +80,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "ends-with((), (), \"http://www.w3.org/2005/xpath-functions/collation/codepoint\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +100,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "ends-with(\"a string\", \"a string\", \"http://www.example.com/COLLATION/NOT/SUPPORTED\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCH0002")
     );
@@ -100,9 +120,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "ends-with(\"foo\", \"foo\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "ends-with(\"tattoo\", \"tattoo\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(ends-with(\"tattoo\", \"atto\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(ends-with(\"tattoo\", \"atto\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "ends-with((), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -182,9 +222,13 @@ public class FnEndsWith extends QT3TestSet {
       "        $vB := (\"b string\", current-time(), string(\"content\"))[1] treat as xs:string\n" +
       "        return ends-with(lower-case($vA), lower-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -201,9 +245,13 @@ public class FnEndsWith extends QT3TestSet {
       "         $vB  := (\"b string\", current-time(), string(\"content\"))[1] treat as xs:string\n" +
       "         return ends-with(upper-case($vA), upper-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -220,9 +268,13 @@ public class FnEndsWith extends QT3TestSet {
       "         $vB  := (\"no match\", current-time(), string(\"content\"))[1] treat as xs:string\n" +
       "         return ends-with(lower-case($vA), lower-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -239,9 +291,13 @@ public class FnEndsWith extends QT3TestSet {
       "         $vB  := (\"no match\", current-time(), string(\"content\"))[1] treat as xs:string\n" +
       "         return ends-with(upper-case($vA), upper-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -258,9 +314,13 @@ public class FnEndsWith extends QT3TestSet {
       "        $vB := (\"b string\", current-time(), string(\"content\"))[1] treat as xs:string\n" +
       "        return ends-with(upper-case($vA), lower-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -277,11 +337,35 @@ public class FnEndsWith extends QT3TestSet {
       "        $vB := (\"b string\", current-time(), string(\"content\"))[1] treat as xs:string\n" +
       "        return ends-with(lower-case($vA), upper-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:ends-with with collation and empty string .
+   */
+  @org.junit.Test
+  public void cbclEndsWith001() {
+    final XQuery query = new XQuery(
+      "fn:boolean(fn:ends-with('input', '', 'http://www.w3.org/2005/xpath-functions/collation/codepoint'))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -293,9 +377,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(\"\",\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -309,9 +397,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(\" \",\"AAAAABBBBB\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -325,9 +417,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:ends-with(\"A\",\"A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -341,9 +437,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:ends-with(\"A\",\"B\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -357,9 +457,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(xs:string(\"A\"),\"A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -373,9 +477,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(\"A\",xs:string(\"A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -389,9 +497,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(\"A\",\"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -405,9 +517,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(\"a\",\"A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -421,9 +537,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(\"\",\"A Character String\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -437,9 +557,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(\"A Character String\",\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -453,9 +577,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with((),\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -469,9 +597,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(\"\",())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -485,9 +617,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(\"A Character String\",())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -501,9 +637,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with((),\"A Character String\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -517,9 +657,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(\"AAAAABBBBBCCCCC\",\"BBBBB\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -533,9 +677,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(\"AAAAABBBBB\",\" \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -549,9 +697,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -565,9 +717,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -581,9 +737,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -597,9 +757,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -613,9 +777,13 @@ public class FnEndsWith extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:ends-with(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

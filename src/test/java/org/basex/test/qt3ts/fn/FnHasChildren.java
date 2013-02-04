@@ -20,11 +20,15 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:exists( fn:has-children#0 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0112")
+      assertBoolean(true)
     );
   }
 
@@ -36,9 +40,13 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:exists( fn:has-children#1 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children( fn:contains#2, fn:contains#2 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -68,9 +80,13 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children#2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +100,13 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPDY0002")
@@ -104,9 +124,13 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children(.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPDY0002")
@@ -124,9 +148,35 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1)[fn:has-children()]",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XPTY0004")
+      )
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   * Evaluates the zero-arity "has-children" function with context item which is not a node..
+   */
+  @org.junit.Test
+  public void fnHasChildren008() {
+    final XQuery query = new XQuery(
+      "(fn:concat#2)[fn:has-children()]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPTY0004")
@@ -138,13 +188,17 @@ public class FnHasChildren extends QT3TestSet {
    * Tests the type checking of the argument..
    */
   @org.junit.Test
-  public void fnHasChildren008() {
+  public void fnHasChildren009() {
     final XQuery query = new XQuery(
       "fn:has-children(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -158,9 +212,13 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children(fn:concat#2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -174,10 +232,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children( (.,.) )",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -191,10 +253,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "(., 1) ! fn:has-children()",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -208,10 +274,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "(., 1) ! fn:has-children(.)",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -225,10 +295,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children()",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:boolean")
     );
@@ -242,10 +316,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children(.)",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:boolean")
     );
@@ -259,10 +337,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "/root/@attribute/fn:has-children()",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -276,10 +358,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children( /root/@attribute )",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -293,10 +379,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "/root/comment()/fn:has-children()",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -310,10 +400,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children( /root/comment() )",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -327,10 +421,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "/root/processing-instruction()/fn:has-children()",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -344,10 +442,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children( /root/processing-instruction() )",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -361,10 +463,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "/root/text()/fn:has-children()",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -378,10 +484,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children( /root/text() )",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -395,10 +505,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "/root/empty/fn:has-children()",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -412,10 +526,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children( /root/empty )",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -429,10 +547,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "/root/fn:has-children()",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -446,10 +568,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children( /root )",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -463,10 +589,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "/root/non-empty/fn:has-children()",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -480,10 +610,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children( /root/non-empty )",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -497,10 +631,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "/fn:has-children()",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -514,10 +652,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:has-children( / )",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -531,10 +673,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "/root/node()/fn:has-children()",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false false false false true")
     );
@@ -548,10 +694,14 @@ public class FnHasChildren extends QT3TestSet {
     final XQuery query = new XQuery(
       "/root/node()/fn:has-children(.)",
       ctx);
-    query.context(node(file("fn/has-children/has-children.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/has-children/has-children.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false false false false true")
     );

@@ -37,9 +37,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "            return (functx:add-attributes( $in-xml/a, xs:QName('att1'), 1))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a att1=\"1\">x</a>", false)
     );
@@ -70,9 +74,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         return (functx:add-attributes( $in-xml/a, (xs:QName('att1'),xs:QName('att2')), (1,2)))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a att1=\"1\" att2=\"2\">x</a>", false)
     );
@@ -103,9 +111,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         return (functx:add-attributes( $in-xml/b, (xs:QName('att1'),xs:QName('att2')), (1,2)))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b att2=\"2\" att1=\"x\">x</b>", false)
     );
@@ -129,9 +141,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         return (functx:add-attributes( $in-xml/a, xs:QName('new:att1'), 1))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a xmlns:new=\"http://new\" new:att1=\"1\">x</a>", false)
     );
@@ -156,9 +172,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         return (functx:add-attributes( $in-xml/a, QName('http://new','new:att1'), 1))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a xmlns:new=\"http://new\" new:att1=\"1\">x</a>", false)
     );
@@ -194,9 +214,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "                  functx:add-attributes( $in-xml/a, QName('http://new','new:att1'), 1))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a att1=\"1\">x</a><a att1=\"1\" att2=\"2\">x</a><b att2=\"2\" att1=\"x\">x</b><a xmlns:new=\"http://new\" new:att1=\"1\">x</a><a xmlns:new=\"http://new\" new:att1=\"1\">x</a>", false)
     );
@@ -217,9 +241,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
       "                    (functx:add-months(xs:date('2004-01-23'),1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-02-23")
     );
@@ -240,9 +268,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
       "                    (functx:add-months( xs:dateTime('2005-12-31T12:00:13'),2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-02-28")
     );
@@ -263,9 +295,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
       "                    (functx:add-months('2005-12-31',-3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2005-09-30")
     );
@@ -286,9 +322,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
       "                    (functx:add-months(xs:date('2004-01-23'),1), functx:add-months( xs:dateTime('2005-12-31T12:00:13'),2), functx:add-months('2005-12-31',-3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-02-23 2006-02-28 2005-09-30")
     );
@@ -306,9 +346,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:add-or-update-attributes ( $elements as element()* , $attrNames as xs:QName* , $attrValues as xs:anyAtomicType* ) as element()? { for $element in $elements return element { node-name($element)} { for $attrName at $seq in $attrNames return attribute {$attrName} {$attrValues[$seq]}, $element/@*[not(node-name(.) = $attrNames)], $element/node() } } ;\n" +
       "                    let $in-xml := <in-xml> <a>x</a> <b att1=\"x\">x</b> </in-xml> return (functx:add-or-update-attributes( $in-xml/a, xs:QName('att1'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a att1=\"1\">x</a>", false)
     );
@@ -326,9 +370,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:add-or-update-attributes ( $elements as element()* , $attrNames as xs:QName* , $attrValues as xs:anyAtomicType* ) as element()? { for $element in $elements return element { node-name($element)} { for $attrName at $seq in $attrNames return attribute {$attrName} {$attrValues[$seq]}, $element/@*[not(node-name(.) = $attrNames)], $element/node() } } ;\n" +
       "                    let $in-xml := <in-xml> <a>x</a> <b att1=\"x\">x</b> </in-xml> return (functx:add-or-update-attributes( $in-xml/a, (xs:QName('att1'),xs:QName('att2')), (1,2)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a att1=\"1\" att2=\"2\">x</a>", false)
     );
@@ -346,9 +394,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:add-or-update-attributes ( $elements as element()* , $attrNames as xs:QName* , $attrValues as xs:anyAtomicType* ) as element()? { for $element in $elements return element { node-name($element)} { for $attrName at $seq in $attrNames return attribute {$attrName} {$attrValues[$seq]}, $element/@*[not(node-name(.) = $attrNames)], $element/node() } } ;\n" +
       "                    let $in-xml := <in-xml> <a>x</a> <b att1=\"x\">x</b> </in-xml> return (functx:add-or-update-attributes( $in-xml/b, (xs:QName('att1'),xs:QName('att2')), (1,2)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b att1=\"1\" att2=\"2\">x</b>", false)
     );
@@ -366,9 +418,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:add-or-update-attributes ( $elements as element()* , $attrNames as xs:QName* , $attrValues as xs:anyAtomicType* ) as element()? { for $element in $elements return element { node-name($element)} { for $attrName at $seq in $attrNames return attribute {$attrName} {$attrValues[$seq]}, $element/@*[not(node-name(.) = $attrNames)], $element/node() } } ;\n" +
       "                    let $in-xml := <in-xml> <a>x</a> <b att1=\"x\">x</b> </in-xml> return (functx:add-or-update-attributes( $in-xml/a, xs:QName('new:att1'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a xmlns:new=\"http://new\" new:att1=\"1\">x</a>", false)
     );
@@ -386,9 +442,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:add-or-update-attributes ( $elements as element()* , $attrNames as xs:QName* , $attrValues as xs:anyAtomicType* ) as element()? { for $element in $elements return element { node-name($element)} { for $attrName at $seq in $attrNames return attribute {$attrName} {$attrValues[$seq]}, $element/@*[not(node-name(.) = $attrNames)], $element/node() } } ;\n" +
       "                    let $in-xml := <in-xml> <a>x</a> <b att1=\"x\">x</b> </in-xml> return (functx:add-or-update-attributes( $in-xml/a, QName('http://new','new:att1'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a xmlns:new=\"http://new\" new:att1=\"1\">x</a>", false)
     );
@@ -406,9 +466,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:add-or-update-attributes ( $elements as element()* , $attrNames as xs:QName* , $attrValues as xs:anyAtomicType* ) as element()? { for $element in $elements return element { node-name($element)} { for $attrName at $seq in $attrNames return attribute {$attrName} {$attrValues[$seq]}, $element/@*[not(node-name(.) = $attrNames)], $element/node() } } ;\n" +
       "                    let $in-xml := <in-xml> <a>x</a> <b att1=\"x\">x</b> </in-xml> return (functx:add-or-update-attributes( $in-xml/a, xs:QName('att1'), 1), functx:add-or-update-attributes( $in-xml/a, (xs:QName('att1'),xs:QName('att2')), (1,2)), functx:add-or-update-attributes( $in-xml/b, (xs:QName('att1'),xs:QName('att2')), (1,2)), functx:add-or-update-attributes( $in-xml/a, xs:QName('new:att1'), 1), functx:add-or-update-attributes( $in-xml/a, QName('http://new','new:att1'), 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a att1=\"1\">x</a><a att1=\"1\" att2=\"2\">x</a><b att1=\"1\" att2=\"2\">x</b><a xmlns:new=\"http://new\" new:att1=\"1\">x</a><a xmlns:new=\"http://new\" new:att1=\"1\">x</a>", false)
     );
@@ -425,9 +489,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:all-whitespace ( $arg as xs:string? ) as xs:boolean { normalize-space($arg) = '' } ;\n" +
       "                    let $in-xml := <in-xml> <a> </a> <b>x </b> <c> <x>x</x> </c> </in-xml> return (functx:all-whitespace(' '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -444,9 +512,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:all-whitespace ( $arg as xs:string? ) as xs:boolean { normalize-space($arg) = '' } ;\n" +
       "                    let $in-xml := <in-xml> <a> </a> <b>x </b> <c> <x>x</x> </c> </in-xml> return (functx:all-whitespace(' x '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -463,9 +535,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:all-whitespace ( $arg as xs:string? ) as xs:boolean { normalize-space($arg) = '' } ;\n" +
       "                    let $in-xml := <in-xml> <a> </a> <b>x </b> <c> <x>x</x> </c> </in-xml> return (functx:all-whitespace($in-xml/a))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -482,9 +558,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:all-whitespace ( $arg as xs:string? ) as xs:boolean { normalize-space($arg) = '' } ;\n" +
       "                    let $in-xml := <in-xml> <a> </a> <b>x </b> <c> <x>x</x> </c> </in-xml> return (functx:all-whitespace($in-xml/b))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -501,9 +581,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:all-whitespace ( $arg as xs:string? ) as xs:boolean { normalize-space($arg) = '' } ;\n" +
       "                    let $in-xml := <in-xml> <a> </a> <b>x </b> <c> <x>x</x> </c> </in-xml> return (functx:all-whitespace($in-xml/c))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -520,9 +604,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:all-whitespace ( $arg as xs:string? ) as xs:boolean { normalize-space($arg) = '' } ;\n" +
       "                    let $in-xml := <in-xml> <a> </a> <b>x </b> <c> <x>x</x> </c> </in-xml> return (functx:all-whitespace($in-xml/c/text()[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -539,9 +627,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:all-whitespace ( $arg as xs:string? ) as xs:boolean { normalize-space($arg) = '' } ;\n" +
       "                    let $in-xml := <in-xml> <a> </a> <b>x </b> <c> <x>x</x> </c> </in-xml> return (functx:all-whitespace(' '), functx:all-whitespace(' x '), functx:all-whitespace($in-xml/a), functx:all-whitespace($in-xml/b), functx:all-whitespace($in-xml/c), functx:all-whitespace($in-xml/c/text()[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false true false false true")
     );
@@ -558,9 +650,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:are-distinct-values ( $seq as xs:anyAtomicType* ) as xs:boolean { count(distinct-values($seq)) = count($seq) } ;\n" +
       "                    (functx:are-distinct-values( (1,2,1,3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -577,9 +673,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:are-distinct-values ( $seq as xs:anyAtomicType* ) as xs:boolean { count(distinct-values($seq)) = count($seq) } ;\n" +
       "                    (functx:are-distinct-values( (1,2,1,3,2.0)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -596,9 +696,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:are-distinct-values ( $seq as xs:anyAtomicType* ) as xs:boolean { count(distinct-values($seq)) = count($seq) } ;\n" +
       "                    (functx:are-distinct-values( (1,2,3) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -615,9 +719,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:are-distinct-values ( $seq as xs:anyAtomicType* ) as xs:boolean { count(distinct-values($seq)) = count($seq) } ;\n" +
       "                    (functx:are-distinct-values( (1,2,1,3)), functx:are-distinct-values( (1,2,1,3,2.0)), functx:are-distinct-values( (1,2,3) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false false true")
     );
@@ -634,9 +742,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:atomic-type ( $values as xs:anyAtomicType* ) as xs:string* { for $val in $values return (if ($val instance of xs:untypedAtomic) then 'xs:untypedAtomic' else if ($val instance of xs:anyURI) then 'xs:anyURI' else if ($val instance of xs:ENTITY) then 'xs:ENTITY' else if ($val instance of xs:ID) then 'xs:ID' else if ($val instance of xs:NMTOKEN) then 'xs:NMTOKEN' else if ($val instance of xs:language) then 'xs:language' else if ($val instance of xs:NCName) then 'xs:NCName' else if ($val instance of xs:Name) then 'xs:Name' else if ($val instance of xs:token) then 'xs:token' else if ($val instance of xs:normalizedString) then 'xs:normalizedString' else if ($val instance of xs:string) then 'xs:string' else if ($val instance of xs:QName) then 'xs:QName' else if ($val instance of xs:boolean) then 'xs:boolean' else if ($val instance of xs:base64Binary) then 'xs:base64Binary' else if ($val instance of xs:hexBinary) then 'xs:hexBinary' else if ($val instance of xs:byte) then 'xs:byte' else if ($val instance of xs:short) then 'xs:short' else if ($val instance of xs:int) then 'xs:int' else if ($val instance of xs:long) then 'xs:long' else if ($val instance of xs:unsignedByte) then 'xs:unsignedByte' else if ($val instance of xs:unsignedShort) then 'xs:unsignedShort' else if ($val instance of xs:unsignedInt) then 'xs:unsignedInt' else if ($val instance of xs:unsignedLong) then 'xs:unsignedLong' else if ($val instance of xs:positiveInteger) then 'xs:positiveInteger' else if ($val instance of xs:nonNegativeInteger) then 'xs:nonNegativeInteger' else if ($val instance of xs:negativeInteger) then 'xs:negativeInteger' else if ($val instance of xs:nonPositiveInteger) then 'xs:nonPositiveInteger' else if ($val instance of xs:integer) then 'xs:integer' else if ($val instance of xs:decimal) then 'xs:decimal' else if ($val instance of xs:float) then 'xs:float' else if ($val instance of xs:double) then 'xs:double' else if ($val instance of xs:date) then 'xs:date' else if ($val instance of xs:time) then 'xs:time' else if ($val instance of xs:dateTime) then 'xs:dateTime' else if ($val instance of xs:dayTimeDuration) then 'xs:dayTimeDuration' else if ($val instance of xs:yearMonthDuration) then 'xs:yearMonthDuration' else if ($val instance of xs:duration) then 'xs:duration' else if ($val instance of xs:gMonth) then 'xs:gMonth' else if ($val instance of xs:gYear) then 'xs:gYear' else if ($val instance of xs:gYearMonth) then 'xs:gYearMonth' else if ($val instance of xs:gDay) then 'xs:gDay' else if ($val instance of xs:gMonthDay) then 'xs:gMonthDay' else 'unknown') } ;\n" +
       "                    (functx:atomic-type(2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xs:integer")
     );
@@ -653,9 +765,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:atomic-type ( $values as xs:anyAtomicType* ) as xs:string* { for $val in $values return (if ($val instance of xs:untypedAtomic) then 'xs:untypedAtomic' else if ($val instance of xs:anyURI) then 'xs:anyURI' else if ($val instance of xs:ENTITY) then 'xs:ENTITY' else if ($val instance of xs:ID) then 'xs:ID' else if ($val instance of xs:NMTOKEN) then 'xs:NMTOKEN' else if ($val instance of xs:language) then 'xs:language' else if ($val instance of xs:NCName) then 'xs:NCName' else if ($val instance of xs:Name) then 'xs:Name' else if ($val instance of xs:token) then 'xs:token' else if ($val instance of xs:normalizedString) then 'xs:normalizedString' else if ($val instance of xs:string) then 'xs:string' else if ($val instance of xs:QName) then 'xs:QName' else if ($val instance of xs:boolean) then 'xs:boolean' else if ($val instance of xs:base64Binary) then 'xs:base64Binary' else if ($val instance of xs:hexBinary) then 'xs:hexBinary' else if ($val instance of xs:byte) then 'xs:byte' else if ($val instance of xs:short) then 'xs:short' else if ($val instance of xs:int) then 'xs:int' else if ($val instance of xs:long) then 'xs:long' else if ($val instance of xs:unsignedByte) then 'xs:unsignedByte' else if ($val instance of xs:unsignedShort) then 'xs:unsignedShort' else if ($val instance of xs:unsignedInt) then 'xs:unsignedInt' else if ($val instance of xs:unsignedLong) then 'xs:unsignedLong' else if ($val instance of xs:positiveInteger) then 'xs:positiveInteger' else if ($val instance of xs:nonNegativeInteger) then 'xs:nonNegativeInteger' else if ($val instance of xs:negativeInteger) then 'xs:negativeInteger' else if ($val instance of xs:nonPositiveInteger) then 'xs:nonPositiveInteger' else if ($val instance of xs:integer) then 'xs:integer' else if ($val instance of xs:decimal) then 'xs:decimal' else if ($val instance of xs:float) then 'xs:float' else if ($val instance of xs:double) then 'xs:double' else if ($val instance of xs:date) then 'xs:date' else if ($val instance of xs:time) then 'xs:time' else if ($val instance of xs:dateTime) then 'xs:dateTime' else if ($val instance of xs:dayTimeDuration) then 'xs:dayTimeDuration' else if ($val instance of xs:yearMonthDuration) then 'xs:yearMonthDuration' else if ($val instance of xs:duration) then 'xs:duration' else if ($val instance of xs:gMonth) then 'xs:gMonth' else if ($val instance of xs:gYear) then 'xs:gYear' else if ($val instance of xs:gYearMonth) then 'xs:gYearMonth' else if ($val instance of xs:gDay) then 'xs:gDay' else if ($val instance of xs:gMonthDay) then 'xs:gMonthDay' else 'unknown') } ;\n" +
       "                    (functx:atomic-type('abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xs:string")
     );
@@ -672,9 +788,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:atomic-type ( $values as xs:anyAtomicType* ) as xs:string* { for $val in $values return (if ($val instance of xs:untypedAtomic) then 'xs:untypedAtomic' else if ($val instance of xs:anyURI) then 'xs:anyURI' else if ($val instance of xs:ENTITY) then 'xs:ENTITY' else if ($val instance of xs:ID) then 'xs:ID' else if ($val instance of xs:NMTOKEN) then 'xs:NMTOKEN' else if ($val instance of xs:language) then 'xs:language' else if ($val instance of xs:NCName) then 'xs:NCName' else if ($val instance of xs:Name) then 'xs:Name' else if ($val instance of xs:token) then 'xs:token' else if ($val instance of xs:normalizedString) then 'xs:normalizedString' else if ($val instance of xs:string) then 'xs:string' else if ($val instance of xs:QName) then 'xs:QName' else if ($val instance of xs:boolean) then 'xs:boolean' else if ($val instance of xs:base64Binary) then 'xs:base64Binary' else if ($val instance of xs:hexBinary) then 'xs:hexBinary' else if ($val instance of xs:byte) then 'xs:byte' else if ($val instance of xs:short) then 'xs:short' else if ($val instance of xs:int) then 'xs:int' else if ($val instance of xs:long) then 'xs:long' else if ($val instance of xs:unsignedByte) then 'xs:unsignedByte' else if ($val instance of xs:unsignedShort) then 'xs:unsignedShort' else if ($val instance of xs:unsignedInt) then 'xs:unsignedInt' else if ($val instance of xs:unsignedLong) then 'xs:unsignedLong' else if ($val instance of xs:positiveInteger) then 'xs:positiveInteger' else if ($val instance of xs:nonNegativeInteger) then 'xs:nonNegativeInteger' else if ($val instance of xs:negativeInteger) then 'xs:negativeInteger' else if ($val instance of xs:nonPositiveInteger) then 'xs:nonPositiveInteger' else if ($val instance of xs:integer) then 'xs:integer' else if ($val instance of xs:decimal) then 'xs:decimal' else if ($val instance of xs:float) then 'xs:float' else if ($val instance of xs:double) then 'xs:double' else if ($val instance of xs:date) then 'xs:date' else if ($val instance of xs:time) then 'xs:time' else if ($val instance of xs:dateTime) then 'xs:dateTime' else if ($val instance of xs:dayTimeDuration) then 'xs:dayTimeDuration' else if ($val instance of xs:yearMonthDuration) then 'xs:yearMonthDuration' else if ($val instance of xs:duration) then 'xs:duration' else if ($val instance of xs:gMonth) then 'xs:gMonth' else if ($val instance of xs:gYear) then 'xs:gYear' else if ($val instance of xs:gYearMonth) then 'xs:gYearMonth' else if ($val instance of xs:gDay) then 'xs:gDay' else if ($val instance of xs:gMonthDay) then 'xs:gMonthDay' else 'unknown') } ;\n" +
       "                    (functx:atomic-type(xs:date('2005-12-15')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xs:date")
     );
@@ -691,9 +811,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:atomic-type ( $values as xs:anyAtomicType* ) as xs:string* { for $val in $values return (if ($val instance of xs:untypedAtomic) then 'xs:untypedAtomic' else if ($val instance of xs:anyURI) then 'xs:anyURI' else if ($val instance of xs:ENTITY) then 'xs:ENTITY' else if ($val instance of xs:ID) then 'xs:ID' else if ($val instance of xs:NMTOKEN) then 'xs:NMTOKEN' else if ($val instance of xs:language) then 'xs:language' else if ($val instance of xs:NCName) then 'xs:NCName' else if ($val instance of xs:Name) then 'xs:Name' else if ($val instance of xs:token) then 'xs:token' else if ($val instance of xs:normalizedString) then 'xs:normalizedString' else if ($val instance of xs:string) then 'xs:string' else if ($val instance of xs:QName) then 'xs:QName' else if ($val instance of xs:boolean) then 'xs:boolean' else if ($val instance of xs:base64Binary) then 'xs:base64Binary' else if ($val instance of xs:hexBinary) then 'xs:hexBinary' else if ($val instance of xs:byte) then 'xs:byte' else if ($val instance of xs:short) then 'xs:short' else if ($val instance of xs:int) then 'xs:int' else if ($val instance of xs:long) then 'xs:long' else if ($val instance of xs:unsignedByte) then 'xs:unsignedByte' else if ($val instance of xs:unsignedShort) then 'xs:unsignedShort' else if ($val instance of xs:unsignedInt) then 'xs:unsignedInt' else if ($val instance of xs:unsignedLong) then 'xs:unsignedLong' else if ($val instance of xs:positiveInteger) then 'xs:positiveInteger' else if ($val instance of xs:nonNegativeInteger) then 'xs:nonNegativeInteger' else if ($val instance of xs:negativeInteger) then 'xs:negativeInteger' else if ($val instance of xs:nonPositiveInteger) then 'xs:nonPositiveInteger' else if ($val instance of xs:integer) then 'xs:integer' else if ($val instance of xs:decimal) then 'xs:decimal' else if ($val instance of xs:float) then 'xs:float' else if ($val instance of xs:double) then 'xs:double' else if ($val instance of xs:date) then 'xs:date' else if ($val instance of xs:time) then 'xs:time' else if ($val instance of xs:dateTime) then 'xs:dateTime' else if ($val instance of xs:dayTimeDuration) then 'xs:dayTimeDuration' else if ($val instance of xs:yearMonthDuration) then 'xs:yearMonthDuration' else if ($val instance of xs:duration) then 'xs:duration' else if ($val instance of xs:gMonth) then 'xs:gMonth' else if ($val instance of xs:gYear) then 'xs:gYear' else if ($val instance of xs:gYearMonth) then 'xs:gYearMonth' else if ($val instance of xs:gDay) then 'xs:gDay' else if ($val instance of xs:gMonthDay) then 'xs:gMonthDay' else 'unknown') } ;\n" +
       "                    (functx:atomic-type( (2,'abc',xs:date('2005-12-15'))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xs:integer xs:string xs:date")
     );
@@ -710,9 +834,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:atomic-type ( $values as xs:anyAtomicType* ) as xs:string* { for $val in $values return (if ($val instance of xs:untypedAtomic) then 'xs:untypedAtomic' else if ($val instance of xs:anyURI) then 'xs:anyURI' else if ($val instance of xs:ENTITY) then 'xs:ENTITY' else if ($val instance of xs:ID) then 'xs:ID' else if ($val instance of xs:NMTOKEN) then 'xs:NMTOKEN' else if ($val instance of xs:language) then 'xs:language' else if ($val instance of xs:NCName) then 'xs:NCName' else if ($val instance of xs:Name) then 'xs:Name' else if ($val instance of xs:token) then 'xs:token' else if ($val instance of xs:normalizedString) then 'xs:normalizedString' else if ($val instance of xs:string) then 'xs:string' else if ($val instance of xs:QName) then 'xs:QName' else if ($val instance of xs:boolean) then 'xs:boolean' else if ($val instance of xs:base64Binary) then 'xs:base64Binary' else if ($val instance of xs:hexBinary) then 'xs:hexBinary' else if ($val instance of xs:byte) then 'xs:byte' else if ($val instance of xs:short) then 'xs:short' else if ($val instance of xs:int) then 'xs:int' else if ($val instance of xs:long) then 'xs:long' else if ($val instance of xs:unsignedByte) then 'xs:unsignedByte' else if ($val instance of xs:unsignedShort) then 'xs:unsignedShort' else if ($val instance of xs:unsignedInt) then 'xs:unsignedInt' else if ($val instance of xs:unsignedLong) then 'xs:unsignedLong' else if ($val instance of xs:positiveInteger) then 'xs:positiveInteger' else if ($val instance of xs:nonNegativeInteger) then 'xs:nonNegativeInteger' else if ($val instance of xs:negativeInteger) then 'xs:negativeInteger' else if ($val instance of xs:nonPositiveInteger) then 'xs:nonPositiveInteger' else if ($val instance of xs:integer) then 'xs:integer' else if ($val instance of xs:decimal) then 'xs:decimal' else if ($val instance of xs:float) then 'xs:float' else if ($val instance of xs:double) then 'xs:double' else if ($val instance of xs:date) then 'xs:date' else if ($val instance of xs:time) then 'xs:time' else if ($val instance of xs:dateTime) then 'xs:dateTime' else if ($val instance of xs:dayTimeDuration) then 'xs:dayTimeDuration' else if ($val instance of xs:yearMonthDuration) then 'xs:yearMonthDuration' else if ($val instance of xs:duration) then 'xs:duration' else if ($val instance of xs:gMonth) then 'xs:gMonth' else if ($val instance of xs:gYear) then 'xs:gYear' else if ($val instance of xs:gYearMonth) then 'xs:gYearMonth' else if ($val instance of xs:gDay) then 'xs:gDay' else if ($val instance of xs:gMonthDay) then 'xs:gMonthDay' else 'unknown') } ;\n" +
       "                    (functx:atomic-type(2), functx:atomic-type('abc'), functx:atomic-type(xs:date('2005-12-15')), functx:atomic-type( (2,'abc',xs:date('2005-12-15'))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xs:integer xs:string xs:date xs:integer xs:string xs:date")
     );
@@ -729,9 +857,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:avg-empty-is-zero ( $values as xs:anyAtomicType* , $allNodes as node()* ) as xs:double { if (empty($allNodes)) then 0 else sum($values[string(.) != '']) div count($allNodes) } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"69.99\"/> <price value=\"49.99\" discount=\"\"/> </prices> return (functx:avg-empty-is-zero( $in-xml//price/@discount, $in-xml//price))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -748,9 +880,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:between-exclusive ( $value as xs:anyAtomicType? , $minValue as xs:anyAtomicType , $maxValue as xs:anyAtomicType ) as xs:boolean { $value > $minValue and $value < $maxValue } ;\n" +
       "                    (functx:between-exclusive(55, 1, 1000))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -767,9 +903,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:between-exclusive ( $value as xs:anyAtomicType? , $minValue as xs:anyAtomicType , $maxValue as xs:anyAtomicType ) as xs:boolean { $value > $minValue and $value < $maxValue } ;\n" +
       "                    (functx:between-exclusive(1, 1, 1000))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -786,9 +926,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:between-exclusive ( $value as xs:anyAtomicType? , $minValue as xs:anyAtomicType , $maxValue as xs:anyAtomicType ) as xs:boolean { $value > $minValue and $value < $maxValue } ;\n" +
       "                    (functx:between-exclusive(1200, 1, 1000))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -805,9 +949,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:between-exclusive ( $value as xs:anyAtomicType? , $minValue as xs:anyAtomicType , $maxValue as xs:anyAtomicType ) as xs:boolean { $value > $minValue and $value < $maxValue } ;\n" +
       "                    (functx:between-exclusive('b', 'a', 'c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -824,9 +972,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:between-exclusive ( $value as xs:anyAtomicType? , $minValue as xs:anyAtomicType , $maxValue as xs:anyAtomicType ) as xs:boolean { $value > $minValue and $value < $maxValue } ;\n" +
       "                    (functx:between-exclusive(xs:date('2004-10-31'), xs:date('2004-10-15'), xs:date('2004-11-01')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -843,9 +995,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:between-exclusive ( $value as xs:anyAtomicType? , $minValue as xs:anyAtomicType , $maxValue as xs:anyAtomicType ) as xs:boolean { $value > $minValue and $value < $maxValue } ;\n" +
       "                    (functx:between-exclusive(55, 1, 1000), functx:between-exclusive(1, 1, 1000), functx:between-exclusive(1200, 1, 1000), functx:between-exclusive('b', 'a', 'c'), functx:between-exclusive(xs:date('2004-10-31'), xs:date('2004-10-15'), xs:date('2004-11-01')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false false true true")
     );
@@ -862,9 +1018,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:between-inclusive ( $value as xs:anyAtomicType? , $minValue as xs:anyAtomicType , $maxValue as xs:anyAtomicType ) as xs:boolean { $value >= $minValue and $value <= $maxValue } ;\n" +
       "                    (functx:between-inclusive(55, 1, 1000))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -881,9 +1041,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:between-inclusive ( $value as xs:anyAtomicType? , $minValue as xs:anyAtomicType , $maxValue as xs:anyAtomicType ) as xs:boolean { $value >= $minValue and $value <= $maxValue } ;\n" +
       "                    (functx:between-inclusive(1, 1, 1000))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -900,9 +1064,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:between-inclusive ( $value as xs:anyAtomicType? , $minValue as xs:anyAtomicType , $maxValue as xs:anyAtomicType ) as xs:boolean { $value >= $minValue and $value <= $maxValue } ;\n" +
       "                    (functx:between-inclusive(1200, 1, 1000))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -919,9 +1087,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:between-inclusive ( $value as xs:anyAtomicType? , $minValue as xs:anyAtomicType , $maxValue as xs:anyAtomicType ) as xs:boolean { $value >= $minValue and $value <= $maxValue } ;\n" +
       "                    (functx:between-inclusive('b', 'b', 'd'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -938,9 +1110,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:between-inclusive ( $value as xs:anyAtomicType? , $minValue as xs:anyAtomicType , $maxValue as xs:anyAtomicType ) as xs:boolean { $value >= $minValue and $value <= $maxValue } ;\n" +
       "                    (functx:between-inclusive(xs:date('2004-10-31'), xs:date('2004-10-15'), xs:date('2004-11-01')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -957,9 +1133,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:between-inclusive ( $value as xs:anyAtomicType? , $minValue as xs:anyAtomicType , $maxValue as xs:anyAtomicType ) as xs:boolean { $value >= $minValue and $value <= $maxValue } ;\n" +
       "                    (functx:between-inclusive(55, 1, 1000), functx:between-inclusive(1, 1, 1000), functx:between-inclusive(1200, 1, 1000), functx:between-inclusive('b', 'b', 'd'), functx:between-inclusive(xs:date('2004-10-31'), xs:date('2004-10-15'), xs:date('2004-11-01')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true false true true")
     );
@@ -976,9 +1156,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:camel-case-to-words ( $arg as xs:string? , $delim as xs:string ) as xs:string { concat(substring($arg,1,1), replace(substring($arg,2),'(\\p{Lu})', concat($delim, '$1'))) } ;\n" +
       "                    (functx:camel-case-to-words( 'thisIsACamelCaseTerm',' '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "this Is A Camel Case Term")
     );
@@ -995,9 +1179,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:camel-case-to-words ( $arg as xs:string? , $delim as xs:string ) as xs:string { concat(substring($arg,1,1), replace(substring($arg,2),'(\\p{Lu})', concat($delim, '$1'))) } ;\n" +
       "                    (functx:camel-case-to-words( 'thisIsACamelCaseTerm',','))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "this,Is,A,Camel,Case,Term")
     );
@@ -1014,9 +1202,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:camel-case-to-words ( $arg as xs:string? , $delim as xs:string ) as xs:string { concat(substring($arg,1,1), replace(substring($arg,2),'(\\p{Lu})', concat($delim, '$1'))) } ;\n" +
       "                    (functx:camel-case-to-words( 'thisIsACamelCaseTerm',' '), functx:camel-case-to-words( 'thisIsACamelCaseTerm',','))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "this Is A Camel Case Term this,Is,A,Camel,Case,Term")
     );
@@ -1033,9 +1225,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:capitalize-first ( $arg as xs:string? ) as xs:string? { concat(upper-case(substring($arg,1,1)), substring($arg,2)) } ;\n" +
       "                    (functx:capitalize-first('hello'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Hello")
     );
@@ -1052,9 +1248,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:capitalize-first ( $arg as xs:string? ) as xs:string? { concat(upper-case(substring($arg,1,1)), substring($arg,2)) } ;\n" +
       "                    (functx:capitalize-first('hello world'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Hello world")
     );
@@ -1071,9 +1271,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:capitalize-first ( $arg as xs:string? ) as xs:string? { concat(upper-case(substring($arg,1,1)), substring($arg,2)) } ;\n" +
       "                    (functx:capitalize-first('Hello world'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Hello world")
     );
@@ -1090,9 +1294,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:capitalize-first ( $arg as xs:string? ) as xs:string? { concat(upper-case(substring($arg,1,1)), substring($arg,2)) } ;\n" +
       "                    (functx:capitalize-first('hello'), functx:capitalize-first('hello world'), functx:capitalize-first('Hello world'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Hello Hello world Hello world")
     );
@@ -1112,9 +1320,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b</b> <c>c</c> </a> </in-xml> return let $in-xml-2 := <in-xml xmlns:dty=\"http://datypic.com\"> <a> <dty:b>b</dty:b> <c>c</c> </a> </in-xml> return (functx:change-element-names-deep( $in-xml-1, xs:QName('b'), xs:QName('y')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a><y>b</y><c>c</c></a></in-xml>", false)
     );
@@ -1134,9 +1346,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b</b> <c>c</c> </a> </in-xml> return let $in-xml-2 := <in-xml xmlns:dty=\"http://datypic.com\"> <a> <dty:b>b</dty:b> <c>c</c> </a> </in-xml> return (functx:change-element-names-deep( $in-xml-1, (xs:QName('a'), xs:QName('b'),xs:QName('c')), (xs:QName('x'), xs:QName('y'),xs:QName('z'))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><x><y>b</y><z>c</z></x></in-xml>", false)
     );
@@ -1156,9 +1372,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b</b> <c>c</c> </a> </in-xml> return let $in-xml-2 := <in-xml xmlns:dty=\"http://datypic.com\"> <a> <dty:b>b</dty:b> <c>c</c> </a> </in-xml> return (functx:change-element-names-deep( $in-xml-2, (xs:QName('dty:b'),xs:QName('c')), (xs:QName('q'), QName('http://new','new:c'))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a><q>b</q><new:c xmlns:new=\"http://new\">c</new:c></a></in-xml>", false)
     );
@@ -1178,9 +1398,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b</b> <c>c</c> </a> </in-xml> return let $in-xml-2 := <in-xml xmlns:dty=\"http://datypic.com\"> <a> <dty:b>b</dty:b> <c>c</c> </a> </in-xml> return (functx:change-element-names-deep( $in-xml-1, xs:QName('b'), xs:QName('y')), functx:change-element-names-deep( $in-xml-1, (xs:QName('a'), xs:QName('b'),xs:QName('c')), (xs:QName('x'), xs:QName('y'),xs:QName('z'))), functx:change-element-names-deep( $in-xml-2, (xs:QName('dty:b'),xs:QName('c')), (xs:QName('q'), QName('http://new','new:c'))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a><y>b</y><c>c</c></a></in-xml><in-xml><x><y>b</y><z>c</z></x></in-xml><in-xml><a><q>b</q><new:c xmlns:new=\"http://new\">c</new:c></a></in-xml>", false)
     );
@@ -1197,9 +1421,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:change-element-ns ( $elements as element()* , $newns as xs:string , $prefix as xs:string ) as element()? { for $element in $elements return element {QName ($newns, concat($prefix, if ($prefix = '') then '' else ':', local-name($element)))} {$element/@*, $element/node()} } ;\n" +
       "                    let $in-xml := <bar:a xmlns:bar=\"http://bar\"> <bar:b>557</bar:b> <bar:c>xyz</bar:c> </bar:a> return (functx:change-element-ns( $in-xml, 'http://foo',''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a xmlns=\"http://foo\"><bar:b xmlns:bar=\"http://bar\">557</bar:b><bar:c xmlns:bar=\"http://bar\">xyz</bar:c></a>", false)
     );
@@ -1216,9 +1444,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:change-element-ns ( $elements as element()* , $newns as xs:string , $prefix as xs:string ) as element()? { for $element in $elements return element {QName ($newns, concat($prefix, if ($prefix = '') then '' else ':', local-name($element)))} {$element/@*, $element/node()} } ;\n" +
       "                    let $in-xml := <bar:a xmlns:bar=\"http://bar\"> <bar:b>557</bar:b> <bar:c>xyz</bar:c> </bar:a> return (functx:change-element-ns( $in-xml, 'http://foo','foo'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<foo:a xmlns:foo=\"http://foo\"><bar:b xmlns:bar=\"http://bar\">557</bar:b><bar:c xmlns:bar=\"http://bar\">xyz</bar:c></foo:a>", false)
     );
@@ -1235,9 +1467,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:change-element-ns ( $elements as element()* , $newns as xs:string , $prefix as xs:string ) as element()? { for $element in $elements return element {QName ($newns, concat($prefix, if ($prefix = '') then '' else ':', local-name($element)))} {$element/@*, $element/node()} } ;\n" +
       "                    let $in-xml := <bar:a xmlns:bar=\"http://bar\"> <bar:b>557</bar:b> <bar:c>xyz</bar:c> </bar:a> return (functx:change-element-ns( $in-xml, 'http://foo',''), functx:change-element-ns( $in-xml, 'http://foo','foo'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a xmlns=\"http://foo\"><bar:b xmlns:bar=\"http://bar\">557</bar:b><bar:c xmlns:bar=\"http://bar\">xyz</bar:c></a><foo:a xmlns:foo=\"http://foo\"><bar:b xmlns:bar=\"http://bar\">557</bar:b><bar:c xmlns:bar=\"http://bar\">xyz</bar:c></foo:a>", false)
     );
@@ -1254,9 +1490,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:change-element-ns-deep ( $nodes as node()* , $newns as xs:string , $prefix as xs:string ) as node()* { for $node in $nodes return if ($node instance of element()) then (element {QName ($newns, concat($prefix, if ($prefix = '') then '' else ':', local-name($node)))} {$node/@*, functx:change-element-ns-deep($node/node(), $newns, $prefix)}) else if ($node instance of document-node()) then functx:change-element-ns-deep($node/node(), $newns, $prefix) else $node } ;\n" +
       "                    let $in-xml := <bar:a xmlns:bar=\"http://bar\"> <bar:b>557</bar:b> <bar:c>xyz</bar:c> </bar:a> return (functx:change-element-ns-deep( $in-xml, 'http://foo',''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a xmlns=\"http://foo\"><b>557</b><c>xyz</c></a>", false)
     );
@@ -1273,9 +1513,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:change-element-ns-deep ( $nodes as node()* , $newns as xs:string , $prefix as xs:string ) as node()* { for $node in $nodes return if ($node instance of element()) then (element {QName ($newns, concat($prefix, if ($prefix = '') then '' else ':', local-name($node)))} {$node/@*, functx:change-element-ns-deep($node/node(), $newns, $prefix)}) else if ($node instance of document-node()) then functx:change-element-ns-deep($node/node(), $newns, $prefix) else $node } ;\n" +
       "                    let $in-xml := <bar:a xmlns:bar=\"http://bar\"> <bar:b>557</bar:b> <bar:c>xyz</bar:c> </bar:a> return (functx:change-element-ns-deep( $in-xml, 'http://foo','foo'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<foo:a xmlns:foo=\"http://foo\"><foo:b>557</foo:b><foo:c>xyz</foo:c></foo:a>", false)
     );
@@ -1292,9 +1536,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:change-element-ns-deep ( $nodes as node()* , $newns as xs:string , $prefix as xs:string ) as node()* { for $node in $nodes return if ($node instance of element()) then (element {QName ($newns, concat($prefix, if ($prefix = '') then '' else ':', local-name($node)))} {$node/@*, functx:change-element-ns-deep($node/node(), $newns, $prefix)}) else if ($node instance of document-node()) then functx:change-element-ns-deep($node/node(), $newns, $prefix) else $node } ;\n" +
       "                    let $in-xml := <bar:a xmlns:bar=\"http://bar\"> <bar:b>557</bar:b> <bar:c>xyz</bar:c> </bar:a> return (functx:change-element-ns-deep( $in-xml, 'http://foo',''), functx:change-element-ns-deep( $in-xml, 'http://foo','foo'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a xmlns=\"http://foo\"><b>557</b><c>xyz</c></a><foo:a xmlns:foo=\"http://foo\"><foo:b>557</foo:b><foo:c>xyz</foo:c></foo:a>", false)
     );
@@ -1311,9 +1559,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:chars ( $arg as xs:string? ) as xs:string* { for $ch in string-to-codepoints($arg) return codepoints-to-string($ch) } ;\n" +
       "                    (functx:chars('abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c")
     );
@@ -1330,9 +1582,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:chars ( $arg as xs:string? ) as xs:string* { for $ch in string-to-codepoints($arg) return codepoints-to-string($ch) } ;\n" +
       "                    (functx:chars('a b c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a   b   c")
     );
@@ -1349,9 +1605,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:chars ( $arg as xs:string? ) as xs:string* { for $ch in string-to-codepoints($arg) return codepoints-to-string($ch) } ;\n" +
       "                    (functx:chars('abc'), functx:chars('a b c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c a   b   c")
     );
@@ -1368,9 +1628,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:contains-any-of ( $arg as xs:string? , $searchStrings as xs:string* ) as xs:boolean { some $searchString in $searchStrings satisfies contains($arg,$searchString) } ;\n" +
       "                    (functx:contains-any-of('abc',('bc','xy')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1387,9 +1651,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:contains-any-of ( $arg as xs:string? , $searchStrings as xs:string* ) as xs:boolean { some $searchString in $searchStrings satisfies contains($arg,$searchString) } ;\n" +
       "                    (functx:contains-any-of('abc',('de','xy')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1406,9 +1674,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:contains-any-of ( $arg as xs:string? , $searchStrings as xs:string* ) as xs:boolean { some $searchString in $searchStrings satisfies contains($arg,$searchString) } ;\n" +
       "                    (functx:contains-any-of('abc',('bc','xy')), functx:contains-any-of('abc',('de','xy')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false")
     );
@@ -1425,9 +1697,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:contains-case-insensitive ( $arg as xs:string? , $substring as xs:string ) as xs:boolean? { contains(upper-case($arg), upper-case($substring)) } ;\n" +
       "                    (functx:contains-case-insensitive( 'abcdef', 'def'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1444,9 +1720,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:contains-case-insensitive ( $arg as xs:string? , $substring as xs:string ) as xs:boolean? { contains(upper-case($arg), upper-case($substring)) } ;\n" +
       "                    (functx:contains-case-insensitive( 'abcdEF', 'def'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1463,9 +1743,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:contains-case-insensitive ( $arg as xs:string? , $substring as xs:string ) as xs:boolean? { contains(upper-case($arg), upper-case($substring)) } ;\n" +
       "                    (functx:contains-case-insensitive( 'abcdef', 'def'), functx:contains-case-insensitive( 'abcdEF', 'def'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true")
     );
@@ -1484,9 +1768,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:escape-for-regex ( $arg as xs:string? ) as xs:string { replace($arg, '(\\.|\\[|\\]|\\\\|\\||\\-|\\^|\\$|\\?|\\*|\\+|\\{|\\}|\\(|\\))','\\\\$1') } ;\n" +
       "                    (functx:contains-word('abc def ghi', 'def'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1505,9 +1793,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:escape-for-regex ( $arg as xs:string? ) as xs:string { replace($arg, '(\\.|\\[|\\]|\\\\|\\||\\-|\\^|\\$|\\?|\\*|\\+|\\{|\\}|\\(|\\))','\\\\$1') } ;\n" +
       "                    (functx:contains-word('abc.def\\ghi', 'def'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1526,9 +1818,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:escape-for-regex ( $arg as xs:string? ) as xs:string { replace($arg, '(\\.|\\[|\\]|\\\\|\\||\\-|\\^|\\$|\\?|\\*|\\+|\\{|\\}|\\(|\\))','\\\\$1') } ;\n" +
       "                    (functx:contains-word('abc def ghi', 'abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1547,9 +1843,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:escape-for-regex ( $arg as xs:string? ) as xs:string { replace($arg, '(\\.|\\[|\\]|\\\\|\\||\\-|\\^|\\$|\\?|\\*|\\+|\\{|\\}|\\(|\\))','\\\\$1') } ;\n" +
       "                    (functx:contains-word('abc', 'abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1568,9 +1868,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:escape-for-regex ( $arg as xs:string? ) as xs:string { replace($arg, '(\\.|\\[|\\]|\\\\|\\||\\-|\\^|\\$|\\?|\\*|\\+|\\{|\\}|\\(|\\))','\\\\$1') } ;\n" +
       "                    (functx:contains-word('abcdef', 'abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1589,9 +1893,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:escape-for-regex ( $arg as xs:string? ) as xs:string { replace($arg, '(\\.|\\[|\\]|\\\\|\\||\\-|\\^|\\$|\\?|\\*|\\+|\\{|\\}|\\(|\\))','\\\\$1') } ;\n" +
       "                    (functx:contains-word('abc def ghi', 'def'), functx:contains-word('abc.def\\ghi', 'def'), functx:contains-word('abc def ghi', 'abc'), functx:contains-word('abc', 'abc'), functx:contains-word('abcdef', 'abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true true true false")
     );
@@ -1608,9 +1916,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:copy-attributes ( $copyTo as element() , $copyFrom as element() ) as element() { element { node-name($copyTo)} { $copyTo/@*[not(node-name(.) = $copyFrom/@*/node-name(.))], $copyFrom/@*, $copyTo/node() } } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a>> <b x=\"1\" y=\"2\">456</b> <c x=\"9\">123</c> <d z=\"5\">123</d> </in-xml> return (functx:copy-attributes( $in-xml/a, $in-xml/b))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a y=\"2\" x=\"1\">123</a>", false)
     );
@@ -1627,9 +1939,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:copy-attributes ( $copyTo as element() , $copyFrom as element() ) as element() { element { node-name($copyTo)} { $copyTo/@*[not(node-name(.) = $copyFrom/@*/node-name(.))], $copyFrom/@*, $copyTo/node() } } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a>> <b x=\"1\" y=\"2\">456</b> <c x=\"9\">123</c> <d z=\"5\">123</d> </in-xml> return (functx:copy-attributes( $in-xml/b, $in-xml/c))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b y=\"2\" x=\"9\">456</b>", false)
     );
@@ -1646,9 +1962,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:copy-attributes ( $copyTo as element() , $copyFrom as element() ) as element() { element { node-name($copyTo)} { $copyTo/@*[not(node-name(.) = $copyFrom/@*/node-name(.))], $copyFrom/@*, $copyTo/node() } } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a>> <b x=\"1\" y=\"2\">456</b> <c x=\"9\">123</c> <d z=\"5\">123</d> </in-xml> return (functx:copy-attributes( $in-xml/d, $in-xml/c))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<d z=\"5\" x=\"9\">123</d>", false)
     );
@@ -1665,9 +1985,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:copy-attributes ( $copyTo as element() , $copyFrom as element() ) as element() { element { node-name($copyTo)} { $copyTo/@*[not(node-name(.) = $copyFrom/@*/node-name(.))], $copyFrom/@*, $copyTo/node() } } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a>> <b x=\"1\" y=\"2\">456</b> <c x=\"9\">123</c> <d z=\"5\">123</d> </in-xml> return (functx:copy-attributes( $in-xml/a, $in-xml/b), functx:copy-attributes( $in-xml/b, $in-xml/c), functx:copy-attributes( $in-xml/d, $in-xml/c))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a y=\"2\" x=\"1\">123</a><b y=\"2\" x=\"9\">456</b><d z=\"5\" x=\"9\">123</d>", false)
     );
@@ -1688,9 +2012,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:date(2006,6,12))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-06-12")
     );
@@ -1711,9 +2039,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:date('2006','06','12'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-06-12")
     );
@@ -1734,9 +2066,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:date(2006,6,12), functx:date('2006','06','12'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-06-12 2006-06-12")
     );
@@ -1761,9 +2097,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:time ( $hour as xs:anyAtomicType , $minute as xs:anyAtomicType , $second as xs:anyAtomicType ) as xs:time { xs:time( concat( functx:pad-integer-to-length(xs:integer($hour),2),':', functx:pad-integer-to-length(xs:integer($minute),2),':', functx:pad-integer-to-length(xs:integer($second),2))) } ;\n" +
       "                    (functx:dateTime(2006,6,12,20,6,12))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-06-12T20:06:12")
     );
@@ -1788,9 +2128,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:time ( $hour as xs:anyAtomicType , $minute as xs:anyAtomicType , $second as xs:anyAtomicType ) as xs:time { xs:time( concat( functx:pad-integer-to-length(xs:integer($hour),2),':', functx:pad-integer-to-length(xs:integer($minute),2),':', functx:pad-integer-to-length(xs:integer($second),2))) } ;\n" +
       "                    (functx:dateTime('2006','6','12','20','6','12'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-06-12T20:06:12")
     );
@@ -1815,9 +2159,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:time ( $hour as xs:anyAtomicType , $minute as xs:anyAtomicType , $second as xs:anyAtomicType ) as xs:time { xs:time( concat( functx:pad-integer-to-length(xs:integer($hour),2),':', functx:pad-integer-to-length(xs:integer($minute),2),':', functx:pad-integer-to-length(xs:integer($second),2))) } ;\n" +
       "                    (functx:dateTime(2006,6,12,20,6,12), functx:dateTime('2006','6','12','20','6','12'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-06-12T20:06:12 2006-06-12T20:06:12")
     );
@@ -1842,9 +2190,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:day-in-year(xs:date('2004-01-01')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1869,9 +2221,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:day-in-year( xs:dateTime('2004-02-01T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("32")
     );
@@ -1896,9 +2252,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:day-in-year('2004-02-05'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("36")
     );
@@ -1923,9 +2283,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:day-in-year(xs:date('2004-01-01')), functx:day-in-year( xs:dateTime('2004-02-01T12:00:13')), functx:day-in-year('2004-02-05'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 32 36")
     );
@@ -1942,9 +2306,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:day-of-week ( $date as xs:anyAtomicType? ) as xs:integer? { if (empty($date)) then () else xs:integer((xs:date($date) - xs:date('1901-01-06')) div xs:dayTimeDuration('P1D')) mod 7 } ;\n" +
       "                    (functx:day-of-week( xs:date('2004-11-04')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -1961,9 +2329,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:day-of-week ( $date as xs:anyAtomicType? ) as xs:integer? { if (empty($date)) then () else xs:integer((xs:date($date) - xs:date('1901-01-06')) div xs:dayTimeDuration('P1D')) mod 7 } ;\n" +
       "                    (functx:day-of-week( xs:dateTime('2004-11-04T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -1980,9 +2352,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:day-of-week ( $date as xs:anyAtomicType? ) as xs:integer? { if (empty($date)) then () else xs:integer((xs:date($date) - xs:date('1901-01-06')) div xs:dayTimeDuration('P1D')) mod 7 } ;\n" +
       "                    (functx:day-of-week('2004-11-04'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -2001,9 +2377,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:day-of-week ( $date as xs:anyAtomicType? ) as xs:integer? { if (empty($date)) then () else xs:integer((xs:date($date) - xs:date('1901-01-06')) div xs:dayTimeDuration('P1D')) mod 7 } ;\n" +
       "                    (functx:day-of-week-abbrev-en( xs:date('2004-11-04')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Thurs")
     );
@@ -2022,9 +2402,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:day-of-week ( $date as xs:anyAtomicType? ) as xs:integer? { if (empty($date)) then () else xs:integer((xs:date($date) - xs:date('1901-01-06')) div xs:dayTimeDuration('P1D')) mod 7 } ;\n" +
       "                    (functx:day-of-week-abbrev-en('2004-11-04'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Thurs")
     );
@@ -2043,9 +2427,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:day-of-week ( $date as xs:anyAtomicType? ) as xs:integer? { if (empty($date)) then () else xs:integer((xs:date($date) - xs:date('1901-01-06')) div xs:dayTimeDuration('P1D')) mod 7 } ;\n" +
       "                    (functx:day-of-week-abbrev-en( xs:date('2004-11-04')), functx:day-of-week-abbrev-en('2004-11-04'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Thurs Thurs")
     );
@@ -2062,9 +2450,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:day-of-week ( $date as xs:anyAtomicType? ) as xs:integer? { if (empty($date)) then () else xs:integer((xs:date($date) - xs:date('1901-01-06')) div xs:dayTimeDuration('P1D')) mod 7 } ;\n" +
       "                    (functx:day-of-week( xs:date('2004-11-04')), functx:day-of-week( xs:dateTime('2004-11-04T12:00:13')), functx:day-of-week('2004-11-04'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "4 4 4")
     );
@@ -2083,9 +2475,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:day-of-week ( $date as xs:anyAtomicType? ) as xs:integer? { if (empty($date)) then () else xs:integer((xs:date($date) - xs:date('1901-01-06')) div xs:dayTimeDuration('P1D')) mod 7 } ;\n" +
       "                    (functx:day-of-week-name-en( xs:date('2004-11-04')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Thursday")
     );
@@ -2104,9 +2500,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:day-of-week ( $date as xs:anyAtomicType? ) as xs:integer? { if (empty($date)) then () else xs:integer((xs:date($date) - xs:date('1901-01-06')) div xs:dayTimeDuration('P1D')) mod 7 } ;\n" +
       "                    (functx:day-of-week-name-en('2004-11-04'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Thursday")
     );
@@ -2125,9 +2525,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:day-of-week ( $date as xs:anyAtomicType? ) as xs:integer? { if (empty($date)) then () else xs:integer((xs:date($date) - xs:date('1901-01-06')) div xs:dayTimeDuration('P1D')) mod 7 } ;\n" +
       "                    (functx:day-of-week-name-en( xs:date('2004-11-04')), functx:day-of-week-name-en('2004-11-04'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Thursday Thursday")
     );
@@ -2146,9 +2550,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    (functx:dayTimeDuration(1,6,0,0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1DT6H")
     );
@@ -2167,9 +2575,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    (functx:dayTimeDuration(2.5,0,0,0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P2DT12H")
     );
@@ -2188,9 +2600,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    (functx:dayTimeDuration(1,(),3,5.6))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1DT3M5.6S")
     );
@@ -2209,9 +2625,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    (functx:dayTimeDuration(0,0,5,0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT5M")
     );
@@ -2230,9 +2650,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    (functx:dayTimeDuration(0,0,0,0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -2251,9 +2675,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    (functx:dayTimeDuration(1,6,0,0), functx:dayTimeDuration(2.5,0,0,0), functx:dayTimeDuration(1,(),3,5.6), functx:dayTimeDuration(0,0,5,0), functx:dayTimeDuration(0,0,0,0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1DT6H P2DT12H P1DT3M5.6S PT5M PT0S")
     );
@@ -2272,9 +2700,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-leap-year ( $date as xs:anyAtomicType? ) as xs:boolean { for $year in xs:integer(substring(string($date),1,4)) return ($year mod 4 = 0 and $year mod 100 != 0) or $year mod 400 = 0 } ;\n" +
       "                    (functx:days-in-month(xs:date('2004-01-23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("31")
     );
@@ -2293,9 +2725,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-leap-year ( $date as xs:anyAtomicType? ) as xs:boolean { for $year in xs:integer(substring(string($date),1,4)) return ($year mod 4 = 0 and $year mod 100 != 0) or $year mod 400 = 0 } ;\n" +
       "                    (functx:days-in-month( xs:dateTime('2004-02-15T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("29")
     );
@@ -2314,9 +2750,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-leap-year ( $date as xs:anyAtomicType? ) as xs:boolean { for $year in xs:integer(substring(string($date),1,4)) return ($year mod 4 = 0 and $year mod 100 != 0) or $year mod 400 = 0 } ;\n" +
       "                    (functx:days-in-month('2005-02-15'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("28")
     );
@@ -2335,9 +2775,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-leap-year ( $date as xs:anyAtomicType? ) as xs:boolean { for $year in xs:integer(substring(string($date),1,4)) return ($year mod 4 = 0 and $year mod 100 != 0) or $year mod 400 = 0 } ;\n" +
       "                    (functx:days-in-month(xs:date('2004-01-23')), functx:days-in-month( xs:dateTime('2004-02-15T12:00:13')), functx:days-in-month('2005-02-15'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "31 29 28")
     );
@@ -2354,9 +2798,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:ddmmyyyy-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$', '$3-$2-$1')) } ;\n" +
       "                    (functx:ddmmyyyy-to-date('15-12-2004'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15")
     );
@@ -2373,9 +2821,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:ddmmyyyy-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$', '$3-$2-$1')) } ;\n" +
       "                    (functx:ddmmyyyy-to-date('15122004'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15")
     );
@@ -2392,9 +2844,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:ddmmyyyy-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$', '$3-$2-$1')) } ;\n" +
       "                    (functx:ddmmyyyy-to-date('15/12/2004'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15")
     );
@@ -2411,9 +2867,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:ddmmyyyy-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$', '$3-$2-$1')) } ;\n" +
       "                    (functx:ddmmyyyy-to-date('15-12-2004'), functx:ddmmyyyy-to-date('15122004'), functx:ddmmyyyy-to-date('15/12/2004'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15 2004-12-15 2004-12-15")
     );
@@ -2430,9 +2890,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:depth-of-node ( $node as node()? ) as xs:integer { count($node/ancestor-or-self::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:depth-of-node($in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2449,9 +2913,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:depth-of-node ( $node as node()? ) as xs:integer { count($node/ancestor-or-self::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:depth-of-node($in-xml/author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -2468,9 +2936,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:depth-of-node ( $node as node()? ) as xs:integer { count($node/ancestor-or-self::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:depth-of-node( $in-xml/author[1]/fName/text()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -2487,9 +2959,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:depth-of-node ( $node as node()? ) as xs:integer { count($node/ancestor-or-self::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:depth-of-node($in-xml), functx:depth-of-node($in-xml/author[1]), functx:depth-of-node( $in-xml/author[1]/fName/text()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 4")
     );
@@ -2506,9 +2982,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:distinct-attribute-names ( $nodes as node()* ) as xs:string* { distinct-values($nodes//@*/name(.)) } ;\n" +
       "                    let $in-xml := <authors a1=\"xyz\"> <author a2=\"abc\"> <fName a3=\"def\">Kate</fName> <lName>Jones</lName> </author> <author> <fName a3=\"def\">John</fName> <lName>Doe</lName> </author> </authors> return (functx:distinct-attribute-names($in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a1 a2 a3")
     );
@@ -2527,9 +3007,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>Kate</fName> <lName>Doe</lName> </author> </authors> return (functx:distinct-deep($in-xml//author))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<author><fName>Kate</fName><lName>Jones</lName></author><author><fName>Kate</fName><lName>Doe</lName></author>", false)
     );
@@ -2548,9 +3032,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>Kate</fName> <lName>Doe</lName> </author> </authors> return (functx:distinct-deep($in-xml//lName))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<lName>Jones</lName><lName>Doe</lName>", false)
     );
@@ -2569,9 +3057,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>Kate</fName> <lName>Doe</lName> </author> </authors> return (functx:distinct-deep($in-xml//fName))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fName>Kate</fName>", false)
     );
@@ -2590,9 +3082,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>Kate</fName> <lName>Doe</lName> </author> </authors> return (functx:distinct-deep($in-xml//author), functx:distinct-deep($in-xml//lName), functx:distinct-deep($in-xml//fName))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<author><fName>Kate</fName><lName>Jones</lName></author><author><fName>Kate</fName><lName>Doe</lName></author><lName>Jones</lName><lName>Doe</lName><fName>Kate</fName>", false)
     );
@@ -2611,9 +3107,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:path-to-node ( $nodes as node()* ) as xs:string* { $nodes/string-join(ancestor-or-self::*/name(.), '/') } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:distinct-element-names($in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "authors author fName lName")
     );
@@ -2632,9 +3132,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:path-to-node ( $nodes as node()* ) as xs:string* { $nodes/string-join(ancestor-or-self::*/name(.), '/') } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:distinct-element-names( $in-xml/author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "author fName lName")
     );
@@ -2653,9 +3157,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:path-to-node ( $nodes as node()* ) as xs:string* { $nodes/string-join(ancestor-or-self::*/name(.), '/') } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:distinct-element-names($in-xml), functx:distinct-element-names( $in-xml/author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "authors author fName lName author fName lName")
     );
@@ -2674,9 +3182,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:path-to-node ( $nodes as node()* ) as xs:string* { $nodes/string-join(ancestor-or-self::*/name(.), '/') } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:distinct-element-paths( $in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "authors authors/author authors/author/fName authors/author/lName")
     );
@@ -2695,9 +3207,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:path-to-node ( $nodes as node()* ) as xs:string* { $nodes/string-join(ancestor-or-self::*/name(.), '/') } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:distinct-element-paths( $in-xml/author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "authors/author authors/author/fName authors/author/lName")
     );
@@ -2716,9 +3232,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:path-to-node ( $nodes as node()* ) as xs:string* { $nodes/string-join(ancestor-or-self::*/name(.), '/') } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:distinct-element-paths( $in-xml), functx:distinct-element-paths( $in-xml/author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "authors authors/author authors/author/fName authors/author/lName authors/author authors/author/fName authors/author/lName")
     );
@@ -2737,9 +3257,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies $nodeInSeq is $node } ;\n" +
       "                    let $in-xml :=  <test> <child>1</child> <child>2</child> <child>3</child> <child>3</child> </test> return (functx:distinct-nodes( ($in-xml/child, $in-xml/*) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<child>1</child><child>2</child><child>3</child><child>3</child>", false)
     );
@@ -2758,9 +3282,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies $nodeInSeq is $node } ;\n" +
       "                    let $in-xml :=  <test> <child>1</child> <child>2</child> <child>3</child> <child>3</child> </test> return (functx:distinct-nodes( ($in-xml/child[3], $in-xml/*) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<child>3</child><child>1</child><child>2</child><child>3</child>", false)
     );
@@ -2779,9 +3307,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies $nodeInSeq is $node } ;\n" +
       "                    let $in-xml :=  <test> <child>1</child> <child>2</child> <child>3</child> <child>3</child> </test> return (functx:distinct-nodes( ($in-xml/child, $in-xml/*) ), functx:distinct-nodes( ($in-xml/child[3], $in-xml/*) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<child>1</child><child>2</child><child>3</child><child>3</child><child>3</child><child>1</child><child>2</child><child>3</child>", false)
     );
@@ -2798,9 +3330,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:duration-from-timezone ( $timezone as xs:string ) as xs:dayTimeDuration { xs:dayTimeDuration( if (not(matches($timezone,'Z|[\\+\\-]\\d{2}:\\d{2}'))) then error(xs:QName('functx:Invalid_Timezone_Value')) else if ($timezone = 'Z') then 'PT0S' else replace($timezone,'\\+?(\\d{2}):\\d{2}','PT$1H') ) } ;\n" +
       "                    (functx:duration-from-timezone('Z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -2817,9 +3353,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:duration-from-timezone ( $timezone as xs:string ) as xs:dayTimeDuration { xs:dayTimeDuration( if (not(matches($timezone,'Z|[\\+\\-]\\d{2}:\\d{2}'))) then error(xs:QName('functx:Invalid_Timezone_Value')) else if ($timezone = 'Z') then 'PT0S' else replace($timezone,'\\+?(\\d{2}):\\d{2}','PT$1H') ) } ;\n" +
       "                    (functx:duration-from-timezone('-05:00'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-PT5H")
     );
@@ -2836,9 +3376,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:duration-from-timezone ( $timezone as xs:string ) as xs:dayTimeDuration { xs:dayTimeDuration( if (not(matches($timezone,'Z|[\\+\\-]\\d{2}:\\d{2}'))) then error(xs:QName('functx:Invalid_Timezone_Value')) else if ($timezone = 'Z') then 'PT0S' else replace($timezone,'\\+?(\\d{2}):\\d{2}','PT$1H') ) } ;\n" +
       "                    (functx:duration-from-timezone('+09:00'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT9H")
     );
@@ -2855,9 +3399,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:duration-from-timezone ( $timezone as xs:string ) as xs:dayTimeDuration { xs:dayTimeDuration( if (not(matches($timezone,'Z|[\\+\\-]\\d{2}:\\d{2}'))) then error(xs:QName('functx:Invalid_Timezone_Value')) else if ($timezone = 'Z') then 'PT0S' else replace($timezone,'\\+?(\\d{2}):\\d{2}','PT$1H') ) } ;\n" +
       "                    (functx:duration-from-timezone('Z'), functx:duration-from-timezone('-05:00'), functx:duration-from-timezone('+09:00'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S -PT5H PT9H")
     );
@@ -2880,9 +3428,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-before($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml := <authors> <author test=\"abc\"> <first>Kate</first> <last>Jones</last> </author> <author> <first>John</first> <a:last xmlns:a=\"http://a\">Doe</a:last> </author> </authors> return (functx:dynamic-path( $in-xml,'author/first'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<first>Kate</first><first>John</first>", false)
     );
@@ -2905,9 +3457,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-before($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml := <authors> <author test=\"abc\"> <first>Kate</first> <last>Jones</last> </author> <author> <first>John</first> <a:last xmlns:a=\"http://a\">Doe</a:last> </author> </authors> return (name(functx:dynamic-path( $in-xml,'author/@test')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "test")
     );
@@ -2930,9 +3486,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-before($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml := <authors> <author test=\"abc\"> <first>Kate</first> <last>Jones</last> </author> <author> <first>John</first> <a:last xmlns:a=\"http://a\">Doe</a:last> </author> </authors> return (functx:dynamic-path( $in-xml,'author'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<author test=\"abc\"><first>Kate</first><last>Jones</last></author><author><first>John</first><a:last xmlns:a=\"http://a\">Doe</a:last></author>", false)
     );
@@ -2955,9 +3515,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-before($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml := <authors> <author test=\"abc\"> <first>Kate</first> <last>Jones</last> </author> <author> <first>John</first> <a:last xmlns:a=\"http://a\">Doe</a:last> </author> </authors> return (functx:dynamic-path( $in-xml,'author/a:last'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a:last xmlns:a=\"http://a\">Doe</a:last>", false)
     );
@@ -2980,9 +3544,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-before($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml := <authors> <author test=\"abc\"> <first>Kate</first> <last>Jones</last> </author> <author> <first>John</first> <a:last xmlns:a=\"http://a\">Doe</a:last> </author> </authors> return (functx:dynamic-path( $in-xml,'author/first'), name(functx:dynamic-path( $in-xml,'author/@test')), functx:dynamic-path( $in-xml,'author'), functx:dynamic-path( $in-xml,'author/a:last'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<first>Kate</first><first>John</first>test<author test=\"abc\"><first>Kate</first><last>Jones</last></author><author><first>John</first><a:last xmlns:a=\"http://a\">Doe</a:last></author><a:last xmlns:a=\"http://a\">Doe</a:last>", false)
     );
@@ -2999,9 +3567,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:escape-for-regex ( $arg as xs:string? ) as xs:string { replace($arg, '(\\.|\\[|\\]|\\\\|\\||\\-|\\^|\\$|\\?|\\*|\\+|\\{|\\}|\\(|\\))','\\\\$1') } ;\n" +
       "                    (functx:escape-for-regex('5.55'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5\\.55")
     );
@@ -3018,9 +3590,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:escape-for-regex ( $arg as xs:string? ) as xs:string { replace($arg, '(\\.|\\[|\\]|\\\\|\\||\\-|\\^|\\$|\\?|\\*|\\+|\\{|\\}|\\(|\\))','\\\\$1') } ;\n" +
       "                    (functx:escape-for-regex('[abc]'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "\\[abc\\]")
     );
@@ -3037,9 +3613,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:escape-for-regex ( $arg as xs:string? ) as xs:string { replace($arg, '(\\.|\\[|\\]|\\\\|\\||\\-|\\^|\\$|\\?|\\*|\\+|\\{|\\}|\\(|\\))','\\\\$1') } ;\n" +
       "                    (functx:escape-for-regex('5.55'), functx:escape-for-regex('[abc]'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5\\.55 \\[abc\\]")
     );
@@ -3056,9 +3636,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:exclusive-or ( $arg1 as xs:boolean? , $arg2 as xs:boolean? ) as xs:boolean? { $arg1 != $arg2 } ;\n" +
       "                    (functx:exclusive-or(true(),false()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3075,9 +3659,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:exclusive-or ( $arg1 as xs:boolean? , $arg2 as xs:boolean? ) as xs:boolean? { $arg1 != $arg2 } ;\n" +
       "                    (functx:exclusive-or(true(),true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3096,9 +3684,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "                    3,1 >\n" +
       "                    2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3117,9 +3709,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "                    3,1 >\n" +
       "                    2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false true")
     );
@@ -3142,9 +3738,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:first-day-of-month( xs:date('2004-01-23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-01")
     );
@@ -3167,9 +3767,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:first-day-of-month( xs:dateTime('2004-01-23T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-01")
     );
@@ -3192,9 +3796,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:first-day-of-month('2004-03-23'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-03-01")
     );
@@ -3217,9 +3825,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:first-day-of-month( xs:date('2004-01-23')), functx:first-day-of-month( xs:dateTime('2004-01-23T12:00:13')), functx:first-day-of-month('2004-03-23'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-01 2004-01-01 2004-03-01")
     );
@@ -3242,9 +3854,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:first-day-of-year(xs:date('2004-01-23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-01")
     );
@@ -3267,9 +3883,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:first-day-of-year( xs:dateTime('2004-01-23T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-01")
     );
@@ -3292,9 +3912,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:first-day-of-year('2004-03-23'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-01")
     );
@@ -3317,9 +3941,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:first-day-of-year(xs:date('2004-01-23')), functx:first-day-of-year( xs:dateTime('2004-01-23T12:00:13')), functx:first-day-of-year('2004-03-23'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-01 2004-01-01 2004-01-01")
     );
@@ -3336,9 +3964,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:first-node ( $nodes as node()* ) as node()? { ($nodes/.)[1] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:first-node($in-xml//fName))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fName>Kate</fName>", false)
     );
@@ -3355,9 +3987,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:first-node ( $nodes as node()* ) as node()? { ($nodes/.)[1] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:first-node( ($in-xml//lName, $in-xml//fName) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fName>Kate</fName>", false)
     );
@@ -3374,9 +4010,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:first-node ( $nodes as node()* ) as node()? { ($nodes/.)[1] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:first-node($in-xml//fName), functx:first-node( ($in-xml//lName, $in-xml//fName) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fName>Kate</fName><fName>Kate</fName>", false)
     );
@@ -3393,9 +4033,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:follows-not-descendant ( $a as node()? , $b as node()? ) as xs:boolean { $a >> $b and empty($b intersect $a/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:follows-not-descendant( $in-xml//author[2],$in-xml//author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3412,9 +4056,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:follows-not-descendant ( $a as node()? , $b as node()? ) as xs:boolean { $a >> $b and empty($b intersect $a/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:follows-not-descendant( $in-xml//author[1]/fName, $in-xml//author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3431,9 +4079,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:follows-not-descendant ( $a as node()? , $b as node()? ) as xs:boolean { $a >> $b and empty($b intersect $a/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:follows-not-descendant( $in-xml//author[1],$in-xml//author[2]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3450,9 +4102,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:follows-not-descendant ( $a as node()? , $b as node()? ) as xs:boolean { $a >> $b and empty($b intersect $a/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:follows-not-descendant( $in-xml//author[2],$in-xml//author[1]), functx:follows-not-descendant( $in-xml//author[1]/fName, $in-xml//author[1]), functx:follows-not-descendant( $in-xml//author[1],$in-xml//author[2]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false false")
     );
@@ -3471,9 +4127,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { tokenize($arg,$regex)[1] } ;\n" +
       "                    (functx:format-as-title-en( ('A Midsummer Night''s Dream', 'The Merchant of Venice', 'Hamlet')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Midsummer Night's Dream, A Merchant of Venice, The Hamlet")
     );
@@ -3490,9 +4150,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:fragment-from-uri ( $uri as xs:string? ) as xs:string? { substring-after($uri,'#') } ;\n" +
       "                    (functx:fragment-from-uri( 'http://datypic.com/index.htm#abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc")
     );
@@ -3509,9 +4173,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:fragment-from-uri ( $uri as xs:string? ) as xs:string? { substring-after($uri,'#') } ;\n" +
       "                    (functx:fragment-from-uri( 'http://datypic.com/index.htm'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -3528,9 +4196,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:fragment-from-uri ( $uri as xs:string? ) as xs:string? { substring-after($uri,'#') } ;\n" +
       "                    (functx:fragment-from-uri( 'http://datypic.com/index.htm#abc'), functx:fragment-from-uri( 'http://datypic.com/index.htm'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc ")
     );
@@ -3553,9 +4225,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:get-matches( 'abc123def', '\\d+'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " 123 ")
     );
@@ -3578,9 +4254,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:get-matches( 'abc123def', '\\d'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " 1 2 3 ")
     );
@@ -3603,9 +4283,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:get-matches( 'abc123def', '[a-z]{2}'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ab  de ")
     );
@@ -3628,9 +4312,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:get-matches( 'abc123def', '\\d+'), functx:get-matches( 'abc123def', '\\d'), functx:get-matches( 'abc123def', '[a-z]{2}'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " 123   1 2 3  ab  de ")
     );
@@ -3651,9 +4339,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:get-matches-and-non-matches( 'abc123def', '\\d+'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<non-match>abc</non-match><match>123</match><non-match>def</non-match>", false)
     );
@@ -3674,9 +4366,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:get-matches-and-non-matches( 'abc123def', '\\d'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<non-match>abc</non-match><match>1</match><match>2</match><match>3</match><non-match>def</non-match>", false)
     );
@@ -3697,9 +4393,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:get-matches-and-non-matches( 'abc123def', '[a-z]{2}'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<match>ab</match><non-match>c123</non-match><match>de</match><non-match>f</non-match>", false)
     );
@@ -3720,9 +4420,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:get-matches-and-non-matches( 'abc123def', '\\d+'), functx:get-matches-and-non-matches( 'abc123def', '\\d'), functx:get-matches-and-non-matches( 'abc123def', '[a-z]{2}'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<non-match>abc</non-match><match>123</match><non-match>def</non-match><non-match>abc</non-match><match>1</match><match>2</match><match>3</match><non-match>def</non-match><match>ab</match><non-match>c123</non-match><match>de</match><non-match>f</non-match>", false)
     );
@@ -3739,9 +4443,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-element-only-content ( $element as element() ) as xs:boolean { not($element/text()[normalize-space(.) != '']) and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> <h><x>xml</x><y>xml</y></h> <i> <x>xml</x> <y>xml</y> </i> </in-xml> return (functx:has-element-only-content($in-xml/a))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3758,9 +4466,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-element-only-content ( $element as element() ) as xs:boolean { not($element/text()[normalize-space(.) != '']) and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> <h><x>xml</x><y>xml</y></h> <i> <x>xml</x> <y>xml</y> </i> </in-xml> return (functx:has-element-only-content($in-xml/b))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3777,9 +4489,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-element-only-content ( $element as element() ) as xs:boolean { not($element/text()[normalize-space(.) != '']) and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> <h><x>xml</x><y>xml</y></h> <i> <x>xml</x> <y>xml</y> </i> </in-xml> return (functx:has-element-only-content($in-xml/c))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3796,9 +4512,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-element-only-content ( $element as element() ) as xs:boolean { not($element/text()[normalize-space(.) != '']) and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> <h><x>xml</x><y>xml</y></h> <i> <x>xml</x> <y>xml</y> </i> </in-xml> return (functx:has-element-only-content($in-xml/d))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3815,9 +4535,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-element-only-content ( $element as element() ) as xs:boolean { not($element/text()[normalize-space(.) != '']) and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> <h><x>xml</x><y>xml</y></h> <i> <x>xml</x> <y>xml</y> </i> </in-xml> return (functx:has-element-only-content($in-xml/e))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3834,9 +4558,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-element-only-content ( $element as element() ) as xs:boolean { not($element/text()[normalize-space(.) != '']) and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> <h><x>xml</x><y>xml</y></h> <i> <x>xml</x> <y>xml</y> </i> </in-xml> return (functx:has-element-only-content($in-xml/f))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3853,9 +4581,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-element-only-content ( $element as element() ) as xs:boolean { not($element/text()[normalize-space(.) != '']) and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> <h><x>xml</x><y>xml</y></h> <i> <x>xml</x> <y>xml</y> </i> </in-xml> return (functx:has-element-only-content($in-xml/g))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3872,9 +4604,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-element-only-content ( $element as element() ) as xs:boolean { not($element/text()[normalize-space(.) != '']) and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> <h><x>xml</x><y>xml</y></h> <i> <x>xml</x> <y>xml</y> </i> </in-xml> return (functx:has-element-only-content($in-xml/h))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3891,9 +4627,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-element-only-content ( $element as element() ) as xs:boolean { not($element/text()[normalize-space(.) != '']) and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> <h><x>xml</x><y>xml</y></h> <i> <x>xml</x> <y>xml</y> </i> </in-xml> return (functx:has-element-only-content($in-xml/i))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3910,9 +4650,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-element-only-content ( $element as element() ) as xs:boolean { not($element/text()[normalize-space(.) != '']) and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> <h><x>xml</x><y>xml</y></h> <i> <x>xml</x> <y>xml</y> </i> </in-xml> return (functx:has-element-only-content($in-xml/a), functx:has-element-only-content($in-xml/b), functx:has-element-only-content($in-xml/c), functx:has-element-only-content($in-xml/d), functx:has-element-only-content($in-xml/e), functx:has-element-only-content($in-xml/f), functx:has-element-only-content($in-xml/g), functx:has-element-only-content($in-xml/h), functx:has-element-only-content($in-xml/i))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false false false false true false true true true")
     );
@@ -3929,9 +4673,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-empty-content ( $element as element() ) as xs:boolean { not($element/node()) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-empty-content($in-xml/a))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3948,9 +4696,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-empty-content ( $element as element() ) as xs:boolean { not($element/node()) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-empty-content($in-xml/b))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3967,9 +4719,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-empty-content ( $element as element() ) as xs:boolean { not($element/node()) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-empty-content($in-xml/c))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3986,9 +4742,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-empty-content ( $element as element() ) as xs:boolean { not($element/node()) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-empty-content($in-xml/d))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4005,9 +4765,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-empty-content ( $element as element() ) as xs:boolean { not($element/node()) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-empty-content($in-xml/e))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4024,9 +4788,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-empty-content ( $element as element() ) as xs:boolean { not($element/node()) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-empty-content($in-xml/f))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4043,9 +4811,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-empty-content ( $element as element() ) as xs:boolean { not($element/node()) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-empty-content($in-xml/g))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4062,9 +4834,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-empty-content ( $element as element() ) as xs:boolean { not($element/node()) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-empty-content($in-xml/a), functx:has-empty-content($in-xml/b), functx:has-empty-content($in-xml/c), functx:has-empty-content($in-xml/d), functx:has-empty-content($in-xml/e), functx:has-empty-content($in-xml/f), functx:has-empty-content($in-xml/g))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true true false false false false")
     );
@@ -4081,9 +4857,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-mixed-content ( $element as element() ) as xs:boolean { $element/text()[normalize-space(.) != ''] and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-mixed-content($in-xml/a))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4100,9 +4880,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-mixed-content ( $element as element() ) as xs:boolean { $element/text()[normalize-space(.) != ''] and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-mixed-content($in-xml/b))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4119,9 +4903,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-mixed-content ( $element as element() ) as xs:boolean { $element/text()[normalize-space(.) != ''] and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-mixed-content($in-xml/c))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4138,9 +4926,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-mixed-content ( $element as element() ) as xs:boolean { $element/text()[normalize-space(.) != ''] and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-mixed-content($in-xml/d))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4157,9 +4949,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-mixed-content ( $element as element() ) as xs:boolean { $element/text()[normalize-space(.) != ''] and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-mixed-content($in-xml/e))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4176,9 +4972,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-mixed-content ( $element as element() ) as xs:boolean { $element/text()[normalize-space(.) != ''] and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-mixed-content($in-xml/f))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4195,9 +4995,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-mixed-content ( $element as element() ) as xs:boolean { $element/text()[normalize-space(.) != ''] and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-mixed-content($in-xml/g))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4214,9 +5018,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-mixed-content ( $element as element() ) as xs:boolean { $element/text()[normalize-space(.) != ''] and $element/* } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> <g> <x>xml</x> </g> </in-xml> return (functx:has-mixed-content($in-xml/a), functx:has-mixed-content($in-xml/b), functx:has-mixed-content($in-xml/c), functx:has-mixed-content($in-xml/d), functx:has-mixed-content($in-xml/e), functx:has-mixed-content($in-xml/f), functx:has-mixed-content($in-xml/g))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false false false false false true false")
     );
@@ -4233,9 +5041,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-simple-content ( $element as element() ) as xs:boolean { $element/text() and not($element/*) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> </in-xml> return (functx:has-simple-content($in-xml/a))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4252,9 +5064,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-simple-content ( $element as element() ) as xs:boolean { $element/text() and not($element/*) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> </in-xml> return (functx:has-simple-content($in-xml/b))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4271,9 +5087,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-simple-content ( $element as element() ) as xs:boolean { $element/text() and not($element/*) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> </in-xml> return (functx:has-simple-content($in-xml/c))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4290,9 +5110,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-simple-content ( $element as element() ) as xs:boolean { $element/text() and not($element/*) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> </in-xml> return (functx:has-simple-content($in-xml/d))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4309,9 +5133,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-simple-content ( $element as element() ) as xs:boolean { $element/text() and not($element/*) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> </in-xml> return (functx:has-simple-content($in-xml/e))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4328,9 +5156,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-simple-content ( $element as element() ) as xs:boolean { $element/text() and not($element/*) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> </in-xml> return (functx:has-simple-content($in-xml/f))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4347,9 +5179,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:has-simple-content ( $element as element() ) as xs:boolean { $element/text() and not($element/*) } ;\n" +
       "                    let $in-xml := <in-xml> <a></a> <b/> <c> </c> <d>xml</d> <e><x>xml</x></e> <f>mixed <x>xml</x></f> </in-xml> return (functx:has-simple-content($in-xml/a), functx:has-simple-content($in-xml/b), functx:has-simple-content($in-xml/c), functx:has-simple-content($in-xml/d), functx:has-simple-content($in-xml/e), functx:has-simple-content($in-xml/f))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false false false true false false")
     );
@@ -4366,10 +5202,14 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:id-from-element ( $element as element()? ) as xs:string? { data(($element/@*[id(.) is ..])[1]) } ;\n" +
       "         let $book := (/) return (functx:id-from-element($book/book/section[1]))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_book.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_book.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "preface")
     );
@@ -4386,9 +5226,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:id-untyped ( $node as node()* , $id as xs:anyAtomicType ) as element()* { $node//*[@* = $id] } ;\n" +
       "                    let $in-xml := <in-xml> <a id=\"A001\">abc</a> <b foo=\"A001\">def</b> <c id=\"B001\">ghi</c> </in-xml> return (functx:id-untyped($in-xml,'B001'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<c id=\"B001\">ghi</c>", false)
     );
@@ -4405,9 +5249,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:id-untyped ( $node as node()* , $id as xs:anyAtomicType ) as element()* { $node//*[@* = $id] } ;\n" +
       "                    let $in-xml := <in-xml> <a id=\"A001\">abc</a> <b foo=\"A001\">def</b> <c id=\"B001\">ghi</c> </in-xml> return (functx:id-untyped($in-xml,'A001'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a id=\"A001\">abc</a><b foo=\"A001\">def</b>", false)
     );
@@ -4424,9 +5272,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:id-untyped ( $node as node()* , $id as xs:anyAtomicType ) as element()* { $node//*[@* = $id] } ;\n" +
       "                    let $in-xml := <in-xml> <a id=\"A001\">abc</a> <b foo=\"A001\">def</b> <c id=\"B001\">ghi</c> </in-xml> return (functx:id-untyped($in-xml,'C001'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4443,9 +5295,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:id-untyped ( $node as node()* , $id as xs:anyAtomicType ) as element()* { $node//*[@* = $id] } ;\n" +
       "                    let $in-xml := <in-xml> <a id=\"A001\">abc</a> <b foo=\"A001\">def</b> <c id=\"B001\">ghi</c> </in-xml> return (functx:id-untyped($in-xml,'B001'), functx:id-untyped($in-xml,'A001'), functx:id-untyped($in-xml,'C001'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<c id=\"B001\">ghi</c><a id=\"A001\">abc</a><b foo=\"A001\">def</b>", false)
     );
@@ -4462,9 +5318,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-absent ( $arg as item()* , $value as item()* ) as item()* { if (exists($arg)) then $arg else $value } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"69.99\"/> <price value=\"49.99\" discount=\"\"/> </prices> return (data(functx:if-absent( $in-xml//price[1]/@discount, 0)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10.00")
     );
@@ -4481,9 +5341,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-absent ( $arg as item()* , $value as item()* ) as item()* { if (exists($arg)) then $arg else $value } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"69.99\"/> <price value=\"49.99\" discount=\"\"/> </prices> return (data(functx:if-absent( $in-xml//price[3]/@discount, 0)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -4500,9 +5364,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-absent ( $arg as item()* , $value as item()* ) as item()* { if (exists($arg)) then $arg else $value } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"69.99\"/> <price value=\"49.99\" discount=\"\"/> </prices> return (data(functx:if-absent( $in-xml//price[4]/@discount, 0)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4519,9 +5387,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-absent ( $arg as item()* , $value as item()* ) as item()* { if (exists($arg)) then $arg else $value } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"69.99\"/> <price value=\"49.99\" discount=\"\"/> </prices> return (data(functx:if-absent( $in-xml//price[1]/@discount, 0)), data(functx:if-absent( $in-xml//price[3]/@discount, 0)), data(functx:if-absent( $in-xml//price[4]/@discount, 0)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10.00 0 ")
     );
@@ -4538,9 +5410,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    let $in-xml := <prices> <price discount=\"10.00\">29.99</price> <price discount=\"6.00\">39.99</price> <price></price> <price discount=\"\">49.99</price> </prices> return (functx:if-empty($in-xml//price[1], 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "29.99")
     );
@@ -4557,9 +5433,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    let $in-xml := <prices> <price discount=\"10.00\">29.99</price> <price discount=\"6.00\">39.99</price> <price></price> <price discount=\"\">49.99</price> </prices> return (functx:if-empty($in-xml//price[3], 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -4576,9 +5456,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    let $in-xml := <prices> <price discount=\"10.00\">29.99</price> <price discount=\"6.00\">39.99</price> <price></price> <price discount=\"\">49.99</price> </prices> return (functx:if-empty($in-xml//price[99], 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -4595,9 +5479,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    let $in-xml := <prices> <price discount=\"10.00\">29.99</price> <price discount=\"6.00\">39.99</price> <price></price> <price discount=\"\">49.99</price> </prices> return (functx:if-empty($in-xml//price[1]/@discount, 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10.00")
     );
@@ -4614,9 +5502,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    let $in-xml := <prices> <price discount=\"10.00\">29.99</price> <price discount=\"6.00\">39.99</price> <price></price> <price discount=\"\">49.99</price> </prices> return (functx:if-empty($in-xml//price[3]/@discount, 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -4633,9 +5525,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    let $in-xml := <prices> <price discount=\"10.00\">29.99</price> <price discount=\"6.00\">39.99</price> <price></price> <price discount=\"\">49.99</price> </prices> return (functx:if-empty($in-xml//price[4]/@discount, 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -4652,9 +5548,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:if-empty ( $arg as item()? , $value as item()* ) as item()* { if (string($arg) != '') then data($arg) else $value } ;\n" +
       "                    let $in-xml := <prices> <price discount=\"10.00\">29.99</price> <price discount=\"6.00\">39.99</price> <price></price> <price discount=\"\">49.99</price> </prices> return (functx:if-empty($in-xml//price[1], 0), functx:if-empty($in-xml//price[3], 0), functx:if-empty($in-xml//price[99], 0), functx:if-empty($in-xml//price[1]/@discount, 0), functx:if-empty($in-xml//price[3]/@discount, 0), functx:if-empty($in-xml//price[4]/@discount, 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "29.99 0 0 10.00 0 0")
     );
@@ -4671,9 +5571,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-deep-equal-node ( $nodes as node()* , $nodeToFind as node() ) as xs:integer* { for $seq in (1 to count($nodes)) return $seq[deep-equal($nodes[$seq],$nodeToFind)] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName/> <lName>Smith</lName> </author> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return let $anotherAuthor := <author> <fName>John</fName> <lName>Smith</lName> </author> return (functx:index-of-deep-equal-node( $in-xml/author,$anAuthor))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -4690,9 +5594,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-deep-equal-node ( $nodes as node()* , $nodeToFind as node() ) as xs:integer* { for $seq in (1 to count($nodes)) return $seq[deep-equal($nodes[$seq],$nodeToFind)] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName/> <lName>Smith</lName> </author> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return let $anotherAuthor := <author> <fName>John</fName> <lName>Smith</lName> </author> return (functx:index-of-deep-equal-node( $in-xml/author,$anotherAuthor))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4709,9 +5617,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-deep-equal-node ( $nodes as node()* , $nodeToFind as node() ) as xs:integer* { for $seq in (1 to count($nodes)) return $seq[deep-equal($nodes[$seq],$nodeToFind)] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName/> <lName>Smith</lName> </author> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return let $anotherAuthor := <author> <fName>John</fName> <lName>Smith</lName> </author> return (functx:index-of-deep-equal-node( $in-xml/author/lName,$anAuthor/lName))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -4728,9 +5640,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-deep-equal-node ( $nodes as node()* , $nodeToFind as node() ) as xs:integer* { for $seq in (1 to count($nodes)) return $seq[deep-equal($nodes[$seq],$nodeToFind)] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName/> <lName>Smith</lName> </author> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return let $anotherAuthor := <author> <fName>John</fName> <lName>Smith</lName> </author> return (functx:index-of-deep-equal-node( $in-xml/author,$anAuthor), functx:index-of-deep-equal-node( $in-xml/author,$anotherAuthor), functx:index-of-deep-equal-node( $in-xml/author/lName,$anAuthor/lName))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 2")
     );
@@ -4747,9 +5663,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-match-first ( $arg as xs:string? , $pattern as xs:string ) as xs:integer? { if (matches($arg,$pattern)) then string-length(tokenize($arg, $pattern)[1]) + 1 else () } ;\n" +
       "                    (functx:index-of-match-first( 'abcdabcdabcd','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -4766,9 +5686,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-match-first ( $arg as xs:string? , $pattern as xs:string ) as xs:integer? { if (matches($arg,$pattern)) then string-length(tokenize($arg, $pattern)[1]) + 1 else () } ;\n" +
       "                    (functx:index-of-match-first( 'abcdabcdabcd','bcd'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -4785,9 +5709,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-match-first ( $arg as xs:string? , $pattern as xs:string ) as xs:integer? { if (matches($arg,$pattern)) then string-length(tokenize($arg, $pattern)[1]) + 1 else () } ;\n" +
       "                    (functx:index-of-match-first('a1234','\\d'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -4804,9 +5732,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-match-first ( $arg as xs:string? , $pattern as xs:string ) as xs:integer? { if (matches($arg,$pattern)) then string-length(tokenize($arg, $pattern)[1]) + 1 else () } ;\n" +
       "                    (functx:index-of-match-first('abc abc','\\s'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -4823,9 +5755,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-match-first ( $arg as xs:string? , $pattern as xs:string ) as xs:integer? { if (matches($arg,$pattern)) then string-length(tokenize($arg, $pattern)[1]) + 1 else () } ;\n" +
       "                    (functx:index-of-match-first('abc abc','z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4842,9 +5778,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-match-first ( $arg as xs:string? , $pattern as xs:string ) as xs:integer? { if (matches($arg,$pattern)) then string-length(tokenize($arg, $pattern)[1]) + 1 else () } ;\n" +
       "                    (functx:index-of-match-first( 'abcdabcdabcd','abc'), functx:index-of-match-first( 'abcdabcdabcd','bcd'), functx:index-of-match-first('a1234','\\d'), functx:index-of-match-first('abc abc','\\s'), functx:index-of-match-first('abc abc','z'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 2 4")
     );
@@ -4861,9 +5801,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-node ( $nodes as node()* , $nodeToFind as node() ) as xs:integer* { for $seq in (1 to count($nodes)) return $seq[$nodes[$seq] is $nodeToFind] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:index-of-node( $in-xml/author,$in-xml/author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -4880,9 +5824,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-node ( $nodes as node()* , $nodeToFind as node() ) as xs:integer* { for $seq in (1 to count($nodes)) return $seq[$nodes[$seq] is $nodeToFind] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:index-of-node( $in-xml/author,$in-xml/author[2]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -4899,9 +5847,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-node ( $nodes as node()* , $nodeToFind as node() ) as xs:integer* { for $seq in (1 to count($nodes)) return $seq[$nodes[$seq] is $nodeToFind] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:index-of-node( $in-xml/author, $in-xml/author[lName='Doe']))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -4918,9 +5870,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-node ( $nodes as node()* , $nodeToFind as node() ) as xs:integer* { for $seq in (1 to count($nodes)) return $seq[$nodes[$seq] is $nodeToFind] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:index-of-node( $in-xml/author,$in-xml/author[1]), functx:index-of-node( $in-xml/author,$in-xml/author[2]), functx:index-of-node( $in-xml/author, $in-xml/author[lName='Doe']))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 2")
     );
@@ -4937,9 +5893,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-string ( $arg as xs:string? , $substring as xs:string ) as xs:integer* { if (contains($arg, $substring)) then (string-length(substring-before($arg, $substring))+1, for $other in functx:index-of-string(substring-after($arg, $substring), $substring) return $other + string-length(substring-before($arg, $substring)) + string-length($substring)) else () } ;\n" +
       "                    (functx:index-of-string('abcdabcdabcd','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 5 9")
     );
@@ -4956,9 +5916,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-string ( $arg as xs:string? , $substring as xs:string ) as xs:integer* { if (contains($arg, $substring)) then (string-length(substring-before($arg, $substring))+1, for $other in functx:index-of-string(substring-after($arg, $substring), $substring) return $other + string-length(substring-before($arg, $substring)) + string-length($substring)) else () } ;\n" +
       "                    (functx:index-of-string('abcd','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -4975,9 +5939,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-string ( $arg as xs:string? , $substring as xs:string ) as xs:integer* { if (contains($arg, $substring)) then (string-length(substring-before($arg, $substring))+1, for $other in functx:index-of-string(substring-after($arg, $substring), $substring) return $other + string-length(substring-before($arg, $substring)) + string-length($substring)) else () } ;\n" +
       "                    (functx:index-of-string('xxx','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -4994,9 +5962,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-string ( $arg as xs:string? , $substring as xs:string ) as xs:integer* { if (contains($arg, $substring)) then (string-length(substring-before($arg, $substring))+1, for $other in functx:index-of-string(substring-after($arg, $substring), $substring) return $other + string-length(substring-before($arg, $substring)) + string-length($substring)) else () } ;\n" +
       "                    (functx:index-of-string('abcdabcdabcd','abc'), functx:index-of-string('abcd','abc'), functx:index-of-string('xxx','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 5 9 1")
     );
@@ -5013,9 +5985,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-string-first ( $arg as xs:string? , $substring as xs:string ) as xs:integer? { if (contains($arg, $substring)) then string-length(substring-before($arg, $substring))+1 else () } ;\n" +
       "                    (functx:index-of-string-first( 'abcdabcdabcd','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -5032,9 +6008,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-string-first ( $arg as xs:string? , $substring as xs:string ) as xs:integer? { if (contains($arg, $substring)) then string-length(substring-before($arg, $substring))+1 else () } ;\n" +
       "                    (functx:index-of-string-first( 'abcd','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -5051,9 +6031,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-string-first ( $arg as xs:string? , $substring as xs:string ) as xs:integer? { if (contains($arg, $substring)) then string-length(substring-before($arg, $substring))+1 else () } ;\n" +
       "                    (functx:index-of-string-first( 'xxx','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -5070,9 +6054,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-string-first ( $arg as xs:string? , $substring as xs:string ) as xs:integer? { if (contains($arg, $substring)) then string-length(substring-before($arg, $substring))+1 else () } ;\n" +
       "                    (functx:index-of-string-first( 'abcdabcdabcd','abc'), functx:index-of-string-first( 'abcd','abc'), functx:index-of-string-first( 'xxx','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 1")
     );
@@ -5091,9 +6079,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-string ( $arg as xs:string? , $substring as xs:string ) as xs:integer* { if (contains($arg, $substring)) then (string-length(substring-before($arg, $substring))+1, for $other in functx:index-of-string(substring-after($arg, $substring), $substring) return $other + string-length(substring-before($arg, $substring)) + string-length($substring)) else () } ;\n" +
       "                    (functx:index-of-string-last( 'abcdabcdabcd','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("9")
     );
@@ -5112,9 +6104,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-string ( $arg as xs:string? , $substring as xs:string ) as xs:integer* { if (contains($arg, $substring)) then (string-length(substring-before($arg, $substring))+1, for $other in functx:index-of-string(substring-after($arg, $substring), $substring) return $other + string-length(substring-before($arg, $substring)) + string-length($substring)) else () } ;\n" +
       "                    (functx:index-of-string-last( 'abcd','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -5133,9 +6129,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-string ( $arg as xs:string? , $substring as xs:string ) as xs:integer* { if (contains($arg, $substring)) then (string-length(substring-before($arg, $substring))+1, for $other in functx:index-of-string(substring-after($arg, $substring), $substring) return $other + string-length(substring-before($arg, $substring)) + string-length($substring)) else () } ;\n" +
       "                    (functx:index-of-string-last( 'xxx','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -5154,9 +6154,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:index-of-string ( $arg as xs:string? , $substring as xs:string ) as xs:integer* { if (contains($arg, $substring)) then (string-length(substring-before($arg, $substring))+1, for $other in functx:index-of-string(substring-after($arg, $substring), $substring) return $other + string-length(substring-before($arg, $substring)) + string-length($substring)) else () } ;\n" +
       "                    (functx:index-of-string-last( 'abcdabcdabcd','abc'), functx:index-of-string-last( 'abcd','abc'), functx:index-of-string-last( 'xxx','abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "9 1")
     );
@@ -5173,9 +6177,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:insert-string ( $originalString as xs:string? , $stringToInsert as xs:string? , $pos as xs:integer ) as xs:string { concat(substring($originalString,1,$pos - 1), $stringToInsert, substring($originalString,$pos)) } ;\n" +
       "                    (functx:insert-string('xyz','def',2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xdefyz")
     );
@@ -5192,9 +6200,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:insert-string ( $originalString as xs:string? , $stringToInsert as xs:string? , $pos as xs:integer ) as xs:string { concat(substring($originalString,1,$pos - 1), $stringToInsert, substring($originalString,$pos)) } ;\n" +
       "                    (functx:insert-string('xyz','def',5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xyzdef")
     );
@@ -5211,9 +6223,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:insert-string ( $originalString as xs:string? , $stringToInsert as xs:string? , $pos as xs:integer ) as xs:string { concat(substring($originalString,1,$pos - 1), $stringToInsert, substring($originalString,$pos)) } ;\n" +
       "                    (functx:insert-string('xyz','',2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xyz")
     );
@@ -5230,9 +6246,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:insert-string ( $originalString as xs:string? , $stringToInsert as xs:string? , $pos as xs:integer ) as xs:string { concat(substring($originalString,1,$pos - 1), $stringToInsert, substring($originalString,$pos)) } ;\n" +
       "                    (functx:insert-string('','def',2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "def")
     );
@@ -5249,9 +6269,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:insert-string ( $originalString as xs:string? , $stringToInsert as xs:string? , $pos as xs:integer ) as xs:string { concat(substring($originalString,1,$pos - 1), $stringToInsert, substring($originalString,$pos)) } ;\n" +
       "                    (functx:insert-string('xyz','def',2), functx:insert-string('xyz','def',5), functx:insert-string('xyz','',2), functx:insert-string('','def',2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xdefyz xyzdef xyz def")
     );
@@ -5268,9 +6292,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-a-number ( $value as xs:anyAtomicType? ) as xs:boolean { string(number($value)) != 'NaN' } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a> <b>abc</b> </in-xml> return (functx:is-a-number('123'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5287,9 +6315,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-a-number ( $value as xs:anyAtomicType? ) as xs:boolean { string(number($value)) != 'NaN' } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a> <b>abc</b> </in-xml> return (functx:is-a-number(123))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5306,9 +6338,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-a-number ( $value as xs:anyAtomicType? ) as xs:boolean { string(number($value)) != 'NaN' } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a> <b>abc</b> </in-xml> return (functx:is-a-number(' 123 '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5325,9 +6361,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-a-number ( $value as xs:anyAtomicType? ) as xs:boolean { string(number($value)) != 'NaN' } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a> <b>abc</b> </in-xml> return (functx:is-a-number(''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5344,9 +6384,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-a-number ( $value as xs:anyAtomicType? ) as xs:boolean { string(number($value)) != 'NaN' } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a> <b>abc</b> </in-xml> return (functx:is-a-number('123abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5363,9 +6407,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-a-number ( $value as xs:anyAtomicType? ) as xs:boolean { string(number($value)) != 'NaN' } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a> <b>abc</b> </in-xml> return (functx:is-a-number('NaN'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5382,9 +6430,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-a-number ( $value as xs:anyAtomicType? ) as xs:boolean { string(number($value)) != 'NaN' } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a> <b>abc</b> </in-xml> return (functx:is-a-number($in-xml/a))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5401,9 +6453,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-a-number ( $value as xs:anyAtomicType? ) as xs:boolean { string(number($value)) != 'NaN' } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a> <b>abc</b> </in-xml> return (functx:is-a-number($in-xml/b))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5420,9 +6476,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-a-number ( $value as xs:anyAtomicType? ) as xs:boolean { string(number($value)) != 'NaN' } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a> <b>abc</b> </in-xml> return (functx:is-a-number('123'), functx:is-a-number(123), functx:is-a-number(' 123 '), functx:is-a-number(''), functx:is-a-number('123abc'), functx:is-a-number('NaN'), functx:is-a-number($in-xml/a), functx:is-a-number($in-xml/b))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true true false false false true false")
     );
@@ -5439,9 +6499,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-absolute-uri ( $uri as xs:string? ) as xs:boolean { matches($uri,'^[a-z]+:') } ;\n" +
       "                    (functx:is-absolute-uri( 'http://www.datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5458,9 +6522,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-absolute-uri ( $uri as xs:string? ) as xs:boolean { matches($uri,'^[a-z]+:') } ;\n" +
       "                    (functx:is-absolute-uri( 'ftp://ftp.datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5477,9 +6545,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-absolute-uri ( $uri as xs:string? ) as xs:boolean { matches($uri,'^[a-z]+:') } ;\n" +
       "                    (functx:is-absolute-uri('ftp.datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5496,9 +6568,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-absolute-uri ( $uri as xs:string? ) as xs:boolean { matches($uri,'^[a-z]+:') } ;\n" +
       "                    (functx:is-absolute-uri('www.datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5515,9 +6591,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-absolute-uri ( $uri as xs:string? ) as xs:boolean { matches($uri,'^[a-z]+:') } ;\n" +
       "                    (functx:is-absolute-uri('prod.html'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5534,9 +6614,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-absolute-uri ( $uri as xs:string? ) as xs:boolean { matches($uri,'^[a-z]+:') } ;\n" +
       "                    (functx:is-absolute-uri( 'http://www.datypic.com'), functx:is-absolute-uri( 'ftp://ftp.datypic.com'), functx:is-absolute-uri('ftp.datypic.com'), functx:is-absolute-uri('www.datypic.com'), functx:is-absolute-uri('prod.html'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true false false false")
     );
@@ -5553,9 +6637,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-ancestor ( $node1 as node() , $node2 as node() ) as xs:boolean { exists($node1 intersect $node2/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:is-ancestor( $in-xml//author[1], $in-xml//author[1]/fName))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5572,9 +6660,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-ancestor ( $node1 as node() , $node2 as node() ) as xs:boolean { exists($node1 intersect $node2/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:is-ancestor( $in-xml//author[1]/fName, $in-xml//author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5591,9 +6683,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-ancestor ( $node1 as node() , $node2 as node() ) as xs:boolean { exists($node1 intersect $node2/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:is-ancestor( $in-xml//author[1]/fName, $in-xml//author[1]/fName/text()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5610,9 +6706,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-ancestor ( $node1 as node() , $node2 as node() ) as xs:boolean { exists($node1 intersect $node2/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:is-ancestor( $in-xml//author[1], $in-xml//author[2]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5629,9 +6729,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-ancestor ( $node1 as node() , $node2 as node() ) as xs:boolean { exists($node1 intersect $node2/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:is-ancestor( $in-xml//author[1], $in-xml//author[1]/fName), functx:is-ancestor( $in-xml//author[1]/fName, $in-xml//author[1]), functx:is-ancestor( $in-xml//author[1]/fName, $in-xml//author[1]/fName/text()), functx:is-ancestor( $in-xml//author[1], $in-xml//author[2]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false true false")
     );
@@ -5648,9 +6752,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-descendant ( $node1 as node() , $node2 as node() ) as xs:boolean { boolean($node2 intersect $node1/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:is-descendant( $in-xml//author[1]/fName, $in-xml//author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5667,9 +6775,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-descendant ( $node1 as node() , $node2 as node() ) as xs:boolean { boolean($node2 intersect $node1/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:is-descendant( $in-xml//author[1], $in-xml//author[1]/fName))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5686,9 +6798,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-descendant ( $node1 as node() , $node2 as node() ) as xs:boolean { boolean($node2 intersect $node1/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:is-descendant( $in-xml//author[1]/fName/text(), $in-xml//author[1]/fName))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5705,9 +6821,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-descendant ( $node1 as node() , $node2 as node() ) as xs:boolean { boolean($node2 intersect $node1/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:is-descendant( $in-xml//author[1], $in-xml//author[2]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5724,9 +6844,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-descendant ( $node1 as node() , $node2 as node() ) as xs:boolean { boolean($node2 intersect $node1/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:is-descendant( $in-xml//author[1]/fName, $in-xml//author[1]), functx:is-descendant( $in-xml//author[1], $in-xml//author[1]/fName), functx:is-descendant( $in-xml//author[1]/fName/text(), $in-xml//author[1]/fName), functx:is-descendant( $in-xml//author[1], $in-xml//author[2]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false true false")
     );
@@ -5743,9 +6867,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-leap-year ( $date as xs:anyAtomicType? ) as xs:boolean { for $year in xs:integer(substring(string($date),1,4)) return ($year mod 4 = 0 and $year mod 100 != 0) or $year mod 400 = 0 } ;\n" +
       "                    (functx:is-leap-year(xs:date('2004-01-23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5762,9 +6890,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-leap-year ( $date as xs:anyAtomicType? ) as xs:boolean { for $year in xs:integer(substring(string($date),1,4)) return ($year mod 4 = 0 and $year mod 100 != 0) or $year mod 400 = 0 } ;\n" +
       "                    (functx:is-leap-year(2004))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5781,9 +6913,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-leap-year ( $date as xs:anyAtomicType? ) as xs:boolean { for $year in xs:integer(substring(string($date),1,4)) return ($year mod 4 = 0 and $year mod 100 != 0) or $year mod 400 = 0 } ;\n" +
       "                    (functx:is-leap-year('2005-02-15'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5800,9 +6936,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-leap-year ( $date as xs:anyAtomicType? ) as xs:boolean { for $year in xs:integer(substring(string($date),1,4)) return ($year mod 4 = 0 and $year mod 100 != 0) or $year mod 400 = 0 } ;\n" +
       "                    (functx:is-leap-year(xs:date('2004-01-23')), functx:is-leap-year(2004), functx:is-leap-year('2005-02-15'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true false")
     );
@@ -5819,9 +6959,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-among-descendants ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq/descendant-or-self::*/(.|@*) satisfies $nodeInSeq is $node } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"49.99\" discount=\"\"/> </prices> return let $aPrice := <price value=\"49.99\" discount=\"\"/> return (functx:is-node-among-descendants( $in-xml/price[1],$in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5838,9 +6982,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-among-descendants ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq/descendant-or-self::*/(.|@*) satisfies $nodeInSeq is $node } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"49.99\" discount=\"\"/> </prices> return let $aPrice := <price value=\"49.99\" discount=\"\"/> return (functx:is-node-among-descendants( $in-xml,$in-xml/price[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5857,9 +7005,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-among-descendants ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq/descendant-or-self::*/(.|@*) satisfies $nodeInSeq is $node } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"49.99\" discount=\"\"/> </prices> return let $aPrice := <price value=\"49.99\" discount=\"\"/> return (functx:is-node-among-descendants( $in-xml,$in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5876,9 +7028,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-among-descendants ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq/descendant-or-self::*/(.|@*) satisfies $nodeInSeq is $node } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"49.99\" discount=\"\"/> </prices> return let $aPrice := <price value=\"49.99\" discount=\"\"/> return (functx:is-node-among-descendants( $aPrice,$in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5895,9 +7051,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-among-descendants ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq/descendant-or-self::*/(.|@*) satisfies $nodeInSeq is $node } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"49.99\" discount=\"\"/> </prices> return let $aPrice := <price value=\"49.99\" discount=\"\"/> return (functx:is-node-among-descendants( $in-xml/price[1],$in-xml), functx:is-node-among-descendants( $in-xml,$in-xml/price[1]), functx:is-node-among-descendants( $in-xml,$in-xml), functx:is-node-among-descendants( $aPrice,$in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false true false")
     );
@@ -5914,9 +7074,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-among-descendants-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq/descendant-or-self::*/(.|@*) satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>John</fName> <lName>Doe</lName> </author> return let $anotherAuthor := <author> <lName>Doe</lName> <fName>John</fName> </author> return (functx:is-node-among-descendants-deep-equal( $in-xml/author[1],$in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5933,9 +7097,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-among-descendants-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq/descendant-or-self::*/(.|@*) satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>John</fName> <lName>Doe</lName> </author> return let $anotherAuthor := <author> <lName>Doe</lName> <fName>John</fName> </author> return (functx:is-node-among-descendants-deep-equal( $anAuthor,$in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5952,9 +7120,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-among-descendants-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq/descendant-or-self::*/(.|@*) satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>John</fName> <lName>Doe</lName> </author> return let $anotherAuthor := <author> <lName>Doe</lName> <fName>John</fName> </author> return (functx:is-node-among-descendants-deep-equal( $anotherAuthor,$in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -5971,9 +7143,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-among-descendants-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq/descendant-or-self::*/(.|@*) satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>John</fName> <lName>Doe</lName> </author> return let $anotherAuthor := <author> <lName>Doe</lName> <fName>John</fName> </author> return (functx:is-node-among-descendants-deep-equal( $anAuthor,$in-xml/author))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -5990,9 +7166,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-among-descendants-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq/descendant-or-self::*/(.|@*) satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>John</fName> <lName>Doe</lName> </author> return let $anotherAuthor := <author> <lName>Doe</lName> <fName>John</fName> </author> return (functx:is-node-among-descendants-deep-equal( $in-xml/author[1],$in-xml), functx:is-node-among-descendants-deep-equal( $anAuthor,$in-xml), functx:is-node-among-descendants-deep-equal( $anotherAuthor,$in-xml), functx:is-node-among-descendants-deep-equal( $anAuthor,$in-xml/author))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true false true")
     );
@@ -6009,9 +7189,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies $nodeInSeq is $node } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"49.99\" discount=\"\"/> </prices> return let $aPrice := <price value=\"49.99\" discount=\"\"/> return (functx:is-node-in-sequence( $in-xml/price[1],$in-xml/price))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6028,9 +7212,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies $nodeInSeq is $node } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"49.99\" discount=\"\"/> </prices> return let $aPrice := <price value=\"49.99\" discount=\"\"/> return (functx:is-node-in-sequence( $in-xml/price[1],$in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6047,9 +7235,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies $nodeInSeq is $node } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"49.99\" discount=\"\"/> </prices> return let $aPrice := <price value=\"49.99\" discount=\"\"/> return (functx:is-node-in-sequence( $aPrice,$in-xml/price))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6066,9 +7258,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies $nodeInSeq is $node } ;\n" +
       "                    let $in-xml := <prices> <price value=\"29.99\" discount=\"10.00\"/> <price value=\"39.99\" discount=\"6.00\"/> <price value=\"49.99\" discount=\"\"/> </prices> return let $aPrice := <price value=\"49.99\" discount=\"\"/> return (functx:is-node-in-sequence( $in-xml/price[1],$in-xml/price), functx:is-node-in-sequence( $in-xml/price[1],$in-xml), functx:is-node-in-sequence( $aPrice,$in-xml/price))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false false")
     );
@@ -6085,9 +7281,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>John</fName> <lName>Doe</lName> </author> return (functx:is-node-in-sequence-deep-equal( $in-xml/author[1],$in-xml/author))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6104,9 +7304,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>John</fName> <lName>Doe</lName> </author> return (functx:is-node-in-sequence-deep-equal( $anAuthor,$in-xml/author))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6123,9 +7327,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>John</fName> <lName>Doe</lName> </author> return (functx:is-node-in-sequence-deep-equal( $in-xml/author[1],$in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6142,9 +7350,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-node-in-sequence-deep-equal ( $node as node()? , $seq as node()* ) as xs:boolean { some $nodeInSeq in $seq satisfies deep-equal($nodeInSeq,$node) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>John</fName> <lName>Doe</lName> </author> return (functx:is-node-in-sequence-deep-equal( $in-xml/author[1],$in-xml/author), functx:is-node-in-sequence-deep-equal( $anAuthor,$in-xml/author), functx:is-node-in-sequence-deep-equal( $in-xml/author[1],$in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true false")
     );
@@ -6161,9 +7373,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-value-in-sequence ( $value as xs:anyAtomicType? , $seq as xs:anyAtomicType* ) as xs:boolean { $value = $seq } ;\n" +
       "                    (functx:is-value-in-sequence(1,(1,2,3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6180,9 +7396,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-value-in-sequence ( $value as xs:anyAtomicType? , $seq as xs:anyAtomicType* ) as xs:boolean { $value = $seq } ;\n" +
       "                    (functx:is-value-in-sequence(5,(1,2,3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -6199,9 +7419,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-value-in-sequence ( $value as xs:anyAtomicType? , $seq as xs:anyAtomicType* ) as xs:boolean { $value = $seq } ;\n" +
       "                    (functx:is-value-in-sequence(1.0,(1,2,3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -6218,9 +7442,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:is-value-in-sequence ( $value as xs:anyAtomicType? , $seq as xs:anyAtomicType* ) as xs:boolean { $value = $seq } ;\n" +
       "                    (functx:is-value-in-sequence(1,(1,2,3)), functx:is-value-in-sequence(5,(1,2,3)), functx:is-value-in-sequence(1.0,(1,2,3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false true")
     );
@@ -6247,9 +7475,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:last-day-of-month(xs:date('2004-01-23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-31")
     );
@@ -6276,9 +7508,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:last-day-of-month( xs:dateTime('2004-09-23T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-09-30")
     );
@@ -6305,9 +7541,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:last-day-of-month('2004-03-23'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-03-31")
     );
@@ -6334,9 +7574,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:last-day-of-month(xs:date('2004-01-23')), functx:last-day-of-month( xs:dateTime('2004-09-23T12:00:13')), functx:last-day-of-month('2004-03-23'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-31 2004-09-30 2004-03-31")
     );
@@ -6363,9 +7607,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:last-day-of-year(xs:date('2004-01-23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-31")
     );
@@ -6392,9 +7640,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:last-day-of-year( xs:dateTime('2004-12-23T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-31")
     );
@@ -6421,9 +7673,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:last-day-of-year('2004-03-23'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-31")
     );
@@ -6450,9 +7706,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:last-day-of-year(xs:date('2004-01-23')), functx:last-day-of-year( xs:dateTime('2004-12-23T12:00:13')), functx:last-day-of-year('2004-03-23'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-31 2004-12-31 2004-12-31")
     );
@@ -6469,9 +7729,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:last-node ( $nodes as node()* ) as node()? { ($nodes/.)[last()] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:last-node($in-xml//fName))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fName>John</fName>", false)
     );
@@ -6488,9 +7752,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:last-node ( $nodes as node()* ) as node()? { ($nodes/.)[last()] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:last-node( ($in-xml//lName, $in-xml//fName) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<lName>Doe</lName>", false)
     );
@@ -6507,9 +7775,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:last-node ( $nodes as node()* ) as node()? { ($nodes/.)[last()] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:last-node($in-xml//fName), functx:last-node( ($in-xml//lName, $in-xml//fName) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fName>John</fName><lName>Doe</lName>", false)
     );
@@ -6536,9 +7808,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "        return (functx:leaf-elements($in-xml))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fName>Kate</fName><lName>Jones</lName><fName>John</fName><lName>Doe</lName>", false)
     );
@@ -6565,9 +7841,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "        return (functx:leaf-elements($in-xml/author[1]))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fName>Kate</fName><lName>Jones</lName>", false)
     );
@@ -6594,9 +7874,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "        return (functx:leaf-elements($in-xml), functx:leaf-elements($in-xml/author[1]))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fName>Kate</fName><lName>Jones</lName><fName>John</fName><lName>Doe</lName><fName>Kate</fName><lName>Jones</lName>", false)
     );
@@ -6613,9 +7897,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:left-trim ( $arg as xs:string? ) as xs:string { replace($arg,'^\\s+','') } ;\n" +
       "                    (functx:left-trim(' xyz'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xyz")
     );
@@ -6633,9 +7921,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         (functx:left-trim(' xyz    x'))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xyz    x")
     );
@@ -6652,9 +7944,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:left-trim ( $arg as xs:string? ) as xs:string { replace($arg,'^\\s+','') } ;\n" +
       "                    (functx:left-trim('xyz'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xyz")
     );
@@ -6671,9 +7967,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:left-trim ( $arg as xs:string? ) as xs:string { replace($arg,'^\\s+','') } ;\n" +
       "                    (functx:left-trim(' xyz'), functx:left-trim(' xyz    x'), functx:left-trim('xyz'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xyz xyz    x xyz")
     );
@@ -6692,9 +7992,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:lines ( $arg as xs:string? ) as xs:string* { tokenize($arg, '(\\r\\n?|\\n\\r?)') } ;\n" +
       "                    let $lines := 'a value on many lines' return (functx:line-count('a value'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -6718,9 +8022,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "            lines' return (functx:line-count($lines))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -6744,9 +8052,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "                    lines' \n" +
       "         return (functx:line-count('a value'), functx:line-count($lines))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 5")
     );
@@ -6763,9 +8075,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:lines ( $arg as xs:string? ) as xs:string* { tokenize($arg, '(\\r\\n?|\\n\\r?)') } ;\n" +
       "                    let $in-xml := <in-xml>a value on many lines</in-xml> return (functx:lines('a value'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a value")
     );
@@ -6782,9 +8098,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:lines ( $arg as xs:string? ) as xs:string* { tokenize($arg, '(\\r\\n?|\\n\\r?)') } ;\n" +
       "                    let $in-xml := <in-xml>a value on many lines</in-xml> return (functx:lines($in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a value on many lines")
     );
@@ -6801,9 +8121,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:lines ( $arg as xs:string? ) as xs:string* { tokenize($arg, '(\\r\\n?|\\n\\r?)') } ;\n" +
       "                    let $in-xml := <in-xml>a value on many lines</in-xml> return (functx:lines('a value'), functx:lines($in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a value a value on many lines")
     );
@@ -6820,9 +8144,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:max-depth ( $root as node()? ) as xs:integer? { if ($root/*) then max($root/*/functx:max-depth(.)) + 1 else 1 } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:max-depth($in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -6839,9 +8167,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:max-depth ( $root as node()? ) as xs:integer? { if ($root/*) then max($root/*/functx:max-depth(.)) + 1 else 1 } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:max-depth($in-xml/author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -6858,9 +8190,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:max-depth ( $root as node()? ) as xs:integer? { if ($root/*) then max($root/*/functx:max-depth(.)) + 1 else 1 } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:max-depth($in-xml), functx:max-depth($in-xml/author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 2")
     );
@@ -6877,9 +8213,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:max-determine-type ( $seq as xs:anyAtomicType* ) as xs:anyAtomicType? { if (every $value in $seq satisfies ($value castable as xs:double)) then max(for $value in $seq return xs:double($value)) else max(for $value in $seq return xs:string($value)) } ;\n" +
       "                    let $in-xml := <values> <nums> <num>12</num> <num>23</num> <num>115</num> <num>12.5</num> </nums> <strings> <string>def</string> <string>abc</string> </strings> </values> return (functx:max-determine-type($in-xml//num))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("115")
     );
@@ -6896,9 +8236,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:max-determine-type ( $seq as xs:anyAtomicType* ) as xs:anyAtomicType? { if (every $value in $seq satisfies ($value castable as xs:double)) then max(for $value in $seq return xs:double($value)) else max(for $value in $seq return xs:string($value)) } ;\n" +
       "                    let $in-xml := <values> <nums> <num>12</num> <num>23</num> <num>115</num> <num>12.5</num> </nums> <strings> <string>def</string> <string>abc</string> </strings> </values> return (functx:max-determine-type($in-xml//string))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "def")
     );
@@ -6915,9 +8259,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:max-determine-type ( $seq as xs:anyAtomicType* ) as xs:anyAtomicType? { if (every $value in $seq satisfies ($value castable as xs:double)) then max(for $value in $seq return xs:double($value)) else max(for $value in $seq return xs:string($value)) } ;\n" +
       "                    let $in-xml := <values> <nums> <num>12</num> <num>23</num> <num>115</num> <num>12.5</num> </nums> <strings> <string>def</string> <string>abc</string> </strings> </values> return (functx:max-determine-type( $in-xml//(num|string)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "def")
     );
@@ -6934,9 +8282,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:max-determine-type ( $seq as xs:anyAtomicType* ) as xs:anyAtomicType? { if (every $value in $seq satisfies ($value castable as xs:double)) then max(for $value in $seq return xs:double($value)) else max(for $value in $seq return xs:string($value)) } ;\n" +
       "                    let $in-xml := <values> <nums> <num>12</num> <num>23</num> <num>115</num> <num>12.5</num> </nums> <strings> <string>def</string> <string>abc</string> </strings> </values> return (functx:max-determine-type($in-xml//num), functx:max-determine-type($in-xml//string), functx:max-determine-type( $in-xml//(num|string)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "115 def def")
     );
@@ -6955,9 +8307,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:max-line-length ( $arg as xs:string? ) as xs:integer? { max( for $line in functx:lines($arg) return string-length($line)) } ;\n" +
       "                    let $lines := 'a value on several lines' return (functx:max-line-length('a value'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("7")
     );
@@ -6981,9 +8337,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "     lines' \n" +
       "         return (functx:max-line-length($lines))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("12")
     );
@@ -7007,9 +8367,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "     lines' \n" +
       "         return (functx:max-line-length('a value'), functx:max-line-length($lines))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "7 12")
     );
@@ -7026,9 +8390,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:max-node ( $nodes as node()* ) as node()* { $nodes[. = max($nodes)] } ;\n" +
       "                    let $in-xml := <values> <int>1</int> <int>23</int> <int>115</int> </values> return (functx:max-node($in-xml//int))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<int>115</int>", false)
     );
@@ -7045,9 +8413,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:max-string ( $strings as xs:anyAtomicType* ) as xs:string? { max(for $string in $strings return string($string)) } ;\n" +
       "                    let $in-xml := <in-xml> <x>a</x> <y>c</y> <z>b</z> </in-xml> return (functx:max-string( $in-xml/* ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "c")
     );
@@ -7064,9 +8436,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:max-string ( $strings as xs:anyAtomicType* ) as xs:string? { max(for $string in $strings return string($string)) } ;\n" +
       "                    let $in-xml := <in-xml> <x>a</x> <y>c</y> <z>b</z> </in-xml> return (functx:max-string( (100,25,3) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3")
     );
@@ -7083,9 +8459,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:max-string ( $strings as xs:anyAtomicType* ) as xs:string? { max(for $string in $strings return string($string)) } ;\n" +
       "                    let $in-xml := <in-xml> <x>a</x> <y>c</y> <z>b</z> </in-xml> return (functx:max-string( $in-xml/* ), functx:max-string( (100,25,3) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "c 3")
     );
@@ -7102,9 +8482,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:min-determine-type ( $seq as xs:anyAtomicType* ) as xs:anyAtomicType? { if (every $value in $seq satisfies ($value castable as xs:double)) then min(for $value in $seq return xs:double($value)) else min(for $value in $seq return xs:string($value)) } ;\n" +
       "                    let $in-xml := <values> <nums> <num>12</num> <num>23</num> <num>115</num> <num>12.5</num> </nums> <strings> <str>def</str> <str>abc</str> </strings> </values> return (functx:min-determine-type($in-xml//num))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("12")
     );
@@ -7121,9 +8505,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:min-determine-type ( $seq as xs:anyAtomicType* ) as xs:anyAtomicType? { if (every $value in $seq satisfies ($value castable as xs:double)) then min(for $value in $seq return xs:double($value)) else min(for $value in $seq return xs:string($value)) } ;\n" +
       "                    let $in-xml := <values> <nums> <num>12</num> <num>23</num> <num>115</num> <num>12.5</num> </nums> <strings> <str>def</str> <str>abc</str> </strings> </values> return (functx:min-determine-type($in-xml//str))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc")
     );
@@ -7140,9 +8528,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:min-determine-type ( $seq as xs:anyAtomicType* ) as xs:anyAtomicType? { if (every $value in $seq satisfies ($value castable as xs:double)) then min(for $value in $seq return xs:double($value)) else min(for $value in $seq return xs:string($value)) } ;\n" +
       "                    let $in-xml := <values> <nums> <num>12</num> <num>23</num> <num>115</num> <num>12.5</num> </nums> <strings> <str>def</str> <str>abc</str> </strings> </values> return (functx:min-determine-type($in-xml//(num|str)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "115")
     );
@@ -7159,9 +8551,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:min-determine-type ( $seq as xs:anyAtomicType* ) as xs:anyAtomicType? { if (every $value in $seq satisfies ($value castable as xs:double)) then min(for $value in $seq return xs:double($value)) else min(for $value in $seq return xs:string($value)) } ;\n" +
       "                    let $in-xml := <values> <nums> <num>12</num> <num>23</num> <num>115</num> <num>12.5</num> </nums> <strings> <str>def</str> <str>abc</str> </strings> </values> return (functx:min-determine-type($in-xml//num), functx:min-determine-type($in-xml//str), functx:min-determine-type($in-xml//(num|str)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12 abc 115")
     );
@@ -7178,9 +8574,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:min-node ( $nodes as node()* ) as node()* { $nodes[. = min($nodes)] } ;\n" +
       "                    let $in-xml := <values> <int>1</int> <int>23</int> <int>115</int> </values> return (functx:min-node($in-xml//int))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<int>1</int>", false)
     );
@@ -7197,9 +8597,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:min-non-empty-string ( $strings as xs:string* ) as xs:string? { min($strings[. != '']) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName/> <lName>Smith</lName> </author> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:min-non-empty-string( $in-xml//fName ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "John")
     );
@@ -7216,9 +8620,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:min-string ( $strings as xs:anyAtomicType* ) as xs:string? { min(for $string in $strings return string($string)) } ;\n" +
       "                    let $in-xml := <in-xml> <x>a</x> <y>c</y> <z>b</z> </in-xml> return (functx:min-string( $in-xml/* ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a")
     );
@@ -7235,9 +8643,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:min-string ( $strings as xs:anyAtomicType* ) as xs:string? { min(for $string in $strings return string($string)) } ;\n" +
       "                    let $in-xml := <in-xml> <x>a</x> <y>c</y> <z>b</z> </in-xml> return (functx:min-string( (100,25,3) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "100")
     );
@@ -7254,9 +8666,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:min-string ( $strings as xs:anyAtomicType* ) as xs:string? { min(for $string in $strings return string($string)) } ;\n" +
       "                    let $in-xml := <in-xml> <x>a</x> <y>c</y> <z>b</z> </in-xml> return (functx:min-string( $in-xml/* ), functx:min-string( (100,25,3) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a 100")
     );
@@ -7273,9 +8689,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:mmddyyyy-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$', '$3-$1-$2')) } ;\n" +
       "                    (functx:mmddyyyy-to-date('12-15-2004'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15")
     );
@@ -7292,9 +8712,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:mmddyyyy-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$', '$3-$1-$2')) } ;\n" +
       "                    (functx:mmddyyyy-to-date('12152004'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15")
     );
@@ -7311,9 +8735,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:mmddyyyy-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$', '$3-$1-$2')) } ;\n" +
       "                    (functx:mmddyyyy-to-date('12/15/2004'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15")
     );
@@ -7330,9 +8758,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:mmddyyyy-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{2})\\D*(\\d{2})\\D*(\\d{4})\\D*$', '$3-$1-$2')) } ;\n" +
       "                    (functx:mmddyyyy-to-date('12-15-2004'), functx:mmddyyyy-to-date('12152004'), functx:mmddyyyy-to-date('12/15/2004'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15 2004-12-15 2004-12-15")
     );
@@ -7349,9 +8781,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:month-abbrev-en ( $date as xs:anyAtomicType? ) as xs:string? { ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec') [month-from-date(xs:date($date))] } ;\n" +
       "                    (functx:month-abbrev-en(xs:date('2004-01-23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jan")
     );
@@ -7368,9 +8804,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:month-abbrev-en ( $date as xs:anyAtomicType? ) as xs:string? { ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec') [month-from-date(xs:date($date))] } ;\n" +
       "                    (functx:month-abbrev-en( xs:dateTime('2004-01-23T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jan")
     );
@@ -7387,9 +8827,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:month-abbrev-en ( $date as xs:anyAtomicType? ) as xs:string? { ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec') [month-from-date(xs:date($date))] } ;\n" +
       "                    (functx:month-abbrev-en('2004-01-23'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jan")
     );
@@ -7406,9 +8850,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:month-abbrev-en ( $date as xs:anyAtomicType? ) as xs:string? { ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec') [month-from-date(xs:date($date))] } ;\n" +
       "                    (functx:month-abbrev-en(xs:date('2004-01-23')), functx:month-abbrev-en( xs:dateTime('2004-01-23T12:00:13')), functx:month-abbrev-en('2004-01-23'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jan Jan Jan")
     );
@@ -7425,9 +8873,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:month-name-en ( $date as xs:anyAtomicType? ) as xs:string? { ('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December') [month-from-date(xs:date($date))] } ;\n" +
       "                    (functx:month-name-en(xs:date('2004-01-23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "January")
     );
@@ -7444,9 +8896,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:month-name-en ( $date as xs:anyAtomicType? ) as xs:string? { ('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December') [month-from-date(xs:date($date))] } ;\n" +
       "                    (functx:month-name-en( xs:dateTime('2004-01-23T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "January")
     );
@@ -7463,9 +8919,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:month-name-en ( $date as xs:anyAtomicType? ) as xs:string? { ('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December') [month-from-date(xs:date($date))] } ;\n" +
       "                    (functx:month-name-en('2004-01-23'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "January")
     );
@@ -7482,9 +8942,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:month-name-en ( $date as xs:anyAtomicType? ) as xs:string? { ('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December') [month-from-date(xs:date($date))] } ;\n" +
       "                    (functx:month-name-en(xs:date('2004-01-23')), functx:month-name-en( xs:dateTime('2004-01-23T12:00:13')), functx:month-name-en('2004-01-23'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "January January January")
     );
@@ -7503,9 +8967,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml := <pre:a xmlns:pre=\"http://ns.example.com/ns1\">abc</pre:a> return (functx:name-test(name($in-xml),('*')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7524,9 +8992,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml := <pre:a xmlns:pre=\"http://ns.example.com/ns1\">abc</pre:a> return (functx:name-test(name($in-xml),('pre:*')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7545,9 +9017,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml := <pre:a xmlns:pre=\"http://ns.example.com/ns1\">abc</pre:a> return (functx:name-test(name($in-xml),('*:a')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7566,9 +9042,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml := <pre:a xmlns:pre=\"http://ns.example.com/ns1\">abc</pre:a> return (functx:name-test( name($in-xml),('pre:a','pre:b')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -7587,9 +9067,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml := <pre:a xmlns:pre=\"http://ns.example.com/ns1\">abc</pre:a> return (functx:name-test( name($in-xml),('a','b','c')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -7608,9 +9092,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml := <pre:a xmlns:pre=\"http://ns/example.com/ns1\">abc</pre:a> return (functx:name-test(name($in-xml),('*')), functx:name-test(name($in-xml),('pre:*')), functx:name-test(name($in-xml),('*:a')), functx:name-test( name($in-xml),('pre:a','pre:b')), functx:name-test( name($in-xml),('a','b','c')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true true true false")
     );
@@ -7627,9 +9115,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:namespaces-in-use ( $root as node()? ) as xs:anyURI* { distinct-values( $root/descendant-or-self::*/(.|@*)/namespace-uri(.)) } ;\n" +
       "                    let $in-xml := <authors xmlns=\"http://ns.example.com/abc\" xmlns:d=\"http://ns.example.com/def\"> <author xmlns=\"http://ns.example.com/ghi\"> <fName xmlns:x=\"http://ns.example.com/xyz\" x:attr=\"123\">Kate</fName> <lName>Jones</lName> </author> </authors> return (functx:namespaces-in-use($in-xml))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://ns.example.com/abc http://ns.example.com/ghi http://ns.example.com/xyz")
     );
@@ -7646,9 +9138,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:next-day ( $date as xs:anyAtomicType? ) as xs:date? { xs:date($date) + xs:dayTimeDuration('P1D') } ;\n" +
       "                    (functx:next-day(xs:date('2004-01-23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-24")
     );
@@ -7665,9 +9161,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:next-day ( $date as xs:anyAtomicType? ) as xs:date? { xs:date($date) + xs:dayTimeDuration('P1D') } ;\n" +
       "                    (functx:next-day( xs:dateTime('2005-12-31T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2006-01-01")
     );
@@ -7684,9 +9184,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:next-day ( $date as xs:anyAtomicType? ) as xs:date? { xs:date($date) + xs:dayTimeDuration('P1D') } ;\n" +
       "                    (functx:next-day(xs:date('2004-01-23')), functx:next-day( xs:dateTime('2005-12-31T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-24 2006-01-01")
     );
@@ -7703,9 +9207,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:node-kind ( $nodes as node()* ) as xs:string* { for $node in $nodes return if ($node instance of element()) then 'element' else if ($node instance of attribute()) then 'attribute' else if ($node instance of text()) then 'text' else if ($node instance of document-node()) then 'document-node' else if ($node instance of comment()) then 'comment' else if ($node instance of processing-instruction()) then 'processing-instruction' else 'unknown' } ;\n" +
       "                    let $in-xml := <in-xml> <!-- this is in-xml --> <?test see?> <a z=\"2\">xyz</a> </in-xml> return (functx:node-kind($in-xml/a))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "element")
     );
@@ -7722,9 +9230,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:node-kind ( $nodes as node()* ) as xs:string* { for $node in $nodes return if ($node instance of element()) then 'element' else if ($node instance of attribute()) then 'attribute' else if ($node instance of text()) then 'text' else if ($node instance of document-node()) then 'document-node' else if ($node instance of comment()) then 'comment' else if ($node instance of processing-instruction()) then 'processing-instruction' else 'unknown' } ;\n" +
       "                    let $in-xml := <in-xml> <!-- this is in-xml --> <?test see?> <a z=\"2\">xyz</a> </in-xml> return (functx:node-kind($in-xml/a/@z))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "attribute")
     );
@@ -7741,9 +9253,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:node-kind ( $nodes as node()* ) as xs:string* { for $node in $nodes return if ($node instance of element()) then 'element' else if ($node instance of attribute()) then 'attribute' else if ($node instance of text()) then 'text' else if ($node instance of document-node()) then 'document-node' else if ($node instance of comment()) then 'comment' else if ($node instance of processing-instruction()) then 'processing-instruction' else 'unknown' } ;\n" +
       "                    let $in-xml := <in-xml> <!-- this is in-xml --> <?test see?> <a z=\"2\">xyz</a> </in-xml> return (functx:node-kind($in-xml/comment()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "comment")
     );
@@ -7760,9 +9276,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:node-kind ( $nodes as node()* ) as xs:string* { for $node in $nodes return if ($node instance of element()) then 'element' else if ($node instance of attribute()) then 'attribute' else if ($node instance of text()) then 'text' else if ($node instance of document-node()) then 'document-node' else if ($node instance of comment()) then 'comment' else if ($node instance of processing-instruction()) then 'processing-instruction' else 'unknown' } ;\n" +
       "                    let $in-xml := <in-xml> <!-- this is in-xml --> <?test see?> <a z=\"2\">xyz</a> </in-xml> return (functx:node-kind( $in-xml/processing-instruction()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "processing-instruction")
     );
@@ -7779,9 +9299,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:node-kind ( $nodes as node()* ) as xs:string* { for $node in $nodes return if ($node instance of element()) then 'element' else if ($node instance of attribute()) then 'attribute' else if ($node instance of text()) then 'text' else if ($node instance of document-node()) then 'document-node' else if ($node instance of comment()) then 'comment' else if ($node instance of processing-instruction()) then 'processing-instruction' else 'unknown' } ;\n" +
       "                    let $in-xml := <in-xml> <!-- this is in-xml --> <?test see?> <a z=\"2\">xyz</a> </in-xml> return (functx:node-kind($in-xml/a/text()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "text")
     );
@@ -7801,10 +9325,14 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         return (functx:node-kind(/))\n" +
       "      ",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_book.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_book.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "document-node")
     );
@@ -7828,10 +9356,14 @@ public class AppFunctxFunctx extends QT3TestSet {
       "                    functx:node-kind($in-xml/a/text()), \n" +
       "                    functx:node-kind(/))",
       ctx);
-    query.context(node(file("app/FunctxFn/functx_book.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("app/FunctxFn/functx_book.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "element attribute comment processing-instruction text document-node")
     );
@@ -7849,9 +9381,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "                    1] } ;\n" +
       "                    (functx:non-distinct-values( (1,2,1,3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -7869,9 +9405,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "                    1] } ;\n" +
       "                    (functx:non-distinct-values( (1,2,1,3,2.0)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2")
     );
@@ -7889,9 +9429,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "                    1] } ;\n" +
       "                    (functx:non-distinct-values( (1,2,3) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -7909,9 +9453,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "                    1] } ;\n" +
       "                    (functx:non-distinct-values( (1,2,1,3)), functx:non-distinct-values( (1,2,1,3,2.0)), functx:non-distinct-values( (1,2,3) ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 1 2")
     );
@@ -7928,9 +9476,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:number-of-matches ( $arg as xs:string? , $pattern as xs:string ) as xs:integer { count(tokenize($arg,$pattern)) - 1 } ;\n" +
       "                    (functx:number-of-matches('abcabc','ab'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -7947,9 +9499,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:number-of-matches ( $arg as xs:string? , $pattern as xs:string ) as xs:integer { count(tokenize($arg,$pattern)) - 1 } ;\n" +
       "                    (functx:number-of-matches('12345','\\d'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -7966,9 +9522,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:number-of-matches ( $arg as xs:string? , $pattern as xs:string ) as xs:integer { count(tokenize($arg,$pattern)) - 1 } ;\n" +
       "                    (functx:number-of-matches('aaaaaa','aaa'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -7985,9 +9545,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:number-of-matches ( $arg as xs:string? , $pattern as xs:string ) as xs:integer { count(tokenize($arg,$pattern)) - 1 } ;\n" +
       "                    (functx:number-of-matches('abcabc','ab'), functx:number-of-matches('12345','\\d'), functx:number-of-matches('aaaaaa','aaa'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 5 2")
     );
@@ -8004,9 +9568,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:ordinal-number-en ( $num as xs:integer? ) as xs:string { concat(xs:string($num), if (matches(xs:string($num),'[04-9]$|1[1-3]$')) then 'th' else if (ends-with(xs:string($num),'1')) then 'st' else if (ends-with(xs:string($num),'2')) then 'nd' else if (ends-with(xs:string($num),'3')) then 'rd' else '') } ;\n" +
       "                    (functx:ordinal-number-en(1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1st")
     );
@@ -8023,9 +9591,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:ordinal-number-en ( $num as xs:integer? ) as xs:string { concat(xs:string($num), if (matches(xs:string($num),'[04-9]$|1[1-3]$')) then 'th' else if (ends-with(xs:string($num),'1')) then 'st' else if (ends-with(xs:string($num),'2')) then 'nd' else if (ends-with(xs:string($num),'3')) then 'rd' else '') } ;\n" +
       "                    (functx:ordinal-number-en(12))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12th")
     );
@@ -8042,9 +9614,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:ordinal-number-en ( $num as xs:integer? ) as xs:string { concat(xs:string($num), if (matches(xs:string($num),'[04-9]$|1[1-3]$')) then 'th' else if (ends-with(xs:string($num),'1')) then 'st' else if (ends-with(xs:string($num),'2')) then 'nd' else if (ends-with(xs:string($num),'3')) then 'rd' else '') } ;\n" +
       "                    (functx:ordinal-number-en(1), functx:ordinal-number-en(12))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1st 12th")
     );
@@ -8063,9 +9639,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:pad-integer-to-length(12, 6))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "000012")
     );
@@ -8084,9 +9664,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:pad-integer-to-length(1, 6))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "000001")
     );
@@ -8105,9 +9689,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:pad-integer-to-length(12, 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12")
     );
@@ -8126,9 +9714,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:pad-integer-to-length(12, 6), functx:pad-integer-to-length(1, 6), functx:pad-integer-to-length(12, 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "000012 000001 12")
     );
@@ -8145,9 +9737,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:pad-string-to-length ( $stringToPad as xs:string? , $padChar as xs:string , $length as xs:integer ) as xs:string { substring( string-join ( ($stringToPad, for $i in (1 to $length) return $padChar) ,'') ,1,$length) } ;\n" +
       "                    (functx:pad-string-to-length('abc', '*', 6))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc***")
     );
@@ -8164,9 +9760,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:pad-string-to-length ( $stringToPad as xs:string? , $padChar as xs:string , $length as xs:integer ) as xs:string { substring( string-join ( ($stringToPad, for $i in (1 to $length) return $padChar) ,'') ,1,$length) } ;\n" +
       "                    (functx:pad-string-to-length('abcdef', '*', 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcd")
     );
@@ -8183,9 +9783,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:pad-string-to-length ( $stringToPad as xs:string? , $padChar as xs:string , $length as xs:integer ) as xs:string { substring( string-join ( ($stringToPad, for $i in (1 to $length) return $padChar) ,'') ,1,$length) } ;\n" +
       "                    (functx:pad-string-to-length('', '*', 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "****")
     );
@@ -8202,9 +9806,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:pad-string-to-length ( $stringToPad as xs:string? , $padChar as xs:string , $length as xs:integer ) as xs:string { substring( string-join ( ($stringToPad, for $i in (1 to $length) return $padChar) ,'') ,1,$length) } ;\n" +
       "                    (functx:pad-string-to-length('abc', '*', 6), functx:pad-string-to-length('abcdef', '*', 4), functx:pad-string-to-length('', '*', 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc*** abcd ****")
     );
@@ -8221,9 +9829,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:path-to-node ( $nodes as node()* ) as xs:string* { $nodes/string-join(ancestor-or-self::*/name(.), '/') } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:path-to-node($in-xml//lName[. = 'Doe']))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "authors/author/lName")
     );
@@ -8240,9 +9852,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:path-to-node ( $nodes as node()* ) as xs:string* { $nodes/string-join(ancestor-or-self::*/name(.), '/') } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:path-to-node($in-xml/*[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "authors/author")
     );
@@ -8259,9 +9875,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:path-to-node ( $nodes as node()* ) as xs:string* { $nodes/string-join(ancestor-or-self::*/name(.), '/') } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:path-to-node($in-xml//lName[. = 'Doe']), functx:path-to-node($in-xml/*[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "authors/author/lName authors/author")
     );
@@ -8280,9 +9900,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:path-to-node-with-pos ( $node as node()? ) as xs:string { string-join( for $ancestor in $node/ancestor-or-self::* let $sibsOfSameName := $ancestor/../*[name() = name($ancestor)] return concat(name($ancestor), if (count($sibsOfSameName) <= 1) then '' else concat( '[',functx:index-of-node($sibsOfSameName,$ancestor),']')) , '/') } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:path-to-node-with-pos( $in-xml//lName[. = 'Doe']))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "authors/author[2]/lName")
     );
@@ -8301,9 +9925,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:path-to-node-with-pos ( $node as node()? ) as xs:string { string-join( for $ancestor in $node/ancestor-or-self::* let $sibsOfSameName := $ancestor/../*[name() = name($ancestor)] return concat(name($ancestor), if (count($sibsOfSameName) <= 1) then '' else concat( '[',functx:index-of-node($sibsOfSameName,$ancestor),']')) , '/') } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:path-to-node-with-pos($in-xml/*[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "authors/author[1]")
     );
@@ -8322,9 +9950,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:path-to-node-with-pos ( $node as node()? ) as xs:string { string-join( for $ancestor in $node/ancestor-or-self::* let $sibsOfSameName := $ancestor/../*[name() = name($ancestor)] return concat(name($ancestor), if (count($sibsOfSameName) <= 1) then '' else concat( '[',functx:index-of-node($sibsOfSameName,$ancestor),']')) , '/') } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:path-to-node-with-pos( $in-xml//lName[. = 'Doe']), functx:path-to-node-with-pos($in-xml/*[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "authors/author[2]/lName authors/author[1]")
     );
@@ -8341,9 +9973,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:precedes-not-ancestor ( $a as node()? , $b as node()? ) as xs:boolean { $a << $b and empty($a intersect $b/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:precedes-not-ancestor( $in-xml//author[1],$in-xml//author[2]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -8360,9 +9996,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:precedes-not-ancestor ( $a as node()? , $b as node()? ) as xs:boolean { $a << $b and empty($a intersect $b/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:precedes-not-ancestor( $in-xml//author[1], $in-xml//author[1]/fName))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8379,9 +10019,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:precedes-not-ancestor ( $a as node()? , $b as node()? ) as xs:boolean { $a << $b and empty($a intersect $b/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:precedes-not-ancestor( $in-xml//author[2],$in-xml//author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -8398,9 +10042,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:precedes-not-ancestor ( $a as node()? , $b as node()? ) as xs:boolean { $a << $b and empty($a intersect $b/ancestor::node()) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:precedes-not-ancestor( $in-xml//author[1],$in-xml//author[2]), functx:precedes-not-ancestor( $in-xml//author[1], $in-xml//author[1]/fName), functx:precedes-not-ancestor( $in-xml//author[2],$in-xml//author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false false")
     );
@@ -8417,9 +10065,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:previous-day ( $date as xs:anyAtomicType? ) as xs:date? { xs:date($date) - xs:dayTimeDuration('P1D') } ;\n" +
       "                    (functx:previous-day(xs:date('2004-01-23')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-22")
     );
@@ -8436,9 +10088,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:previous-day ( $date as xs:anyAtomicType? ) as xs:date? { xs:date($date) - xs:dayTimeDuration('P1D') } ;\n" +
       "                    (functx:previous-day( xs:dateTime('2005-01-01T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-31")
     );
@@ -8455,9 +10111,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:previous-day ( $date as xs:anyAtomicType? ) as xs:date? { xs:date($date) - xs:dayTimeDuration('P1D') } ;\n" +
       "                    (functx:previous-day(xs:date('2004-01-23')), functx:previous-day( xs:dateTime('2005-01-01T12:00:13')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-01-22 2004-12-31")
     );
@@ -8478,9 +10138,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <a attr1=\"123\" attr2=\"456\">abc</a> return let $in-xml-2 := <a xmlns:a=\"http://a\" a:attr1=\"123\" attr1=\"456\">abc</a> return (functx:remove-attributes( $in-xml-1, ('attr1','attr2')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>abc</a>", false)
     );
@@ -8501,9 +10165,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <a attr1=\"123\" attr2=\"456\">abc</a> return let $in-xml-2 := <a xmlns:a=\"http://a\" a:attr1=\"123\" attr1=\"456\">abc</a> return (functx:remove-attributes( $in-xml-1, ('attr1','attr3')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a attr2=\"456\">abc</a>", false)
     );
@@ -8524,9 +10192,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <a attr1=\"123\" attr2=\"456\">abc</a> return let $in-xml-2 := <a xmlns:a=\"http://a\" a:attr1=\"123\" attr1=\"456\">abc</a> return (functx:remove-attributes($in-xml-1, '*'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>abc</a>", false)
     );
@@ -8547,9 +10219,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <a attr1=\"123\" attr2=\"456\">abc</a> return let $in-xml-2 := <a xmlns:a=\"http://a\" a:attr1=\"123\" attr1=\"456\">abc</a> return (functx:remove-attributes( $in-xml-2, ('a:attr1')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a attr1=\"456\">abc</a>", false)
     );
@@ -8570,9 +10246,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <a attr1=\"123\" attr2=\"456\">abc</a> return let $in-xml-2 := <a xmlns:a=\"http://a\" a:attr1=\"123\" attr1=\"456\">abc</a> return (functx:remove-attributes( $in-xml-1, ('attr1','attr2')), functx:remove-attributes( $in-xml-1, ('attr1','attr3')), functx:remove-attributes($in-xml-1, '*'), functx:remove-attributes( $in-xml-2, ('a:attr1')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>abc</a><a attr2=\"456\">abc</a><a>abc</a><a attr1=\"456\">abc</a>", false)
     );
@@ -8593,9 +10273,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <a attr1=\"123\" attr2=\"456\"> <b attr1=\"xzy\">abc</b> </a> return let $in-xml-2 := <a xmlns:a=\"http://a\" a:attr1=\"123\" attr1=\"456\"> <b a:attr1=\"ghi\" attr1=\"xzy\">abc</b> </a> return (functx:remove-attributes-deep( $in-xml-1, ('attr1','attr2')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a><b>abc</b></a>", false)
     );
@@ -8616,9 +10300,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <a attr1=\"123\" attr2=\"456\"> <b attr1=\"xzy\">abc</b> </a> return let $in-xml-2 := <a xmlns:a=\"http://a\" a:attr1=\"123\" attr1=\"456\"> <b a:attr1=\"ghi\" attr1=\"xzy\">abc</b> </a> return (functx:remove-attributes-deep( $in-xml-1, ('attr1','attr3')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a attr2=\"456\"><b>abc</b></a>", false)
     );
@@ -8639,9 +10327,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <a attr1=\"123\" attr2=\"456\"> <b attr1=\"xzy\">abc</b> </a> return let $in-xml-2 := <a xmlns:a=\"http://a\" a:attr1=\"123\" attr1=\"456\"> <b a:attr1=\"ghi\" attr1=\"xzy\">abc</b> </a> return (functx:remove-attributes-deep( $in-xml-2, 'a:attr1'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a attr1=\"456\"><b attr1=\"xzy\">abc</b></a>", false)
     );
@@ -8662,9 +10354,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <a attr1=\"123\" attr2=\"456\"> <b attr1=\"xzy\">abc</b> </a> return let $in-xml-2 := <a xmlns:a=\"http://a\" a:attr1=\"123\" attr1=\"456\"> <b a:attr1=\"ghi\" attr1=\"xzy\">abc</b> </a> return (functx:remove-attributes-deep( $in-xml-1, ('attr1','attr2')), functx:remove-attributes-deep( $in-xml-1, ('attr1','attr3')), functx:remove-attributes-deep( $in-xml-2, 'a:attr1'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a><b>abc</b></a><a attr2=\"456\"><b>abc</b></a><a attr1=\"456\"><b attr1=\"xzy\">abc</b></a>", false)
     );
@@ -8685,9 +10381,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a>123</a> <a>456</a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a>123</a> <x:a>456</x:a> <c>Mixed <x:a>content</x:a></c> </in-xml> return (functx:remove-elements( $in-xml-1, 'c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a>123</a><a>456</a></in-xml>", false)
     );
@@ -8708,9 +10408,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a>123</a> <a>456</a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a>123</a> <x:a>456</x:a> <c>Mixed <x:a>content</x:a></c> </in-xml> return (functx:remove-elements( $in-xml-1, ('a','b')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><c>Mixed <b>content</b></c></in-xml>", false)
     );
@@ -8731,9 +10435,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a>123</a> <a>456</a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a>123</a> <x:a>456</x:a> <c>Mixed <x:a>content</x:a></c> </in-xml> return (functx:remove-elements( $in-xml-2, 'x:a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a xmlns:x=\"http://x\">123</a><c xmlns:x=\"http://x\">Mixed <x:a>content</x:a></c></in-xml>", false)
     );
@@ -8754,9 +10462,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a>123</a> <a>456</a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a>123</a> <x:a>456</x:a> <c>Mixed <x:a>content</x:a></c> </in-xml> return (functx:remove-elements( $in-xml-1, 'c'), functx:remove-elements( $in-xml-1, ('a','b')), functx:remove-elements( $in-xml-2, 'x:a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a>123</a><a>456</a></in-xml><in-xml><c>Mixed <b>content</b></c></in-xml><in-xml><a xmlns:x=\"http://x\">123</a><c xmlns:x=\"http://x\">Mixed <x:a>content</x:a></c></in-xml>", false)
     );
@@ -8777,9 +10489,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a> <x:b>b1</x:b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return (functx:remove-elements-deep( $in-xml-1, 'b'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a><c>c1</c></a><c>Mixed </c></in-xml>", false)
     );
@@ -8800,9 +10516,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a> <x:b>b1</x:b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return (functx:remove-elements-deep( $in-xml-1, 'a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><c>Mixed <b>content</b></c></in-xml>", false)
     );
@@ -8823,9 +10543,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a> <x:b>b1</x:b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return (functx:remove-elements-deep( $in-xml-1, ('b','c')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a/></in-xml>", false)
     );
@@ -8846,9 +10570,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a> <x:b>b1</x:b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return (functx:remove-elements-deep( $in-xml-2, 'x:b'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a><c>c1</c></a><c>Mixed <b>content</b></c></in-xml>", false)
     );
@@ -8869,9 +10597,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a> <x:b>b1</x:b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return (functx:remove-elements-deep( $in-xml-1, 'b'), functx:remove-elements-deep( $in-xml-1, 'a'), functx:remove-elements-deep( $in-xml-1, ('b','c')), functx:remove-elements-deep( $in-xml-2, 'x:b'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a><c>c1</c></a><c>Mixed </c></in-xml><in-xml><c>Mixed <b>content</b></c></in-xml><in-xml><a/></in-xml><in-xml><a><c>c1</c></a><c>Mixed <b>content</b></c></in-xml>", false)
     );
@@ -8892,9 +10624,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <x:b>content</x:b></c> </in-xml> return (functx:remove-elements-not-contents( $in-xml-1, 'b'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a>b1<c>c1</c></a><c>Mixed content</c></in-xml>", false)
     );
@@ -8915,9 +10651,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <x:b>content</x:b></c> </in-xml> return (functx:remove-elements-not-contents( $in-xml-1, ('b','c')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a>b1c1</a>Mixed content</in-xml>", false)
     );
@@ -8938,9 +10678,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <x:b>content</x:b></c> </in-xml> return (functx:remove-elements-not-contents( $in-xml-1, 'a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><b>b1</b><c>c1</c><c>Mixed <b>content</b></c></in-xml>", false)
     );
@@ -8961,9 +10705,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <x:b>content</x:b></c> </in-xml> return (functx:remove-elements-not-contents( $in-xml-2, 'x:b'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a><b>b1</b><c>c1</c></a><c>Mixed content</c></in-xml>", false)
     );
@@ -8984,9 +10732,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    let $in-xml-1 := <in-xml> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <b>content</b></c> </in-xml> return let $in-xml-2 := <in-xml xmlns:x=\"http://x\"> <a> <b>b1</b> <c>c1</c> </a> <c>Mixed <x:b>content</x:b></c> </in-xml> return (functx:remove-elements-not-contents( $in-xml-1, 'b'), functx:remove-elements-not-contents( $in-xml-1, ('b','c')), functx:remove-elements-not-contents( $in-xml-1, 'a'), functx:remove-elements-not-contents( $in-xml-2, 'x:b'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<in-xml><a>b1<c>c1</c></a><c>Mixed content</c></in-xml><in-xml><a>b1c1</a>Mixed content</in-xml><in-xml><b>b1</b><c>c1</c><c>Mixed <b>content</b></c></in-xml><in-xml><a><b>b1</b><c>c1</c></a><c>Mixed content</c></in-xml>", false)
     );
@@ -9003,9 +10755,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:repeat-string('*', 6))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "******")
     );
@@ -9022,9 +10778,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:repeat-string('abc', 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcabcabc")
     );
@@ -9041,9 +10801,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:repeat-string ( $stringToRepeat as xs:string? , $count as xs:integer ) as xs:string { string-join((for $i in 1 to $count return $stringToRepeat), '') } ;\n" +
       "                    (functx:repeat-string('*', 6), functx:repeat-string('abc', 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "****** abcabcabc")
     );
@@ -9060,9 +10824,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-beginning ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('^.*?', $pattern), $replacement) } ;\n" +
       "                    (functx:replace-beginning('abc-def', '-', 'xxx'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xxxdef")
     );
@@ -9079,9 +10847,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-beginning ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('^.*?', $pattern), $replacement) } ;\n" +
       "                    (functx:replace-beginning('abc-def', '-', ''))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "def")
     );
@@ -9098,9 +10870,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-beginning ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('^.*?', $pattern), $replacement) } ;\n" +
       "                    (functx:replace-beginning( '---abc', '[a-z]', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xbc")
     );
@@ -9117,9 +10893,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-beginning ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('^.*?', $pattern), $replacement) } ;\n" +
       "                    (functx:replace-beginning( '2004-12-05', '-', '2005-'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2005-12-05")
     );
@@ -9136,9 +10916,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-beginning ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('^.*?', $pattern), $replacement) } ;\n" +
       "                    (functx:replace-beginning('abc-def', '-', 'xxx'), functx:replace-beginning('abc-def', '-', ''), functx:replace-beginning( '---abc', '[a-z]', 'x'), functx:replace-beginning( '2004-12-05', '-', '2005-'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xxxdef def xbc 2005-12-05")
     );
@@ -9155,9 +10939,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-element-values ( $elements as element()* , $values as xs:anyAtomicType* ) as element()* { for $element at $seq in $elements return element { node-name($element)} { $element/@*, $values[$seq] } } ;\n" +
       "                    let $in-xml := <in-xml> <price num=\"1\">12</price> <price num=\"2\">20</price> <price num=\"3\">5</price> </in-xml> return (functx:replace-element-values( $in-xml/price, for $p in $in-xml/price return $p * 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<price num=\"1\">24</price><price num=\"2\">40</price><price num=\"3\">10</price>", false)
     );
@@ -9174,9 +10962,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-element-values ( $elements as element()* , $values as xs:anyAtomicType* ) as element()* { for $element at $seq in $elements return element { node-name($element)} { $element/@*, $values[$seq] } } ;\n" +
       "                    let $in-xml := <in-xml> <price num=\"1\">12</price> <price num=\"2\">20</price> <price num=\"3\">5</price> </in-xml> return (for $p in $in-xml/price return functx:replace-element-values( $p,concat($p,'.0')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<price num=\"1\">12.0</price><price num=\"2\">20.0</price><price num=\"3\">5.0</price>", false)
     );
@@ -9193,9 +10985,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-element-values ( $elements as element()* , $values as xs:anyAtomicType* ) as element()* { for $element at $seq in $elements return element { node-name($element)} { $element/@*, $values[$seq] } } ;\n" +
       "                    let $in-xml := <in-xml> <price num=\"1\">12</price> <price num=\"2\">20</price> <price num=\"3\">5</price> </in-xml> return (functx:replace-element-values( $in-xml/price, for $p in $in-xml/price return $p * 2), for $p in $in-xml/price return functx:replace-element-values( $p,concat($p,'.0')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<price num=\"1\">24</price><price num=\"2\">40</price><price num=\"3\">10</price><price num=\"1\">12.0</price><price num=\"2\">20.0</price><price num=\"3\">5.0</price>", false)
     );
@@ -9212,9 +11008,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:replace-first('abcabcabc', 'ab', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xcabcabc")
     );
@@ -9231,9 +11031,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:replace-first('elementary', 'e.*e', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xntary")
     );
@@ -9250,9 +11054,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:replace-first( 'elementary', 'e.*?e', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xmentary")
     );
@@ -9269,9 +11077,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:replace-first('9999-9999', '\\d+', 'X'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "X-9999")
     );
@@ -9288,9 +11100,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:replace-first('9999-9999', '\\d{3}', 'X'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "X9-9999")
     );
@@ -9307,9 +11123,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:replace-first ( $arg as xs:string? , $pattern as xs:string , $replacement as xs:string ) as xs:string { replace($arg, concat('(^.*?)', $pattern), concat('$1',$replacement)) } ;\n" +
       "                    (functx:replace-first('abcabcabc', 'ab', 'x'), functx:replace-first('elementary', 'e.*e', 'x'), functx:replace-first( 'elementary', 'e.*?e', 'x'), functx:replace-first('9999-9999', '\\d+', 'X'), functx:replace-first('9999-9999', '\\d{3}', 'X'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xcabcabc xntary xmentary X-9999 X9-9999")
     );
@@ -9336,9 +11156,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         return let $to := ('x', 'y', '0')\n" +
       "         return (functx:replace-multi('abcdef123',$fr,$to))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xxxy0")
     );
@@ -9355,9 +11179,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:reverse-string ( $arg as xs:string? ) as xs:string { codepoints-to-string(reverse(string-to-codepoints($arg))) } ;\n" +
       "                    (functx:reverse-string('abc'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "cba")
     );
@@ -9374,9 +11202,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:reverse-string ( $arg as xs:string? ) as xs:string { codepoints-to-string(reverse(string-to-codepoints($arg))) } ;\n" +
       "                    (functx:reverse-string('a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a")
     );
@@ -9393,9 +11225,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:reverse-string ( $arg as xs:string? ) as xs:string { codepoints-to-string(reverse(string-to-codepoints($arg))) } ;\n" +
       "                    (functx:reverse-string('abc'), functx:reverse-string('a'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "cba a")
     );
@@ -9412,9 +11248,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:right-trim ( $arg as xs:string? ) as xs:string { replace($arg,'\\s+$','') } ;\n" +
       "                    (functx:right-trim('xyz '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xyz")
     );
@@ -9431,9 +11271,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:right-trim ( $arg as xs:string? ) as xs:string { replace($arg,'\\s+$','') } ;\n" +
       "         (functx:right-trim(' x   xyz '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, " x   xyz")
     );
@@ -9450,9 +11294,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:right-trim ( $arg as xs:string? ) as xs:string { replace($arg,'\\s+$','') } ;\n" +
       "                    (functx:right-trim('xyz'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xyz")
     );
@@ -9469,9 +11317,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:right-trim ( $arg as xs:string? ) as xs:string { replace($arg,'\\s+$','') } ;\n" +
       "                    (functx:right-trim('xyz '), functx:right-trim(' x   xyz '), functx:right-trim('xyz'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"xyz\", \" x   xyz\", \"xyz\"")
     );
@@ -9488,9 +11340,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:scheme-from-uri ( $uri as xs:string? ) as xs:string? { substring-before($uri,':') } ;\n" +
       "                    (functx:scheme-from-uri( 'http://www.datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http")
     );
@@ -9507,9 +11363,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:scheme-from-uri ( $uri as xs:string? ) as xs:string? { substring-before($uri,':') } ;\n" +
       "                    (functx:scheme-from-uri( 'ftp://ftp.datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ftp")
     );
@@ -9526,9 +11386,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:scheme-from-uri ( $uri as xs:string? ) as xs:string? { substring-before($uri,':') } ;\n" +
       "                    (functx:scheme-from-uri('ftp.datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -9545,9 +11409,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:scheme-from-uri ( $uri as xs:string? ) as xs:string? { substring-before($uri,':') } ;\n" +
       "                    (functx:scheme-from-uri('www.datypic.com'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -9564,9 +11432,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:scheme-from-uri ( $uri as xs:string? ) as xs:string? { substring-before($uri,':') } ;\n" +
       "                    (functx:scheme-from-uri('prod.html'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -9583,9 +11455,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:scheme-from-uri ( $uri as xs:string? ) as xs:string? { substring-before($uri,':') } ;\n" +
       "                    (functx:scheme-from-uri( 'http://www.datypic.com'), functx:scheme-from-uri( 'ftp://ftp.datypic.com'), functx:scheme-from-uri('ftp.datypic.com'), functx:scheme-from-uri('www.datypic.com'), functx:scheme-from-uri('prod.html'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http ftp   ")
     );
@@ -9602,9 +11478,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-deep-equal ( $seq1 as item()* , $seq2 as item()* ) as xs:boolean { every $i in 1 to max((count($seq1),count($seq2))) satisfies deep-equal($seq1[$i],$seq2[$i]) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return (functx:sequence-deep-equal( $in-xml/author/*, $in-xml/*/*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9621,9 +11501,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-deep-equal ( $seq1 as item()* , $seq2 as item()* ) as xs:boolean { every $i in 1 to max((count($seq1),count($seq2))) satisfies deep-equal($seq1[$i],$seq2[$i]) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return (functx:sequence-deep-equal( $in-xml/author[1], $anAuthor))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9640,9 +11524,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-deep-equal ( $seq1 as item()* , $seq2 as item()* ) as xs:boolean { every $i in 1 to max((count($seq1),count($seq2))) satisfies deep-equal($seq1[$i],$seq2[$i]) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return (functx:sequence-deep-equal( (1,2,3), (1.0,2.0,3.0)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9659,9 +11547,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-deep-equal ( $seq1 as item()* , $seq2 as item()* ) as xs:boolean { every $i in 1 to max((count($seq1),count($seq2))) satisfies deep-equal($seq1[$i],$seq2[$i]) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return (functx:sequence-deep-equal( $in-xml/author/*, $in-xml/*/*), functx:sequence-deep-equal( $in-xml/author[1], $anAuthor), functx:sequence-deep-equal( (1,2,3), (1.0,2.0,3.0)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true true")
     );
@@ -9678,9 +11570,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-node-equal ( $seq1 as node()* , $seq2 as node()* ) as xs:boolean { every $i in 1 to max((count($seq1),count($seq2))) satisfies $seq1[$i] is $seq2[$i] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return (functx:sequence-node-equal( $in-xml/author/*, $in-xml/*/*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9697,9 +11593,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-node-equal ( $seq1 as node()* , $seq2 as node()* ) as xs:boolean { every $i in 1 to max((count($seq1),count($seq2))) satisfies $seq1[$i] is $seq2[$i] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return (functx:sequence-node-equal( $in-xml/author, ($in-xml/author[2],$in-xml/author[1])))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9716,9 +11616,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-node-equal ( $seq1 as node()* , $seq2 as node()* ) as xs:boolean { every $i in 1 to max((count($seq1),count($seq2))) satisfies $seq1[$i] is $seq2[$i] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return (functx:sequence-node-equal( $in-xml/author[1],$anAuthor))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9735,9 +11639,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-node-equal ( $seq1 as node()* , $seq2 as node()* ) as xs:boolean { every $i in 1 to max((count($seq1),count($seq2))) satisfies $seq1[$i] is $seq2[$i] } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return (functx:sequence-node-equal( $in-xml/author/*, $in-xml/*/*), functx:sequence-node-equal( $in-xml/author, ($in-xml/author[2],$in-xml/author[1])), functx:sequence-node-equal( $in-xml/author[1],$anAuthor))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false false")
     );
@@ -9754,9 +11662,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-node-equal-any-order ( $seq1 as node()* , $seq2 as node()* ) as xs:boolean { not( ($seq1 except $seq2, $seq2 except $seq1)) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return (functx:sequence-node-equal-any-order( $in-xml/author, $in-xml/*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9773,9 +11685,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-node-equal-any-order ( $seq1 as node()* , $seq2 as node()* ) as xs:boolean { not( ($seq1 except $seq2, $seq2 except $seq1)) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return (functx:sequence-node-equal-any-order( $in-xml/author, ($in-xml/author[2],$in-xml/author[1])))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -9792,9 +11708,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-node-equal-any-order ( $seq1 as node()* , $seq2 as node()* ) as xs:boolean { not( ($seq1 except $seq2, $seq2 except $seq1)) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return (functx:sequence-node-equal-any-order( $in-xml/author[1],$anAuthor))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -9811,9 +11731,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-node-equal-any-order ( $seq1 as node()* , $seq2 as node()* ) as xs:boolean { not( ($seq1 except $seq2, $seq2 except $seq1)) } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return let $anAuthor := <author> <fName>Kate</fName> <lName>Jones</lName> </author> return (functx:sequence-node-equal-any-order( $in-xml/author, $in-xml/*), functx:sequence-node-equal-any-order( $in-xml/author, ($in-xml/author[2],$in-xml/author[1])), functx:sequence-node-equal-any-order( $in-xml/author[1],$anAuthor))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true false")
     );
@@ -9834,9 +11758,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-type ( $items as item()* ) as xs:string { concat( if (empty($items)) then 'empty-sequence()' else if (every $val in $items satisfies $val instance of xs:anyAtomicType) then if (count(distinct-values(functx:atomic-type($items))) > 1) then 'xs:anyAtomicType' else functx:atomic-type($items[1]) else if (some $val in $items satisfies $val instance of xs:anyAtomicType) then 'item()' else if (count(distinct-values(functx:node-kind($items))) > 1) then 'node()' else concat(functx:node-kind($items[1]),'()') , if (count($items) > 1) then '+' else '') } ;\n" +
       "                    let $in-xml := <in-xml> <a att1=\"y\">x</a> <b att1=\"x\">x</b> <!-- comment --> </in-xml> return (functx:sequence-type(2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xs:integer")
     );
@@ -9857,9 +11785,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-type ( $items as item()* ) as xs:string { concat( if (empty($items)) then 'empty-sequence()' else if (every $val in $items satisfies $val instance of xs:anyAtomicType) then if (count(distinct-values(functx:atomic-type($items))) > 1) then 'xs:anyAtomicType' else functx:atomic-type($items[1]) else if (some $val in $items satisfies $val instance of xs:anyAtomicType) then 'item()' else if (count(distinct-values(functx:node-kind($items))) > 1) then 'node()' else concat(functx:node-kind($items[1]),'()') , if (count($items) > 1) then '+' else '') } ;\n" +
       "                    let $in-xml := <in-xml> <a att1=\"y\">x</a> <b att1=\"x\">x</b> <!-- comment --> </in-xml> return (functx:sequence-type($in-xml/node()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "node()+")
     );
@@ -9880,9 +11812,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-type ( $items as item()* ) as xs:string { concat( if (empty($items)) then 'empty-sequence()' else if (every $val in $items satisfies $val instance of xs:anyAtomicType) then if (count(distinct-values(functx:atomic-type($items))) > 1) then 'xs:anyAtomicType' else functx:atomic-type($items[1]) else if (some $val in $items satisfies $val instance of xs:anyAtomicType) then 'item()' else if (count(distinct-values(functx:node-kind($items))) > 1) then 'node()' else concat(functx:node-kind($items[1]),'()') , if (count($items) > 1) then '+' else '') } ;\n" +
       "                    let $in-xml := <in-xml> <a att1=\"y\">x</a> <b att1=\"x\">x</b> <!-- comment --> </in-xml> return (functx:sequence-type(($in-xml/*,'2')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "item()+")
     );
@@ -9903,9 +11839,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-type ( $items as item()* ) as xs:string { concat( if (empty($items)) then 'empty-sequence()' else if (every $val in $items satisfies $val instance of xs:anyAtomicType) then if (count(distinct-values(functx:atomic-type($items))) > 1) then 'xs:anyAtomicType' else functx:atomic-type($items[1]) else if (some $val in $items satisfies $val instance of xs:anyAtomicType) then 'item()' else if (count(distinct-values(functx:node-kind($items))) > 1) then 'node()' else concat(functx:node-kind($items[1]),'()') , if (count($items) > 1) then '+' else '') } ;\n" +
       "                    let $in-xml := <in-xml> <a att1=\"y\">x</a> <b att1=\"x\">x</b> <!-- comment --> </in-xml> return (functx:sequence-type(('abc','def')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xs:string+")
     );
@@ -9926,9 +11866,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-type ( $items as item()* ) as xs:string { concat( if (empty($items)) then 'empty-sequence()' else if (every $val in $items satisfies $val instance of xs:anyAtomicType) then if (count(distinct-values(functx:atomic-type($items))) > 1) then 'xs:anyAtomicType' else functx:atomic-type($items[1]) else if (some $val in $items satisfies $val instance of xs:anyAtomicType) then 'item()' else if (count(distinct-values(functx:node-kind($items))) > 1) then 'node()' else concat(functx:node-kind($items[1]),'()') , if (count($items) > 1) then '+' else '') } ;\n" +
       "                    let $in-xml := <in-xml> <a att1=\"y\">x</a> <b att1=\"x\">x</b> <!-- comment --> </in-xml> return (functx:sequence-type(('abc',2)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xs:anyAtomicType+")
     );
@@ -9949,9 +11893,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-type ( $items as item()* ) as xs:string { concat( if (empty($items)) then 'empty-sequence()' else if (every $val in $items satisfies $val instance of xs:anyAtomicType) then if (count(distinct-values(functx:atomic-type($items))) > 1) then 'xs:anyAtomicType' else functx:atomic-type($items[1]) else if (some $val in $items satisfies $val instance of xs:anyAtomicType) then 'item()' else if (count(distinct-values(functx:node-kind($items))) > 1) then 'node()' else concat(functx:node-kind($items[1]),'()') , if (count($items) > 1) then '+' else '') } ;\n" +
       "                    let $in-xml := <in-xml> <a att1=\"y\">x</a> <b att1=\"x\">x</b> <!-- comment --> </in-xml> return (functx:sequence-type( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "empty-sequence()")
     );
@@ -9972,9 +11920,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-type ( $items as item()* ) as xs:string { concat( if (empty($items)) then 'empty-sequence()' else if (every $val in $items satisfies $val instance of xs:anyAtomicType) then if (count(distinct-values(functx:atomic-type($items))) > 1) then 'xs:anyAtomicType' else functx:atomic-type($items[1]) else if (some $val in $items satisfies $val instance of xs:anyAtomicType) then 'item()' else if (count(distinct-values(functx:node-kind($items))) > 1) then 'node()' else concat(functx:node-kind($items[1]),'()') , if (count($items) > 1) then '+' else '') } ;\n" +
       "                    let $in-xml := <in-xml> <a att1=\"y\">x</a> <b att1=\"x\">x</b> <!-- comment --> </in-xml> return (functx:sequence-type($in-xml/*[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "element()")
     );
@@ -9995,9 +11947,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-type ( $items as item()* ) as xs:string { concat( if (empty($items)) then 'empty-sequence()' else if (every $val in $items satisfies $val instance of xs:anyAtomicType) then if (count(distinct-values(functx:atomic-type($items))) > 1) then 'xs:anyAtomicType' else functx:atomic-type($items[1]) else if (some $val in $items satisfies $val instance of xs:anyAtomicType) then 'item()' else if (count(distinct-values(functx:node-kind($items))) > 1) then 'node()' else concat(functx:node-kind($items[1]),'()') , if (count($items) > 1) then '+' else '') } ;\n" +
       "                    let $in-xml := <in-xml> <a att1=\"y\">x</a> <b att1=\"x\">x</b> <!-- comment --> </in-xml> return (functx:sequence-type($in-xml/*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "element()+")
     );
@@ -10018,9 +11974,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-type ( $items as item()* ) as xs:string { concat( if (empty($items)) then 'empty-sequence()' else if (every $val in $items satisfies $val instance of xs:anyAtomicType) then if (count(distinct-values(functx:atomic-type($items))) > 1) then 'xs:anyAtomicType' else functx:atomic-type($items[1]) else if (some $val in $items satisfies $val instance of xs:anyAtomicType) then 'item()' else if (count(distinct-values(functx:node-kind($items))) > 1) then 'node()' else concat(functx:node-kind($items[1]),'()') , if (count($items) > 1) then '+' else '') } ;\n" +
       "                    let $in-xml := <in-xml> <a att1=\"y\">x</a> <b att1=\"x\">x</b> <!-- comment --> </in-xml> return (functx:sequence-type($in-xml/*/@*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "attribute()+")
     );
@@ -10041,9 +12001,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-type ( $items as item()* ) as xs:string { concat( if (empty($items)) then 'empty-sequence()' else if (every $val in $items satisfies $val instance of xs:anyAtomicType) then if (count(distinct-values(functx:atomic-type($items))) > 1) then 'xs:anyAtomicType' else functx:atomic-type($items[1]) else if (some $val in $items satisfies $val instance of xs:anyAtomicType) then 'item()' else if (count(distinct-values(functx:node-kind($items))) > 1) then 'node()' else concat(functx:node-kind($items[1]),'()') , if (count($items) > 1) then '+' else '') } ;\n" +
       "                    let $in-xml := <in-xml> <a att1=\"y\">x</a> <b att1=\"x\">x</b> <!-- comment --> </in-xml> return (functx:sequence-type($in-xml/*/text()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "text()+")
     );
@@ -10064,9 +12028,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-type ( $items as item()* ) as xs:string { concat( if (empty($items)) then 'empty-sequence()' else if (every $val in $items satisfies $val instance of xs:anyAtomicType) then if (count(distinct-values(functx:atomic-type($items))) > 1) then 'xs:anyAtomicType' else functx:atomic-type($items[1]) else if (some $val in $items satisfies $val instance of xs:anyAtomicType) then 'item()' else if (count(distinct-values(functx:node-kind($items))) > 1) then 'node()' else concat(functx:node-kind($items[1]),'()') , if (count($items) > 1) then '+' else '') } ;\n" +
       "                    let $in-xml := <in-xml> <a att1=\"y\">x</a> <b att1=\"x\">x</b> <!-- comment --> </in-xml> return (functx:sequence-type($in-xml/comment()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "comment()")
     );
@@ -10087,9 +12055,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sequence-type ( $items as item()* ) as xs:string { concat( if (empty($items)) then 'empty-sequence()' else if (every $val in $items satisfies $val instance of xs:anyAtomicType) then if (count(distinct-values(functx:atomic-type($items))) > 1) then 'xs:anyAtomicType' else functx:atomic-type($items[1]) else if (some $val in $items satisfies $val instance of xs:anyAtomicType) then 'item()' else if (count(distinct-values(functx:node-kind($items))) > 1) then 'node()' else concat(functx:node-kind($items[1]),'()') , if (count($items) > 1) then '+' else '') } ;\n" +
       "                    let $in-xml := <in-xml> <a att1=\"y\">x</a> <b att1=\"x\">x</b> <!-- comment --> </in-xml> return (functx:sequence-type(2), functx:sequence-type(('abc','def')), functx:sequence-type(('abc',2)), functx:sequence-type( () ), functx:sequence-type($in-xml/*[1]), functx:sequence-type($in-xml/*), functx:sequence-type($in-xml/*/@*), functx:sequence-type($in-xml/*/text()), functx:sequence-type($in-xml/comment()), functx:sequence-type($in-xml/node()), functx:sequence-type(($in-xml/*,'2')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xs:integer xs:string+ xs:anyAtomicType+ empty-sequence() element() element()+ attribute()+ text()+ comment() node()+ item()+")
     );
@@ -10106,9 +12078,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:siblings ( $node as node()? ) as node()* { $node/../node() except $node } ;\n" +
       "                    let $in-xml := <authors a1='xyz'> <author a2='abc'> <fName a3='def'>Kate</fName> <fName a3='def'>Jane</fName> <lName>Jones</lName> </author> <author> <fName a3='def'>John</fName> <lName>Doe</lName> </author> </authors> return (functx:siblings( $in-xml/author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<author><fName a3=\"def\">John</fName><lName>Doe</lName></author>", false)
     );
@@ -10125,9 +12101,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:siblings ( $node as node()? ) as node()* { $node/../node() except $node } ;\n" +
       "                    let $in-xml := <authors a1='xyz'> <author a2='abc'> <fName a3='def'>Kate</fName> <fName a3='def'>Jane</fName> <lName>Jones</lName> </author> <author> <fName a3='def'>John</fName> <lName>Doe</lName> </author> </authors> return (functx:siblings( $in-xml/author[1]/fName[2]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fName a3=\"def\">Kate</fName><lName>Jones</lName>", false)
     );
@@ -10144,9 +12124,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:siblings ( $node as node()? ) as node()* { $node/../node() except $node } ;\n" +
       "                    let $in-xml := <authors a1='xyz'> <author a2='abc'> <fName a3='def'>Kate</fName> <fName a3='def'>Jane</fName> <lName>Jones</lName> </author> <author> <fName a3='def'>John</fName> <lName>Doe</lName> </author> </authors> return (functx:siblings( $in-xml/author[1]), functx:siblings( $in-xml/author[1]/fName[2]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<author><fName a3=\"def\">John</fName><lName>Doe</lName></author><fName a3=\"def\">Kate</fName><lName>Jones</lName>", false)
     );
@@ -10163,9 +12147,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:siblings-same-name ( $element as element()? ) as element()* { $element/../*[node-name(.) = node-name($element)] except $element } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <fName>Jane</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:siblings-same-name( $in-xml/author[1]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<author><fName>John</fName><lName>Doe</lName></author>", false)
     );
@@ -10182,9 +12170,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:siblings-same-name ( $element as element()? ) as element()* { $element/../*[node-name(.) = node-name($element)] except $element } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <fName>Jane</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:siblings-same-name( $in-xml/author[1]/fName[2]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fName>Kate</fName>", false)
     );
@@ -10201,9 +12193,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:siblings-same-name ( $element as element()? ) as element()* { $element/../*[node-name(.) = node-name($element)] except $element } ;\n" +
       "                    let $in-xml := <authors> <author> <fName>Kate</fName> <fName>Jane</fName> <lName>Jones</lName> </author> <author> <fName>John</fName> <lName>Doe</lName> </author> </authors> return (functx:siblings-same-name( $in-xml/author[1]), functx:siblings-same-name( $in-xml/author[1]/fName[2]))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<author><fName>John</fName><lName>Doe</lName></author><fName>Kate</fName>", false)
     );
@@ -10220,9 +12216,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sort ( $seq as item()* ) as item()* { for $item in $seq order by $item return $item } ;\n" +
       "                    let $in-xml := <in-xml> <f>c</f> <f>a</f> <e>b</e> </in-xml> return (functx:sort(('c','a','b')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a b c")
     );
@@ -10239,9 +12239,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sort ( $seq as item()* ) as item()* { for $item in $seq order by $item return $item } ;\n" +
       "                    let $in-xml := <in-xml> <f>c</f> <f>a</f> <e>b</e> </in-xml> return (functx:sort($in-xml/*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<f>a</f><e>b</e><f>c</f>", false)
     );
@@ -10258,9 +12262,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sort ( $seq as item()* ) as item()* { for $item in $seq order by $item return $item } ;\n" +
       "                    let $in-xml := <in-xml> <f>c</f> <f>a</f> <e>b</e> </in-xml> return (functx:sort(('c','a','b')), functx:sort($in-xml/*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("a b c<f>a</f><e>b</e><f>c</f>", false)
     );
@@ -10277,9 +12285,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sort-as-numeric ( $seq as item()* ) as item()* { for $item in $seq order by number($item) return $item } ;\n" +
       "                    let $in-xml := <in-xml> <f>1</f> <f>35</f> <e>4</e> </in-xml> return (functx:sort-as-numeric(('1','100','99')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 99 100")
     );
@@ -10296,9 +12308,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sort-as-numeric ( $seq as item()* ) as item()* { for $item in $seq order by number($item) return $item } ;\n" +
       "                    let $in-xml := <in-xml> <f>1</f> <f>35</f> <e>4</e> </in-xml> return (functx:sort-as-numeric($in-xml/*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<f>1</f><e>4</e><f>35</f>", false)
     );
@@ -10315,9 +12331,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sort-as-numeric ( $seq as item()* ) as item()* { for $item in $seq order by number($item) return $item } ;\n" +
       "                    let $in-xml := <in-xml> <f>1</f> <f>35</f> <e>4</e> </in-xml> return (functx:sort-as-numeric(('1','100','99')), functx:sort-as-numeric($in-xml/*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("1 99 100<f>1</f><e>4</e><f>35</f>", false)
     );
@@ -10334,9 +12354,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sort-case-insensitive ( $seq as item()* ) as item()* { for $item in $seq order by upper-case(string($item)) return $item } ;\n" +
       "                    let $in-xml := <in-xml> <f>a</f> <f>c</f> <e>B</e> </in-xml> return (functx:sort-case-insensitive(('a','c','B')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a B c")
     );
@@ -10353,9 +12377,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sort-case-insensitive ( $seq as item()* ) as item()* { for $item in $seq order by upper-case(string($item)) return $item } ;\n" +
       "                    let $in-xml := <in-xml> <f>a</f> <f>c</f> <e>B</e> </in-xml> return (functx:sort-case-insensitive($in-xml/*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<f>a</f><e>B</e><f>c</f>", false)
     );
@@ -10372,9 +12400,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sort-case-insensitive ( $seq as item()* ) as item()* { for $item in $seq order by upper-case(string($item)) return $item } ;\n" +
       "                    let $in-xml := <in-xml> <f>a</f> <f>c</f> <e>B</e> </in-xml> return (functx:sort-case-insensitive(('a','c','B')), functx:sort-case-insensitive($in-xml/*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("a B c<f>a</f><e>B</e><f>c</f>", false)
     );
@@ -10391,9 +12423,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:sort-document-order ( $seq as node()* ) as node()* { $seq/. } ;\n" +
       "                    let $in-xml := <in-xml> <a>123</a> <b>456</b> <c>789</c> </in-xml> return (functx:sort-document-order( ($in-xml/c,$in-xml/a)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>123</a><c>789</c>", false)
     );
@@ -10410,9 +12446,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    (functx:substring-after-if-contains('abcd','b'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "cd")
     );
@@ -10429,9 +12469,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    (functx:substring-after-if-contains('abcd','x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcd")
     );
@@ -10448,9 +12492,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-after($arg,$delim) else $arg } ;\n" +
       "                    (functx:substring-after-if-contains('abcd','b'), functx:substring-after-if-contains('abcd','x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "cd abcd")
     );
@@ -10469,9 +12517,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-last ( $arg as xs:string? , $delim as xs:string ) as xs:string { replace ($arg,concat('^.*',functx:escape-for-regex($delim)),'') } ;\n" +
       "                    (functx:substring-after-last('abc-def-ghi', '-'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ghi")
     );
@@ -10490,9 +12542,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-last ( $arg as xs:string? , $delim as xs:string ) as xs:string { replace ($arg,concat('^.*',functx:escape-for-regex($delim)),'') } ;\n" +
       "                    (functx:substring-after-last('abcd-abcd', 'ab'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "cd")
     );
@@ -10511,9 +12567,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-last ( $arg as xs:string? , $delim as xs:string ) as xs:string { replace ($arg,concat('^.*',functx:escape-for-regex($delim)),'') } ;\n" +
       "                    (functx:substring-after-last('abcd-abcd', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcd-abcd")
     );
@@ -10532,9 +12592,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-last ( $arg as xs:string? , $delim as xs:string ) as xs:string { replace ($arg,concat('^.*',functx:escape-for-regex($delim)),'') } ;\n" +
       "                    (functx:substring-after-last('abc-def-ghi', '-'), functx:substring-after-last('abcd-abcd', 'ab'), functx:substring-after-last('abcd-abcd', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ghi cd abcd-abcd")
     );
@@ -10551,9 +12615,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-last-match ( $arg as xs:string? , $regex as xs:string ) as xs:string { replace($arg,concat('^.*',$regex),'') } ;\n" +
       "                    (functx:substring-after-last-match( 'abc-def-ghi', '[ad]'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ef-ghi")
     );
@@ -10570,9 +12638,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-last-match ( $arg as xs:string? , $regex as xs:string ) as xs:string { replace($arg,concat('^.*',$regex),'') } ;\n" +
       "                    (functx:substring-after-last-match( 'abcd-abcd', 'bc?'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "d")
     );
@@ -10589,9 +12661,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-last-match ( $arg as xs:string? , $regex as xs:string ) as xs:string { replace($arg,concat('^.*',$regex),'') } ;\n" +
       "                    (functx:substring-after-last-match( 'abcd-abcd', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcd-abcd")
     );
@@ -10608,9 +12684,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-last-match ( $arg as xs:string? , $regex as xs:string ) as xs:string { replace($arg,concat('^.*',$regex),'') } ;\n" +
       "                    (functx:substring-after-last-match( 'abc-def-ghi', '[ad]'), functx:substring-after-last-match( 'abcd-abcd', 'bc?'), functx:substring-after-last-match( 'abcd-abcd', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ef-ghi d abcd-abcd")
     );
@@ -10627,9 +12707,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { replace($arg,concat('^.*?',$regex),'') } ;\n" +
       "                    (functx:substring-after-match( 'abc-def-ghi', '[ce]'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-def-ghi")
     );
@@ -10646,9 +12730,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { replace($arg,concat('^.*?',$regex),'') } ;\n" +
       "                    (functx:substring-after-match( 'abcd-abcd', 'ab?'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "cd-abcd")
     );
@@ -10665,9 +12753,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { replace($arg,concat('^.*?',$regex),'') } ;\n" +
       "                    (functx:substring-after-match( 'abcd-abcd', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcd-abcd")
     );
@@ -10684,9 +12776,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-after-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { replace($arg,concat('^.*?',$regex),'') } ;\n" +
       "                    (functx:substring-after-match( 'abc-def-ghi', '[ce]'), functx:substring-after-match( 'abcd-abcd', 'ab?'), functx:substring-after-match( 'abcd-abcd', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-def-ghi cd-abcd abcd-abcd")
     );
@@ -10703,9 +12799,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-before($arg,$delim) else $arg } ;\n" +
       "                    (functx:substring-before-if-contains('abcd','c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ab")
     );
@@ -10722,9 +12822,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-before($arg,$delim) else $arg } ;\n" +
       "                    (functx:substring-before-if-contains('abcd','x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcd")
     );
@@ -10741,9 +12845,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-if-contains ( $arg as xs:string? , $delim as xs:string ) as xs:string? { if (contains($arg,$delim)) then substring-before($arg,$delim) else $arg } ;\n" +
       "                    (functx:substring-before-if-contains('abcd','c'), functx:substring-before-if-contains('abcd','x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ab abcd")
     );
@@ -10762,9 +12870,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-last ( $arg as xs:string? , $delim as xs:string ) as xs:string { if (matches($arg, functx:escape-for-regex($delim))) then replace($arg, concat('^(.*)', functx:escape-for-regex($delim),'.*'), '$1') else '' } ;\n" +
       "                    (functx:substring-before-last( 'abc-def-ghi', '-'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc-def")
     );
@@ -10783,9 +12895,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-last ( $arg as xs:string? , $delim as xs:string ) as xs:string { if (matches($arg, functx:escape-for-regex($delim))) then replace($arg, concat('^(.*)', functx:escape-for-regex($delim),'.*'), '$1') else '' } ;\n" +
       "                    (functx:substring-before-last('abcd-abcd', 'ab'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcd-")
     );
@@ -10804,9 +12920,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-last ( $arg as xs:string? , $delim as xs:string ) as xs:string { if (matches($arg, functx:escape-for-regex($delim))) then replace($arg, concat('^(.*)', functx:escape-for-regex($delim),'.*'), '$1') else '' } ;\n" +
       "                    (functx:substring-before-last('abcd-abcd', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -10825,9 +12945,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-last ( $arg as xs:string? , $delim as xs:string ) as xs:string { if (matches($arg, functx:escape-for-regex($delim))) then replace($arg, concat('^(.*)', functx:escape-for-regex($delim),'.*'), '$1') else '' } ;\n" +
       "                    (functx:substring-before-last( 'abc-def-ghi', '-'), functx:substring-before-last('abcd-abcd', 'ab'), functx:substring-before-last('abcd-abcd', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc-def abcd- ")
     );
@@ -10844,9 +12968,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-last-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { replace($arg,concat('^(.*)',$regex,'.*'),'$1') } ;\n" +
       "                    (functx:substring-before-last-match( 'abc-def-ghi', '[ce]'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc-d")
     );
@@ -10863,9 +12991,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-last-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { replace($arg,concat('^(.*)',$regex,'.*'),'$1') } ;\n" +
       "                    (functx:substring-before-last-match( 'abcd-abcd', 'ab?'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcd-")
     );
@@ -10882,9 +13014,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-last-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { replace($arg,concat('^(.*)',$regex,'.*'),'$1') } ;\n" +
       "                    (functx:substring-before-last-match( 'abcd-abcd', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcd-abcd")
     );
@@ -10901,9 +13037,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-last-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { replace($arg,concat('^(.*)',$regex,'.*'),'$1') } ;\n" +
       "                    (functx:substring-before-last-match( 'abc-def-ghi', '[ce]'), functx:substring-before-last-match( 'abcd-abcd', 'ab?'), functx:substring-before-last-match( 'abcd-abcd', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc-d abcd- abcd-abcd")
     );
@@ -10920,9 +13060,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { tokenize($arg,$regex)[1] } ;\n" +
       "                    (functx:substring-before-match( 'abc-def-ghi', '[dg]'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc-")
     );
@@ -10939,9 +13083,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { tokenize($arg,$regex)[1] } ;\n" +
       "                    (functx:substring-before-match( 'abcd-abcd', 'bc?'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a")
     );
@@ -10958,9 +13106,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { tokenize($arg,$regex)[1] } ;\n" +
       "                    (functx:substring-before-match( 'abcd-abcd', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcd-abcd")
     );
@@ -10977,9 +13129,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:substring-before-match ( $arg as xs:string? , $regex as xs:string ) as xs:string? { tokenize($arg,$regex)[1] } ;\n" +
       "                    (functx:substring-before-match( 'abc-def-ghi', '[dg]'), functx:substring-before-match( 'abcd-abcd', 'bc?'), functx:substring-before-match( 'abcd-abcd', 'x'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc- a abcd-abcd")
     );
@@ -11000,9 +13156,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:time ( $hour as xs:anyAtomicType , $minute as xs:anyAtomicType , $second as xs:anyAtomicType ) as xs:time { xs:time( concat( functx:pad-integer-to-length(xs:integer($hour),2),':', functx:pad-integer-to-length(xs:integer($minute),2),':', functx:pad-integer-to-length(xs:integer($second),2))) } ;\n" +
       "                    (functx:time(20,6,12))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "20:06:12")
     );
@@ -11023,9 +13183,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:time ( $hour as xs:anyAtomicType , $minute as xs:anyAtomicType , $second as xs:anyAtomicType ) as xs:time { xs:time( concat( functx:pad-integer-to-length(xs:integer($hour),2),':', functx:pad-integer-to-length(xs:integer($minute),2),':', functx:pad-integer-to-length(xs:integer($second),2))) } ;\n" +
       "                    (functx:time('20','6','12'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "20:06:12")
     );
@@ -11046,9 +13210,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:time ( $hour as xs:anyAtomicType , $minute as xs:anyAtomicType , $second as xs:anyAtomicType ) as xs:time { xs:time( concat( functx:pad-integer-to-length(xs:integer($hour),2),':', functx:pad-integer-to-length(xs:integer($minute),2),':', functx:pad-integer-to-length(xs:integer($second),2))) } ;\n" +
       "                    (functx:time(20,6,12), functx:time('20','6','12'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "20:06:12 20:06:12")
     );
@@ -11065,9 +13233,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:timezone-from-duration ( $duration as xs:dayTimeDuration ) as xs:string { if (string($duration) = ('PT0S','-PT0S')) then 'Z' else if (matches(string($duration),'-PT[1-9]H')) then replace(string($duration),'PT([1-9])H','0$1:00') else if (matches(string($duration),'PT[1-9]H')) then replace(string($duration),'PT([1-9])H','+0$1:00') else if (matches(string($duration),'-PT1[0-4]H')) then replace(string($duration),'PT(1[0-4])H','$1:00') else if (matches(string($duration),'PT1[0-4]H')) then replace(string($duration),'PT(1[0-4])H','+$1:00') else error(xs:QName('functx:Invalid_Duration_Value')) } ;\n" +
       "                    (functx:timezone-from-duration( xs:dayTimeDuration('PT0S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Z")
     );
@@ -11084,9 +13256,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:timezone-from-duration ( $duration as xs:dayTimeDuration ) as xs:string { if (string($duration) = ('PT0S','-PT0S')) then 'Z' else if (matches(string($duration),'-PT[1-9]H')) then replace(string($duration),'PT([1-9])H','0$1:00') else if (matches(string($duration),'PT[1-9]H')) then replace(string($duration),'PT([1-9])H','+0$1:00') else if (matches(string($duration),'-PT1[0-4]H')) then replace(string($duration),'PT(1[0-4])H','$1:00') else if (matches(string($duration),'PT1[0-4]H')) then replace(string($duration),'PT(1[0-4])H','+$1:00') else error(xs:QName('functx:Invalid_Duration_Value')) } ;\n" +
       "                    (functx:timezone-from-duration( xs:dayTimeDuration('-PT5H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-05:00")
     );
@@ -11103,9 +13279,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:timezone-from-duration ( $duration as xs:dayTimeDuration ) as xs:string { if (string($duration) = ('PT0S','-PT0S')) then 'Z' else if (matches(string($duration),'-PT[1-9]H')) then replace(string($duration),'PT([1-9])H','0$1:00') else if (matches(string($duration),'PT[1-9]H')) then replace(string($duration),'PT([1-9])H','+0$1:00') else if (matches(string($duration),'-PT1[0-4]H')) then replace(string($duration),'PT(1[0-4])H','$1:00') else if (matches(string($duration),'PT1[0-4]H')) then replace(string($duration),'PT(1[0-4])H','+$1:00') else error(xs:QName('functx:Invalid_Duration_Value')) } ;\n" +
       "                    (functx:timezone-from-duration( xs:dayTimeDuration('PT9H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "+09:00")
     );
@@ -11122,9 +13302,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:timezone-from-duration ( $duration as xs:dayTimeDuration ) as xs:string { if (string($duration) = ('PT0S','-PT0S')) then 'Z' else if (matches(string($duration),'-PT[1-9]H')) then replace(string($duration),'PT([1-9])H','0$1:00') else if (matches(string($duration),'PT[1-9]H')) then replace(string($duration),'PT([1-9])H','+0$1:00') else if (matches(string($duration),'-PT1[0-4]H')) then replace(string($duration),'PT(1[0-4])H','$1:00') else if (matches(string($duration),'PT1[0-4]H')) then replace(string($duration),'PT(1[0-4])H','+$1:00') else error(xs:QName('functx:Invalid_Duration_Value')) } ;\n" +
       "                    (functx:timezone-from-duration( xs:dayTimeDuration('PT0S')), functx:timezone-from-duration( xs:dayTimeDuration('-PT5H')), functx:timezone-from-duration( xs:dayTimeDuration('PT9H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Z -05:00 +09:00")
     );
@@ -11141,9 +13325,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-days-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('P1D') } ;\n" +
       "                    (functx:total-days-from-duration( xs:dayTimeDuration('PT24H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -11160,9 +13348,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-days-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('P1D') } ;\n" +
       "                    (functx:total-days-from-duration( xs:dayTimeDuration('P1D')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -11179,9 +13371,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-days-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('P1D') } ;\n" +
       "                    (functx:total-days-from-duration( xs:dayTimeDuration('PT36H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.5")
     );
@@ -11198,9 +13394,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-days-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('P1D') } ;\n" +
       "                    (functx:total-days-from-duration( xs:dayTimeDuration('PT48H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -11217,9 +13417,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-days-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('P1D') } ;\n" +
       "                    (functx:total-days-from-duration( xs:dayTimeDuration('PT24H')), functx:total-days-from-duration( xs:dayTimeDuration('P1D')), functx:total-days-from-duration( xs:dayTimeDuration('PT36H')), functx:total-days-from-duration( xs:dayTimeDuration('PT48H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 1 1.5 2")
     );
@@ -11236,9 +13440,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-hours-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1H') } ;\n" +
       "                    (functx:total-hours-from-duration( xs:dayTimeDuration('PT26H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("26")
     );
@@ -11255,9 +13463,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-hours-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1H') } ;\n" +
       "                    (functx:total-hours-from-duration( xs:dayTimeDuration('PT1H30M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.5")
     );
@@ -11274,9 +13486,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-hours-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1H') } ;\n" +
       "                    (functx:total-hours-from-duration( xs:dayTimeDuration('-PT3H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-3")
     );
@@ -11293,9 +13509,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-hours-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1H') } ;\n" +
       "                    (functx:total-hours-from-duration( xs:dayTimeDuration('P1D')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("24")
     );
@@ -11312,9 +13532,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-hours-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1H') } ;\n" +
       "                    (functx:total-hours-from-duration( xs:dayTimeDuration('P1DT2H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("26")
     );
@@ -11331,9 +13555,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-hours-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1H') } ;\n" +
       "                    (functx:total-hours-from-duration( xs:dayTimeDuration('PT26H')), functx:total-hours-from-duration( xs:dayTimeDuration('PT1H30M')), functx:total-hours-from-duration( xs:dayTimeDuration('-PT3H')), functx:total-hours-from-duration( xs:dayTimeDuration('P1D')), functx:total-hours-from-duration( xs:dayTimeDuration('P1DT2H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "26 1.5 -3 24 26")
     );
@@ -11350,9 +13578,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-minutes-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1M') } ;\n" +
       "                    (functx:total-minutes-from-duration( xs:dayTimeDuration('PT90M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("90")
     );
@@ -11369,9 +13601,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-minutes-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1M') } ;\n" +
       "                    (functx:total-minutes-from-duration( xs:dayTimeDuration('PT1H90M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("150")
     );
@@ -11388,9 +13624,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-minutes-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1M') } ;\n" +
       "                    (functx:total-minutes-from-duration( xs:dayTimeDuration('PT3H')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("180")
     );
@@ -11407,9 +13647,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-minutes-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1M') } ;\n" +
       "                    (functx:total-minutes-from-duration( xs:dayTimeDuration('PT1M30S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.5")
     );
@@ -11426,9 +13670,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-minutes-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1M') } ;\n" +
       "                    (functx:total-minutes-from-duration( xs:dayTimeDuration('PT90M')), functx:total-minutes-from-duration( xs:dayTimeDuration('PT1H90M')), functx:total-minutes-from-duration( xs:dayTimeDuration('PT3H')), functx:total-minutes-from-duration( xs:dayTimeDuration('PT1M30S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "90 150 180 1.5")
     );
@@ -11445,9 +13693,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-months-from-duration ( $duration as xs:yearMonthDuration? ) as xs:decimal? { $duration div xs:yearMonthDuration('P1M') } ;\n" +
       "                    (functx:total-months-from-duration( xs:yearMonthDuration('P18M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("18")
     );
@@ -11464,9 +13716,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-months-from-duration ( $duration as xs:yearMonthDuration? ) as xs:decimal? { $duration div xs:yearMonthDuration('P1M') } ;\n" +
       "                    (functx:total-months-from-duration( xs:yearMonthDuration('P1Y')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("12")
     );
@@ -11483,9 +13739,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-months-from-duration ( $duration as xs:yearMonthDuration? ) as xs:decimal? { $duration div xs:yearMonthDuration('P1M') } ;\n" +
       "                    (functx:total-months-from-duration( xs:yearMonthDuration('P1Y6M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("18")
     );
@@ -11502,9 +13762,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-months-from-duration ( $duration as xs:yearMonthDuration? ) as xs:decimal? { $duration div xs:yearMonthDuration('P1M') } ;\n" +
       "                    (functx:total-months-from-duration( xs:yearMonthDuration('P18M')), functx:total-months-from-duration( xs:yearMonthDuration('P1Y')), functx:total-months-from-duration( xs:yearMonthDuration('P1Y6M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "18 12 18")
     );
@@ -11521,9 +13785,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-seconds-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1S') } ;\n" +
       "                    (functx:total-seconds-from-duration( xs:dayTimeDuration('PT90S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("90")
     );
@@ -11540,9 +13808,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-seconds-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1S') } ;\n" +
       "                    (functx:total-seconds-from-duration( xs:dayTimeDuration('PT90.5S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "90.5")
     );
@@ -11559,9 +13831,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-seconds-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1S') } ;\n" +
       "                    (functx:total-seconds-from-duration( xs:dayTimeDuration('PT1M30S')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("90")
     );
@@ -11578,9 +13854,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-seconds-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1S') } ;\n" +
       "                    (functx:total-seconds-from-duration( xs:dayTimeDuration('PT3M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("180")
     );
@@ -11597,9 +13877,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-seconds-from-duration ( $duration as xs:dayTimeDuration? ) as xs:decimal? { $duration div xs:dayTimeDuration('PT1S') } ;\n" +
       "                    (functx:total-seconds-from-duration( xs:dayTimeDuration('PT90S')), functx:total-seconds-from-duration( xs:dayTimeDuration('PT90.5S')), functx:total-seconds-from-duration( xs:dayTimeDuration('PT1M30S')), functx:total-seconds-from-duration( xs:dayTimeDuration('PT3M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "90 90.5 90 180")
     );
@@ -11616,9 +13900,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-years-from-duration ( $duration as xs:yearMonthDuration? ) as xs:decimal? { $duration div xs:yearMonthDuration('P1Y') } ;\n" +
       "                    (functx:total-years-from-duration( xs:yearMonthDuration('P18M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.5")
     );
@@ -11635,9 +13923,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-years-from-duration ( $duration as xs:yearMonthDuration? ) as xs:decimal? { $duration div xs:yearMonthDuration('P1Y') } ;\n" +
       "                    (functx:total-years-from-duration( xs:yearMonthDuration('P1Y')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -11654,9 +13946,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-years-from-duration ( $duration as xs:yearMonthDuration? ) as xs:decimal? { $duration div xs:yearMonthDuration('P1Y') } ;\n" +
       "                    (functx:total-years-from-duration( xs:yearMonthDuration('P1Y6M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.5")
     );
@@ -11673,9 +13969,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:total-years-from-duration ( $duration as xs:yearMonthDuration? ) as xs:decimal? { $duration div xs:yearMonthDuration('P1Y') } ;\n" +
       "                    (functx:total-years-from-duration( xs:yearMonthDuration('P18M')), functx:total-years-from-duration( xs:yearMonthDuration('P1Y')), functx:total-years-from-duration( xs:yearMonthDuration('P1Y6M')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1.5 1 1.5")
     );
@@ -11692,9 +13992,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:trim ( $arg as xs:string? ) as xs:string { replace(replace($arg,'\\s+$',''),'^\\s+','') } ;\n" +
       "                    (functx:trim(' xyz '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xyz")
     );
@@ -11711,9 +14015,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:trim ( $arg as xs:string? ) as xs:string { replace(replace($arg,'\\s+$',''),'^\\s+','') } ;\n" +
       "                    (functx:trim(' xyz'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xyz")
     );
@@ -11730,9 +14038,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:trim ( $arg as xs:string? ) as xs:string { replace(replace($arg,'\\s+$',''),'^\\s+','') } ;\n" +
       "                    (functx:trim('x   xyz '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "x   xyz")
     );
@@ -11749,9 +14061,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:trim ( $arg as xs:string? ) as xs:string { replace(replace($arg,'\\s+$',''),'^\\s+','') } ;\n" +
       "                    (functx:trim(' xyz '), functx:trim(' xyz'), functx:trim('x   xyz '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"xyz\", \"xyz\",  \"x   xyz\"")
     );
@@ -11768,9 +14084,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:update-attributes ( $elements as element()* , $attrNames as xs:QName* , $attrValues as xs:anyAtomicType* ) as element()? { for $element in $elements return element { node-name($element)} { for $attrName at $seq in $attrNames return if ($element/@*[node-name(.) = $attrName]) then attribute {$attrName} {$attrValues[$seq]} else (), $element/@*[not(node-name(.) = $attrNames)], $element/node() } } ;\n" +
       "                    let $in-xml := <in-xml xmlns:new='http://new'> <a att1='def'>x</a> <b>x</b> <c new:att1='def'>x</c> </in-xml> return (functx:update-attributes( $in-xml/a, xs:QName('att1'), 123))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a att1=\"123\">x</a>", false)
     );
@@ -11787,9 +14107,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:update-attributes ( $elements as element()* , $attrNames as xs:QName* , $attrValues as xs:anyAtomicType* ) as element()? { for $element in $elements return element { node-name($element)} { for $attrName at $seq in $attrNames return if ($element/@*[node-name(.) = $attrName]) then attribute {$attrName} {$attrValues[$seq]} else (), $element/@*[not(node-name(.) = $attrNames)], $element/node() } } ;\n" +
       "                    let $in-xml := <in-xml xmlns:new='http://new'> <a att1='def'>x</a> <b>x</b> <c new:att1='def'>x</c> </in-xml> return (functx:update-attributes( $in-xml/a, (xs:QName('att1'),xs:QName('att2')), (1,2)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a att1=\"1\">x</a>", false)
     );
@@ -11806,9 +14130,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:update-attributes ( $elements as element()* , $attrNames as xs:QName* , $attrValues as xs:anyAtomicType* ) as element()? { for $element in $elements return element { node-name($element)} { for $attrName at $seq in $attrNames return if ($element/@*[node-name(.) = $attrName]) then attribute {$attrName} {$attrValues[$seq]} else (), $element/@*[not(node-name(.) = $attrNames)], $element/node() } } ;\n" +
       "                    let $in-xml := <in-xml xmlns:new='http://new'> <a att1='def'>x</a> <b>x</b> <c new:att1='def'>x</c> </in-xml> return (functx:update-attributes( $in-xml/b, xs:QName('att1'), 123))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b>x</b>", false)
     );
@@ -11825,9 +14153,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:update-attributes ( $elements as element()* , $attrNames as xs:QName* , $attrValues as xs:anyAtomicType* ) as element()? { for $element in $elements return element { node-name($element)} { for $attrName at $seq in $attrNames return if ($element/@*[node-name(.) = $attrName]) then attribute {$attrName} {$attrValues[$seq]} else (), $element/@*[not(node-name(.) = $attrNames)], $element/node() } } ;\n" +
       "                    let $in-xml := <in-xml xmlns:new='http://new'> <a att1='def'>x</a> <b>x</b> <c new:att1='def'>x</c> </in-xml> return (functx:update-attributes( $in-xml/c, QName('http://new','prefix:att1'), 123))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<c xmlns:prefix=\"http://new\" prefix:att1=\"123\">x</c>", false)
     );
@@ -11844,9 +14176,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:update-attributes ( $elements as element()* , $attrNames as xs:QName* , $attrValues as xs:anyAtomicType* ) as element()? { for $element in $elements return element { node-name($element)} { for $attrName at $seq in $attrNames return if ($element/@*[node-name(.) = $attrName]) then attribute {$attrName} {$attrValues[$seq]} else (), $element/@*[not(node-name(.) = $attrNames)], $element/node() } } ;\n" +
       "                    let $in-xml := <in-xml xmlns:new='http://new'> <a att1='def'>x</a> <b>x</b> <c new:att1='def'>x</c> </in-xml> return (functx:update-attributes( $in-xml/a, xs:QName('att1'), 123), functx:update-attributes( $in-xml/a, (xs:QName('att1'),xs:QName('att2')), (1,2)), functx:update-attributes( $in-xml/b, xs:QName('att1'), 123), functx:update-attributes( $in-xml/c, QName('http://new','prefix:att1'), 123))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a att1=\"123\">x</a><a att1=\"1\">x</a><b>x</b><c xmlns:prefix=\"http://new\" prefix:att1=\"123\">x</c>", false)
     );
@@ -11863,9 +14199,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-except ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values($arg1[not(.=$arg2)]) } ;\n" +
       "                    (functx:value-except((1,2,3),(3,4,5)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2")
     );
@@ -11882,9 +14222,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-except ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values($arg1[not(.=$arg2)]) } ;\n" +
       "                    (functx:value-except((1,1,2,3),(2,3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -11901,9 +14245,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-except ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values($arg1[not(.=$arg2)]) } ;\n" +
       "                    (functx:value-except((1,2),(3,4)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2")
     );
@@ -11920,9 +14268,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-except ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values($arg1[not(.=$arg2)]) } ;\n" +
       "                    (functx:value-except((1,2,2,3),()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -11939,9 +14291,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-except ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values($arg1[not(.=$arg2)]) } ;\n" +
       "                    (functx:value-except((1,2,3),(3,4,5)), functx:value-except((1,1,2,3),(2,3)), functx:value-except((1,2),(3,4)), functx:value-except((1,2,2,3),()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 1 1 2 1 2 3")
     );
@@ -11958,9 +14314,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-intersect ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values($arg1[.=$arg2]) } ;\n" +
       "                    (functx:value-intersect((1,2),(2,3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -11977,9 +14337,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-intersect ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values($arg1[.=$arg2]) } ;\n" +
       "                    (functx:value-intersect((1,2,3),(2,3,4)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 3")
     );
@@ -11996,9 +14360,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-intersect ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values($arg1[.=$arg2]) } ;\n" +
       "                    (functx:value-intersect((1,2,2,3),(2,3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 3")
     );
@@ -12015,9 +14383,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-intersect ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values($arg1[.=$arg2]) } ;\n" +
       "                    (functx:value-intersect((1,2,2,3),()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -12034,9 +14406,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-intersect ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values($arg1[.=$arg2]) } ;\n" +
       "                    (functx:value-intersect((1,2),(2,3)), functx:value-intersect((1,2,3),(2,3,4)), functx:value-intersect((1,2,2,3),(2,3)), functx:value-intersect((1,2,2,3),()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 2 3 2 3")
     );
@@ -12053,9 +14429,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-union ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values(($arg1, $arg2)) } ;\n" +
       "                    (functx:value-union((1,2),(3,4)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4")
     );
@@ -12072,9 +14452,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-union ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values(($arg1, $arg2)) } ;\n" +
       "                    (functx:value-union((1,2,3),(2,3,4)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4")
     );
@@ -12091,9 +14475,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-union ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values(($arg1, $arg2)) } ;\n" +
       "                    (functx:value-union((1,2,2,3),(3,4)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4")
     );
@@ -12110,9 +14498,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-union ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values(($arg1, $arg2)) } ;\n" +
       "                    (functx:value-union((1,2,2,3),()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -12129,9 +14521,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:value-union ( $arg1 as xs:anyAtomicType* , $arg2 as xs:anyAtomicType* ) as xs:anyAtomicType* { distinct-values(($arg1, $arg2)) } ;\n" +
       "                    (functx:value-union((1,2),(3,4)), functx:value-union((1,2,3),(2,3,4)), functx:value-union((1,2,2,3),(3,4)), functx:value-union((1,2,2,3),()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 1 2 3 4 1 2 3 4 1 2 3")
     );
@@ -12148,9 +14544,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:word-count ( $arg as xs:string? ) as xs:integer { count(tokenize($arg, '\\W+')[. != '']) } ;\n" +
       "                    (functx:word-count('hello there world'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -12167,9 +14567,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:word-count ( $arg as xs:string? ) as xs:integer { count(tokenize($arg, '\\W+')[. != '']) } ;\n" +
       "                    (functx:word-count(' hello world '))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -12186,9 +14590,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:word-count ( $arg as xs:string? ) as xs:integer { count(tokenize($arg, '\\W+')[. != '']) } ;\n" +
       "                    (functx:word-count('a.b.c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -12205,9 +14613,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:word-count ( $arg as xs:string? ) as xs:integer { count(tokenize($arg, '\\W+')[. != '']) } ;\n" +
       "                    (functx:word-count('hello there world'), functx:word-count(' hello world '), functx:word-count('a.b.c'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 2 3")
     );
@@ -12227,9 +14639,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "                    1] return functx:capitalize-first($word)) ,'') } ;\n" +
       "                    (functx:words-to-camel-case('this Is A Term'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "thisIsATerm")
     );
@@ -12249,9 +14665,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "                    1] return functx:capitalize-first($word)) ,'') } ;\n" +
       "                    (functx:words-to-camel-case( 'This is a term'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ThisIsATerm")
     );
@@ -12271,9 +14691,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "                    1] return functx:capitalize-first($word)) ,'') } ;\n" +
       "                    (functx:words-to-camel-case('this Is A Term'), functx:words-to-camel-case( 'This is a term'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "thisIsATerm ThisIsATerm")
     );
@@ -12291,9 +14715,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:wrap-values-in-elements ( $values as xs:anyAtomicType* , $elementName as xs:QName ) as element()* { for $value in $values return element {$elementName} {$value} } ;\n" +
       "                    (functx:wrap-values-in-elements( (1,2,3), xs:QName('num')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<num>1</num><num>2</num><num>3</num>", false)
     );
@@ -12311,9 +14739,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:wrap-values-in-elements ( $values as xs:anyAtomicType* , $elementName as xs:QName ) as element()* { for $value in $values return element {$elementName} {$value} } ;\n" +
       "                    (functx:wrap-values-in-elements( (1,2,3), xs:QName('new:num')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<new:num xmlns:new=\"http://newns\">1</new:num><new:num xmlns:new=\"http://newns\">2</new:num><new:num xmlns:new=\"http://newns\">3</new:num>", false)
     );
@@ -12331,9 +14763,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:wrap-values-in-elements ( $values as xs:anyAtomicType* , $elementName as xs:QName ) as element()* { for $value in $values return element {$elementName} {$value} } ;\n" +
       "                    (functx:wrap-values-in-elements( (1,2,3), QName('http://newns','num')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<num xmlns=\"http://newns\">1</num><num xmlns=\"http://newns\">2</num><num xmlns=\"http://newns\">3</num>", false)
     );
@@ -12351,9 +14787,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:wrap-values-in-elements ( $values as xs:anyAtomicType* , $elementName as xs:QName ) as element()* { for $value in $values return element {$elementName} {$value} } ;\n" +
       "                    (functx:wrap-values-in-elements( (1,2,3), QName('http://newns','new:num')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<new:num xmlns:new=\"http://newns\">1</new:num><new:num xmlns:new=\"http://newns\">2</new:num><new:num xmlns:new=\"http://newns\">3</new:num>", false)
     );
@@ -12371,9 +14811,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:wrap-values-in-elements ( $values as xs:anyAtomicType* , $elementName as xs:QName ) as element()* { for $value in $values return element {$elementName} {$value} } ;\n" +
       "                    (functx:wrap-values-in-elements( (1,2,3), xs:QName('num')), functx:wrap-values-in-elements( (1,2,3), xs:QName('new:num')), functx:wrap-values-in-elements( (1,2,3), QName('http://newns','num')), functx:wrap-values-in-elements( (1,2,3), QName('http://newns','new:num')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<num>1</num><num>2</num><num>3</num><new:num xmlns:new=\"http://newns\">1</new:num><new:num xmlns:new=\"http://newns\">2</new:num><new:num xmlns:new=\"http://newns\">3</new:num><num xmlns=\"http://newns\">1</num><num xmlns=\"http://newns\">2</num><num xmlns=\"http://newns\">3</num><new:num xmlns:new=\"http://newns\">1</new:num><new:num xmlns:new=\"http://newns\">2</new:num><new:num xmlns:new=\"http://newns\">3</new:num>", false)
     );
@@ -12392,9 +14836,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
       "                    (functx:yearMonthDuration(1,6))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1Y6M")
     );
@@ -12413,9 +14861,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
       "                    (functx:yearMonthDuration(1.5,0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1Y6M")
     );
@@ -12434,9 +14886,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
       "                    (functx:yearMonthDuration(1,()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1Y")
     );
@@ -12455,9 +14911,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
       "                    (functx:yearMonthDuration(1,0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1Y")
     );
@@ -12476,9 +14936,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
       "                    (functx:yearMonthDuration(-1,-3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-P1Y3M")
     );
@@ -12497,9 +14961,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
       "                    (functx:yearMonthDuration(-1,3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-P9M")
     );
@@ -12518,9 +14986,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
       "                    (functx:yearMonthDuration(0,0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P0M")
     );
@@ -12539,9 +15011,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yearMonthDuration ( $years as xs:decimal? , $months as xs:integer? ) as xs:yearMonthDuration { (xs:yearMonthDuration('P1M') * functx:if-empty($months,0)) + (xs:yearMonthDuration('P1Y') * functx:if-empty($years,0)) } ;\n" +
       "                    (functx:yearMonthDuration(1,6), functx:yearMonthDuration(1.5,0), functx:yearMonthDuration(1,()), functx:yearMonthDuration(1,0), functx:yearMonthDuration(-1,-3), functx:yearMonthDuration(-1,3), functx:yearMonthDuration(0,0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1Y6M P1Y6M P1Y P1Y -P1Y3M -P9M P0M")
     );
@@ -12558,9 +15034,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yyyyddmm-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$', '$1-$3-$2')) } ;\n" +
       "                    (functx:yyyyddmm-to-date('2004-15-12'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15")
     );
@@ -12577,9 +15057,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yyyyddmm-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$', '$1-$3-$2')) } ;\n" +
       "                    (functx:yyyyddmm-to-date('20041512'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15")
     );
@@ -12596,9 +15080,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yyyyddmm-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$', '$1-$3-$2')) } ;\n" +
       "                    (functx:yyyyddmm-to-date('2004/15/12'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15")
     );
@@ -12615,9 +15103,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yyyyddmm-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$', '$1-$3-$2')) } ;\n" +
       "                    (functx:yyyyddmm-to-date('2004-15-12'), functx:yyyyddmm-to-date('20041512'), functx:yyyyddmm-to-date('2004/15/12'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15 2004-12-15 2004-12-15")
     );
@@ -12634,9 +15126,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yyyymmdd-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$', '$1-$2-$3')) } ;\n" +
       "                    (functx:yyyymmdd-to-date('2004-12-15'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15")
     );
@@ -12653,9 +15149,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yyyymmdd-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$', '$1-$2-$3')) } ;\n" +
       "                    (functx:yyyymmdd-to-date('20041215'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15")
     );
@@ -12672,9 +15172,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yyyymmdd-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$', '$1-$2-$3')) } ;\n" +
       "                    (functx:yyyymmdd-to-date('2004/12/15'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15")
     );
@@ -12691,9 +15195,13 @@ public class AppFunctxFunctx extends QT3TestSet {
       "         declare function functx:yyyymmdd-to-date ( $dateString as xs:string? ) as xs:date? { if (empty($dateString)) then () else if (not(matches($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$'))) then error(xs:QName('functx:Invalid_Date_Format')) else xs:date(replace($dateString, '^\\D*(\\d{4})\\D*(\\d{2})\\D*(\\d{2})\\D*$', '$1-$2-$3')) } ;\n" +
       "                    (functx:yyyymmdd-to-date('2004-12-15'), functx:yyyymmdd-to-date('20041215'), functx:yyyymmdd-to-date('2004/12/15'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2004-12-15 2004-12-15 2004-12-15")
     );

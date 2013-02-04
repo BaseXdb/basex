@@ -20,9 +20,13 @@ public class MiscErrorsAndOptimization extends QT3TestSet {
     final XQuery query = new XQuery(
       "if (true()) then 1 else error(QName('http://www.example.com/errors', 'err:oops'), \"Oops, this error should not be raised!\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -36,9 +40,13 @@ public class MiscErrorsAndOptimization extends QT3TestSet {
     final XQuery query = new XQuery(
       "if (true()) then 1 div 0 else 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -52,9 +60,13 @@ public class MiscErrorsAndOptimization extends QT3TestSet {
     final XQuery query = new XQuery(
       "count( let $N := <n x=\"this ain't no date\"/> return $N[if (@x castable as xs:date) then xs:date(@x) gt xs:date(\"2000-01-01\") else false()] )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -68,9 +80,13 @@ public class MiscErrorsAndOptimization extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-length((\"one\", \"two\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -84,9 +100,13 @@ public class MiscErrorsAndOptimization extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $e := (1,2) return $e eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -100,9 +120,13 @@ public class MiscErrorsAndOptimization extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $s in \"var:QName\" return QName($s)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -116,9 +140,13 @@ public class MiscErrorsAndOptimization extends QT3TestSet {
     final XQuery query = new XQuery(
       "if (true()) then 1 else let $unbound:var := 2 return $unbound:var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );

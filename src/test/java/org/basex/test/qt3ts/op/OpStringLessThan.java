@@ -20,9 +20,13 @@ public class OpStringLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "'a' lt 'abc'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class OpStringLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not('abc' lt 'a')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class OpStringLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "'a' le 'abc'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class OpStringLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not('abc' le 'a')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class OpStringLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "'abc' le 'abc'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,97 @@ public class OpStringLessThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"\uea60\" lt \"\ud804\udd70\"",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  test string comparison .
+   */
+  @org.junit.Test
+  public void cbclStringLessThan001() {
+    final XQuery query = new XQuery(
+      "not(string(current-time()) lt \"now\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test string comparison .
+   */
+  @org.junit.Test
+  public void cbclStringLessThan002() {
+    final XQuery query = new XQuery(
+      "not(string(current-time()) ge \"now\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test string comparison .
+   */
+  @org.junit.Test
+  public void cbclStringLessThan003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        not(xs:untypedAtomic(current-time()) lt xs:untypedAtomic(\"now\"))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test string comparison .
+   */
+  @org.junit.Test
+  public void cbclStringLessThan004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        not(xs:untypedAtomic(current-time()) ge xs:untypedAtomic(\"now\"))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

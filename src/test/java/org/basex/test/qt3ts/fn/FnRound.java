@@ -4,7 +4,7 @@ import org.basex.tests.bxapi.XQuery;
 import org.basex.test.qt3ts.QT3TestSet;
 
 /**
-.
+ * Tests for the round() function.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
@@ -20,9 +20,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(1, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -52,9 +60,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(round(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(1) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(1.1) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:double(1)) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:float(1)) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(2.4999) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(-2.5) eq -2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,10 +200,14 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:unsignedShort(.)) instance of xs:unsignedShort",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -185,10 +225,14 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:int(.)) instance of xs:int",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -206,9 +250,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.54\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -222,9 +270,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.54\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -238,9 +290,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.54\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -254,9 +310,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.55\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -270,9 +330,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.55\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -286,9 +350,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.55\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -302,9 +370,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.55\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -318,9 +390,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.56\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -334,9 +410,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.56\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -350,9 +430,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.56\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -366,10 +450,14 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:short(.)) instance of xs:short",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -387,9 +475,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.56\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -403,9 +495,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.59\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -419,9 +515,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.59\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -435,9 +535,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.59\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -451,9 +555,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.59\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -467,9 +575,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.50\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -483,9 +595,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.50\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -499,9 +615,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.50\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -515,9 +635,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.50\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -531,9 +655,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.61\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -547,10 +675,14 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:byte(.)) instance of xs:byte",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -568,9 +700,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.61\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -584,9 +720,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.61\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -600,9 +740,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.61\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -616,9 +760,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.64\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -632,9 +780,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.64\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -648,9 +800,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.64\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -664,9 +820,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.64\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -680,9 +840,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.65\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -696,9 +860,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.65\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -712,9 +880,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.65\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -728,9 +900,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:double(\"INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -744,9 +920,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.65\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -760,9 +940,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.66\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -776,9 +960,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.66\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -792,9 +980,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.66\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -808,9 +1000,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.66\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -824,9 +1020,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.69\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -840,9 +1040,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.69\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -856,9 +1060,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.69\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -872,9 +1080,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.69\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -888,9 +1100,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.60\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -904,9 +1120,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:double(\"-INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF")
     );
@@ -920,9 +1140,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.60\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -936,9 +1160,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.60\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -952,9 +1180,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.60\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -968,9 +1200,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.91\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -984,9 +1220,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.91\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1000,9 +1240,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.91\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1016,9 +1260,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.91\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1032,9 +1280,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.94\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1048,9 +1300,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.94\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1064,9 +1320,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.94\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1080,9 +1340,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:double(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1096,9 +1360,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.94\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1112,9 +1380,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.95\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1128,9 +1400,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.95\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1144,9 +1420,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.95\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1160,9 +1440,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.95\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1176,9 +1460,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.96\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1192,9 +1480,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.96\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1208,9 +1500,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.96\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1224,9 +1520,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.96\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1240,9 +1540,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.99\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1256,9 +1560,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:double(\"-0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1272,9 +1580,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.99\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1288,9 +1600,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.99\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1304,9 +1620,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.99\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1320,9 +1640,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.90\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1336,9 +1660,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.90\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1352,9 +1680,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.90\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1368,9 +1700,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.90\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1384,9 +1720,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.101\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1400,9 +1740,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.101\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1416,9 +1760,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.101\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1432,9 +1780,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:float(\"INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -1448,9 +1800,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.101\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1464,9 +1820,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.104\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1480,9 +1840,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.104\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1496,9 +1860,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.104\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1512,9 +1880,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.104\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1528,9 +1900,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.105\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1544,9 +1920,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.105\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1560,9 +1940,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.105\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1576,9 +1960,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.105\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1592,9 +1980,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.106\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1608,9 +2000,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:float(\"-INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF")
     );
@@ -1624,9 +2020,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.106\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1640,9 +2040,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.106\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1656,9 +2060,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.106\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1672,9 +2080,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.109\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1688,9 +2100,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.109\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1704,9 +2120,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.109\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1720,9 +2140,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.109\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1736,9 +2160,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.100\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1752,9 +2180,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.100\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1768,9 +2200,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.100\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1784,9 +2220,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:float(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1800,9 +2240,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.100\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1816,10 +2260,14 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:unsignedLong(.)) instance of xs:unsignedLong",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -1837,9 +2285,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:float(\"-0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1853,9 +2305,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -1869,9 +2325,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -1885,9 +2345,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.01\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1901,9 +2365,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.01\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1917,9 +2385,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.01\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0")
     );
@@ -1933,9 +2405,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.01\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1949,9 +2425,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.04\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1965,9 +2445,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.04\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -1981,9 +2465,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.04\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -1997,10 +2485,14 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:unsignedInt(.)) instance of xs:unsignedInt",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -2018,9 +2510,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.04\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2034,9 +2530,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.05\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2050,9 +2550,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.05\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2066,9 +2570,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.05\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2082,9 +2590,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.05\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2098,9 +2610,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.06\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2114,9 +2630,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.06\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2130,9 +2650,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.06\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2146,9 +2670,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.06\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2162,9 +2690,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.09\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2178,10 +2710,14 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:unsignedByte(.)) instance of xs:unsignedByte",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -2199,9 +2735,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.09\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2215,9 +2755,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.09\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2231,9 +2775,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.09\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2247,9 +2795,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2263,9 +2815,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2279,9 +2835,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2295,9 +2855,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2311,9 +2875,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.11\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2327,9 +2895,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.11\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2343,9 +2915,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.11\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2359,10 +2935,14 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:positiveInteger(.)) instance of xs:positiveInteger",
       ctx);
-    query.context(node(file("fn/abs/e-1.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e1.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -2380,9 +2960,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.11\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2396,9 +2980,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.14\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2412,9 +3000,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.14\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2428,9 +3020,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.14\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2444,9 +3040,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.14\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:double")
@@ -2464,9 +3064,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.15\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2480,9 +3084,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.15\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2496,9 +3104,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.15\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2512,9 +3124,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.15\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2528,9 +3144,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.16\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2544,10 +3164,14 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:nonPositiveInteger(.)) instance of xs:nonPositiveInteger",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -2565,9 +3189,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.16\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2581,9 +3209,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.16\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2597,9 +3229,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.16\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2613,9 +3249,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.19\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2629,9 +3269,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.19\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2645,9 +3289,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.19\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2661,9 +3309,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.19\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2677,9 +3329,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.10\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2693,9 +3349,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.10\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2709,9 +3369,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.10\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2725,10 +3389,14 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:nonNegativeInteger(.)) instance of xs:nonNegativeInteger",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -2746,9 +3414,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.10\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2762,9 +3434,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.41\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2778,9 +3454,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.41\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2794,9 +3474,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.41\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2810,9 +3494,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.41\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2826,9 +3514,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.44\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2842,9 +3534,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.44\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2858,9 +3554,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.44\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2874,9 +3574,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.44\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2890,9 +3594,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.45\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2906,10 +3614,14 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:negativeInteger(.)) instance of xs:negativeInteger",
       ctx);
-    query.context(node(file("fn/abs/e-1.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e-1.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -2927,9 +3639,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.45\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2943,9 +3659,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.45\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2959,9 +3679,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.45\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -2975,9 +3699,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.46\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -2991,9 +3719,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.46\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -3007,9 +3739,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.46\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -3023,9 +3759,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.46\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -3039,9 +3779,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.49\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -3055,9 +3799,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.49\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -3071,9 +3819,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.49\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -3087,10 +3839,14 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "round(xs:long(.)) instance of xs:long",
       ctx);
-    query.context(node(file("fn/abs/e0.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/abs/e0.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -3108,9 +3864,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.49\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -3124,9 +3884,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.40\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -3140,9 +3904,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.40\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -3156,9 +3924,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.40\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -3172,9 +3944,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.40\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-0")
     );
@@ -3188,9 +3964,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.51\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -3204,9 +3984,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0.51\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -3220,9 +4004,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-0.51\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -3236,9 +4024,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-0.51\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -3252,9 +4044,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0.54\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -3273,9 +4069,13 @@ public class FnRound extends QT3TestSet {
       "           else if ((round($x)) instance of xs:double) then \"double\" \n" +
       "           else error()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"integer\", \"decimal\", \"float\", \"double\"")
     );
@@ -3289,9 +4089,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(-12.567, 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-13")
@@ -3309,9 +4113,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(-1234.567, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-1200")
@@ -3329,9 +4137,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(1.567, -3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3349,9 +4161,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:decimal(\"12.1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("12")
@@ -3369,9 +4185,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:decimal(\"12.7\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("13")
@@ -3389,9 +4209,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:decimal(\"12.5\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("13")
@@ -3409,9 +4233,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:decimal(\"-12.7\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-13")
@@ -3429,9 +4257,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:decimal(\"-12.1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12")
@@ -3449,9 +4281,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:decimal(\"-12.5\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12")
@@ -3469,9 +4305,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(-12.567, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12.57")
@@ -3489,9 +4329,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(-12.567, 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12.567")
@@ -3509,9 +4353,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(1.125, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1.13")
@@ -3529,9 +4377,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(8452, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8500")
     );
@@ -3545,9 +4397,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(3.1415e0, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3.14e0")
     );
@@ -3561,9 +4417,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(35.425, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("35.43")
     );
@@ -3577,9 +4437,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"-1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -3593,9 +4457,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -3613,9 +4481,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:double(\"1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.7976931348623157E308")
     );
@@ -3629,9 +4501,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:decimal(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -3645,9 +4521,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:decimal(\"617375191608514839\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("617375191608514839")
@@ -3665,9 +4545,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:decimal(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -3681,9 +4565,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"-3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -3697,9 +4585,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:float")
@@ -3717,9 +4609,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:float(\"3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"3.4028235E38\")")
     );
@@ -3733,9 +4629,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:int(\"-2147483648\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-2147483648")
@@ -3753,9 +4653,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:int(\"-1873914410\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1873914410")
     );
@@ -3769,9 +4673,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:int(\"2147483647\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2147483647")
     );
@@ -3785,9 +4693,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:integer(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -3801,9 +4713,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:integer(\"830993497117024304\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("830993497117024304")
     );
@@ -3817,9 +4733,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:integer(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -3833,9 +4753,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:long(\"-92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -3849,9 +4773,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:long(\"-47175562203048468\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-47175562203048468")
     );
@@ -3865,9 +4793,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:long(\"92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547758")
     );
@@ -3881,9 +4813,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:negativeInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -3897,9 +4833,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:negativeInteger(\"-297014075999096793\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-297014075999096793")
     );
@@ -3913,9 +4853,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:negativeInteger(\"-1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -3929,9 +4873,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:nonNegativeInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3945,9 +4893,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:nonNegativeInteger(\"303884545991464527\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -3961,9 +4913,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:nonNegativeInteger(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -3977,9 +4933,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:nonPositiveInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -3993,9 +4953,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:nonPositiveInteger(\"-475688437271870490\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-475688437271870490")
     );
@@ -4009,9 +4973,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:nonPositiveInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -4025,9 +4993,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:positiveInteger(\"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -4041,9 +5013,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:positiveInteger(\"52704602390610033\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610033")
     );
@@ -4057,9 +5033,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:positiveInteger(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -4073,9 +5053,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:short(\"-32768\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -4089,9 +5073,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:short(\"-5324\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5324")
     );
@@ -4105,9 +5093,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:short(\"32767\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("32767")
     );
@@ -4121,9 +5113,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:unsignedLong(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -4137,9 +5133,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:unsignedLong(\"130747108607674654\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -4153,9 +5153,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:unsignedLong(\"184467440737095516\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -4169,9 +5173,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:unsignedShort(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -4185,9 +5193,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:unsignedShort(\"44633\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -4201,9 +5213,13 @@ public class FnRound extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round(xs:unsignedShort(\"65535\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );

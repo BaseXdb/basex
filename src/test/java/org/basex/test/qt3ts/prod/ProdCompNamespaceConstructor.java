@@ -24,9 +24,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        <e>{ namespace saxon {$s}, attribute a {23}, namespace xsl {$xsl} }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xmlns:saxon=\"http://saxon.sf.net/\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" a=\"23\"/>", false)
     );
@@ -46,9 +50,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "             namespace {$xsl} {\"http://www.w3.org/1999/XSL/Transform\"} }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xmlns:saxon=\"http://saxon.sf.net/\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" a=\"23\"/>", false)
     );
@@ -69,9 +77,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "            namespace {$xsl} {\"http://www.w3.org/1999/XSL/Transform\"}, <f/> }</t:e> </out>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out><t:e xmlns:t=\"http://www.example.com/\" xmlns=\"http://saxon.sf.net/\"\n        xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" a=\"23\"><f xmlns=\"\"/></t:e></out>", false)
     );
@@ -91,9 +103,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "            attribute a {23}, <f/> }</t:e> </out>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out><t:e xmlns:t=\"http://www.example.com/\" xml:space=\"preserve\" a=\"23\"><f/></t:e></out>", false)
     );
@@ -111,9 +127,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        element {QName(\"http://saxon.sf.net/\", \"saxon:extension\")} { namespace saxon {$s}, attribute a {23}, namespace xsl {$xsl}, element f {42} }\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<saxon:extension xmlns:saxon=\"http://saxon.sf.net/\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" \n            a=\"23\"><f>42</f></saxon:extension>", false)
     );
@@ -132,9 +152,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "                { namespace saxon {$s}, attribute a {23}, namespace xsl {$xsl}, namespace saxon {$s}, element f {42} }\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<saxon:extension xmlns:saxon=\"http://saxon.sf.net/\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n                 a=\"23\"><f>42</f></saxon:extension>", false)
     );
@@ -153,9 +177,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        <e> { namespace saxon {$s}, attribute a {23}, namespace xsl {$xsl}, namespace xmlns {$s}, element f {42} }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0101")
     );
@@ -174,9 +202,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        <e> { namespace saxon {$s}, attribute a {23}, namespace xsl {$xsl}, namespace {$xmlns} {$s}, element f {42} }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0101")
     );
@@ -194,9 +226,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        <e> { namespace p {$p1}, namespace p {$p2}, element f {42} }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0102")
     );
@@ -215,9 +251,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        <out> { exists($r/@*:att[prefix-from-QName(node-name(.))!='p']), exists(in-scope-prefixes($r)[.='p']) }</out>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>true true</out>", false)
     );
@@ -237,9 +277,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        <out> { exists($r[prefix-from-QName(node-name(.))!='p']), exists(in-scope-prefixes($r)[.='p']) }</out>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out>true true</out>", false)
     );
@@ -267,9 +311,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "            local:f(namespace {\"\"} {\"http://example.com/two\"}) }</out>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out><namespace \n              same-as-self=\"true\" is-namespace=\"true\" namespace-uri=\"\" is-item=\"true\"\n              typed-value=\"http://example.com/one\"\n              is-untyped=\"false\"\n              string-value=\"http://example.com/one\"\n              local-name=\"p\"\n              parent-exists=\"false\"\n              name=\"p\"\n              is-node=\"true\"/><namespace \n              same-as-self=\"true\" is-namespace=\"true\" namespace-uri=\"\" is-item=\"true\"\n              typed-value=\"http://example.com/two\"\n              is-untyped=\"false\"\n              string-value=\"http://example.com/two\"\n              local-name=\"\"\n              parent-exists=\"false\"\n              name=\"\"\n              is-node=\"true\"/></out>", false)
     );
@@ -288,9 +336,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          <e>{ namespace { $pre } { $uri } }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xmlns:z=\"http://www.zorba-xquery.com/\"/>", false)
     );
@@ -309,9 +361,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          <e>{ namespace { $pre } { $uri } }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xmlns:z=\"http://www.zorba-xquery.com/\"/>", false)
     );
@@ -328,9 +384,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        <z:e>{ namespace { <a/>/* } { \"http://www.w3.org/\" } }</z:e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<z:e xmlns:z=\"http://www.zorba-xquery.com/\" xmlns=\"http://www.w3.org/\" />", false)
     );
@@ -349,9 +409,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          <e>{ namespace { $pre } { $uri } }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0074")
     );
@@ -370,9 +434,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          <e>{ namespace { $pre } { $uri } }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0074")
     );
@@ -391,9 +459,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          <e>{ namespace { $pre } { $uri } }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -411,9 +483,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          <e>{ namespace x { $uri } }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0101")
     );
@@ -431,9 +507,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          <e>{ namespace x { $uri } }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0101")
     );
@@ -449,9 +529,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        <e>{ namespace x { \"\" } }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0101")
     );
@@ -469,9 +553,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          element { resolve-QName(\"z:f\", $elem) } {}\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<z:f xmlns:z=\"http://www.zorba-xquery.com/\" />", false)
     );
@@ -487,9 +575,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        <z:e>{ namespace z { \"http://www.zorba-xquery.com/\" } }</z:e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -505,9 +597,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        <e>{ namespace z { \"http://www.zorba-xquery.com/\" }, element z:e {} }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -523,9 +619,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        element e { attribute z:a {},  namespace z { \"http://www.zorba-xquery.com/\" } }\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -541,9 +641,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        <e>{ namespace z { \"http://www.zorba-xquery.com/\" }, element { xs:QName(\"z:e\") } { } }</e>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FONS0004")
     );
@@ -562,10 +666,14 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          element { resolve-QName(\"z:f\", $elem) } {}\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/cnc-module", file("prod/CompNamespaceConstructor/cnc-module.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/cnc-module", file("prod/CompNamespaceConstructor/cnc-module.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<z:f xmlns:z=\"http://www.zorba-xquery.com/\" />", false)
     );
@@ -583,10 +691,14 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        return ($ns is $ns, $ns is mod1:one())\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/cnc-module", file("prod/CompNamespaceConstructor/cnc-module.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/cnc-module", file("prod/CompNamespaceConstructor/cnc-module.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false")
     );
@@ -602,9 +714,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        serialize( namespace z { \"http://www.zorba-xquery.com/\" } )\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("SENR0001")
     );
@@ -620,9 +736,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        serialize( element e { namespace z { \"http://www.zorba-xquery.com/\" } } )\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("contains($result,'xmlns:z')")
@@ -652,9 +772,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          $elem/outer/inner\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<inner xmlns:new=\"http://new.zorba-xquery.com/\" xmlns:out=\"http://out.zorba-xquery.com/\" xmlns:in=\"http://in.zorba-xquery.com/\" />", false)
     );
@@ -678,9 +802,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          $elem/outer/inner\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<inner xmlns:in=\"http://in.zorba-xquery.com/\" />", false)
     );
@@ -704,9 +832,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          $elem/outer/inner\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<inner xmlns:new=\"http://new.zorba-xquery.com/\" />", false)
     );
@@ -730,9 +862,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          $elem/outer/inner\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<inner/>", false)
     );
@@ -753,10 +889,14 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          $elem/outer/inner\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/cnc-module", file("prod/CompNamespaceConstructor/cnc-module.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/cnc-module", file("prod/CompNamespaceConstructor/cnc-module.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<inner xmlns:new=\"http://new.zorba-xquery.com/\" xmlns:out=\"http://out.zorba-xquery.com/\" xmlns:in=\"http://in.zorba-xquery.com/\" />", false)
     );
@@ -777,12 +917,16 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          $elem/outer/inner\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/cnc-module", file("prod/CompNamespaceConstructor/cnc-module.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/cnc-module", file("prod/CompNamespaceConstructor/cnc-module.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<inner xmlns:in=\"http://in.zorba-xquery.com/\" />", false)
+      assertSerialization("<inner xmlns:in=\"http://in.zorba-xquery.com/\" xmlns:out=\"http://out.zorba-xquery.com/\" />", false)
     );
   }
 
@@ -801,10 +945,14 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          $elem/outer/inner\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/cnc-module", file("prod/CompNamespaceConstructor/cnc-module.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/cnc-module", file("prod/CompNamespaceConstructor/cnc-module.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<inner xmlns:new=\"http://new.zorba-xquery.com/\" />", false)
     );
@@ -825,10 +973,14 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "          $elem/outer/inner\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/cnc-module", file("prod/CompNamespaceConstructor/cnc-module.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/cnc-module", file("prod/CompNamespaceConstructor/cnc-module.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<inner/>", false)
     );
@@ -856,9 +1008,13 @@ public class ProdCompNamespaceConstructor extends QT3TestSet {
       "        local:rec-add(2)/e1/e0\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e0 xmlns:pre2=\"uri2\" xmlns:pre1=\"uri1\" />", false)
     );

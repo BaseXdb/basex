@@ -20,9 +20,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "minutes-from-dateTime()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "minutes-from-dateTime((), \"Wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(minutes-from-dateTime(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "minutes-from-dateTime(()) instance of xs:integer?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "minutes-from-dateTime(xs:dateTime(\"2001-02-03T08:23:12.43\")) eq 23",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1999-05-31T13:20:00-05:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "20")
     );
@@ -116,9 +140,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T02:02:00Z\")) * fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:03:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "6")
     );
@@ -132,9 +160,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T02:10:00Z\")) div fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:05:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2")
     );
@@ -148,9 +180,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:10:00Z\")) idiv fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T02:05:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2")
     );
@@ -164,9 +200,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:10:00Z\")) mod fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T03:10:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -180,9 +220,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "+fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:10:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10")
     );
@@ -196,9 +240,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "-fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:10:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-10")
     );
@@ -212,9 +260,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:10:00Z\")) eq fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:10:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:10:00Z\")) ne fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:10:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -244,9 +300,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:10:00Z\")) le fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:10:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:10:00Z\")) ge fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:10:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1999-05-31T13:30:00+05:30\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "30")
     );
@@ -292,9 +360,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1999-12-31T21:20:00-05:00\")) lt fn:minutes-from-dateTime(xs:dateTime(\"1999-12-31T21:20:00-05:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -308,9 +380,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1999-12-31T21:20:00-05:00\")) le fn:minutes-from-dateTime(xs:dateTime(\"1999-12-31T21:20:00-05:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -324,9 +400,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:minutes-from-dateTime(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -340,9 +420,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1999-05-31T20:00:00-05:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -356,9 +440,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1999-05-31T23:59:00-05:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "59")
     );
@@ -372,9 +460,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T00:00:00Z\")) + fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -388,9 +480,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T00:00:00Z\")) - fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T10:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -404,9 +500,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1970-01-01T00:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -420,9 +520,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"1996-04-07T01:40:52Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "40")
     );
@@ -436,9 +540,13 @@ public class FnMinutesFromDateTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:minutes-from-dateTime(xs:dateTime(\"2030-12-31T23:59:59Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "59")
     );

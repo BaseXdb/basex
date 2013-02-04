@@ -27,11 +27,55 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-08-12\") - xs:dayTimeDuration(\"P23DT09H32M59S\") eq xs:date(\"1999-07-19\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test subtraction of zero duration from date .
+   */
+  @org.junit.Test
+  public void cbclSubtractDayTimeDurationFromDate001() {
+    final XQuery query = new XQuery(
+      "declare function local:two-digit($number as xs:integer) { let $string := string($number) return if (string-length($string) lt 2) then concat('0', $string) else $string }; declare function local:date($year as xs:integer, $month as xs:integer, $day as xs:integer) { let $m := local:two-digit($month), $d := local:two-digit($day) return xs:date(concat($year, '-', $m, '-', $d)) }; local:date(2008, 05, 12) - xs:dayTimeDuration(\"P0D\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2008-05-12")
+    );
+  }
+
+  /**
+   *  test subtraction of large duration from date .
+   */
+  @org.junit.Test
+  public void cbclSubtractDayTimeDurationFromDate002() {
+    final XQuery query = new XQuery(
+      "declare function local:two-digit($number as xs:integer) { let $string := string($number) return if (string-length($string) lt 2) then concat('0', $string) else $string }; declare function local:date($year as xs:integer, $month as xs:integer, $day as xs:integer) { let $m := local:two-digit($month), $d := local:two-digit($day) return xs:date(concat($year, '-', $m, '-', $d)) }; local:date(-25252734927766555, 05, 12) - xs:dayTimeDuration(\"P4267296D\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FODT0001")
     );
   }
 
@@ -51,9 +95,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-10-30\") - xs:dayTimeDuration(\"P3DT1H15M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2000-10-26")
     );
@@ -75,9 +123,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:date(\"1985-07-05Z\") - xs:dayTimeDuration(\"P03DT01H04M\"))) or fn:string((xs:date(\"1985-07-05Z\") - xs:dayTimeDuration(\"P01DT01H03M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -99,9 +151,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:date(\"1980-03-02Z\") - xs:dayTimeDuration(\"P05DT08H11M\"))) and (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -123,9 +179,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:date(\"1980-05-05Z\") - xs:dayTimeDuration(\"P23DT11H11M\")) eq xs:date(\"1980-05-05Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -147,9 +207,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:date(\"1979-12-12Z\") - xs:dayTimeDuration(\"P08DT08H05M\")) ne xs:date(\"1979-12-12Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -171,9 +235,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:date(\"1978-12-12Z\") - xs:dayTimeDuration(\"P17DT10H02M\")) le xs:date(\"1978-12-12Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -195,9 +263,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:date(\"1977-12-12Z\") - xs:dayTimeDuration(\"P18DT02H02M\")) ge xs:date(\"1977-12-12Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -219,9 +291,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(xs:date(\"2000-12-12Z\") - xs:dayTimeDuration(\"P12DT10H07M\")) and fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -242,9 +318,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:date(\"1999-10-23Z\") - xs:dayTimeDuration(\"P19DT13H10M\"))) or fn:false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -266,9 +346,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:string(xs:date(\"1998-09-12Z\") - xs:dayTimeDuration(\"P02DT07H01M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -290,9 +374,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:boolean(fn:string(xs:date(\"1962-03-12Z\") - xs:dayTimeDuration(\"P03DT08H06M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -314,9 +402,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:date(\"1988-01-28Z\") - xs:dayTimeDuration(\"P10DT08H01M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -338,9 +430,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(xs:date(\"1989-07-05Z\") - xs:dayTimeDuration(\"P01DT09H02M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1989-07-03Z")
     );
@@ -362,9 +458,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:date(\"0001-01-01Z\") - xs:dayTimeDuration(\"P11DT02H02M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "-0001-12-20Z")
@@ -390,9 +490,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:date(\"1993-12-09Z\") - xs:dayTimeDuration(\"P03DT01H04M\"))) and fn:string((xs:date(\"1993-12-09Z\") - xs:dayTimeDuration(\"P01DT01H03M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -416,9 +520,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1970-01-01Z\") - xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1970-01-01Z")
     );
@@ -442,9 +550,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1983-11-17Z\") - xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1983-11-17Z")
     );
@@ -468,9 +580,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2030-12-31Z\") - xs:dayTimeDuration(\"P0DT0H0M0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2030-12-31Z")
     );
@@ -494,9 +610,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1970-01-01Z\") - xs:dayTimeDuration(\"P15DT11H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1969-12-16Z")
     );
@@ -520,9 +640,13 @@ public class OpSubtractDayTimeDurationFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1970-01-01Z\") - xs:dayTimeDuration(\"P31DT23H59M59S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1969-11-30Z")
     );

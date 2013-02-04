@@ -20,9 +20,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {fn:QName(\"http://www.example.com/example\", \"person\")}{ \"test\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<person xmlns=\"http://www.example.com/example\">test</person>", false)
     );
@@ -36,9 +40,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {fn:QName(\"http://www.example.com/example\", \"ht:person\")}{ \"test\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<ht:person xmlns:ht=\"http://www.example.com/example\">test</ht:person>", false)
     );
@@ -52,9 +60,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {fn:QName(\"\", \"person\")}{ \"test\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<person>test</person>", false)
     );
@@ -68,9 +80,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {fn:QName((), \"person\")}{ \"test\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<person>test</person>", false)
     );
@@ -84,9 +100,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"\", \"ht:person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -100,9 +120,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName((), \"ht:person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -116,9 +140,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"1person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -132,9 +160,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"@person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -148,9 +180,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"-person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -164,9 +200,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"<person>\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -180,9 +220,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \":person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -196,9 +240,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", \"person:\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -212,9 +260,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"person\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -228,9 +280,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -244,9 +300,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName(\"http://www.example.com/example\", xs:integer(\"100\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -260,9 +320,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName( xs:integer(\"100\"), \"person\" )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -276,10 +340,14 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {fn:QName( \"http://www.example.com/example\", string((//FolderName)[2]) )}{ \"test\" }",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<Folder00000000001 xmlns=\"http://www.example.com/example\">test</Folder00000000001>", false)
     );
@@ -293,10 +361,14 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {fn:QName( concat('http://www.example.com/', string((//FolderName)[2])), \"people\" )}{ \"test\" }",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<people xmlns=\"http://www.example.com/Folder00000000001\">test</people>", false)
     );
@@ -310,9 +382,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "element {fn:QName( \"http://www.example.com/example\", \"\" )}{ \"test\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -326,9 +402,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ht=\"http://www.example.com/example\"; element {fn:QName( \"http://www.example.com/another-example\", \"ht:person\" )}{ \"test\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<ht:person xmlns:ht=\"http://www.example.com/another-example\">test</ht:person>", false)
     );
@@ -342,9 +422,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ht=\"http://www.example.com/example\"; element {fn:QName( \"http://www.example.com/example\", \"ht2:person\" )}{ \"test\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<ht2:person xmlns:ht2=\"http://www.example.com/example\">test</ht2:person>", false)
     );
@@ -358,9 +442,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -374,9 +462,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName((), \"local\") eq xs:QName(\"local\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -390,9 +482,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"http://www.example.com/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -406,9 +502,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"http://www.example.com/\", \"ncname\", \"error\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -422,9 +522,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"http://www.w3.org/2005/xpath-functions\", \"prefix:local\") eq xs:QName(\"fn:local\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -438,9 +542,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"http://www.example.com/\", \"1asd:error\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -454,9 +562,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"\", \"error:ncname\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -470,9 +582,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName((), \"error:ncname\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -486,9 +602,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"my:qName\", \"http://example.com/MyErrorNS\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCA0002")
     );
@@ -502,9 +622,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "QName(\"\", \"local\") eq xs:QName(\"local\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -518,11 +642,35 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:QName((), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test fn:QName for FOCA0002 on invalid input. .
+   */
+  @org.junit.Test
+  public void cbclQname001() {
+    final XQuery query = new XQuery(
+      "fn:QName('', ' ')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FOCA0002")
     );
   }
 
@@ -534,9 +682,13 @@ public class FnQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:QName(20)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );

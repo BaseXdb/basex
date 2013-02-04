@@ -20,9 +20,14 @@ public class MathPi extends QT3TestSet {
     final XQuery query = new XQuery(
       "2*math:pi()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6.283185307179586e0")
     );
@@ -36,11 +41,79 @@ public class MathPi extends QT3TestSet {
     final XQuery query = new XQuery(
       "60 * (math:pi() div 180)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("math:pi() div 3")
+      assertQuery("abs($result - 1.0471975511965976e0) lt 1e-14")
+    );
+  }
+
+  /**
+   * function pi() itself.
+   */
+  @org.junit.Test
+  public void mathPi003() {
+    final XQuery query = new XQuery(
+      "math:pi()",
+      ctx);
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("3.141592653589793e0")
+    );
+  }
+
+  /**
+   * function pi() as a function item.
+   */
+  @org.junit.Test
+  public void mathPi004() {
+    final XQuery query = new XQuery(
+      "math:pi#0()",
+      ctx);
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("3.141592653589793e0")
+    );
+  }
+
+  /**
+   * function pi() via function lookup.
+   */
+  @org.junit.Test
+  public void mathPi005() {
+    final XQuery query = new XQuery(
+      "function-lookup(xs:QName('math:pi'), 0)()",
+      ctx);
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("3.141592653589793e0")
     );
   }
 }

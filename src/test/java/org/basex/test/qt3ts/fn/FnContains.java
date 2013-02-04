@@ -20,9 +20,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "contains()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "contains(\"foo\", \"foo\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(contains(\"\", \"a string\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "contains(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +100,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "contains((), (), \"http://www.w3.org/2005/xpath-functions/collation/codepoint\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -100,9 +120,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "contains(\"a string\", \"a string\", \"http://www.example.com/COLLATION/NOT/SUPPORTED\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCH0002")
     );
@@ -116,9 +140,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "contains(\"foo\", \"foo\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "contains(\"tattoo\", \"t\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(contains(\"tattoo\", \"ttt\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "contains(\"\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "contains(\"a string\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -198,9 +242,13 @@ public class FnContains extends QT3TestSet {
       "                $vB  := (\"b string\", current-time(), string(\"content\"))[1] treat as xs:string\n" +
       "         return contains(lower-case($vA), lower-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -216,9 +264,13 @@ public class FnContains extends QT3TestSet {
       "                $vB := (\"b string\", current-time(), string(\"content\"))[1] treat as xs:string\n" +
       "         return contains(upper-case($vA), upper-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -234,9 +286,13 @@ public class FnContains extends QT3TestSet {
       "                $vB := (\"no match\", current-time(), string(\"content\"))[1] treat as xs:string\n" +
       "         return contains(lower-case($vA), lower-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -252,9 +308,13 @@ public class FnContains extends QT3TestSet {
       "                $vB  := (\"no match\", current-time(), string(\"content\"))[1] treat as xs:string\n" +
       "        return contains(upper-case($vA), upper-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -270,9 +330,13 @@ public class FnContains extends QT3TestSet {
       "                $vB := (\"b string\", current-time(), string(\"content\"))[1] treat as xs:string\n" +
       "         return contains(upper-case($vA), lower-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -288,11 +352,75 @@ public class FnContains extends QT3TestSet {
       "                $vB := (\"b string\", current-time(), string(\"content\"))[1] treat as xs:string\n" +
       "         return contains(lower-case($vA), upper-case($vB))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:contains with collation and $arg2 as empty string .
+   */
+  @org.junit.Test
+  public void cbclContains001() {
+    final XQuery query = new XQuery(
+      "fn:boolean(fn:contains('input', '', 'http://www.w3.org/2005/xpath-functions/collation/codepoint'))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:contains with collation and $arg1 as empty string Author: Tim Mills .
+   */
+  @org.junit.Test
+  public void cbclContains002() {
+    final XQuery query = new XQuery(
+      "fn:boolean(fn:contains('', 'empty', 'http://www.w3.org/2005/xpath-functions/collation/codepoint'))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test evaluation of fn:contains to exactly one item Author: Tim Mills .
+   */
+  @org.junit.Test
+  public void cbclContains003() {
+    final XQuery query = new XQuery(
+      "fn:index-of( ( fn:true(), fn:false()), fn:contains('input', 'in', 'http://www.w3.org/2005/xpath-functions/collation/codepoint'))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1")
     );
   }
 
@@ -304,9 +432,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(\"\",\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -320,9 +452,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(\" \",\"AAAAABBBBB\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -336,9 +472,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:contains(\"A\",\"A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -352,9 +492,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:contains(\"A\",\"B\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -368,9 +512,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(xs:string(\"A\"),\"A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -384,9 +532,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(\"A\",xs:string(\"A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -400,9 +552,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(\"A\",\"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -416,9 +572,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(\"a\",\"A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -432,9 +592,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(\"\",\"A Character String\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -448,9 +612,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(\"A Character String\",\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -464,9 +632,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains((),\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -480,9 +652,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(\"\",())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -496,9 +672,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(\"A Character String\",())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -512,9 +692,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains((),\"A Character String\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -528,9 +712,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(\"AAAAABBBBBCCCCC\",\"BBBBB\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -544,9 +732,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(\"AAAAABBBBB\",\" \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -560,9 +752,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -576,9 +772,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -592,9 +792,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -608,9 +812,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -624,9 +832,13 @@ public class FnContains extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:contains(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

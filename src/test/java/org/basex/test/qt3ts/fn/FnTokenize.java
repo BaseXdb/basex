@@ -20,9 +20,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "tokenize(\"input\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "tokenize(\"input\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -52,9 +60,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "tokenize(\"input\", \"pattern\", \" \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0001")
     );
@@ -68,9 +80,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "tokenize(\"input\", \"pattern\", \"X\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0001")
     );
@@ -84,9 +100,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "tokenize(\"input\", \"pattern\", \"\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -100,9 +120,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize((\"abracadabra\", current-time())[1] treat as xs:string, \"(ab)|(a)\")[last()] eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(fn:tokenize((\"abracadabra\", current-time())[1] treat as xs:string, \"(ab)|(a)\")[last() + 1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize((\"abracadabra\", current-time())[1] treat as xs:string, \"(ab)|(a)\")[last() - 1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "r")
     );
@@ -148,9 +180,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize((\"abracadabra\", current-time())[1] treat as xs:string, \"(ab)|(a)\")[last() - 3]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "c")
     );
@@ -164,9 +200,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(fn:tokenize(\"The cat sat on the mat\", \"\\s+\"), (\"The\", \"cat\", \"sat\", \"on\", \"the\", \"mat\")), count(fn:tokenize(\"The cat sat on the mat\", \"\\s+\")), count(fn:tokenize(\" The cat sat on the mat \", \"\\s+\")), fn:tokenize(\"The cat sat on the mat\", \"\\s+\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true 6 8 The cat sat on the mat")
     );
@@ -180,9 +220,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "replace('APXterms6', '\\w{3}\\d*([^TKR0-9]+).*$', '$1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "terms")
     );
@@ -196,25 +240,99 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(tokenize(\"a b\", \" \")), count(tokenize(\"a b\", \"\\s\")), string-join(tokenize(\"a b\", \" \"), '|'), string-join(tokenize(\"a b\", \"\\s\"), '|'), tokenize(\"a b\", \" \"), tokenize(\"a b\", \"\\s\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 2 a|b a|b a b a b")
     );
   }
 
   /**
-   *  Evaluation of tokenize function where pattern matches the zero lentgh string. Given on example 3 for this function in the Func and Ops specs. .
+   *  Test boolean on tokenize .
+   */
+  @org.junit.Test
+  public void cbclFnTokenize001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      for $x in xs:string(zero-or-one((1 to 10)[. mod 2 = -1])) return tokenize($x,',')\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "")
+    );
+  }
+
+  /**
+   *  Test invalid regex expression .
+   */
+  @org.junit.Test
+  public void cbclFnTokenize002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      tokenize(string-join(for $x in (1 to 10)[. mod 2 = 0] return string($x),','),'[')\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  Test tokenize on empty string .
+   */
+  @org.junit.Test
+  public void cbclFnTokenize003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      tokenize(string-join(for $x in (1 to 10)[. mod 2 < 0] return string($x),','),',')\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "")
+    );
+  }
+
+  /**
+   *  Evaluation of tokenize function where pattern matches the zero length string. Given on example 3 for this function in the Func and Ops specs. .
    */
   @org.junit.Test
   public void fnTokenize1() {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abba\", \".?\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0003")
     );
@@ -228,9 +346,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra\", \"ww\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abracadabra")
     );
@@ -244,9 +366,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra\", \"^a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"\", \"bracadabra\"")
     );
@@ -260,9 +386,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra^abracadabra\", \"\\^\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -276,9 +406,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra?abracadabra\", \"\\?\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -292,9 +426,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra*abracadabra\", \"\\*\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -308,9 +446,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra+abracadabra\", \"\\+\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -324,9 +466,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra{abracadabra\", \"\\{\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -340,9 +486,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra}abracadabra\", \"\\}\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -356,9 +506,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra(abracadabra\", \"\\(\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -372,9 +526,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra)abracadabra\", \"\\)\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -388,9 +546,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"The cat sat on the mat\", \"\\s+\", \"t\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0001")
     );
@@ -404,9 +566,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra[abracadabra\", \"\\[\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -420,9 +586,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra]abracadabra\", \"\\]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -436,9 +606,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra-abracadabra\", \"\\-\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -452,9 +626,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra.abracadabra\", \"\\.\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -468,9 +646,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra|abracadabra\", \"\\|\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -484,9 +666,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra\\abracadabra\", \"\\\\\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -500,9 +686,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabra\tabracadabra\", \"\\t\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -517,9 +707,13 @@ public class FnTokenize extends QT3TestSet {
       "fn:tokenize(\"abracadabra\n" +
       "abracadabra\", \"\\n\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabra\", \"abracadabra\"")
     );
@@ -533,9 +727,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabraabracadabra\", \"aa{1}\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabr\", \"bracadabra\"")
     );
@@ -549,9 +747,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabraabracadabraabracadabra\", \"aa{1,}\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabr\", \"bracadabr\", \"bracadabra\"")
     );
@@ -565,9 +767,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"The cat sat on the mat\", \"\\s+\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "The cat sat on the mat")
     );
@@ -581,11 +787,115 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"abracadabraabracadabraabracadabra\", \"aa{1,2}\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"abracadabr\", \"bracadabr\", \"bracadabra\"")
+    );
+  }
+
+  /**
+   *  Evaluation of tokenize function with regex 'q' flag. .
+   */
+  @org.junit.Test
+  public void fnTokenize31() {
+    final XQuery query = new XQuery(
+      "fn:tokenize(\"abc.def.gh.ijk\", \".\", \"q\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertDeepEq("\"abc\", \"def\", \"gh\", \"ijk\"")
+    );
+  }
+
+  /**
+   *  Evaluation of tokenize function with regex 'q' and "i" flags. .
+   */
+  @org.junit.Test
+  public void fnTokenize32() {
+    final XQuery query = new XQuery(
+      "fn:tokenize(\"A.BRA.CADA.BRA\", \"a.\", \"qi\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertDeepEq("\"\", \"BR\", \"CAD\", \"BRA\"")
+    );
+  }
+
+  /**
+   *  Evaluation of tokenize function with non-capturing group in the regex. .
+   */
+  @org.junit.Test
+  public void fnTokenize33() {
+    final XQuery query = new XQuery(
+      "fn:tokenize(\"ABRACADABRA\", \"A(?:B)\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertDeepEq("\"\", \"RACAD\", \"RA\"")
+    );
+  }
+
+  /**
+   *  "." does NOT match CR in default mode.
+   */
+  @org.junit.Test
+  public void fnTokenize34() {
+    final XQuery query = new XQuery(
+      "fn:tokenize(concat('Mary', codepoints-to-string(13), 'Jones'), 'y.J')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("concat('Mary', codepoints-to-string(13), 'Jones')")
+    );
+  }
+
+  /**
+   *  "." does match CR in dot-all mode.
+   */
+  @org.junit.Test
+  public void fnTokenize35() {
+    final XQuery query = new XQuery(
+      "fn:tokenize(concat('Mary', codepoints-to-string(13), 'Jones'), 'y.J', 's')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertDeepEq("\"Mar\", \"ones\"")
     );
   }
 
@@ -597,9 +907,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"1, 15, 24, 50\", \",\\s*\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 15 24 50")
     );
@@ -613,9 +927,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"Some unparsed <br> HTML <BR> text\", \"\\s*<br>\\s*\", \"i\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"Some unparsed\", \"HTML\", \"text\"")
     );
@@ -629,9 +947,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:tokenize(\"Some unparsed <br> HTML <BR> text\", \"\\s*<br>\\s*\", \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"Some unparsed\", \"HTML <BR> text\"")
     );
@@ -645,9 +967,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:tokenize((), \"\\s+\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -661,9 +987,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:tokenize(\"\", \"\\s+\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -677,9 +1007,13 @@ public class FnTokenize extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(fn:tokenize(\"abracadabra\", \"(ab)|(a)\"), '#')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "#r#c#d#r#")
     );

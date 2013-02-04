@@ -25,10 +25,14 @@ public class AppUseCaseTREE extends QT3TestSet {
       "        <toc> { for $s in /book return local:toc($s) } </toc>\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/book.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/book.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<toc><section id=\"intro\" difficulty=\"easy\"><title>Introduction</title><section><title>Audience</title></section><section><title>Web Data and the Two Cultures</title></section></section><section id=\"syntax\" difficulty=\"medium\"><title>A Syntax For Data</title><section><title>Base Types</title></section><section><title>Representing Relational Databases</title></section><section><title>Representing Object Databases</title></section></section></toc>", false)
     );
@@ -42,10 +46,14 @@ public class AppUseCaseTREE extends QT3TestSet {
     final XQuery query = new XQuery(
       "<figlist> { for $f in //figure return <figure> { $f/@* } { $f/title } </figure> } </figlist>",
       ctx);
-    query.context(node(file("docs/book.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/book.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<figlist><figure height=\"400\" width=\"400\"><title>Traditional client/server architecture</title></figure><figure height=\"200\" width=\"500\"><title>Graph representations of structures</title></figure><figure height=\"250\" width=\"400\"><title>Examples of Relations</title></figure></figlist>", false)
     );
@@ -59,10 +67,14 @@ public class AppUseCaseTREE extends QT3TestSet {
     final XQuery query = new XQuery(
       "<section_count>{ count(//section) }</section_count>, <figure_count>{ count(//figure) }</figure_count>",
       ctx);
-    query.context(node(file("docs/book.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/book.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<section_count>7</section_count><figure_count>3</figure_count>", false)
     );
@@ -76,10 +88,14 @@ public class AppUseCaseTREE extends QT3TestSet {
     final XQuery query = new XQuery(
       "<top_section_count> { count(/book/section) } </top_section_count>",
       ctx);
-    query.context(node(file("docs/book.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/book.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<top_section_count>2</top_section_count>", false)
     );
@@ -93,10 +109,14 @@ public class AppUseCaseTREE extends QT3TestSet {
     final XQuery query = new XQuery(
       "<section_list> { for $s in //section let $f := $s/figure return <section title=\"{ $s/title/text() }\" figcount=\"{ count($f) }\"/> } </section_list>",
       ctx);
-    query.context(node(file("docs/book.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/book.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<section_list><section title=\"Introduction\" figcount=\"0\"/><section title=\"Audience\" figcount=\"0\"/><section title=\"Web Data and the Two Cultures\" figcount=\"1\"/><section title=\"A Syntax For Data\" figcount=\"1\"/><section title=\"Base Types\" figcount=\"0\"/><section title=\"Representing Relational Databases\" figcount=\"1\"/><section title=\"Representing Object Databases\" figcount=\"0\"/></section_list>", false)
     );
@@ -119,10 +139,14 @@ public class AppUseCaseTREE extends QT3TestSet {
       "        } </toc>\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/book.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/book.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<toc><section id=\"intro\" difficulty=\"easy\"><title>Introduction</title><figcount>0</figcount><section><title>Audience</title><figcount>0</figcount></section><section><title>Web Data and the Two Cultures</title><figcount>1</figcount></section></section><section id=\"syntax\" difficulty=\"medium\"><title>A Syntax For Data</title><figcount>1</figcount><section><title>Base Types</title><figcount>0</figcount></section><section><title>Representing Relational Databases</title><figcount>1</figcount></section><section><title>Representing Object Databases</title><figcount>0</figcount></section></section></toc>", false)
     );

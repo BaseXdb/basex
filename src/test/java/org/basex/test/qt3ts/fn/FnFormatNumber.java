@@ -4,9 +4,7 @@ import org.basex.tests.bxapi.XQuery;
 import org.basex.test.qt3ts.QT3TestSet;
 
 /**
- * 
- *       Tests for the format-number() function transferred from XSLT 1.0/2.0 to XPath 3.0/XQuery 3.0
- *    .
+ * Tests for the format-number() function transferred from XSLT 1.0/2.0 to XPath 3.0/XQuery 3.0.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
@@ -24,9 +22,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(2392.14*36.58,'000,000.000000')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "087,504.481200")
     );
@@ -42,9 +44,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(12792.14*96.58,'##,###,000.000###')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1,235,464.8812")
     );
@@ -60,9 +66,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(2792.14*(-36.58),'000,000.000###')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-102,136.4812")
     );
@@ -78,9 +88,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(2392.14*(-36.58),'000,000.000###;###,###.000###')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "87,504.4812")
     );
@@ -96,9 +110,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(0.4857,'###.###%')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "48.57%")
     );
@@ -114,9 +132,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(0.4857,'###.###\u2030')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "485.7\u2030")
     );
@@ -132,9 +154,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(95.4857,'¤###.####')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "¤95.4857")
     );
@@ -150,9 +176,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(2.14*86.58,'PREFIX##00.000###SUFFIX')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PREFIX185.2812SUFFIX")
     );
@@ -168,10 +198,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(931.4857,'000.000|###')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "000.931|486")
     );
@@ -187,10 +221,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(26931.4,'+!!!,!!!.!!!\\-!!,!!!.!!!')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "+26,931.4")
     );
@@ -206,10 +244,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(-26931.4,'+!!,!!!.!!!\\-!!!,!!!.!!!')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-26,931.4")
     );
@@ -225,10 +267,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(-26931.4,'!!!,!!!.!!!')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-26,931.4")
     );
@@ -244,10 +290,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(1 div 0e0,'###############################')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "off-the-scale")
     );
@@ -263,10 +313,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(0.4857,'###.###m')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "485.7m")
     );
@@ -282,10 +336,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(-26931.4,'+###,###.###;-###,###.###')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-26,931.4")
     );
@@ -301,10 +359,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(-26931.4,'###,###.###')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "_26,931.4")
     );
@@ -321,10 +383,14 @@ public class FnFormatNumber extends QT3TestSet {
       "concat(format-number(-26931.4,'###,###.###','myminus'), '/',\n" +
       "            format-number(-42857.1,'###,###.###'))",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "_26,931.4/-42,857.1")
     );
@@ -340,12 +406,16 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(1234.567,'#*###*###!###','foo:decimal1')",
       ctx);
-    query.namespace("foo", "http://foo.ns");
-    // decimal format
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("foo", "http://foo.ns");
+      // decimal format
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1*234!567")
     );
@@ -361,10 +431,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(7654321.4857,'### ### ###,#####')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "7 654 321,4857")
     );
@@ -383,10 +457,14 @@ public class FnFormatNumber extends QT3TestSet {
       "                        format-number(2392.14*36.58,'000,000.000000;###,###.000###','myminus')), ' ')\n" +
       "      ",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "087,504.481200 087,504.481200 087,504.481200")
     );
@@ -402,9 +480,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(2392.14*(-36.58),'000,000.000###;-###,###.000###')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-87,504.4812")
     );
@@ -420,10 +502,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(-26931.4,'+###,###.###;_###,###.###')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "_26,931.4")
     );
@@ -442,10 +528,14 @@ public class FnFormatNumber extends QT3TestSet {
       "                format-number(-26931.4,'zzz-###,###.###','myminus'),\n" +
       "                format-number(-26931.4,'_###,###.###','myminus')), ' ')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "--26,931.4 _zzz-26,931.4 __26,931.4")
     );
@@ -461,10 +551,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(-26931.4,'###,###.###;###,###.###')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "26,931.4")
     );
@@ -480,10 +574,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(0.4857,'###.###c')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "48.57c")
     );
@@ -499,10 +597,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(4030201.0506,'#!!!,!!!,٠٠٠.٠٠٠٠٠٠0')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "#٤,٠٣٠,٢٠١.٠٥٠٦٠٠0")
     );
@@ -518,9 +620,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(987654321,'###,##0,00.00')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "9876,543,21.00")
     );
@@ -536,9 +642,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(239236.588,'00000.00')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "239236.59")
     );
@@ -554,9 +664,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(1 div 0e0,'###############################')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Infinity")
     );
@@ -572,9 +686,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(-1 div 0e0,'###############################')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-Infinity")
     );
@@ -590,10 +708,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(-1 div 0e0,'###############################')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-huge")
     );
@@ -606,36 +728,387 @@ public class FnFormatNumber extends QT3TestSet {
    *       .
    */
   @org.junit.Test
-  public void numberformat60() {
+  public void numberformat60a() {
     final XQuery query = new XQuery(
-      "string-join((format-number(1E25,'#,######'),\n" +
-      "                            format-number(1E10,'#####################'),\n" +
-      "                            format-number(1E11,'#####################'),\n" +
-      "                            format-number(1E12,'#####################'),\n" +
-      "                            format-number(1E13,'#####################'),\n" +
-      "                            format-number(1E14,'#####################'),\n" +
-      "                            format-number(1E15,'#####################'),\n" +
-      "                            format-number(1E16,'#####################'),\n" +
-      "                            format-number(1E17,'#####################'),\n" +
-      "                            format-number(1E18,'#####################'),\n" +
-      "                            format-number(1E19,'#####################'),\n" +
-      "                            format-number(1E20,'#####################'),\n" +
-      "                            format-number(1E21,'#####################'),\n" +
-      "                            format-number(1E22,'#####################'),\n" +
-      "                            format-number(1E23,'#####################'),\n" +
-      "                            format-number(1E24,'#####################'),\n" +
-      "                            format-number(1E25,'#####################'),\n" +
-      "                            format-number(1E30,'#####################'),\n" +
-      "                            format-number(1E35,'#####################'),\n" +
-      "                            format-number(1E100,'#####################'),\n" +
-      "                            format-number(1E100 div 3,'#####################')), ';\n" +
-      "')",
+      "format-number(1E25,'#,######')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "10,000000,000000,000000,000000;\n10000000000;\n100000000000;\n1000000000000;\n10000000000000;\n100000000000000;\n1000000000000000;\n10000000000000000;\n100000000000000000;\n1000000000000000000;\n10000000000000000000;\n100000000000000000000;\n1000000000000000000000;\n10000000000000000000000;\n100000000000000000000000;\n1000000000000000000000000;\n10000000000000000000000000;\n1000000000000000000000000000000;\n100000000000000000000000000000000000;\n10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;\n3333333333333333224453896013722304246165110619355184909726539264904319486405759542029132894851563520")
+      assertStringValue(false, "10,000000,000000,000000,000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60b() {
+    final XQuery query = new XQuery(
+      "format-number(1E10,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "10000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60c() {
+    final XQuery query = new XQuery(
+      "format-number(1E11,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "100000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60d() {
+    final XQuery query = new XQuery(
+      "format-number(1E12,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60e() {
+    final XQuery query = new XQuery(
+      "format-number(1E13,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "10000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60f() {
+    final XQuery query = new XQuery(
+      "format-number(1E14,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "100000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60g() {
+    final XQuery query = new XQuery(
+      "format-number(1E15,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1000000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60h() {
+    final XQuery query = new XQuery(
+      "format-number(1E16,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "10000000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60i() {
+    final XQuery query = new XQuery(
+      "format-number(1E17,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "100000000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60j() {
+    final XQuery query = new XQuery(
+      "format-number(1E18,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1000000000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60k() {
+    final XQuery query = new XQuery(
+      "format-number(1E19,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "10000000000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60l() {
+    final XQuery query = new XQuery(
+      "format-number(1E20,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "100000000000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60m() {
+    final XQuery query = new XQuery(
+      "format-number(1E25,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "10000000000000000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60n() {
+    final XQuery query = new XQuery(
+      "format-number(1E30,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1000000000000000000000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60o() {
+    final XQuery query = new XQuery(
+      "format-number(1E35,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "100000000000000000000000000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60p() {
+    final XQuery query = new XQuery(
+      "format-number(1E100,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+    );
+  }
+
+  /**
+   * 
+   *         Test format-number() applied to large numbers (test how good the rounding is)
+   *         Bug report from Pedro Christian against Saxon 7.8
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat60q() {
+    final XQuery query = new XQuery(
+      "format-number(1E100 div 3,'#####################')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "3333333333333333000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
     );
   }
 
@@ -649,9 +1122,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number((),'###.###')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -666,11 +1143,19 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(000123456789012345678901234567890.123456789012345678900000,     '##0.0####################################################')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "123456789012345678901234567890.1234567890123456789")
+      (
+        assertStringValue(false, "123456789012345678901234567890.1234567890123456789")
+      ||
+        error("FOAR0002")
+      )
     );
   }
 
@@ -683,12 +1168,20 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(000123456789012345678901234567890123456789012345678900000,     '# #0.0####################################################')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "12 34 56 78 90 12 34 56 78 90 12 34 56 78 90 12 34 56 78 90 12 34 56 78 90 00 00.0")
+      (
+        assertStringValue(false, "12 34 56 78 90 12 34 56 78 90 12 34 56 78 90 12 34 56 78 90 12 34 56 78 90 00 00.0")
+      ||
+        error("FOAR0002")
+      )
     );
   }
 
@@ -703,10 +1196,14 @@ public class FnFormatNumber extends QT3TestSet {
       "concat(format-number(1234e0, '0000.####'), '|',\n" +
       "                    format-number(1234.00, '0000.####'))",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1234|1234")
     );
@@ -722,10 +1219,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(1234567890.123456,'\ud82b\uddb1000\ud82b\uddb0000')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1\ud82b\uddb1234\ud82b\uddb1567\ud82b\uddb1890\ud82b\uddb0123")
     );
@@ -741,10 +1242,14 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(1234567890.123456,'##########𐒠.𐒠#####')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "𐒡𐒢𐒣𐒤𐒥𐒦𐒧𐒨𐒩𐒠.𐒡𐒢𐒣𐒤𐒥𐒦")
     );
@@ -760,9 +1265,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(1234567890.123456,'000.000')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1234567890.123")
     );
@@ -778,9 +1287,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(12.34, '##.##')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12.34")
     );
@@ -788,20 +1301,75 @@ public class FnFormatNumber extends QT3TestSet {
 
   /**
    * 
-   *         PURPOSE: test format-number() with three arguments
+   *         PURPOSE: test format-number() with three arguments; also tests use of whitespace in name
    *       .
    */
   @org.junit.Test
   public void numberformat81() {
     final XQuery query = new XQuery(
-      "format-number(12.34, '0.000,00', 'b:test')",
+      "format-number(12.34, '0.000,00', ' b:test ')",
       ctx);
-    query.namespace("a", "http://a.ns/");
-    query.namespace("b", "http://a.ns/");
-    // decimal format
+    try {
+      query.namespace("a", "http://a.ns/");
+      query.namespace("b", "http://a.ns/");
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0.012,34")
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   * 
+   *         PURPOSE: test format-number() where third argument is not known statically
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat82() {
+    final XQuery query = new XQuery(
+      "format-number(12.34, '0.000,00', if (current-date() gt xs:date('1900-01-01')) then 'two' else 'one')",
+      ctx);
+    try {
+      // decimal format
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0.012,34")
+    );
+  }
+
+  /**
+   * 
+   *         PURPOSE: test format-number() where third argument is not known statically and depends on namespace context; 
+   *         also tests use of whitespace in name
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat83() {
+    final XQuery query = new XQuery(
+      "format-number(12.34, '0.000,00', concat(if (current-date() lt xs:date('1900-01-01')) then ' a' else ' b', ':one '))",
+      ctx);
+    try {
+      query.namespace("a", "http://a.ns/");
+      query.namespace("b", "http://b.ns/");
+      // decimal format
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0.012,34")
     );
@@ -817,9 +1385,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(123456789.34, '#,###.##')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123,456,789.34")
     );
@@ -841,9 +1413,13 @@ public class FnFormatNumber extends QT3TestSet {
       "        \n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0|0|0|0")
     );
@@ -857,11 +1433,61 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(0.4857,'###.###%', ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "48.57%")
+    );
+  }
+
+  /**
+   * 
+   *         PURPOSE: test format-number() with EQName for third argument, known statically; also tests use of whitespace in name
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat87() {
+    final XQuery query = new XQuery(
+      "format-number(12.34, '0.000,00', 'Q{http://a.ns/}test ')",
+      ctx);
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0.012,34")
+    );
+  }
+
+  /**
+   * 
+   *         PURPOSE: test format-number() with EQName for third argument, not known statically; also tests use of whitespace in name
+   *       .
+   */
+  @org.junit.Test
+  public void numberformat88() {
+    final XQuery query = new XQuery(
+      "format-number(12.34, '0.000,00', if (current-date() lt xs:date('1900-01-01')) then () else ' Q{http://a.ns/}test')",
+      ctx);
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0.012,34")
     );
   }
 
@@ -878,9 +1504,13 @@ public class FnFormatNumber extends QT3TestSet {
       "        declare default decimal-format decimal-separator=\"!\" grouping-separator=\"!\";\n" +
       "        format-number(931.4857,'###!###!###')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0098")
     );
@@ -896,11 +1526,15 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(931.4857,'000.##0')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE1310")
+      error("FODF1310")
     );
   }
 
@@ -913,12 +1547,60 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(931.4857,'fred.ginger', 'q')",
       ctx);
-    // decimal format
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      // decimal format
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XTDE1310")
+      error("FODF1310")
+    );
+  }
+
+  /**
+   * 
+   *         Creator: Zhen Hua Liu
+   *         Purpose: Test wrong arg datatype inputs for format-number. .
+   */
+  @org.junit.Test
+  public void numberformat906InputErr() {
+    final XQuery query = new XQuery(
+      "format-number('abc','000.##0')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * 
+   *         Creator: Zhen Hua Liu
+   *         Purpose: Test wrong arg datatype inputs for format-number. .
+   */
+  @org.junit.Test
+  public void numberformat907InputErr() {
+    final XQuery query = new XQuery(
+      "format-number(931.45, 931.45)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
     );
   }
 
@@ -932,29 +1614,15 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(931.45, '000.##0', 'foo:bar')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODF1280")
-    );
-  }
-
-  /**
-   * 
-   *         Creator: Zhen Hua Liu
-   *         Purpose: Test wrong arg datatype inputs for format-number. .
-   */
-  @org.junit.Test
-  public void numberformatInputErr() {
-    final XQuery query = new XQuery(
-      "format-number(931.45, 931.45)",
-      ctx);
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      error("XPTY0004")
     );
   }
 
@@ -968,9 +1636,13 @@ public class FnFormatNumber extends QT3TestSet {
     final XQuery query = new XQuery(
       "format-number(number(\"abc\"),'#############')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );

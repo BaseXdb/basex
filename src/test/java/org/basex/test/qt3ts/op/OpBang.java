@@ -20,9 +20,13 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to 10)!(.*.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 4, 9, 16, 25, 36, 49, 64, 81, 100")
     );
@@ -36,10 +40,14 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to 5) ! (1 to .)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 1,2, 1,2,3, 1,2,3,4, 1,2,3,4,5")
     );
@@ -53,10 +61,14 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to 5) ! ((1 to .) ! position())",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 1,2, 1,2,3, 1,2,3,4, 1,2,3,4,5")
     );
@@ -70,10 +82,14 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to 5) ! (1 to .) ! position()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1 to 15")
     );
@@ -87,29 +103,37 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "/ works ! employee[4] ! preceding-sibling::*[1] ! string(@name) ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"Jane Doe 3\"")
     );
   }
 
   /**
-   * Interaction of "!" with "/" TODO: confirm this with the spec.
+   * Interaction of "!" with "/".
    */
   @org.junit.Test
   public void bang14() {
     final XQuery query = new XQuery(
-      "/ ! works ",
+      "count(/ ! works)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0003")
+      assertEq("1")
     );
   }
 
@@ -121,9 +145,13 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"red\", \"blue\", \"green\")!string-length()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("3, 4, 5")
     );
@@ -137,9 +165,13 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"red\", \"blue\", \"green\")!position()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 2, 3")
     );
@@ -153,9 +185,13 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"red\", \"blue\", \"green\")!(position() = last())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("false(), false(), true()")
     );
@@ -169,9 +205,13 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"red\", \"blue\", \"green\") ! string-length() ! (.+1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("4, 5, 6")
     );
@@ -185,10 +225,14 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[2], /works/employee[1], /works/employee[2]) ! @name ! string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"John Doe 2\", \"Jane Doe 1\", \"John Doe 2\"")
     );
@@ -202,10 +246,14 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "/ works ! employee[2] ! hours[2] ! number()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("20")
     );
@@ -219,10 +267,14 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "2 + (/ works ! employee[2] ! hours[2]) ! number() ! (-.)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-18")
     );
@@ -236,9 +288,13 @@ public class OpBang extends QT3TestSet {
     final XQuery query = new XQuery(
       "-2!(.+1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-3")
     );

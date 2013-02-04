@@ -20,9 +20,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "seconds-from-time()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "seconds-from-time((), \"Wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(seconds-from-time(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "seconds-from-time(()) instance of xs:decimal?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "seconds-from-time(xs:time(\"23:11:12.43\")) eq 12.43",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"13:20:10.5\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10.5")
     );
@@ -116,9 +140,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"02:02:03Z\")) * fn:seconds-from-time(xs:time(\"10:08:09Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "27")
     );
@@ -132,9 +160,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"22:33:10Z\")) div fn:seconds-from-time(xs:time(\"02:11:02Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5")
     );
@@ -148,9 +180,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"10:12:15Z\")) idiv fn:seconds-from-time(xs:time(\"02:02:03Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5")
     );
@@ -164,9 +200,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"10:10:20Z\")) mod fn:seconds-from-time(xs:time(\"03:03:02Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -180,9 +220,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "+fn:seconds-from-time(xs:time(\"10:00:01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -196,9 +240,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "-fn:seconds-from-time(xs:time(\"10:10:01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1")
     );
@@ -212,9 +260,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"10:02:01Z\")) eq fn:seconds-from-time(xs:time(\"10:02:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -228,9 +280,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"10:00:01Z\")) ne fn:seconds-from-time(xs:time(\"01:01:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"10:00:00Z\")) le fn:seconds-from-time(xs:time(\"10:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"10:03:01Z\")) ge fn:seconds-from-time(xs:time(\"10:04:02Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -276,9 +340,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"21:23:04Z\")) lt fn:seconds-from-time(xs:time(\"21:24:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -292,9 +360,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"01:23:02Z\")) gt fn:seconds-from-time(xs:time(\"01:23:03Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -308,9 +380,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((fn:seconds-from-time(xs:time(\"01:10:20Z\")), fn:seconds-from-time(xs:time(\"01:20:30Z\"))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "25")
     );
@@ -324,9 +400,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:seconds-from-time(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -340,9 +420,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:hours-from-time(xs:time(\"00:59:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -356,9 +440,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"23:20:59Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "59")
     );
@@ -372,9 +460,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"02:00:00Z\")) + fn:seconds-from-time(xs:time(\"10:00:10Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10")
     );
@@ -388,9 +480,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"10:10:10Z\")) - fn:seconds-from-time(xs:time(\"09:02:07Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3")
     );
@@ -404,9 +500,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"00:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -420,9 +520,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"08:03:35Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "35")
     );
@@ -436,9 +540,13 @@ public class FnSecondsFromTime extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:seconds-from-time(xs:time(\"23:59:59Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "59")
     );

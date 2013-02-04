@@ -27,9 +27,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"08:12:32\") - xs:time(\"18:12:32\") eq xs:dayTimeDuration(\"-PT10H\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"08:12:32\") - xs:time(\"08:12:32\") eq xs:dayTimeDuration(\"PT0S\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3D\") - xs:time(\"08:01:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -96,9 +108,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dayTimeDuration(\"P3D\") - xs:date(\"1999-08-12\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -119,9 +135,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"08:01:23\") + xs:time(\"08:01:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -142,9 +162,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"08:01:23\") * xs:time(\"08:01:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -165,9 +189,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"08:01:23\") div xs:time(\"08:01:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -188,11 +216,99 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"08:01:23\") mod xs:time(\"08:01:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
+    );
+  }
+
+  /**
+   *  test subtraction of times .
+   */
+  @org.junit.Test
+  public void cbclSubtractTimes001() {
+    final XQuery query = new XQuery(
+      "xs:time(\"12:00:00+01:00\") - xs:time(\"12:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-PT1H")
+    );
+  }
+
+  /**
+   *  test subtraction of times .
+   */
+  @org.junit.Test
+  public void cbclSubtractTimes002() {
+    final XQuery query = new XQuery(
+      "xs:time(\"12:00:00\") - xs:time(\"12:00:00+01:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "PT1H")
+    );
+  }
+
+  /**
+   *  test subtraction of times .
+   */
+  @org.junit.Test
+  public void cbclSubtractTimes003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      fn:adjust-time-to-timezone(xs:time(\"12:00:00\")) - fn:adjust-time-to-timezone(xs:time(\"08:00:00+05:00\"), xs:dayTimeDuration(\"PT1H\"))\n" +
+      "   ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "PT9H")
+    );
+  }
+
+  /**
+   *  test subtraction of times .
+   */
+  @org.junit.Test
+  public void cbclSubtractTimes004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      fn:adjust-time-to-timezone(xs:time(\"08:00:00+05:00\"), xs:dayTimeDuration(\"PT1H\")) - fn:adjust-time-to-timezone(xs:time(\"12:00:00\"))\n" +
+      "   ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-PT9H")
     );
   }
 
@@ -212,9 +328,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"11:12:00Z\") - xs:time(\"04:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT7H12M")
     );
@@ -237,9 +357,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:time(\"13:00:00Z\") - xs:time(\"17:00:00Z\"))) or fn:string((xs:time(\"13:00:00Z\") - xs:time(\"17:00:00Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -261,9 +385,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"23:00:00Z\") - xs:time(\"17:00:00Z\")) div (xs:time(\"13:00:00Z\") - xs:time(\"10:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2")
     );
@@ -286,9 +414,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:time(\"17:00:00Z\") - xs:time(\"13:00:00Z\"))) and (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -310,9 +442,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") - xs:time(\"17:00:00Z\")) eq xs:dayTimeDuration(\"P20DT01H02M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -334,9 +470,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") - xs:time(\"17:00:00Z\")) ne xs:dayTimeDuration(\"P10DT01H01M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -358,9 +498,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") - xs:time(\"17:00:00Z\")) le xs:dayTimeDuration(\"P10DT02H10M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -382,9 +526,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") - xs:time(\"17:00:00Z\")) ge xs:dayTimeDuration(\"P17DT10H02M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -406,9 +554,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"11:00:00-05:00\") - xs:time(\"21:30:00+05:30\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -430,9 +582,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"17:00:00-06:00\") - xs:time(\"08:00:00+09:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P1D")
     );
@@ -455,9 +611,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:string(xs:time(\"13:00:00Z\") - xs:time(\"14:00:00Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -480,9 +640,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:boolean(fn:string(xs:time(\"13:00:00Z\") - xs:time(\"10:00:00Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -504,9 +668,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:number(xs:time(\"13:00:00Z\") - xs:time(\"12:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -528,9 +696,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(xs:time(\"13:00:00Z\") - xs:time(\"17:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-PT4H")
     );
@@ -552,9 +724,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:time(\"13:00:00Z\") - xs:time(\"17:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-PT4H")
     );
@@ -577,9 +753,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string((xs:time(\"13:00:00Z\") - xs:time(\"12:00:00Z\"))) and fn:string((xs:time(\"13:00:00Z\") - xs:time(\"10:00:00Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -603,9 +783,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"00:00:00Z\") - xs:time(\"00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -629,9 +813,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"08:03:35Z\") - xs:time(\"00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT8H3M35S")
     );
@@ -655,9 +843,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"23:59:59Z\") - xs:time(\"00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT23H59M59S")
     );
@@ -681,9 +873,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"00:00:00Z\") - xs:time(\"08:03:35Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-PT8H3M35S")
     );
@@ -707,9 +903,13 @@ public class OpSubtractTimes extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"00:00:00Z\") - xs:time(\"23:59:59Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-PT23H59M59S")
     );

@@ -20,9 +20,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered(1, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered(1) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(unordered((1, 2, 3))) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(unordered((1, 2, current-time()))) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(unordered(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -120,9 +144,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3), unordered((1, 2, 3)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -136,11 +164,75 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "unordered(error())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
+    );
+  }
+
+  /**
+   *  Tests optimizations for unordered .
+   */
+  @org.junit.Test
+  public void cbclFnUnordered001() {
+    final XQuery query = new XQuery(
+      "boolean(unordered(reverse((1 to 10)[. div 2 = 2])))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Tries EvaluateOptionalItem on fn:unordered .
+   */
+  @org.junit.Test
+  public void cbclFnUnordered002() {
+    final XQuery query = new XQuery(
+      "local-name(unordered(<a><b/><c/></a>/*[1]))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "b")
+    );
+  }
+
+  /**
+   *  Tests corner evaluation case .
+   */
+  @org.junit.Test
+  public void cbclFnUnordered003() {
+    final XQuery query = new XQuery(
+      "floor(unordered((1 to 10)[. div 2 = 0]))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "")
     );
   }
 
@@ -152,9 +244,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered( (\"c\",1, \"xzy\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"c\", 1, \"xzy\"")
     );
@@ -168,9 +264,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered( (\"c\", \"b\", \"a\") )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"c\",  \"b\", \"a\"")
     );
@@ -184,9 +284,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", \"b\", \"c\"")
     );
@@ -200,9 +304,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:string(\"\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", \"\",  \"b\", \"c\"")
     );
@@ -216,9 +324,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:anyURI(\"www.example.com\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", \"www.example.com\", \"b\", \"c\"")
     );
@@ -232,9 +344,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", (), (), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", \"b\", \"c\"")
     );
@@ -248,9 +364,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:integer(\"100\"), xs:integer(\"-100\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", 100, -100, \"b\", \"c\"")
     );
@@ -264,9 +384,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:decimal(\"-1.000000000001\"), xs:integer(\"-100\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", -1.000000000001, -100, \"b\", \"c\"")
     );
@@ -280,9 +404,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:float(\"INF\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", xs:float(\"INF\"), \"b\", \"c\"")
     );
@@ -296,9 +424,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:float(\"-INF\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", xs:float('-INF'), \"b\", \"c\"")
     );
@@ -312,9 +444,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:float(\"NaN\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", xs:float('NaN'), \"b\", \"c\"")
     );
@@ -328,9 +464,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:float(\"1.01\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", 1.01, \"b\", \"c\"")
     );
@@ -344,9 +484,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:double(\"NaN\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", xs:double('NaN'), \"b\", \"c\"")
     );
@@ -360,9 +504,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:double(\"1.01\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", 1.01, \"b\", \"c\"")
     );
@@ -376,9 +524,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:double(\"-INF\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", xs:double('-INF'), \"b\", \"c\"")
     );
@@ -392,9 +544,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:double(\"INF\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", xs:double(\"INF\"), \"b\", \"c\"")
     );
@@ -408,9 +564,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:boolean(\"1\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", true(), \"b\", \"c\"")
     );
@@ -424,9 +584,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:boolean(\"0\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", false(), \"b\", \"c\"")
     );
@@ -440,9 +604,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:boolean(\"true\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", true(), \"b\", \"c\"")
     );
@@ -456,9 +624,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:boolean(\"false\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", false(), \"b\", \"c\"")
     );
@@ -472,9 +644,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:date(\"1993-03-31\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", xs:date('1993-03-31'), \"b\", \"c\"")
     );
@@ -488,9 +664,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:dateTime(\"1972-12-31T00:00:00\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", xs:dateTime(\"1972-12-31T00:00:00\"), \"b\", \"c\"")
     );
@@ -504,9 +684,13 @@ public class FnUnordered extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:unordered ( (\"a\", xs:time(\"12:30:00\"), \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertPermutation("\"a\", xs:time('12:30:00'), \"b\", \"c\"")
     );

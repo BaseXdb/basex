@@ -20,9 +20,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "year-from-date()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "year-from-date((), \"Wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(year-from-date(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "year-from-date(()) instance of xs:integer?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "year-from-date(xs:date(\"2000-02-03\")) eq 2000",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1999-05-31Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1999")
     );
@@ -116,9 +140,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1970-01-01Z\")) * fn:year-from-date(xs:date(\"0002-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3940")
     );
@@ -132,9 +160,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1970-01-01Z\")) div fn:year-from-date(xs:date(\"1970-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -148,9 +180,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1970-01-01Z\")) idiv fn:year-from-date(xs:date(\"1970-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -164,9 +200,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1970-01-01Z\")) mod fn:year-from-date(xs:date(\"1970-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -180,9 +220,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "+fn:year-from-date(xs:date(\"1970-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1970")
     );
@@ -196,9 +240,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "-fn:year-from-date(xs:date(\"1970-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1970")
     );
@@ -212,9 +260,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1970-01-01Z\")) eq fn:year-from-date(xs:date(\"1970-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1970-01-01Z\")) ne fn:year-from-date(xs:date(\"1970-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -244,9 +300,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1970-01-01Z\")) le fn:year-from-date(xs:date(\"1970-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1970-01-01Z\")) ge fn:year-from-date(xs:date(\"1970-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"2000-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2000")
     );
@@ -292,9 +360,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1999-12-31Z\")) lt fn:year-from-date(xs:date(\"1999-12-31Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -308,9 +380,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1999-12-31Z\")) le fn:year-from-date(xs:date(\"1999-12-31Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -324,9 +400,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:year-from-date(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -340,9 +420,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"0001-05-31Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -356,9 +440,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"-1999-05-31Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-1999")
     );
@@ -372,9 +460,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1970-01-01Z\")) + fn:year-from-date(xs:date(\"1970-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3940")
     );
@@ -388,9 +480,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1970-01-01Z\")) - fn:year-from-date(xs:date(\"1970-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
     );
@@ -404,9 +500,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1970-01-01Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1970")
     );
@@ -420,9 +520,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"1983-11-17Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1983")
     );
@@ -436,9 +540,13 @@ public class FnYearFromDate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:year-from-date(xs:date(\"2030-12-31Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2030")
     );

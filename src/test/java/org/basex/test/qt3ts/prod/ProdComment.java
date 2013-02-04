@@ -26,9 +26,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "(3(: comment inbetween :)- 1) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -48,9 +52,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "(::) 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -70,9 +78,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "true()(::)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -92,9 +104,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "for (: set up loop :) $i in 3 return $i eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -114,9 +130,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "if((: comment inbetween :)) then 1 else 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -136,9 +156,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "1(: this comment does not end:",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -158,9 +182,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "1(: content (: this comment does not end :)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -180,9 +208,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "1(: content this comment does not start properly :) :)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -202,9 +234,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "1(: ((( : )) ))ladl:  :(): ()()(dahsi ()()( dad: ) :) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -225,9 +261,13 @@ public class ProdComment extends QT3TestSet {
       "1(: (:one comment:) content (:another comment:) content (:a third:):)\n" +
       "\t\t\t   eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -247,9 +287,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "1(:(:(:(:(:(:(:(::):):):):):):):) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -269,9 +313,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "1 (: a (: nested :) comment :) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -291,9 +339,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       ": :) 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -313,9 +365,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "1 (: comment (: inside :) comment :) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -336,9 +392,13 @@ public class ProdComment extends QT3TestSet {
       "\"reminds of a comment :)\" eq\n" +
       "\t\t    \"reminds of a comment :)\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -358,9 +418,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "5 instance (: strange place for a comment :) of item()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -380,9 +444,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "1 (: simple comment :) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -403,9 +471,13 @@ public class ProdComment extends QT3TestSet {
       "1 (: comment (: inside :)\n" +
       "\t\t\t\tNEW LINE comment :) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -426,9 +498,13 @@ public class ProdComment extends QT3TestSet {
       "(: \"recursive comments must be \n" +
       "\tbalanced, this one is not :)\" :)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -448,9 +524,13 @@ public class ProdComment extends QT3TestSet {
       "(:*******************************************************:)\n" +
       "1 eq (::)1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -475,9 +555,13 @@ public class ProdComment extends QT3TestSet {
       "                                        </e>\n" +
       "                              return $i/b(:  ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -502,9 +586,13 @@ public class ProdComment extends QT3TestSet {
       "                                        </e>\n" +
       "                              return $i/b(: some : content (:some content  ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -529,9 +617,13 @@ public class ProdComment extends QT3TestSet {
       "                                        </e>\n" +
       "                                        return $i/b/comment(: some : content (:some content:):){\"content\"}  ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--content--><!--content--><!--content-->", false)
     );
@@ -556,9 +648,13 @@ public class ProdComment extends QT3TestSet {
       "                                        </e>\n" +
       "                                        return $i/(: some : content (:some content:):)<!--content-->  ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--content-->", false)
     );
@@ -583,9 +679,13 @@ public class ProdComment extends QT3TestSet {
       "                                        </e>\n" +
       "                                        return $i/b/(: some : content (:some content:):)<!--content-->  ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--content--><!--content--><!--content-->", false)
     );
@@ -606,9 +706,13 @@ public class ProdComment extends QT3TestSet {
       "\n" +
       "",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result/>", false)
     );
@@ -630,11 +734,15 @@ public class ProdComment extends QT3TestSet {
       "(//fs:Folder)[1]/fs:File[1]/fs:FileName\n" +
       "",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-    query.namespace("fs", "http://www.example.com/filesystem");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      query.namespace("fs", "http://www.example.com/filesystem");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fs:FileName xmlns:fs=\"http://www.example.com/filesystem\">File00000000000</fs:FileName>", false)
     );
@@ -654,9 +762,13 @@ public class ProdComment extends QT3TestSet {
       "<result/>\n" +
       "",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result/>", false)
     );
@@ -676,9 +788,13 @@ public class ProdComment extends QT3TestSet {
       "<result/>\n" +
       "",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result/>", false)
     );
@@ -698,9 +814,13 @@ public class ProdComment extends QT3TestSet {
       "<result/>\n" +
       "",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result/>", false)
     );
@@ -720,9 +840,13 @@ public class ProdComment extends QT3TestSet {
       "<result/>\n" +
       "",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result/>", false)
     );
@@ -742,9 +866,13 @@ public class ProdComment extends QT3TestSet {
       "<result/>\n" +
       "",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result/>", false)
     );
@@ -764,9 +892,13 @@ public class ProdComment extends QT3TestSet {
       "<result/>\n" +
       "",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result/>", false)
     );
@@ -788,11 +920,15 @@ public class ProdComment extends QT3TestSet {
       "\telse \"false\"\n" +
       "",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-    query.namespace("fs", "http://www.example.com/filesystem");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      query.namespace("fs", "http://www.example.com/filesystem");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true")
     );
@@ -814,11 +950,15 @@ public class ProdComment extends QT3TestSet {
       "\n" +
       "",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-    query.namespace("fs", "http://www.example.com/filesystem");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      query.namespace("fs", "http://www.example.com/filesystem");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -841,11 +981,15 @@ public class ProdComment extends QT3TestSet {
       "\n" +
       "",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-    query.namespace("fs", "http://www.example.com/filesystem");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      query.namespace("fs", "http://www.example.com/filesystem");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true")
     );
@@ -865,10 +1009,14 @@ public class ProdComment extends QT3TestSet {
       "\n" +
       "",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<south mark=\"s0\" />", false)
     );
@@ -888,9 +1036,13 @@ public class ProdComment extends QT3TestSet {
       "\n" +
       "",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4")
     );
@@ -910,9 +1062,13 @@ public class ProdComment extends QT3TestSet {
       "\n" +
       "",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -931,9 +1087,13 @@ public class ProdComment extends QT3TestSet {
       "(! Wrong syntax :)\n" +
       "<empty/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -952,9 +1112,13 @@ public class ProdComment extends QT3TestSet {
       "(:)\n" +
       "<empty/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -973,9 +1137,13 @@ public class ProdComment extends QT3TestSet {
       "(:: )\n" +
       "<empty/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -994,9 +1162,13 @@ public class ProdComment extends QT3TestSet {
       "-- Wrong comment format\n" +
       "<empty/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1015,9 +1187,13 @@ public class ProdComment extends QT3TestSet {
       "{-- Wrong comment format --}\n" +
       "<empty/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1036,9 +1212,13 @@ public class ProdComment extends QT3TestSet {
       "(: { \"comment\" } :)\n" +
       "<result/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result/>", false)
     );

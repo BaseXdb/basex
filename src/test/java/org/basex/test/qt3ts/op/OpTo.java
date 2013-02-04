@@ -20,9 +20,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 to 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -40,9 +44,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((10, 1 to 4)) eq 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -56,9 +64,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "subsequence(-3 to -1, 1, 1) eq -3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -72,9 +84,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "subsequence(-3 to -1, 3, 1) eq -1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -88,9 +104,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(reverse(4 to 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -104,9 +124,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "subsequence(reverse(1 to 3), 1, 1) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -120,9 +144,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "subsequence(reverse(1 to 3), 3, 1) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -136,9 +164,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "subsequence(reverse(1 to 4), 2, 1) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -152,9 +184,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "subsequence(reverse(1 to 4), 3, 1) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -168,9 +204,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "subsequence(reverse(-4 to -1), 2, 1) eq -2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -184,9 +224,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((-1, -2, -3, -4), reverse(-4 to -1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -200,9 +244,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(30 to 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -216,9 +264,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((), reverse(0 to -5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -232,9 +284,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((0, -1, -2, -3, -4, -5), reverse(-5 to 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -248,9 +304,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(reverse(-5 to -2)) eq 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -264,9 +324,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(reverse(-5 to -0)) eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -280,9 +344,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(reverse(1 to 4)) eq 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -296,9 +364,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(1 to 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -312,9 +384,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(0 to -5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -328,9 +404,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(-4 to -5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -344,9 +424,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(reverse(1 to 0))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -360,9 +444,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(reverse(0 to -5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -376,9 +464,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(0 to -3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -392,9 +484,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(reverse(-4 to -5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -408,9 +504,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(remove((2.e0, 4), 1) treat as xs:integer to 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "4")
     );
@@ -424,9 +524,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(4 to remove((2e0, 4), 1) treat as xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "4")
     );
@@ -440,9 +544,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "1.1 to 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -456,9 +564,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 to 1.1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -472,9 +584,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "1.1 to 3.3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -488,9 +604,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 + 1.1 to 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -504,9 +624,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(1 to ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -524,9 +648,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(() to 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -544,9 +672,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(-1 to -3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -560,9 +692,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(1 to 4) eq 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -576,9 +712,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(0 to 4) eq 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -592,9 +732,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(-5 to -0) eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -608,9 +752,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "1e3 to 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -624,9 +772,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 to 1e3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -640,9 +792,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $i in 1 to 3 return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -656,9 +812,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 to <value>5</value>, 5 to <value>5</value>, <value>1</value> to 5, <value>1</value> to <value>5</value>, let $i := <e>5</e> return $i to $i, count(5 to 10), count(1000 to 2000), count(<e>5</e> to 10), count(3 to <e>10</e>), count(<e>3</e> to <e>10</e>), count(<e>5</e> to 10), count(3 to <e>10</e>), count(<e>3</e> to <e>10</e>), count(4294967295 to 4294967298)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5 5 1 2 3 4 5 1 2 3 4 5 5 6 1001 6 8 8 6 8 8 4")
     );
@@ -672,9 +832,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10, 1 to 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10 1 2 3 4")
     );
@@ -688,9 +852,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to xs:integer(5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5")
     );
@@ -704,9 +872,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(1) to xs:integer(5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5")
     );
@@ -720,9 +892,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:min((1,2)) to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5")
     );
@@ -736,9 +912,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:max((1,2)) to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 3 4 5")
     );
@@ -752,9 +932,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:min((1,2)) to fn:max((6,7)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5 6 7")
     );
@@ -768,9 +952,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:min((1 to 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -784,9 +972,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:max((1 to 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5")
     );
@@ -800,9 +992,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg((1 to 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3")
     );
@@ -816,9 +1012,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count((1 to 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5")
     );
@@ -832,9 +1032,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "((3*2) to 10)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "6 7 8 9 10")
     );
@@ -848,9 +1052,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "10 to 10",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10")
     );
@@ -864,9 +1072,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to (3*2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5 6")
     );
@@ -880,9 +1092,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1*2) to (3*2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 3 4 5 6")
     );
@@ -896,9 +1112,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "((3 - 2) to 10)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5 6 7 8 9 10")
     );
@@ -912,9 +1132,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to (3 - 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -928,9 +1152,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "((2 - 1) to (7 - 1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5 6")
     );
@@ -944,9 +1172,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "((6 idiv 2) to 10)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 4 5 6 7 8 9 10")
     );
@@ -960,9 +1192,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to (10 idiv 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5")
     );
@@ -976,11 +1212,63 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "((5 idiv 5) to (8 idiv 2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4")
+    );
+  }
+
+  /**
+   *  test op:to with large numbers .
+   */
+  @org.junit.Test
+  public void rangeExpr28() {
+    final XQuery query = new XQuery(
+      "18446744073709551616 to 18446744073709551620",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertStringValue(false, "18446744073709551616 18446744073709551617 18446744073709551618 18446744073709551619 18446744073709551620")
+      ||
+        error("FOAR0002")
+      )
+    );
+  }
+
+  /**
+   *  test op:to with large numbers .
+   */
+  @org.junit.Test
+  public void rangeExpr29() {
+    final XQuery query = new XQuery(
+      "count(18446744073709551616 to 18446744073709551620)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertEq("5")
+      ||
+        error("FOAR0002")
+      )
     );
   }
 
@@ -992,11 +1280,87 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(15 to 10)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0")
+    );
+  }
+
+  /**
+   *  test op:to with large numbers .
+   */
+  @org.junit.Test
+  public void rangeExpr30() {
+    final XQuery query = new XQuery(
+      "(28446744073709551616 to 28446744073709551620)!position()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertStringValue(false, "1 2 3 4 5")
+      ||
+        error("FOAR0002")
+      )
+    );
+  }
+
+  /**
+   *  test op:to with large numbers .
+   */
+  @org.junit.Test
+  public void rangeExpr31() {
+    final XQuery query = new XQuery(
+      "((28446744073709551616 to 28446744073709551620)!last())[1]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertEq("5")
+      ||
+        error("FOAR0002")
+      )
+    );
+  }
+
+  /**
+   *  test op:to with large numbers .
+   */
+  @org.junit.Test
+  public void rangeExpr32() {
+    final XQuery query = new XQuery(
+      "reverse(28446744073709551616 to 28446744073709551620)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertStringValue(false, "28446744073709551620 28446744073709551619 28446744073709551618 28446744073709551617 28446744073709551616")
+      ||
+        error("FOAR0002")
+      )
     );
   }
 
@@ -1008,9 +1372,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:reverse(10 to 15)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "15 14 13 12 11 10")
     );
@@ -1024,9 +1392,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count((1, 2 to ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "1")
@@ -1044,9 +1416,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "((1+2) to (2+2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 4")
     );
@@ -1060,9 +1436,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(-4,-3 to 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-4 -3 -2 -1 0 1 2")
     );
@@ -1076,9 +1456,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(-4, -3 to -1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-4 -3 -2 -1")
     );
@@ -1092,9 +1476,13 @@ public class OpTo extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(1) to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5")
     );

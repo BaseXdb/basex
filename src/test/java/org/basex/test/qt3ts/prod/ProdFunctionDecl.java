@@ -22,9 +22,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function test:myFunction() { 1};\n" +
       "        1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -40,9 +44,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction() as xs:double { \"This is not a double, it's an xs:string.\" };\n" +
       "        local:myFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -58,30 +66,38 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction() as item() { () };\n" +
       "        local:myFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
   }
 
   /**
-   *  Variables appearing after a function declaration is not in scope inside the function. .
+   *  XQuery 3.0: Variable appearing after a function declaration is in scope inside the function. .
    */
   @org.junit.Test
-  public void kFunctionProlog12() {
+  public void kFunctionProlog12b() {
     final XQuery query = new XQuery(
       "\n" +
       "        declare function local:computeSum() { $myVariable };\n" +
       "        declare variable $myVariable := 1;\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0008")
+      assertEq("1")
     );
   }
 
@@ -96,9 +112,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare namespaces prefix = \"example.com/Anamespace\";\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0081")
@@ -118,9 +138,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction() as xs:integer { subsequence((1, 2, \"a string\"), 3 ,1) };\n" +
       "        fn:boolean(local:myFunction())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -136,9 +160,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction() as xs:anyURI { 1 };\n" +
       "        true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -158,9 +186,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction as xs:integer { 1 };\n" +
       "        true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -176,9 +208,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction { 1 };\n" +
       "        true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -196,9 +232,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:func2() as xs:integer { $var2 };\n" +
       "        1 eq local:func1() and 2 eq local:func2()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -214,9 +254,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:func1($a1, $a2, $a3) { 1 };\n" +
       "        local:func1(1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -232,9 +276,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function wrongNS() { 1 };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -250,9 +298,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:func($choose, $whenTrue, $whenFalse) { if($choose) then $whenTrue else $whenFalse };\n" +
       "        local:func(true(), current-time(), current-date()) instance of xs:time and local:func(false(), current-time(), current-date()) instance of xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -268,9 +320,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:func($a as xs:integer, $unused, $c as xs:integer) { $a + $c };\n" +
       "        local:func(1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -286,9 +342,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:func($unused, $b as xs:integer, $c as xs:integer) { $b + $c };\n" +
       "        local:func(1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -304,9 +364,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:func($a as xs:integer, $b as xs:integer, $unused) { $a + $b };\n" +
       "        local:func(1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -322,9 +386,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function wrongNS() { 1 };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -340,9 +408,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myName() as xs:integer { 1 };\n" +
       "        $local:myName eq local:myName()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -359,9 +431,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myName() { 1 };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0034")
     );
@@ -378,9 +454,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myName() as xs:nonPositiveInteger { 1 };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0034")
     );
@@ -397,9 +477,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myName($myvar as xs:nonPositiveInteger) { 1 };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0034")
     );
@@ -416,9 +500,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myName($myvar2) { 1 };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0034")
     );
@@ -434,9 +522,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function xml:wrongNS() { 1 };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -453,9 +545,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myName() as xs:integer { 1 };\n" +
       "        (local:myName(4) - 3) eq local:myName()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -471,9 +567,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function fn:count($var) { fn:count($var) };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -489,9 +589,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function xs:gYear($arg as xs:anyAtomicType?) as xs:gYear? { xs:gYear($arg) };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -507,9 +611,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction() { \"a string\" + 1 };\n" +
       "        true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -529,9 +637,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:MyFunction() { 1 };\n" +
       "        local:myFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -547,9 +659,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:MyFunction() { 1 };\n" +
       "        local:myFunctionn()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -565,9 +681,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:MyFunction($myArg) { 0 };\n" +
       "        $myArg",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -584,9 +704,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:MyFunction2($myArg2) { $myArg };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -603,9 +727,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:MyFunction2($myArg2) { 0 };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -621,9 +749,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($local:myVar) { $local:myVar };\n" +
       "        $local:myVar, local:myFunction(2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2")
     );
@@ -639,9 +771,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function my:wrongNS() { 1 };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -657,9 +793,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($local:myVar as xs:integer) { for $local:myVar in ($local:myVar, 3) return $local:myVar };\n" +
       "        deep-equal(local:myFunction(1), (1, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -675,9 +815,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($local:myVar) { $local:myVar + 1 };\n" +
       "        local:myFunction(1), local:myFunction(\"this will fail\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -693,9 +837,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($local:arg) as item() { 1, $local:arg };\n" +
       "        local:myFunction(()), local:myFunction(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -711,9 +859,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg as item(), $arg2 as xs:integer) { $arg, $arg2 };\n" +
       "        local:myFunction(\"3\", \"3\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -729,9 +881,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg as item(), $arg2 as xs:integer) { $arg, $arg2 };\n" +
       "        local:myFunction(\"3\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -747,9 +903,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg as item()?, $arg2 as xs:integer) { $arg, $arg2 };\n" +
       "        local:myFunction((), 4.1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -765,9 +925,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg as empty-sequence()) { $arg };\n" +
       "        local:myFunction(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPTY0004")
@@ -787,9 +951,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg as empty-sequence()+) { $arg };\n" +
       "        local:myFunction(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -805,9 +973,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg as empty-sequence()?) { $arg };\n" +
       "        local:myFunction(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -823,9 +995,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg as empty-sequence()) { $arg };\n" +
       "        empty(local:myFunction(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -845,9 +1021,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function my:wrongNS() { 1 };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0045")
     );
@@ -863,9 +1043,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg) as empty-sequence() { $arg };\n" +
       "        local:myFunction(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -881,9 +1065,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg) { $arg };\n" +
       "        local:myFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -899,9 +1087,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction() as empty-sequence() { fn:error() };\n" +
       "        local:myFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -918,9 +1110,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function my:error($choice, $msg as xs:string) as empty-sequence() { if($choice) then error($my:error-qname, concat('No luck: ', $msg)) else () };\n" +
       "        empty((my:error(false(), \"msg\"), my:error(false(), \"The message\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -941,9 +1137,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function my:error($msg as xs:string) as empty-sequence() { error($my:error-qname, concat('No luck: ', $msg)) };\n" +
       "        my:error(\"The message\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("*")
     );
@@ -960,9 +1160,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function my:error($choice, $msg as xs:string) as empty-sequence() { if($choice) then error($my:error-qname, concat('No luck: ', $msg)) else () };\n" +
       "        my:error(false(), \"msg\"), my:error(true(), \"The message\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("*")
     );
@@ -979,9 +1183,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function my:error($choice, $msg as xs:string) as empty-sequence() { if($choice) then error($my:error-qname, concat('No luck: ', $msg)) else () };\n" +
       "        empty((my:error(false(), \"msg\"), my:error(false(), \"The message\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1001,9 +1209,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:error() as none { 1 };\n" +
       "        local:error()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0051")
     );
@@ -1019,9 +1231,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:error() as none() { 1 };\n" +
       "        local:error()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0003")
@@ -1041,9 +1257,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($unusedArg) { true() };\n" +
       "        local:myFunction(1 + \"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1063,9 +1283,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg = 1) {1};\n" +
       "        true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1081,9 +1305,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg) { 1 };\n" +
       "        $arg",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1099,9 +1327,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg, $arg2, $arg3) { 1 };\n" +
       "        $arg3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1117,9 +1349,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($my, $arg2, $arg4) { 1 };\n" +
       "        $my eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1133,9 +1369,13 @@ public class ProdFunctionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "local:myFunction(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1150,9 +1390,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "declare namespace my = \"http://example.com/ANamespace\";\n" +
       "        my:function(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1168,9 +1412,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction() as empty-sequence() { fn:error() };\n" +
       "        QName(\"http://example.com/ANamespace\", local:myFunction())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPTY0004")
@@ -1190,9 +1438,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction() { fn:error() };\n" +
       "        QName(\"http://example.com/ANamespace\", local:myFunction())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FOER0000")
@@ -1212,9 +1464,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:is() as xs:integer { 1 };\n" +
       "        is() eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1230,9 +1486,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($usedArg) { $usedArg };\n" +
       "        local:myFunction(1 + \"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1248,9 +1508,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg = 1 as xs:integer) {1};\n" +
       "        true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1266,9 +1530,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg := 1) {1};\n" +
       "        true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1284,9 +1552,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg := 1 as xs:integer) {1};\n" +
       "        true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1302,9 +1574,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg as xs:integer) as xs:integer { ((if($arg eq 1) then 1 else $arg - 1), current-time())[1] treat as xs:integer };\n" +
       "        local:myFunction(1) eq local:myFunction(2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1320,9 +1596,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function _() { 1 };\n" +
       "        _()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1338,9 +1618,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:_() { 1 };\n" +
       "        local:_()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1356,9 +1640,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:_($arg as node()) { $arg };\n" +
       "        local:_(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1374,9 +1662,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:_($arg as attribute()?) { 1 };\n" +
       "        local:_(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -1395,9 +1687,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "       declare function local:myFunc() { e };\n" +
       "        <e/>/local:myFunc()/1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPDY0002")
@@ -1416,9 +1712,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "declare variable $var1 := let $var1 := 1 return 1;\n" +
       "        $var1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1434,9 +1734,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction() as item()* {***};\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -1455,9 +1759,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "       declare function local:func() as xs:integer { <e>1</e> };\n" +
       "        local:func()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1473,9 +1781,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:func() as xs:integer { attribute name {\"1\"} };\n" +
       "        local:func()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1491,9 +1803,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:func() as xs:integer { document {\"1\"} };\n" +
       "        local:func()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1509,9 +1825,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg as xs:integer) as xs:integer { ((if($arg eq 1) then 1 else $arg - 1), current-time())[1] treat as xs:integer };\n" +
       "        not(local:myFunction(1) ne local:myFunction(2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1526,9 +1846,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "       declare function local:func() as xs:integer { <!--1--> };\n" +
       "        local:func()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1543,9 +1867,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "       declare function local:func() as xs:integer { <?target 1?> };\n" +
       "        local:func()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1561,9 +1889,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:func() as xs:integer? { text {\"1\"} };\n" +
       "        local:func()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1580,9 +1912,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:proxy() as xs:integer { local:recursiveFunction(0) + 3 };\n" +
       "        local:proxy()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -1597,9 +1933,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "       declare function local:distinct-nodes-stable ($arg as node()*) as xs:boolean* { for $a in $arg return $a };\n" +
       "        local:distinct-nodes-stable((<element1/>,<element2/>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -1614,9 +1954,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "       declare function local:myFunc($recurse as xs:integer) { attribute {concat(\"name\", $recurse)} {()} , if ($recurse = 0) then () else local:myFunc($recurse - 1) };\n" +
       "        <e> { local:myFunc((2, current-time())[1] treat as xs:integer) } </e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e name2=\"\" name1=\"\" name0=\"\"/>", false)
     );
@@ -1631,9 +1975,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "       declare function local:myFunc() as element(foo) { <bar/> };\n" +
       "        local:myFunc()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1648,9 +1996,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "       declare function local:myFunc() as attribute(foo) { <foo/> };\n" +
       "        local:myFunc()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1666,9 +2018,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:levenshtein($arg1 as xs:string, $arg2 as xs:string) as xs:decimal { if(string-length($arg1) = 0) then string-length($arg2) else if(string-length($arg2) = 0) then string-length($arg1) else min((local:levenshtein(substring($arg1, 2), $arg2) + 1, local:levenshtein($arg1, substring($arg2, 2)) + 1, local:levenshtein(substring($arg1, 2), substring($arg2, 2)) + (if(substring($arg1, 1, 1) = substring($arg2, 1, 1)) then 0 else 1))) };\n" +
       "        local:levenshtein(\"a\", \"a\"), local:levenshtein(\"aa\", \"aa\"), local:levenshtein(\"aaa\", \"aaa\"), local:levenshtein(\"aa a\", \"aa a\"), local:levenshtein(\"a a a\", \"aaa\"), local:levenshtein(\"aaa\", \"a a a\"), local:levenshtein(\"aaa\", \"aaab\"), local:levenshtein(\"978\", \"abc\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "0 0 0 0 2 2 1 3")
     );
@@ -1682,9 +2038,13 @@ public class ProdFunctionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "function gt function",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -1700,9 +2060,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg as xs:integer) as xs:integer { ((if($arg eq 1) then 1 else $arg - 1), current-time())[1] treat as xs:integer };\n" +
       "        local:myFunction(1) = local:myFunction(2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1717,9 +2081,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "       declare function local:foo($arg) as xs:boolean { $arg };\n" +
       "        local:foo(<e/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FORG0001")
@@ -1738,9 +2106,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "       declare function local:foo($arg) as xs:boolean* { $arg };\n" +
       "        local:foo((<e>true</e>, true(), xs:untypedAtomic(\"false\"), false(), <e> true </e>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true false false true")
     );
@@ -1756,9 +2128,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:foo($arg ) as xs:boolean* { $arg };\n" +
       "        local:foo(current-date())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1773,9 +2149,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "       declare function local:foo($arg ) as xs:boolean* { $arg };\n" +
       "        local:foo((<e>true</e>, true(), xs:untypedAtomic(\"false\"), false(), <e> true </e>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true false false true")
     );
@@ -1791,9 +2171,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:foo($arg) as xs:boolean* { $arg };\n" +
       "        local:foo((true(), xs:untypedAtomic(\"false\"))), local:foo((false(), xs:untypedAtomic(\"false\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false false false")
     );
@@ -1809,9 +2193,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:foo($arg) as xs:boolean* { $arg };\n" +
       "        local:foo(xs:untypedAtomic(\"false\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1827,9 +2215,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:foo($arg) as xs:boolean { $arg };\n" +
       "        local:foo(xs:untypedAtomic(\"false\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1844,9 +2236,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "       declare function local:foo($arg ) as xs:boolean* { $arg };\n" +
       "        local:foo((<e>true</e>, true(), xs:untypedAtomic(\"false\"), false(), <e> true </e>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true false false true")
     );
@@ -1862,9 +2258,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:foo() as xs:boolean { text {local:doesNotExist()} };\n" +
       "        1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1882,9 +2282,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:functionB ( ) as xs:string { xs:string($A) };\n" +
       "        local:functionB()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "testing ...")
     );
@@ -1900,9 +2304,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg as xs:integer) as xs:integer { ((if($arg eq 1) then 1 else $arg - 1), current-time())[1] treat as xs:integer };\n" +
       "        not(local:myFunction(1) != local:myFunction(2))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1920,9 +2328,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:functionB ( ) as xs:string { $A };\n" +
       "        local:functionB()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "testing ...")
     );
@@ -1938,9 +2350,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction($arg as xs:integer) { $arg };\n" +
       "        local:myFunction(1.0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1956,9 +2372,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction() as xs:integer { 1.0 };\n" +
       "        local:myFunction()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1975,9 +2395,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        (current-time(), 1, 2, \"a string\", local:myFunction(), 4.0, xs:double(\"NaN\"), current-date())[5] instance of xs:float\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1995,9 +2419,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:myFunction3($arg as xs:integer) as xs:integer { local:myFunction2($arg) };\n" +
       "        local:myFunction3(3) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2013,11 +2441,439 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:multiplySequence($input as xs:integer*) as xs:integer { if (empty($input)) then 1 else $input[1] * local:multiplySequence($input[position() != 1]) };\n" +
       "        local:multiplySequence((1, 2, 3, 4, 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("120")
+    );
+  }
+
+  /**
+   *  check that XPST0005 is NOT a valid response .
+   */
+  @org.junit.Test
+  public void cbclFunctionDecl001() {
+    final XQuery query = new XQuery(
+      "declare function local:nothing() as empty-sequence() { () }; empty(local:nothing())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test passing a large sequence to a function. .
+   */
+  @org.junit.Test
+  public void cbclFunctionDeclaration002() {
+    final XQuery query = new XQuery(
+      "declare function local:count($x) { count($x) }; local:count((1 to 100000, 1 to 100000))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "200000")
+    );
+  }
+
+  /**
+   * Check that reserved function name attribute is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function attribute() { fn:true() };\n" +
+      "\tlocal:attribute()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name comment is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function comment() { fn:true() };\n" +
+      "\tlocal:comment()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name document-node is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames006() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function document-node() { fn:true() };\n" +
+      "\tlocal:document-node()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name element is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames008() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function element() { fn:true() };\n" +
+      "\tlocal:element()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name empty-sequence is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames010() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function empty-sequence() { fn:true() };\n" +
+      "\tlocal:empty-sequence()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name function is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames012() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function function() { fn:true() };\n" +
+      "\tlocal:function()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name if is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames014() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function if() { fn:true() };\n" +
+      "\tlocal:if()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name item is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames016() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function item() { fn:true() };\n" +
+      "\tlocal:item()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name namespace-node is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames018() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function namespace-node() { fn:true() };\n" +
+      "\tlocal:namespace-node()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name node is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames020() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function node() { fn:true() };\n" +
+      "\tlocal:node()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name processing-instruction is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames022() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function processing-instruction() { fn:true() };\n" +
+      "\tlocal:processing-instruction()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name schema-attribute is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames024() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function schema-attribute() { fn:true() };\n" +
+      "\tlocal:schema-attribute()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name schema-element is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames026() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function schema-element() { fn:true() };\n" +
+      "\tlocal:schema-element()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name switch is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames028() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function switch() { fn:true() };\n" +
+      "\tlocal:switch()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name text is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames030() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function text() { fn:true() };\n" +
+      "\tlocal:text()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name typeswitch is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames032() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function typeswitch() { fn:true() };\n" +
+      "\tlocal:typeswitch()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
     );
   }
 
@@ -2033,9 +2889,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        1\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2052,9 +2912,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        local:foo(4)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<tr>4</tr>", false)
     );
@@ -2070,10 +2934,14 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:price ($i as element()) as element()? { $i/price };\n" +
       "        for $j in /bib/book return local:price($j)",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<price>65.95</price><price>65.95</price><price>39.95</price><price>129.95</price>", false)
     );
@@ -2098,10 +2966,14 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        local:summary(//employee[location = \"Denver\"])\n" +
       "      ",
       ctx);
-    query.context(node(file("op/union/acme_corp.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/acme_corp.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<dept><deptno>1</deptno><headcount>2</headcount><payroll>130000</payroll></dept><dept><deptno>2</deptno><headcount>1</headcount><payroll>80000</payroll></dept>", false)
     );
@@ -2118,9 +2990,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:invoke_mysum() { let $s := 1 for $d in (1,2,3,4,5) let $s := local:mysum($s, $d) return $s };\n" +
       "        local:invoke_mysum()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 3 4 5 6")
     );
@@ -2137,9 +3013,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:invoke_mysum($st as xs:integer) { for $d in (1,2,3,4,5) let $st := local:mysum($d, $st) return $st };\n" +
       "        local:invoke_mysum(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3 4 5")
     );
@@ -2157,9 +3037,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "            if ($a > 100) then $a else let $a := $a + 1 return local:foo($a) };\n" +
       "        local:foo($a)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("101")
     );
@@ -2177,9 +3061,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare variable $my:ten := my:fact(10);\n" +
       "        <table> { for $i in 1 to 10 return <tr> <td>10!/{$i}! = {$my:ten div my:fact($i)}</td> </tr> } </table>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<table><tr><td>10!/1! = 3628800</td></tr><tr><td>10!/2! = 1814400</td></tr><tr><td>10!/3! = 604800</td></tr><tr><td>10!/4! = 151200</td></tr><tr><td>10!/5! = 30240</td></tr><tr><td>10!/6! = 5040</td></tr><tr><td>10!/7! = 720</td></tr><tr><td>10!/8! = 90</td></tr><tr><td>10!/9! = 10</td></tr><tr><td>10!/10! = 1</td></tr></table>", false)
     );
@@ -2195,9 +3083,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:fact($n as xs:integer) as xs:integer { if ($n < 2) then 1 else $n * local:fact(($n)-1) };\n" +
       "        <table> { for $i in 1 to 10 return <tr> <td>{$i}! = {local:fact($i)}</td> </tr> } </table>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<table><tr><td>1! = 1</td></tr><tr><td>2! = 2</td></tr><tr><td>3! = 6</td></tr><tr><td>4! = 24</td></tr><tr><td>5! = 120</td></tr><tr><td>6! = 720</td></tr><tr><td>7! = 5040</td></tr><tr><td>8! = 40320</td></tr><tr><td>9! = 362880</td></tr><tr><td>10! = 3628800</td></tr></table>", false)
     );
@@ -2213,9 +3105,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:prnt($n as xs:integer,$n2 as xs:string, $n3 as xs:date, $n4 as xs:long, $n5 as xs:string, $n6 as xs:decimal) { if ($n < 2) then 1 else concat($n, \" \",$n2,\" \",$n3,\" \",$n4,\" \",$n5,\" \",$n6) };\n" +
       "        <table> { <td>Value is = {local:prnt(4,xs:string(\"hello\"),xs:date(\"2005-02-22\"), xs:long(5),xs:string(\"well\"),xs:decimal(1.2))}</td> } </table>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<table><td>Value is = 4 hello 2005-02-22 5 well 1.2</td></table>", false)
     );
@@ -2232,9 +3128,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:fn2 ($n as xs:integer) as xs:integer { if ($n = 1) then 1 else $n + local:fn1($n - 1) };\n" +
       "        local:fn1(4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -2251,9 +3151,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:fn2 ($n as xs:integer) as xs:integer { if ($n = 1) then 1 else $n + local:fn1($n - 1) };\n" +
       "        local:fn1(4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -2270,9 +3174,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:foo($i as xs:string) as xs:string {$i};\n" +
       "        local:foo2(\"abc\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc")
     );
@@ -2289,9 +3197,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:even($x as xs:integer) as xs:boolean {if ($x = 0) then true() else local:odd($x - 1)};\n" +
       "        local:even(4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2308,9 +3220,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:even($x as xs:integer) as xs:boolean {if ($x = 0) then true() else local:odd($x - 1)};\n" +
       "        local:even(3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2326,10 +3242,14 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:title($a_book as element()) { for $i in $a_book return $i/title };\n" +
       "        /bib/book/(local:title(.))",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<title>TCP/IP Illustrated</title><title>Advanced Programming in the Unix environment</title><title>Data on the Web</title><title>The Economics of Technology and Content for Digital TV</title>", false)
     );
@@ -2348,9 +3268,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        local:udf1(10)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<empty xmlns=\"http://www.example.com/filesystem\">1000</empty>", false)
     );
@@ -2368,9 +3292,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        local:udf1 ()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<empty xmlns=\"http://www.example.com/filesystem\">100</empty>", false)
     );
@@ -2390,9 +3318,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function test2:udf1() { <empty/> };\n" +
       "        <A> {test:udf1()} {test2:udf1()} </A>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<A xmlns=\"http://www.example.com/def\"><empty>100</empty><empty/></A>", false)
     );
@@ -2411,9 +3343,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function foo:price ($x as xs:integer, $y as xs:integer, $z as xs:integer) as xs:integer+ { $x+$y+$z };\n" +
       "        foo:price(), foo:price(1), foo:price(2,3), foo:price(4,5,6)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "100 1 2 3 15")
     );
@@ -2429,9 +3365,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:foo ($n as xs:integer) as xs:string { $n };\n" +
       "        local:foo(4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -2448,9 +3388,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:foo ($n as xs:integer) { $n };\n" +
       "        local:foo(4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0034")
     );
@@ -2466,9 +3410,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function foo ($n as xs:integer) { $n };\n" +
       "        foo(4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XQST0045")
@@ -2488,9 +3436,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:foo ($n as xs:integer, $n as xs:integer) { $n };\n" +
       "        local:foo(4, 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0039")
     );
@@ -2506,9 +3458,13 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function foo ($n as xs:integer, $m as xs:integer) { $n };\n" +
       "        foo(4, 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0060")
     );
@@ -2525,10 +3481,14 @@ public class ProdFunctionDecl extends QT3TestSet {
       "        declare function local:function() { exists($global) };\n" +
       "        local:function()",
       ctx);
-    query.context(node(file("op/union/bib2.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

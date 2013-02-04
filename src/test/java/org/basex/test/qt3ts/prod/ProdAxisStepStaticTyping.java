@@ -20,9 +20,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/self::nowhere)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -36,9 +41,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/@center-attr-2/self::*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -52,9 +62,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/@center-attr-3/self::center-attr-3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -68,9 +83,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/@center-attr-1/self::nowhere)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -84,9 +104,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/text()/self::*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -100,9 +125,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/text()/self::center)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -116,9 +146,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/@center-attr-1/descendant-or-self::*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -132,9 +167,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/@center-attr-2/descendant-or-self::far-south)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -148,9 +188,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/@center-attr-2/descendant-or-self::center-attr-2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -164,9 +209,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(//center/text()/descendant-or-self::*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/Tree1Text.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -180,9 +230,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/attribute::*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -196,9 +251,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/@*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -212,9 +272,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/parent::*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -228,9 +293,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeCompass.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );
@@ -244,10 +314,14 @@ public class ProdAxisStepStaticTyping extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(/self::*)",
       ctx);
-    query.context(node(file("prod/AxisStep/TopMany.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TopMany.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0005")
     );

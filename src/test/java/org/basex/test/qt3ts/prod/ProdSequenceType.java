@@ -20,9 +20,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2,3) instance of xs:integer*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2) castable as xs:integer?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -52,9 +60,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1E3) castable as xs:double?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1E3,2E3) castable as xs:double?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -84,9 +100,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1.2) castable as xs:decimal?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1.2,2.1) castable as xs:decimal?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -116,9 +140,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"abc\") castable as xs:string?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"abc\",\"def\") castable as xs:string?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -148,9 +180,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"abc\") castable as xs:integer?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -164,9 +200,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"abc\",\"def\") castable as xs:integer?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -180,9 +220,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:true(),fn:false()) instance of xs:boolean*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1E3,2E3,3E3) instance of xs:double*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:true(),fn:false()) instance of xs:boolean?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -228,9 +280,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(fn:true(),fn:false()) instance of xs:boolean+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1.1,3.2,4.5) instance of xs:decimal*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"ab\",\"cde\",\"fgh\") instance of xs:string*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"ab\",\"cde\",\"fgh\") instance of xs:integer*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -292,9 +360,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1) instance of xs:integer?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2) instance of xs:integer?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -324,9 +400,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1,2) instance of xs:integer+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class ProdSequenceType extends QT3TestSet {
     final XQuery query = new XQuery(
       "(2) castable as xs:integer?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

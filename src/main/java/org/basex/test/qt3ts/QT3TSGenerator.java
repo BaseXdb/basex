@@ -34,6 +34,7 @@ public final class QT3TSGenerator {
     }
 
     System.setProperty("QT3TS", qt3ts.getAbsolutePath());
+    System.out.println(qt3ts.getAbsolutePath());
 
     final Context ctx = new Context();
     new Set("QUERYPATH", XQ_PATH).execute(ctx);

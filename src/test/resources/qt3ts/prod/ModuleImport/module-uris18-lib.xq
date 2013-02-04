@@ -5,7 +5,7 @@
 (: Purpose: uri containing port                          :)
 (:*******************************************************:)
 
-module namespace test="http://www.w3.org:-7334/TestModules/test";
+module namespace test="http://www.w3.org:7334/TestModules/test";
 
 declare function test:ok ()
 {

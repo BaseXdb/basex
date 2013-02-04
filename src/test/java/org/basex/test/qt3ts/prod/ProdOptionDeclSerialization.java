@@ -30,9 +30,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -49,9 +53,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "        ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -68,10 +76,14 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test", file("prod/Serialization/serialization1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test", file("prod/Serialization/serialization1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0108")
     );
@@ -89,9 +101,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0110")
     );
@@ -108,9 +124,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0109")
     );
@@ -127,9 +147,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -151,9 +175,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -173,9 +201,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -199,9 +231,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -225,9 +261,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -251,9 +291,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -277,14 +321,20 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
       ||
         assertSerialError("SEPM0016")
+      ||
+        assertSerialError("SESU0007")
       )
     );
   }
@@ -303,9 +353,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -329,9 +383,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -355,9 +413,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -382,9 +444,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -409,9 +475,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -423,26 +493,31 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
 
   /**
    *  
-   *          It is a serialization error [err:SEPM0016] if a parameter value is invalid for the given parameter. 
-   *          Wrong serialization parameter value for normalization-form.
+   *        A serialization error [err:SESU0011] results if the value of the normalization-form parameter 
+   *        specifies a normalization form that is not supported by the serializer; the serializer MUST 
+   *        signal the error.
    *       .
    */
   @org.junit.Test
   public void serialization018() {
     final XQuery query = new XQuery(
       "declare namespace output = \"http://www.w3.org/2010/xslt-xquery-serialization\";\n" +
-      "         declare option output:normalization-form \"INVALID_VALUE\";\n" +
+      "         declare option output:normalization-form \"__NOT_SUPPORTED__\";\n" +
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
       ||
-        assertSerialError("SEPM0016")
+        assertSerialError("SESU0011")
       )
     );
   }
@@ -461,9 +536,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -487,9 +566,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -513,9 +596,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -539,9 +626,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -565,9 +656,13 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
@@ -579,27 +674,33 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
 
   /**
    *  
-   *          It is a serialization error [err:SEPM0016] if a parameter value is invalid for the given parameter. 
-   *          Wrong serialization parameter value for version.
+   *         The value of the version parameter MUST match the VersionNum production of the XML Recommendation 
+   *         [XML10] or [XML11]. A serialization error [err:SESU0013] results if the value of the version 
+   *         parameter specifies a version of XML that is not supported by the serializer; the serializer 
+   *         MUST signal the error.
    *       .
    */
   @org.junit.Test
   public void serialization024() {
     final XQuery query = new XQuery(
       "declare namespace output = \"http://www.w3.org/2010/xslt-xquery-serialization\";\n" +
-      "         (: A string of Unicode characters :)\n" +
-      "         declare option output:version \"\";\n" +
+      "         (: An unsupported xml version which matches the VersionNum of XML Recommendation XML10 :)\n" +
+      "         declare option output:version \"1.14159265\";\n" +
       "         <result>ok</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok</result>", false)
       ||
-        assertSerialError("SEPM0016")
+        assertSerialError("SESU0013")
       )
     );
   }
@@ -618,15 +719,226 @@ public class ProdOptionDeclSerialization extends QT3TestSet {
       "         <result>ok&#x7f;</result>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<result>ok\u007f</result>", false)
       ||
         assertSerialError("SEPM0014")
       )
+    );
+  }
+
+  /**
+   *  
+   *          XML method: it's an error to use standalone=yes if the document is not well-formed   
+   *       .
+   */
+  @org.junit.Test
+  public void serialization026() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare namespace output = \"http://www.w3.org/2010/xslt-xquery-serialization\";\n" +
+      "         declare option output:method \"xml\";\n" +
+      "         declare option output:standalone \"yes\";\n" +
+      "\t\t (<a/>,<b/>)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        serializationMatches("<\\?xml[^t]+\\?><a/><b/>", "")
+      ||
+        assertSerialError("SEPM0004")
+      )
+    );
+  }
+
+  /**
+   *  
+   *          XML method: it's an error to use standalone=no if the document is not well-formed   
+   *       .
+   */
+  @org.junit.Test
+  public void serialization027() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare namespace output = \"http://www.w3.org/2010/xslt-xquery-serialization\";\n" +
+      "         declare option output:method \"xml\";\n" +
+      "         declare option output:standalone \"yes\";\n" +
+      "\t\t \"banana\"\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        serializationMatches("banana", "")
+      ||
+        assertSerialError("SEPM0004")
+      )
+    );
+  }
+
+  /**
+   *  
+   *          XML method: it's an error to use doctype-system if the document is not well-formed   
+   *       .
+   */
+  @org.junit.Test
+  public void serialization028() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare namespace output = \"http://www.w3.org/2010/xslt-xquery-serialization\";\n" +
+      "         declare option output:method \"xml\";\n" +
+      "         declare option output:doctype-system \"http://www.example.com/\";\n" +
+      "\t\t (<a/>,<b/>)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        serializationMatches("<\\?xml.*\\?><a/><b/>", "")
+      ||
+        assertSerialError("SEPM0004")
+      )
+    );
+  }
+
+  /**
+   *  
+   *          XML method: it's an error to use doctype-system if the document is not well-formed   
+   *       .
+   */
+  @org.junit.Test
+  public void serialization029() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare namespace output = \"http://www.w3.org/2010/xslt-xquery-serialization\";\n" +
+      "         declare option output:method \"xml\";\n" +
+      "         declare option output:doctype-system \"http://www.example.com/\";\n" +
+      "\t\t \"potato\"\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        serializationMatches("potato", "")
+      ||
+        assertSerialError("SEPM0004")
+      )
+    );
+  }
+
+  /**
+   *  
+   *          XML method: it's NOT an error to use standalone=omit if the document is not well-formed   
+   *       .
+   */
+  @org.junit.Test
+  public void serialization030() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare namespace output = \"http://www.w3.org/2010/xslt-xquery-serialization\";\n" +
+      "         declare option output:method \"xml\";\n" +
+      "         declare option output:standalone \"omit\";\n" +
+      "\t\t \"banana\"\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      serializationMatches("banana", "")
+    );
+  }
+
+  /**
+   *  
+   *          XML method: it's an error to use standalone together with omit-xml-declaration   
+   *       .
+   */
+  @org.junit.Test
+  public void serialization031() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare namespace output = \"http://www.w3.org/2010/xslt-xquery-serialization\";\n" +
+      "         declare option output:method \"xml\";\n" +
+      "         declare option output:standalone \"yes\";\n" +
+      "         declare option output:omit-xml-declaration \"yes\";\n" +
+      "\t\t <a/>\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialError("SEPM0009")
+    );
+  }
+
+  /**
+   *  
+   *          XML method: it's an error to use standalone together with omit-xml-declaration   
+   *       .
+   */
+  @org.junit.Test
+  public void serialization032() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         declare namespace output = \"http://www.w3.org/2010/xslt-xquery-serialization\";\n" +
+      "         declare option output:method \"xml\";\n" +
+      "         declare option output:standalone \"no\";\n" +
+      "         declare option output:omit-xml-declaration \"yes\";\n" +
+      "\t\t <a/>\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialError("SEPM0009")
     );
   }
 }

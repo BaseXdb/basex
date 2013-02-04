@@ -20,9 +20,13 @@ public class ProdModuleImport extends QT3TestSet {
     final XQuery query = new XQuery(
       "import(::)module \"\"; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0088")
     );
@@ -36,9 +40,13 @@ public class ProdModuleImport extends QT3TestSet {
     final XQuery query = new XQuery(
       "import(::)module \"\" at \"http://example.com/\", \"http://example.com/2\"; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0088")
     );
@@ -52,9 +60,13 @@ public class ProdModuleImport extends QT3TestSet {
     final XQuery query = new XQuery(
       "import module namespace NCName := \"http://example.com/Dummy\"; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -68,9 +80,13 @@ public class ProdModuleImport extends QT3TestSet {
     final XQuery query = new XQuery(
       "import ne import",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -84,36 +100,66 @@ public class ProdModuleImport extends QT3TestSet {
     final XQuery query = new XQuery(
       "module namespace example = \"http://example.com/\"; \"an expression\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
   }
 
   /**
-   *  Test XQST0093 by importing a module with a circular dependency .
+   *  Test that the correct base URI is assigned to nodes constructed in a library. .
    */
   @org.junit.Test
-  public void errata8001() {
+  public void cbclModule002() {
     final XQuery query = new XQuery(
       "\n" +
-      "        import module namespace errata8_1a=\"http://www.w3.org/TestModules/errata8_1a\"; \n" +
-      "        errata8_1a:fun()\n" +
+      "      \timport module namespace lib=\"http://www.xqsharp.com/test/baseuri-lib\"; \n" +
+      "      \tdeclare base-uri \"http://www.example.org/wrong/\"; \n" +
+      "      \tbase-uri($lib:node/node())\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/errata8_1a", file("prod/ModuleImport/errata8-module1a.xq"));
-    query.addModule("http://www.w3.org/TestModules/errata8_1b", file("prod/ModuleImport/errata8-module1b.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.xqsharp.com/test/baseuri-lib", file("prod/ModuleImport/baseuri-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      (
-        error("XQST0093")
-      ||
-        error("XQST0054")
-      )
+      assertStringValue(false, "http://www.example.org/correct/")
+    );
+  }
+
+  /**
+   *  Test that global variables defined in one module are not "leaked" into another .
+   */
+  @org.junit.Test
+  public void cbclModule003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \timport module namespace foo=\"http://www.xqsharp.com/test/variabledeclaration\"; \n" +
+      "      \timport module namespace bar=\"http://www.xqsharp.com/test/variablereference\"; \n" +
+      "      \tbar:test()\n" +
+      "      ",
+      ctx);
+    try {
+      query.addModule("http://www.xqsharp.com/test/variablereference", file("prod/ModuleImport/variablereference-lib.xq"));
+      query.addModule("http://www.xqsharp.com/test/variabledeclaration", file("prod/ModuleImport/variabledeclaration-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0008")
     );
   }
 
@@ -121,19 +167,48 @@ public class ProdModuleImport extends QT3TestSet {
    *  Test XQST0093 by importing a module with a circular dependency .
    */
   @org.junit.Test
-  public void errata8002() {
+  public void errata8001a() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        import module namespace errata8_1a=\"http://www.w3.org/TestModules/errata8_1a\"; \n" +
+      "        errata8_1a:fun()\n" +
+      "      ",
+      ctx);
+    try {
+      query.addModule("http://www.w3.org/TestModules/errata8_1a", file("prod/ModuleImport/errata8-module1a.xq"));
+      query.addModule("http://www.w3.org/TestModules/errata8_1b", file("prod/ModuleImport/errata8-module1b.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQDY0054")
+    );
+  }
+
+  /**
+   *  Test XQST0093 by importing a module with a circular dependency .
+   */
+  @org.junit.Test
+  public void errata8002a() {
     final XQuery query = new XQuery(
       "\n" +
       "        import module namespace errata8_2a=\"http://www.w3.org/TestModules/errata8_2a\"; \n" +
       "        errata8_2a:fun()",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/errata8_2a", file("prod/ModuleImport/errata8-module2a.xq"));
-    query.addModule("http://www.w3.org/TestModules/errata8_2b", file("prod/ModuleImport/errata8-module2b.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/errata8_2a", file("prod/ModuleImport/errata8-module2a.xq"));
+      query.addModule("http://www.w3.org/TestModules/errata8_2b", file("prod/ModuleImport/errata8-module2b.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XQST0093")
+      assertEq("10")
     );
   }
 
@@ -148,11 +223,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        errata8_3a:fun()\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/errata8_3a", file("prod/ModuleImport/errata8-module3a.xq"));
-    query.addModule("http://www.w3.org/TestModules/errata8_3b", file("prod/ModuleImport/errata8-module3b.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/errata8_3a", file("prod/ModuleImport/errata8-module3a.xq"));
+      query.addModule("http://www.w3.org/TestModules/errata8_3b", file("prod/ModuleImport/errata8-module3b.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("10")
     );
@@ -169,10 +248,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test", file("prod/ModuleImport/module-uris1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test", file("prod/ModuleImport/module-uris1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -189,10 +272,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/..TestModules/test", file("prod/ModuleImport/module-uris6-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/..TestModules/test", file("prod/ModuleImport/module-uris6-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -209,10 +296,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/키/test", file("prod/ModuleImport/module-uris7-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/키/test", file("prod/ModuleImport/module-uris7-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -229,10 +320,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/<=>@/test", file("prod/ModuleImport/module-uris8-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/<=>@/test", file("prod/ModuleImport/module-uris8-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -249,10 +344,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("urn:example:animal:ferret:nose", file("prod/ModuleImport/module-uris9-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("urn:example:animal:ferret:nose", file("prod/ModuleImport/module-uris9-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -269,10 +368,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("ftp://www.w3.org/TestModules/test;type=A", file("prod/ModuleImport/module-uris10-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("ftp://www.w3.org/TestModules/test;type=A", file("prod/ModuleImport/module-uris10-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -289,10 +392,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test?hello=world", file("prod/ModuleImport/module-uris11-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test?hello=world", file("prod/ModuleImport/module-uris11-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -309,10 +416,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test#world", file("prod/ModuleImport/module-uris12-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test#world", file("prod/ModuleImport/module-uris12-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -329,10 +440,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("ftp://www.w3.org/TestModules/test;type=A?hello=world&q#world", file("prod/ModuleImport/module-uris13-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("ftp://www.w3.org/TestModules/test;type=A?hello=world&q#world", file("prod/ModuleImport/module-uris13-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -349,10 +464,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("#1", file("prod/ModuleImport/module-uris14-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("#1", file("prod/ModuleImport/module-uris14-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -369,10 +488,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http:test", file("prod/ModuleImport/module-uris15-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http:test", file("prod/ModuleImport/module-uris15-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -389,10 +512,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test", file("prod/ModuleImport/module-uris1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test", file("prod/ModuleImport/module-uris1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -409,10 +536,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("ftp://user@www.w3.org/TestModules/test", file("prod/ModuleImport/module-uris16-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("ftp://user@www.w3.org/TestModules/test", file("prod/ModuleImport/module-uris16-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -425,14 +556,18 @@ public class ProdModuleImport extends QT3TestSet {
   public void moduleURIs21() {
     final XQuery query = new XQuery(
       "\n" +
-      "        import module namespace test=\"http://2001:0db8:85a3:0000:0000:8a2e:0370:7334/TestModules/test\";\n" +
+      "        import module namespace test=\"http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]/TestModules/test\";\n" +
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://2001:0db8:85a3:0000:0000:8a2e:0370:7334/TestModules/test", file("prod/ModuleImport/module-uris17-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]/TestModules/test", file("prod/ModuleImport/module-uris17-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -445,14 +580,18 @@ public class ProdModuleImport extends QT3TestSet {
   public void moduleURIs22() {
     final XQuery query = new XQuery(
       "\n" +
-      "        import module namespace test=\"http://www.w3.org:-7334/TestModules/test\";\n" +
+      "        import module namespace test=\"http://www.w3.org:7334/TestModules/test\";\n" +
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org:-7334/TestModules/test", file("prod/ModuleImport/module-uris18-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org:7334/TestModules/test", file("prod/ModuleImport/module-uris18-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -469,10 +608,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("mailto:jane.doe@w3c.org", file("prod/ModuleImport/module-uris19-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("mailto:jane.doe@w3c.org", file("prod/ModuleImport/module-uris19-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -489,10 +632,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("fax:+1-234-567-890", file("prod/ModuleImport/module-uris20-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("fax:+1-234-567-890", file("prod/ModuleImport/module-uris20-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -509,10 +656,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("ldap://[2001:db8::7]/c=GB?objectClass?one", file("prod/ModuleImport/module-uris21-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("ldap://[2001:db8::7]/c=GB?objectClass?one", file("prod/ModuleImport/module-uris21-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -529,10 +680,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/Test Modules/test", file("prod/ModuleImport/module-uris2-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/Test Modules/test", file("prod/ModuleImport/module-uris2-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -549,54 +704,16 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test", file("prod/ModuleImport/module-urisi1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test", file("prod/ModuleImport/module-uris1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0059")
-    );
-  }
-
-  /**
-   *  resolving against base uri .
-   */
-  @org.junit.Test
-  public void moduleURIs5() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "        declare base-uri \"http://www.w3.org/TestModules/test\";\n" +
-      "        import module namespace test=\"test\";\n" +
-      "        <result>{test:ok()}</result>\n" +
-      "      ",
-      ctx);
-    query.addModule("http://www.w3.org/TestModules/test", file("prod/ModuleImport/module-uris1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      assertSerialization("<result>ok</result>", false)
-    );
-  }
-
-  /**
-   *  resolving dots against base uri .
-   */
-  @org.junit.Test
-  public void moduleURIs6() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "        declare base-uri \"http://www.w3.org/TestModules/test/1/2\";\n" +
-      "        import module namespace test=\"../../test\";\n" +
-      "        <result>{test:ok()}</result>\n" +
-      "      ",
-      ctx);
-    query.addModule("http://www.w3.org/TestModules/test", file("prod/ModuleImport/module-uris1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      assertSerialization("<result>ok</result>", false)
     );
   }
 
@@ -611,10 +728,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules./test", file("prod/ModuleImport/module-uris3-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules./test", file("prod/ModuleImport/module-uris3-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -631,10 +752,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/.TestModules/test", file("prod/ModuleImport/module-uris4-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/.TestModules/test", file("prod/ModuleImport/module-uris4-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -651,10 +776,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules../test", file("prod/ModuleImport/module-uris5-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules../test", file("prod/ModuleImport/module-uris5-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -671,12 +800,16 @@ public class ProdModuleImport extends QT3TestSet {
       "        <foo:anElement>some Content</foo:anElement>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/defs", file("prod/ModuleImport/moduleDefs-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/defs", file("prod/ModuleImport/moduleDefs-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -693,11 +826,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        fn:lower-case(test1:ok())\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ok")
     );
@@ -713,11 +850,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        import module namespace test1=\"http://www.w3.org/TestModules/test1\"; \n" +
       "        fn:string-length(test1:ok())",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -734,11 +875,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        $test1:flag + $test1:flag\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -755,11 +900,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        $test1:flag - $test1:flag\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -776,11 +925,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        xs:integer($test1:flag)\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -797,10 +950,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        \"aaa\"\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test2-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test2-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0088")
     );
@@ -817,10 +974,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        xs:string($xml:flag)\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0070")
     );
@@ -837,10 +998,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        \"abc\"\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/diffns", file("prod/ModuleImport/modulesdiffns-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/diffns", file("prod/ModuleImport/modulesdiffns-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0048")
     );
@@ -857,11 +1022,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        import module namespace mod2=\"http://www.w3.org/TestModules/module2\"; \n" +
       "        mod1:x(),mod2:y()",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module1", file("prod/ModuleImport/module1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/module2", file("prod/ModuleImport/module2-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module1", file("prod/ModuleImport/module1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/module2", file("prod/ModuleImport/module2-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "x y x y")
     );
@@ -879,12 +1048,16 @@ public class ProdModuleImport extends QT3TestSet {
       "        <foo:anElement>some Content</foo:anElement>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/defs", file("prod/ModuleImport/moduleDefs-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/defs", file("prod/ModuleImport/moduleDefs-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<foo:anElement xmlns:foo=\"http://example.org\">some Content</foo:anElement>", false)
     );
@@ -894,24 +1067,24 @@ public class ProdModuleImport extends QT3TestSet {
    *  Cyclic module imports .
    */
   @org.junit.Test
-  public void modules28() {
+  public void modules28a() {
     final XQuery query = new XQuery(
       "\n" +
       "        import module namespace defs1 = \"http://www.w3.org/TestModules/defs1\"; \n" +
       "        $defs1:var\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/defs1", file("prod/ModuleImport/modules-recursive1.xq"));
-    query.addModule("http://www.w3.org/TestModules/defs2", file("prod/ModuleImport/modules-recursive2.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/defs1", file("prod/ModuleImport/modules-recursive1.xq"));
+      query.addModule("http://www.w3.org/TestModules/defs2", file("prod/ModuleImport/modules-recursive2.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      (
-        error("XQST0093")
-      ||
-        error("XQST0054")
-      )
+      error("XQDY0054")
     );
   }
 
@@ -926,10 +1099,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        xmlns:ok ()\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0070")
     );
@@ -946,12 +1123,16 @@ public class ProdModuleImport extends QT3TestSet {
       "        let $var := $test1:flag + 1 return $var\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/defs", file("prod/ModuleImport/moduleDefs-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/defs", file("prod/ModuleImport/moduleDefs-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -968,12 +1149,16 @@ public class ProdModuleImport extends QT3TestSet {
       "        let $var := $defs:var1+ 1 return $var\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/defs", file("prod/ModuleImport/moduleDefs-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/defs", file("prod/ModuleImport/moduleDefs-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -991,12 +1176,16 @@ public class ProdModuleImport extends QT3TestSet {
       "        let $var := $defs:var2 + 1 return $var\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/defs", file("prod/ModuleImport/moduleDefs-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/defs", file("prod/ModuleImport/moduleDefs-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -1016,11 +1205,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        let $var := $test1:flag + $foo:flag \n" +
       "        return $var",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -1037,11 +1230,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        let $var := fn:concat(xs:string($test1:flag),xs:string(test1:ok())) \n" +
       "        return $var",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1ok")
     );
@@ -1060,11 +1257,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        let $var := fn:concat(test1:ok(),foo:ok()) \n" +
       "        return $var",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "okok")
     );
@@ -1080,11 +1281,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        import module namespace test1=\"http://www.w3.org/TestModules/test1\"; \n" +
       "        fn:upper-case(test1:ok())",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "OK")
     );
@@ -1101,11 +1306,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test2:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0059")
     );
@@ -1122,11 +1331,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test1:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1c1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test2c1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1c1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test2c1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ok")
     );
@@ -1143,10 +1356,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test1:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1collide2-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1collide2-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0034")
     );
@@ -1164,10 +1381,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test1:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0034")
     );
@@ -1183,10 +1404,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        import module namespace test1=\"http://www.w3.org/TestModules/test1\"; \n" +
       "        <result>{test1:ok()}</result>",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1collide1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1collide1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0049")
     );
@@ -1204,10 +1429,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test1:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0049")
     );
@@ -1224,10 +1453,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>ok</result>\n" +
       "      ",
       ctx);
-    query.addModule("", file("prod/ModuleImport/emptyns-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("", file("prod/ModuleImport/emptyns-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0088")
     );
@@ -1244,10 +1477,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        \"abc\"\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/none", file("prod/ModuleImport/empty-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/none", file("prod/ModuleImport/empty-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0059")
     );
@@ -1264,10 +1501,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{defs:g(42)}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>65</a>", false)
     );
@@ -1290,9 +1531,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{local:test()}</a>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -1313,9 +1558,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{local:test()}</a>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -1336,9 +1585,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{local:test()}</a>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -1358,10 +1611,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{local:test()}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>65</a>", false)
     );
@@ -1381,10 +1638,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{local:test()}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1404,10 +1665,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{local:test()}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>1</a>", false)
     );
@@ -1427,10 +1692,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{local:test()}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1452,9 +1721,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{$test}</a>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -1476,9 +1749,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{$test}</a>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -1498,9 +1775,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{$test}</a>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -1517,10 +1798,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        defs:f()\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1540,9 +1825,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{$test}</a>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -1562,10 +1851,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{$test}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>65</a>", false)
     );
@@ -1585,10 +1878,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{$test}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1608,10 +1905,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{$test}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>1</a>", false)
     );
@@ -1631,10 +1932,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{local:test()}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1652,10 +1957,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{defs:h(42)}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>65</a>", false)
     );
@@ -1673,10 +1982,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{$defs:ninety}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>90</a>", false)
     );
@@ -1693,11 +2006,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{defs:f(42)}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv3", file("prod/ModuleImport/module-pub-priv3.xq"));
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv3", file("prod/ModuleImport/module-pub-priv3.xq"));
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>65</a>", false)
     );
@@ -1714,11 +2031,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{defs:fails()}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv2", file("prod/ModuleImport/module-pub-priv2.xq"));
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv2", file("prod/ModuleImport/module-pub-priv2.xq"));
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1735,9 +2056,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0106")
     );
@@ -1754,10 +2079,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{defs:g($defs:one)}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>24</a>", false)
     );
@@ -1770,13 +2099,18 @@ public class ProdModuleImport extends QT3TestSet {
   public void modulesPubPriv30() {
     final XQuery query = new XQuery(
       "\n" +
-      "        declare %private %fn:public function local:foo() { () };\n" +
+      "        declare namespace xq=\"http://www.w3.org/2012/xquery\";\n" +
+      "        declare %private %xq:public function local:foo() { () };\n" +
       "        local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0106")
     );
@@ -1793,9 +2127,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0106")
     );
@@ -1812,9 +2150,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        local:foo()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0106")
     );
@@ -1831,9 +2173,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0116")
     );
@@ -1846,13 +2192,18 @@ public class ProdModuleImport extends QT3TestSet {
   public void modulesPubPriv34() {
     final XQuery query = new XQuery(
       "\n" +
-      "        declare %private %fn:public variable $foo := ();\n" +
+      "        declare namespace xq=\"http://www.w3.org/2012/xquery\";\n" +
+      "        declare %private %xq:public variable $foo := ();\n" +
       "        $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0116")
     );
@@ -1869,9 +2220,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0116")
     );
@@ -1888,9 +2243,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        $foo\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0116")
     );
@@ -1907,10 +2266,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        defs:f#0()\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -1927,10 +2290,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{defs:g#1(42)}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>65</a>", false)
     );
@@ -1947,10 +2314,14 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{defs:g($defs:two)}</a>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/module-pub-priv", file("prod/ModuleImport/module-pub-priv.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1969,9 +2340,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{local:inc(1)}</a>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -1990,9 +2365,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{local:inc(1)}</a>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -2009,9 +2388,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{$i+1}</a>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -2028,9 +2411,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{$i+1}</a>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -2053,9 +2440,13 @@ public class ProdModuleImport extends QT3TestSet {
       "        <a>{local:test()}</a>\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a>2</a>", false)
     );
@@ -2071,11 +2462,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        import module namespace test1=\"http://www.w3.org/TestModules/test1\"; \n" +
       "        <result>{test1:ok()}</result>",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );
@@ -2093,11 +2488,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test1:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0047")
     );
@@ -2114,11 +2513,15 @@ public class ProdModuleImport extends QT3TestSet {
       "        <result>{test1:ok()}</result>\n" +
       "      ",
       ctx);
-    query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
-    query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addModule("http://www.w3.org/TestModules/test1", file("prod/ModuleImport/test1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test2", file("prod/ModuleImport/test1-lib.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>ok</result>", false)
     );

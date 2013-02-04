@@ -20,9 +20,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"--aaa--\",\"abc-\",\"ABC\") eq \"AAA\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"string\", \"map string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -68,9 +80,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"arg\", \"map string\", \"transString\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +100,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"--aaa--\",\"-\",\"\") eq \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"--aaa--\",\"bbb++\",\"\") eq \"--aaa--\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"argstr\", \"\", \"matrs\") eq \"argstr\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate((), \"map\", \"trans\") eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"abcdabc\", \"abc\", \"AB\") eq \"ABdAB\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"bar\",\"abc\",\"ABC\") eq \"BAr\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:translate(\"arg\", (), \"transString\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -196,11 +240,59 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:translate(\"arg\", \"mapString\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Tests EffectiveBooleanValue on fn:translate .
+   */
+  @org.junit.Test
+  public void cbclFnTranslate001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      boolean(translate(string-join(for $x in 1 to 10 return \"blah\",\"-\"),exactly-one((\"--\",\"==\")[position() mod 2 = 0]),\"__\"))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Tests with surrogates .
+   */
+  @org.junit.Test
+  public void cbclFnTranslate002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      translate(codepoints-to-string(65536 to 65537),codepoints-to-string(65536 to 65537),\"l\")\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "l")
     );
   }
 
@@ -212,9 +304,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:translate(\"bar\",\"abc\",\"ABC\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "BAr")
     );
@@ -228,9 +324,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:translate(fn:string(\"ABC\"), fn:string(\"ABC\"), fn:string(\"ABC\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABC")
     );
@@ -244,9 +344,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:translate(\"ABC\", \"ABC\", \"ABC\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABC")
     );
@@ -260,9 +364,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-length(fn:translate(\"ABC\",\"ABC\",\"ABC\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3")
     );
@@ -276,9 +384,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(fn:translate(\"123\",\"123\",\"123\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123")
     );
@@ -292,9 +404,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(fn:translate(\"123\",\"123\",\"123\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123")
     );
@@ -308,9 +424,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(fn:translate(\"123\",\"123\",\"123\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123")
     );
@@ -324,9 +444,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(fn:translate(\"123\",\"123\",\"123\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123")
     );
@@ -340,9 +464,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"abcd\", \"𐀁a\", \"xy\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"ybcd\"")
     );
@@ -356,9 +484,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"abcd\", \"xa\", \"𐀁y\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"ybcd\"")
     );
@@ -372,9 +504,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"abcd𐀄e\", \"a𐀄e\", \"XYZ\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"XbcdYZ\"")
     );
@@ -388,9 +524,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:translate(\"--aaa--\",\"abc-\",\"ABC\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "AAA")
     );
@@ -404,9 +544,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(\"abcd𐀄e\", \"a𐀄e\", \"𐀆YZ\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"𐀆bcdYZ\"")
     );
@@ -420,9 +564,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:translate(\"abcdabc\", \"abc\", \"AB\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABdAB")
     );
@@ -436,9 +584,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:translate(\"acdefghijklmnopqrstuvwxyz\", \"abcdefghijklmnopqrstuvwxyz\", \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ACDEFGHIJKLMNOPQRSTUVWXYZ")
     );
@@ -452,9 +604,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:translate(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\",\"abcdefghijklmnopqrstuvwxyz\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcdefghijklmnopqrstuvwxyz")
     );
@@ -468,9 +624,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:translate(\"\",\"\",\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -484,9 +644,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:translate(\"ABC\", \"ABC\", \"ABC\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABC")
     );
@@ -500,9 +664,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:translate(\"123\", \"123\", \"123\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123")
     );
@@ -516,9 +684,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:translate(\"123ABC\", \"123ABC\", \"123ABC\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123ABC")
     );
@@ -532,9 +704,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate('---abcABCxyz---','-abcABCxyz','1ABCabcXYZ')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "111ABCabcXYZ111")
     );
@@ -550,9 +726,13 @@ public class FnTranslate extends QT3TestSet {
       "tab\tspace ','\n" +
       "\t ','123')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "newline1tab2space3")
     );
@@ -566,9 +746,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate('','-','x')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -582,9 +766,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate((),'-','x')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -598,9 +786,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate(1,'-','x')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -614,9 +806,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate('abc',1,'x')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -630,9 +826,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate('abc','x',1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -646,9 +846,13 @@ public class FnTranslate extends QT3TestSet {
     final XQuery query = new XQuery(
       "translate('abc')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );

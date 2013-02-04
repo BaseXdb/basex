@@ -20,9 +20,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri-for-prefix()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri-for-prefix(\"string\", (), \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace p = \"http://www.example.com/B\"; namespace-uri-for-prefix(\"\", <e xmlns=\"http://www.example.com/A\" xmlns:A=\"http://www.example.com/C\"> <b xmlns:B=\"http://www.example.com/C\" xmlns=\"http://www.example.com/B\"/> </e>/p:b)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/B")
     );
@@ -70,9 +82,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
       "                      <e xmlns=\"http://www.example.com/A\" xmlns:A=\"http://www.example.com/C\"> <b xmlns:B=\"http://www.example.com/C\" xmlns=\"\"/> </e>/b)\n" +
       "                      )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -86,11 +102,37 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace p = \"http://www.example.com/A\"; namespace-uri-for-prefix(\"\", <e xmlns=\"http://www.example.com/A\" xmlns:A=\"http://www.example.com/C\"> <b xmlns:B=\"http://www.example.com/C\" /> </e>/p:b)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/A")
+    );
+  }
+
+  /**
+   *  Test EBV of fn:namespace-uri-for-prefix .
+   */
+  @org.junit.Test
+  public void cbclNamespaceUriForPrefix001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tfn:boolean(fn:namespace-uri-for-prefix('', <a />))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -104,9 +146,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
       "let $var := <anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement> \n" +
       "      return string(fn:namespace-uri-for-prefix(\"p1\",$var))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -121,9 +167,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:namespace-uri-for-prefix(fn:lower-case(\"P1\"),<anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -138,9 +188,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:namespace-uri-for-prefix(fn:substring(\"abcp1\",4),<anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -155,9 +209,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:namespace-uri-for-prefix(fn:concat(\"p\",\"1\"),<anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -172,9 +230,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:namespace-uri-for-prefix(fn:string-join((\"p\",\"1\"),\"\"),<anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -189,9 +251,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:namespace-uri-for-prefix(fn:substring-before(\"p1abc\",\"abc\"),<anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -206,9 +272,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:namespace-uri-for-prefix(fn:substring-after(\"abcp1\",\"abc\"),<anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -224,9 +294,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
       "declare default element namespace \"http://www.example.com/defaultnamespace\"; \n" +
       "        fn:count(fn:namespace-uri-for-prefix(\"p1\",<anElement>some context</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -241,9 +315,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
       "declare default element namespace \"http://www.example.com/defaultnamespace\"; \n" +
       "        fn:count(fn:namespace-uri-for-prefix(\"p1\",element anElement {\"some content\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -259,9 +337,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
       "        let $var := element anElement {\"some content\"} \n" +
       "        return fn:count(fn:namespace-uri-for-prefix(\"p1\",$var))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -278,9 +360,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
       "        for $var in (element anElement {\"some content\"}) \n" +
       "        return fn:count(fn:namespace-uri-for-prefix(\"p1\",$var))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -298,9 +384,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
       "        return fn:count(fn:namespace-uri-for-prefix(\"p2\",$var))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -317,9 +407,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
       "        for $var in element anElement {\"some content\"} \n" +
       "        return fn:count(fn:namespace-uri-for-prefix(\"p1\",$var))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -338,11 +432,61 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
       "                  ))\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
+    );
+  }
+
+  /**
+   *  
+   *            Evaluation of fn:namespace-uri-for-prefix function for which the prefix is the empty string and the element has no default namespace. 
+   *            The expected behavior for this case was clarified in 3.0.  See bugs 11590, 12554.  
+   *       .
+   */
+  @org.junit.Test
+  public void fnNamespaceUriForPrefix22() {
+    final XQuery query = new XQuery(
+      "fn:namespace-uri-for-prefix(\"\", <e/>)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *  
+   *            Evaluation of fn:namespace-uri-for-prefix function for which the prefix is the empty sequence and the element has no default namespace. 
+   *            The expected behavior for this case was clarified in 3.0.  See bugs 11590, 12554.  
+   *       .
+   */
+  @org.junit.Test
+  public void fnNamespaceUriForPrefix23() {
+    final XQuery query = new XQuery(
+      "fn:namespace-uri-for-prefix((), <e/>)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
     );
   }
 
@@ -357,9 +501,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
       "        let $var := <anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement> \n" +
       "        return fn:string(fn:namespace-uri-for-prefix(\"\",$var))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/defaultspace")
     );
@@ -377,9 +525,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
       "        let $var := <anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement> \n" +
       "        return fn:string(fn:namespace-uri-for-prefix((), $var))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/defaultspace")
     );
@@ -394,9 +546,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:namespace-uri-for-prefix(\"p1\",<anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -411,9 +567,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:namespace-uri-for-prefix(\"p2\",<anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -428,9 +588,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:namespace-uri-for-prefix(xs:string(\"p1\"),<anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -445,9 +609,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:namespace-uri-for-prefix(fn:string(\"p1\"),<anElement xmlns:p1 = \"http://www.example.com/examples\">some context</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );
@@ -462,9 +630,13 @@ public class FnNamespaceUriForPrefix extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(fn:namespace-uri-for-prefix(fn:upper-case(\"p1\"),<anElement xmlns:P1 = \"http://www.example.com/examples\">some context</anElement>))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/examples")
     );

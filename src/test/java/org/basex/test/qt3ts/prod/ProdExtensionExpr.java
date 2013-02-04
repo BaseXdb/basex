@@ -20,9 +20,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(#local:pr content # {1}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -36,9 +40,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "local:pr content #) {1}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -52,9 +60,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace prefix = \"http://example.com/NotRecognized\"; (#prefix:pr content #) {1 eq 1}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(#name content #) {1}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -84,9 +100,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace prefix = \"\"; (# prefix:notRecognized #){1}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -100,9 +120,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace prefix = \"http://example.com/NotRecognized\"; 1 eq (#prefix:notRecognized ##cont## # # ( \"# ) # )# )#ent #) {1}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace prefix = \"http://example.com/NotRecognized\"; (#prefix:PragmaNotSupported content #) {}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0079")
     );
@@ -134,9 +162,13 @@ public class ProdExtensionExpr extends QT3TestSet {
       "(::)1(::)eq(::)(#prefix:name ##cont## # # ( \"# ) #\n" +
       "\t\t)# )#ent #)(::){(::)1(::)}(::)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -150,9 +182,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xs = \"\"; (#xs:name content #) {1}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -166,9 +202,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (#ex:myExtensionExpression:)#) {true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -182,9 +222,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (#ex:myExtensionExpression :)#) {true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -198,9 +242,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (#ex:myExtensionExpression#) {true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -214,9 +262,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (#",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -230,9 +282,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (#",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -246,9 +302,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (# ex:name",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -262,9 +322,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (# ex:name",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -278,9 +342,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(#xs:a#)(#xs:a#)(#local:a#){-5}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5")
     );
@@ -294,9 +362,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (#ex:myExtensionExpression#) {true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -310,9 +382,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (#ex:myExtensionExpression #) {true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -326,9 +402,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (#ex:myExtensionExpression content#) {true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -342,9 +422,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (#ex:myExtensionExpression (:(:(:(:(: content #) {true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -358,9 +442,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (#ex:myExtensionExpression(content)#) {true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -375,9 +463,13 @@ public class ProdExtensionExpr extends QT3TestSet {
       "declare namespace ex = \"http://example.com/\";\n" +
       "(#ex:myExtensionExpression(:content:)#) {true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -391,9 +483,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (#ex:myExtensionExpression:)#) {true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -407,9 +503,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ex = \"http://example.com/\"; (#ex:myExtensionExpression:)#) {true()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -423,10 +523,14 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) { /works/employee[12]/overtime }",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<overtime>\n     <day>Monday</day>\n     <day>Tuesday</day>\n   </overtime>", false)
     );
@@ -440,9 +544,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {(fn:false())}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -456,9 +564,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {(fn:false() or fn:true())}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -472,9 +584,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {(fn:false() or fn:false())}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -488,9 +604,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {(fn:true() and fn:true())}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -504,9 +624,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {(fn:true() and fn:false())}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -520,9 +644,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {if(fn:true()) then \"passed\" else \"failed\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "passed")
     );
@@ -536,9 +664,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {if(fn:false()) then \"failed\" else \"passed\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "passed")
     );
@@ -552,9 +684,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {typeswitch (\"A String\") case $i as xs:decimal return \"test failed\" case $i as xs:integer return \"test failed\" case $i as xs:string return \"test passed\" default return \"test failed\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "test passed")
     );
@@ -568,9 +704,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {(fn:not(fn:true()))}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -584,9 +724,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {fn:string-length(\"abc\")}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -600,9 +744,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0079")
     );
@@ -616,9 +764,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {fn:count((1,2,3))}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -632,9 +784,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {3+2}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -648,9 +804,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {10 - 5}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -664,9 +824,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {10 * 2}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("20")
     );
@@ -680,9 +844,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {10 div 2}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -696,9 +864,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {10 idiv 2}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("5")
     );
@@ -712,9 +884,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index#){fn:count((1,2,3))}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -728,10 +904,14 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index \"ABC#\" #) {/works/employee[12]/overtime}",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<overtime>\n     <day>Monday</day>\n     <day>Tuesday</day>\n   </overtime>", false)
     );
@@ -745,9 +925,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns2:you-do-not-know-me-as-index #) {/works/employee[12]/overtime}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -761,10 +945,14 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) (# ns1:you-should-not-know-me-either #) {/works/employee[12]/overtime}",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<overtime>\n     <day>Monday</day>\n     <day>Tuesday</day>\n   </overtime>", false)
     );
@@ -778,10 +966,14 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; for $x in (# ns1:you-do-not-know-me-as-index #) {/works/employee[12]/overtime} return (# ns1:you-do-not-know-me-as-index #) {/works/employee[12]/overtime}",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<overtime>\n     <day>Monday</day>\n     <day>Tuesday</day>\n   </overtime>", false)
     );
@@ -795,9 +987,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {(every $x in (1,2,3) satisfies $x < 4)}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -811,9 +1007,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {(some $x in (1,2,3) satisfies $x = 2)}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -827,9 +1027,13 @@ public class ProdExtensionExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace ns1 = \"http://example.org/someweirdnamespace\"; (# ns1:you-do-not-know-me-as-index #) {(fn:true())}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

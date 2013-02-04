@@ -20,9 +20,14 @@ public class MathTan extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:tan(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -36,9 +41,14 @@ public class MathTan extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:tan(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.0e0")
     );
@@ -52,9 +62,14 @@ public class MathTan extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:tan(-0.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0.0e0")
     );
@@ -68,9 +83,14 @@ public class MathTan extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:tan(math:pi() div 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("abs($result - 1.0e0) lt 0.0000001")
     );
@@ -84,43 +104,58 @@ public class MathTan extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:tan(-math:pi() div 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("abs($result - -1.0e0) lt 0.0000001")
     );
   }
 
   /**
-   * Evaluate the function math:tan() with the argument math:pi() div 2.
+   * Evaluate the function math:tan() with the argument math:pi() div 4.
    */
   @org.junit.Test
   public void mathTan006() {
     final XQuery query = new XQuery(
-      "math:tan(math:pi() div 2)",
+      "math:tan(math:pi() div 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("1.633123935319537E16")
+      assertEq("0.9999999999999999")
     );
   }
 
   /**
-   * Evaluate the function math:tan() with the argument math:pi() div 2.
+   * Evaluate the function math:tan() with the argument math:pi() div 4.
    */
   @org.junit.Test
   public void mathTan007() {
     final XQuery query = new XQuery(
-      "math:tan(-math:pi() div 2)",
+      "math:tan(-math:pi() div 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("-1.633123935319537E16")
+      assertEq("-0.9999999999999999")
     );
   }
 
@@ -132,9 +167,14 @@ public class MathTan extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:tan(math:pi())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("abs($result) < 1e12")
     );
@@ -148,9 +188,14 @@ public class MathTan extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:tan(xs:double('NaN'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -164,9 +209,14 @@ public class MathTan extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:tan(xs:double('INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -180,9 +230,14 @@ public class MathTan extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:tan(xs:double('-INF'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );

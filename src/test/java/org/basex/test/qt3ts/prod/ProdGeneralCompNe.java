@@ -20,9 +20,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(() != ()) eq false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"2\" = xs:untypedAtomic(\"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "2 != xs:untypedAtomic(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 != xs:untypedAtomic(\"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((0, timezone-from-time(current-time()))) != 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"a string\" != \"a stringDIFF\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"a string\" != \"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"a string\") != \"a stringDIFF\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"a string\" != xs:untypedAtomic(\"a stringDIFF\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"a string\" != xs:untypedAtomic(\"a string\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:untypedAtomic(\"a string\") != \"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(() = 1 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"true\") != false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() != xs:untypedAtomic(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:untypedAtomic(\"false\") != false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(false() != xs:untypedAtomic(\"false\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3) != 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3) != 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3) != 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -324,9 +400,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 != 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 != (1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +440,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "2 != (1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +460,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(() != () )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +480,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 != (1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,9 +500,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"three\") != 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -420,9 +520,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 != xs:untypedAtomic(\"three\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -436,9 +540,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"2\" != 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -452,9 +560,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 != \"2\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -468,9 +580,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"falseERR\") != false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -484,9 +600,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 != \"1\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -500,9 +620,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:string(\"false\") != false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -516,9 +640,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() != xs:string(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -532,9 +660,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() != xs:untypedAtomic(\"falseERR\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -548,9 +680,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 != () )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -564,9 +700,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() != xs:anyURI(\"example.com/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -580,9 +720,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"example.com/\") != false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -596,9 +740,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(() != 1 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -612,9 +760,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 !! 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -628,9 +780,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2) != (2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -644,9 +800,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"2\") != 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -660,9 +820,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:untypedAtomic(\"1\") != 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -676,9 +840,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "() != ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -692,9 +860,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "() != 10000",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -708,9 +880,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "() != (50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -724,9 +900,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "() != (10000,50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -740,9 +920,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "() != <a>10000</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -756,9 +940,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "() != (<a>10000</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -772,9 +960,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "() != (<a>10000</a>,<b>50000</b>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -788,10 +980,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "() != (/works/employee[1]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -805,10 +1001,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "() != (/works/employee[1]/hours[1],/works/employee[6]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -822,11 +1022,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "() != ($works/works/employee[1]/hours[1],$staff/staff/employee[6]/grade[1])",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -840,9 +1044,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "10000 != ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -856,9 +1064,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "10000 != (50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -872,9 +1084,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "10000 != (10000,50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -888,9 +1104,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "10000 != <a>10000</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -904,9 +1124,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "10000 != (<a>10000</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -920,9 +1144,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "10000 != (<a>10000</a>,<b>50000</b>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -936,10 +1164,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "10000 != (/works/employee[1]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -953,10 +1185,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "10000 != (/works/employee[1]/hours[1],/works/employee[6]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -970,11 +1206,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "10000 != ($works/works/employee[1]/hours[1],$staff/staff/employee[6]/grade[1])",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -988,9 +1228,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(50000) != ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1004,9 +1248,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(50000) != 10000",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1020,9 +1268,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(50000) != (50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1036,9 +1288,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(50000) != (10000,50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1052,9 +1308,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(50000) != <a>10000</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1068,9 +1328,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(50000) != (<a>10000</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1084,9 +1348,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(50000) != (<a>10000</a>,<b>50000</b>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1100,10 +1368,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(50000) != (/works/employee[1]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1117,10 +1389,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(50000) != (/works/employee[1]/hours[1],/works/employee[6]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1134,11 +1410,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(50000) != ($works/works/employee[1]/hours[1],$staff/staff/employee[6]/grade[1])",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1152,9 +1432,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10000,50000) != ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1168,9 +1452,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10000,50000) != 10000",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1184,9 +1472,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10000,50000) != (50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1200,9 +1492,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10000,50000) != (10000,50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1216,9 +1512,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10000,50000) != <a>10000</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1232,9 +1532,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10000,50000) != (<a>10000</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1248,9 +1552,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10000,50000) != (<a>10000</a>,<b>50000</b>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1264,10 +1572,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10000,50000) != (/works/employee[1]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1281,10 +1593,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10000,50000) != (/works/employee[1]/hours[1],/works/employee[6]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1298,11 +1614,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(10000,50000) != ($works/works/employee[1]/hours[1],$staff/staff/employee[6]/grade[1])",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1316,9 +1636,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>10000</a> != ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1332,9 +1656,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>10000</a> != 10000",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1348,9 +1676,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>10000</a> != (50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1364,9 +1696,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>10000</a> != (10000,50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1380,9 +1716,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>10000</a> != <a>10000</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1396,9 +1736,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>10000</a> != (<a>10000</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1412,9 +1756,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>10000</a> != (<a>10000</a>,<b>50000</b>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1428,10 +1776,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>10000</a> != (/works/employee[1]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1445,10 +1797,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>10000</a> != (/works/employee[1]/hours[1],/works/employee[6]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1462,11 +1818,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>10000</a> != ($works/works/employee[1]/hours[1],$staff/staff/employee[6]/grade[1])",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1480,9 +1840,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>) != ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1496,9 +1860,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>) != 10000",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1512,9 +1880,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>) != (50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1528,9 +1900,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>) != (10000,50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1544,9 +1920,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>) != <a>10000</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1560,9 +1940,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>) != (<a>10000</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1576,9 +1960,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>) != (<a>10000</a>,<b>50000</b>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1592,10 +1980,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>) != (/works/employee[1]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1609,10 +2001,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>) != (/works/employee[1]/hours[1],/works/employee[6]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1626,11 +2022,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>) != ($works/works/employee[1]/hours[1],$staff/staff/employee[6]/grade[1])",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1644,9 +2044,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>,<b>50000</b>) != ()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1660,9 +2064,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>,<b>50000</b>) != 10000",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1676,9 +2084,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>,<b>50000</b>) != (50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1692,9 +2104,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>,<b>50000</b>) != (10000,50000)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1708,9 +2124,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>,<b>50000</b>) != <a>10000</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1724,9 +2144,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>,<b>50000</b>) != (<a>10000</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1740,9 +2164,13 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>,<b>50000</b>) != (<a>10000</a>,<b>50000</b>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1756,10 +2184,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>,<b>50000</b>) != (/works/employee[1]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1773,10 +2205,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>,<b>50000</b>) != (/works/employee[1]/hours[1],/works/employee[6]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1790,11 +2226,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(<a>10000</a>,<b>50000</b>) != ($works/works/employee[1]/hours[1],$staff/staff/employee[6]/grade[1])",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1808,10 +2248,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1]) != ()",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1825,10 +2269,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1]) != 10000",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1842,10 +2290,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1]) != (50000)",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1859,10 +2311,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1]) != (10000,50000)",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1876,10 +2332,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1]) != <a>10000</a>",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1893,10 +2353,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1]) != (<a>10000</a>)",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1910,10 +2374,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1]) != (<a>10000</a>,<b>50000</b>)",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1927,10 +2395,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1]) != (/works/employee[1]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1944,10 +2416,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1]) != (/works/employee[1]/hours[1],/works/employee[6]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1961,11 +2437,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "($works/works/employee[1]/hours[1]) != ($works/works/employee[1]/hours[1],$staff/staff/employee[6]/grade[1])",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1979,10 +2459,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1],/works/employee[6]/hours[1]) != ()",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1996,10 +2480,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1],/works/employee[6]/hours[1]) != 10000",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2013,10 +2501,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1],/works/employee[6]/hours[1]) != (50000)",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2030,10 +2522,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1],/works/employee[6]/hours[1]) != (10000,50000)",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2047,10 +2543,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1],/works/employee[6]/hours[1]) != <a>10000</a>",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2064,10 +2564,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1],/works/employee[6]/hours[1]) != (<a>10000</a>)",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2081,10 +2585,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1],/works/employee[6]/hours[1]) != (<a>10000</a>,<b>50000</b>)",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2098,10 +2606,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1],/works/employee[6]/hours[1]) != (/works/employee[1]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2115,10 +2627,14 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "(/works/employee[1]/hours[1],/works/employee[6]/hours[1]) != (/works/employee[1]/hours[1],/works/employee[6]/hours[1])",
       ctx);
-    query.context(node(file("docs/works.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2132,11 +2648,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "($works/works/employee[1]/hours[1],$works/works/employee[6]/hours[1]) != ($works/works/employee[1]/hours[1],$staff/staff/employee[6]/grade[1])",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2150,11 +2670,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "($works/works/employee[1]/hours[1],$staff/staff/employee[6]/hours[1]) != ()",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2168,11 +2692,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "($works/works/employee[1]/hours[1],$staff/staff/employee[6]/hours[1]) != 10000",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2186,11 +2714,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "($works/works/employee[1]/hours[1],$staff/staff/employee[6]/hours[1]) != (50000)",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2204,11 +2736,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "($works/works/employee[1]/hours[1],$staff/staff/employee[6]/hours[1]) != (10000,50000)",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2222,11 +2758,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "($works/works/employee[1]/hours[1],$staff/staff/employee[6]/hours[1]) != <a>10000</a>",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2240,11 +2780,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "($works/works/employee[1]/hours[1],$staff/staff/employee[6]/hours[1]) != (<a>10000</a>)",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2258,11 +2802,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "($works/works/employee[1]/hours[1],$staff/staff/employee[6]/hours[1]) != (<a>10000</a>,<b>50000</b>)",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2276,11 +2824,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "($works/works/employee[1]/hours[1],$staff/staff/employee[6]/hours[1]) != ($works/works/employee[1]/hours[1])",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2294,11 +2846,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "($works/works/employee[1]/hours[1],$staff/staff/employee[6]/hours[1]) != ($works/works/employee[1]/hours[1],$works/works/employee[6]/hours[1])",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2312,11 +2868,15 @@ public class ProdGeneralCompNe extends QT3TestSet {
     final XQuery query = new XQuery(
       "($works/works/employee[1]/hours[1],$staff/staff/employee[6]/hours[1]) != ($works/works/employee[1]/hours[1],$staff/staff/employee[6]/grade[1])",
       ctx);
-    query.bind("$works", node(file("docs/works.xml")));
-    query.bind("$staff", node(file("docs/staff.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.bind("$works", node(file("docs/works.xml")));
+      query.bind("$staff", node(file("docs/staff.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

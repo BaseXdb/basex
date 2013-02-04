@@ -20,9 +20,13 @@ public class XsDouble extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(xs:double(\"+INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -39,9 +43,13 @@ public class XsDouble extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"2.2250738585072012e-308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:double")
     );

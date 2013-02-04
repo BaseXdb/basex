@@ -20,9 +20,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((document {1, 'string', 1,2e3})/text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -36,10 +40,14 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((document {1, //text(), 'string'})/text())",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -53,9 +61,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((document {1, 2, <a/>, 3, 4, <b/>, 5, 6})/text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -69,10 +81,14 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {//@mark}",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -86,10 +102,14 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {<a/>, //@mark}",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -103,10 +123,14 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {<a/>, //@mark, <b/>}",
       ctx);
-    query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/AxisStep/TreeEmpty.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -120,9 +144,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:data(document {'a', element a {}, 'b'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ab")
     );
@@ -136,10 +164,14 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {., .}",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<root><child1><a>text</a><!--comment--><?pi content?></child1><child2><a>text</a><!--comment--><?pi content?></child2></root><root><child1><a>text</a><!--comment--><?pi content?></child1><child2><a>text</a><!--comment--><?pi content?></child2></root>", false)
@@ -157,9 +189,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -173,9 +209,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {1,'a',3.5,4e2}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 a 3.5 400")
     );
@@ -189,10 +229,14 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {1,//a,2,3,//comment(),4,5,//processing-instruction(),6,7,//text(),8}",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("1<a>text</a><a>text</a>2 3<!--comment--><!--comment-->4 5<?pi content?><?pi content?>6 7texttext8", false)
     );
@@ -206,9 +250,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {1, '', 2}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1  2")
     );
@@ -222,9 +270,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {1, document {2, document {document {()}, document {3}}, 4}}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1234")
     );
@@ -238,10 +290,14 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {/root}",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<root><child1><a>text</a><!--comment--><?pi content?></child1><child2><a>text</a><!--comment--><?pi content?></child2></root>", false)
     );
@@ -255,9 +311,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(document {1, document{2}, document { document {()}, document {3}}, 4}/text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -271,9 +331,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(document {\"\", document{\"\"}, document { document {()}, document {\"\"}}, \"\"}/text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -287,9 +351,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in <a/>, $y in document {$x} return exactly-one($y/a) is $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -303,9 +371,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in <!--comment-->, $y in document {$x} return exactly-one($y/comment()) is $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -319,9 +391,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in <?pi content?>, $y in document {$x} return exactly-one($y/processing-instruction()) is $x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -335,9 +411,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in <a>text</a>, $y in document {$x/text()} return exactly-one($y/text()) is exactly-one($x/text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -351,9 +431,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((document {()})/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -371,9 +455,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(document {'a', element a {}, 'b'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ab")
     );
@@ -387,9 +475,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document-node{\"content\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -403,9 +495,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document{<a/>, <b/>, <c/>}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/><b/><c/>", false)
     );
@@ -419,9 +515,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>{data(document{<a/>, <b/>, <c/>})}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/>", false)
     );
@@ -435,9 +535,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>{string(document{<a/>, <b/>, <c/>})}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/>", false)
     );
@@ -451,9 +555,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a>{string(document{<a/>, <b/>, <c/>})}</a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/>", false)
     );
@@ -467,9 +575,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(document{\"abc\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc")
     );
@@ -483,9 +595,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "data(document {\"content\"}) instance of xs:untypedAtomic",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -499,9 +615,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {\"content\"} is document{\"content\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -515,9 +635,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(document{\"string\", <e>more<a>even more</a><b attr=\"thisIsIgnored\"/><![CDATA[ButNotThis]]><?target butThisIs?> content</e>})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "stringmoreeven moreButNotThis content")
     );
@@ -531,9 +655,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(document{ text {\"data\"}, processing-instruction name {\"data\"}, processing-instruction name {\"data\"}, text {\"data\"}, processing-instruction name {\"data\"}, processing-instruction name1 {\"data\"}, comment {\"content\"}, comment {\"content\"}, text {\"data\"}, processing-instruction name2 {\"data\"}, comment {\"content\"}, text {\"data\"} })",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "datadatadatadata")
     );
@@ -547,9 +675,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(document{document{document{document{()}}}}/child::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -563,9 +695,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document{\"content\"};",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -579,9 +715,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "1, document{document{document{document{()}}}}/child::node(), 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 1")
     );
@@ -595,9 +735,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document{document{document{document{<e/>}}}}/child::node()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e/>", false)
     );
@@ -611,9 +755,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document{document{document{document{<e/>, document{()}, <e>{document{()}}</e>}}}}//child::node()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e/><e/>", false)
     );
@@ -627,9 +775,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(document{ text {\"data\"}, text {\"data\"}, text {\"data\"}, text {\"data\"} })",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "datadatadatadata")
     );
@@ -643,9 +795,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(document{ text {\"data\"}, text {\"data\"}, <e/>, text {\"data\"}, text {\"data\"} }/child::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -659,9 +815,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(document{ text {\"data\"}, text {\"data\"}, text {\"data\"}, text {\"data\"} }/child::node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -675,9 +835,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<doo> { document { attribute name {\"content\"} } } </doo>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -691,9 +855,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<doo> { document { <e/>, attribute name {\"content\"} } } </doo>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -707,9 +875,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<doo> { document { <e> <b/> <b/> <b/> <c> <d/> </c> </e>, attribute name {\"content\"} } } </doo>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -723,9 +895,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<doo> { document { <e> { <?target data?>, attribute name {\"content\"} } </e> } } </doo>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQTY0024")
     );
@@ -739,9 +915,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document{\"some text\", <e/>, attribute name {\"content\"}}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -755,9 +935,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(<a>{document {text{'a'}}}b</a>/node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -771,9 +955,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(document {1, document {2, document {document {()}, 3, document {4}}, 5}, 6})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123456")
     );
@@ -787,9 +975,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document {1, document {2, document {document {()}, 3, document {4}}, 5}, 6}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "123456")
     );
@@ -803,9 +995,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document{<e/>, attribute name {\"content\"}, \"some text\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -819,9 +1015,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document{attribute name {\"content\"}, <e/>, \"some text\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -835,9 +1035,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(document{\"some text\", <e/>, attribute name {\"content\"}})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -851,9 +1055,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(document{<e/>, attribute name {\"content\"}, \"some text\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -867,9 +1075,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(document{attribute name {\"content\"}, <e/>, \"some text\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -883,9 +1095,13 @@ public class ProdCompDocConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "document{<a/>, <b/>, <c/>}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a/><b/><c/>", false)
     );

@@ -20,9 +20,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "escape-html-uri()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "escape-html-uri(\"http://example.com/\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "escape-html-uri(()) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "escape-html-uri(\"http://www.example.com/00/Weather/CA/Los Angeles#ocean\") eq \"http://www.example.com/00/Weather/CA/Los Angeles#ocean\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "escape-html-uri(\"javascript:if (navigator.browserLanguage == 'fr') window.open('http://www.example.com/~bébé');\") eq \"javascript:if (navigator.browserLanguage == 'fr') window.open('http://www.example.com/~b%C3%A9b%C3%A9');\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,11 +120,35 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(iri-to-uri((\"example.com\", current-time())[1] treat as xs:string))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example.com")
+    );
+  }
+
+  /**
+   *  test fn:escape-html-uri with a variety of characters .
+   */
+  @org.junit.Test
+  public void cbclEscapeHtmlUri001() {
+    final XQuery query = new XQuery(
+      "fn:escape-html-uri(codepoints-to-string((9, 65, 128)))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "%09A%C2%80")
     );
   }
 
@@ -116,9 +160,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"abcdedfghijklmnopqrstuvwxyz\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcdedfghijklmnopqrstuvwxyz")
     );
@@ -132,9 +180,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example)example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example)example")
     );
@@ -148,9 +200,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example*example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example*example")
     );
@@ -164,9 +220,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example+example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example+example")
     );
@@ -180,9 +240,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example,example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example,example")
     );
@@ -196,9 +260,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example-example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example-example")
     );
@@ -212,9 +280,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example.example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example.example")
     );
@@ -228,9 +300,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example/example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example/example")
     );
@@ -244,9 +320,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example;example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example;example")
     );
@@ -260,9 +340,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example:example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example:example")
     );
@@ -276,9 +360,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example@example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example@example")
     );
@@ -292,9 +380,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     );
@@ -308,9 +400,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"exampleé€example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example%C3%A9%E2%82%ACexample")
     );
@@ -324,9 +420,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example€example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example%E2%82%ACexample")
     );
@@ -340,9 +440,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"a0123456789\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a0123456789")
     );
@@ -356,9 +460,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example example")
     );
@@ -372,9 +480,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example!example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example!example")
     );
@@ -388,9 +500,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example#example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example#example")
     );
@@ -404,9 +520,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example$example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example$example")
     );
@@ -420,9 +540,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example'example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example'example")
     );
@@ -436,9 +560,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:escape-html-uri(\"example(example\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "example(example")
     );
@@ -452,9 +580,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "escape-html-uri(\"http://www.example.com/00/Weather/CA/Los Angeles#ocean\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.example.com/00/Weather/CA/Los Angeles#ocean")
     );
@@ -468,9 +600,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "escape-html-uri(\"javascript:if (navigator.browserLanguage == 'fr') window.open('http://www.example.com/~bébé');\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "javascript:if (navigator.browserLanguage == 'fr') window.open('http://www.example.com/~b%C3%A9b%C3%A9');")
     );
@@ -484,9 +620,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "escape-html-uri('')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -500,9 +640,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "escape-html-uri(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -516,9 +660,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "escape-html-uri(12)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -532,9 +680,13 @@ public class FnEscapeHtmlUri extends QT3TestSet {
     final XQuery query = new XQuery(
       "escape-html-uri('',())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );

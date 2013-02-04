@@ -20,9 +20,13 @@ public class FnTail extends QT3TestSet {
     final XQuery query = new XQuery(
       "tail(12 to 15)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("13, 14, 15")
     );
@@ -36,9 +40,13 @@ public class FnTail extends QT3TestSet {
     final XQuery query = new XQuery(
       "tail((\"a\", \"b\", \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"b\", \"c\"")
     );
@@ -52,9 +60,13 @@ public class FnTail extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(tail(\"a\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -68,10 +80,14 @@ public class FnTail extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $a := /works/employee return count(tail($a/z))",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -85,10 +101,14 @@ public class FnTail extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $a := /works/employee[@gender='female']/@name return tail($a)/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"Jane Doe 3\", \"Jane Doe 5\", \"Jane Doe 7\", \"Jane Doe 9\", \"Jane Doe 11\", \"Jane Doe 13\"")
     );
@@ -103,9 +123,13 @@ public class FnTail extends QT3TestSet {
       "declare function local:sum($n) { if (empty($n)) then 0 else head($n) + local:sum(tail($n)) }; \n" +
       "            local:sum(1 to 5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("15")

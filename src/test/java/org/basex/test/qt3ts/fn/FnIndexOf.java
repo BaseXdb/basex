@@ -20,9 +20,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "index-of()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(index-of(xs:double(\"NaN\"), xs:double(\"NaN\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(index-of(4, \"4\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "index-of(4, 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -84,9 +100,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(index-of((), 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "index-of(4, 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -116,9 +140,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3, 4, 5, 6), index-of((4, 4, 4, 4, 4, 4), 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(index-of(xs:anyURI(\"example.com/\"), xs:hexBinary(\"FF\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "index-of(xs:untypedAtomic(\"example.com/\"), xs:anyURI(\"example.com/\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -164,9 +200,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(index-of((1, 2, \"three\", 5, 5, 6), 5), (4, 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(index-of((10, 20, 30, 40), 35))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "index-of(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -212,9 +260,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(index-of((10, 20, 30, 30, 20, 10), 20), (2, 5))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(index-of((\"a\", \"sport\", \"and\", \"a\", \"pastime\"), \"a\"), (1, 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(index-of((1, 2, 3, 2, 1), 2)) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(index-of((1, 2, 3, 2, 1), 1)) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(index-of((1, 2, 3, 2, 1), 3)) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(index-of((1, 2, 3, 2, 1), 4)) eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "index-of((1, 2, 3), 1, ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -324,9 +400,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "index-of(\"a string\", \"a string\", \"http://www.example.com/COLLATION/NOT/SUPPORTED\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCH0002")
     );
@@ -340,9 +420,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "index-of(\"a string\", \"a string\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -356,9 +440,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "index-of(\"a string\", \"a string\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -372,9 +460,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(index-of(xs:double(\"NaN\"), xs:float(\"NaN\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +480,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(index-of(xs:float(\"NaN\"), xs:double(\"NaN\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,11 +500,135 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(index-of(xs:float(\"NaN\"), xs:float(\"NaN\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Tests corner case .
+   */
+  @org.junit.Test
+  public void cbclFnIndexof006() {
+    final XQuery query = new XQuery(
+      "index-of(1 to 10,(1 to 10)[. div 2 = 0][1])",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test an index-of on a range expression .
+   */
+  @org.junit.Test
+  public void cbclFnIndexof1() {
+    final XQuery query = new XQuery(
+      "index-of(1 to 5,4)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "4")
+    );
+  }
+
+  /**
+   *  Test optimization of index-of to equal .
+   */
+  @org.junit.Test
+  public void cbclFnIndexof2() {
+    final XQuery query = new XQuery(
+      "index-of(exactly-one((1 to 10)[. div 5 = 1]),5)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1")
+    );
+  }
+
+  /**
+   *  Test boolean of indexof .
+   */
+  @org.junit.Test
+  public void cbclFnIndexof3() {
+    final XQuery query = new XQuery(
+      "boolean(index-of((1 to 10)[. mod 2 = 0],4))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Tests false boolean of indexof .
+   */
+  @org.junit.Test
+  public void cbclFnIndexof4() {
+    final XQuery query = new XQuery(
+      "boolean(index-of((1 to 10)[. mod 2 = 0],5))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Tests fn:index-of of a range value followed by an sequence .
+   */
+  @org.junit.Test
+  public void cbclFnIndexof5() {
+    final XQuery query = new XQuery(
+      "index-of((1 to 10,(1 to 10)[. mod 2 = 0]),4)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "4 12")
     );
   }
 
@@ -420,9 +640,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of ((10, 20, 30, 30, 20, 10), 20)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 5")
     );
@@ -436,9 +660,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of ((10, 20, 30, 40), 35)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -452,9 +680,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of ((\"a\", \"sport\", \"and\", \"a\", \"pastime\"), \"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 4")
     );
@@ -468,9 +700,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((\"sport\", \"\", \"and\", \"\", \"\", \"pastime\"), \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 4 5")
     );
@@ -484,9 +720,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((),\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -500,9 +740,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((\"sport\"), \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -516,9 +760,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((),fn:exactly-one(xs:untypedAtomic('')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -532,9 +780,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((xs:float('NaN')), fn:exactly-one(xs:float('NaN')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -548,9 +800,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((xs:double('NaN')), fn:exactly-one(xs:double('NaN')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -564,9 +820,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((xs:double('INF')), fn:exactly-one(xs:double('INF')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -580,9 +840,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((xs:double('-INF')), fn:exactly-one(xs:double('-INF')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -596,9 +860,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((xs:decimal('9.99999999999999999999999999')), fn:exactly-one(xs:decimal('9.99999999999999999999999999')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -612,9 +880,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((xs:decimal('9.99999999999999999999999999')), fn:exactly-one(xs:decimal('9.9999999999999999999999999')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "")
     );
@@ -628,9 +900,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((xs:positiveInteger('1'),xs:positiveInteger('2')), fn:exactly-one(xs:positiveInteger('2')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -644,9 +920,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((xs:negativeInteger('-2'), xs:negativeInteger('-1')), fn:exactly-one(xs:negativeInteger('-1')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -660,9 +940,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((1, (1,2,3)),1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2")
     );
@@ -676,9 +960,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of(((1),(1), (2,1), (0,1)),1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 4 6")
     );
@@ -692,10 +980,14 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((/bib/book/publisher), \"Addison-Wesley\")",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2")
     );
@@ -709,10 +1001,14 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((/bib/book/publisher), /bib/book[1]/publisher[1]/text() cast as xs:string)",
       ctx);
-    query.context(node(file("docs/bib.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/bib.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2")
     );
@@ -726,9 +1022,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((\"sport\", \"\", \"and\", \"\", \"\", \"pastime\"), \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "2 4 5")
     );
@@ -742,9 +1042,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of( (\"\", 1, \"\"), \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 3")
     );
@@ -758,9 +1062,13 @@ public class FnIndexOf extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:index-of((1,2,3,4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );

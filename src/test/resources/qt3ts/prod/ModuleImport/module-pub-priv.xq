@@ -9,13 +9,13 @@ xquery version "3.0";
 
 module namespace mod="http://www.w3.org/TestModules/module-pub-priv";
 
-declare %fn:public variable $mod:one := 1;
+declare %public variable $mod:one := 1;
 
-declare %fn:private variable $mod:two := 2;
+declare %private variable $mod:two := 2;
 
-declare %fn:private function mod:f() { 23 };
+declare %private function mod:f() { 23 };
 
-declare %fn:public function mod:g($a as xs:integer) {
+declare %public function mod:g($a as xs:integer) {
    mod:f() + $a + $mod:two - 2*$mod:one
 };
 

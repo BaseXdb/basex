@@ -22,9 +22,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json(map{})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("translate($result,' \t\n\r', '') = '{}'")
     );
@@ -38,9 +42,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json((), map{\"spec\":=\"ECMA-262\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("translate($result,' \t\n\r', '') = 'null'")
     );
@@ -54,9 +62,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json(12.5, map{\"spec\":=\"ECMA-262\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("number($result) = 12.5")
     );
@@ -70,9 +82,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(serialize-json(true(), map{\"spec\":=\"ECMA-262\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true")
     );
@@ -86,9 +102,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "normalize-space(serialize-json(false(), map{\"spec\":=\"ECMA-262\"}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "false")
     );
@@ -102,9 +122,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json(map{'abc':=23})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("translate($result,' \t\n\r', '') = '{\"abc\":23}'")
     );
@@ -120,9 +144,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("starts-with($result, '{')")
@@ -152,9 +180,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[1,2,3,\"four\",true,false,null]")
     );
@@ -170,9 +202,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[1,2,3,\"four\",true,false]")
     );
@@ -188,9 +224,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[[1,2],[3,4],[5,6],[7],[],[null]]")
     );
@@ -206,9 +246,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "{\"abc\":[1,2,3,4,5,6,7,8,9,10]}")
     );
@@ -224,9 +268,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[{\"abc\":1},{\"def\":2},{\"ghi\":3}]")
     );
@@ -242,9 +290,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[{\"abc\":{\"abc\":1}},{\"def\":{\"def\":2}},{\"ghi\":{\"ghi\":3}}]")
     );
@@ -259,9 +311,13 @@ public class FnSerializeJson extends QT3TestSet {
       "let $r := serialize-json('𝄞', map{\"spec\":=\"ECMA-262\"})\n" +
       "            return translate(normalize-space($r), 'abcdef', 'ABCDEF')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "\"\\uD834\\uDD1E\"")
     );
@@ -277,9 +333,13 @@ public class FnSerializeJson extends QT3TestSet {
       "', map{\"spec\":=\"ECMA-262\"})\n" +
       "            return translate(normalize-space($r), 'abcdef', 'ABCDEF')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "\"\\n\"")
@@ -298,9 +358,13 @@ public class FnSerializeJson extends QT3TestSet {
       "serialize-json((map{\"abc\":=map{\"abc\":=1}},map{\"def\":=map{\"def\":=2}},map{\"ghi\":=map{\"ghi\":=3}}),\n" +
       "        map{\"indent\":=false()})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[{\"abc\":{\"abc\":1}},{\"def\":{\"def\":2}},{\"ghi\":{\"ghi\":3}}]")
     );
@@ -317,9 +381,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[{\"abc\":{\"abc\":1}},{\"def\":{\"def\":2}},{\"ghi\":{\"ghi\":3}}]")
     );
@@ -333,9 +401,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(serialize-json(12.34, map{\"spec\":=\"ECMA-262\"}), map{\"spec\":=\"ECMA-262\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result eq xs:double('12.34')")
@@ -353,9 +425,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "parse-json(serialize-json(12.34e-30, map{\"spec\":=\"ECMA-262\"}), map{\"spec\":=\"ECMA-262\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result eq 12.34e-30")
@@ -373,9 +449,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json(\"abc\"\"def\", map{\"spec\":=\"ECMA-262\",\"escape\":=true()})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result eq '\"abc\\\"def\"'")
@@ -393,9 +473,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json(\"abc\\\\def\", map{\"spec\":=\"ECMA-262\",\"escape\":=false()})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result eq '\"abc\\\\def\"'")
@@ -415,9 +499,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[\"NaN\",\"INF\",\"-INF\"]")
     );
@@ -433,9 +521,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[0,0,\"abcd\"]")
     );
@@ -451,9 +543,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[\"a\",\"b\",null,\"d\",null,null,\"g\",null,null,\"j\"]")
     );
@@ -469,9 +565,13 @@ public class FnSerializeJson extends QT3TestSet {
       "        return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[0,0,\"2011-04-06\"]")
     );
@@ -487,9 +587,13 @@ public class FnSerializeJson extends QT3TestSet {
       "        return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "{\"a\":\"2011-04-06\"}")
     );
@@ -505,11 +609,15 @@ public class FnSerializeJson extends QT3TestSet {
       "        return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-    query.addDocument("http://www.w3.org/fots/serialize-json/doc001.xml", file("fn/serialize-json/doc001.xml"));
-    query.bind("uri", new XQuery("'http://www.w3.org/fots/serialize-json/doc001.xml'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("http://www.w3.org/fots/serialize-json/doc001.xml", file("fn/serialize-json/doc001.xml"));
+      query.bind("uri", new XQuery("'http://www.w3.org/fots/serialize-json/doc001.xml'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "{\"a\":\"<?xmlversion=\\\"1.0\\\"encoding=\\\"UTF-8\\\"?><a>text</a>\"}")
     );
@@ -525,9 +633,13 @@ public class FnSerializeJson extends QT3TestSet {
       "        return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[0,0,\"a-boolean-map\"]")
     );
@@ -547,9 +659,13 @@ public class FnSerializeJson extends QT3TestSet {
       "        return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[0,0,{\"false\":{\"false\":\"ok\"}}]")
     );
@@ -563,9 +679,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json(\"abcd\", map{\"spec\":=\"RFC4627\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0002")
     );
@@ -579,9 +699,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json(true(), map{\"spec\":=\"RFC4627\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0002")
     );
@@ -595,9 +719,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json((), map{\"spec\":=\"RFC4627\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0002")
     );
@@ -611,9 +739,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json((0,0,xs:date('2011-04-06')))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0002")
     );
@@ -627,9 +759,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json(map{\"uri\":=xs:anyURI('http://www.w3.org/')})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0002")
     );
@@ -643,9 +779,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json((1,2,3),map:entry(\"indent\",23))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0002")
     );
@@ -659,9 +799,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json((1,2,3),map:entry(\"indent\",\"true\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0002")
     );
@@ -675,9 +819,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json((1,2,3),map:entry(\"indent\",(true(),false())))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0002")
     );
@@ -693,9 +841,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0002")
     );
@@ -711,9 +863,13 @@ public class FnSerializeJson extends QT3TestSet {
       "            return translate($r,' \t\n" +
       "\r', '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0002")
     );
@@ -727,9 +883,13 @@ public class FnSerializeJson extends QT3TestSet {
     final XQuery query = new XQuery(
       "serialize-json((1,2,3),map:entry(\"escape\",map{}))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOJS0002")
     );

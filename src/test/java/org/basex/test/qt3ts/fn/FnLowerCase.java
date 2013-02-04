@@ -20,9 +20,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "lower-case()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "lower-case(\"string\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "lower-case(()) eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "upper-case(\"abCd0\") eq \"ABCD0\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(\"ABc!D\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abc!d")
     );
@@ -100,9 +120,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(\"*****\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "*****")
     );
@@ -116,9 +140,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(lower-case(\"zzzzz\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "zzzzz")
     );
@@ -132,9 +160,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:boolean(fn:lower-case(\"abcde\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(fn:lower-case(\"abcde\"), fn:lower-case(\"fghi\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcdefghi")
     );
@@ -164,9 +200,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:lower-case(\"abcde\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -180,9 +220,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(\"%$#@!\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "%$#@!")
     );
@@ -196,9 +240,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(\"lower-case\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "lower-case")
     );
@@ -212,9 +260,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(\"abc\") and fn:lower-case(\"abc\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:lower-case(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -244,9 +300,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(\"12345\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12345")
     );
@@ -260,9 +320,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(\"12345abcd\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12345abcd")
     );
@@ -276,9 +340,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(\"ABCD\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcd")
     );
@@ -292,9 +360,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(\"abcde\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcde")
     );
@@ -308,9 +380,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(\"ABCDEabcde\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcdeabcde")
     );
@@ -324,9 +400,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:lower-case(\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -340,9 +420,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(upper-case(\"AbcDH\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "abcdh")
     );
@@ -356,9 +440,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "this is a characte")
     );
@@ -372,9 +460,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "this is a characte")
     );
@@ -388,9 +480,13 @@ public class FnLowerCase extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lower-case(xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "this is a characte")
     );

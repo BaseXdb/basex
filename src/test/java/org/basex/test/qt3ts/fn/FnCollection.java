@@ -20,9 +20,13 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection(\"http:\\\\invalidURI\\someURI%gg\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0004")
     );
@@ -36,9 +40,33 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection(\":/\")",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FODC0004")
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  test fn:collection with invalid input .
+   */
+  @org.junit.Test
+  public void cbclCollection001() {
+    final XQuery query = new XQuery(
+      "fn:collection('%gg')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0004")
     );
@@ -52,10 +80,14 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection()",
       ctx);
-    query.addCollection("", new String[] { "docs/bib.xml", "docs/reviews.xml" });
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("", new String[] { file("docs/bib.xml"), file("docs/reviews.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         (
@@ -77,10 +109,14 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection(())",
       ctx);
-    query.addCollection("", new String[] { "docs/bib.xml", "docs/reviews.xml" });
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("", new String[] { file("docs/bib.xml"), file("docs/reviews.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         (
@@ -102,10 +138,14 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection() | collection(())",
       ctx);
-    query.addCollection("", new String[] { "docs/books.xml", "docs/bib.xml", "docs/reviews.xml" });
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("", new String[] { file("docs/books.xml"), file("docs/bib.xml"), file("docs/reviews.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         (
@@ -127,10 +167,14 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection() | collection(())",
       ctx);
-    query.addCollection("", new String[] { "docs/bib.xml", "docs/reviews.xml" });
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("", new String[] { file("docs/bib.xml"), file("docs/reviews.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         (
@@ -156,12 +200,16 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection(\"http://www.w3.org/2010/09/qt-fots-catalog/collection1\")",
       ctx);
-    query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { "docs/bib.xml", "docs/reviews.xml" });
-    query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
-    query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { file("docs/bib.xml"), file("docs/reviews.xml") });
+      query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
+      query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         (
@@ -183,12 +231,16 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection(\"collection1\")",
       ctx);
-    query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { "docs/bib.xml", "docs/reviews.xml" });
-    query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
-    query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { file("docs/bib.xml"), file("docs/reviews.xml") });
+      query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
+      query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         (
@@ -210,12 +262,16 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection(\"http://www.w3.org/2010/09/qt-fots-catalog/collection1\") | collection(\"collection1\")",
       ctx);
-    query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { "docs/bib.xml", "docs/reviews.xml" });
-    query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
-    query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { file("docs/bib.xml"), file("docs/reviews.xml") });
+      query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
+      query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         (
@@ -237,12 +293,16 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection(\"http://www.w3.org/2010/09/qt-fots-catalog/collection1\") | collection(\"collection1\")",
       ctx);
-    query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { "docs/bib.xml", "docs/reviews.xml" });
-    query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
-    query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { file("docs/bib.xml"), file("docs/reviews.xml") });
+      query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
+      query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         (
@@ -269,12 +329,16 @@ public class FnCollection extends QT3TestSet {
       "let $c := collection(\"http://www.w3.org/2010/09/qt-fots-catalog/collection1\") \n" +
       "            return $c | (for $doc in $c return doc(document-uri($doc)))",
       ctx);
-    query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { "docs/bib.xml", "docs/reviews.xml" });
-    query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
-    query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { file("docs/bib.xml"), file("docs/reviews.xml") });
+      query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
+      query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         (
@@ -296,9 +360,13 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection(\"collection/one/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         (
@@ -322,9 +390,13 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection(\"nonexistent\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -338,9 +410,13 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -354,11 +430,35 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "collection(\"##invalid\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0004")
+    );
+  }
+
+  /**
+   * Unknown default collection.
+   */
+  @org.junit.Test
+  public void collection903() {
+    final XQuery query = new XQuery(
+      "collection(())",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FODC0002")
     );
   }
 
@@ -370,9 +470,13 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:collection(\"argument1\",\"argument2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -390,11 +494,15 @@ public class FnCollection extends QT3TestSet {
       "        for $c at $p in $c1 \n" +
       "        return $c is exactly-one($c2[$p])",
       ctx);
-    query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection2", new String[] { "docs/books.xml", "docs/bib.xml", "docs/reviews.xml" });
-    query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection2'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection2", new String[] { file("docs/books.xml"), file("docs/bib.xml"), file("docs/reviews.xml") });
+      query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection2'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true true")
     );
@@ -412,10 +520,14 @@ public class FnCollection extends QT3TestSet {
       "        for $c at $p in $c1 \n" +
       "        return $c is exactly-one($c2[$p])",
       ctx);
-    query.addCollection("", new String[] { "docs/books.xml", "docs/bib.xml", "docs/reviews.xml" });
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("", new String[] { file("docs/books.xml"), file("docs/bib.xml"), file("docs/reviews.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true true")
     );
@@ -429,9 +541,13 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:collection(\"thisfileshouldnotexists\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -445,9 +561,13 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:collection(\"invalidURI%gg\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0004")
     );
@@ -461,12 +581,16 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(fn:collection($collection-uri))",
       ctx);
-    query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { "docs/bib.xml", "docs/reviews.xml" });
-    query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
-    query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { file("docs/bib.xml"), file("docs/reviews.xml") });
+      query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
+      query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -480,10 +604,14 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(fn:collection())",
       ctx);
-    query.addCollection("", new String[] { "docs/bib.xml", "docs/reviews.xml" });
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("", new String[] { file("docs/bib.xml"), file("docs/reviews.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -497,11 +625,15 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(fn:collection($collection-uri))",
       ctx);
-    query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection2", new String[] { "docs/books.xml", "docs/bib.xml", "docs/reviews.xml" });
-    query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection2'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection2", new String[] { file("docs/books.xml"), file("docs/bib.xml"), file("docs/reviews.xml") });
+      query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection2'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -515,10 +647,14 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(fn:collection())",
       ctx);
-    query.addCollection("", new String[] { "docs/books.xml", "docs/bib.xml", "docs/reviews.xml" });
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("", new String[] { file("docs/books.xml"), file("docs/bib.xml"), file("docs/reviews.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -532,11 +668,15 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in fn:collection($collection-uri)//title order by string($x) return $x",
       ctx);
-    query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection2", new String[] { "docs/books.xml", "docs/bib.xml", "docs/reviews.xml" });
-    query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection2'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection2", new String[] { file("docs/books.xml"), file("docs/bib.xml"), file("docs/reviews.xml") });
+      query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection2'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<title>Advanced Programming in the Unix environment</title><title>Advanced Programming in the Unix environment</title><title>Basic Syntax</title><title>Data Model</title><title>Data on the Web</title><title>Data on the Web</title><title>Syntax For Data Model</title><title>TCP/IP Illustrated</title><title>TCP/IP Illustrated</title><title>The Economics of Technology and Content for Digital TV</title><title>XML</title><title>XML and Semistructured Data</title>", false)
     );
@@ -550,11 +690,15 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "distinct-values(fn:collection($collection-uri)//*[text()[contains(.,\"TCP/IP\")]]/normalize-space())",
       ctx);
-    query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection2", new String[] { "docs/books.xml", "docs/bib.xml", "docs/reviews.xml" });
-    query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection2'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection2", new String[] { file("docs/books.xml"), file("docs/bib.xml"), file("docs/reviews.xml") });
+      query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection2'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertPermutation("\"TCP/IP Illustrated\", \"One of the best books on TCP/IP.\"")
@@ -572,12 +716,16 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $d in fn:collection($collection-uri) return ($d//title)[1]",
       ctx);
-    query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { "docs/bib.xml", "docs/reviews.xml" });
-    query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
-    query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection1", new String[] { file("docs/bib.xml"), file("docs/reviews.xml") });
+      query.baseURI("http://www.w3.org/2010/09/qt-fots-catalog/");
+      query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection1'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<title>TCP/IP Illustrated</title><title>Data on the Web</title>", false)
@@ -595,11 +743,15 @@ public class FnCollection extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $d in fn:collection($collection-uri) order by count($d//title) return count($d//title)",
       ctx);
-    query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection2", new String[] { "docs/books.xml", "docs/bib.xml", "docs/reviews.xml" });
-    query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection2'", ctx).value());
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("http://www.w3.org/2010/09/qt-fots-catalog/collection2", new String[] { file("docs/books.xml"), file("docs/bib.xml"), file("docs/reviews.xml") });
+      query.bind("collection-uri", new XQuery("'http://www.w3.org/2010/09/qt-fots-catalog/collection2'", ctx).value());
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 4 5")
     );

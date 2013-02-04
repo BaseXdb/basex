@@ -20,9 +20,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 instance of item()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"a string\" instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"false\" instance of xs:boolean)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1.1 instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1.1 instance of xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.example.com/\") instance of xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:anyURI(\"http://www.example.com/\") instance of xs:string)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"a string\" instance of xs:untypedAtomic)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3, 4, 5) instance of xs:integer+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not((1, 2, 3, 4, 5) instance of xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not((1, 2, 3, 4, 5) instance of xs:integer?)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 instance of item()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3, 4, 5) instance of xs:integer*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3, 4, 5) instance of item()+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not((1, 2, \"a string\", 4, 5) instance of xs:integer*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not((1, 2, 1.1, 4, 5) instance of xs:integer*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not((1, 2, \"a string\", 4, 5) instance of xs:string*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, \"a string\", 4, 5) instance of xs:anyAtomicType*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, count(\"one\"), 4, 5) instance of xs:integer+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -324,9 +400,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 instance of text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 instance of node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +440,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 instance of element())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +460,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +480,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 instance of processing-instruction())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,9 +500,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 instance of comment())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -420,9 +520,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 instance of text())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -436,9 +540,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 instance of node())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -452,9 +560,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 instance of element())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -468,9 +580,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 instance of processing-instruction())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -484,9 +600,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 instance of comment())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -500,9 +620,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(1 instance of empty-sequence())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -516,9 +640,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not( (1, 2, 3) instance of empty-sequence())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -532,9 +660,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "() instance of empty-sequence()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -548,9 +680,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -564,9 +700,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "() instance of empty-sequence()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -580,9 +720,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(((()))) instance of empty-sequence()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -596,9 +740,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "((), (), ()) instance of empty-sequence()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -612,9 +760,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "((), \"xs:string\") instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -628,9 +780,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(\"xs:string\", (), \"xs:string\") instance of xs:string+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -644,9 +800,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1.1, (), 1) instance of xs:decimal+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -660,9 +820,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"a string\" instance of xs:NOTATION)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -676,9 +840,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(\"a string\" instance of xs:QName)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -692,9 +860,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1.1 instance of xs:decimal and not(1.1 instance of xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -708,9 +880,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 instance of prefixDoesNotExist:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -724,9 +900,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 instance of xs:integer?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -740,9 +920,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 instance of xs:doesNotExist",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0051")
     );
@@ -756,9 +940,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 instance of xs:qname",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0051")
     );
@@ -772,9 +960,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 instance of none",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0051")
     );
@@ -788,9 +980,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 instance of void",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0051")
     );
@@ -804,9 +1000,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 instance of none()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0051")
@@ -824,9 +1024,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 instance of void()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("XPST0051")
@@ -844,9 +1048,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "error() instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -864,9 +1072,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "error() instance of xs:integer*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -884,9 +1096,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "error() instance of empty-sequence()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -904,9 +1120,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(error(), 1) instance of empty-sequence()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -924,9 +1144,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 instance of xs:integer+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -940,9 +1164,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, error()) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -956,9 +1184,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(error(), 1) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0000")
     );
@@ -972,9 +1204,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, error()) instance of xs:integer*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -992,9 +1228,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(error(), 1) instance of xs:integer*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1012,9 +1252,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(((10)div(3)) instance of xs:integer)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1028,9 +1272,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "((10)idiv(3)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1044,9 +1292,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "((10)mod(3)) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1060,9 +1312,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 instance of xs:integer*",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1076,9 +1332,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() instance of xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1092,9 +1352,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "false() instance of xs:anyAtomicType",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1108,9 +1372,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/> instance of element()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1124,9 +1392,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "attribute e{\"content\"} instance of attribute(*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1140,9 +1412,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a><b/></a>/(b instance of element(), * instance of element())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true")
     );
@@ -1156,9 +1432,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "attribute e{\"content\"} instance of element(e)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1172,9 +1452,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "attribute e{\"content\"} instance of element()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1188,9 +1472,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "attribute e{\"content\"} instance of element(*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1204,9 +1492,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "attribute e{\"content\"} instance of attribute(name)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1220,9 +1512,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(0) instance of xs:nonPositiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1236,9 +1532,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(-1) instance of xs:negativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1252,9 +1552,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(0) instance of xs:long",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1268,9 +1572,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(0) instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1284,9 +1592,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(0) instance of xs:short",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1300,9 +1612,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/> instance of element(*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1316,9 +1632,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(0) instance of xs:byte",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1332,9 +1652,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(0) instance of xs:nonNegativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1348,9 +1672,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(0) instance of xs:nonNegativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1364,9 +1692,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(0) instance of xs:unsignedLong",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1380,9 +1712,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(0) instance of xs:unsignedInt",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1396,9 +1732,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(0) instance of xs:unsignedShort",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1412,9 +1752,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(0) instance of xs:unsignedByte",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1428,9 +1772,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(1) instance of xs:positiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1444,9 +1792,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:normalizedString(\"NCName\") instance of xs:normalizedString",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1460,9 +1812,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:token(\"NCName\") instance of xs:token",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1476,9 +1832,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/> instance of element(e)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1492,9 +1852,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:language(\"NCName\") instance of xs:language",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1508,9 +1872,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:NMTOKEN(\"NCName\") instance of xs:NMTOKEN",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1524,9 +1892,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:Name(\"NCName\") instance of xs:Name",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1540,9 +1912,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:NCName(\"NCName\") instance of xs:NCName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1556,9 +1932,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:ID(\"NCName\") instance of xs:ID",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1572,9 +1952,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:IDREF(\"NCName\") instance of xs:IDREF",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1588,9 +1972,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:ENTITY(\"NCName\") instance of xs:ENTITY",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1604,9 +1992,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:normalizedString(\"ncname\") instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1620,9 +2012,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:token(\"ncname\") instance of xs:normalizedString",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1636,9 +2032,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:language(\"ncname\") instance of xs:token",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1652,9 +2052,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/> instance of element(name)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1668,9 +2072,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:NMTOKEN(\"ncname\") instance of xs:token",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1684,9 +2092,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:Name(\"ncname\") instance of xs:token",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1700,9 +2112,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:NCName(\"ncname\") instance of xs:Name",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1716,9 +2132,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:ID(\"ncname\") instance of xs:NCName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1732,9 +2152,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:IDREF(\"ncname\") instance of xs:NCName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1748,9 +2172,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:ENTITY(\"ncname\") instance of xs:NCName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1764,9 +2192,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"0\") instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1780,9 +2212,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-1\") instance of xs:nonPositiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1796,9 +2232,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"0\") instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1812,9 +2252,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"0\") instance of xs:long",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1828,9 +2272,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/> instance of attribute()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1844,9 +2292,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"0\") instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1860,9 +2312,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(\"0\") instance of xs:short",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1876,9 +2332,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1892,9 +2352,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") instance of xs:nonNegativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1908,9 +2372,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(\"0\") instance of xs:unsignedLong",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1924,9 +2392,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") instance of xs:unsignedInt",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1940,9 +2412,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(\"0\") instance of xs:unsignedShort",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1956,9 +2432,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") instance of xs:nonNegativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1972,9 +2452,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"1\") instance of xs:nonPositiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1988,9 +2472,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"1\") instance of xs:negativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2004,9 +2492,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/> instance of attribute(*)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2020,9 +2512,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") instance of xs:negativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2036,9 +2532,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") instance of xs:nonPositiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2052,9 +2552,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"1\") instance of xs:negativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2068,9 +2572,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"1\") instance of xs:nonPositiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2084,9 +2592,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"1\") instance of xs:nonNegativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2100,9 +2612,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"1\") instance of xs:positiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2116,9 +2632,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:token(\"ncname\") instance of xs:NCName",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2132,9 +2652,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:ID(\"ncname\") instance of xs:IDREF",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2148,9 +2672,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:ENTITY(\"ncname\") instance of xs:IDREF",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2164,9 +2692,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:language(\"ncname\") instance of xs:NMTOKEN",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2180,9 +2712,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/> instance of attribute(e)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2196,9 +2732,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:Name(\"ncname\") instance of xs:language",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2212,9 +2752,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:normalizedString(\"ncname\") instance of xs:token",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2228,9 +2772,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e a=\"\"/>/attribute::a instance of attribute(a)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2244,9 +2792,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e a=\"\"/>/@a instance of attribute(a)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2260,9 +2812,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(xs:double(\"1\")) instance of xs:byte",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2276,9 +2832,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(xs:double(\"0\")) instance of xs:nonPositiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2292,9 +2852,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(xs:double(\"-4\")) instance of xs:negativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2308,9 +2872,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(xs:double(\"-4\")) instance of xs:long",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2324,9 +2892,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(xs:double(\"-4\")) instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2340,9 +2912,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(xs:double(\"-4\")) instance of xs:short",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2356,9 +2932,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "attribute e{\"content\"} instance of attribute(e)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2372,9 +2952,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(xs:double(\"4\")) instance of xs:nonNegativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2388,9 +2972,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(xs:double(\"4\")) instance of xs:unsignedLong",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2404,9 +2992,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(xs:double(\"4\")) instance of xs:unsignedInt",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2420,9 +3012,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(xs:double(\"4\")) instance of xs:unsignedShort",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2436,9 +3032,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(xs:double(\"4\")) instance of xs:unsignedByte",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2452,9 +3052,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(xs:double(\"4\")) instance of xs:positiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2468,9 +3072,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:byte(xs:float(\"1\")) instance of xs:byte",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2484,9 +3092,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(xs:float(\"0\")) instance of xs:nonPositiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2500,9 +3112,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(xs:float(\"-4\")) instance of xs:negativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2516,9 +3132,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(xs:float(\"-4\")) instance of xs:long",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2532,9 +3152,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "attribute e{\"content\"} instance of attribute()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2548,9 +3172,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(xs:float(\"-4\")) instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2564,9 +3192,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(xs:float(\"-4\")) instance of xs:short",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2580,9 +3212,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(xs:float(\"4\")) instance of xs:nonNegativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2596,9 +3232,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(xs:float(\"4\")) instance of xs:unsignedLong",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2612,9 +3252,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedInt(xs:float(\"4\")) instance of xs:unsignedInt",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2628,9 +3272,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(xs:float(\"4\")) instance of xs:unsignedShort",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2644,9 +3292,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedByte(xs:float(\"4\")) instance of xs:unsignedByte",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2660,9 +3312,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(xs:float(\"4\")) instance of xs:positiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2676,9 +3332,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "node-name(text {\"\"}) instance of empty-sequence()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2692,11 +3352,37 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e attr=\"\"/>/(@attr instance of attribute(), @* instance of attribute())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true true")
+    );
+  }
+
+  /**
+   *  Test that the types of variables are correctly preserved on the stack. .
+   */
+  @org.junit.Test
+  public void cbclInstanceOf001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        for $x in (xs:integer(1), xs:decimal(1)) return (((($x + 1) * 2) - 1) instance of xs:integer)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "true false")
     );
   }
 
@@ -2708,9 +3394,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2002-04-02T12:00:00Z\") instance of xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2724,9 +3414,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2002-04-02T12:00:00Z\") instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2740,9 +3434,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967543233 instance of xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2756,9 +3454,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967543233 instance of xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2772,9 +3474,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967543233 instance of xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2788,9 +3494,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967543233 instance of xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2804,9 +3514,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967543233 instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2820,9 +3534,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967543233 instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2836,9 +3554,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967543233 instance of xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2852,9 +3574,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967543233 instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2868,9 +3594,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967543233 instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2884,9 +3614,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967543233 instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2900,9 +3634,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2002-04-02T12:00:00Z\") instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2916,9 +3654,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967543233 instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2932,9 +3674,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:NMTOKEN('abc') instance of xs:NMTOKENS",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0051")
     );
@@ -2948,9 +3694,211 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:10.5Z\") instance of xs:dateTime",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof121() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         name#1 instance of function(*)\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof122() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         name#1 instance of function(node()?) as xs:string\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof123() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         name#1 instance of function(node()) as xs:string\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof124() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         name#1 instance of function(element(A)?) as xs:string\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof125() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         name#1 instance of function(element(A)) as xs:string\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof126() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         name#1 instance of function(element(A)) as xs:anyAtomicType\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof127() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         name#1 instance of function(element(A)) as xs:string+\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof128() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         name#1 instance of function(element(A)) as xs:NCName\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof129() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         name#1 instance of function(node()*) as xs:string\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2964,9 +3912,101 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:10.5Z\") instance of xs:time",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof130() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         name#1 instance of function(item()) as xs:string\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof131() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         name#0 instance of function(item()) as xs:string\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof132() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         filter#2 instance of function(function(item()) as xs:boolean, item()*) as item()*\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Instance of with function types.
+   */
+  @org.junit.Test
+  public void instanceof133() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         filter#2 instance of function(function(item()*) as xs:boolean, item()*) as item()*\n" +
+      "       ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2980,9 +4020,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:10.5Z\") instance of xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -2996,9 +4040,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:10.5Z\") instance of xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3012,9 +4060,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:10.5Z\") instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3028,9 +4080,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:10.5Z\") instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3044,9 +4100,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:10.5Z\") instance of xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3060,9 +4120,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:10.5Z\") instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3076,9 +4140,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2002-04-02T12:00:00Z\") instance of xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3092,9 +4160,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:10.5Z\") instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3108,9 +4180,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:10.5Z\") instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3124,9 +4200,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"13:20:10.5Z\") instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3140,9 +4220,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-01-01+05:00\") instance of xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3156,9 +4240,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-01-01+05:00\") instance of xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3172,9 +4260,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-01-01+05:00\") instance of xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3188,9 +4280,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-01-01+05:00\") instance of xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3204,9 +4300,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-01-01+05:00\") instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3220,9 +4320,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-01-01+05:00\") instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3236,9 +4340,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-01-01+05:00\") instance of xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3252,9 +4360,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2002-04-02T12:00:00Z\") instance of xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3268,9 +4380,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-01-01+05:00\") instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3284,9 +4400,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-01-01+05:00\") instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3300,9 +4420,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-01-01+05:00\") instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3316,9 +4440,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"2000-01-01+05:00\") instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3332,9 +4460,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") instance of xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3348,9 +4480,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") instance of xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3364,9 +4500,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") instance of xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3380,9 +4520,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") instance of xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3396,9 +4540,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3412,9 +4560,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3428,9 +4580,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2002-04-02T12:00:00Z\") instance of xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3444,9 +4600,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") instance of xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3460,9 +4620,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3476,9 +4640,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3492,9 +4660,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3508,9 +4680,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3524,9 +4700,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3540,9 +4720,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3556,9 +4740,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3572,9 +4760,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3588,9 +4780,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3604,9 +4800,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2002-04-02T12:00:00Z\") instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3620,9 +4820,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3636,9 +4840,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3652,9 +4860,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3668,9 +4880,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3684,9 +4900,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3700,9 +4920,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3716,9 +4940,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3732,9 +4960,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3748,9 +4980,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3764,9 +5000,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3780,9 +5020,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2002-04-02T12:00:00Z\") instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3796,9 +5040,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3812,9 +5060,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -3828,9 +5080,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3844,9 +5100,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3860,9 +5120,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3876,9 +5140,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3892,9 +5160,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1267.43233E12 instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3908,9 +5180,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.example.com\") instance of xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3924,9 +5200,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.example.com\") instance of xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3940,9 +5220,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.example.com\") instance of xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3956,9 +5240,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2002-04-02T12:00:00Z\") instance of xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3972,9 +5260,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.example.com\") instance of xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -3988,9 +5280,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.example.com\") instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4004,9 +5300,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.example.com\") instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4020,9 +5320,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.example.com\") instance of xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4036,9 +5340,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.example.com\") instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4052,9 +5360,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.example.com\") instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4068,9 +5380,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.example.com\") instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4084,9 +5400,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:anyURI(\"http://www.example.com\") instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4100,9 +5420,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"A String Function\" instance of xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4116,9 +5440,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"A String Function\" instance of xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4132,9 +5460,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2002-04-02T12:00:00Z\") instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4148,9 +5480,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"A String Function\" instance of xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4164,9 +5500,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"A String Function\" instance of xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4180,9 +5520,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"A String Function\" instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4196,9 +5540,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"A String Function\" instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4212,9 +5560,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"A String Function\" instance of xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4228,9 +5580,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"A String Function\" instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4244,9 +5600,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"A String Function\" instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4260,9 +5620,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"A String Function\" instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4276,9 +5640,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"A String Function\" instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4292,9 +5660,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967.543233 instance of xs:dateTime",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4308,9 +5680,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2002-04-02T12:00:00Z\") instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4324,9 +5700,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967.543233 instance of xs:time",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4340,9 +5720,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967.543233 instance of xs:date",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4356,9 +5740,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967.543233 instance of xs:boolean",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4372,9 +5760,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967.543233 instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4388,9 +5780,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967.543233 instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4404,9 +5800,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967.543233 instance of xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4420,9 +5820,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967.543233 instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4436,9 +5840,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967.543233 instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -4452,9 +5860,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967.543233 instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -4468,9 +5880,13 @@ public class ProdInstanceofExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "12678967.543233 instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

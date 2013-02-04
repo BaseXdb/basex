@@ -27,9 +27,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\" ---31 \") eq xs:gDay(\"---31\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:gDay(\"---31\") eq xs:gDay(\"---01\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---01\") ne xs:gDay(\"---10\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -96,9 +108,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:gDay(\"---01\") ne xs:gDay(\"---01\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -119,9 +135,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---01-00:00\") eq xs:gDay(\"---01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -142,9 +162,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---01+00:00\") eq xs:gDay(\"---01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -165,9 +189,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---01Z\") eq xs:gDay(\"---01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -188,11 +216,415 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---01-00:00\") eq xs:gDay(\"---01+00:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual001() {
+    final XQuery query = new XQuery(
+      "declare function local:gDay($day as xs:integer) { if ($day lt 10) then xs:gDay(concat(\"---0\", $day)) else xs:gDay(concat(\"---\", $day)) }; not(local:gDay(1) eq xs:gDay(\"---31\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual002() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---30\") eq xs:gDay(\"---31+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual003() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---31+09:00\") eq xs:gDay(\"---30\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual004() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---30\") eq xs:gDay(\"---31+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual005() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---31+09:00\") eq xs:gDay(\"---30\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual006() {
+    final XQuery query = new XQuery(
+      "declare function local:gDay($day as xs:integer) { if ($day lt 10) then xs:gDay(concat(\"---0\", $day)) else xs:gDay(concat(\"---\", $day)) }; not(local:gDay(1) ne xs:gDay(\"---31\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual007() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---30\") ne xs:gDay(\"---31+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual008() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---31+09:00\") ne xs:gDay(\"---30\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual009() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---30\") ne xs:gDay(\"---31+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual010() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---31+09:00\") ne xs:gDay(\"---30\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual011() {
+    final XQuery query = new XQuery(
+      "declare function local:gDay($gDay as xs:gDay, $null as xs:boolean) { if ($null) then () else $gDay }; exists(local:gDay(xs:gDay(\"---31\"), fn:true()) eq xs:gDay(\"---31\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual012() {
+    final XQuery query = new XQuery(
+      "declare function local:gDay($gDay as xs:gDay, $null as xs:boolean) { if ($null) then () else $gDay }; local:gDay(xs:gDay(\"---31\"), fn:false()) eq xs:gDay(\"---31\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual013() {
+    final XQuery query = new XQuery(
+      "declare function local:gDay($gDay as xs:gDay, $null as xs:boolean) { if ($null) then () else $gDay }; exists(local:gDay(xs:gDay(\"---31\"), fn:true()) ne xs:gDay(\"---31\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual014() {
+    final XQuery query = new XQuery(
+      "declare function local:gDay($gDay as xs:gDay, $null as xs:boolean) { if ($null) then () else $gDay }; local:gDay(xs:gDay(\"---31\"), fn:false()) ne xs:gDay(\"---31\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual015() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---30-12:00\") eq xs:gDay(\"---31+12:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual016() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---31+12:00\") eq xs:gDay(\"---30-12:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual017() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---30-12:00\") ne xs:gDay(\"---31+12:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual018() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---31+12:00\") ne xs:gDay(\"---30-12:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual019() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---31+01:00\") eq xs:gDay(\"---31\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gDay .
+   */
+  @org.junit.Test
+  public void cbclGDayEqual020() {
+    final XQuery query = new XQuery(
+      "xs:gDay(\"---31\") eq xs:gDay(\"---31+01:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -212,9 +644,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gDay(\"---06Z\") ne xs:gDay(\"---06Z\")) or (xs:gDay(\"---08Z\") ne xs:gDay(\"---09Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -236,9 +672,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gDay(\"---03Z\") eq xs:gDay(\"---01Z\")) or (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +700,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gDay(\"---08Z\") ne xs:gDay(\"---07Z\")) or (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -284,9 +728,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gDay(\"---05Z\") eq xs:gDay(\"---05Z\")) or (fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +756,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gDay(\"---09Z\") ne xs:gDay(\"---09Z\")) or (fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -332,9 +784,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gDay(\"---12-05:00\") eq xs:gDay(\"---12Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -356,9 +812,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not((xs:gDay(\"---12Z\") eq xs:gDay(\"---12Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -380,9 +840,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:gDay(\"---05Z\") ne xs:gDay(\"---06Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -404,9 +868,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:gDay(\"---11Z\") eq xs:gDay(\"---10Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -428,9 +896,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:gDay(\"---05Z\") ne xs:gDay(\"---05Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -452,9 +924,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gDay(\"---04Z\") eq xs:gDay(\"---02Z\")) and (xs:gDay(\"---01Z\") eq xs:gDay(\"---12Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -476,9 +952,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gDay(\"---12Z\") ne xs:gDay(\"---03Z\")) and (xs:gDay(\"---05Z\") ne xs:gDay(\"---08Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -500,9 +980,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gDay(\"---02Z\") eq xs:gDay(\"---02Z\")) or (xs:gDay(\"---06Z\") eq xs:gDay(\"---06Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -526,9 +1010,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---01Z\") eq xs:gDay(\"---01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -552,9 +1040,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---01Z\") ne xs:gDay(\"---31Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -578,9 +1070,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---14Z\") eq xs:gDay(\"---01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -604,9 +1100,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31Z\") eq xs:gDay(\"---01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -630,9 +1130,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---01Z\") eq xs:gDay(\"---14Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -656,9 +1160,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---01Z\") eq xs:gDay(\"---31Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -682,9 +1190,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---01Z\") ne xs:gDay(\"---01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -708,9 +1220,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---14Z\") ne xs:gDay(\"---01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -734,9 +1250,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---31Z\") ne xs:gDay(\"---01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -760,9 +1280,13 @@ public class OpGDayEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gDay(\"---01Z\") ne xs:gDay(\"---14Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

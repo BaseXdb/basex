@@ -20,9 +20,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -36,9 +40,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "$x",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -52,9 +60,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i as xs:string := 1 return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -68,9 +80,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { doc('rubbish.xml') } catch * {\"ok\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ok")
     );
@@ -82,12 +98,18 @@ public class ProdTryCatchExpr extends QT3TestSet {
   @org.junit.Test
   public void try002() {
     final XQuery query = new XQuery(
-      "try { doc('rubbish.xml') } catch err:FODC0001 | err:FODC0002 | err:FODC0005 {\"ok\"}",
+      "\n" +
+      "        declare namespace err = \"http://www.w3.org/2005/xqt-errors\";\n" +
+      "        try { doc('rubbish.xml') } catch err:FODC0001 | err:FODC0002 | err:FODC0005 {\"ok\"}\n" +
+      "      ",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ok")
     );
@@ -101,9 +123,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { doc('rubbish.xml') } catch *:FODC0001 | *:FODC0002 | *:FODC0005 {\"ok\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ok")
     );
@@ -123,10 +149,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "        catch err:* {<caught-error code=\"other\"/>}\n" +
       "      ",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<caught-error code=\"FODC0002\"/>", false)
     );
@@ -140,9 +170,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "<out>{ try { doc('rubbish.xml') } catch * {<caught-error/>}, try { doc('rubbish.xml') } catch * {<caught-another/>} }</out>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<out><caught-error/><caught-another/></out>", false)
     );
@@ -159,9 +193,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "        try { $doc } catch * {<caught-error/>}\n" +
       "       ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -177,9 +215,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "        let $doc := doc('rubbish.xml') \n" +
       "        return try { $doc } catch * {<caught-error/>}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FODC0002")
     );
@@ -196,9 +238,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "        try { local:f() } catch * {\"ok\"}\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ok")
     );
@@ -215,10 +261,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "        try { local:f(0) } catch err:FOAR0001 {\"ok\"}\n" +
       "      ",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ok")
     );
@@ -235,10 +285,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "        try { local:f(0) } catch * {local-name-from-QName($err:code)}\n" +
       "      ",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "FOAR0001")
     );
@@ -256,10 +310,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "        try { local:f(0) } catch * { try { local:f($t cast as xs:integer) } catch * {local-name-from-QName($err:code)} }\n" +
       "      ",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "FORG0001")
     );
@@ -276,10 +334,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "        try { local:f(0) } catch * {$err:description}\n" +
       "      ",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "Integer division by zero")
@@ -300,10 +362,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "        try { local:f(0) } catch * {$err:column-number, $err:line-number, $err:line-number}\n" +
       "      ",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:integer*")
     );
@@ -317,10 +383,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { . } catch err:XPDY0002 { \"Context item not set.\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Context item not set.")
     );
@@ -334,10 +404,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { element { \"prefix:name\" } {} } catch err:XQDY0074 { \"Invalid element.\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Invalid element.")
     );
@@ -351,15 +425,19 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(try { (attribute xml:id {\"\"})/0 } catch err:XQDY0091 { \"Invalid attribute ID.\" })",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
       ||
-        assertEq("Invalid attribute ID.")
+        assertStringValue(false, "Invalid attribute ID.")
       )
     );
   }
@@ -372,10 +450,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { let $x := (1,2)[position() < 3] group by $x return $x } catch err:XPTY0004 { \"More than a grouping item.\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "More than a grouping item.")
@@ -391,12 +473,37 @@ public class ProdTryCatchExpr extends QT3TestSet {
   @org.junit.Test
   public void tryCatchAllDynamicErrorsCaught13() {
     final XQuery query = new XQuery(
-      "try { element { \"xmlns:name\" } {} } catch err:XQDY0096 { \"Invalid element.\" }",
+      "try { element { \"xmlns:name\" } {} } catch err:XQDY0096 | err:XQDY0074 { \"Invalid element.\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "Invalid element.")
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   * XQDY0096 must be caught..
+   */
+  @org.junit.Test
+  public void tryCatchAllDynamicErrorsCaught13b() {
+    final XQuery query = new XQuery(
+      "try { element { QName(\"http://www.w3.org/2000/xmlns/\", \"xmlns:name\") } {} } catch err:XQDY0096 { \"Invalid element.\" }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Invalid element.")
     );
@@ -410,12 +517,37 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { namespace xmlns { \"http://www.example.com\" } } catch err:XQDY0101 { \"Invalid namespace node.\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Invalid namespace node.")
+    );
+  }
+
+  /**
+   * FAOR0002 must be caught, even when detectable statically..
+   */
+  @org.junit.Test
+  public void tryCatchAllDynamicErrorsCaught15() {
+    final XQuery query = new XQuery(
+      "try { 10000000000000000000000000001 - 10000000000000000000000000000 } catch err:FAOR0002 { 1 }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("1")
     );
   }
 
@@ -427,10 +559,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { \"\" treat as element() } catch err:XPDY0050 { \"Sequence type mismatch.\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Sequence type mismatch.")
     );
@@ -444,10 +580,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { element  element { attribute a {\"\"}, attribute a {\"\"} } } catch err:XQDY0025 { \"Attribute name duplicate.\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Attribute name duplicate.")
     );
@@ -461,10 +601,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { processing-instruction name { \"?>\" } } catch err:XQDY0026 { \"Invalid PI.\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Invalid PI.")
     );
@@ -478,10 +622,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { processing-instruction  { \"prefix:name\" } {} } catch err:XQDY0041 { \"Invalid PI.\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Invalid PI.")
     );
@@ -495,10 +643,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { attribute xmlns {} } catch err:XQDY0044 { \"Invalid attribute.\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Invalid attribute.")
     );
@@ -512,14 +664,22 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "\n" +
       "      try { validate { document { <a/>, <b/> }} } catch err:XQDY0061 { \"Invalid document.\" }\n" +
-      "      ",
+      "    ",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "Invalid document.")
+      (
+        assertStringValue(false, "Invalid document.")
+      ||
+        error("XQDY0084")
+      )
     );
   }
 
@@ -531,10 +691,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { processing-instruction XML {} } catch err:XQDY0064 { \"Invalid PI.\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Invalid PI.")
     );
@@ -548,10 +712,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { comment { \"--\" } } catch err:XQDY0072 { \"Invalid comment.\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Invalid comment.")
     );
@@ -565,11 +733,15 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch * { \"Division by zero\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "Division by zero")
+      assertEq("\"Division by zero\"")
     );
   }
 
@@ -581,12 +753,16 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:FOAR0001 { \"Division by zero\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "Division by zero")
+      assertEq("\"Division by zero\"")
     );
   }
 
@@ -598,12 +774,16 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:* { \"Division by zero\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "Division by zero")
+      assertEq("\"Division by zero\"")
     );
   }
 
@@ -615,11 +795,15 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch *:FOAR0001 { \"Division by zero\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertStringValue(false, "Division by zero")
+      assertEq("\"Division by zero\"")
     );
   }
 
@@ -631,9 +815,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 + (try { \"\" } catch * { \"Invalid argument\" })",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -647,10 +835,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 + (try { \"\" } catch err:XPTY0004 { \"Invalid argument\" })",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -664,10 +856,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 + (try { \"\" } catch err:* { \"Invalid argument\" })",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -681,9 +877,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 + (try { \"\" } catch *:XPTY0004 { \"Invalid argument\" })",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -697,9 +897,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(try { \"\" } catch * { \"Invalid argument\" }) + 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -713,10 +917,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(try { \"\" } catch err:FOAR0001 { \"Invalid argument\" }) + 1",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -730,10 +938,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(try { \"\" } catch err:* { \"Invalid argument\" }) + 1",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -747,9 +959,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "(try { \"\" } catch *:FOAR0001 { \"Invalid argument\" }) + 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -763,9 +979,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { () } catch * { \"Division by zero\" }, 1 div 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -779,10 +999,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { () } catch err:FOAR0001 { \"Division by zero\" }, 1 div 0",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -796,10 +1020,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { () } catch err:* { \"Division by zero\" }, 1 div 0",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -813,9 +1041,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { () } catch *:FOAR0001 { \"Division by zero\" }, 1 div 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -829,9 +1061,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div 0, try { () } catch * { \"Division by zero\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -845,10 +1081,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div 0, try { () } catch err:FOAR0001 { \"Division by zero\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -862,10 +1102,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div 0, try { () } catch err:* { \"Division by zero\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -879,9 +1123,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div 0, try { () } catch *:FOAR0001 { \"Division by zero\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -895,10 +1143,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch * { $err:code }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "err:FOAR0001")
     );
@@ -912,10 +1164,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { fn:prefix-from-QName($err:code) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "err")
     );
@@ -929,10 +1185,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { fn:local-name-from-QName($err:code) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "FOER0000")
     );
@@ -946,10 +1206,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { fn:namespace-uri-from-QName($err:code) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xqt-errors")
     );
@@ -963,10 +1227,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch * { fn:prefix-from-QName($err:code) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "err")
     );
@@ -980,10 +1248,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch * { fn:local-name-from-QName($err:code) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "FOAR0001")
     );
@@ -997,10 +1269,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch * { fn:namespace-uri-from-QName($err:code) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xqt-errors")
     );
@@ -1014,10 +1290,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0001')) } catch * { $err:code }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "err:FOER0001")
     );
@@ -1031,10 +1311,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0001')) } catch * { fn:prefix-from-QName($err:code) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "err")
     );
@@ -1048,10 +1332,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0001')) } catch * { fn:local-name-from-QName($err:code) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "FOER0001")
     );
@@ -1065,10 +1353,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0001')) } catch * { fn:namespace-uri-from-QName($err:code) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://www.w3.org/2005/xqt-errors")
     );
@@ -1082,10 +1374,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { $err:code }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "err:FOER0000")
     );
@@ -1099,10 +1395,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { let $n := $err:column-number return true() }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1116,10 +1416,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { count($err:column-number) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -1137,10 +1441,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { if (count($err:column-number) eq 1) then $err:column-number else 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:integer")
     );
@@ -1154,10 +1462,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch * { count($err:description) le 1 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1171,10 +1483,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch * { if (($err:description)) then $err:description instance of xs:string else fn:true() }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1188,10 +1504,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000'), \"Description\") } catch * { $err:description }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Description")
     );
@@ -1205,9 +1525,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0001')) }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOER0001")
     );
@@ -1221,10 +1545,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:FOER0000 { fn:error() }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -1238,10 +1566,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 0 } catch err:FOER0000 { fn:error() }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1255,10 +1587,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch err:FOER0001 { fn:error() } catch err:FOER0000 { 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1272,10 +1608,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch err:FOER0000 { 0 } catch err:FOER0001 { fn:error() }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1289,10 +1629,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { let $n := $err:line-number return true() }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1306,10 +1650,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { count($err:line-number) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -1327,10 +1675,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { if (count($err:line-number) eq 1) then $err:line-number else 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:integer")
     );
@@ -1344,10 +1696,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { let $n := $err:module return true() }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1361,10 +1717,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { count($err:module) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -1382,10 +1742,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { if (count($err:module) eq 1) then $err:module else \"\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:string")
     );
@@ -1399,10 +1763,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { $err:other }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1416,10 +1784,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000'), \"Description\", \"Value\") } catch * { $err:value }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Value")
     );
@@ -1433,10 +1805,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000'), \"Description\", (\"Value\", 3, <a/>, true())) } catch * { count($err:value) }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("4")
     );
@@ -1450,10 +1826,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error(fn:QName('http://www.w3.org/2005/xqt-errors', 'err:FOER0000'), \"Description\", (\"Value\", 3)) } catch * { $err:value[2] }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -1467,10 +1847,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error(xs:QName(\"err:XPST0008\")) } catch err:XPST0008 { 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1484,10 +1868,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:FOAR0001 { \"Clause 1\" } catch err:FOAR0001 { \"Clause 2\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Clause 1")
     );
@@ -1501,9 +1889,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch Q{http://www.w3.org/2005/xqt-errors}* { \"Clause 1\" } catch Q{http://www.w3.org/2001/XMLSchema}* { \"Clause 2\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Clause 1")
     );
@@ -1517,9 +1909,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch Q{http://www.w3.org/2001/XMLSchema}* { \"Clause 1\" } catch Q{http://www.w3.org/2005/xqt-errors}* { \"Clause 2\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Clause 2")
     );
@@ -1533,10 +1929,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch * { \"Clause 1\" } catch err:FOAR0001 { \"Clause 2\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Clause 1")
     );
@@ -1550,10 +1950,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:XQST008 { \"Clause 1\" } catch err:FOAR0001 { \"Clause 2\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Clause 2")
     );
@@ -1567,10 +1971,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:FOAR0001 { \"Clause 1\" } catch err:XQST008 { \"Clause 2\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Clause 1")
     );
@@ -1584,10 +1992,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:FOAR0001 { \"Clause 1\" } catch err:XQST008 { \"Clause 2\" } catch err:XPTY0004 { \"Clause 3\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Clause 1")
     );
@@ -1601,10 +2013,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:FOAR0001 { \"Clause 1\" } catch err:XPTY0004 { \"Clause 2\" } catch err:XQST008 { \"Clause 3\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Clause 1")
     );
@@ -1618,10 +2034,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:XPTY0004 { \"Clause 1\" } catch err:FOAR0001 { \"Clause 2\" } catch err:XQST008 { \"Clause 3\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Clause 2")
     );
@@ -1635,10 +2055,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:XPTY0004 { \"Clause 1\" } catch err:XPST0008 { \"Clause 2\" } catch err:FOAR0001 { \"Clause 3\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Clause 3")
     );
@@ -1652,10 +2076,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:* { \"Clause 1\" } catch xs:* { \"Clause 2\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Clause 1")
     );
@@ -1669,12 +2097,435 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch xs:* { \"Clause 1\" } catch err:* { \"Clause 2\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Clause 2")
+    );
+  }
+
+  /**
+   * Try-catch must match fn:error semantics..
+   */
+  @org.junit.Test
+  public void tryCatchFnError1() {
+    final XQuery query = new XQuery(
+      "fn:error(fn:QName(\"http://www.example.com/\", \"example:EXER3141\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("Q{http://www.example.com/}EXER3141")
+    );
+  }
+
+  /**
+   * Try-catch must match fn:error semantics..
+   */
+  @org.junit.Test
+  public void tryCatchFnError10() {
+    final XQuery query = new XQuery(
+      "try { fn:error(fn:QName(\"http://www.example.com/\", \"example:EXER3141\"), \"Description\") } catch Q{http://www.example.com/}EXER3141 { $err:description }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("'Description'")
+    );
+  }
+
+  /**
+   * Try-catch must match fn:error semantics..
+   */
+  @org.junit.Test
+  public void tryCatchFnError11() {
+    final XQuery query = new XQuery(
+      "try { fn:error(fn:QName(\"http://www.example.com/\", \"example:EXER3141\"), \"Description\", (1, 2)) } catch Q{http://www.example.com/}EXER3141 { $err:value[2] }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("2")
+    );
+  }
+
+  /**
+   * Try-catch must match any error raised by fn:error..
+   */
+  @org.junit.Test
+  public void tryCatchFnError12() {
+    final XQuery query = new XQuery(
+      "try { fn:error(xs:QName(\"err:XPTY0004\")) } catch Q{http://www.w3.org/2005/xqt-errors}XPTY0004 { 0 }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match any error raised by fn:error..
+   */
+  @org.junit.Test
+  public void tryCatchFnError13() {
+    final XQuery query = new XQuery(
+      "try { fn:error(xs:QName(\"err:XPST0001\")) } catch Q{http://www.w3.org/2005/xqt-errors}XPST0001 { 0 }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match any error raised by fn:error..
+   */
+  @org.junit.Test
+  public void tryCatchFnError14() {
+    final XQuery query = new XQuery(
+      "try { fn:error(xs:QName(\"err:XPDY0002\")) } catch Q{http://www.w3.org/2005/xqt-errors}XPDY0002 { 0 }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match any error raised by fn:error..
+   */
+  @org.junit.Test
+  public void tryCatchFnError15() {
+    final XQuery query = new XQuery(
+      "try { fn:error(xs:QName(\"err:XQTY0105\")) } catch Q{http://www.w3.org/2005/xqt-errors}XQTY0105 { 0 }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match any error raised by fn:error..
+   */
+  @org.junit.Test
+  public void tryCatchFnError16() {
+    final XQuery query = new XQuery(
+      "try { fn:error(xs:QName(\"err:XQST0089\")) } catch Q{http://www.w3.org/2005/xqt-errors}XQST0089 { 0 }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match any error raised by fn:error..
+   */
+  @org.junit.Test
+  public void tryCatchFnError17() {
+    final XQuery query = new XQuery(
+      "try { fn:error(xs:QName(\"err:XQDY0061\")) } catch Q{http://www.w3.org/2005/xqt-errors}XQDY0061 { 0 }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match any error raised by fn:error..
+   */
+  @org.junit.Test
+  public void tryCatchFnError18() {
+    final XQuery query = new XQuery(
+      "try { fn:error(xs:QName(\"err:FOTY0014\")) } catch Q{http://www.w3.org/2005/xqt-errors}FOTY0014 { 0 }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match any error raised by fn:error..
+   */
+  @org.junit.Test
+  public void tryCatchFnError19() {
+    final XQuery query = new XQuery(
+      "try { fn:error(xs:QName(\"err:FORG0001\")) } catch Q{http://www.w3.org/2005/xqt-errors}FORG0001 { 0 }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match fn:error semantics..
+   */
+  @org.junit.Test
+  public void tryCatchFnError2() {
+    final XQuery query = new XQuery(
+      "try { fn:error(fn:QName(\"http://www.example.com/\", \"example:EXER3141\")) } catch * { 0 }",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match any error raised by fn:error..
+   */
+  @org.junit.Test
+  public void tryCatchFnError20() {
+    final XQuery query = new XQuery(
+      "try { fn:error(xs:QName(\"err:FONS0004\")) } catch Q{http://www.w3.org/2005/xqt-errors}FONS0004 { 0 }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match fn:error semantics..
+   */
+  @org.junit.Test
+  public void tryCatchFnError3() {
+    final XQuery query = new XQuery(
+      "try { fn:error(fn:QName(\"http://www.example.com/\", \"example:EXER3141\")) } catch Q{http://www.example.com/}EXER3141 { 0 }",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match fn:error semantics..
+   */
+  @org.junit.Test
+  public void tryCatchFnError4() {
+    final XQuery query = new XQuery(
+      "try { fn:error(fn:QName(\"http://www.example.com/\", \"example:EXER3141\")) } catch Q{http://www.example.com/}* { 0 }",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match fn:error semantics..
+   */
+  @org.junit.Test
+  public void tryCatchFnError5() {
+    final XQuery query = new XQuery(
+      "try { fn:error(fn:QName(\"http://www.example.com/\", \"example:EXER3141\")) } catch *:EXER3141 { 0 }",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("0")
+    );
+  }
+
+  /**
+   * Try-catch must match fn:error semantics..
+   */
+  @org.junit.Test
+  public void tryCatchFnError6() {
+    final XQuery query = new XQuery(
+      "try { fn:error(fn:QName(\"http://www.example.com/\", \"example:EXER3141\"), \"Description\") } catch Q{http://www.example.com/}EXER3141 { $err:code }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertQuery("local-name-from-QName($result) eq 'EXER3141'")
+      &&
+        assertQuery("namespace-uri-from-QName($result) eq \"http://www.example.com/\"")
+      )
+    );
+  }
+
+  /**
+   * Try-catch must match fn:error semantics..
+   */
+  @org.junit.Test
+  public void tryCatchFnError7() {
+    final XQuery query = new XQuery(
+      "try { fn:error(fn:QName(\"http://www.example.com/\", \"example:EXER3141\"), \"Description\") } catch Q{http://www.example.com/}EXER3141 { namespace-uri-from-QName($err:code) }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("'http://www.example.com/'")
+    );
+  }
+
+  /**
+   * Try-catch must match fn:error semantics..
+   */
+  @org.junit.Test
+  public void tryCatchFnError8() {
+    final XQuery query = new XQuery(
+      "try { fn:error(fn:QName(\"http://www.example.com/\", \"example:EXER3141\"), \"Description\") } catch Q{http://www.example.com/}EXER3141 { prefix-from-QName($err:code) }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("'example'")
+    );
+  }
+
+  /**
+   * Try-catch must match fn:error semantics..
+   */
+  @org.junit.Test
+  public void tryCatchFnError9() {
+    final XQuery query = new XQuery(
+      "try { fn:error(fn:QName(\"http://www.example.com/\", \"example:EXER3141\"), \"Description\") } catch Q{http://www.example.com/}EXER3141 { local-name-from-QName($err:code) }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("'EXER3141'")
     );
   }
 
@@ -1686,10 +2537,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch err:FOER0000 { 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1703,10 +2558,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:one-or-more(()) } catch err:FORG0004 { 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1720,10 +2579,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { function() { fn:error() } () } catch err:FOER0000 { 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1737,12 +2600,39 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { function() { 1 div 0 } () } catch err:FOAR0001 { 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
+    );
+  }
+
+  /**
+   * Can't catch this error within the function body.
+   */
+  @org.junit.Test
+  public void tryCatchFunctionResultType1() {
+    final XQuery query = new XQuery(
+      "declare function local:thrice($x as xs:integer) as xs:integer\n" +
+      "      { try { if (current-date() gt xs:date('2000-01-01')) then \"three\" else 3 } catch * { 3 } };\n" +
+      "      local:thrice(3)\n" +
+      "    ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
     );
   }
 
@@ -1754,10 +2644,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:XPST0008 { \"Division by zero\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -1771,9 +2665,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch xs:* { \"Division by zero\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -1787,9 +2685,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch *:XPST0008 { \"Division by zero\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -1801,11 +2703,15 @@ public class ProdTryCatchExpr extends QT3TestSet {
   @org.junit.Test
   public void tryCatchNameNoMatchingCatchClause4() {
     final XQuery query = new XQuery(
-      "try { 1 div 0 } catch Q{http://www.w3.org/2005/xqt-errors}XPST0008 { \"Division by zero\" }",
+      "try { 1 div 0 } catch Q{http://www.w3.org/2005/not-xqt-errors}* { \"Division by zero\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -1817,12 +2723,36 @@ public class ProdTryCatchExpr extends QT3TestSet {
   @org.junit.Test
   public void tryCatchNameNoMatchingCatchClause5() {
     final XQuery query = new XQuery(
-      "try { 1 div 0 } catch err:XPST0008 { \"Division by zero\" } catch xs:* { \"Division by zero\" } catch *:XPST0008 { \"Division by zero\" } catch Q{http://www.w3.org/2005/xqt-error}* { \"Division by zero\" } catch Q{http://www.w3.org/2005/xqt-errors}XPST0008 { \"Division by zero\" }",
+      "try { 1 div 0 } catch Q{http://www.w3.org/2005/xqt-errors}XPST0008 { \"Division by zero\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FOAR0001")
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   * If there is no matching catch clause, the error is forwarded..
+   */
+  @org.junit.Test
+  public void tryCatchNameNoMatchingCatchClause6() {
+    final XQuery query = new XQuery(
+      "try { 1 div 0 } catch err:XPST0008 { \"Division by zero\" } catch xs:* { \"Division by zero\" } catch *:XPST0008 { \"Division by zero\" } catch Q{http://www.w3.org/2005/not-xqt-errors}* { \"Division by zero\" } catch Q{http://www.w3.org/2005/xqt-errors}XPST0008 { \"Division by zero\" }",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -1834,11 +2764,35 @@ public class ProdTryCatchExpr extends QT3TestSet {
   @org.junit.Test
   public void tryCatchNameTestsNamespace1() {
     final XQuery query = new XQuery(
+      "try { 1 div 0 } catch Q{http://www.w3.org/2005/xqt-errors}FOAR0001 { \"Division by zero\" }",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "Division by zero")
+    );
+  }
+
+  /**
+   * URI literals are supported in name tests..
+   */
+  @org.junit.Test
+  public void tryCatchNameTestsNamespace2() {
+    final XQuery query = new XQuery(
       "try { 1 div 0 } catch Q{http://www.w3.org/2005/xqt-errors}* { \"Division by zero\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Division by zero")
     );
@@ -1852,9 +2806,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { try { 1 div 0 } catch * { \"Division by zero\" } } catch * { \"Should not be reached.\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Division by zero")
     );
@@ -1868,9 +2826,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { try { 1 div 0 } catch * { \"Division by zero\" } }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Division by zero")
     );
@@ -1884,9 +2846,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 0 } catch * { \"No error\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1900,10 +2866,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 0 } catch err:FOAR0001 { \"No error\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1917,10 +2887,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 0 } catch err:* { \"No error\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1934,9 +2908,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 0 } catch *:FOAR0001 { \"No error\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1950,10 +2928,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 0 } catch err:FOAR0001 { \"No error\" } catch *:FOAR0001 { \"No error \"} catch err:* { \"No error \"}  catch * { \"No error \"}",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1967,12 +2949,16 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch * { 0 }, try { 1 div 0 } catch err:FOAR0001 { 1}",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("(0, 1)")
+      assertDeepEq("0, 1")
     );
   }
 
@@ -1984,10 +2970,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { fn:error() } catch * { 0 }, try { fn:error() } catch err:FOER0000 { 1}",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("0 1", false)
     );
@@ -2001,9 +2991,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x := 1 div 0 return try { $x } catch * { 0 }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -2017,10 +3011,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:XPST0008 | err:FOAR0001 { \"Division by zero\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Division by zero")
     );
@@ -2034,10 +3032,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:FOAR0001 | err:XPST0008 { \"Division by zero\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Division by zero")
     );
@@ -2051,10 +3053,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { 1 div 0 } catch err:XPTY0004 | err:FOAR0001 | err:XPST0008 { \"Division by zero\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Division by zero")
     );
@@ -2073,9 +3079,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "      0\n" +
       "      }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2094,10 +3104,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "      0\n" +
       "      }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2116,10 +3130,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "      0\n" +
       "      }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2142,10 +3160,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "      return true()\n" +
       "    ",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2165,9 +3187,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "      local:thrice(try { \"oops\" } catch * { 3 } )\n" +
       "    ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -2181,9 +3207,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { $x } catch * { \"Undefined variable\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -2197,10 +3227,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { $x } catch err:XPST0008 { \"Undefined variable\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -2214,10 +3248,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { $x } catch err:* { \"Undefined variable\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -2231,9 +3269,13 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { $x } catch *:XPST0008 { \"Undefined variable\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -2245,13 +3287,21 @@ public class ProdTryCatchExpr extends QT3TestSet {
   @org.junit.Test
   public void tryCatchTypeError1() {
     final XQuery query = new XQuery(
-      "try { let $i as xs:string := 1 return $i } catch * { \"Undefined variable\" }",
+      "try { let $i as xs:string := 1 return $i } catch * { \"Type error\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPTY0004")
+      (
+        error("XPTY0004")
+      ||
+        assertEq("\"Type error\"")
+      )
     );
   }
 
@@ -2261,14 +3311,22 @@ public class ProdTryCatchExpr extends QT3TestSet {
   @org.junit.Test
   public void tryCatchTypeError2() {
     final XQuery query = new XQuery(
-      "try { let $i as xs:string := 1 return $i } catch err:XPTY0004 { \"Undefined variable\" }",
+      "try { let $i as xs:string := 1 return $i } catch err:XPTY0004 { \"Type error\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPTY0004")
+      (
+        error("XPTY0004")
+      ||
+        assertEq("\"Type error\"")
+      )
     );
   }
 
@@ -2278,14 +3336,22 @@ public class ProdTryCatchExpr extends QT3TestSet {
   @org.junit.Test
   public void tryCatchTypeError3() {
     final XQuery query = new XQuery(
-      "try { let $i as xs:string := 1 return $i } catch err:* { \"Undefined variable\" }",
+      "try { let $i as xs:string := 1 return $i } catch err:* { \"Type error\" }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPTY0004")
+      (
+        error("XPTY0004")
+      ||
+        assertEq("\"Type error\"")
+      )
     );
   }
 
@@ -2295,13 +3361,21 @@ public class ProdTryCatchExpr extends QT3TestSet {
   @org.junit.Test
   public void tryCatchTypeError4() {
     final XQuery query = new XQuery(
-      "try { let $i as xs:string := 1 return $i } catch *:XPTY0004 { \"Undefined variable\" }",
+      "try { let $i as xs:string := 1 return $i } catch *:XPTY0004 { \"Type error\" }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPTY0004")
+      (
+        error("XPTY0004")
+      ||
+        assertEq("\"Type error\"")
+      )
     );
   }
 
@@ -2313,10 +3387,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $x as xs:integer := \"\" return try { $x } catch err:XPTY0004 { 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -2330,10 +3408,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { let $x as xs:integer := \"\" return $x } catch err:XPTY0004 { 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -2351,10 +3433,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x as xs:integer in (0, 1, \"\") return try { $x } catch err:XPTY0004 { 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -2372,10 +3458,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
     final XQuery query = new XQuery(
       "try { for $x as xs:integer in (0, 1, \"\") return $x } catch err:XPTY0004 { 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2391,10 +3481,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "      start $s at $spos previous $sprev next $snext when true() end $e at\n" +
       "      $epos previous $eprev next $enext when true() return try { $x } catch err:XPTY0004 { 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -2410,10 +3504,14 @@ public class ProdTryCatchExpr extends QT3TestSet {
       "      start $s at $spos previous $sprev next $snext when true() end $e at\n" +
       "      $epos previous $eprev next $enext when true() return $x } catch err:XPTY0004 { 0 }",
       ctx);
-    query.namespace("err", "http://www.w3.org/2005/xqt-errors");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")

@@ -20,9 +20,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {()} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -36,9 +40,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {'pi'} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi text?>", false)
     );
@@ -52,9 +60,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {'pi', ()} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi text?>", false)
     );
@@ -68,9 +80,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {(), 'pi'} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi text?>", false)
     );
@@ -84,9 +100,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem xmlns:foo=\"http://www.example.com/foo\">{processing-instruction {'foo:attr'} {}}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0041")
     );
@@ -100,9 +120,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {xs:untypedAtomic('pi')} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi text?>", false)
     );
@@ -116,9 +140,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem xmlns:foo=\"http://www.example.com/foo\">{processing-instruction {xs:untypedAtomic('foo:pi')} {'text'}}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0041")
     );
@@ -132,9 +160,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {'p i'} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0041")
     );
@@ -148,9 +180,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {xs:untypedAtomic('p i')} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0041")
     );
@@ -164,9 +200,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {'one', 'two'} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -180,9 +220,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {xs:untypedAtomic('one'), xs:untypedAtomic('two')} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -196,10 +240,14 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {//a} {'text'}",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -213,9 +261,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {1,2} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -229,9 +281,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {123} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -245,9 +301,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {xs:dateTime(\"1999-05-31T13:20:00\")} {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -261,9 +321,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:data(processing-instruction pi {'a', element a {}, 'b'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a  b")
     );
@@ -277,10 +341,14 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {., .}",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi texttext texttext?>", false)
     );
@@ -294,9 +362,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi ?>", false)
     );
@@ -310,9 +382,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {''}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi ?>", false)
     );
@@ -326,9 +402,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {1,'string',3.14,xs:float('1.2345e-2'),xs:dateTime('2002-04-02T12:00:00-01:00')}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi 1 string 3.14 0.012345 2002-04-02T12:00:00-01:00?>", false)
     );
@@ -342,9 +422,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {<elem>123</elem>, (<elem attr='456'/>)/@attr, (<elem>789</elem>)/text()}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi 123 456 789?>", false)
     );
@@ -358,9 +442,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {1,'',2}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi 1  2?>", false)
     );
@@ -374,9 +462,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {1,<a/>,2}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi 1  2?>", false)
     );
@@ -390,10 +482,14 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {/root}",
       ctx);
-    query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/CompAttrConstructor/DupNode.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi texttext?>", false)
     );
@@ -407,9 +503,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {'?>'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0026")
     );
@@ -423,9 +523,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {'?>text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0026")
     );
@@ -439,9 +543,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {'text?>text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0026")
     );
@@ -455,9 +563,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {'text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi text?>", false)
     );
@@ -471,9 +583,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<elem xmlns:foo=\"http://www.example.com\">{processing-instruction foo:pi {'text'}}</elem>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -487,9 +603,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction xml {'pi'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0064")
     );
@@ -503,9 +623,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction XmL {'pi'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0064")
     );
@@ -519,9 +643,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {'xml'} {'pi'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0064")
     );
@@ -535,9 +663,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {'XmL'} {'pi'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0064")
     );
@@ -551,9 +683,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "count((processing-instruction pi {()})/..)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -567,9 +703,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {' text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi text?>", false)
     );
@@ -583,9 +723,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction pi {'&#x20;&#x0A;&#x0D;&#x09;text'}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi text?>", false)
     );
@@ -599,9 +743,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(processing-instruction pi {' text'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "116 101 120 116")
     );
@@ -615,9 +763,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(processing-instruction pi {'&#x20;&#x0A;&#x0D;&#x09;text'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "116 101 120 116")
     );
@@ -631,9 +783,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string(processing-instruction pi {'a', element a {}, 'b'})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a  b")
     );
@@ -647,9 +803,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction \"name\" {\"content\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -663,9 +823,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction name {\" \"} eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -679,9 +843,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "data(processing-instruction name {\"content\"}) instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -695,9 +863,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {\"xml\"} {\"content\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0064")
     );
@@ -711,9 +883,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {\" xmL \"} {\"content\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0064")
     );
@@ -727,9 +903,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name(processing-instruction {\" name \"} {\"content\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "name")
     );
@@ -743,9 +923,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name(processing-instruction {\" XmLnaMe \"} {\"content\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "XmLnaMe")
     );
@@ -759,9 +943,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {\"1.das \"} {\"content\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0041")
     );
@@ -775,9 +963,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "processing-instruction {\"thename\"} {\"asdas?>\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQDY0026")
     );
@@ -791,9 +983,13 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(processing-instruction {\"thename\"} {\"asdas? >\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "asdas? >")
     );
@@ -807,11 +1003,60 @@ public class ProdCompPIConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(processing-instruction {\"thename\"} {\"content {1+ } {\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "content {1+ } {")
+    );
+  }
+
+  /**
+   *  test detection of '?>' in computed comment .
+   */
+  @org.junit.Test
+  public void cbclConstrComppi001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \t<element> { processing-instruction { 'pi' } { <element>?&gt;</element> } } </element>\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQDY0026")
+    );
+  }
+
+  /**
+   *  test detection of '?>' in computed comment .
+   */
+  @org.junit.Test
+  public void cbclConstrComppi002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:tag($arg) as element() { element { 'tag' } { $arg } }; \n" +
+      "      \t<element> { processing-instruction { 'pi' } { \"content\", local:tag('?&gt;') } } </element>\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQDY0026")
     );
   }
 }

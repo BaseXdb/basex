@@ -20,9 +20,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after(\"a string\", ()) eq \"a string\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after(\"a string\", \"not in other\") eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +100,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after((), (), \"http://www.w3.org/2005/xpath-functions/collation/codepoint\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -100,9 +120,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after(\"a string\", \"a string\", \"http://www.example.com/COLLATION/NOT/SUPPORTED\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOCH0002")
     );
@@ -116,9 +140,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after(\"foo\", \"fo\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\") eq \"o\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after(\"tattoo\", \"tat\") eq \"too\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after(\"tattoo\", \"tattoo\") eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after(\"abcdefgedij\", \"def\") eq \"gedij\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,35 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after((), ()) eq \"\"",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  test fn:substring-after with collation and empty string .
+   */
+  @org.junit.Test
+  public void cbclSubstringAfter001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        fn:boolean(fn:substring-after('input', '', 'http://www.w3.org/2005/xpath-functions/collation/codepoint'))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +262,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"\",\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -216,9 +286,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\" \",\"AAAAABBBBB\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -236,9 +310,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:substring-after(\"A\",\"A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -252,9 +330,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:substring-after(\"A\",\"B\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -268,9 +350,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(xs:string(\"A\"),\"A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -288,9 +374,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"A\",xs:string(\"A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -308,9 +398,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"A\",\"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -328,9 +422,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"a\",\"A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -348,9 +446,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"substring-after\",\"substring-after\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -368,9 +470,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"substring-aftersubstring-after\",\"substring-after\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "substring-after")
     );
@@ -384,9 +490,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"****\",\"***\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "*")
     );
@@ -400,9 +510,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"\",\"A Character String\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -420,9 +534,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"12345\",\"1234\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5")
     );
@@ -436,9 +554,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"substring-after\",\"refta-gnirtsbus\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -456,9 +578,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after(\"banana\", \"a\", \"http://www.w3.org/2005/xpath-functions/collation/codepoint\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"nana\"")
     );
@@ -472,10 +598,14 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after(\"banana\", \"a\", \"collation/codepoint\")",
       ctx);
-    query.baseURI("http://www.w3.org/2005/xpath-functions/");
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.baseURI("http://www.w3.org/2005/xpath-functions/");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"nana\"")
     );
@@ -489,9 +619,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "substring-after(\"𐀁𐀂𐀃\", \"𐀂\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"𐀃\"")
     );
@@ -505,9 +639,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"A Character String\",\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"A Character String\"")
@@ -525,9 +663,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after((),\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -545,9 +687,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"\",())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -565,9 +711,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"A Character String\",())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"A Character String\"")
@@ -585,9 +735,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after((),\"A Character String\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")
@@ -605,9 +759,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"AAAAABBBBBCCCCC\",\"BBBBB\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "CCCCC")
     );
@@ -621,9 +779,13 @@ public class FnSubstringAfter extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:substring-after(\"AAAAABBBBB\",\" \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("\"\"")

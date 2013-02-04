@@ -13,22 +13,22 @@ import org.basex.test.qt3ts.QT3TestSet;
 public class FnStringJoin extends QT3TestSet {
 
   /**
-   *  A test whose essence is: `string-join("a string")`. .
+   *  A test whose essence is: `string-join("a string")`. Allowed in 3.0.
    */
   @org.junit.Test
-  public void kStringJoinFunc1() {
+  public void kStringJoinFunc1a() {
     final XQuery query = new XQuery(
       "string-join(\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      (
-        assertStringValue(false, "a string")
-      ||
-        error("XPST0017")
-      )
+      assertStringValue(false, "a string")
     );
   }
 
@@ -40,9 +40,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(\"a string\", \"a string\", \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -56,9 +60,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(('Now', 'is', 'the', 'time', '...'), ' ') eq \"Now is the time ...\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -72,9 +80,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join((\"abc\", \"def\"), \"\") eq \"abcdef\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -88,9 +100,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(('Blow, ', 'blow, ', 'thou ', 'winter ', 'wind!'), '') eq \"Blow, blow, thou winter wind!\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -104,9 +120,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join((), 'separator') eq \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -120,11 +140,37 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(\"a string\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test boolean fn:string-join on various cases .
+   */
+  @org.junit.Test
+  public void cbclFnStringJoin001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:repeat($count as xs:integer, $arg as xs:string) as xs:string* { if ($count le 0) then \"\" else for $x in 1 to $count return $arg };\n" +
+      "        string-join( for $x in 0 to 4 return local:repeat($x, 'a') , ' ') and string-join( for $x in 0 to 4 return local:repeat($x, 'a') , '')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -136,9 +182,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join(('Now', 'is', 'the', 'time', '...'), ' ')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Now is the time ...")
     );
@@ -152,9 +202,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:string-join((\" \"),\"AAAAABBBBB\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -168,9 +222,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:string-join((),\"A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -184,9 +242,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(fn:string-join((\"A\"),\"B\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -200,9 +262,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join((xs:string(\"A\")),\"A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "A")
     );
@@ -216,9 +282,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join((\"A\"),xs:string(\"A\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "A")
     );
@@ -232,9 +302,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join((\"A\"),\"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "A")
     );
@@ -248,9 +322,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join((\"a\"),\"A\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "a")
     );
@@ -264,9 +342,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join(\"string-join\",\"string-join\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "string-join")
     );
@@ -280,9 +362,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join((\"string-joinstring-join\"),\"string-join\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "string-joinstring-join")
     );
@@ -296,9 +382,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join(\"****\",\"***\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "****")
     );
@@ -312,9 +402,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join(('Blow, ', 'blow, ', 'thou ', 'winter ', 'wind!'), '')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Blow, blow, thou winter wind!")
     );
@@ -328,9 +422,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join(\"12345\",\"1234\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "12345")
     );
@@ -344,11 +442,126 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join(\"string-join\",\"nioj-gnirts\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "string-join")
+    );
+  }
+
+  /**
+   *  Default second argument is zero-length string in 3.0 .
+   */
+  @org.junit.Test
+  public void fnStringJoin22() {
+    final XQuery query = new XQuery(
+      "fn:string-join((\"1\", \"2\", \"3\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "123")
+    );
+  }
+
+  /**
+   *  Default second argument is zero-length string in 3.0 .
+   */
+  @org.junit.Test
+  public void fnStringJoin23() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         let $e := <e><a>1</a><b>2</b><c>3</c></e>\n" +
+      "         return fn:string-join($e/*)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "123")
+    );
+  }
+
+  /**
+   *  Default second argument is zero-length string in 3.0 .
+   */
+  @org.junit.Test
+  public void fnStringJoin24() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         let $e := <e><a>1</a><b></b><c>3</c></e>\n" +
+      "         return fn:string-join($e/*)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "13")
+    );
+  }
+
+  /**
+   *  Default second argument is zero-length string in 3.0 .
+   */
+  @org.junit.Test
+  public void fnStringJoin25() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         let $e := <e><a>1</a><b></b><c>3</c></e>\n" +
+      "         return fn:string-join($e/d)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "")
+    );
+  }
+
+  /**
+   *  Default second argument is zero-length string in 3.0 .
+   */
+  @org.junit.Test
+  public void fnStringJoin26() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "         fn:string-join((1 to 9)!string())\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "123456789")
     );
   }
 
@@ -360,9 +573,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:string-join((), 'separator'))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -376,9 +593,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:string-join((),\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -392,9 +613,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:string-join(\"\",\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -408,9 +633,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:string-join(\"\",\"A Character String\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -424,9 +653,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:string-join((),\"A Character String\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -440,9 +673,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join((\"AAAAABBBBBCCCCC\"),\"BBBBB\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "AAAAABBBBBCCCCC")
     );
@@ -456,9 +693,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join((\"AAAAABBBBB\"),\" \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "AAAAABBBBB")
     );
@@ -472,9 +713,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a characte")
     );
@@ -488,9 +733,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a characte")
     );
@@ -504,9 +753,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a characte")
     );
@@ -520,9 +773,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a characte")
     );
@@ -536,9 +793,13 @@ public class FnStringJoin extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-join(xs:string(\"This is a characte\"),xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "This is a characte")
     );

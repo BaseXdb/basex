@@ -13,18 +13,24 @@ import org.basex.test.qt3ts.QT3TestSet;
 public class ProdOptionDecl extends QT3TestSet {
 
   /**
-   *  The name of an option must be a full QName. .
+   * 
+   *       	The name of an option need not be a full QName in XQuery 3.0. 
+   *       .
    */
   @org.junit.Test
-  public void kOptionDeclarationProlog1() {
+  public void kOptionDeclarationProlog1b() {
     final XQuery query = new XQuery(
-      "declare option myopt \"option value\"; 1",
+      "declare option myopt \"option value\"; true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPST0081")
+      error("XQST0123")
     );
   }
 
@@ -40,9 +46,13 @@ public class ProdOptionDecl extends QT3TestSet {
       "        declare(::)option(::)local:opt(::)\"option value\"(::); \n" +
       "        declare(::)option(::)local:opt(::)\"option value\";1(::)eq(::)1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -56,9 +66,13 @@ public class ProdOptionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)option(::)local:opt\"option value\"; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -72,9 +86,13 @@ public class ProdOptionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)option(::)local:opt'option value'; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -88,9 +106,13 @@ public class ProdOptionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare option prefixnotdeclared:opt 'option value'; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -104,9 +126,13 @@ public class ProdOptionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare option localpartmissing: 'option value'; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -120,9 +146,13 @@ public class ProdOptionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace exq = \"http://example.org/XQueryImplementation\"; declare option exq:java-class \"math = java.lang.Math\"; \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "aaa")
     );
@@ -136,9 +166,13 @@ public class ProdOptionDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare option exq:java-class \"math = java.lang.Math\"; \"aaa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );

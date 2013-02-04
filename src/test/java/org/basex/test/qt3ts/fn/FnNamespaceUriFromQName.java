@@ -20,9 +20,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri-from-QName()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri-from-QName(1, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(namespace-uri-from-QName( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri-from-QName( QName(\"example.com/\", \"pre:lname\")) eq xs:anyURI(\"example.com/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "namespace-uri-from-QName( QName(\"example.com/\", \"pre:lname\")) instance of xs:anyURI",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -103,9 +123,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
       "        string(<name xmlns:ns=\"http://example.com/BNamespace\">{namespace-uri-from-QName(\"ns:foo\" cast as xs:QName)}</name>)\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.com/BNamespace")
     );
@@ -121,9 +145,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
       "        <e xmlns=\"http://example.com/\"> {namespace-uri-from-QName(node-name(element anElement{\"text\"}))} </e>/string()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "http://example.com/")
     );
@@ -140,9 +168,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
       "        <e xmlns=\"\">{namespace-uri-from-QName(xs:QName(\"l\"))}</e>/string()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("\"\"")
     );
@@ -160,9 +192,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
       "        <e xmlns=\"\" xmlns:p=\"http://example.com/3\">[{namespace-uri-from-QName(xs:QName(\"n1\"))}|{namespace-uri-from-QName(xs:QName(\"p:n2\"))}]</e>/text()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "[|http://example.com/3]")
     );
@@ -176,9 +212,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri-from-QName(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -192,9 +232,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri-from-QName(((),()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -208,9 +252,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri-from-QName(\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -224,28 +272,37 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri-from-QName()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
   }
 
   /**
-   *  Test function fn:namespace-uri-from-QName. Error case - invalid parameter type (simple type) .
+   *  Test function fn:namespace-uri-from-QName. 
+   *       				Error case - invalid parameter type (simple type) .
    */
   @org.junit.Test
-  public void namespaceURIFromQNameFunc015() {
+  public void namespaceURIFromQNameFunc015a() {
     final XQuery query = new XQuery(
       "fn:namespace-uri-from-QName((//Folder)[1])",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPTY0004")
+      error("XPTY0117")
     );
   }
 
@@ -257,9 +314,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri-from-QName(xs:integer(\"100\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -273,9 +334,13 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:namespace-uri-from-QName(xs:time(\"12:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );

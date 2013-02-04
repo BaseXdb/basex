@@ -20,9 +20,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name#0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( fn:dateTime#2, fn:dateTime#2 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -68,9 +80,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name#2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +100,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "exists(fn:function-name#1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( () )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -116,9 +140,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( 1 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -132,9 +160,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( fn:analyze-string((), \"unused\") )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -148,9 +180,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( (fn:dateTime#2, fn:dateTime#2) )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -169,9 +205,13 @@ public class FnFunctionName extends QT3TestSet {
       "                                then 1\n" +
       "                                else fn:dateTime#2 ) )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -185,9 +225,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( fn:substring#2 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertType("xs:QName")
     );
@@ -201,9 +245,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( fn:substring(?, 1) )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("empty-sequence()")
@@ -221,9 +269,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( function($node){count($node/*)} )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("empty-sequence()")
@@ -241,9 +293,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( dateTime#2 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("fn:QName(\"http://www.w3.org/2005/xpath-functions\", \n                              \"fn:dateTime\")")
     );
@@ -257,9 +313,14 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( math:pow#2 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("fn:QName(\"http://www.w3.org/2005/xpath-functions/math\", \n                              \"math:pow\")")
     );
@@ -273,9 +334,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( concat#99 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("fn:QName(\"http://www.w3.org/2005/xpath-functions\", \n                              \"fn:concat\")")
     );
@@ -289,9 +354,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( concat#340282366920938463463374607431768211456 )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FOAR0002")
@@ -309,9 +378,13 @@ public class FnFunctionName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:function-name( function($node){name($node)} )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -326,9 +399,13 @@ public class FnFunctionName extends QT3TestSet {
       "fn:function-name( function($arg1, $arg2)\n" +
       "                               { subsequence($arg1, $arg2, 1) } )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -343,9 +420,13 @@ public class FnFunctionName extends QT3TestSet {
       "let $initial := fn:substring(?, 1, 1) \n" +
       "            return fn:function-name( $initial )",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -366,9 +447,13 @@ public class FnFunctionName extends QT3TestSet {
       "\tfn:function-name( local:add#3 )\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("fn:QName(\"http://www.w3.org/2005/xquery-local-functions\",\n                              \"local:add\")")
     );
@@ -389,9 +474,13 @@ public class FnFunctionName extends QT3TestSet {
       "\tfn:function-name( local:add(1, 2, ?) )\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -416,9 +505,13 @@ public class FnFunctionName extends QT3TestSet {
       "               else \"error\"\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("fn:QName(\"http://www.w3.org/2005/xpath-functions\", \n                              \"fn:abs\")")
     );

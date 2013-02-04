@@ -22,9 +22,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -40,9 +44,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(string-to-codepoints(\"eee\"), (101, 101, 101))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -58,9 +66,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-join(for $code in string-to-codepoints(\"example.com/\") return string($code), \"\") eq \"10112097109112108101469911110947\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -76,9 +88,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(string-to-codepoints(\"Thérèse\"), (84, 104, 233, 114, 232, 115, 101))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -94,9 +110,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "codepoints-to-string((87, 36, 56, 87, 102, 96)) eq \"W$8Wf`\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -112,9 +132,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(\"Thérèse\")[last()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("101")
     );
@@ -130,9 +154,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(\"Thérèse\")[0 + last()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("101")
     );
@@ -148,9 +176,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(\"Thérèse\")[last() - 1]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("115")
     );
@@ -166,9 +198,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(\"Thérèse\")[last() - 0]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("101")
     );
@@ -184,9 +220,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(\"Thérèse\")[0 + last()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("101")
     );
@@ -202,9 +242,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(\"Thérèse\")[last() - 2]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("232")
     );
@@ -220,9 +264,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(\"str\", \"INVALID\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -238,9 +286,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(string-to-codepoints(\"Thérèse\")[last() - 7])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -256,9 +308,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(\"Thérèse\")[last() - 6]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("84")
     );
@@ -274,9 +330,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(string-to-codepoints(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +352,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(string-to-codepoints(\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -310,9 +374,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(string-to-codepoints(\"123\")) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -328,9 +396,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(string-to-codepoints(\"\")) eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -346,9 +418,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(string-to-codepoints(\"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -364,9 +440,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(\"e\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("101")
     );
@@ -382,9 +462,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(string-to-codepoints(\"ee\"), (101, 101))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -400,9 +484,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("49")
     );
@@ -418,9 +506,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:avg(fn:string-to-codepoints(\"A String\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("91")
     );
@@ -436,9 +528,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:empty(fn:string-to-codepoints(\"A String\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -454,9 +550,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:empty(fn:string-to-codepoints(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -472,9 +572,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:exists(fn:string-to-codepoints(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -490,9 +594,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:exists(fn:string-to-codepoints(\"A String\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -508,9 +616,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:deep-equal(fn:string-to-codepoints(\"𐀁𐀂\"), (65537, 65538))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -526,9 +638,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints('a')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("97")
     );
@@ -544,9 +660,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints('1a')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("49, 97")
     );
@@ -562,9 +682,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints('#*^$')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("35, 42, 94, 36")
     );
@@ -580,9 +704,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints('string-to-codepoints')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("115, 116, 114, 105, 110, 103, 45, 116, 111, 45, 99, 111, 100, 101, 112, 111, 105, 110, 116, 115")
     );
@@ -598,9 +726,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints(xs:string(\"A String\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("65, 32, 83, 116, 114, 105, 110, 103")
     );
@@ -616,9 +748,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints(fn:upper-case(\"A String\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("(65, 32, 83, 84, 82, 73, 78, 71)")
     );
@@ -634,9 +770,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints(fn:lower-case(\"A String\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("(97, 32, 115, 116, 114, 105, 110, 103)")
     );
@@ -652,9 +792,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:string-to-codepoints(\"A String\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("8")
     );
@@ -672,9 +816,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints(xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("84, 104, 105, 115, 32, 105, 115, 32, 97, 32, 99, 104, 97, 114, 97, 99, 116, 101")
     );
@@ -692,9 +840,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints(xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("84, 104, 105, 115, 32, 105, 115, 32, 97, 32, 99, 104, 97, 114, 97, 99, 116, 101")
     );
@@ -712,9 +864,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints(xs:string(\"This is a characte\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("84, 104, 105, 115, 32, 105, 115, 32, 97, 32, 99, 104, 97, 114, 97, 99, 116, 101")
     );
@@ -730,9 +886,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints('bßڒき豈')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("98, 223, 1682, 12365, 63744")
     );
@@ -748,9 +908,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:string-to-codepoints(\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -766,9 +930,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -784,9 +952,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints(12)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -802,9 +974,13 @@ public class FnStringToCodepoints extends QT3TestSet {
     final XQuery query = new XQuery(
       "string-to-codepoints('abc','def')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );

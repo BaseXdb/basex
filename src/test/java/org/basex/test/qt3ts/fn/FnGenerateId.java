@@ -4,9 +4,7 @@ import org.basex.tests.bxapi.XQuery;
 import org.basex.test.qt3ts.QT3TestSet;
 
 /**
- * 
- *      Tests for the generate-id() function transferred from the XSLT 2.0 specification to XPath/XQuery 3.0
- *    .
+ * Tests for the generate-id() function transferred from the XSLT 2.0 specification to XPath/XQuery 3.0.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
@@ -22,9 +20,13 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "generate-id(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertType("xs:string")
@@ -42,15 +44,19 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "generate-id(/*)",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("matches($result, '^[A-Za-z][A-Za-z0-9]*$')")
     );
@@ -64,15 +70,19 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "generate-id((//@*)[1])",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("matches($result, '^[A-Za-z][A-Za-z0-9]*$')")
     );
@@ -86,15 +96,19 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "generate-id(/)",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("matches($result, '^[A-Za-z][A-Za-z0-9]*$')")
     );
@@ -108,15 +122,19 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "generate-id((//comment())[1])",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("matches($result, '^[A-Za-z][A-Za-z0-9]*$')")
     );
@@ -130,15 +148,19 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "generate-id((//processing-instruction())[1])",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("matches($result, '^[A-Za-z][A-Za-z0-9]*$')")
     );
@@ -152,15 +174,19 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "generate-id((//text())[1])",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("matches($result, '^[A-Za-z][A-Za-z0-9]*$')")
     );
@@ -174,15 +200,19 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "generate-id() eq generate-id(/)",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,15 +226,19 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "/*/(generate-id() eq generate-id(.))",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -219,15 +253,19 @@ public class FnGenerateId extends QT3TestSet {
       "let $nodes := (/ | //*/(.|@*|comment()|processing-instruction()|text())) \n" +
       "            return count($nodes) eq count(distinct-values($nodes/generate-id()))",
       ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("ma", "http://www.example.com/AuctionWatch");
+      query.namespace("xlink", "http://www.w3.org/1999/xlink");
+      query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
+      query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
+      query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
+      query.context(node(file("docs/auction.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -242,10 +280,14 @@ public class FnGenerateId extends QT3TestSet {
       "let $nodes := collection()\n" +
       "            return count($nodes) eq count(distinct-values($nodes/generate-id()))",
       ctx);
-    query.addCollection("", new String[] { "docs/auction.xml", "docs/works-mod.xml" });
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("", new String[] { file("docs/auction.xml"), file("docs/works-mod.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,10 +302,14 @@ public class FnGenerateId extends QT3TestSet {
       "let $nodes := collection()//*\n" +
       "            return count($nodes) eq count(distinct-values($nodes/generate-id()))",
       ctx);
-    query.addCollection("", new String[] { "docs/auction.xml", "docs/works-mod.xml" });
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addCollection("", new String[] { file("docs/auction.xml"), file("docs/works-mod.xml") });
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -280,11 +326,15 @@ public class FnGenerateId extends QT3TestSet {
       "        generate-id(copy:copy(/*))\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.addModule("http://www.w3.org/QT3/copy", file("fn/id/copy.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.addModule("http://www.w3.org/QT3/copy", file("fn/id/copy.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("matches($result, '^[A-Za-z][A-Za-z0-9]*$')")
     );
@@ -301,11 +351,15 @@ public class FnGenerateId extends QT3TestSet {
       "        generate-id(copy:copy((//@*)[1]))\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.addModule("http://www.w3.org/QT3/copy", file("fn/id/copy.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.addModule("http://www.w3.org/QT3/copy", file("fn/id/copy.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertQuery("matches($result, '^[A-Za-z][A-Za-z0-9]*$')")
     );
@@ -322,11 +376,15 @@ public class FnGenerateId extends QT3TestSet {
       "        generate-id(copy:copy(/*)) eq generate-id(/*)\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.addModule("http://www.w3.org/QT3/copy", file("fn/id/copy.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.addModule("http://www.w3.org/QT3/copy", file("fn/id/copy.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -343,35 +401,17 @@ public class FnGenerateId extends QT3TestSet {
       "        let $att := (//@*)[1] return generate-id(copy:copy($att)) eq generate-id($att)\n" +
       "      ",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-    query.addModule("http://www.w3.org/QT3/copy", file("fn/id/copy.xq"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      query.addModule("http://www.w3.org/QT3/copy", file("fn/id/copy.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
-    );
-  }
-
-  /**
-   * generate-id() applied to a sequence of element nodes in backwards-compatibility mode.
-   */
-  @org.junit.Test
-  public void generateId018() {
-    final XQuery query = new XQuery(
-      "generate-id(//*) eq generate-id(/*)",
-      ctx);
-    query.namespace("ma", "http://www.example.com/AuctionWatch");
-    query.namespace("xlink", "http://www.w3.org/1999/xlink");
-    query.namespace("anyzone", "http://www.example.com/auctioneers#anyzone");
-    query.namespace("eachbay", "http://www.example.com/auctioneers#eachbay");
-    query.namespace("yabadoo", "http://www.example.com/auctioneers#yabadoo");
-    query.context(node(file("docs/auction.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
-    test(
-      assertBoolean(true)
     );
   }
 
@@ -383,9 +423,13 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $f := function() {generate-id()} return $f()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -399,9 +443,13 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $f := function($x as item()) {generate-id($x)} return $f(3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -415,9 +463,13 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $i in 1 to 20 return generate-id($i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -431,9 +483,13 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $f := function($x as item()) {\"\"} return generate-id($f)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -447,10 +503,14 @@ public class FnGenerateId extends QT3TestSet {
     final XQuery query = new XQuery(
       "generate-id(//*)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );

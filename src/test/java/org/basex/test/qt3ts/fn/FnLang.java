@@ -20,9 +20,13 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "lang()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(false()) then lang(\"en\", .) else true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -56,9 +64,13 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "if(false()) then lang(\"en\") else true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -76,9 +88,13 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "lang(\"en\", 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -92,9 +108,13 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i := <e xml:lang=\"en\"> <b xml:lang=\"de\"/> </e> return (lang(\"de\", $i/b), lang(\"de\", $i))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true false")
     );
@@ -108,9 +128,13 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $i := <e xml:lang=\"en\"> <b xml:lang=\"de\"/> </e> return lang(\"de\", $i/b/@xml:lang)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -124,9 +148,13 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "lang(\"de\", attribute xml:lang {()})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -140,9 +168,13 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "lang(\"en\", <e xml:lang=\"ene\"/>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -156,9 +188,13 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lang(\"fr\", attribute xml:lang {\"fr\"})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -172,9 +208,35 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lang(\"fr\", attribute xml:lang {()})",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  Try to force optional item call on fn:lang .
+   */
+  @org.junit.Test
+  public void cbclFnLang001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tif(current-date() > xs:date(\"2000-01-01\")) then lang(\"en\",<a/>) else ()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -192,9 +254,13 @@ public class FnLang extends QT3TestSet {
       "        eg:noContextFunction()\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -208,10 +274,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /langs/para[3] return $x/fn:lang(\"EN\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -225,10 +295,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /langs/para[3] return $x/fn:lang(\"En\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -242,10 +316,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /langs/para[3] return $x/fn:lang(\"eN\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -259,10 +337,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /langs/para[3] return $x/fn:lang(\"en\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,10 +358,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /langs/para[3] return $x/fn:lang(\"en-us\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -293,9 +379,13 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "1[fn:lang(\"en-us\")]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -309,10 +399,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /langs/para[3] return $x/fn:lang(\"us-us\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -326,10 +420,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /langs/para[2] return $x/fn:lang(\"fr\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -343,10 +441,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lang(\"en\",fn:exactly-one(/langs/para[1]))",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -360,10 +462,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lang(\"fr\",fn:exactly-one(/langs/para[1]))",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -377,10 +483,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:lang((), ./langs[1]/para[1]))",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -394,10 +504,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lang(\"en\",fn:exactly-one(/langs/para[3]))",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -411,10 +525,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lang(\"en\",fn:exactly-one(/langs/para[2]))",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -428,9 +546,13 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lang(\"en\",.)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -444,10 +566,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       " for $x in /langs/para[1] return $x/fn:lang(\"en\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -461,10 +587,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /langs/div[1]/para return $x/fn:lang(\"en\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -478,10 +608,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /langs/para[2] return $x/fn:lang(\"EN\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -495,10 +629,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       " for $x in /langs/para[2] return $x/fn:lang(\"En\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -512,10 +650,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /langs/para[2] return $x/fn:lang(\"eN\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -529,10 +671,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /langs/para[2] return $x/fn:lang(\"en\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -546,10 +692,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $x in /langs/para[3] return $x/fn:lang(\"en-us\")",
       ctx);
-    query.context(node(file("fn/lang/lang.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/lang/lang.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -563,10 +713,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lang(xs:string(\"en\"),/root[1]/time[1])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -580,10 +734,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lang(xs:string(\"EN\"),./root[1]/time[1])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -597,10 +755,14 @@ public class FnLang extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:lang(xs:string(\"eN\"),./root[1]/time[1])",
       ctx);
-    query.context(node(file("docs/atomicns.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/atomicns.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );

@@ -20,9 +20,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(1.1, 3, \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(round-half-to-even(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(round-half-to-even((), 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -100,9 +120,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(1) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:float(\"-0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0")
     );
@@ -132,9 +160,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:double(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -148,9 +180,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:float(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -164,9 +200,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:double(\"-INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF")
     );
@@ -180,9 +220,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:float(\"-INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF")
     );
@@ -196,9 +240,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:double(\"INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -212,9 +260,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:float(\"INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -228,9 +280,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:unsignedShort(\"0\")) instance of xs:unsignedShort",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -248,9 +304,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:unsignedLong(\"0\")) instance of xs:unsignedLong",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -268,9 +328,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:unsignedInt(\"0\")) instance of xs:unsignedInt",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -288,9 +352,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(1.0) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -304,9 +372,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:unsignedByte(\"0\")) instance of xs:unsignedByte",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -324,9 +396,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:positiveInteger(\"1\")) instance of xs:positiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -344,9 +420,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:nonPositiveInteger(\"0\")) instance of xs:nonPositiveInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -364,9 +444,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:nonNegativeInteger(\"0\")) instance of xs:nonNegativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -384,9 +468,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:negativeInteger(\"-1\")) instance of xs:negativeInteger",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -404,9 +492,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:long(\"0\")) instance of xs:long",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -424,9 +516,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:int(\"0\")) instance of xs:int",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -444,9 +540,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:short(\"0\")) instance of xs:short",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -464,9 +564,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:byte(\"0\")) instance of xs:byte",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(false)
@@ -484,9 +588,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(0.5) eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -500,9 +608,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(1.5) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -516,9 +628,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(2.5) eq 2",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -532,9 +648,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(3.567812E+3, 2) eq 3567.81E0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -548,9 +668,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(4.7564E-3, 2) eq 0.0E0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -564,9 +688,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(35612.25, -2) eq 35600",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -580,11 +708,295 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:double(\"-0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0")
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even on xs:double with large $precision argment .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven001() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(3.567812E+3, 4294967296)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "3567.812")
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even on integer with positive precision .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven002() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(12345, 2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "12345")
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even on integer with negative precision .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven003() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(12345, -2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "12300")
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even on short with positive precision .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven004() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(xs:short(12345), 2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "12345")
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even on short with negative precision .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven005() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(xs:short(12345), -2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "12300")
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even on decimal with positive precision .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven006() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(12345.6, 2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "12345.6")
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even on decimal with negative precision .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven007() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(12345.6, -2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "12300")
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even on float with positive precision .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven008() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(xs:float(12345.6), 2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "12345.6")
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even on float with negative precision .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven009() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(xs:float(12345.6), -2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "12300")
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even on double with positive precision .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven010() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(123456e-2, 2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1234.56")
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even on double with negative precision .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven011() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(123456e-2, -2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1200")
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even on xs:decimal with large $precision argment .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven012() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(3.567812, 4294967296)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "3.567812")
+    );
+  }
+
+  /**
+   *  test EBV of fn:found-half-to-even with invalid type for argument 2 .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven013() {
+    final XQuery query = new XQuery(
+      "fn:boolean(fn:round-half-to-even(5, 1))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:found-half-to-even with invalid type for argument 2 .
+   */
+  @org.junit.Test
+  public void cbclRoundHalfToEven014() {
+    final XQuery query = new XQuery(
+      "fn:round-half-to-even(123456e-2, \"two\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
     );
   }
 
@@ -601,9 +1013,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
       "           else if ((round-half-to-even($x)) instance of xs:double) then \"double\" \n" +
       "           else error()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"integer\", \"decimal\", \"float\", \"double\"")
     );
@@ -617,9 +1033,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(4561.234567, 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("4561")
@@ -637,9 +1057,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(4561.000005e0, 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("4561")
@@ -657,9 +1081,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:float('4561.000005e0'), 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("4561")
@@ -677,9 +1105,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(4561234567, 0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("4561234567")
@@ -697,9 +1129,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:float('0.05'), 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0.1")
@@ -717,9 +1153,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:float('-0.05'), 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-0.1")
@@ -737,9 +1177,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:float('3.75'), 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("3.8")
@@ -757,9 +1201,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(123.355, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("123.36")
@@ -777,9 +1225,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(123.365, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("123.36")
@@ -797,9 +1249,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(123.375, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("123.38")
@@ -822,9 +1278,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
       "           else if ((round-half-to-even($x,1)) instance of xs:double) then \"double\" \n" +
       "           else error()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"integer\", \"decimal\", \"float\", \"double\"")
     );
@@ -838,9 +1298,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(123.385, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("123.38")
@@ -858,9 +1322,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-123.355, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-123.36")
@@ -878,9 +1346,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-123.365, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-123.36")
@@ -898,9 +1370,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-123.375, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-123.38")
@@ -918,9 +1394,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-123.385, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-123.38")
@@ -938,9 +1418,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(12350.00, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("12400")
@@ -958,9 +1442,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-12350.00, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12400")
@@ -978,9 +1466,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(12450.00, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("12400")
@@ -998,9 +1490,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-12450.00, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12400")
@@ -1018,9 +1514,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(12550.00, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("12600")
@@ -1038,9 +1538,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-12550.00, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12600")
@@ -1058,9 +1562,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(1.234567, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1.23")
@@ -1078,9 +1586,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(12350, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("12400")
@@ -1098,9 +1610,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-12350, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12400")
@@ -1118,9 +1634,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(12450, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("12400")
@@ -1138,9 +1658,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-12450, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12400")
@@ -1158,9 +1682,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(12550, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("12600")
@@ -1178,9 +1706,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-12550, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12600")
@@ -1198,9 +1730,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(12350e0, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("12400")
@@ -1218,9 +1754,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-12350e0, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12400")
@@ -1238,9 +1778,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(12450e0, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("12400")
@@ -1258,9 +1802,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-12450e0, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12400")
@@ -1278,9 +1826,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(1.000005e0, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -1298,9 +1850,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(12550e0, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("12600")
@@ -1318,9 +1874,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(-12550e0, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-12600")
@@ -1338,9 +1898,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:float('1.000005e0'), 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -1358,9 +1922,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(4561.234567, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("4600")
@@ -1378,9 +1946,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(4561.000005e0, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("4600")
@@ -1398,9 +1970,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(xs:float('4561.000005e0'), -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("4600")
@@ -1418,9 +1994,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "round-half-to-even(4561234567, -2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("4561234600")
@@ -1438,9 +2018,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:double(\"-1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-1.7976931348623157E308")
@@ -1458,9 +2042,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:double(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1474,9 +2062,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:double(\"1.7976931348623157E308\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1.7976931348623157E308")
@@ -1494,9 +2086,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:decimal(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1510,9 +2106,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:decimal(\"617375191608514839\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("617375191608514839")
     );
@@ -1526,9 +2126,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:decimal(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1542,9 +2146,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:float(\"-3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("xs:float(\"-3.4028235E38\")")
@@ -1562,9 +2170,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:float(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1578,9 +2190,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:float(\"3.4028235E38\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("xs:float(\"3.4028235E38\")")
@@ -1598,9 +2214,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:int(\"-2147483648\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1614,9 +2234,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:int(\"-1873914410\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1873914410")
     );
@@ -1630,9 +2254,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:int(\"2147483647\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2147483647")
     );
@@ -1646,9 +2274,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:integer(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1662,9 +2294,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:integer(\"830993497117024304\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("830993497117024304")
     );
@@ -1678,9 +2314,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:integer(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1694,9 +2334,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:long(\"-92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -1710,9 +2354,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:long(\"-47175562203048468\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-47175562203048468")
     );
@@ -1726,9 +2374,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:long(\"92233720368547758\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547758")
     );
@@ -1742,9 +2394,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:negativeInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1758,9 +2414,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:negativeInteger(\"-297014075999096793\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-297014075999096793")
     );
@@ -1774,9 +2434,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:negativeInteger(\"-1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1790,9 +2454,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:nonNegativeInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1806,9 +2474,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:nonNegativeInteger(\"303884545991464527\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -1822,9 +2494,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:nonNegativeInteger(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1838,9 +2514,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:nonPositiveInteger(\"-999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1854,9 +2534,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:nonPositiveInteger(\"-475688437271870490\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-475688437271870490")
     );
@@ -1870,9 +2554,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:nonPositiveInteger(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1886,9 +2574,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:positiveInteger(\"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1902,9 +2594,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:positiveInteger(\"52704602390610033\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610033")
     );
@@ -1918,9 +2614,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:positiveInteger(\"999999999999999999\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1934,9 +2634,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:short(\"-32768\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -1950,9 +2654,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:short(\"-5324\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5324")
     );
@@ -1966,9 +2674,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:short(\"32767\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("32767")
     );
@@ -1982,9 +2694,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:unsignedLong(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1998,9 +2714,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:unsignedLong(\"130747108607674654\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -2014,9 +2734,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:unsignedLong(\"184467440737095516\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -2030,9 +2754,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:unsignedShort(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2046,9 +2774,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:unsignedShort(\"44633\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -2062,9 +2794,13 @@ public class FnRoundHalfToEven extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even(xs:unsignedShort(\"65535\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );

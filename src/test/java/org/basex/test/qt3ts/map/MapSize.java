@@ -20,9 +20,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map{})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -40,9 +44,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map:new(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -60,9 +68,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map{\"a\":=1})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -80,9 +92,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map:entry(\"a\", \"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -100,9 +116,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map:new((map:entry(\"a\", \"1\"), map:entry(\"b\", 2))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("2")
@@ -120,9 +140,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map{\"a\":=1, \"b\":=2})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("2")
@@ -140,9 +164,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map{\"a\":=1, \"a\":=2})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -160,9 +188,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map:new((map:entry(\"a\",1), map:entry(\"a\",2))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -180,9 +212,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map:remove(map{\"a\":=1,\"b\":=2}, \"b\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -200,9 +236,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map:remove(map:entry(1,2),1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -220,9 +260,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map:remove(map:remove(map{\"a\":=1,\"b\":=2},\"b\"),\"a\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0")
@@ -240,9 +284,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map{number('NaN'):=1,\"b\":=2})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -260,9 +308,13 @@ public class MapSize extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:size(map:remove(map{\"a\":=1,\"b\":=2}, \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("2")

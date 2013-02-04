@@ -21,9 +21,13 @@ public class MiscStaticContext extends QT3TestSet {
       "declare namespace test = 'http://www.example.com'; \n" +
       "        <a/> instance of element(*, test:unknownType)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );

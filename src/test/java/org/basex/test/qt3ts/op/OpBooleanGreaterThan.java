@@ -27,9 +27,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() gt false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() ge false()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,11 +81,234 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "true() ge true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+.
+   */
+  @org.junit.Test
+  public void cbclBooleanGreaterThan001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      not(local:is-even(15) ge local:is-even(17))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+.
+   */
+  @org.junit.Test
+  public void cbclBooleanGreaterThan002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      fn:true() ge local:is-even(17)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+.
+   */
+  @org.junit.Test
+  public void cbclBooleanGreaterThan003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      fn:false() ge local:is-even(17)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+.
+   */
+  @org.junit.Test
+  public void cbclBooleanGreaterThan004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      not(local:is-even(15) gt local:is-even(17))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+.
+   */
+  @org.junit.Test
+  public void cbclBooleanGreaterThan005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      fn:true() gt local:is-even(17)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+.
+   */
+  @org.junit.Test
+  public void cbclBooleanGreaterThan006() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      fn:false() gt local:is-even(17)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+.
+   */
+  @org.junit.Test
+  public void cbclBooleanGreaterThan007() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      local:is-even(17) ge fn:true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+.
+   */
+  @org.junit.Test
+  public void cbclBooleanGreaterThan008() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      local:is-even(17) ge fn:false()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+.
+   */
+  @org.junit.Test
+  public void cbclBooleanGreaterThan009() {
+    final XQuery query = new XQuery(
+      "declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      local:is-even(17) gt fn:true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+.
+   */
+  @org.junit.Test
+  public void cbclBooleanGreaterThan010() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:is-even($arg as xs:integer) as xs:boolean { (($arg mod 2) eq 0) }; \n" +
+      "      local:is-even(17) gt fn:false()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -98,9 +329,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"true\")) gt xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -123,9 +358,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(7 eq 7) le xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +387,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(7 eq 7) gt xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -173,9 +416,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(7 eq 7) le xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -198,9 +445,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"true\")) le xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -223,9 +474,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"true\")) gt xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -248,9 +503,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"true\")) le xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -273,9 +532,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"false\")) gt xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -298,9 +561,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"false\")) le xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -323,9 +590,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"false\")) gt xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -348,9 +619,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:boolean(\"false\")) le xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -373,9 +648,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "(7 eq 7) gt xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -396,9 +675,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") gt xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -419,9 +702,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"1\") gt xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -442,9 +729,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"0\") gt xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -465,9 +756,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") gt xs:boolean(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -488,9 +783,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") gt xs:boolean(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -511,9 +810,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") gt xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -534,9 +837,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") gt xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -557,9 +864,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") le xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -580,9 +891,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"1\") le xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -603,9 +918,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"0\") le xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -626,9 +945,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") le xs:boolean(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -649,9 +972,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") le xs:boolean(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -672,9 +999,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"true\") le xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -695,9 +1026,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") le xs:boolean(\"true\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -721,9 +1056,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") gt xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -747,9 +1086,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") le xs:boolean(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -773,9 +1116,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"1\") gt xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -799,9 +1146,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"0\") gt xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -825,9 +1176,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") gt xs:boolean(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -851,9 +1206,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") gt xs:boolean(\"0\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -877,9 +1236,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") le xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -903,9 +1266,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"1\") le xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -929,9 +1296,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"0\") le xs:boolean(\"false\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -955,9 +1326,13 @@ public class OpBooleanGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:boolean(\"false\") le xs:boolean(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

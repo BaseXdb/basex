@@ -20,9 +20,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!--comment-->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--comment-->", false)
     );
@@ -36,9 +40,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:data(<!--comment-->) = \"comment\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!---->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!---->", false)
     );
@@ -68,9 +80,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:data(<!---->) = \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!--<?&-&lt;&#x20;><![CDATA[x]]>-->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!--<?&-&lt;&#x20;><![CDATA[x]]>-->", false)
     );
@@ -100,9 +120,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!----->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -116,9 +140,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!--comment--->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -132,9 +160,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!--com--ment-->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -148,9 +180,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?pi content?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi content?>", false)
     );
@@ -164,9 +200,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:data(<?pi content?>) = \"content\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?pi ?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi ?>", false)
     );
@@ -196,9 +240,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:data(<?pi ?>) = \"\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?pi <?&--&lt;&#x20;><![CDATA[x]]> ?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?pi <?&--&lt;&#x20;><![CDATA[x]]> ?>", false)
     );
@@ -228,9 +280,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<pi>{string-to-codepoints(<?pi x?>)}</pi>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<pi>120</pi>", false)
     );
@@ -244,9 +300,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<pi>{string-to-codepoints(<?pi x ?>)}</pi>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<pi>120 32</pi>", false)
     );
@@ -260,9 +320,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?pi ?>?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -276,9 +340,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?XmL?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -292,9 +360,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?XML?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -308,9 +380,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?xml?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -324,9 +400,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?xMl?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -340,9 +420,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<?target \"\"''content&amp;amp;ss&amp;#00; &amp;#x2014;?>) eq \"\"\"\"\"''content&amp;amp;amp;ss&amp;amp;#00; &amp;amp;#x2014;\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +440,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -372,9 +460,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo><!--",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -388,9 +480,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo><!-",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -404,9 +500,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<foo><!",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -420,9 +520,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!--",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -436,9 +540,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!-- content",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -452,9 +560,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!-- content -",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -468,9 +580,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!---",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -484,9 +600,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!----",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -500,9 +620,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!----",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -516,9 +640,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!- oo -->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -532,9 +660,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<? spaceIsNotAllowedBefore ?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -548,9 +680,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?invalid|char ?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -564,9 +700,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?invalid:char ?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -580,9 +720,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?xml:char ?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -596,9 +740,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -612,9 +760,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -628,9 +780,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?xml ?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -644,9 +800,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?XML ?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -660,9 +820,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?XmL ?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -676,9 +840,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name(<?xmlSUFFIX content?>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "xmlSUFFIX")
     );
@@ -692,9 +860,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<! oo -->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -708,9 +880,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name(<?PREFIXxml content?>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PREFIXxml")
     );
@@ -724,9 +900,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name(<?PREFIXxmlSUFFIX content?>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PREFIXxmlSUFFIX")
     );
@@ -740,9 +920,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?validchar ???<<???? <? >?hm???> eq \"???<<???? <? >?hm??\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -756,9 +940,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?validchar content ?> eq \"content \"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -772,9 +960,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?validchar content a b c asdada dad ?> eq \"content a b c asdada dad \"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -788,9 +980,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!-- some - - - - content - - - >>>>> << >>><>& ;& --> eq \" some - - - - content - - - >>>>> << >>><>&amp; ;&amp; \"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -804,9 +1000,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!-- - - - - - - - - - - - - - - - - --> eq \" - - - - - - - - - - - - - - - - \"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -820,9 +1020,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?target {1 + 1}?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?target {1 + 1}?>", false)
     );
@@ -836,9 +1040,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<?target content ?>) eq \"content \"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -852,9 +1060,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e>a<!--data tar-->b</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e>a<!--data tar-->b</e>", false)
     );
@@ -868,9 +1080,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!-- oo ->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -884,9 +1100,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<e>a<!--data tar-->b</e>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "ab")
     );
@@ -900,9 +1120,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(<!-- content&amp;amp;ss&amp;amp;#00; &amp;#x2014;-->) eq \" content&amp;amp;amp;ss&amp;amp;amp;#00; &amp;amp;#x2014;\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -916,9 +1140,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<??>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -932,9 +1160,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?a?><?b ?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -948,9 +1180,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "data(<?target data?>) instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -964,9 +1200,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "data(<!-- a comment -->) instance of xs:string",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -980,9 +1220,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!-- <<<>><&%(/?=(=)&entity;-]]> -->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!-- <<<>><&%(/?=(=)&entity;-]]> -->", false)
     );
@@ -996,9 +1240,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<?target ]]>?>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?target ]]>?>", false)
     );
@@ -1012,9 +1260,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(exactly-one(<e xml:id=\" ab c d \"/>/@*))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "ab c d")
@@ -1033,17 +1285,17 @@ public class ProdDirectConstructor extends QT3TestSet {
   @org.junit.Test
   public void k2DirectConOther49() {
     final XQuery query = new XQuery(
-      "(:*******************************************************:)\n" +
-      "(: Test: K2-DirectConOther-49                            :)\n" +
-      "(: Written by: Frans Englich                             :)\n" +
-      "(: Date: 2007-11-22T11:31:21+01:00                       :)\n" +
-      "(: Purpose: Check that an attribute value's value is properly read and serialized. Since the whitespace is expressed with character references they are preserved and hence aren't subject to for instance end-of-line handling. Subsequently, the serialization process must escape such characters in order to not have the parser normalize the values when being read back in. :)\n" +
-      "(:*******************************************************:)\n" +
-      "<e attr=\"&#x20;&#xD;&#xA;&#x9;&#xD;&#xD;&#xD;&#xD;      &#xD; &#xD;     &#xD;&#xA; &#xD;&#xA; &#xD;&#xA;\"/>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirectConstructor/K2-DirectConOther-49.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e attr=\" &#xD;&#xA;&#x9;&#xD;&#xD;&#xD;&#xD;      &#xD; &#xD;     &#xD;&#xA; &#xD;&#xA; &#xD;&#xA;\"/>", false)
     );
@@ -1057,9 +1309,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!--- oo ->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1071,18 +1327,17 @@ public class ProdDirectConstructor extends QT3TestSet {
   @org.junit.Test
   public void k2DirectConOther50() {
     final XQuery query = new XQuery(
-      "(:*******************************************************:)\n" +
-      "(: Test: K2-DirectConOther-50                            :)\n" +
-      "(: Written by: Frans Englich                             :)\n" +
-      "(: Date: 2007-11-22T11:31:21+01:00                       :)\n" +
-      "(: Purpose: Ensure that EOL-normalization also takes place in CDATA sections. :)\n" +
-      "(:*******************************************************:)\n" +
-      "string(<e><![CDATA[\n" +
-      "]]></e>) eq \"&#xA;\"",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirectConstructor/K2-DirectConOther-50.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("true", false)
     );
@@ -1094,18 +1349,17 @@ public class ProdDirectConstructor extends QT3TestSet {
   @org.junit.Test
   public void k2DirectConOther51() {
     final XQuery query = new XQuery(
-      "(:*******************************************************:)\n" +
-      "(: Test: K2-DirectConOther-51                            :)\n" +
-      "(: Written by: Frans Englich                             :)\n" +
-      "(: Date: 2007-11-22T11:31:21+01:00                       :)\n" +
-      "(: Purpose: Ensure that EOL-normalization also takes place in CDATA sections(#2). :)\n" +
-      "(:*******************************************************:)\n" +
-      "string(<e><![CDATA[\n" +
-      "]]></e>) eq \"&#xA;\"",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirectConstructor/K2-DirectConOther-51.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("true", false)
     );
@@ -1117,24 +1371,19 @@ public class ProdDirectConstructor extends QT3TestSet {
   @org.junit.Test
   public void k2DirectConOther52() {
     final XQuery query = new XQuery(
-      "(:*******************************************************:)\n" +
-      "(: Test: K2-DirectConOther-52                            :)\n" +
-      "(: Written by: Frans Englich                             :)\n" +
-      "(: Date: 2007-11-22T11:31:21+01:00                       :)\n" +
-      "(: Purpose: Ensure that EOLs are normalized in text nodes. :)\n" +
-      "(:*******************************************************:)\n" +
-      "<e>a \n" +
-      "\n" +
-      "\n" +
-      " \n" +
-      "string literal \n" +
-      "</e>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirectConstructor/K2-DirectConOther-52.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<e>a \n\n\n \nstring literal \n</e>", false)
+      assertSerialization("<e>a \r\n\r\n\r\n \r\nstring literal \r\n</e>", false)
     );
   }
 
@@ -1144,24 +1393,19 @@ public class ProdDirectConstructor extends QT3TestSet {
   @org.junit.Test
   public void k2DirectConOther53() {
     final XQuery query = new XQuery(
-      "(:*******************************************************:)\n" +
-      "(: Test: K2-DirectConOther-53                            :)\n" +
-      "(: Written by: Frans Englich                             :)\n" +
-      "(: Date: 2007-11-22T11:31:21+01:00                       :)\n" +
-      "(: Purpose: Ensure that EOLs are normalized in comment nodes. :)\n" +
-      "(:*******************************************************:)\n" +
-      "<e><!--a \n" +
-      "\n" +
-      "\n" +
-      " \n" +
-      "string literal \n" +
-      "--></e>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirectConstructor/K2-DirectConOther-53.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<e><!--a \n\n\n \nstring literal \n--></e>", false)
+      assertSerialization("<e><!--a \r\n\r\n\r\n \r\nstring literal \r\n--></e>", false)
     );
   }
 
@@ -1171,24 +1415,19 @@ public class ProdDirectConstructor extends QT3TestSet {
   @org.junit.Test
   public void k2DirectConOther54() {
     final XQuery query = new XQuery(
-      "(:*******************************************************:)\n" +
-      "(: Test: K2-DirectConOther-54                            :)\n" +
-      "(: Written by: Frans Englich                             :)\n" +
-      "(: Date: 2007-11-22T11:31:21+01:00                       :)\n" +
-      "(: Purpose: Ensure that EOLs are normalized in processing instructions. :)\n" +
-      "(:*******************************************************:)\n" +
-      "<e><?target a \n" +
-      "\n" +
-      "\n" +
-      " \n" +
-      "string literal \n" +
-      "?></e>",
+      queryFile(
+          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirectConstructor/K2-DirectConOther-54.xq"
+      ),
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertSerialization("<e><?target a \n\n\n \nstring literal \n?></e>", false)
+      assertSerialization("<e><?target a \r\n\r\n\r\n \r\nstring literal \r\n?></e>", false)
     );
   }
 
@@ -1200,9 +1439,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       ">",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1216,9 +1459,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1232,9 +1479,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1248,9 +1499,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e attr=\"   a\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e attr=\"   a\"/>", false)
     );
@@ -1270,9 +1525,13 @@ public class ProdDirectConstructor extends QT3TestSet {
       "\n" +
       "                 '/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<elem attr=\"                                                                                                               \"/>", false)
     );
@@ -1286,9 +1545,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!-->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1302,9 +1565,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e attr=\"    \"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e attr=\"    \"/>", false)
     );
@@ -1318,9 +1585,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<element attributeName=\"}\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1334,9 +1605,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<element attributeName='}'/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1350,9 +1625,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a xml:id=\"1\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a xml:id=\"1\"/>", false)
@@ -1370,9 +1649,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a xml:space=\"PRESERVE\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a xml:space=\"PRESERVE\"/>", false)
@@ -1390,9 +1673,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a xml:space=\"   preserve\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a xml:space=\"   preserve\"/>", false)
@@ -1410,9 +1697,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace a=\"http://example.com/NotThis\"; declare namespace g=\"http://example.com/NotThis2\"; <a xmlns:a=\"http://example.com/NotThis\" xmlns:b=\"http://example.com\"> <b xmlns:a=\"http://example.com/\" xmlns:c=\"http://example.com/c\"> <c xmlns:d=\"http://example.com/d\"/> { for $i in in-scope-prefixes(<e/>) order by $i return $i, \"|\", for $i in in-scope-prefixes(element e {()}) order by $i return $i } <d xmlns:e=\"http://example.com/d\"/> </b> </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a xmlns:b=\"http://example.com\" xmlns:a=\"http://example.com/NotThis\"><b xmlns:c=\"http://example.com/c\" xmlns:a=\"http://example.com/\"><c xmlns:d=\"http://example.com/d\"/>a b c xml | a b c xml<d xmlns:e=\"http://example.com/d\"/></b></a>", false)
     );
@@ -1426,9 +1717,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e xmlns=\"http://example.com/3\">{namespace-uri-from-QName(node-name(<e/>)), namespace-uri-from-QName(node-name(element e2 {()}))}</e>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xmlns=\"http://example.com/3\">http://example.com/3 http://example.com/3</e>", false)
     );
@@ -1447,9 +1742,13 @@ public class ProdDirectConstructor extends QT3TestSet {
       "string literal \n" +
       "\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<c b=\"a      string literal  \"/>", false)
     );
@@ -1468,9 +1767,13 @@ public class ProdDirectConstructor extends QT3TestSet {
       "string literal \n" +
       "\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<c b=\"a      string literal  \"/>", false)
     );
@@ -1484,9 +1787,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!-- -- -->",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1504,9 +1811,13 @@ public class ProdDirectConstructor extends QT3TestSet {
       " \n" +
       "|&#xD; &#xD;&#xA;</a>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10 10 10 32 10 124 13 32 13 10")
     );
@@ -1520,9 +1831,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a xmlns:p=\"urn:abbrev:NS\"><b p:c=\"\" p:d=\"\"/></a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<a xmlns:p=\"urn:abbrev:NS\"><b p:c=\"\" p:d=\"\"/></a>", false)
     );
@@ -1536,9 +1851,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!--",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1552,9 +1871,13 @@ public class ProdDirectConstructor extends QT3TestSet {
     final XQuery query = new XQuery(
       "<!-",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );

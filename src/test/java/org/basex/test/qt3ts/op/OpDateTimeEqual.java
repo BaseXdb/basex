@@ -27,9 +27,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2004-08-12T23:01:04.12\") eq xs:dateTime(\"2004-08-12T23:01:04.12\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T12:12:23\") ne xs:date(\"1999-12-04\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -73,9 +81,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T12:12:23\") le xs:date(\"1999-12-04\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -96,9 +108,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T12:12:23\") lt xs:date(\"1999-12-04\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -119,9 +135,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T12:12:23\") ge xs:date(\"1999-12-04\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -142,9 +162,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T12:12:23\") gt xs:date(\"1999-12-04\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -165,9 +189,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-12-04\") eq xs:dateTime(\"1999-12-04T12:12:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -188,9 +216,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-12-04\") ne xs:dateTime(\"1999-12-04T12:12:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -211,9 +243,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-12-04\") le xs:dateTime(\"1999-12-04T12:12:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -234,9 +270,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-12-04\") lt xs:dateTime(\"1999-12-04T12:12:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -257,9 +297,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-12-04\") ge xs:dateTime(\"1999-12-04T12:12:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -280,9 +324,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:dateTime(\"2004-08-12T23:01:04.12\") eq xs:dateTime(\"2004-08-12T23:01:04.13\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -303,9 +351,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:date(\"1999-12-04\") gt xs:dateTime(\"1999-12-04T12:12:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -326,9 +378,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T12:12:23\") eq xs:time(\"22:12:04\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -349,9 +405,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T12:12:23\") ne xs:time(\"22:12:04\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -372,9 +432,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T12:12:23\") le xs:time(\"22:12:04\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -395,9 +459,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T12:12:23\") lt xs:time(\"22:12:04\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -418,9 +486,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T12:12:23\") ge xs:time(\"22:12:04\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -441,9 +513,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T12:12:23\") gt xs:time(\"22:12:04\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -464,9 +540,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"22:12:04\") eq xs:dateTime(\"1999-12-04T12:12:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -487,9 +567,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"22:12:04\") ne xs:dateTime(\"1999-12-04T12:12:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -510,9 +594,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"22:12:04\") le xs:dateTime(\"1999-12-04T12:12:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -533,9 +621,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2004-08-12T23:01:05.12\") ne xs:dateTime(\"2004-08-12T23:01:04.12\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -556,9 +648,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"22:12:04\") lt xs:dateTime(\"1999-12-04T12:12:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -579,9 +675,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"22:12:04\") ge xs:dateTime(\"1999-12-04T12:12:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -602,9 +702,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:time(\"22:12:04\") gt xs:dateTime(\"1999-12-04T12:12:23\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -625,9 +729,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:dateTime(\"2004-07-12T23:01:04.12\") ne xs:dateTime(\"2004-07-12T23:01:04.12\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -648,9 +756,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T16:00:12.345-00:00\") eq xs:dateTime(\"1999-12-04T16:00:12.345Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -671,9 +783,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T16:00:12.345+00:00\") eq xs:dateTime(\"1999-12-04T16:00:12.345Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -694,9 +810,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T16:00:12.345Z\") eq xs:dateTime(\"1999-12-04T16:00:12.345Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -717,9 +837,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T16:00:12.345-00:00\") eq xs:dateTime(\"1999-12-04T16:00:12.345+00:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -740,9 +864,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1999-12-04T12:12:23\") eq xs:date(\"1999-12-04\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -763,9 +891,373 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2002-03-06T00:00:00Z\") ne xs:dateTime(\"2002-03-05T00:00:00+03:00\")",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual001() {
+    final XQuery query = new XQuery(
+      "declare function local:two-digit($number as xs:integer) { let $string := string($number) return if (string-length($string) lt 2) then concat('0', $string) else $string }; declare function local:dateTime($year as xs:integer, $month as xs:integer, $day as xs:integer) { let $m := local:two-digit($month), $d := local:two-digit($day) return xs:dateTime(concat($year, '-', $m, '-', $d, \"T12:00:00\")) }; not(local:dateTime(2008, 05, 12) eq xs:dateTime(\"1972-12-15T12:00:00\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual002() {
+    final XQuery query = new XQuery(
+      "xs:dateTime(\"2008-01-30T00:01:00\") eq xs:dateTime(\"2008-01-31T01:00:00+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual003() {
+    final XQuery query = new XQuery(
+      "xs:dateTime(\"2008-01-31T00:01:00+09:00\") eq xs:dateTime(\"2008-01-30T00:01:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual004() {
+    final XQuery query = new XQuery(
+      "xs:dateTime(\"2008-01-31T00:01:00\") eq xs:dateTime(\"2008-01-31T00:01:00+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual005() {
+    final XQuery query = new XQuery(
+      "xs:dateTime(\"2008-01-31T00:01:00+09:00\") eq xs:dateTime(\"2008-01-31T00:01:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual006() {
+    final XQuery query = new XQuery(
+      "declare function local:two-digit($number as xs:integer) { let $string := string($number) return if (string-length($string) lt 2) then concat('0', $string) else $string }; declare function local:dateTime($year as xs:integer, $month as xs:integer, $day as xs:integer) { let $m := local:two-digit($month), $d := local:two-digit($day) return xs:dateTime(concat($year, '-', $m, '-', $d, \"T12:00:00\")) }; not(local:dateTime(2008, 05, 12) ne xs:dateTime(\"1972-12-15T12:00:00\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual007() {
+    final XQuery query = new XQuery(
+      "xs:dateTime(\"2008-01-30T00:01:00\") ne xs:dateTime(\"2008-01-31T00:01:00+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual008() {
+    final XQuery query = new XQuery(
+      "xs:dateTime(\"2008-01-31T00:01:00+09:00\") ne xs:dateTime(\"2008-01-30T00:01:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual009() {
+    final XQuery query = new XQuery(
+      "xs:dateTime(\"2008-01-31T00:01:00\") ne xs:dateTime(\"2008-01-31T00:01:00+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual010() {
+    final XQuery query = new XQuery(
+      "xs:dateTime(\"2008-01-31T00:01:00+09:00\") ne xs:dateTime(\"2008-01-31T00:01:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual011() {
+    final XQuery query = new XQuery(
+      "declare function local:dateTime($dateTime as xs:dateTime, $null as xs:boolean) { if ($null) then () else $dateTime }; exists(local:dateTime(xs:dateTime(\"1972-12-15T12:00:00\"), fn:true()) eq xs:dateTime(\"1972-12-15T12:00:00\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual012() {
+    final XQuery query = new XQuery(
+      "declare function local:dateTime($dateTime as xs:dateTime, $null as xs:boolean) { if ($null) then () else $dateTime }; local:dateTime(xs:dateTime(\"1972-12-15T12:00:00\"), fn:false()) eq xs:dateTime(\"1972-12-15T12:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual013() {
+    final XQuery query = new XQuery(
+      "declare function local:dateTime($dateTime as xs:dateTime, $null as xs:boolean) { if ($null) then () else $dateTime }; exists(local:dateTime(xs:dateTime(\"1972-12-15T12:00:00\"), fn:true()) ne xs:dateTime(\"1972-12-15T12:00:00\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual014() {
+    final XQuery query = new XQuery(
+      "declare function local:dateTime($dateTime as xs:dateTime, $null as xs:boolean) { if ($null) then () else $dateTime }; local:dateTime(xs:dateTime(\"1972-12-15T12:00:00\"), fn:false()) ne xs:dateTime(\"1972-12-15T12:00:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual015() {
+    final XQuery query = new XQuery(
+      "declare function local:dateTime($dateTime as xs:string, $timezone as xs:string) { xs:dateTime( concat($dateTime, $timezone) ) }; adjust-dateTime-to-timezone(local:dateTime(\"1972-12-14T00:00:00\", \"-12:00\")) eq adjust-dateTime-to-timezone(xs:dateTime(\"1972-12-15T00:00:00+12:00\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual016() {
+    final XQuery query = new XQuery(
+      "declare function local:dateTime($dateTime as xs:string, $timezone as xs:string) { xs:dateTime( concat($dateTime, $timezone) ) }; adjust-dateTime-to-timezone(local:dateTime(\"1972-12-14T00:00:00\", \"-12:00\")) ne adjust-dateTime-to-timezone(xs:dateTime(\"1972-12-15T00:00:00+12:00\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual017() {
+    final XQuery query = new XQuery(
+      "xs:dateTime(\"1972-12-15T00:00:00+12:00\") eq xs:dateTime(\"1972-12-15T00:00:01\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of dateTime .
+   */
+  @org.junit.Test
+  public void cbclDateTimeEqual018() {
+    final XQuery query = new XQuery(
+      "xs:dateTime(\"1972-12-15T00:00:00+12:00\") ne xs:dateTime(\"1972-12-15T00:00:01\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -789,9 +1281,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1970-01-01T00:00:00Z\") eq xs:dateTime(\"1970-01-01T00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -815,9 +1311,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1970-01-01T00:00:00Z\") ne xs:dateTime(\"2030-12-31T23:59:59Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -841,9 +1341,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1970-01-01T00:00:00Z\") le xs:dateTime(\"1970-01-01T00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -867,9 +1371,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1996-04-07T01:40:52Z\") le xs:dateTime(\"1970-01-01T00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -893,9 +1401,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2030-12-31T23:59:59Z\") le xs:dateTime(\"1970-01-01T00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -919,9 +1431,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1970-01-01T00:00:00Z\") le xs:dateTime(\"1996-04-07T01:40:52Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -945,9 +1461,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1970-01-01T00:00:00Z\") le xs:dateTime(\"2030-12-31T23:59:59Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -971,9 +1491,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1970-01-01T00:00:00Z\") ge xs:dateTime(\"1970-01-01T00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -997,9 +1521,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1996-04-07T01:40:52Z\") ge xs:dateTime(\"1970-01-01T00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1023,9 +1551,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2030-12-31T23:59:59Z\") ge xs:dateTime(\"1970-01-01T00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1049,9 +1581,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1970-01-01T00:00:00Z\") ge xs:dateTime(\"1996-04-07T01:40:52Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1075,9 +1611,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1996-04-07T01:40:52Z\") eq xs:dateTime(\"1970-01-01T00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1101,9 +1641,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1970-01-01T00:00:00Z\") ge xs:dateTime(\"2030-12-31T23:59:59Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1127,9 +1671,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2030-12-31T23:59:59Z\") eq xs:dateTime(\"1970-01-01T00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1153,9 +1701,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1970-01-01T00:00:00Z\") eq xs:dateTime(\"1996-04-07T01:40:52Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1179,9 +1731,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1970-01-01T00:00:00Z\") eq xs:dateTime(\"2030-12-31T23:59:59Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1205,9 +1761,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1970-01-01T00:00:00Z\") ne xs:dateTime(\"1970-01-01T00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1231,9 +1791,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1996-04-07T01:40:52Z\") ne xs:dateTime(\"1970-01-01T00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1257,9 +1821,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"2030-12-31T23:59:59Z\") ne xs:dateTime(\"1970-01-01T00:00:00Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1283,9 +1851,13 @@ public class OpDateTimeEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:dateTime(\"1970-01-01T00:00:00Z\") ne xs:dateTime(\"1996-04-07T01:40:52Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

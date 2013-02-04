@@ -20,9 +20,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "(::)declare(::)namespace(::)ncname(::)=(::)'http://example.com/';(::)1(::)eq(::)1(::)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "(::)declare(::)namespace(::)ncname(::)=(::)\"http://example.com/\"(::);(::)1(::)eq(::)1(::)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace NCName := \"http://example.com/\";",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -68,9 +80,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace myPrefix = \"http://example.com/\"; declare namespace myPrefix = \"\"; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0033")
     );
@@ -84,9 +100,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace local = \"\"; local:untypedAtomic(\"string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -100,9 +120,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace fn = \"\"; fn:untypedAtomic(\"string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -116,9 +140,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xsi = \"\"; xsi:untypedAtomic(\"string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -132,9 +160,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/<e a=\"{p:asd}\" xmlns:p=\"http://example.com/asd\"/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e xmlns:p=\"http://example.com/asd\" a=\"\"/>", false)
     );
@@ -148,9 +180,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $inputDoc := 2; declare namespace x = \"http://example.com/\"; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -164,9 +200,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xml = \"http://example.com/\"; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0070")
     );
@@ -180,9 +220,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace prefix = \"http://example.com/\" { 1 }",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -196,9 +240,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace myPrefix = \"\"; declare namespace myPrefix = \"http://example.com/\"; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0033")
     );
@@ -212,9 +260,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace myPrefix = \"http://example.com/\"; declare namespace myPrefix = \"http://example.com/TheSecondOne\"; declare namespace myPrefix = \"\"; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0033")
     );
@@ -228,9 +280,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xs = \"\"; xs:integer(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -244,9 +300,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace thisPrefixIsNotBoundExampleCom = \"\"; true()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xml = \"\"; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0070")
     );
@@ -276,9 +340,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xmlns = \"\"; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0070")
     );
@@ -292,9 +360,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xdt = \"\"; xdt:untypedAtomic(\"string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -308,9 +380,37 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xs = \"\"; xs:untypedAtomic(\"string\")",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0081")
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  Test that the empty namespace can be bound to a prefix. .
+   */
+  @org.junit.Test
+  public void cbclDeclareNamespace001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare default element namespace \"http://www.example.org\"; \n" +
+      "      \tdeclare namespace test=\"\"; \n" +
+      "      \t<test:a />\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -324,9 +424,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace foo = \"http://www.example.com/examples\"; declare namespace foo = \"http://www.example.com/examples\"; a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0033")
     );
@@ -340,9 +444,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xsi = \"http://www.example.com/examples\"; let $var := <xsi:someElement>some context</xsi:someElement> return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<xsi:someElement xmlns:xsi=\"http://www.example.com/examples\">some context</xsi:someElement>", false)
     );
@@ -356,9 +464,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace fn = \"http://www.example.com/examples\"; let $var := <fn:someElement>some context</fn:someElement> return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:someElement xmlns:fn=\"http://www.example.com/examples\">some context</fn:someElement>", false)
     );
@@ -372,9 +484,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xdt = \"http://www.example.com/examples\"; let $var := <xdt:someElement>some context</xdt:someElement> return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<xdt:someElement xmlns:xdt=\"http://www.example.com/examples\">some context</xdt:someElement>", false)
     );
@@ -388,9 +504,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace local = \"http://www.example.com/examples\"; let $var := <local:someElement>some context</local:someElement> return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<local:someElement xmlns:local=\"http://www.example.com/examples\">some context</local:someElement>", false)
     );
@@ -404,9 +524,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace XML = \"http://www.example.com/examples\"; let $var := <XML:someElement>some context</XML:someElement> return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<XML:someElement xmlns:XML=\"http://www.example.com/examples\">some context</XML:someElement>", false)
     );
@@ -420,9 +544,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace XMLNS = \"http://www.example.com/examples\"; let $var := <XMLNS:someElement>some context</XMLNS:someElement> return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<XMLNS:someElement xmlns:XMLNS=\"http://www.example.com/examples\">some context</XMLNS:someElement>", false)
     );
@@ -436,9 +564,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace px = \"http://www.example.com/examples\"; let $var := <px:someElement xmlns:px = \"http://www.examples.com/localexamples\">some context</px:someElement> return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<px:someElement xmlns:px=\"http://www.examples.com/localexamples\">some context</px:someElement>", false)
     );
@@ -452,9 +584,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace px = \"http://www.example.com/abc\"; let $var := <px:someElement>some context</px:someElement> return namespace-uri-from-QName(node-name($var)) eq xs:anyURI(\"http://www.example.com/abc\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -468,9 +604,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace px = \"ftp://ftp.is.co.za/rfc/somefile.txt\"; let $var := <px:someElement>some context</px:someElement> return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<px:someElement xmlns:px=\"ftp://ftp.is.co.za/rfc/somefile.txt\">some context</px:someElement>", false)
     );
@@ -484,9 +624,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace px1 = \"http://www.example.com/examples\"; declare namespace px2 = \"http://www.example.com/examples\"; let $var := <px1:someElement>some context</px1:someElement> return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<px1:someElement xmlns:px1=\"http://www.example.com/examples\">some context</px1:someElement>", false)
     );
@@ -500,9 +644,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "element foo:anElement {\"Element content\"}",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -516,9 +664,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xx = \"http://www.example.com/abc123\"; let $var := <xx:someElement>some content</xx:someElement> return namespace-uri-from-QName(node-name($var)) eq xs:anyURI(\"http://www.example.com/abc123\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -532,9 +684,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace abc = \"http://www.example.com/abc\"; let $var := <abc:someElement>some content</abc:someElement> return namespace-uri-from-QName(node-name($var)) eq xs:anyURI(\"http://www.example.com/abc\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -548,9 +704,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace abc = \"gopher://spinaltap.micro.umn.edu/00/Weather/California/somefile\"; <abc:someElement>some content</abc:someElement>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<abc:someElement xmlns:abc=\"gopher://spinaltap.micro.umn.edu/00/Weather/California/somefile\">some content</abc:someElement>", false)
     );
@@ -564,9 +724,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace abc = \"http://www.example.com/abc&amp;\"; let $var := <abc:someElement>some content</abc:someElement> return namespace-uri-from-QName(node-name($var)) eq xs:anyURI(\"http://www.example.com/abc&amp;\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -580,9 +744,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace abc = \"mailto:someuser@someserver.com\"; <abc:someElement>some content</abc:someElement>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<abc:someElement xmlns:abc=\"mailto:someuser@someserver.com\">some content</abc:someElement>", false)
     );
@@ -596,9 +764,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xml = \"http://www.w3.org/XML/1998/namespace\"; \"a\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0070")
     );
@@ -612,9 +784,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace foo = \"http://www.w3.org/XML/1998/namespace\"; \"a\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0070")
     );
@@ -628,9 +804,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xmlns = \"http://example.com/examples\"; \"a\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0070")
     );
@@ -644,9 +824,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace foo = \"http://example.org\"; <foo:bar> Lentils </foo:bar>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<foo:bar xmlns:foo=\"http://example.org\"> Lentils </foo:bar>", false)
     );
@@ -660,9 +844,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xx = \"http://example.org\"; let $i := <foo:bar xmlns:foo = \"http://example.org\"> <foo:bing> Lentils </foo:bing> </foo:bar> return $i/xx:bing",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<foo:bing xmlns:foo=\"http://example.org\"> Lentils </foo:bing>", false)
     );
@@ -676,9 +864,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace foo:bar = \"http://www.example.com/examples\"; \"aa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -692,9 +884,13 @@ public class ProdNamespaceDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace xs = \"http://www.example.com/examples\"; let $var := <xs:someElement>some context</xs:someElement> return $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<xs:someElement xmlns:xs=\"http://www.example.com/examples\">some context</xs:someElement>", false)
     );

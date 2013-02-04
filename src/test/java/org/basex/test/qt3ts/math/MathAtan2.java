@@ -20,9 +20,14 @@ public class MathAtan2 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:atan2(+0.0e0, 0.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.0e0")
     );
@@ -36,9 +41,14 @@ public class MathAtan2 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:atan2(-0.0e0, 0.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0.0e0")
     );
@@ -52,11 +62,16 @@ public class MathAtan2 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:atan2(+0.0e0, -0.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("math:pi()")
+      assertQuery("abs($result - 3.141592653589793e0) lt 1e-14")
     );
   }
 
@@ -68,11 +83,16 @@ public class MathAtan2 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:atan2(-0.0e0, -0.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("-math:pi()")
+      assertQuery("abs($result + 3.141592653589793e0) lt 1e-14")
     );
   }
 
@@ -84,11 +104,16 @@ public class MathAtan2 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:atan2(-1, -0.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("-math:pi() div 2")
+      assertQuery("abs($result + 1.5707963267948966e0) lt 1e-14")
     );
   }
 
@@ -100,11 +125,16 @@ public class MathAtan2 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:atan2(+1, 0.0e0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("+math:pi() div 2")
+      assertQuery("abs($result - 1.5707963267948966e0) lt 1e-14")
     );
   }
 
@@ -116,11 +146,16 @@ public class MathAtan2 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:atan2(-0.0e0, -1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("-math:pi()")
+      assertQuery("abs($result + 3.141592653589793e0) lt 1e-14")
     );
   }
 
@@ -132,11 +167,16 @@ public class MathAtan2 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:atan2(+0.0e0, -1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertEq("+math:pi()")
+      assertQuery("abs($result - 3.141592653589793e0) lt 1e-14")
     );
   }
 
@@ -148,9 +188,14 @@ public class MathAtan2 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:atan2(-0.0e0, +1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0.0e0")
     );
@@ -164,9 +209,14 @@ public class MathAtan2 extends QT3TestSet {
     final XQuery query = new XQuery(
       "math:atan2(+0.0e0, +1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.namespace("math", "http://www.w3.org/2005/xpath-functions/math");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("+0.0e0")
     );

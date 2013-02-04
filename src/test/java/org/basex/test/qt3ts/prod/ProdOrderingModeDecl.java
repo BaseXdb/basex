@@ -20,9 +20,13 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)ordering ordered; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)ordering unordered; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare(::)ordering unordered; declare(::)ordering ordered; 1 eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0065")
     );
@@ -68,9 +80,13 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "ordering eq ordering",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -84,9 +100,13 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "order eq order",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -100,9 +120,13 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering unordered; declare ordering ordered; \"aa\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0065")
     );
@@ -116,10 +140,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; for $x in //hours order by $x ascending return $x",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>12</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>30</hours><hours>40</hours><hours>40</hours><hours>40</hours><hours>40</hours><hours>70</hours><hours>80</hours><hours>80</hours><hours>80</hours>", false)
     );
@@ -133,10 +161,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering unordered; for $x in //hours order by $x descending return $x",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>80</hours><hours>80</hours><hours>80</hours><hours>70</hours><hours>40</hours><hours>40</hours><hours>40</hours><hours>40</hours><hours>30</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>12</hours>", false)
     );
@@ -150,10 +182,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering unordered; for $x in //hours order by $x ascending return $x",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>12</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>30</hours><hours>40</hours><hours>40</hours><hours>40</hours><hours>40</hours><hours>70</hours><hours>80</hours><hours>80</hours><hours>80</hours>", false)
     );
@@ -167,10 +203,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; for $x in (/works/employee/hours) return $x",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>40</hours><hours>70</hours><hours>20</hours><hours>80</hours><hours>20</hours><hours>40</hours><hours>20</hours><hours>30</hours><hours>12</hours><hours>40</hours><hours>80</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>40</hours><hours>80</hours>", false)
     );
@@ -184,10 +224,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; for $x in (//day) return $x",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<day>Monday</day><day>Tuesday</day>", false)
     );
@@ -201,10 +245,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering unordered; for $x in (//day) return $x",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<day>Monday</day><day>Tuesday</day>", false)
@@ -222,10 +270,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering unordered; ordered { for $x in /works//day return $x }",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<day>Monday</day><day>Tuesday</day>", false)
     );
@@ -239,10 +291,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; unordered { for $x in /works//day return $x }",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<day>Monday</day><day>Tuesday</day>", false)
@@ -260,9 +316,13 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; let $a := <a><b>1</b><c>2</c></a> return $a/b union $a/c",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b>1</b><c>2</c>", false)
     );
@@ -276,10 +336,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; for $x in /works//overtime return $x/child::day",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<day>Monday</day><day>Tuesday</day>", false)
     );
@@ -293,10 +357,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; for $x in /works//day[1] return $x/parent::node()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<overtime>\n     <day>Monday</day>\n     <day>Tuesday</day>\n   </overtime>", false)
     );
@@ -310,10 +378,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; for $x in /works//day[1] return $x/following::day",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<day>Tuesday</day>", false)
@@ -331,10 +403,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; for $x in /works//overtime return $x/descendant::day",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<day>Monday</day><day>Tuesday</day>", false)
     );
@@ -348,10 +424,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; (//overtime) intersect (//overtime)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<overtime>\n     <day>Monday</day>\n     <day>Tuesday</day>\n   </overtime>", false)
     );
@@ -365,10 +445,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering unordered; (//employee[1]) except (//employee[2])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 1\" gender=\"female\">\n   <empnum>E1</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee>", false)
     );
@@ -382,10 +466,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; for $x in //hours return $x",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>40</hours><hours>70</hours><hours>20</hours><hours>80</hours><hours>20</hours><hours>40</hours><hours>20</hours><hours>30</hours><hours>12</hours><hours>40</hours><hours>80</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>40</hours><hours>80</hours>", false)
     );
@@ -399,10 +487,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; for $x in //hours order by $x descending return $x",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<hours>80</hours><hours>80</hours><hours>80</hours><hours>70</hours><hours>40</hours><hours>40</hours><hours>40</hours><hours>40</hours><hours>30</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>20</hours><hours>12</hours>", false)
     );
@@ -416,10 +508,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering unordered; for $x in (/works/employee[4]/hours) return $x",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<hours>20</hours><hours>40</hours>", false)
@@ -437,9 +533,13 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering unordered; (<a>1</a>) union (<b>2</b>)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<a>1</a><b>2</b>", false)
@@ -457,10 +557,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering unordered; (//overtime) intersect (//overtime)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<overtime>\n     <day>Monday</day>\n     <day>Tuesday</day>\n   </overtime>", false)
     );
@@ -474,10 +578,14 @@ public class ProdOrderingModeDecl extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare ordering ordered; (//employee[1]) except (//employee[2])",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<employee name=\"Jane Doe 1\" gender=\"female\">\n   <empnum>E1</empnum>\n   <pnum>P1</pnum>\n   <hours>40</hours>\n  </employee>", false)
     );

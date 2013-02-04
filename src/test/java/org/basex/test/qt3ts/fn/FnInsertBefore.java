@@ -20,9 +20,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "insert-before()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "insert-before((), 30, 7) eq 7",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(insert-before((1, 2, 3, 4), 30, ())) eq 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "insert-before(9, 30, ()) eq 9",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(insert-before((1, 2, 3, 4), 1, ())) eq 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(insert-before((1, 2, 3), 30, (4, 5, 6))) eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(insert-before((), 30, (1, 2, 3))) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(insert-before((error(), 1), 1, (1, \"two\", 3))) > 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -152,9 +184,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "(insert-before((1, current-time(), 3), 1, (4, 5, 6))[last()] treat as xs:integer) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -168,9 +204,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "(insert-before((1, current-time(), 3), 10, (4, 5, 6))[last()] treat as xs:integer) eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -184,9 +224,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "(insert-before((1, current-time(), 3), 10, (4, 5, 6))[last() - 3] treat as xs:integer) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -200,9 +244,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "insert-before(\"wrong params\", 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -216,9 +264,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "(insert-before((1, current-time(), 3), 10, ())[last()] treat as xs:integer) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -232,9 +284,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(insert-before((1, current-time(), 3), 0, (4, 5, 6))[last() - 10])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -248,9 +304,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "insert-before(\"wrong params\", 2, 3, 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -264,9 +324,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "insert-before((), (), \"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -280,9 +344,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "insert-before((), -31, \"a string\") eq \"a string\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -296,9 +364,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(insert-before((1, 2, 3), 1, (4, 5, 6))) eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -312,9 +384,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "insert-before((), 1, 3) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -328,9 +404,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "insert-before((), 1, \"a string\") eq \"a string\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -344,11 +424,57 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(insert-before((), 1, (1, 2, 3))) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  tests insert-before at known positions .
+   */
+  @org.junit.Test
+  public void cbclFnInsertBefore001() {
+    final XQuery query = new XQuery(
+      "insert-before(1 to 10,5,20 to 30)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1 2 3 4 20 21 22 23 24 25 26 27 28 29 30 5 6 7 8 9 10")
+    );
+  }
+
+  /**
+   *  Tests insert-before for known positions .
+   */
+  @org.junit.Test
+  public void cbclFnInsertBefore002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        insert-before((1 to 10,(20 to 30)[. mod 2 = 0],30 to 40),12,\"blah\")\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1 2 3 4 5 6 7 8 9 10 20 blah 22 24 26 28 30 30 31 32 33 34 35 36 37 38 39 40")
     );
   }
 
@@ -360,9 +486,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),1, \"z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"z\", \"a\", \"b\", \"c\"")
     );
@@ -376,9 +506,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),0, ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", \"b\", \"c\"")
     );
@@ -392,9 +526,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", \"b\", \"c\"")
     );
@@ -408,9 +546,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:string(\" \"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", \" \", \"b\", \"c\"")
     );
@@ -424,9 +566,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:anyURI(\"www.example.com\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", \"www.example.com\", \"b\", \"c\"")
     );
@@ -440,9 +586,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:integer(\"100\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", 100, \"b\", \"c\"")
     );
@@ -456,9 +606,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:decimal(\"1.1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", 1.1, \"b\", \"c\"")
     );
@@ -472,9 +626,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:float(\"1.1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", 1.1, \"b\", \"c\"")
     );
@@ -488,9 +646,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:float(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", xs:float('NaN'), \"b\", \"c\"")
     );
@@ -504,9 +666,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:float(\"-0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", 0, \"b\", \"c\"")
     );
@@ -520,9 +686,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:float(\"-INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", xs:float('-INF'), \"b\", \"c\"")
     );
@@ -536,9 +706,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:double(\"NaN\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", xs:double('NaN'),  \"b\", \"c\"")
     );
@@ -552,9 +726,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:double(\"INF\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", xs:double('INF'), \"b\", \"c\"")
     );
@@ -568,9 +746,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:boolean(\"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", true(), \"b\", \"c\"")
     );
@@ -584,9 +766,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:boolean(\"0\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", false(), \"b\", \"c\"")
     );
@@ -600,9 +786,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:boolean(\"true\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", true(), \"b\", \"c\"")
     );
@@ -616,9 +806,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),2, xs:boolean(\"false\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", false(),  \"b\",  \"c\"")
     );
@@ -632,9 +826,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),4, xs:date(\"1993-03-31\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", \"b\", \"c\", xs:date('1993-03-31')")
     );
@@ -648,9 +846,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),4, xs:dateTime(\"1972-12-31T00:00:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", \"b\", \"c\", xs:dateTime('1972-12-31T00:00:00')")
     );
@@ -664,9 +866,13 @@ public class FnInsertBefore extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:insert-before( (\"a\", \"b\", \"c\"),4, xs:time(\"12:30:00\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"a\", \"b\", \"c\", xs:time('12:30:00')")
     );

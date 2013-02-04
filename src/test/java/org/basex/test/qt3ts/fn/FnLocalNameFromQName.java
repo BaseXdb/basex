@@ -20,9 +20,13 @@ public class FnLocalNameFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name-from-QName()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnLocalNameFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name-from-QName(1, 2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnLocalNameFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(local-name-from-QName( () ))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnLocalNameFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "local-name-from-QName( QName(\"example.com/\", \"pre:lname\")) eq \"lname\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnLocalNameFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -100,9 +120,13 @@ public class FnLocalNameFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(((),()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -116,9 +140,13 @@ public class FnLocalNameFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(\"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -132,9 +160,13 @@ public class FnLocalNameFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -144,16 +176,20 @@ public class FnLocalNameFromQName extends QT3TestSet {
    *  Test function fn:local-name-from-QName. Error case - invalid parameter type (simple type) .
    */
   @org.junit.Test
-  public void localNameFromQNameFunc015() {
+  public void localNameFromQNameFunc015a() {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName((//Folder)[1])",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      error("XPTY0004")
+      error("XPTY0117")
     );
   }
 
@@ -165,9 +201,13 @@ public class FnLocalNameFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(xs:integer(\"100\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -181,9 +221,13 @@ public class FnLocalNameFromQName extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName(xs:time(\"12:00:00Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );

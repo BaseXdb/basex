@@ -20,9 +20,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(6) div xs:double(2) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(5) div xs:integer(2) ne 2.6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(5) div xs:decimal(2) eq 2.5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(5) div xs:decimal(2) ne 2.6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "5 div 2 ne 2.6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "5.0 div 2.0 eq 2.5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "5.0 div 2.0 ne 2.6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) div xs:integer(2)) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(6) div xs:decimal(2)) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(6) div xs:integer(2)) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) div xs:decimal(2)) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(6) div xs:decimal(2) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -212,9 +260,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(6) div xs:decimal(2)) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) div xs:float(2)) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(6) div xs:integer(2)) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(6) div xs:float(2)) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -276,9 +340,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(6) div xs:float(2)) instance of xs:float",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -292,9 +360,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:decimal(6) div xs:double(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +380,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(6) div xs:decimal(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -324,9 +400,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(6) div xs:float(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:float(6) div xs:double(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +440,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(6) div xs:integer(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +460,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(6) div xs:integer(2) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +480,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(6) div xs:double(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,9 +500,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(6) div xs:double(2)) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -420,9 +520,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "\"3\" div \"3\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -436,9 +540,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(3) div \"3\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -452,9 +560,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:double(3) div xs:untypedAtomic(\"3\")) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -468,9 +580,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:untypedAtomic(\"3\") div xs:double(3)) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -484,9 +600,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "10 div3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -500,9 +620,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "10div 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -516,9 +640,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "10div3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -532,9 +660,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(() div ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -552,9 +684,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(6) div xs:float(2) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -568,9 +704,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(1 div ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -588,9 +728,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(() div 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -608,9 +752,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(xs:double(3) div ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -628,9 +776,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(() div xs:decimal(1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -648,9 +800,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(5) div xs:double(2) eq 2.5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -664,9 +820,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(5) div xs:double(2) ne 2.6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -680,9 +840,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(5) div xs:float(2) eq 2.5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -696,9 +860,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(5) div xs:float(2) ne 2.6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -712,9 +880,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(5) div xs:integer(2) eq 2.5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -728,9 +900,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -744,9 +920,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "+0e0 div +0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -760,9 +940,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "-0e0 div -0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -776,9 +960,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "-0e0 div +0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
     );
@@ -792,9 +980,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "+3 div +0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -808,9 +1000,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "-3 div +0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF")
     );
@@ -824,9 +1020,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "+3 div -0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF")
     );
@@ -840,9 +1040,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "-3 div -0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -856,9 +1060,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(<e/>/(div div div))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -872,9 +1080,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div 0.0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -888,9 +1100,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div +0.0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -904,9 +1120,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div -0.0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FOAR0001")
     );
@@ -920,9 +1140,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div 0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -936,9 +1160,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "-1 div 0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF")
     );
@@ -952,9 +1180,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "INF")
     );
@@ -968,9 +1200,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "-1 div xs:float(0)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "-INF")
     );
@@ -984,11 +1220,361 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "+0e0 div -0e0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "NaN")
+    );
+  }
+
+  /**
+   *  test division of xs:double NaN .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:double) as xs:double { $arg * $arg }; \n" +
+      "      \txs:double('NaN') div local:square(7)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "NaN")
+    );
+  }
+
+  /**
+   *  test division by xs:double NaN .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:double) as xs:double { $arg * $arg }; \n" +
+      "      \tlocal:square(7) div xs:double('NaN')\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "NaN")
+    );
+  }
+
+  /**
+   *  test division by xs:double 1 .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:double) as xs:double { $arg * $arg }; \n" +
+      "      \tlocal:square(7) div 1e0\n" +
+      "      \t",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "49")
+    );
+  }
+
+  /**
+   *  test division by xs:double -1 .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:double) as xs:double { $arg * $arg }; \n" +
+      "      \tlocal:square(7) div -1e0\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-49")
+    );
+  }
+
+  /**
+   *  test division of xs:float NaN .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:float) as xs:float { $arg * $arg }; \n" +
+      "      \txs:float('NaN') div local:square(7)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "NaN")
+    );
+  }
+
+  /**
+   *  test division by xs:float NaN .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide006() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:float) as xs:float { $arg * $arg }; \n" +
+      "      \tlocal:square(7) div xs:float('NaN')\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "NaN")
+    );
+  }
+
+  /**
+   *  test division by xs:float 1 .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide007() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:float) as xs:float { $arg * $arg }; \n" +
+      "      \tlocal:square(7) div xs:float(1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "49")
+    );
+  }
+
+  /**
+   *  test division by xs:float -1 .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide008() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:float) as xs:float { $arg * $arg }; \n" +
+      "      \tlocal:square(7) div xs:float(-1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-49")
+    );
+  }
+
+  /**
+   *  test division by xs:decimal 0 .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide009() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; \n" +
+      "      \tlocal:square(2.0) div 0.0\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FOAR0001")
+    );
+  }
+
+  /**
+   *  test division by xs:decimal 1 .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide010() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; \n" +
+      "      \tlocal:square(7.0) div 1.0\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "49")
+    );
+  }
+
+  /**
+   *  test division by xs:decimal -1 .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide011() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:decimal) as xs:decimal { $arg * $arg }; \n" +
+      "      \tlocal:square(7.0) div -1.0\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-49")
+    );
+  }
+
+  /**
+   *  test division by xs:integer 0 .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide012() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; \n" +
+      "      \tlocal:square(2) div 0\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FOAR0001")
+    );
+  }
+
+  /**
+   *  test division by xs:integer 1 .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide013() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; \n" +
+      "      \tlocal:square(7) div 1\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "49")
+    );
+  }
+
+  /**
+   *  test division by xs:integer -1 .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide014() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:square($arg as xs:integer) as xs:integer { $arg * $arg }; \n" +
+      "      \tlocal:square(7) div -1\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "-49")
+    );
+  }
+
+  /**
+   *  check that overflow occurs correctly when adding values of type xs:decimal .
+   */
+  @org.junit.Test
+  public void cbclNumericDivide015() {
+    final XQuery query = new XQuery(
+      "10000000000000000000000000000.0 div 0.1 gt 0",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("FOAR0002")
+      ||
+        assertBoolean(true)
+      )
     );
   }
 
@@ -1009,11 +1595,39 @@ public class OpNumericDivide extends QT3TestSet {
       "                else error() \n" +
       "       ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "decimal decimal float double double decimal decimal float double double float float float double double double double double double double double double double double double")
+    );
+  }
+
+  /**
+   *  check that overflow occurs correctly when dividing values of type xs:decimal .
+   */
+  @org.junit.Test
+  public void opNumericDivideBig01() {
+    final XQuery query = new XQuery(
+      "(10000000000000000000000000000.0 div 0.1) cast as xs:string",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("FOAR0002")
+      ||
+        assertStringValue(false, "100000000000000000000000000000")
+      )
     );
   }
 
@@ -1025,9 +1639,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.7976931348623157E308\") div xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1041,9 +1659,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"0\") div xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0")
     );
@@ -1057,9 +1679,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"1.7976931348623157E308\") div xs:double(\"-1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1073,9 +1699,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:double(\"-1.7976931348623157E308\") div xs:double(\"1.7976931348623157E308\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1089,9 +1719,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") div xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1105,9 +1739,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:decimal(\"617375191608514839\") div xs:decimal(\"-999999999999999999\")),18)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-0.61737519160851484")
@@ -1125,9 +1763,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"999999999999999999\") div xs:decimal(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1141,9 +1783,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:decimal(\"-999999999999999999\") div xs:decimal(\"617375191608514839\")),18)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-1.619760582531006901")
@@ -1161,9 +1807,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:decimal(\"-999999999999999999\") div xs:decimal(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1177,9 +1827,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.4028235E38\") div xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1193,9 +1847,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"0\") div xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0")
     );
@@ -1209,9 +1867,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"3.4028235E38\") div xs:float(\"-3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1225,9 +1887,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:float(\"-3.4028235E38\") div xs:float(\"3.4028235E38\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1241,9 +1907,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:int(\"-2147483648\") div xs:int(\"-2147483648\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1257,9 +1927,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:int(\"-1873914410\") div xs:int(\"-2147483648\")),10)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.8726093965")
     );
@@ -1273,9 +1947,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:int(\"2147483647\") div xs:int(\"-2147483648\")),10)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-0.9999999995")
     );
@@ -1289,9 +1967,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:int(\"-2147483648\") div xs:int(\"-1873914410\")),10)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.145988118")
     );
@@ -1305,9 +1987,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:int(\"-2147483648\") div xs:int(\"2147483647\")),10)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.0000000005")
     );
@@ -1321,9 +2007,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") div xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1337,9 +2027,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:integer(\"830993497117024304\") div xs:integer(\"-999999999999999999\")),18)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-0.830993497117024305")
@@ -1357,9 +2051,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"999999999999999999\") div xs:integer(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1373,9 +2071,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:integer(\"-999999999999999999\") div xs:integer(\"830993497117024304\")),18)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-1.203378851301859738")
@@ -1393,9 +2095,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:integer(\"-999999999999999999\") div xs:integer(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1409,9 +2115,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:integer(\"-999999999999999999\") div xs:integer(\"999999999999999999\")) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1425,9 +2135,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") div xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1441,9 +2155,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:long(\"-47175562203048468\") div xs:long(\"-92233720368547758\")),17)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0.51147847028770199")
@@ -1461,9 +2179,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"92233720368547758\") div xs:long(\"-92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1477,9 +2199,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:long(\"-92233720368547758\") div xs:long(\"-47175562203048468\")),17)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1.95511650654133906")
@@ -1497,9 +2223,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:long(\"-92233720368547758\") div xs:long(\"92233720368547758\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1513,9 +2243,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "() div 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEmpty()
@@ -1533,9 +2267,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div '1'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1549,9 +2287,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div xs:integer('1')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1565,9 +2307,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div <a> 2 </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.5")
     );
@@ -1581,9 +2327,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div <a> <b> 2 </b> </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.5")
     );
@@ -1597,9 +2347,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div <a> <b> 2</b> <c> 2</c> </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -1613,9 +2367,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "<a> 1 </a> div <b> 2 </b>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.5")
     );
@@ -1629,9 +2387,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div <a> x </a>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -1645,9 +2407,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 div <a/>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0001")
     );
@@ -1661,9 +2427,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") div xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1677,9 +2447,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:negativeInteger(\"-297014075999096793\") div xs:negativeInteger(\"-999999999999999999\")),18)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0.297014075999096793")
@@ -1697,9 +2471,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-1\") div xs:negativeInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0.000000000000000001")
@@ -1719,9 +2497,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:negativeInteger(\"-999999999999999999\") div xs:negativeInteger(\"-297014075999096793\")),18)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("3.366843799022646172")
@@ -1739,9 +2521,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:negativeInteger(\"-999999999999999999\") div xs:negativeInteger(\"-1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1755,9 +2541,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") div xs:nonNegativeInteger(\"303884545991464527\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1771,9 +2561,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonNegativeInteger(\"0\") div xs:nonNegativeInteger(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1787,9 +2581,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"-999999999999999999\") div xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1803,9 +2601,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:nonPositiveInteger(\"-475688437271870490\") div xs:nonPositiveInteger(\"-999999999999999999\")),18)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0.47568843727187049")
@@ -1823,9 +2625,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:nonPositiveInteger(\"0\") div xs:nonPositiveInteger(\"-999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1839,9 +2645,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:nonPositiveInteger(\"-999999999999999999\") div xs:nonPositiveInteger(\"-475688437271870490\")),18)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("2.102216328265447024")
@@ -1859,9 +2669,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") div xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1875,9 +2689,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"52704602390610033\") div xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610033")
     );
@@ -1891,9 +2709,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"999999999999999999\") div xs:positiveInteger(\"1\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1907,9 +2729,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:positiveInteger(\"1\") div xs:positiveInteger(\"52704602390610033\")),17)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0.00000000000000002")
@@ -1927,9 +2753,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:positiveInteger(\"1\") div xs:positiveInteger(\"999999999999999999\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("0.000000000000000001")
@@ -1949,9 +2779,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") div xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -1965,9 +2799,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:short(\"-5324\") div xs:short(\"-32768\")),5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0.16248")
     );
@@ -1981,9 +2819,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"32767\") div xs:short(\"-32768\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("-0.999969482421875")
@@ -2001,9 +2843,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:round-half-to-even((xs:short(\"-32768\") div xs:short(\"-5324\")),5)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("6.15477")
     );
@@ -2017,17 +2863,15 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:short(\"-32768\") div xs:short(\"32767\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      (
-        assertEq("-1.000030518509475997")
-      ||
-        assertEq("-1.000030518509475997192297128208258")
-      ||
-        assertEq("-1.000030518509")
-      )
+      assertQuery("abs($result + 1.000030518509475997) lt 1e-12")
     );
   }
 
@@ -2039,9 +2883,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") div xs:unsignedLong(\"130747108607674654\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2055,9 +2903,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedLong(\"0\") div xs:unsignedLong(\"184467440737095516\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2071,9 +2923,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") div xs:unsignedShort(\"44633\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2087,9 +2943,13 @@ public class OpNumericDivide extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:unsignedShort(\"0\") div xs:unsignedShort(\"65535\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );

@@ -20,9 +20,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"\", \"abc\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"/>", true)
     );
@@ -36,9 +40,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string((), \"abc\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"/>", true)
     );
@@ -52,9 +60,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(analyze-string((), \"abc\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -68,9 +80,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"banana\", \"a\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:non-match>b</fn:non-match><fn:match>a</fn:match><fn:non-match>n</fn:non-match><fn:match>a</fn:match><fn:non-match>n</fn:non-match><fn:match>a</fn:match></fn:analyze-string-result>", true)
     );
@@ -84,9 +100,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"banana\", \"custard\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:non-match>banana</fn:non-match></fn:analyze-string-result>", true)
     );
@@ -100,9 +120,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"banana\", \".+\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:match>banana</fn:match></fn:analyze-string-result>", true)
     );
@@ -116,9 +140,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"banana\", \"an\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:non-match>b</fn:non-match><fn:match>an</fn:match><fn:match>an</fn:match><fn:non-match>a</fn:non-match></fn:analyze-string-result>", true)
@@ -134,9 +162,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"banana\", \"a(n)\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:non-match>b</fn:non-match><fn:match>a<fn:group nr=\"1\">n</fn:group></fn:match><fn:match>a<fn:group nr=\"1\">n</fn:group></fn:match><fn:non-match>a</fn:non-match></fn:analyze-string-result>", true)
     );
@@ -150,9 +182,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"banana\", \"(a(n?))\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:non-match>b</fn:non-match><fn:match><fn:group nr=\"1\">a<fn:group nr=\"2\">n</fn:group></fn:group></fn:match><fn:match><fn:group nr=\"1\">a<fn:group nr=\"2\">n</fn:group></fn:group></fn:match><fn:match><fn:group nr=\"1\">a<fn:group nr=\"2\"/></fn:group></fn:match></fn:analyze-string-result>", true)
     );
@@ -166,9 +202,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"how now brown cow\", \"(how)|(now)|(brown)|(cow)\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:match><fn:group nr=\"1\">how</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr=\"2\">now</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr=\"3\">brown</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr=\"4\">cow</fn:group></fn:match></fn:analyze-string-result>", true)
     );
@@ -182,9 +222,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"how now brown cow\", \"(HOW)|(NOW)|(BROWN)|(COW)\", \"i\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:match><fn:group nr=\"1\">how</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr=\"2\">now</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr=\"3\">brown</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr=\"4\">cow</fn:group></fn:match></fn:analyze-string-result>", true)
     );
@@ -199,9 +243,13 @@ public class FnAnalyzeString extends QT3TestSet {
       "analyze-string(\"how now brown cow\", \" (HOW) | (NOW) \n" +
       "| (BROWN) | (COW) \", \"ix\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:match><fn:group nr=\"1\">how</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr=\"2\">now</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr=\"3\">brown</fn:group></fn:match><fn:non-match> </fn:non-match><fn:match><fn:group nr=\"4\">cow</fn:group></fn:match></fn:analyze-string-result>", true)
     );
@@ -215,9 +263,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"how now brown cow\", \"(.*?ow\\s+)+\", \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:match>how <fn:group nr=\"1\">now </fn:group></fn:match><fn:non-match>brown cow</fn:non-match></fn:analyze-string-result>", true)
     );
@@ -236,9 +288,13 @@ public class FnAnalyzeString extends QT3TestSet {
       "it put its sooty foot.\"\n" +
       "            return analyze-string($in, \"Mary.*foot\", \"s\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:match>Mary had a little lamb,\nit's fleece was black as soot,\nand everywhere that Mary went,\nit put its sooty foot</fn:match><fn:non-match>.</fn:non-match></fn:analyze-string-result>", true)
     );
@@ -257,9 +313,13 @@ public class FnAnalyzeString extends QT3TestSet {
       "it put its sooty foot.\"\n" +
       "            return analyze-string($in, \".+\", \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:match>Mary had a little lamb,</fn:match><fn:non-match>\n</fn:non-match><fn:match>it's fleece was black as soot,</fn:match><fn:non-match>\n</fn:non-match><fn:match>and everywhere that Mary went,</fn:match><fn:non-match>\n</fn:non-match><fn:match>it put its sooty foot.</fn:match></fn:analyze-string-result>", true)
@@ -280,9 +340,13 @@ public class FnAnalyzeString extends QT3TestSet {
       "it put its sooty foot.\"\n" +
       "            return analyze-string($in, \"^.+$\", \"m\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:match>Mary had a little lamb,</fn:match><fn:non-match>\n</fn:non-match><fn:match>it's fleece was black as soot,</fn:match><fn:non-match>\n</fn:non-match><fn:match>and everywhere that Mary went,</fn:match><fn:non-match>\n</fn:non-match><fn:match>it put its sooty foot.</fn:match></fn:analyze-string-result>", true)
@@ -305,9 +369,13 @@ public class FnAnalyzeString extends QT3TestSet {
       "it put its sooty foot.\"\n" +
       "            return analyze-string($in, \"^.+$\", \"\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:non-match>Mary had a little lamb,\nit's fleece was black as soot,\nand everywhere that Mary went,\nit put its sooty foot.</fn:non-match></fn:analyze-string-result>", true)
@@ -323,9 +391,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"banana\", \"(b)(x?)\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:match><fn:group nr=\"1\">b</fn:group><fn:group nr=\"2\"/></fn:match><fn:non-match>anana</fn:non-match></fn:analyze-string-result>", true)
     );
@@ -339,9 +411,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"banana\", \"(b(x?))\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:match><fn:group nr=\"1\">b<fn:group nr=\"2\"/></fn:group></fn:match><fn:non-match>anana</fn:non-match></fn:analyze-string-result>", true)
     );
@@ -355,9 +431,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"banana\", \"(?:b(an)*a)\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:match>ban<fn:group nr=\"1\">an</fn:group>a</fn:match></fn:analyze-string-result>", true)
     );
@@ -371,9 +451,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"((banana))\", \"(banana)\", \"q\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fn:analyze-string-result xmlns:fn=\"http://www.w3.org/2005/xpath-functions\"><fn:non-match>(</fn:non-match><fn:match>(banana)</fn:match><fn:non-match>)</fn:non-match></fn:analyze-string-result>", true)
     );
@@ -387,9 +471,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $result := analyze-string(\"banana\", \"(b)(anana)\") return string($result)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "banana")
     );
@@ -403,11 +491,55 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $result := analyze-string(\"banana\", \"(b)(anana)\") return string($result/fn:match[1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "banana")
+    );
+  }
+
+  /**
+   *  "." does NOT match CR in default mode.
+   */
+  @org.junit.Test
+  public void analyzeString026() {
+    final XQuery query = new XQuery(
+      "exactly-one(fn:analyze-string(concat('Mary', codepoints-to-string(13), 'Jones'), 'y.J')/fn:non-match)/string()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("concat('Mary', codepoints-to-string(13), 'Jones')")
+    );
+  }
+
+  /**
+   *  "." does NOT match CR in default mode.
+   */
+  @org.junit.Test
+  public void analyzeString027() {
+    final XQuery query = new XQuery(
+      "exactly-one(fn:analyze-string(concat('Mary', codepoints-to-string(13), 'Jones'), 'y.J', 's')/fn:match)/string()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("concat('y', codepoints-to-string(13), 'J')")
     );
   }
 
@@ -417,11 +549,15 @@ public class FnAnalyzeString extends QT3TestSet {
   @org.junit.Test
   public void analyzeString901() {
     final XQuery query = new XQuery(
-      "analyze-string(\"\", \")-(\")",
+      "analyze-string(\"abc\", \")-(\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -435,9 +571,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"abc\", \"abc\", \"w\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0001")
     );
@@ -451,9 +591,13 @@ public class FnAnalyzeString extends QT3TestSet {
     final XQuery query = new XQuery(
       "analyze-string(\"abc\", \"a|b|c?\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0003")
     );

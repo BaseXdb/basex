@@ -20,9 +20,13 @@ public class OpStringGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "'abc' gt 'a'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -36,9 +40,13 @@ public class OpStringGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not('abc' gt 'abc')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class OpStringGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "'abc' ge 'a'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class OpStringGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "not('a' ge 'abc')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,11 +100,99 @@ public class OpStringGreaterThan extends QT3TestSet {
     final XQuery query = new XQuery(
       "'abc' ge 'abc'",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test string comparison .
+   */
+  @org.junit.Test
+  public void cbclStringGreaterThan001() {
+    final XQuery query = new XQuery(
+      "not(string(current-time()) gt \"now\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test string comparison .
+   */
+  @org.junit.Test
+  public void cbclStringGreaterThan002() {
+    final XQuery query = new XQuery(
+      "not(string(current-time()) le \"now\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test string comparison .
+   */
+  @org.junit.Test
+  public void cbclStringGreaterThan003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        not(xs:untypedAtomic(current-time()) gt xs:untypedAtomic(\"now\"))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test string comparison .
+   */
+  @org.junit.Test
+  public void cbclStringGreaterThan004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        not(xs:untypedAtomic(current-time()) le xs:untypedAtomic(\"now\"))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 }

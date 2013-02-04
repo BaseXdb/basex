@@ -27,9 +27,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--11 \") eq xs:gMonth(\"--11\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -50,9 +54,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:gMonth(\"--11\") eq xs:gMonth(\"--01\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -73,9 +81,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--12\") ne xs:gMonth(\"--10\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -96,9 +108,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "not(xs:gMonth(\"--03\") ne xs:gMonth(\"--03\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -119,9 +135,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--01-00:00\") eq xs:gMonth(\"--01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -142,9 +162,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--01+00:00\") eq xs:gMonth(\"--01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -165,9 +189,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--01Z\") eq xs:gMonth(\"--01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -188,11 +216,295 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--01-00:00\") eq xs:gMonth(\"--01+00:00\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual001() {
+    final XQuery query = new XQuery(
+      "declare function local:gMonth($month as xs:integer) { if ($month lt 10) then xs:gMonth(concat(\"--0\", $month)) else xs:gMonth(concat(\"--\", $month)) }; not(local:gMonth(1) eq xs:gMonth(\"--06\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual002() {
+    final XQuery query = new XQuery(
+      "xs:gMonth(\"--06\") eq xs:gMonth(\"--06+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual003() {
+    final XQuery query = new XQuery(
+      "xs:gMonth(\"--06+09:00\") eq xs:gMonth(\"--06\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual004() {
+    final XQuery query = new XQuery(
+      "xs:gMonth(\"--06\") eq xs:gMonth(\"--06+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual005() {
+    final XQuery query = new XQuery(
+      "xs:gMonth(\"--06+09:00\") eq xs:gMonth(\"--06\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual006() {
+    final XQuery query = new XQuery(
+      "declare function local:gMonth($month as xs:integer) { if ($month lt 10) then xs:gMonth(concat(\"--0\", $month)) else xs:gMonth(concat(\"--\", $month)) }; not(local:gMonth(1) ne xs:gMonth(\"--06\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual007() {
+    final XQuery query = new XQuery(
+      "xs:gMonth(\"--06\") ne xs:gMonth(\"--06+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual008() {
+    final XQuery query = new XQuery(
+      "xs:gMonth(\"--06+09:00\") ne xs:gMonth(\"--06\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual009() {
+    final XQuery query = new XQuery(
+      "xs:gMonth(\"--06\") ne xs:gMonth(\"--06+09:00\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual010() {
+    final XQuery query = new XQuery(
+      "xs:gMonth(\"--06+09:00\") ne xs:gMonth(\"--06\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual011() {
+    final XQuery query = new XQuery(
+      "declare function local:gMonth($gMonth as xs:gMonth, $null as xs:boolean) { if ($null) then () else $gMonth }; exists(local:gMonth(xs:gMonth(\"--12\"), fn:true()) eq xs:gMonth(\"--12\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual012() {
+    final XQuery query = new XQuery(
+      "declare function local:gMonth($gMonth as xs:gMonth, $null as xs:boolean) { if ($null) then () else $gMonth }; local:gMonth(xs:gMonth(\"--12\"), fn:false()) eq xs:gMonth(\"--12\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual013() {
+    final XQuery query = new XQuery(
+      "declare function local:gMonth($gMonth as xs:gMonth, $null as xs:boolean) { if ($null) then () else $gMonth }; exists(local:gMonth(xs:gMonth(\"--12\"), fn:true()) ne xs:gMonth(\"--12\"))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test comparison of gMonth .
+   */
+  @org.junit.Test
+  public void cbclGMonthEqual014() {
+    final XQuery query = new XQuery(
+      "declare function local:gMonth($gMonth as xs:gMonth, $null as xs:boolean) { if ($null) then () else $gMonth }; local:gMonth(xs:gMonth(\"--12\"), fn:false()) ne xs:gMonth(\"--12\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -212,9 +524,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonth(\"--06Z\") ne xs:gMonth(\"--06Z\")) or (xs:gMonth(\"--08Z\") ne xs:gMonth(\"--09Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -236,9 +552,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonth(\"--03Z\") eq xs:gMonth(\"--01Z\")) or (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +580,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonth(\"--08Z\") ne xs:gMonth(\"--07Z\")) or (fn:true())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -284,9 +608,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonth(\"--05Z\") eq xs:gMonth(\"--05Z\")) or (fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -308,9 +636,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonth(\"--09Z\") ne xs:gMonth(\"--09Z\")) or (fn:false())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -331,9 +663,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonth(\"--12-05:00\") eq xs:gMonth(\"--12Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -355,9 +691,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not((xs:gMonth(\"--12Z\") eq xs:gMonth(\"--12Z\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -379,9 +719,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:gMonth(\"--05Z\") ne xs:gMonth(\"--06Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -403,9 +747,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:gMonth(\"--11Z\") eq xs:gMonth(\"--10Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -427,9 +775,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:not(xs:gMonth(\"--05Z\") ne xs:gMonth(\"--05Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -451,9 +803,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonth(\"--04Z\") eq xs:gMonth(\"--02Z\")) and (xs:gMonth(\"--01Z\") eq xs:gMonth(\"--12Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -475,9 +831,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonth(\"--12Z\") ne xs:gMonth(\"--03Z\")) and (xs:gMonth(\"--05Z\") ne xs:gMonth(\"--08Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -499,9 +859,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "(xs:gMonth(\"--02Z\") eq xs:gMonth(\"--02Z\")) or (xs:gMonth(\"--06Z\") eq xs:gMonth(\"--06Z\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -525,9 +889,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--01Z\") eq xs:gMonth(\"--01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -551,9 +919,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--01Z\") ne xs:gMonth(\"--12Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -577,9 +949,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--07Z\") eq xs:gMonth(\"--01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -603,9 +979,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--12Z\") eq xs:gMonth(\"--01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -629,9 +1009,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--01Z\") eq xs:gMonth(\"--07Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -655,9 +1039,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--01Z\") eq xs:gMonth(\"--12Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -681,9 +1069,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--01Z\") ne xs:gMonth(\"--01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -707,9 +1099,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--07Z\") ne xs:gMonth(\"--01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -733,9 +1129,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--12Z\") ne xs:gMonth(\"--01Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -759,9 +1159,13 @@ public class OpGMonthEqual extends QT3TestSet {
     final XQuery query = new XQuery(
       "xs:gMonth(\"--01Z\") ne xs:gMonth(\"--07Z\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );

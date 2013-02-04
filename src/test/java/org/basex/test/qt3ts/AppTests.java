@@ -14,6 +14,7 @@ import org.basex.test.qt3ts.app.*;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
+  AppDemos.class,
   AppFunctxFn.class,
   AppFunctxFunctx.class,
   AppUseCaseNS.class,

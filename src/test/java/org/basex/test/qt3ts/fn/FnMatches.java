@@ -20,9 +20,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"input\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -36,9 +40,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"input\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -52,9 +60,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"input\", \"pattern\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -68,9 +80,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"input\", \"pattern\", \"\", ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -84,9 +100,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"input\", \"pattern\", \" \")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0001")
     );
@@ -100,9 +120,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"input\", \"pattern\", \"X\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0001")
     );
@@ -116,9 +140,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"hello world\", \"hello\\ sworld\", \"x\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"input\", \"\\3\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -148,9 +180,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"abcd\", \"(asd)[\\1]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -164,9 +200,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"abcd\", \"(asd)[asd\\1]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -180,9 +220,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"abcd\", \"(asd)[asd\\0]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -196,9 +240,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(\"abcd\", \"1[asd\\0]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -212,9 +260,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"a\", \"a[^b]\"), fn:matches(\"a \", \"a[^b]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("false(), true()")
     );
@@ -228,9 +280,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"input\", \"[0-9-.]*/\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "false")
@@ -248,9 +304,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches('aA', '(a)\\1', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -264,9 +324,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"hello world\", \" hello[ ]world\", \"x\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -280,9 +344,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"hello world\", \"hello[ ]world \", \"x\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -296,9 +364,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"hello world\", \"he ll o[ ]worl d\", \"x\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -312,9 +384,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"hello world\", \"\\p{ IsBasicLatin}+\", \"x\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -328,9 +404,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"hello world\", \"\\p{ I s B a s i c L a t i n }+\", \"x\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -344,9 +424,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"hello world\", \"\\p{ IsBasicLatin}+\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -360,9 +444,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"h\", \"(.)\\3\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -376,9 +464,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"h\", \"(.)\\2\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -392,9 +484,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches('abc', 'ABC', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -408,9 +504,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches('abZ', '[A-Z]*', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -424,9 +524,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches('abZ', '[a-z]*', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -440,9 +544,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(codepoints-to-string(8490), '[A-Z]', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -456,9 +564,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(codepoints-to-string(8490), '[a-z]', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -472,9 +584,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(codepoints-to-string(8490), 'K', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -488,9 +604,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches(codepoints-to-string(8490), 'k', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -504,9 +624,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches('x', '[A-Z-[OI]]', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -520,9 +644,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches('X', '[A-Z-[OI]]', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -536,9 +664,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches('O', '[A-Z-[OI]]', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -552,9 +684,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches('i', '[A-Z-[OI]]', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -568,9 +704,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches('Q', '[^Q]', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -584,9 +724,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches('q', '[^Q]', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -600,9 +744,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches('m', '\\p{Lu}', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -616,11 +764,1075 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "matches('m', '\\P{Lu}', 'i')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test an invalid negative pos char group .
+   */
+  @org.junit.Test
+  public void cbclMatches001() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '[^]')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test an invalid char range .
+   */
+  @org.junit.Test
+  public void cbclMatches002() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '[a-\\b]')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test a two-digit back reference .
+   */
+  @org.junit.Test
+  public void cbclMatches003() {
+    final XQuery query = new XQuery(
+      "fn:matches('abcdefghijkabcdefghijk', '(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)\\1\\2\\3\\4\\5\\6\\7\\8\\9\\10\\11')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test a very large exact quantifier .
+   */
+  @org.junit.Test
+  public void cbclMatches004() {
+    final XQuery query = new XQuery(
+      "fn:matches('aaa', 'a{99999999999999999999999999}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test with an invalid character range .
+   */
+  @org.junit.Test
+  public void cbclMatches005() {
+    final XQuery query = new XQuery(
+      "fn:matches('a', '[a--]')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test with a character class containing an escaped character .
+   */
+  @org.junit.Test
+  public void cbclMatches006() {
+    final XQuery query = new XQuery(
+      "fn:matches('&#x9;', '[\\t]')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test with a character class beginning with a '-' .
+   */
+  @org.junit.Test
+  public void cbclMatches007() {
+    final XQuery query = new XQuery(
+      "fn:matches('-abba-', '[-ab]+')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test a badly formed category name .
+   */
+  @org.junit.Test
+  public void cbclMatches008() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{L')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test a badly formed category name .
+   */
+  @org.junit.Test
+  public void cbclMatches009() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{M')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test a badly formed category name .
+   */
+  @org.junit.Test
+  public void cbclMatches010() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{N')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test a badly formed category name .
+   */
+  @org.junit.Test
+  public void cbclMatches011() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{P')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test a badly formed category name .
+   */
+  @org.junit.Test
+  public void cbclMatches012() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Z')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test a badly formed category name .
+   */
+  @org.junit.Test
+  public void cbclMatches013() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{S')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test a badly formed category name .
+   */
+  @org.junit.Test
+  public void cbclMatches014() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{C')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test category name L .
+   */
+  @org.junit.Test
+  public void cbclMatches015() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{L}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test category name M .
+   */
+  @org.junit.Test
+  public void cbclMatches016() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{M}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test category name N .
+   */
+  @org.junit.Test
+  public void cbclMatches017() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{N}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test category name P .
+   */
+  @org.junit.Test
+  public void cbclMatches018() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{P}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test category name Z .
+   */
+  @org.junit.Test
+  public void cbclMatches019() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Z}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test category name S .
+   */
+  @org.junit.Test
+  public void cbclMatches020() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{S}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test category name C .
+   */
+  @org.junit.Test
+  public void cbclMatches021() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{C}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test category name Lu .
+   */
+  @org.junit.Test
+  public void cbclMatches022() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Lu}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test category name Me .
+   */
+  @org.junit.Test
+  public void cbclMatches023() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Me}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test category name No .
+   */
+  @org.junit.Test
+  public void cbclMatches024() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{No}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test category name Pf .
+   */
+  @org.junit.Test
+  public void cbclMatches025() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Pf}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test category name Zs .
+   */
+  @org.junit.Test
+  public void cbclMatches026() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Zs}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test category name Sk .
+   */
+  @org.junit.Test
+  public void cbclMatches027() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Sk}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test category name Cc .
+   */
+  @org.junit.Test
+  public void cbclMatches028() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Cc}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test invalid category name La .
+   */
+  @org.junit.Test
+  public void cbclMatches029() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{La}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test invalid category name Ma .
+   */
+  @org.junit.Test
+  public void cbclMatches030() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Ma}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test invalid category name Na .
+   */
+  @org.junit.Test
+  public void cbclMatches031() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Na}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test invalid category name Pa .
+   */
+  @org.junit.Test
+  public void cbclMatches032() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Pa}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test invalid category name Za .
+   */
+  @org.junit.Test
+  public void cbclMatches033() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Za}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test invalid category name Sa .
+   */
+  @org.junit.Test
+  public void cbclMatches034() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Sa}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test invalid category name Ca .
+   */
+  @org.junit.Test
+  public void cbclMatches035() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', '\\P{Ca}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FORX0002")
+    );
+  }
+
+  /**
+   *  test an empty branch .
+   */
+  @org.junit.Test
+  public void cbclMatches036() {
+    final XQuery query = new XQuery(
+      "fn:matches('foo', 'a()b')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test a multibyte Unicode character .
+   */
+  @org.junit.Test
+  public void cbclMatches037() {
+    final XQuery query = new XQuery(
+      "fn:matches('&#x10000;', '&#x10000;')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test a large exact quantifier .
+   */
+  @org.junit.Test
+  public void cbclMatches038() {
+    final XQuery query = new XQuery(
+      "fn:matches('aaa', 'a{2147483647}')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test a two-digit back reference .
+   */
+  @org.junit.Test
+  public void cbclMatches039() {
+    final XQuery query = new XQuery(
+      "fn:matches('abcdefghiabcdefghia0a1', '(a)(b)(c)(d)(e)(f)(g)(h)(i)\\1\\2\\3\\4\\5\\6\\7\\8\\9\\10\\11')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test the multi-character escape \S .
+   */
+  @org.junit.Test
+  public void cbclMatches040() {
+    final XQuery query = new XQuery(
+      "fn:matches('abc', '\\S+')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test the multi-character escape \S .
+   */
+  @org.junit.Test
+  public void cbclMatches041() {
+    final XQuery query = new XQuery(
+      "fn:matches('&#xD;&#x20;&#x9;', '\\S+')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test the multi-character escape \i .
+   */
+  @org.junit.Test
+  public void cbclMatches042() {
+    final XQuery query = new XQuery(
+      "fn:matches('a_:', '\\i+')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test the multi-character escape \i .
+   */
+  @org.junit.Test
+  public void cbclMatches043() {
+    final XQuery query = new XQuery(
+      "fn:matches('1.0', '\\i+')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test the multi-character escape \I .
+   */
+  @org.junit.Test
+  public void cbclMatches044() {
+    final XQuery query = new XQuery(
+      "fn:matches('1.0', '\\I+')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test the multi-character escape \I .
+   */
+  @org.junit.Test
+  public void cbclMatches045() {
+    final XQuery query = new XQuery(
+      "fn:matches('a_:', '\\I+')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test the multi-character escape \c .
+   */
+  @org.junit.Test
+  public void cbclMatches046() {
+    final XQuery query = new XQuery(
+      "fn:matches('abc', '\\c+')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test the multi-character escape \c .
+   */
+  @org.junit.Test
+  public void cbclMatches047() {
+    final XQuery query = new XQuery(
+      "fn:matches('&#x20;&#x9;&#xD;', '\\c+')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test the multi-character escape \C .
+   */
+  @org.junit.Test
+  public void cbclMatches048() {
+    final XQuery query = new XQuery(
+      "fn:matches('&#x20;&#x9;&#xD;', '\\C+')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test the multi-character escape \C .
+   */
+  @org.junit.Test
+  public void cbclMatches049() {
+    final XQuery query = new XQuery(
+      "fn:matches('abc', '\\C+')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  A back-reference is compared using case-blind comparison: that is, each character must either be the same as the corresponding character of the previously matched string, or must be a case-variant of that character. the back reference. For example, the strings "Mum", "mom", "Dad", and "DUD" all match the regular expression "([md])[aeiou]\1" when the "i" flag is used. .
+   */
+  @org.junit.Test
+  public void cbclMatches050() {
+    final XQuery query = new XQuery(
+      "fn:matches('Mum', '([md])[aeiou]\\1', 'i')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test back-reference to character above &#FFFF; .
+   */
+  @org.junit.Test
+  public void cbclMatches051() {
+    final XQuery query = new XQuery(
+      "fn:matches('&#x10000;&#x10000;', '(&#x10000;)\\1')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test back-reference to character above &#FFFF; .
+   */
+  @org.junit.Test
+  public void cbclMatches052() {
+    final XQuery query = new XQuery(
+      "fn:matches('&#x10000;&#x10001;', '(&#x10000;)\\1')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  A back-reference is compared using case-blind comparison: that is, each character must either be the same as the corresponding character of the previously matched string, or must be a case-variant of that character. the back reference. For example, the strings "Mum", "mom", "Dad", and "DUD" all match the regular expression "([md])[aeiou]\1" when the "i" flag is used. .
+   */
+  @org.junit.Test
+  public void cbclMatches053() {
+    final XQuery query = new XQuery(
+      "fn:matches('Mud', '([md])[aeiou]\\1', 'i')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
     );
   }
 
@@ -632,9 +1844,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra\", \"bra\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -648,9 +1864,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra{abracadabra\", \"\\{\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -664,9 +1884,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra}abracadabra\", \"\\}\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -680,9 +1904,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra(abracadabra\", \"\\(\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -696,9 +1924,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra)abracadabra\", \"\\)\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -712,9 +1944,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra[abracadabra\", \"\\[\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -728,9 +1964,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra]abracadabra\", \"\\]\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -744,9 +1984,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra-abracadabra\", \"\\-\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -760,9 +2004,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra.abracadabra\", \"\\.\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -776,9 +2024,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra|abracadabra\", \"\\|\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -792,9 +2044,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra\\abracadabra\", \"\\\\\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -808,9 +2064,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra\", \"^a.*a$\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -824,9 +2084,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra\tabracadabra\", \"\\t\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -841,9 +2105,13 @@ public class FnMatches extends QT3TestSet {
       "fn:matches(\"abracadabra\n" +
       "abracadabra\", \"\\n\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -857,9 +2125,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabraabracadabra\", \"aa{1}\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -873,9 +2145,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabraabracadabraabracadabra\", \"aa{1,}\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -889,9 +2165,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabraabracadabraabracadabra\", \"aa{1,2}\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -905,25 +2185,34 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra\", \"**%%\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
   }
 
   /**
-   *  Check for the correct behavior of ^ and $ in multi-line mode This test case was motivated by the resolution of Bug Report 4543 .
+   *  Check for the correct behavior of ^ and $ in multi-line mode This test case was motivated by the resolution of Bug Report 4543.
+   *       Note that '^' matches the position after any newline other than a newline that is the last character in the input string..
    */
   @org.junit.Test
   public void fnMatches26() {
     final XQuery query = new XQuery(
-      "fn:matches(\"concat('abcd', codepoints-to-string(10), 'defg', codepoints-to-string(10))\", \"^$\", \"m\")",
+      "fn:matches(concat('abcd', codepoints-to-string(10), 'defg', codepoints-to-string(10)), \"^$\", \"m\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -940,9 +2229,13 @@ public class FnMatches extends QT3TestSet {
       "defg\n" +
       "\", \"^$\", \"m\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -959,9 +2252,13 @@ public class FnMatches extends QT3TestSet {
       "defg\n" +
       "\", \"^$\", \"m\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -975,9 +2272,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"#abc#1\", \"^(#)abc\\11$\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -991,9 +2292,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra\", \"^bra\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1007,9 +2312,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"#abcdefghijklmnopq#1\", \"^(#)(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)(l)(m)(n)(o)(p)(q)\\11$\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1023,9 +2332,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra\", \"(?:abra(?:cad)?)*\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1039,9 +2352,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra\", \"(?:abra(?:cad)?)*\", \"q\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1055,9 +2372,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"x[y-z]\", \"x[y-z]\", \"q\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1071,9 +2392,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"x[Y-z]\", \"X[y-Z]\", \"qi\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1087,9 +2412,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches('aA', '(a)\\99')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -1103,9 +2432,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches('abcdefghijj', '(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)\\10')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1119,9 +2452,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches('abcdefghijk', '(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k\\11)')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -1135,9 +2472,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches('abcdefghijj', '(a)(b)(c)(d)(e)(f)(g)(h)(i)(j\\10)')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -1151,9 +2492,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches('abcdefghii', '(a)(b)(c)(d)(e)(f)(g)(h)(i\\9)')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -1167,9 +2512,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:concat(fn:matches(\"abracadabra\", \"^bra\"),fn:matches(\"abracadabra\", \"^bra\", \"\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "falsefalse")
     );
@@ -1183,9 +2532,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches('aa', '(a\\1)')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -1199,9 +2552,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(concat('Mary', codepoints-to-string(10)), 'Mary$')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1215,9 +2572,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(concat('Mary', codepoints-to-string(10)), 'Mary$', 's')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1231,9 +2592,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(concat('Mary', codepoints-to-string(10), 'Jones'), 'Mary.Jones')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -1247,27 +2612,35 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(concat('Mary', codepoints-to-string(10), 'Jones'), 'Mary.Jones', 's')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
   }
 
   /**
-   *  "." does match CR in default mode.
+   *  "." does NOT match CR in default mode.
    */
   @org.junit.Test
   public void fnMatches45() {
     final XQuery query = new XQuery(
       "fn:matches(concat('Mary', codepoints-to-string(13), 'Jones'), 'Mary.Jones')",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
-      assertBoolean(true)
+      assertBoolean(false)
     );
   }
 
@@ -1279,9 +2652,75 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(concat('Mary', codepoints-to-string(13), 'Jones'), 'Mary.Jones', 's')",
       ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
 
-    final QT3Result res = result(query);
-    result = res;
+  /**
+   *  Check for the correct behavior of $ when not in multi-line mode.
+   *          The correct answer according to the spec is false; though some regex engines
+   *          are known to report true..
+   */
+  @org.junit.Test
+  public void fnMatches47() {
+    final XQuery query = new XQuery(
+      "fn:matches(concat('abcd', codepoints-to-string(10), 'defg', codepoints-to-string(10)), \"g$\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  Edge condition: match occurs at last character. .
+   */
+  @org.junit.Test
+  public void fnMatches48() {
+    final XQuery query = new XQuery(
+      "fn:matches(\"abracadabra-abracadabra.\", \"\\.\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Edge condition: match occurs at last character. .
+   */
+  @org.junit.Test
+  public void fnMatches49() {
+    final XQuery query = new XQuery(
+      "fn:matches(\"abracadabra-abracadabra-3\", \"(124|864|377|3)\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1295,9 +2734,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:count(fn:matches(\"()\", \"^bra\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1")
     );
@@ -1311,9 +2754,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra^abracadabra\", \"\\^\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1327,9 +2774,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra?abracadabra\", \"\\?\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1343,9 +2794,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra*abracadabra\", \"\\*\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1359,9 +2814,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra+abracadabra\", \"\\+\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1375,9 +2834,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"This is a characte\",\"This is a characte\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1391,9 +2854,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"This is a characte\",\"This is a characte\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1407,9 +2874,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"This is a characte\",\"This is a characte\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1423,9 +2894,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"This is a characte\",\"This is a characte\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1439,9 +2914,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"This is a characte\",\"This is a characte\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1455,9 +2934,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abracadabra\", \"bra\", \"p\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0001")
     );
@@ -1471,9 +2954,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"#abc#1\", \"^(#)abc[\\1]1$\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -1487,9 +2974,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"#abc#1\", \"^(#)abc\\2$\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -1503,9 +2994,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"#abc#1\", \"^((#)abc\\1)$\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );
@@ -1519,9 +3014,13 @@ public class FnMatches extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:matches(\"abcdefghijklmnopq\", \"(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)(l)((m)(n)(o)(p)(q)\\13)$\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORX0002")
     );

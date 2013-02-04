@@ -20,9 +20,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "last(1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3, current-time(), current-date(), 6, 7, 8) [0 eq last()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -56,9 +64,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal( (1, 2, 3, remove((current-time(), 4), 1)) [last() != 0], (1, 2, 3, 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -72,9 +84,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal( (1, 2, 3, remove((current-time(), 4), 1)) [last() ne 0], (1, 2, 3, 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -88,9 +104,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal( (1, 2, 3, remove((current-time(), 4), 1)) [0 != last()], (1, 2, 3, 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -104,9 +124,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal( (1, 2, 3, remove((current-time(), 4), 1)) [0 ne last()], (1, 2, 3, 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -120,9 +144,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3, current-time(), current-date(), 6, 7, 8) [last() lt 1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -140,9 +168,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3, current-time(), current-date(), 6, 7, 8) [last() < 1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -160,9 +192,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3, current-time(), current-date(), 6, 7, 8) [last() le 0])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -180,9 +216,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3, current-time(), current-date(), 6, 7, 8) [last() <= 0])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -200,9 +240,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal( (1, 2, 3, remove((current-time(), 4), 1)) [last() > 0], (1, 2, 3, 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -216,9 +260,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3)[if(1) then 1 else last()]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -232,9 +280,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal( (1, 2, 3, remove((current-time(), 4), 1)) [last() > 0], (1, 2, 3, 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -248,9 +300,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal( (1, 2, 3, remove((current-time(), 4), 1)) [last() gt 0], (1, 2, 3, 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -264,9 +320,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal( (1, 2, 3, remove((current-time(), 4), 1)) [last() >= 1], (1, 2, 3, 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -280,9 +340,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal( (1, 2, 3, remove((current-time(), 4), 1)) [last() ge 1], (1, 2, 3, 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -296,9 +360,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3, 4, current-time(), 4, 5, 6)[last() - 2] treat as xs:integer eq 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -312,9 +380,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3, 4, current-time(), 4, 5, 6)[last() - 1] treat as xs:integer eq 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -328,9 +400,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3, 4, current-time(), 4, 5, 6)[last()] treat as xs:integer eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -344,9 +420,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3, 4, current-time(), 4, 5, 6)[last() - 0] treat as xs:integer eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -360,9 +440,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1 to 6)[last()] eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -376,9 +460,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "(-20 to -5)[last() - 3]",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-8")
     );
@@ -392,9 +480,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3)[count((last(), last())) eq 2], (1, 2, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -408,9 +500,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((1, 2, 3)[last() eq last()], (1, 2, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -424,9 +520,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "(1, 2, 3, current-time())[last() - 1] treat as xs:integer eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -440,9 +540,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3, current-time())[last() + 1])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -456,9 +560,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3, current-time(), current-date(), 6, 7, 8) [last() = 0])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -476,9 +584,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3, current-time(), current-date(), 6, 7, 8) [0 = last()])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -496,15 +608,286 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((1, 2, 3, current-time(), current-date(), 6, 7, 8) [last() eq 0])",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
       ||
         error("XPST0005")
       )
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on sub-expression where quant = 1 .
+   */
+  @org.junit.Test
+  public void cbclLastInSequence001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:generate($arg as xs:integer?) { if ($arg = 0) then (1, 2, 3) else () }; \n" +
+      "      \t( local:generate(0), 1, local:generate(0) )[last()]\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "3")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a for expression .
+   */
+  @org.junit.Test
+  public void cbclLastInSequence002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:generate($arg as xs:integer?) as xs:integer* { if ($arg = 0) then (1, 2, 3) else $arg }; \n" +
+      "      \t( local:generate(()), for $x in local:generate(0) return $x + 2 )[last()]\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "5")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a for expression .
+   */
+  @org.junit.Test
+  public void cbclLastInSequence003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:generate($arg as xs:integer?) as xs:integer? { if ($arg = 0) then 0 else () }; \n" +
+      "      \t( local:generate(()), for $x in local:generate(0) return $x + 2 )[last()]\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a for-at expression .
+   */
+  @org.junit.Test
+  public void cbclLastInSequence004() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:generate($arg as xs:integer?) as xs:integer* { if ($arg = 0) then ( 1, 2, 3 ) else ( $arg ) }; \n" +
+      "      \t( local:generate(()), for $x at $p in local:generate(0) return $p + $x)[last()]\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "6")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a for-at expression .
+   */
+  @org.junit.Test
+  public void cbclLastInSequence005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:generate($arg as xs:integer?) as xs:integer? { if ($arg = 0) then 1 else $arg }; \n" +
+      "      \t( local:generate(()), for $x at $p in local:generate(0) return $p + $x)[last()]\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "2")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a map expression .
+   */
+  @org.junit.Test
+  public void cbclLastInSequence006() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:generate($arg as xs:integer?) as xs:string* { if ($arg = 0) then ('a', 'b', 'c') else ('d' ) }; \n" +
+      "      \t( if (local:generate(1) = 'd') then () else 1, for $x in local:generate(0) return fn:lower-case($x))[last()]\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "c")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a map expression .
+   */
+  @org.junit.Test
+  public void cbclLastInSequence007() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:generate($arg as xs:integer?) as xs:integer? { $arg }; \n" +
+      "      \t( if (local:generate(0) = 0) then () else 1, for $x in local:generate(0) return -$x)[last()]\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "0")
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a distinct-doc-order .
+   */
+  @org.junit.Test
+  public void cbclLastInSequence008() {
+    final XQuery query = new XQuery(
+      "( (<a><b>cheese</b></a>)/b )[last()]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialization("<b>cheese</b>", false)
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a for-each expression Author: Tim Mills .
+   */
+  @org.junit.Test
+  public void cbclLastInSequence009() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:generate($arg as xs:integer?) as xs:string* { if ($arg = 0) then ('a', 'b', 'c') else () }; \n" +
+      "      \t( local:generate(()), for $x in local:generate(0) return 3)[last()]\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "3")
+    );
+  }
+
+  /**
+   *  test fn:boolean on fn:first-in-sequence .
+   */
+  @org.junit.Test
+  public void cbclLastInSequence010() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:generate($arg as xs:integer?) as xs:string* { if ($arg = 0) then ('a', 'b', 'c') else () }; \n" +
+      "      \tboolean(local:generate(0)[last()])\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  test fn:boolean on fn:first-in-sequence .
+   */
+  @org.junit.Test
+  public void cbclLastInSequence011() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:integer?) as xs:string* { if ($arg = 0) then ('a', 'b', 'c') else () }; boolean(local:generate(1)[last()])",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   *  test fn:first-in-sequence on a for-each expression .
+   */
+  @org.junit.Test
+  public void cbclLastInSequence012() {
+    final XQuery query = new XQuery(
+      "declare function local:generate($arg as xs:boolean) as xs:string+ { if ($arg) then ('a', 'b', 'c') else ('A', 'B', 'C') }; ( for $x in local:generate(true()) return 3)[last()]",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "3")
     );
   }
 
@@ -516,10 +899,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h//employee[last()]/string(@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 13")
     );
@@ -533,10 +920,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h//employee[last() = 13][@name = \"Jane Doe 13\"]/string(@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 13")
     );
@@ -550,10 +941,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[12]/overtime) return $h/day[not(position() = 1)]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Tuesday")
     );
@@ -567,10 +962,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[12]/overtime) return $h/*[position() = position()]/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"Monday\", \"Tuesday\"")
     );
@@ -584,10 +983,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[position() = (2 + 2)]/string(@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "John Doe 4")
     );
@@ -601,10 +1004,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[position() = (5 - 2)]/string(@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 3")
     );
@@ -618,10 +1025,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[position() = (3 * 2)]/string(@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "John Doe 6")
     );
@@ -635,10 +1046,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[position() = (6 div 2)]/string(@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 3")
     );
@@ -652,10 +1067,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[position() = (6 idiv 2)]/string(@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 3")
     );
@@ -669,10 +1088,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[12]) return ($h/overtime[position() and fn:true()]/*/string())",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"Monday\", \"Tuesday\"")
     );
@@ -686,10 +1109,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[12]) return $h/overtime[position() and fn:false()]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEmpty()
@@ -707,9 +1134,13 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "last()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -723,10 +1154,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[12]) return $h/overtime[position() or fn:true()]/*/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"Monday\", \"Tuesday\"")
     );
@@ -740,10 +1175,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[12]) return $h/overtime[position() or fn:false()]/*/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"Monday\", \"Tuesday\"")
     );
@@ -757,10 +1196,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[position() = 12]/overtime/*/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"Monday\", \"Tuesday\"")
     );
@@ -774,10 +1217,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[position() = 5 to last()]/@name/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"Jane Doe 5\", \"John Doe 6\", \"Jane Doe 7\", \"John Doe 8\", \n            \"Jane Doe 9\", \"John Doe 10\", \"Jane Doe 11\", \"John Doe 12\", \"Jane Doe 13\"")
     );
@@ -791,10 +1238,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "last()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -808,10 +1259,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[12]) return $h/overtime[last() = 1]/*/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"Monday\", \"Tuesday\"")
     );
@@ -825,10 +1280,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[position() = last()]/string(@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 13")
     );
@@ -842,10 +1301,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[last() = position()]/string(@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 13")
     );
@@ -859,10 +1322,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[last()] << $h/employee[last()]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(false)
     );
@@ -876,10 +1343,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h/employee[last()] is $h/employee[last()]",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -893,10 +1364,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works/employee[12]) return $h/overtime[last() = last()]/*/string()",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"Monday\", \"Tuesday\"")
     );
@@ -910,10 +1385,14 @@ public class FnLast extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $h in (/works) return $h//employee[@name=\"Jane Doe 13\"][last() = 1]/string(@name)",
       ctx);
-    query.context(node(file("docs/works-mod.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("docs/works-mod.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "Jane Doe 13")
     );

@@ -20,9 +20,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map{})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -36,9 +40,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map:new(()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -52,9 +60,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map{\"a\":=1})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -74,9 +86,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map:entry(\"a\", \"1\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -96,9 +112,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map:new((map:entry(\"a\", \"1\"), map:entry(\"b\", 2))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result = \"a\"")
@@ -118,9 +138,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map{\"a\":=1, \"b\":=2})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result = \"a\"")
@@ -140,9 +164,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map{\"a\":=1, \"a\":=2})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -162,9 +190,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map:new((map:entry(\"a\",1), map:entry(\"a\",2))))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -184,9 +216,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map:remove(map{\"a\":=1,\"b\":=2}, \"b\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -206,9 +242,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map:remove(map:entry(1,2),1))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -222,9 +262,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map:remove(map:remove(map{\"a\":=1,\"b\":=2},\"b\"),\"a\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -238,9 +282,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map{number('NaN'):=1,\"b\":=2})",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertCount(1)
@@ -260,9 +308,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map:remove(map{\"a\":=1,\"b\":=2}, \"c\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result = \"a\"")
@@ -282,9 +334,13 @@ public class MapKeys extends QT3TestSet {
     final XQuery query = new XQuery(
       "map:keys(map:new(for $n in 1 to 500000 return map:entry($n, $n+1)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertQuery("$result = 1")

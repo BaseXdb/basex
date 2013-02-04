@@ -20,9 +20,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -36,9 +40,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((-5, -0, -3, -6)) eq -14",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -52,9 +60,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(sum((1, 2, 3, xs:float(\"NaN\")))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -68,9 +80,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(sum((1, 2, 3, xs:double(\"NaN\")))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -84,9 +100,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(sum((xs:double(\"NaN\"), 1, 2, 3))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -100,9 +120,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(sum((xs:float(\"NaN\"), 1, 2, 3))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -116,9 +140,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(sum((1, 2, xs:double(\"NaN\"), 1, 2, 3))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -132,9 +160,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "string(sum((1, 2, xs:float(\"NaN\"), 1, 2, 3))) eq \"NaN\"",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -148,9 +180,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(xs:untypedAtomic(\"3\")) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -164,9 +200,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((1, 2, xs:untypedAtomic(\"3\"))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -180,9 +220,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((1, 2, xs:untypedAtomic(\"3\"))) eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -196,9 +240,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(1, 1, \"wrong param\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0017")
     );
@@ -212,9 +260,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((xs:float(1), 2, xs:untypedAtomic(\"3\"))) eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -228,9 +280,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((xs:float(1), 2, xs:untypedAtomic(\"3\"))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -244,9 +300,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(remove((1.0, xs:float(1), 2, xs:untypedAtomic(\"3\")), 1)) eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -260,9 +320,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(\"a string\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -276,9 +340,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(xs:anyURI(\"a string\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -292,9 +360,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((1, 2, 3, xs:anyURI(\"a string\"), xs:double(\"NaN\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -308,9 +380,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((1, 2, 3, xs:anyURI(\"a string\"), xs:double(\"NaN\")), 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -324,9 +400,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(((),())) eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -340,9 +420,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(()) eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -356,9 +440,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((3, 4, 5)) eq 12",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -372,9 +460,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((), 3) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -388,9 +480,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((xs:yearMonthDuration(\"P20Y\"), xs:yearMonthDuration(\"P10M\"))) eq xs:yearMonthDuration(\"P250M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -404,9 +500,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((xs:yearMonthDuration(\"P20Y\"), xs:yearMonthDuration(\"P10M\")) [. < xs:yearMonthDuration(\"P3M\")], xs:yearMonthDuration(\"P0M\")) eq xs:yearMonthDuration(\"P0M\")",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -420,9 +520,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((1 to 100)[. < 0], 0) eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -436,9 +540,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((xs:yearMonthDuration(\"P20Y\"), (3, 4, 5)))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("FORG0006")
     );
@@ -452,9 +560,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((), 3) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -468,9 +580,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(sum((), ()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -484,9 +600,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((), 0.0) instance of xs:decimal",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -500,9 +620,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((), 0.0) eq 0.0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -516,9 +640,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(()) eq 0",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -532,9 +660,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(()) instance of xs:integer",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -548,9 +680,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((), ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -564,9 +700,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((xs:float('NaN'), 2, 3, 4, xs:double('NaN'))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -580,9 +720,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((xs:float('NaN'), 2, 3.3, 4, xs:double('NaN'))) instance of xs:double",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -596,11 +740,137 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(xs:unsignedShort(\"1\")) instance of xs:unsignedShort",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Test sum(1 to 10) .
+   */
+  @org.junit.Test
+  public void cbclSumFunc001() {
+    final XQuery query = new XQuery(
+      "sum(1 to 10)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "55")
+    );
+  }
+
+  /**
+   *  Test sum(foreach) .
+   */
+  @org.junit.Test
+  public void cbclSumFunc002() {
+    final XQuery query = new XQuery(
+      "sum(for $x in 1 to 10 return 5)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "50")
+    );
+  }
+
+  /**
+   *  Test sum($x to $y) .
+   */
+  @org.junit.Test
+  public void cbclSumFunc003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        for $x in 1 to 10, $y in 1 to 10 return concat('sum(',$x,' to ',$y,') = ',sum($x to $y))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "sum(1 to 1) = 1 sum(1 to 2) = 3 sum(1 to 3) = 6 sum(1 to 4) = 10 sum(1 to 5) = 15 sum(1 to 6) = 21 sum(1 to 7) = 28 sum(1 to 8) = 36 sum(1 to 9) = 45 sum(1 to 10) = 55 sum(2 to 1) = 0 sum(2 to 2) = 2 sum(2 to 3) = 5 sum(2 to 4) = 9 sum(2 to 5) = 14 sum(2 to 6) = 20 sum(2 to 7) = 27 sum(2 to 8) = 35 sum(2 to 9) = 44 sum(2 to 10) = 54 sum(3 to 1) = 0 sum(3 to 2) = 0 sum(3 to 3) = 3 sum(3 to 4) = 7 sum(3 to 5) = 12 sum(3 to 6) = 18 sum(3 to 7) = 25 sum(3 to 8) = 33 sum(3 to 9) = 42 sum(3 to 10) = 52 sum(4 to 1) = 0 sum(4 to 2) = 0 sum(4 to 3) = 0 sum(4 to 4) = 4 sum(4 to 5) = 9 sum(4 to 6) = 15 sum(4 to 7) = 22 sum(4 to 8) = 30 sum(4 to 9) = 39 sum(4 to 10) = 49 sum(5 to 1) = 0 sum(5 to 2) = 0 sum(5 to 3) = 0 sum(5 to 4) = 0 sum(5 to 5) = 5 sum(5 to 6) = 11 sum(5 to 7) = 18 sum(5 to 8) = 26 sum(5 to 9) = 35 sum(5 to 10) = 45 sum(6 to 1) = 0 sum(6 to 2) = 0 sum(6 to 3) = 0 sum(6 to 4) = 0 sum(6 to 5) = 0 sum(6 to 6) = 6 sum(6 to 7) = 13 sum(6 to 8) = 21 sum(6 to 9) = 30 sum(6 to 10) = 40 sum(7 to 1) = 0 sum(7 to 2) = 0 sum(7 to 3) = 0 sum(7 to 4) = 0 sum(7 to 5) = 0 sum(7 to 6) = 0 sum(7 to 7) = 7 sum(7 to 8) = 15 sum(7 to 9) = 24 sum(7 to 10) = 34 sum(8 to 1) = 0 sum(8 to 2) = 0 sum(8 to 3) = 0 sum(8 to 4) = 0 sum(8 to 5) = 0 sum(8 to 6) = 0 sum(8 to 7) = 0 sum(8 to 8) = 8 sum(8 to 9) = 17 sum(8 to 10) = 27 sum(9 to 1) = 0 sum(9 to 2) = 0 sum(9 to 3) = 0 sum(9 to 4) = 0 sum(9 to 5) = 0 sum(9 to 6) = 0 sum(9 to 7) = 0 sum(9 to 8) = 0 sum(9 to 9) = 9 sum(9 to 10) = 19 sum(10 to 1) = 0 sum(10 to 2) = 0 sum(10 to 3) = 0 sum(10 to 4) = 0 sum(10 to 5) = 0 sum(10 to 6) = 0 sum(10 to 7) = 0 sum(10 to 8) = 0 sum(10 to 9) = 0 sum(10 to 10) = 10")
+    );
+  }
+
+  /**
+   *  Tests boolean call to sum .
+   */
+  @org.junit.Test
+  public void cbclSumFunc004() {
+    final XQuery query = new XQuery(
+      "boolean(sum((1 to 10)[. mod 2 = 0]))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Tests sum of a sum .
+   */
+  @org.junit.Test
+  public void cbclSumFunc005() {
+    final XQuery query = new XQuery(
+      "sum(sum((1 to 10)[. mod 2 = 0],()))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "30")
+    );
+  }
+
+  /**
+   *  Tests sum of two integer converts to plus .
+   */
+  @org.junit.Test
+  public void cbclSumFunc006() {
+    final XQuery query = new XQuery(
+      "sum((1,exactly-one((1 to 10)[. div 2 = 2])))",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "5")
     );
   }
 
@@ -612,9 +882,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((xs:dayTimeDuration(\"P1D\"), xs:dayTimeDuration(\"PT1H\"))) instance of xs:dayTimeDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -628,9 +902,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(xs:duration(\"P1Y1M1D\"), xs:duration(\"PT0S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FORG0006")
@@ -648,9 +926,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((), xs:dayTimeDuration(\"PT0S\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -664,9 +946,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(for $x in 1 to 10 return xs:dayTimeDuration(concat(\"PT\",$x,\"H\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P2DT7H")
     );
@@ -680,9 +966,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((xs:yearMonthDuration(\"P1Y\"), xs:yearMonthDuration(\"P1M\"))) instance of xs:yearMonthDuration",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -696,9 +986,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((), xs:yearMonthDuration(\"P0M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P0M")
     );
@@ -712,9 +1006,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(for $x in 1 to 10 return xs:yearMonthDuration(concat(\"P\",$x,\"M\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P4Y7M")
     );
@@ -728,9 +1026,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((xs:yearMonthDuration(\"P1Y\"), xs:dayTimeDuration(\"P1D\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FORG0006")
@@ -748,9 +1050,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum((), xs:duration(\"P0M\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "PT0S")
     );
@@ -764,9 +1070,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "sum(xs:duration(\"P1Y1M1D\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         error("FORG0006")
@@ -784,9 +1094,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -800,9 +1114,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -816,9 +1134,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1.7976931348623157E308")
     );
@@ -832,9 +1154,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"0\"),xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -848,9 +1174,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"1.7976931348623157E308\"),xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -864,9 +1194,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"-1.7976931348623157E308\"),xs:double(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -880,9 +1214,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"-1.7976931348623157E308\"),xs:double(\"1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -896,9 +1234,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"0\"),xs:double(\"-1.7976931348623157E308\"),xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "-INF")
@@ -916,9 +1258,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"1.7976931348623157E308\"),xs:double(\"-1.7976931348623157E308\"),xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -932,9 +1278,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"-1.7976931348623157E308\"),xs:double(\"0\"),xs:double(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -948,9 +1298,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"-1.7976931348623157E308\"),xs:double(\"1.7976931348623157E308\"),xs:double(\"-1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1.7976931348623157E308")
     );
@@ -964,9 +1318,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"0\"),xs:double(\"0\"),xs:double(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -980,9 +1338,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:double(\"-1.7976931348623157E308\"),xs:double(\"-1.7976931348623157E308\"),xs:double(\"1.7976931348623157E308\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "-INF")
@@ -1002,9 +1364,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1018,9 +1384,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:decimal(\"617375191608514839\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("617375191608514839")
     );
@@ -1034,9 +1404,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:decimal(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1050,9 +1424,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:decimal(\"617375191608514839\"),xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-382624808391485160")
     );
@@ -1066,9 +1444,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:decimal(\"999999999999999999\"),xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1082,9 +1464,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:decimal(\"-999999999999999999\"),xs:decimal(\"617375191608514839\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-382624808391485160")
     );
@@ -1098,9 +1484,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:decimal(\"-999999999999999999\"),xs:decimal(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1114,9 +1504,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:decimal(\"999999999999999999\"),xs:decimal(\"-999999999999999999\"),xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1130,9 +1524,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:decimal(\"-999999999999999999\"),xs:decimal(\"999999999999999999\"),xs:decimal(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1146,9 +1544,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:decimal(\"0\"),xs:decimal(\"0\"),xs:decimal(\"617375191608514839\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("617375191608514839")
     );
@@ -1162,9 +1564,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:decimal(\"-999999999999999999\"),xs:decimal(\"-999999999999999999\"),xs:decimal(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1178,9 +1584,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -1194,9 +1604,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1210,9 +1624,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"3.4028235E38\")")
     );
@@ -1226,9 +1644,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"0\"),xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -1242,9 +1664,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"3.4028235E38\"),xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1258,9 +1684,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"-3.4028235E38\"),xs:float(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -1274,9 +1704,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"-3.4028235E38\"),xs:float(\"3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1290,9 +1724,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"0\"),xs:float(\"-3.4028235E38\"),xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "-INF")
@@ -1310,9 +1748,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"3.4028235E38\"),xs:float(\"-3.4028235E38\"),xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -1326,9 +1768,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"-3.4028235E38\"),xs:float(\"0\"),xs:float(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -1342,9 +1788,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"-3.4028235E38\"),xs:float(\"3.4028235E38\"),xs:float(\"-3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("xs:float(\"-3.4028235E38\")")
     );
@@ -1358,9 +1808,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"0\"),xs:float(\"0\"),xs:float(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1374,9 +1828,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:float(\"-3.4028235E38\"),xs:float(\"-3.4028235E38\"),xs:float(\"3.4028235E38\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "-INF")
@@ -1396,9 +1854,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1412,9 +1874,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:int(\"-1873914410\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1873914410")
     );
@@ -1428,9 +1894,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:int(\"2147483647\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2147483647")
     );
@@ -1444,9 +1914,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:int(\"-1873914410\"),xs:int(\"-273569238\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1460,9 +1934,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:int(\"2147483647\"),xs:int(\"-2147483648\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1476,9 +1954,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:int(\"-273569238\"),xs:int(\"-1873914410\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1492,9 +1974,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:int(\"-2147483648\"),xs:int(\"2147483647\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -1508,9 +1994,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:int(\"-1873914410\"),xs:int(\"-273569238\"),xs:int(\"-273569238\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2421052886")
     );
@@ -1524,9 +2014,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:int(\"-273569238\"),xs:int(\"-1873914410\"),xs:int(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-2147483648")
     );
@@ -1540,9 +2034,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:int(\"0\"),xs:int(\"0\"),xs:int(\"-1873914410\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1873914410")
     );
@@ -1556,9 +2054,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:int(\"0\"),xs:int(\"0\"),xs:int(\"2147483647\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2147483647")
     );
@@ -1572,9 +2074,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1588,9 +2094,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:integer(\"830993497117024304\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("830993497117024304")
     );
@@ -1604,9 +2114,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:integer(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -1620,9 +2134,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:integer(\"830993497117024304\"),xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-169006502882975695")
     );
@@ -1636,9 +2154,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:integer(\"999999999999999999\"),xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1652,9 +2174,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:integer(\"-999999999999999999\"),xs:integer(\"830993497117024304\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-169006502882975695")
     );
@@ -1668,9 +2194,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:integer(\"-999999999999999999\"),xs:integer(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1684,9 +2214,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:integer(\"999999999999999999\"),xs:integer(\"-999999999999999999\"),xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1700,9 +2234,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:integer(\"-999999999999999999\"),xs:integer(\"999999999999999999\"),xs:integer(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1716,9 +2254,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:integer(\"0\"),xs:integer(\"0\"),xs:integer(\"830993497117024304\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("830993497117024304")
     );
@@ -1732,9 +2274,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:integer(\"-999999999999999999\"),xs:integer(\"-999999999999999999\"),xs:integer(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1748,9 +2294,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -1764,9 +2314,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"-47175562203048468\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-47175562203048468")
     );
@@ -1780,9 +2334,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("92233720368547758")
     );
@@ -1796,9 +2354,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"-47175562203048468\"),xs:long(\"-45058158165499290\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -1812,9 +2374,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"92233720368547758\"),xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1828,9 +2394,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"-45058158165499290\"),xs:long(\"-47175562203048468\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -1844,9 +2414,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"-92233720368547758\"),xs:long(\"92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -1860,9 +2434,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"-47175562203048468\"),xs:long(\"-45058158165499290\"),xs:long(\"-45058158165499290\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-137291878534047048")
     );
@@ -1876,9 +2454,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"92233720368547758\"),xs:long(\"-92233720368547758\"),xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -1892,9 +2474,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"-45058158165499290\"),xs:long(\"-47175562203048468\"),xs:long(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -1908,9 +2494,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"-92233720368547758\"),xs:long(\"92233720368547758\"),xs:long(\"-92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -1924,9 +2514,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"0\"),xs:long(\"0\"),xs:long(\"-47175562203048468\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-47175562203048468")
     );
@@ -1940,9 +2534,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:long(\"-92233720368547758\"),xs:long(\"-92233720368547758\"),xs:long(\"92233720368547758\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-92233720368547758")
     );
@@ -1956,9 +2554,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -1972,9 +2574,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:negativeInteger(\"-297014075999096793\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-297014075999096793")
     );
@@ -1988,9 +2594,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:negativeInteger(\"-1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -2004,9 +2614,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:negativeInteger(\"-297014075999096793\"),xs:negativeInteger(\"-702985924000903206\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2020,9 +2634,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:negativeInteger(\"-1\"),xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1000000000000000000")
     );
@@ -2036,9 +2654,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:negativeInteger(\"-702985924000903206\"),xs:negativeInteger(\"-297014075999096793\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2052,9 +2674,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:negativeInteger(\"-999999999999999999\"),xs:negativeInteger(\"-1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1000000000000000000")
     );
@@ -2068,9 +2694,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:negativeInteger(\"-297014075999096793\"),xs:negativeInteger(\"-702985924000903206\"),xs:negativeInteger(\"-702985924000903206\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1702985924000903205")
     );
@@ -2084,9 +2714,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:negativeInteger(\"-1\"),xs:negativeInteger(\"-999999999999999999\"),xs:negativeInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1999999999999999999")
     );
@@ -2100,9 +2734,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2116,9 +2754,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"303884545991464527\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -2132,9 +2774,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2148,9 +2794,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2164,9 +2814,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"303884545991464527\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -2180,9 +2834,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"999999999999999999\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2196,9 +2854,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"303884545991464527\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -2212,9 +2874,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2228,9 +2894,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2244,9 +2914,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"303884545991464527\"),xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -2260,9 +2934,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"999999999999999999\"),xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2276,9 +2954,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"303884545991464527\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -2292,9 +2974,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"999999999999999999\"),xs:nonNegativeInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2308,9 +2994,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"303884545991464527\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("303884545991464527")
     );
@@ -2324,9 +3014,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"0\"),xs:nonNegativeInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2340,9 +3034,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2356,9 +3054,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"-475688437271870490\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-475688437271870490")
     );
@@ -2372,9 +3074,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2388,9 +3094,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"-475688437271870490\"),xs:nonPositiveInteger(\"-524311562728129509\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2404,9 +3114,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"0\"),xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2420,9 +3134,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"-524311562728129509\"),xs:nonPositiveInteger(\"-475688437271870490\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2436,9 +3154,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"-999999999999999999\"),xs:nonPositiveInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2452,9 +3174,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"-475688437271870490\"),xs:nonPositiveInteger(\"-524311562728129509\"),xs:nonPositiveInteger(\"-524311562728129509\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1524311562728129508")
     );
@@ -2468,9 +3194,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"0\"),xs:nonPositiveInteger(\"-999999999999999999\"),xs:nonPositiveInteger(\"-999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1999999999999999998")
     );
@@ -2484,9 +3214,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"-524311562728129509\"),xs:nonPositiveInteger(\"-475688437271870490\"),xs:nonPositiveInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2500,9 +3234,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"-999999999999999999\"),xs:nonPositiveInteger(\"0\"),xs:nonPositiveInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-999999999999999999")
     );
@@ -2516,9 +3254,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"0\"),xs:nonPositiveInteger(\"0\"),xs:nonPositiveInteger(\"-475688437271870490\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-475688437271870490")
     );
@@ -2532,9 +3274,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:nonPositiveInteger(\"0\"),xs:nonPositiveInteger(\"0\"),xs:nonPositiveInteger(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2548,9 +3294,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2564,9 +3314,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"52704602390610033\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610033")
     );
@@ -2580,9 +3334,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"999999999999999999\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2596,9 +3354,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"1\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("2")
     );
@@ -2612,9 +3374,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"52704602390610033\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610034")
     );
@@ -2628,9 +3394,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"999999999999999998\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2644,9 +3414,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"1\"),xs:positiveInteger(\"52704602390610033\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610034")
     );
@@ -2660,9 +3434,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"1\"),xs:positiveInteger(\"999999999999999998\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("999999999999999999")
     );
@@ -2676,9 +3454,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"1\"),xs:positiveInteger(\"1\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("3")
     );
@@ -2692,9 +3474,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"52704602390610033\"),xs:positiveInteger(\"1\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610035")
     );
@@ -2708,9 +3494,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"999999999999999998\"),xs:positiveInteger(\"1\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1000000000000000000")
     );
@@ -2724,9 +3514,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"1\"),xs:positiveInteger(\"52704602390610033\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610035")
     );
@@ -2740,9 +3534,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"1\"),xs:positiveInteger(\"999999999999999998\"),xs:positiveInteger(\"1\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1000000000000000000")
     );
@@ -2756,9 +3554,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"1\"),xs:positiveInteger(\"1\"),xs:positiveInteger(\"52704602390610033\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("52704602390610035")
     );
@@ -2772,9 +3574,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:positiveInteger(\"1\"),xs:positiveInteger(\"1\"),xs:positiveInteger(\"999999999999999998\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1000000000000000000")
     );
@@ -2788,9 +3594,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -2804,9 +3614,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:short(\"-5324\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5324")
     );
@@ -2820,9 +3634,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:short(\"32767\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("32767")
     );
@@ -2836,9 +3654,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:short(\"-5324\"),xs:short(\"-27444\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -2852,9 +3674,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:short(\"32767\"),xs:short(\"-32768\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -2868,9 +3694,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:short(\"-27444\"),xs:short(\"-5324\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -2884,9 +3714,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:short(\"-32768\"),xs:short(\"32767\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-1")
     );
@@ -2900,9 +3734,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:short(\"-5324\"),xs:short(\"-27444\"),xs:short(\"-27444\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-60212")
     );
@@ -2916,9 +3754,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:short(\"-27444\"),xs:short(\"-5324\"),xs:short(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-32768")
     );
@@ -2932,9 +3774,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:short(\"0\"),xs:short(\"0\"),xs:short(\"-5324\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("-5324")
     );
@@ -2948,9 +3794,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:short(\"0\"),xs:short(\"0\"),xs:short(\"32767\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("32767")
     );
@@ -2964,9 +3814,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -2980,9 +3834,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"130747108607674654\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -2996,9 +3854,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"184467440737095516\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -3012,9 +3874,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"0\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3028,9 +3894,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"130747108607674654\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -3044,9 +3914,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"184467440737095516\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -3060,9 +3934,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"0\"),xs:unsignedLong(\"130747108607674654\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -3076,9 +3954,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"0\"),xs:unsignedLong(\"184467440737095516\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -3092,9 +3974,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"0\"),xs:unsignedLong(\"0\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3108,9 +3994,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"130747108607674654\"),xs:unsignedLong(\"0\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -3124,9 +4014,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"184467440737095516\"),xs:unsignedLong(\"0\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -3140,9 +4034,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"0\"),xs:unsignedLong(\"130747108607674654\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -3156,9 +4054,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"0\"),xs:unsignedLong(\"184467440737095516\"),xs:unsignedLong(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -3172,9 +4074,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"0\"),xs:unsignedLong(\"0\"),xs:unsignedLong(\"130747108607674654\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("130747108607674654")
     );
@@ -3188,9 +4094,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedLong(\"0\"),xs:unsignedLong(\"0\"),xs:unsignedLong(\"184467440737095516\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("184467440737095516")
     );
@@ -3204,9 +4114,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3220,9 +4134,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"44633\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -3236,9 +4154,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"65535\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );
@@ -3252,9 +4174,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"0\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3268,9 +4194,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"44633\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -3284,9 +4214,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"65535\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );
@@ -3300,9 +4234,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"0\"),xs:unsignedShort(\"44633\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -3316,9 +4254,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"0\"),xs:unsignedShort(\"65535\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );
@@ -3332,9 +4274,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"0\"),xs:unsignedShort(\"0\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("0")
     );
@@ -3348,9 +4294,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"44633\"),xs:unsignedShort(\"0\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -3364,9 +4314,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"65535\"),xs:unsignedShort(\"0\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );
@@ -3380,9 +4334,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"0\"),xs:unsignedShort(\"44633\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -3396,9 +4354,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"0\"),xs:unsignedShort(\"65535\"),xs:unsignedShort(\"0\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );
@@ -3412,9 +4374,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"0\"),xs:unsignedShort(\"0\"),xs:unsignedShort(\"44633\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("44633")
     );
@@ -3428,9 +4394,13 @@ public class FnSum extends QT3TestSet {
     final XQuery query = new XQuery(
       "fn:sum((xs:unsignedShort(\"0\"),xs:unsignedShort(\"0\"),xs:unsignedShort(\"65535\")))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("65535")
     );

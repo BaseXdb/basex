@@ -20,9 +20,13 @@ public class FnMap extends QT3TestSet {
     final XQuery query = new XQuery(
       "map(upper-case#1, (\"aa\", \"bb\", \"cc\", \"dd\", \"ee\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"AA\", \"BB\", \"CC\", \"DD\", \"EE\"")
     );
@@ -36,9 +40,13 @@ public class FnMap extends QT3TestSet {
     final XQuery query = new XQuery(
       "map(string-to-codepoints#1, (\"john\", \"jane\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("106, 111, 104, 110, 106, 97, 110, 101")
     );
@@ -52,9 +60,13 @@ public class FnMap extends QT3TestSet {
     final XQuery query = new XQuery(
       "map(function($x){$x[contains(., 'e')]}, (\"john\", \"mary\", \"jane\", \"anne\", \"peter\", \"ian\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"jane\", \"anne\", \"peter\"")
     );
@@ -68,9 +80,13 @@ public class FnMap extends QT3TestSet {
     final XQuery query = new XQuery(
       "map(function($x){upper-case($x)} , (\"john\", \"mary\", \"jane\", \"anne\", \"peter\", \"ian\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"JOHN\", \"MARY\", \"JANE\", \"ANNE\", \"PETER\", \"IAN\"")
     );
@@ -86,10 +102,14 @@ public class FnMap extends QT3TestSet {
       "            map(function($e as xs:string) as xs:string { lower-case($e) }, map(function($n as xs:string){upper-case($n)},(\"john\", \"mary\", \"jane\", \"anne\", \"peter\", \"ian\")))\n" +
       "        ",
       ctx);
-    query.addDocument("fn/higherOrder/names.xml", file("fn/higherOrder/names.xml"));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.addDocument("fn/higherOrder/names.xml", file("fn/higherOrder/names.xml"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("\"john\", \"mary\", \"jane\", \"anne\", \"peter\", \"ian\"")
     );
@@ -117,10 +137,14 @@ public class FnMap extends QT3TestSet {
       "            return map($f, $data/*)[not(. instance of attribute())]\n" +
       "        ",
       ctx);
-    query.context(node(file("fn/higherOrder/doc1.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("fn/higherOrder/doc1.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<b bid=\"b\"><b1/></b><b1/><c cid=\"c\"><c1/></c><c1/>", false)
     );
@@ -134,9 +158,13 @@ public class FnMap extends QT3TestSet {
     final XQuery query = new XQuery(
       "map(round#1, ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEmpty()
     );
@@ -150,9 +178,13 @@ public class FnMap extends QT3TestSet {
     final XQuery query = new XQuery(
       "let $f := function($x as xs:double*){map(round#1, $x)} return $f((1.2345, 6.789))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertDeepEq("1, 7")
     );
@@ -166,9 +198,13 @@ public class FnMap extends QT3TestSet {
     final XQuery query = new XQuery(
       "map(starts-with#2, (\"aa\", \"bb\", \"cc\", \"dd\", \"ee\"))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -182,9 +218,13 @@ public class FnMap extends QT3TestSet {
     final XQuery query = new XQuery(
       "map(upper-case#1, (\"aa\", \"bb\", \"cc\", \"dd\", 12))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -198,9 +238,13 @@ public class FnMap extends QT3TestSet {
     final XQuery query = new XQuery(
       "map((), (\"aa\", \"bb\", \"cc\", \"dd\", 12))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );

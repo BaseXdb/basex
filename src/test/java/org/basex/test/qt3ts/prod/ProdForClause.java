@@ -20,9 +20,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a in (\"test\", \"test1\", \"test2\") return $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "test test1 test2")
     );
@@ -36,10 +40,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $folder in $folder/File return <file name=\"{$folder/File/FileName}\"/>",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -53,10 +61,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $f in /MyComputer/Drive4/Folder[@id=\"128\"] return <FolderName>{$f/@name}</FolderName>",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<FolderName name=\"Folder00000000047\"/>", false)
     );
@@ -70,10 +82,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $f in /MyComputer/Drive1/Folder[@creator=\"Mani\"]/File[@creation_date=\"08/06/00\"] return <file>{$f/../@creator}{$f/@creation_date}</file>",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<file creator=\"Mani\" creation_date=\"08/06/00\" />", false)
     );
@@ -87,10 +103,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $f in /MyComputer//File[@creation_date=\"08/06/00\"]/SecurityObject/Denies/Deny[security/right] return $f/../../@name/string()",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "so00000000001")
     );
@@ -104,10 +124,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "<fragment-result>{ for $folder in /MyComputer/Drive3/Folder ,$file in /MyComputer/Drive3/Folder/File return <Folder>{ $folder/@name, $folder/@id }<file>{ $file/@idref }{ data($file/@name) }</file> </Folder> }</fragment-result>",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fragment-result><Folder name=\"Folder00000000017\" id=\"67\"><file idref=\"67\">File00000000047</file></Folder><Folder name=\"Folder00000000017\" id=\"67\"><file idref=\"97\">File00000000062</file></Folder><Folder name=\"Folder00000000032\" id=\"97\"><file idref=\"67\">File00000000047</file></Folder><Folder name=\"Folder00000000032\" id=\"97\"><file idref=\"97\">File00000000062</file></Folder></fragment-result>", false)
     );
@@ -121,10 +145,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $AaBbCc.-_Dd in /MyComputer/Drive1/Folder return $AaBbCc.-_Dd/FolderName",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<FolderName>Folder00000000000</FolderName>", false)
     );
@@ -138,10 +166,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $AaBbCc.-_Dd in /MyComputer/Drive1/Folder where $AaBbCc.-_Dd/@creator = \"Mani\" return $AaBbCc.-_Dd/FolderName",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<FolderName>Folder00000000000</FolderName>", false)
     );
@@ -155,9 +187,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a in $a/* return $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -171,10 +207,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $folder in //Folder for $file in $folder//File return <File folder=\"{$folder/FolderName}\">{string($file/FileName[1])}</File>",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<File folder=\"Folder00000000000\">File00000000000</File><File folder=\"Folder00000000000\">File00000000001</File><File folder=\"Folder00000000000\">File00000000002</File><File folder=\"Folder00000000000\">File00000000003</File><File folder=\"Folder00000000000\">File00000000004</File><File folder=\"Folder00000000000\">File00000000005</File><File folder=\"Folder00000000000\">File00000000006</File><File folder=\"Folder00000000000\">File00000000007</File><File folder=\"Folder00000000000\">File00000000008</File><File folder=\"Folder00000000000\">File00000000009</File><File folder=\"Folder00000000000\">File00000000010</File><File folder=\"Folder00000000000\">File00000000011</File><File folder=\"Folder00000000000\">File00000000012</File><File folder=\"Folder00000000000\">File00000000013</File><File folder=\"Folder00000000000\">File00000000014</File><File folder=\"Folder00000000000\">File00000000015</File><File folder=\"Folder00000000000\">File00000000016</File><File folder=\"Folder00000000000\">File00000000017</File><File folder=\"Folder00000000000\">File00000000018</File><File folder=\"Folder00000000000\">File00000000019</File><File folder=\"Folder00000000000\">File00000000020</File><File folder=\"Folder00000000000\">File00000000021</File><File folder=\"Folder00000000000\">File00000000022</File><File folder=\"Folder00000000000\">File00000000023</File><File folder=\"Folder00000000000\">File00000000024</File><File folder=\"Folder00000000000\">File00000000025</File><File folder=\"Folder00000000000\">File00000000026</File><File folder=\"Folder00000000000\">File00000000027</File><File folder=\"Folder00000000000\">File00000000028</File><File folder=\"Folder00000000000\">File00000000029</File><File folder=\"Folder00000000000\">File00000000030</File><File folder=\"Folder00000000001\">File00000000031</File><File folder=\"Folder00000000001\">File00000000032</File><File folder=\"Folder00000000001\">File00000000033</File><File folder=\"Folder00000000001\">File00000000034</File><File folder=\"Folder00000000001\">File00000000035</File><File folder=\"Folder00000000001\">File00000000036</File><File folder=\"Folder00000000001\">File00000000037</File><File folder=\"Folder00000000001\">File00000000038</File><File folder=\"Folder00000000001\">File00000000039</File><File folder=\"Folder00000000001\">File00000000040</File><File folder=\"Folder00000000001\">File00000000041</File><File folder=\"Folder00000000001\">File00000000042</File><File folder=\"Folder00000000001\">File00000000043</File><File folder=\"Folder00000000001\">File00000000044</File><File folder=\"Folder00000000001\">File00000000045</File><File folder=\"Folder00000000001\">File00000000046</File><File folder=\"Folder00000000002\">File00000000032</File><File folder=\"Folder00000000002\">File00000000033</File><File folder=\"Folder00000000002\">File00000000034</File><File folder=\"Folder00000000002\">File00000000035</File><File folder=\"Folder00000000002\">File00000000036</File><File folder=\"Folder00000000002\">File00000000037</File><File folder=\"Folder00000000002\">File00000000038</File><File folder=\"Folder00000000002\">File00000000039</File><File folder=\"Folder00000000002\">File00000000040</File><File folder=\"Folder00000000002\">File00000000041</File><File folder=\"Folder00000000002\">File00000000042</File><File folder=\"Folder00000000002\">File00000000043</File><File folder=\"Folder00000000002\">File00000000044</File><File folder=\"Folder00000000002\">File00000000045</File><File folder=\"Folder00000000002\">File00000000046</File><File folder=\"Folder00000000003\">File00000000033</File><File folder=\"Folder00000000003\">File00000000034</File><File folder=\"Folder00000000003\">File00000000035</File><File folder=\"Folder00000000003\">File00000000036</File><File folder=\"Folder00000000003\">File00000000037</File><File folder=\"Folder00000000003\">File00000000038</File><File folder=\"Folder00000000003\">File00000000039</File><File folder=\"Folder00000000003\">File00000000040</File><File folder=\"Folder00000000003\">File00000000041</File><File folder=\"Folder00000000003\">File00000000042</File><File folder=\"Folder00000000003\">File00000000043</File><File folder=\"Folder00000000003\">File00000000044</File><File folder=\"Folder00000000003\">File00000000045</File><File folder=\"Folder00000000003\">File00000000046</File><File folder=\"Folder00000000004\">File00000000034</File><File folder=\"Folder00000000004\">File00000000035</File><File folder=\"Folder00000000004\">File00000000036</File><File folder=\"Folder00000000004\">File00000000037</File><File folder=\"Folder00000000004\">File00000000038</File><File folder=\"Folder00000000004\">File00000000039</File><File folder=\"Folder00000000004\">File00000000040</File><File folder=\"Folder00000000004\">File00000000041</File><File folder=\"Folder00000000004\">File00000000042</File><File folder=\"Folder00000000004\">File00000000043</File><File folder=\"Folder00000000004\">File00000000044</File><File folder=\"Folder00000000004\">File00000000045</File><File folder=\"Folder00000000004\">File00000000046</File><File folder=\"Folder00000000005\">File00000000035</File><File folder=\"Folder00000000005\">File00000000036</File><File folder=\"Folder00000000005\">File00000000037</File><File folder=\"Folder00000000005\">File00000000038</File><File folder=\"Folder00000000005\">File00000000039</File><File folder=\"Folder00000000005\">File00000000040</File><File folder=\"Folder00000000005\">File00000000041</File><File folder=\"Folder00000000005\">File00000000042</File><File folder=\"Folder00000000005\">File00000000043</File><File folder=\"Folder00000000005\">File00000000044</File><File folder=\"Folder00000000005\">File00000000045</File><File folder=\"Folder00000000005\">File00000000046</File><File folder=\"Folder00000000006\">File00000000036</File><File folder=\"Folder00000000006\">File00000000037</File><File folder=\"Folder00000000006\">File00000000038</File><File folder=\"Folder00000000006\">File00000000039</File><File folder=\"Folder00000000006\">File00000000040</File><File folder=\"Folder00000000006\">File00000000041</File><File folder=\"Folder00000000006\">File00000000042</File><File folder=\"Folder00000000006\">File00000000043</File><File folder=\"Folder00000000006\">File00000000044</File><File folder=\"Folder00000000006\">File00000000045</File><File folder=\"Folder00000000006\">File00000000046</File><File folder=\"Folder00000000007\">File00000000037</File><File folder=\"Folder00000000007\">File00000000038</File><File folder=\"Folder00000000007\">File00000000039</File><File folder=\"Folder00000000007\">File00000000040</File><File folder=\"Folder00000000007\">File00000000041</File><File folder=\"Folder00000000007\">File00000000042</File><File folder=\"Folder00000000007\">File00000000043</File><File folder=\"Folder00000000007\">File00000000044</File><File folder=\"Folder00000000007\">File00000000045</File><File folder=\"Folder00000000007\">File00000000046</File><File folder=\"Folder00000000008\">File00000000038</File><File folder=\"Folder00000000008\">File00000000039</File><File folder=\"Folder00000000008\">File00000000040</File><File folder=\"Folder00000000008\">File00000000041</File><File folder=\"Folder00000000008\">File00000000042</File><File folder=\"Folder00000000008\">File00000000043</File><File folder=\"Folder00000000008\">File00000000044</File><File folder=\"Folder00000000008\">File00000000045</File><File folder=\"Folder00000000008\">File00000000046</File><File folder=\"Folder00000000009\">File00000000039</File><File folder=\"Folder00000000009\">File00000000040</File><File folder=\"Folder00000000009\">File00000000041</File><File folder=\"Folder00000000009\">File00000000042</File><File folder=\"Folder00000000009\">File00000000043</File><File folder=\"Folder00000000009\">File00000000044</File><File folder=\"Folder00000000009\">File00000000045</File><File folder=\"Folder00000000009\">File00000000046</File><File folder=\"Folder00000000010\">File00000000040</File><File folder=\"Folder00000000010\">File00000000041</File><File folder=\"Folder00000000010\">File00000000042</File><File folder=\"Folder00000000010\">File00000000043</File><File folder=\"Folder00000000010\">File00000000044</File><File folder=\"Folder00000000010\">File00000000045</File><File folder=\"Folder00000000010\">File00000000046</File><File folder=\"Folder00000000011\">File00000000041</File><File folder=\"Folder00000000011\">File00000000042</File><File folder=\"Folder00000000011\">File00000000043</File><File folder=\"Folder00000000011\">File00000000044</File><File folder=\"Folder00000000011\">File00000000045</File><File folder=\"Folder00000000011\">File00000000046</File><File folder=\"Folder00000000012\">File00000000042</File><File folder=\"Folder00000000012\">File00000000043</File><File folder=\"Folder00000000012\">File00000000044</File><File folder=\"Folder00000000012\">File00000000045</File><File folder=\"Folder00000000012\">File00000000046</File><File folder=\"Folder00000000013\">File00000000043</File><File folder=\"Folder00000000013\">File00000000044</File><File folder=\"Folder00000000013\">File00000000045</File><File folder=\"Folder00000000013\">File00000000046</File><File folder=\"Folder00000000014\">File00000000044</File><File folder=\"Folder00000000014\">File00000000045</File><File folder=\"Folder00000000014\">File00000000046</File><File folder=\"Folder00000000015\">File00000000045</File><File folder=\"Folder00000000015\">File00000000046</File><File folder=\"Folder00000000016\">File00000000046</File><File folder=\"Folder00000000017\">File00000000047</File><File folder=\"Folder00000000017\">File00000000048</File><File folder=\"Folder00000000017\">File00000000049</File><File folder=\"Folder00000000017\">File00000000050</File><File folder=\"Folder00000000017\">File00000000051</File><File folder=\"Folder00000000017\">File00000000052</File><File folder=\"Folder00000000017\">File00000000053</File><File folder=\"Folder00000000017\">File00000000054</File><File folder=\"Folder00000000017\">File00000000055</File><File folder=\"Folder00000000017\">File00000000056</File><File folder=\"Folder00000000017\">File00000000057</File><File folder=\"Folder00000000017\">File00000000058</File><File folder=\"Folder00000000017\">File00000000059</File><File folder=\"Folder00000000017\">File00000000060</File><File folder=\"Folder00000000017\">File00000000061</File><File folder=\"Folder00000000018\">File00000000048</File><File folder=\"Folder00000000018\">File00000000049</File><File folder=\"Folder00000000018\">File00000000050</File><File folder=\"Folder00000000018\">File00000000051</File><File folder=\"Folder00000000018\">File00000000052</File><File folder=\"Folder00000000018\">File00000000053</File><File folder=\"Folder00000000018\">File00000000054</File><File folder=\"Folder00000000019\">File00000000049</File><File folder=\"Folder00000000019\">File00000000050</File><File folder=\"Folder00000000019\">File00000000051</File><File folder=\"Folder00000000020\">File00000000050</File><File folder=\"Folder00000000021\">File00000000051</File><File folder=\"Folder00000000022\">File00000000052</File><File folder=\"Folder00000000022\">File00000000053</File><File folder=\"Folder00000000022\">File00000000054</File><File folder=\"Folder00000000023\">File00000000053</File><File folder=\"Folder00000000024\">File00000000054</File><File folder=\"Folder00000000025\">File00000000055</File><File folder=\"Folder00000000025\">File00000000056</File><File folder=\"Folder00000000025\">File00000000057</File><File folder=\"Folder00000000025\">File00000000058</File><File folder=\"Folder00000000025\">File00000000059</File><File folder=\"Folder00000000025\">File00000000060</File><File folder=\"Folder00000000025\">File00000000061</File><File folder=\"Folder00000000026\">File00000000056</File><File folder=\"Folder00000000026\">File00000000057</File><File folder=\"Folder00000000026\">File00000000058</File><File folder=\"Folder00000000027\">File00000000057</File><File folder=\"Folder00000000028\">File00000000058</File><File folder=\"Folder00000000029\">File00000000059</File><File folder=\"Folder00000000029\">File00000000060</File><File folder=\"Folder00000000029\">File00000000061</File><File folder=\"Folder00000000030\">File00000000060</File><File folder=\"Folder00000000031\">File00000000061</File><File folder=\"Folder00000000032\">File00000000062</File><File folder=\"Folder00000000032\">File00000000063</File><File folder=\"Folder00000000032\">File00000000064</File><File folder=\"Folder00000000032\">File00000000065</File><File folder=\"Folder00000000032\">File00000000066</File><File folder=\"Folder00000000032\">File00000000067</File><File folder=\"Folder00000000032\">File00000000068</File><File folder=\"Folder00000000032\">File00000000069</File><File folder=\"Folder00000000032\">File00000000070</File><File folder=\"Folder00000000032\">File00000000071</File><File folder=\"Folder00000000032\">File00000000072</File><File folder=\"Folder00000000032\">File00000000073</File><File folder=\"Folder00000000032\">File00000000074</File><File folder=\"Folder00000000032\">File00000000075</File><File folder=\"Folder00000000032\">File00000000076</File><File folder=\"Folder00000000033\">File00000000063</File><File folder=\"Folder00000000033\">File00000000064</File><File folder=\"Folder00000000033\">File00000000065</File><File folder=\"Folder00000000033\">File00000000066</File><File folder=\"Folder00000000033\">File00000000067</File><File folder=\"Folder00000000033\">File00000000068</File><File folder=\"Folder00000000033\">File00000000069</File><File folder=\"Folder00000000034\">File00000000064</File><File folder=\"Folder00000000034\">File00000000065</File><File folder=\"Folder00000000034\">File00000000066</File><File folder=\"Folder00000000035\">File00000000065</File><File folder=\"Folder00000000036\">File00000000066</File><File folder=\"Folder00000000037\">File00000000067</File><File folder=\"Folder00000000037\">File00000000068</File><File folder=\"Folder00000000037\">File00000000069</File><File folder=\"Folder00000000038\">File00000000068</File><File folder=\"Folder00000000039\">File00000000069</File><File folder=\"Folder00000000040\">File00000000070</File><File folder=\"Folder00000000040\">File00000000071</File><File folder=\"Folder00000000040\">File00000000072</File><File folder=\"Folder00000000040\">File00000000073</File><File folder=\"Folder00000000040\">File00000000074</File><File folder=\"Folder00000000040\">File00000000075</File><File folder=\"Folder00000000040\">File00000000076</File><File folder=\"Folder00000000041\">File00000000071</File><File folder=\"Folder00000000041\">File00000000072</File><File folder=\"Folder00000000041\">File00000000073</File><File folder=\"Folder00000000042\">File00000000072</File><File folder=\"Folder00000000043\">File00000000073</File><File folder=\"Folder00000000044\">File00000000074</File><File folder=\"Folder00000000044\">File00000000075</File><File folder=\"Folder00000000044\">File00000000076</File><File folder=\"Folder00000000045\">File00000000075</File><File folder=\"Folder00000000046\">File00000000076</File><File folder=\"Folder00000000047\">File00000000077</File><File folder=\"Folder00000000047\">File00000000078</File><File folder=\"Folder00000000047\">File00000000079</File><File folder=\"Folder00000000047\">File00000000080</File><File folder=\"Folder00000000047\">File00000000081</File><File folder=\"Folder00000000047\">File00000000082</File><File folder=\"Folder00000000047\">File00000000083</File><File folder=\"Folder00000000047\">File00000000084</File><File folder=\"Folder00000000047\">File00000000085</File><File folder=\"Folder00000000047\">File00000000086</File><File folder=\"Folder00000000047\">File00000000087</File><File folder=\"Folder00000000047\">File00000000088</File><File folder=\"Folder00000000047\">File00000000089</File><File folder=\"Folder00000000047\">File00000000090</File><File folder=\"Folder00000000047\">File00000000091</File><File folder=\"Folder00000000047\">File00000000092</File><File folder=\"Folder00000000047\">File00000000093</File><File folder=\"Folder00000000047\">File00000000094</File><File folder=\"Folder00000000047\">File00000000095</File><File folder=\"Folder00000000047\">File00000000096</File><File folder=\"Folder00000000047\">File00000000097</File><File folder=\"Folder00000000047\">File00000000098</File><File folder=\"Folder00000000047\">File00000000099</File><File folder=\"Folder00000000047\">File00000000100</File><File folder=\"Folder00000000048\">File00000000077</File><File folder=\"Folder00000000048\">File00000000078</File><File folder=\"Folder00000000048\">File00000000079</File><File folder=\"Folder00000000048\">File00000000080</File><File folder=\"Folder00000000048\">File00000000081</File><File folder=\"Folder00000000049\">File00000000082</File><File folder=\"Folder00000000049\">File00000000083</File><File folder=\"Folder00000000049\">File00000000084</File><File folder=\"Folder00000000049\">File00000000085</File><File folder=\"Folder00000000049\">File00000000086</File><File folder=\"Folder00000000050\">File00000000087</File><File folder=\"Folder00000000050\">File00000000088</File><File folder=\"Folder00000000051\">File00000000089</File><File folder=\"Folder00000000051\">File00000000090</File><File folder=\"Folder00000000051\">File00000000091</File><File folder=\"Folder00000000051\">File00000000092</File><File folder=\"Folder00000000051\">File00000000093</File><File folder=\"Folder00000000051\">File00000000094</File><File folder=\"Folder00000000052\">File00000000095</File><File folder=\"Folder00000000052\">File00000000096</File><File folder=\"Folder00000000053\">File00000000097</File><File folder=\"Folder00000000053\">File00000000098</File><File folder=\"Folder00000000053\">File00000000099</File><File folder=\"Folder00000000054\">File00000000100</File>", false)
     );
@@ -188,10 +228,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $folder in //Folder, $file in $folder//File return <File folder=\"{$folder/FolderName}\">{string($file/FileName[1])}</File>",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<File folder=\"Folder00000000000\">File00000000000</File><File folder=\"Folder00000000000\">File00000000001</File><File folder=\"Folder00000000000\">File00000000002</File><File folder=\"Folder00000000000\">File00000000003</File><File folder=\"Folder00000000000\">File00000000004</File><File folder=\"Folder00000000000\">File00000000005</File><File folder=\"Folder00000000000\">File00000000006</File><File folder=\"Folder00000000000\">File00000000007</File><File folder=\"Folder00000000000\">File00000000008</File><File folder=\"Folder00000000000\">File00000000009</File><File folder=\"Folder00000000000\">File00000000010</File><File folder=\"Folder00000000000\">File00000000011</File><File folder=\"Folder00000000000\">File00000000012</File><File folder=\"Folder00000000000\">File00000000013</File><File folder=\"Folder00000000000\">File00000000014</File><File folder=\"Folder00000000000\">File00000000015</File><File folder=\"Folder00000000000\">File00000000016</File><File folder=\"Folder00000000000\">File00000000017</File><File folder=\"Folder00000000000\">File00000000018</File><File folder=\"Folder00000000000\">File00000000019</File><File folder=\"Folder00000000000\">File00000000020</File><File folder=\"Folder00000000000\">File00000000021</File><File folder=\"Folder00000000000\">File00000000022</File><File folder=\"Folder00000000000\">File00000000023</File><File folder=\"Folder00000000000\">File00000000024</File><File folder=\"Folder00000000000\">File00000000025</File><File folder=\"Folder00000000000\">File00000000026</File><File folder=\"Folder00000000000\">File00000000027</File><File folder=\"Folder00000000000\">File00000000028</File><File folder=\"Folder00000000000\">File00000000029</File><File folder=\"Folder00000000000\">File00000000030</File><File folder=\"Folder00000000001\">File00000000031</File><File folder=\"Folder00000000001\">File00000000032</File><File folder=\"Folder00000000001\">File00000000033</File><File folder=\"Folder00000000001\">File00000000034</File><File folder=\"Folder00000000001\">File00000000035</File><File folder=\"Folder00000000001\">File00000000036</File><File folder=\"Folder00000000001\">File00000000037</File><File folder=\"Folder00000000001\">File00000000038</File><File folder=\"Folder00000000001\">File00000000039</File><File folder=\"Folder00000000001\">File00000000040</File><File folder=\"Folder00000000001\">File00000000041</File><File folder=\"Folder00000000001\">File00000000042</File><File folder=\"Folder00000000001\">File00000000043</File><File folder=\"Folder00000000001\">File00000000044</File><File folder=\"Folder00000000001\">File00000000045</File><File folder=\"Folder00000000001\">File00000000046</File><File folder=\"Folder00000000002\">File00000000032</File><File folder=\"Folder00000000002\">File00000000033</File><File folder=\"Folder00000000002\">File00000000034</File><File folder=\"Folder00000000002\">File00000000035</File><File folder=\"Folder00000000002\">File00000000036</File><File folder=\"Folder00000000002\">File00000000037</File><File folder=\"Folder00000000002\">File00000000038</File><File folder=\"Folder00000000002\">File00000000039</File><File folder=\"Folder00000000002\">File00000000040</File><File folder=\"Folder00000000002\">File00000000041</File><File folder=\"Folder00000000002\">File00000000042</File><File folder=\"Folder00000000002\">File00000000043</File><File folder=\"Folder00000000002\">File00000000044</File><File folder=\"Folder00000000002\">File00000000045</File><File folder=\"Folder00000000002\">File00000000046</File><File folder=\"Folder00000000003\">File00000000033</File><File folder=\"Folder00000000003\">File00000000034</File><File folder=\"Folder00000000003\">File00000000035</File><File folder=\"Folder00000000003\">File00000000036</File><File folder=\"Folder00000000003\">File00000000037</File><File folder=\"Folder00000000003\">File00000000038</File><File folder=\"Folder00000000003\">File00000000039</File><File folder=\"Folder00000000003\">File00000000040</File><File folder=\"Folder00000000003\">File00000000041</File><File folder=\"Folder00000000003\">File00000000042</File><File folder=\"Folder00000000003\">File00000000043</File><File folder=\"Folder00000000003\">File00000000044</File><File folder=\"Folder00000000003\">File00000000045</File><File folder=\"Folder00000000003\">File00000000046</File><File folder=\"Folder00000000004\">File00000000034</File><File folder=\"Folder00000000004\">File00000000035</File><File folder=\"Folder00000000004\">File00000000036</File><File folder=\"Folder00000000004\">File00000000037</File><File folder=\"Folder00000000004\">File00000000038</File><File folder=\"Folder00000000004\">File00000000039</File><File folder=\"Folder00000000004\">File00000000040</File><File folder=\"Folder00000000004\">File00000000041</File><File folder=\"Folder00000000004\">File00000000042</File><File folder=\"Folder00000000004\">File00000000043</File><File folder=\"Folder00000000004\">File00000000044</File><File folder=\"Folder00000000004\">File00000000045</File><File folder=\"Folder00000000004\">File00000000046</File><File folder=\"Folder00000000005\">File00000000035</File><File folder=\"Folder00000000005\">File00000000036</File><File folder=\"Folder00000000005\">File00000000037</File><File folder=\"Folder00000000005\">File00000000038</File><File folder=\"Folder00000000005\">File00000000039</File><File folder=\"Folder00000000005\">File00000000040</File><File folder=\"Folder00000000005\">File00000000041</File><File folder=\"Folder00000000005\">File00000000042</File><File folder=\"Folder00000000005\">File00000000043</File><File folder=\"Folder00000000005\">File00000000044</File><File folder=\"Folder00000000005\">File00000000045</File><File folder=\"Folder00000000005\">File00000000046</File><File folder=\"Folder00000000006\">File00000000036</File><File folder=\"Folder00000000006\">File00000000037</File><File folder=\"Folder00000000006\">File00000000038</File><File folder=\"Folder00000000006\">File00000000039</File><File folder=\"Folder00000000006\">File00000000040</File><File folder=\"Folder00000000006\">File00000000041</File><File folder=\"Folder00000000006\">File00000000042</File><File folder=\"Folder00000000006\">File00000000043</File><File folder=\"Folder00000000006\">File00000000044</File><File folder=\"Folder00000000006\">File00000000045</File><File folder=\"Folder00000000006\">File00000000046</File><File folder=\"Folder00000000007\">File00000000037</File><File folder=\"Folder00000000007\">File00000000038</File><File folder=\"Folder00000000007\">File00000000039</File><File folder=\"Folder00000000007\">File00000000040</File><File folder=\"Folder00000000007\">File00000000041</File><File folder=\"Folder00000000007\">File00000000042</File><File folder=\"Folder00000000007\">File00000000043</File><File folder=\"Folder00000000007\">File00000000044</File><File folder=\"Folder00000000007\">File00000000045</File><File folder=\"Folder00000000007\">File00000000046</File><File folder=\"Folder00000000008\">File00000000038</File><File folder=\"Folder00000000008\">File00000000039</File><File folder=\"Folder00000000008\">File00000000040</File><File folder=\"Folder00000000008\">File00000000041</File><File folder=\"Folder00000000008\">File00000000042</File><File folder=\"Folder00000000008\">File00000000043</File><File folder=\"Folder00000000008\">File00000000044</File><File folder=\"Folder00000000008\">File00000000045</File><File folder=\"Folder00000000008\">File00000000046</File><File folder=\"Folder00000000009\">File00000000039</File><File folder=\"Folder00000000009\">File00000000040</File><File folder=\"Folder00000000009\">File00000000041</File><File folder=\"Folder00000000009\">File00000000042</File><File folder=\"Folder00000000009\">File00000000043</File><File folder=\"Folder00000000009\">File00000000044</File><File folder=\"Folder00000000009\">File00000000045</File><File folder=\"Folder00000000009\">File00000000046</File><File folder=\"Folder00000000010\">File00000000040</File><File folder=\"Folder00000000010\">File00000000041</File><File folder=\"Folder00000000010\">File00000000042</File><File folder=\"Folder00000000010\">File00000000043</File><File folder=\"Folder00000000010\">File00000000044</File><File folder=\"Folder00000000010\">File00000000045</File><File folder=\"Folder00000000010\">File00000000046</File><File folder=\"Folder00000000011\">File00000000041</File><File folder=\"Folder00000000011\">File00000000042</File><File folder=\"Folder00000000011\">File00000000043</File><File folder=\"Folder00000000011\">File00000000044</File><File folder=\"Folder00000000011\">File00000000045</File><File folder=\"Folder00000000011\">File00000000046</File><File folder=\"Folder00000000012\">File00000000042</File><File folder=\"Folder00000000012\">File00000000043</File><File folder=\"Folder00000000012\">File00000000044</File><File folder=\"Folder00000000012\">File00000000045</File><File folder=\"Folder00000000012\">File00000000046</File><File folder=\"Folder00000000013\">File00000000043</File><File folder=\"Folder00000000013\">File00000000044</File><File folder=\"Folder00000000013\">File00000000045</File><File folder=\"Folder00000000013\">File00000000046</File><File folder=\"Folder00000000014\">File00000000044</File><File folder=\"Folder00000000014\">File00000000045</File><File folder=\"Folder00000000014\">File00000000046</File><File folder=\"Folder00000000015\">File00000000045</File><File folder=\"Folder00000000015\">File00000000046</File><File folder=\"Folder00000000016\">File00000000046</File><File folder=\"Folder00000000017\">File00000000047</File><File folder=\"Folder00000000017\">File00000000048</File><File folder=\"Folder00000000017\">File00000000049</File><File folder=\"Folder00000000017\">File00000000050</File><File folder=\"Folder00000000017\">File00000000051</File><File folder=\"Folder00000000017\">File00000000052</File><File folder=\"Folder00000000017\">File00000000053</File><File folder=\"Folder00000000017\">File00000000054</File><File folder=\"Folder00000000017\">File00000000055</File><File folder=\"Folder00000000017\">File00000000056</File><File folder=\"Folder00000000017\">File00000000057</File><File folder=\"Folder00000000017\">File00000000058</File><File folder=\"Folder00000000017\">File00000000059</File><File folder=\"Folder00000000017\">File00000000060</File><File folder=\"Folder00000000017\">File00000000061</File><File folder=\"Folder00000000018\">File00000000048</File><File folder=\"Folder00000000018\">File00000000049</File><File folder=\"Folder00000000018\">File00000000050</File><File folder=\"Folder00000000018\">File00000000051</File><File folder=\"Folder00000000018\">File00000000052</File><File folder=\"Folder00000000018\">File00000000053</File><File folder=\"Folder00000000018\">File00000000054</File><File folder=\"Folder00000000019\">File00000000049</File><File folder=\"Folder00000000019\">File00000000050</File><File folder=\"Folder00000000019\">File00000000051</File><File folder=\"Folder00000000020\">File00000000050</File><File folder=\"Folder00000000021\">File00000000051</File><File folder=\"Folder00000000022\">File00000000052</File><File folder=\"Folder00000000022\">File00000000053</File><File folder=\"Folder00000000022\">File00000000054</File><File folder=\"Folder00000000023\">File00000000053</File><File folder=\"Folder00000000024\">File00000000054</File><File folder=\"Folder00000000025\">File00000000055</File><File folder=\"Folder00000000025\">File00000000056</File><File folder=\"Folder00000000025\">File00000000057</File><File folder=\"Folder00000000025\">File00000000058</File><File folder=\"Folder00000000025\">File00000000059</File><File folder=\"Folder00000000025\">File00000000060</File><File folder=\"Folder00000000025\">File00000000061</File><File folder=\"Folder00000000026\">File00000000056</File><File folder=\"Folder00000000026\">File00000000057</File><File folder=\"Folder00000000026\">File00000000058</File><File folder=\"Folder00000000027\">File00000000057</File><File folder=\"Folder00000000028\">File00000000058</File><File folder=\"Folder00000000029\">File00000000059</File><File folder=\"Folder00000000029\">File00000000060</File><File folder=\"Folder00000000029\">File00000000061</File><File folder=\"Folder00000000030\">File00000000060</File><File folder=\"Folder00000000031\">File00000000061</File><File folder=\"Folder00000000032\">File00000000062</File><File folder=\"Folder00000000032\">File00000000063</File><File folder=\"Folder00000000032\">File00000000064</File><File folder=\"Folder00000000032\">File00000000065</File><File folder=\"Folder00000000032\">File00000000066</File><File folder=\"Folder00000000032\">File00000000067</File><File folder=\"Folder00000000032\">File00000000068</File><File folder=\"Folder00000000032\">File00000000069</File><File folder=\"Folder00000000032\">File00000000070</File><File folder=\"Folder00000000032\">File00000000071</File><File folder=\"Folder00000000032\">File00000000072</File><File folder=\"Folder00000000032\">File00000000073</File><File folder=\"Folder00000000032\">File00000000074</File><File folder=\"Folder00000000032\">File00000000075</File><File folder=\"Folder00000000032\">File00000000076</File><File folder=\"Folder00000000033\">File00000000063</File><File folder=\"Folder00000000033\">File00000000064</File><File folder=\"Folder00000000033\">File00000000065</File><File folder=\"Folder00000000033\">File00000000066</File><File folder=\"Folder00000000033\">File00000000067</File><File folder=\"Folder00000000033\">File00000000068</File><File folder=\"Folder00000000033\">File00000000069</File><File folder=\"Folder00000000034\">File00000000064</File><File folder=\"Folder00000000034\">File00000000065</File><File folder=\"Folder00000000034\">File00000000066</File><File folder=\"Folder00000000035\">File00000000065</File><File folder=\"Folder00000000036\">File00000000066</File><File folder=\"Folder00000000037\">File00000000067</File><File folder=\"Folder00000000037\">File00000000068</File><File folder=\"Folder00000000037\">File00000000069</File><File folder=\"Folder00000000038\">File00000000068</File><File folder=\"Folder00000000039\">File00000000069</File><File folder=\"Folder00000000040\">File00000000070</File><File folder=\"Folder00000000040\">File00000000071</File><File folder=\"Folder00000000040\">File00000000072</File><File folder=\"Folder00000000040\">File00000000073</File><File folder=\"Folder00000000040\">File00000000074</File><File folder=\"Folder00000000040\">File00000000075</File><File folder=\"Folder00000000040\">File00000000076</File><File folder=\"Folder00000000041\">File00000000071</File><File folder=\"Folder00000000041\">File00000000072</File><File folder=\"Folder00000000041\">File00000000073</File><File folder=\"Folder00000000042\">File00000000072</File><File folder=\"Folder00000000043\">File00000000073</File><File folder=\"Folder00000000044\">File00000000074</File><File folder=\"Folder00000000044\">File00000000075</File><File folder=\"Folder00000000044\">File00000000076</File><File folder=\"Folder00000000045\">File00000000075</File><File folder=\"Folder00000000046\">File00000000076</File><File folder=\"Folder00000000047\">File00000000077</File><File folder=\"Folder00000000047\">File00000000078</File><File folder=\"Folder00000000047\">File00000000079</File><File folder=\"Folder00000000047\">File00000000080</File><File folder=\"Folder00000000047\">File00000000081</File><File folder=\"Folder00000000047\">File00000000082</File><File folder=\"Folder00000000047\">File00000000083</File><File folder=\"Folder00000000047\">File00000000084</File><File folder=\"Folder00000000047\">File00000000085</File><File folder=\"Folder00000000047\">File00000000086</File><File folder=\"Folder00000000047\">File00000000087</File><File folder=\"Folder00000000047\">File00000000088</File><File folder=\"Folder00000000047\">File00000000089</File><File folder=\"Folder00000000047\">File00000000090</File><File folder=\"Folder00000000047\">File00000000091</File><File folder=\"Folder00000000047\">File00000000092</File><File folder=\"Folder00000000047\">File00000000093</File><File folder=\"Folder00000000047\">File00000000094</File><File folder=\"Folder00000000047\">File00000000095</File><File folder=\"Folder00000000047\">File00000000096</File><File folder=\"Folder00000000047\">File00000000097</File><File folder=\"Folder00000000047\">File00000000098</File><File folder=\"Folder00000000047\">File00000000099</File><File folder=\"Folder00000000047\">File00000000100</File><File folder=\"Folder00000000048\">File00000000077</File><File folder=\"Folder00000000048\">File00000000078</File><File folder=\"Folder00000000048\">File00000000079</File><File folder=\"Folder00000000048\">File00000000080</File><File folder=\"Folder00000000048\">File00000000081</File><File folder=\"Folder00000000049\">File00000000082</File><File folder=\"Folder00000000049\">File00000000083</File><File folder=\"Folder00000000049\">File00000000084</File><File folder=\"Folder00000000049\">File00000000085</File><File folder=\"Folder00000000049\">File00000000086</File><File folder=\"Folder00000000050\">File00000000087</File><File folder=\"Folder00000000050\">File00000000088</File><File folder=\"Folder00000000051\">File00000000089</File><File folder=\"Folder00000000051\">File00000000090</File><File folder=\"Folder00000000051\">File00000000091</File><File folder=\"Folder00000000051\">File00000000092</File><File folder=\"Folder00000000051\">File00000000093</File><File folder=\"Folder00000000051\">File00000000094</File><File folder=\"Folder00000000052\">File00000000095</File><File folder=\"Folder00000000052\">File00000000096</File><File folder=\"Folder00000000053\">File00000000097</File><File folder=\"Folder00000000053\">File00000000098</File><File folder=\"Folder00000000053\">File00000000099</File><File folder=\"Folder00000000054\">File00000000100</File>", false)
     );
@@ -205,10 +249,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $fileName in for $file in //Folder/File return $file/FileName return string( $fileName )",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "File00000000000 File00000000001 File00000000002 File00000000003 File00000000004 File00000000005 File00000000006 File00000000007 File00000000008 File00000000009 File00000000010 File00000000011 File00000000012 File00000000013 File00000000014 File00000000015 File00000000016 File00000000017 File00000000018 File00000000019 File00000000020 File00000000021 File00000000022 File00000000023 File00000000024 File00000000025 File00000000026 File00000000027 File00000000028 File00000000029 File00000000030 File00000000031 File00000000032 File00000000033 File00000000034 File00000000035 File00000000036 File00000000037 File00000000038 File00000000039 File00000000040 File00000000041 File00000000042 File00000000043 File00000000044 File00000000045 File00000000046 File00000000047 File00000000048 File00000000049 File00000000050 File00000000051 File00000000052 File00000000053 File00000000054 File00000000055 File00000000056 File00000000057 File00000000058 File00000000059 File00000000060 File00000000061 File00000000062 File00000000063 File00000000064 File00000000065 File00000000066 File00000000067 File00000000068 File00000000069 File00000000070 File00000000071 File00000000072 File00000000073 File00000000074 File00000000075 File00000000076 File00000000077 File00000000078 File00000000079 File00000000080 File00000000081 File00000000082 File00000000083 File00000000084 File00000000085 File00000000086 File00000000087 File00000000088 File00000000089 File00000000090 File00000000091 File00000000092 File00000000093 File00000000094 File00000000095 File00000000096 File00000000097 File00000000098 File00000000099 File00000000100")
     );
@@ -225,10 +273,14 @@ public class ProdForClause extends QT3TestSet {
       "            $folderName in //Folder[contains(description, 'fren')]/FolderName \n" +
       "        return ($folderName, $fileName)",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<FolderName>Folder00000000026</FolderName><FileName>File00000000000</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000001</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000002</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000003</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000004</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000005</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000006</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000007</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000008</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000009</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000010</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000011</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000012</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000013</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000014</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000015</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000016</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000017</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000018</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000019</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000020</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000021</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000022</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000023</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000024</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000025</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000026</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000027</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000028</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000029</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000030</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000031</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000032</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000033</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000034</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000035</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000036</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000037</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000038</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000039</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000040</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000041</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000042</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000043</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000044</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000045</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000046</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000047</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000048</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000049</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000050</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000051</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000052</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000053</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000054</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000055</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000056</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000057</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000058</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000059</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000060</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000061</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000062</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000063</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000064</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000065</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000066</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000067</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000068</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000069</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000070</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000071</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000072</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000073</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000074</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000075</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000076</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000077</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000078</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000079</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000080</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000081</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000082</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000083</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000084</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000085</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000086</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000087</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000088</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000089</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000090</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000091</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000092</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000093</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000094</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000095</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000096</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000097</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000098</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000099</FileName><FolderName>Folder00000000026</FolderName><FileName>File00000000100</FileName>", false)
     );
@@ -242,10 +294,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $fileName in //File/FileName for $folderName in //Folder/FolderName return $folderName return $fileName",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -259,10 +315,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $folder in //Folder return for $file in $folder/File return string( $file/FileName[1] )",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "File00000000000 File00000000001 File00000000002 File00000000003 File00000000004 File00000000005 File00000000006 File00000000007 File00000000008 File00000000009 File00000000010 File00000000011 File00000000012 File00000000013 File00000000014 File00000000015 File00000000016 File00000000017 File00000000018 File00000000019 File00000000020 File00000000021 File00000000022 File00000000023 File00000000024 File00000000025 File00000000026 File00000000027 File00000000028 File00000000029 File00000000030 File00000000031 File00000000032 File00000000033 File00000000034 File00000000035 File00000000036 File00000000037 File00000000038 File00000000039 File00000000040 File00000000041 File00000000042 File00000000043 File00000000044 File00000000045 File00000000046 File00000000047 File00000000048 File00000000049 File00000000050 File00000000051 File00000000052 File00000000053 File00000000054 File00000000055 File00000000056 File00000000057 File00000000058 File00000000059 File00000000060 File00000000061 File00000000062 File00000000063 File00000000064 File00000000065 File00000000066 File00000000067 File00000000068 File00000000069 File00000000070 File00000000071 File00000000072 File00000000073 File00000000074 File00000000075 File00000000076 File00000000077 File00000000078 File00000000079 File00000000080 File00000000081 File00000000082 File00000000083 File00000000084 File00000000085 File00000000086 File00000000087 File00000000088 File00000000089 File00000000090 File00000000091 File00000000092 File00000000093 File00000000094 File00000000095 File00000000096 File00000000097 File00000000098 File00000000099 File00000000100")
     );
@@ -276,10 +336,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $folder in //Folder, $index in (1, 2, 3) return $folder/File[$index]/FileName",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<FileName>File00000000000</FileName><FileName>File00000000001</FileName><FileName>File00000000002</FileName><FileName>File00000000031</FileName><FileName>File00000000032</FileName><FileName>File00000000033</FileName><FileName>File00000000034</FileName><FileName>File00000000035</FileName><FileName>File00000000036</FileName><FileName>File00000000037</FileName><FileName>File00000000038</FileName><FileName>File00000000039</FileName><FileName>File00000000040</FileName><FileName>File00000000041</FileName><FileName>File00000000042</FileName><FileName>File00000000043</FileName><FileName>File00000000044</FileName><FileName>File00000000045</FileName><FileName>File00000000046</FileName><FileName>File00000000047</FileName><FileName>File00000000048</FileName><FileName>File00000000049</FileName><FileName>File00000000050</FileName><FileName>File00000000051</FileName><FileName>File00000000052</FileName><FileName>File00000000053</FileName><FileName>File00000000054</FileName><FileName>File00000000055</FileName><FileName>File00000000056</FileName><FileName>File00000000057</FileName><FileName>File00000000058</FileName><FileName>File00000000059</FileName><FileName>File00000000060</FileName><FileName>File00000000061</FileName><FileName>File00000000062</FileName><FileName>File00000000063</FileName><FileName>File00000000064</FileName><FileName>File00000000065</FileName><FileName>File00000000066</FileName><FileName>File00000000067</FileName><FileName>File00000000068</FileName><FileName>File00000000069</FileName><FileName>File00000000070</FileName><FileName>File00000000071</FileName><FileName>File00000000072</FileName><FileName>File00000000073</FileName><FileName>File00000000074</FileName><FileName>File00000000075</FileName><FileName>File00000000076</FileName><FileName>File00000000077</FileName><FileName>File00000000078</FileName><FileName>File00000000079</FileName><FileName>File00000000082</FileName><FileName>File00000000083</FileName><FileName>File00000000084</FileName><FileName>File00000000087</FileName><FileName>File00000000088</FileName><FileName>File00000000089</FileName><FileName>File00000000090</FileName><FileName>File00000000091</FileName><FileName>File00000000095</FileName><FileName>File00000000096</FileName><FileName>File00000000097</FileName><FileName>File00000000098</FileName><FileName>File00000000099</FileName><FileName>File00000000100</FileName>", false)
     );
@@ -293,10 +357,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $folder in //Folder return $folder return $folder",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -310,10 +378,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $folder in in .//Folder return $folder",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -327,10 +399,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for for $folder in //Folder return $folder",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -344,10 +420,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $folder in //Folder, $file in $folder/File, return $file/FileName",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -361,10 +441,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $i in (1, 2), $j in (3, 4) return ($i, $j)",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 3 1 4 2 3 2 4")
     );
@@ -378,10 +462,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file at $pos in (//Folder)[1]/File return (string($file/FileName[1]), $pos)",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "File00000000000 1 File00000000001 2 File00000000002 3 File00000000003 4 File00000000004 5 File00000000005 6 File00000000006 7 File00000000007 8 File00000000008 9 File00000000009 10 File00000000010 11 File00000000011 12 File00000000012 13 File00000000013 14 File00000000014 15 File00000000015 16 File00000000016 17 File00000000017 18 File00000000018 19 File00000000019 20 File00000000020 21 File00000000021 22 File00000000022 23 File00000000023 24 File00000000024 25 File00000000025 26 File00000000026 27 File00000000027 28 File00000000028 29 File00000000029 30 File00000000030 31")
     );
@@ -395,10 +483,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file at $pos in (//Folder)[1]/File, $pos2 in $pos+1 return (string($file/FileName[1]), $pos, $pos2)",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "File00000000000 1 2 File00000000001 2 3 File00000000002 3 4 File00000000003 4 5 File00000000004 5 6 File00000000005 6 7 File00000000006 7 8 File00000000007 8 9 File00000000008 9 10 File00000000009 10 11 File00000000010 11 12 File00000000011 12 13 File00000000012 13 14 File00000000013 14 15 File00000000014 15 16 File00000000015 16 17 File00000000016 17 18 File00000000017 18 19 File00000000018 19 20 File00000000019 20 21 File00000000020 21 22 File00000000021 22 23 File00000000022 23 24 File00000000023 24 25 File00000000024 25 26 File00000000025 26 27 File00000000026 27 28 File00000000027 28 29 File00000000028 29 30 File00000000029 30 31 File00000000030 31 32")
     );
@@ -412,10 +504,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file at $file in (//Folder)[1]/File return (string($file/FileName[1]), $file)",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0089")
     );
@@ -429,10 +525,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file in (//Folder)[1]/File, $file in (//Folder)[2]/File return $file/FileName",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName><FileName>File00000000031</FileName>", false)
     );
@@ -446,10 +546,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file (//Folder)[1]/File return $file/FileName",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -463,10 +567,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file in (//Folder)[1]/File at $pos return (string($file/FileName[1]), $pos)",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -480,10 +588,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $num in ( <one/>, <two/>, <three/> ) return $num",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<one/><two/><three/>", false)
     );
@@ -497,9 +609,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (1,2) for $var in (2,2) return $var * $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "4 4 4 4")
     );
@@ -513,9 +629,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var in (1,2), $var in (2,2) return $var * $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "4 4 4 4")
     );
@@ -529,9 +649,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $var at $var in (1, 2) return $var * $var",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XQST0089")
     );
@@ -545,10 +669,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file as element(File,xs:untyped) in (//Folder)[1]/File return $file/FileName",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<FileName>File00000000000</FileName><FileName>File00000000001</FileName><FileName>File00000000002</FileName><FileName>File00000000003</FileName><FileName>File00000000004</FileName><FileName>File00000000005</FileName><FileName>File00000000006</FileName><FileName>File00000000007</FileName><FileName>File00000000008</FileName><FileName>File00000000009</FileName><FileName>File00000000010</FileName><FileName>File00000000011</FileName><FileName>File00000000012</FileName><FileName>File00000000013</FileName><FileName>File00000000014</FileName><FileName>File00000000015</FileName><FileName>File00000000016</FileName><FileName>File00000000017</FileName><FileName>File00000000018</FileName><FileName>File00000000019</FileName><FileName>File00000000020</FileName><FileName>File00000000021</FileName><FileName>File00000000022</FileName><FileName>File00000000023</FileName><FileName>File00000000024</FileName><FileName>File00000000025</FileName><FileName>File00000000026</FileName><FileName>File00000000027</FileName><FileName>File00000000028</FileName><FileName>File00000000029</FileName><FileName>File00000000030</FileName>", false)
     );
@@ -562,10 +690,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $fileName as attribute(name,xs:untypedAtomic) in (//Folder)[1]/File/@name return data($fileName)",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "File00000000000 File00000000001 File00000000002 File00000000003 File00000000004 File00000000005 File00000000006 File00000000007 File00000000008 File00000000009 File00000000010 File00000000011 File00000000012 File00000000013 File00000000014 File00000000015 File00000000016 File00000000017 File00000000018 File00000000019 File00000000020 File00000000021 File00000000022 File00000000023 File00000000024 File00000000025 File00000000026 File00000000027 File00000000028 File00000000029 File00000000030")
     );
@@ -579,10 +711,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $PI as processing-instruction() in //processing-instruction() return $PI",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?FileSystem scale='0'?><?FileSystem maxDepth='64'?>", false)
     );
@@ -596,10 +732,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $comment as comment() in //comment() return $comment",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!-- This is an official fsx file -->", false)
     );
@@ -613,10 +753,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $int as xs:int in (xs:int(1), xs:int(2)) return $int",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2")
     );
@@ -630,10 +774,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $int as xs:string in (xs:int(1), xs:int(2)) return $int",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -647,10 +795,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file in (//Folder)[1]/File as element(Folder,xs:untypedAny) return $file/FileName",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -664,10 +816,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file at $pos as element(Folder,xs:untyped) in (//Folder)[1]/File return (string($file/FileName[1]), $pos)",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -681,10 +837,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file as in (//Folder)[1]/File return $file",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -698,10 +858,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $num as xs:decimal in (xs:integer(1), xs:integer(2), xs:integer(3)) return $num",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -715,10 +879,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $num as xs:decimal in (xs:integer(1), xs:decimal(2), xs:integer(3)) return $num",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 2 3")
     );
@@ -732,10 +900,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $num as xs:double in (xs:int(\"1\"), xs:integer(\"2\"), xs:string(\"3\")) return $num",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -749,10 +921,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $file as node() in (//Folder)[1]/File return $file/FileName",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<FileName>File00000000000</FileName><FileName>File00000000001</FileName><FileName>File00000000002</FileName><FileName>File00000000003</FileName><FileName>File00000000004</FileName><FileName>File00000000005</FileName><FileName>File00000000006</FileName><FileName>File00000000007</FileName><FileName>File00000000008</FileName><FileName>File00000000009</FileName><FileName>File00000000010</FileName><FileName>File00000000011</FileName><FileName>File00000000012</FileName><FileName>File00000000013</FileName><FileName>File00000000014</FileName><FileName>File00000000015</FileName><FileName>File00000000016</FileName><FileName>File00000000017</FileName><FileName>File00000000018</FileName><FileName>File00000000019</FileName><FileName>File00000000020</FileName><FileName>File00000000021</FileName><FileName>File00000000022</FileName><FileName>File00000000023</FileName><FileName>File00000000024</FileName><FileName>File00000000025</FileName><FileName>File00000000026</FileName><FileName>File00000000027</FileName><FileName>File00000000028</FileName><FileName>File00000000029</FileName><FileName>File00000000030</FileName>", false)
     );
@@ -766,10 +942,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $fileName as text() in (//Folder)[1]/File/FileName/text() return string( $fileName )",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "File00000000000 File00000000001 File00000000002 File00000000003 File00000000004 File00000000005 File00000000006 File00000000007 File00000000008 File00000000009 File00000000010 File00000000011 File00000000012 File00000000013 File00000000014 File00000000015 File00000000016 File00000000017 File00000000018 File00000000019 File00000000020 File00000000021 File00000000022 File00000000023 File00000000024 File00000000025 File00000000026 File00000000027 File00000000028 File00000000029 File00000000030")
     );
@@ -783,10 +963,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $fileName as item() in data( (//Folder)[1]/File/FileName ) return $fileName",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "File00000000000 File00000000001 File00000000002 File00000000003 File00000000004 File00000000005 File00000000006 File00000000007 File00000000008 File00000000009 File00000000010 File00000000011 File00000000012 File00000000013 File00000000014 File00000000015 File00000000016 File00000000017 File00000000018 File00000000019 File00000000020 File00000000021 File00000000022 File00000000023 File00000000024 File00000000025 File00000000026 File00000000027 File00000000028 File00000000029 File00000000030")
     );
@@ -800,10 +984,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $doc as document-node() in (/) return count( $doc )",
       ctx);
-    query.context(node(file("prod/ForClause/fsx.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -821,9 +1009,13 @@ public class ProdForClause extends QT3TestSet {
       "        return $test\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 10000 -10 100 100 100")
     );
@@ -841,9 +1033,13 @@ public class ProdForClause extends QT3TestSet {
       "        return $test\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "100 1 10000 -10 100 100 100")
     );
@@ -861,9 +1057,13 @@ public class ProdForClause extends QT3TestSet {
       "        return $test\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "en-US foobar token1 entity1")
     );
@@ -882,9 +1082,13 @@ public class ProdForClause extends QT3TestSet {
       "        return $test\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "P112Y3M 1999-05-31T13:20:00-05:00 13:00:00-05:00 1999-05-10Z 2002-03 1999 --05-10 ---10 --05")
     );
@@ -902,9 +1106,13 @@ public class ProdForClause extends QT3TestSet {
       "        return $test\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "true abcd 1234 5.7 7.5 http://foo")
     );
@@ -923,9 +1131,13 @@ public class ProdForClause extends QT3TestSet {
       "        return $test\n" +
       "      ",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "10 20 30 -40 5.5 entity1 foobar en-US foobar FFFF 1999")
     );
@@ -939,9 +1151,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $test as xs:decimal in ( 1, 0.3 ) return $test",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 0.3")
     );
@@ -955,9 +1171,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $test as xs:anyAtomicType in ( 1, \"string\", 1e2, 0.3 ) return $test",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 string 100 0.3")
     );
@@ -974,10 +1194,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as item() in data( (//fs:Folder)[1]/fs:File/fs:FileName ) return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "File00000000000 File00000000001 File00000000002")
     );
@@ -994,10 +1218,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as node() in (//fs:Folder)[1]/fs:File return $test/fs:FileName\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fs:FileName xmlns:fs=\"http://www.example.com/filesystem\">File00000000000</fs:FileName><fs:FileName xmlns:fs=\"http://www.example.com/filesystem\">File00000000001</fs:FileName><fs:FileName xmlns:fs=\"http://www.example.com/filesystem\">File00000000002</fs:FileName>", false)
     );
@@ -1014,10 +1242,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as document-node() in (/) return ($test//fs:Folder)[1]/fs:FolderName\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fs:FolderName xmlns:fs=\"http://www.example.com/filesystem\">Folder00000000000</fs:FolderName>", false)
     );
@@ -1034,10 +1266,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as text() in (//fs:Folder)[1]/fs:File/fs:FileName/text() return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("File00000000000File00000000001File00000000002", false)
     );
@@ -1054,10 +1290,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as comment() in (//fs:Folder)[1]/comment() return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<!-- This is a comment for File00000000000 --><!-- This is a comment for File00000000001 --><!-- This is a comment for File00000000002 -->", false)
     );
@@ -1074,10 +1314,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as processing-instruction() in (//fs:Folder)[1]//processing-instruction() return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?filesystem compressionUtil='foozip.exe'?>", false)
     );
@@ -1091,10 +1335,14 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare namespace fs=\"http://www.example.com/filesystem\"; for $test as processing-instruction() in (//fs:Folder)[1]//processing-instruction() return $test",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<?filesystem compressionUtil='foozip.exe'?>", false)
     );
@@ -1111,10 +1359,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as processing-instruction(\"unknown\") in (//fs:Folder)[1]//processing-instruction() return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1131,10 +1383,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as item() in (//fs:Folder)[1]/fs:File/fs:FileName return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<fs:FileName xmlns:fs=\"http://www.example.com/filesystem\">File00000000000</fs:FileName><fs:FileName xmlns:fs=\"http://www.example.com/filesystem\">File00000000001</fs:FileName><fs:FileName xmlns:fs=\"http://www.example.com/filesystem\">File00000000002</fs:FileName>", false)
     );
@@ -1151,10 +1407,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as node() in data( (//fs:Folder)[1]/fs:File/fs:FileName ) return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1171,10 +1431,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as text() in (//fs:Folder)[1]/fs:File/fs:FileName return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1191,10 +1455,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as text() in data( (//fs:Folder)[1]/fs:File/fs:FileName ) return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1211,10 +1479,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as comment() in (//fs:Folder)[1]/fs:File/fs:FileName return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1231,10 +1503,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as comment() in data( (//fs:Folder)[1]/fs:File/fs:FileName ) return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1251,10 +1527,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as processing-instruction() in (//fs:Folder)[1]/fs:File/fs:FileName return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1271,10 +1551,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as processing-instruction() in data( (//fs:Folder)[1]/fs:File/fs:FileName ) return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1291,10 +1575,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as processing-instruction(\"foo\") in (//fs:Folder)[1]/fs:File/fs:FileName return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1311,10 +1599,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as processing-instruction(\"foo\") in data( (//fs:Folder)[1]/fs:File/fs:FileName ) return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1331,10 +1623,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as document-node() in (//fs:Folder)[1]/fs:File/fs:FileName return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1351,10 +1647,14 @@ public class ProdForClause extends QT3TestSet {
       "        for $test as document-node() in data( (//fs:Folder)[1]/fs:File/fs:FileName ) return $test\n" +
       "      ",
       ctx);
-    query.context(node(file("prod/ForClause/fsx_NS.xml")));
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      query.context(node(file("prod/ForClause/fsx_NS.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -1368,9 +1668,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $foo in 1, $bar in 2, $moo in 3, return 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1384,9 +1688,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((for $var in (1, 2, 3) return $var), (1, 2, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1400,9 +1708,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((2, 2), (for $foo in (1, 1) return 1 + $foo))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1416,9 +1728,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "4 eq (for $foo in 1, $bar in 2, $moo in 3 return 4)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1432,9 +1748,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 eq (for $foo in 1 return for $bar in 2 return $bar + $foo)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1448,9 +1768,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 eq (for $foo in 1 return for $bar in 2 return $bar + $foo)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1464,9 +1788,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 eq (for $foo in 1, $foo in 3 return $foo)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1480,9 +1808,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "8 eq (for $foo in 1, $foo in 3, $moo in 5 return $moo + $foo)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1496,9 +1828,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "6 eq (for $foo in 1, $foo in 3 return $foo + $foo)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1512,9 +1848,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(for $var in () return current-time())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1532,9 +1872,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(for $var in () return 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1552,9 +1896,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for in 1 return 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1568,9 +1916,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((for $var in () return current-time()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1588,9 +1940,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty((for $var in () return 1) eq 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertBoolean(true)
@@ -1608,9 +1964,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "empty(for $var in subsequence((current-time(), 1), 4) return 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1624,9 +1984,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(remove(for $var in (current-time(), 2, 3, 4) return $var, 1), (2, 3, 4))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1640,9 +2004,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "(for $fn:name in (1, 1) return $fn:name) instance of xs:integer+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1656,9 +2024,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "(for $xs:name in (1, 1) return $xs:name) instance of xs:integer+",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -1672,9 +2044,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "$NOTEXIST",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1688,9 +2064,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "$PREFIXNOTEXIST:NOTEXIST",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -1704,9 +2084,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "$xs:NOTEXIST",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1720,9 +2104,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 + $NOTEXIST",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1736,9 +2124,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for return 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1752,9 +2144,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 + $prefix:NOTEXIST",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -1768,9 +2164,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 + $xs:NOTEXIST",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1784,9 +2184,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "$NOTEXIST + 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1800,9 +2204,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "$PREFIXNOTEXIST:NOTEXIST + 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0081")
     );
@@ -1816,9 +2224,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "$xs:NOTEXIST + 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1832,9 +2244,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $foo in 1 return $NOTEXIST",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1848,9 +2264,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $foo in (1, 2, $foo) return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1864,9 +2284,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $foo in (1, $foo, 3) return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1880,9 +2304,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $foo in ($foo, 2, 3) return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1896,9 +2324,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $foo in $foo return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1912,9 +2344,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a in 1 satisfies 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -1928,9 +2364,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $foo in 1 return $bar + (for $bar in 2 return $bar)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1944,9 +2384,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a in (1, 2, 3), $b in (1, 2, 3, $b) return $a, $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1960,9 +2404,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a in (1, 2), $b in (1, 2), $c in (1, 2) return 1, $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1976,9 +2424,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a in (1, 2) return 1, $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -1992,9 +2444,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a in (1, 2), $b in (1, 2), $c in (1, 2) return 1, $b",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -2008,9 +2464,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a in (1, 2), $b in (1, 2), $c in (1, 2) return 1, $c",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0008")
     );
@@ -2024,9 +2484,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $foo in \"foo\" return 1 + $foo",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -2040,9 +2504,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $foo in (\"a string\", \"another one\") return 1 + subsequence($foo, 1, 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -2056,9 +2524,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 eq (for $a in 1 return $a)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2072,9 +2544,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal((for $fo in trace((1, 2, 3), \"msg\") return $fo), (1, 2, 3))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2088,9 +2564,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "deep-equal(1 to 5, (for $i in (1,2,3,4,5) return $i))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2104,9 +2584,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 eq (for $a in 1 return $a)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2120,9 +2604,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 eq (for $xs:a in 1 return $xs:a)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2140,9 +2628,13 @@ public class ProdForClause extends QT3TestSet {
       "        deep-equal( for $i in (true(), true()), $t in (true(), true()) \n" +
       "                    return ($i, $t), (true(), true(), true(), true(), true(), true(), true(), true()))",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2156,9 +2648,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $my := 3; (for $i in 1 return $my) eq 3",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2172,9 +2668,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare variable $i := 3; (for $i in 1 return $i) eq 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2188,9 +2688,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(for $i in (1, 2, current-time()) return ($i, $i)) eq 6",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2204,9 +2708,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "count(for $i in (1, 2, timezone-from-time(current-time())) return ($i, $i)) eq 6 or count(for $i in (1, 2, timezone-from-time(current-time())) return ($i, $i)) eq 4",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2220,9 +2728,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 eq (for $foo in 1 return 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2236,9 +2748,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "1 eq (for $foo in 1 return $foo)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2252,9 +2768,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "2 eq (for $foo in 1 return $foo + 1)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2268,9 +2788,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "3 eq (for $foo in 1 return for $foo in 3 return $foo)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertBoolean(true)
     );
@@ -2284,9 +2808,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $i as xs:string in xs:untypedAtomic(\"input\") return $i",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPTY0004")
     );
@@ -2300,9 +2828,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "FOR $i IN (1, 2, 3)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPST0003")
     );
@@ -2322,9 +2854,13 @@ public class ProdForClause extends QT3TestSet {
       "        let $e := () stable order by $a ascending, $b descending, $d empty greatest, $e empty least, $c descending empty greatest, $d ascending empty greatest, $e descending empty least, $b ascending empty least \n" +
       "        return $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertStringValue(false, "1 1 1 2 2 2 3 3 3")
@@ -2342,9 +2878,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a in (3, 2, 1, 1) stable order by $a return 5",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "5 5 5 5")
     );
@@ -2358,9 +2898,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a in (3, 2, 1, 1) stable order by 1 return $a",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "3 2 1 1")
     );
@@ -2374,9 +2918,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/(for $i in self::node() return $i)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e/>", false)
     );
@@ -2390,9 +2938,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "<e/>/(for $i in 1, $b in self::node() return $b)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<e/>", false)
     );
@@ -2406,9 +2958,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/element return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2422,9 +2978,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/document return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2438,9 +2998,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/document-node return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2454,9 +3018,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/attribute return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2470,9 +3038,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/comment return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2488,9 +3060,13 @@ public class ProdForClause extends QT3TestSet {
       "        declare function local:myFunc() { for $i in (1, 2, 3) return position() }; \n" +
       "        local:myFunc()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -2504,9 +3080,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/processing-instruction return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2520,9 +3100,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/processing-instruction return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2536,9 +3120,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/text return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2552,9 +3140,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/typeswitch return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2568,9 +3160,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/if return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2584,9 +3180,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/for return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2600,9 +3200,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/let return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2616,9 +3220,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/declare return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2632,9 +3240,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/some return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2648,9 +3260,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/child return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2664,9 +3280,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:myFunc() { for $i in (1, 2, 3) return position() }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -2684,9 +3304,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/ordered return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2700,9 +3324,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/unordered return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2716,9 +3344,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/schema-attribute return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2732,9 +3364,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/schema-element return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2748,9 +3384,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/item return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2764,9 +3404,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/following-sibling return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2780,9 +3424,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/validate return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2796,9 +3444,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/instance return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2812,9 +3464,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/castable return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2828,9 +3484,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:func($arg as element()* ) as element()* { for $n in $arg/import return $n }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2844,9 +3504,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:myFunc() { for $i at $p in (1, 2, 3) return position() }; local:myFunc()",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -2860,9 +3524,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $n in node return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -2876,9 +3544,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $n in document return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -2892,9 +3564,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $n in attribute return {()} return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2908,9 +3584,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $n in element return {()} return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2924,9 +3604,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $n in processing-instruction return {()} return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertEq("1")
     );
@@ -2940,9 +3624,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $n in attribute return 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -2960,9 +3648,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "declare function local:myFunc() { for $i at $p in (1, 2, 3) return position() }; 1",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       (
         assertEq("1")
@@ -2980,9 +3672,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $ti in <ti><rangeDate><initDate>17880505</initDate><terminatingDate>19550505</terminatingDate></rangeDate></ti> return <result> { fn:min(if ($ti/singleDate) then let $tmp:=$ti/singleDate/compute return xs:date(fn:concat(fn:substring($tmp, 1, 4), \"-\", fn:substring($tmp, 5, 2), \"-\", fn:substring($tmp, 7, 2))) else let $tmp:=$ti/rangeDate/initDate return xs:date(fn:concat(fn:substring($tmp, 1, 4), \"-\", fn:substring($tmp, 5, 2), \"-\", fn:substring($tmp, 7, 2)))) } </result>",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<result>1788-05-05</result>", false)
     );
@@ -2996,9 +3692,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $d in person return $d",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       error("XPDY0002")
     );
@@ -3012,9 +3712,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "(for $d in <people> <person id=\"person0\"> <name>First</name> </person> <person> <name>Second</name> </person> </people>/person return if (some $id in 1 satisfies typeswitch ($d/@id) case $n as node() return $d/@id = \"person0\" default $d return ()) then $d/name else ())",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertSerialization("<name>First</name>", false)
     );
@@ -3028,9 +3732,13 @@ public class ProdForClause extends QT3TestSet {
     final XQuery query = new XQuery(
       "for $a at $pos1 in (1, 2, 3) return for $b at $pos2 in (4, 5, 6) return for $c at $pos3 in (7, 8, 9) return ($a, $pos1, $b, $pos2, $c, $pos2)",
       ctx);
-
-    final QT3Result res = result(query);
-    result = res;
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
     test(
       assertStringValue(false, "1 1 4 1 7 1 1 1 4 1 8 1 1 1 4 1 9 1 1 1 5 2 7 2 1 1 5 2 8 2 1 1 5 2 9 2 1 1 6 3 7 3 1 1 6 3 8 3 1 1 6 3 9 3 2 2 4 1 7 1 2 2 4 1 8 1 2 2 4 1 9 1 2 2 5 2 7 2 2 2 5 2 8 2 2 2 5 2 9 2 2 2 6 3 7 3 2 2 6 3 8 3 2 2 6 3 9 3 3 3 4 1 7 1 3 3 4 1 8 1 3 3 4 1 9 1 3 3 5 2 7 2 3 3 5 2 8 2 3 3 5 2 9 2 3 3 6 3 7 3 3 3 6 3 8 3 3 3 6 3 9 3")
     );
