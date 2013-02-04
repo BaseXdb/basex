@@ -172,15 +172,20 @@ public final class EditorView extends View {
         final ActionListener al = new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent ac) {
-            open(new IOFile(ac.getActionCommand()), true);
+            // rewrite and open chosen file
+            final String s = ac.getActionCommand().replaceAll("(.*) \\[(.*)\\]", "$2/$1");
+            open(new IOFile(s), true);
           }
         };
-        final StringList sl = new StringList();
-        for(final EditorArea ea : editors()) sl.add(ea.file.path());
-        for(final String en : new StringList().add(
-            gui.gprop.strings(GUIProp.EDITOR)).sort(Prop.CASE, true)) {
-          final JMenuItem it = new JMenuItem(en);
-          it.setEnabled(!sl.contains(en));
+
+        // create popup menu with of recently opened files
+        final StringList opened = new StringList();
+        for(final EditorArea ea : editors()) opened.add(ea.file.path());
+        final StringList files = new StringList(gui.gprop.strings(GUIProp.EDITOR));
+        for(final String en : files.sort(Prop.CASE, true)) {
+          // disable opened files
+          final JMenuItem it = new JMenuItem(en.replaceAll("(.*)[/\\\\](.*)", "$2 [$1]"));
+          it.setEnabled(!opened.contains(en));
           pm.add(it).addActionListener(al);
         }
         pm.show(hist, 0, hist.getHeight());
