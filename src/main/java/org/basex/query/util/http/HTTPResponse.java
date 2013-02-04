@@ -60,14 +60,22 @@ public final class HTTPResponse {
     final ANodeList attrs = extractAttrs(conn);
     final ANodeList hdrs = extractHdrs(conn);
     final String type = conn.getContentType();
-    final String cType = ctype == null ? extractContentType(type) : string(ctype);
     final ValueBuilder payloads = new ValueBuilder();
     final boolean s = status != null && Bln.parse(status, info);
 
     // multipart response
     final FNode body;
     InputStream is = conn.getErrorStream();
-    if(is == null) is = conn.getInputStream();
+
+    final String cType;
+    if(is == null) {
+      cType = ctype == null ? extractContentType(type) : string(ctype);
+      is = conn.getInputStream();
+    } else {
+      // error: use text/plain as content type
+      cType = MimeTypes.TEXT_PLAIN;
+    }
+
     if(cType.startsWith(MULTIPART)) {
       final byte[] boundary = extractBoundary(type);
       final ANodeList a = new ANodeList(
@@ -129,11 +137,11 @@ public final class HTTPResponse {
 
   /**
    * Creates a <http:body/> element.
-   * @param mediaType content type
+   * @param cType content type
    * @return body
    */
-  private static FElem createBody(final String mediaType) {
-    return new FElem(Q_HTTP_BODY, new Atts(HTTP, HTTPURI)).add(Q_MEDIA_TYPE, mediaType);
+  private static FElem createBody(final String cType) {
+    return new FElem(Q_HTTP_BODY, new Atts(HTTP, HTTPURI)).add(Q_MEDIA_TYPE, cType);
   }
 
   /**
