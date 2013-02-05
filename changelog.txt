@@ -3,6 +3,23 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.6 (February 5, 2012) -----------------------------------------
+
+ DATABASE LOCKING:
+ - updates on different databases can now be executed in parallel and
+   won't lock your read-only queries anymore:
+   http://docs.basex.org/wiki/Transaction_Management
+
+ XQUERY
+ - when errors are raised, the full stack trace is now returned
+ - the EXPath Geo Module, Fetch Module and HTML Module have been added:
+   http://docs.basex.org/wiki/Module_Library
+ - the Validation, XSLT, Database and Profiling Module have been updated
+
+ GUI
+ - error messages are now clickable and linked with the text editor
+ - trace/profiling output is redirected to the info view in realtime
+
 VERSION 7.5 (December 21, 2012) ----------------------------------------
 
   XQUERY UPDATE

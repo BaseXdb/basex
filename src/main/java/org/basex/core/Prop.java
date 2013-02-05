@@ -19,7 +19,7 @@ public final class Prop extends AProp {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = "7.6 RC1";
+  public static final String VERSION = "7.6";
 
   /** New line string. */
   public static final String NL = System.getProperty("line.separator");
