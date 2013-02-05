@@ -164,8 +164,8 @@ public abstract class ANode extends Item {
   public final byte[] uri(final byte[] pref, final QueryContext ctx) {
     final Atts at = namespaces();
     if(at != null) {
-      final int i = at.get(pref);
-      if(i != -1) return at.string(i);
+      final byte[] s = at.string(pref);
+      if(s != null) return s;
       final ANode n = parent();
       if(n != null) return n.uri(pref, ctx);
     }

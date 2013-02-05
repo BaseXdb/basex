@@ -2328,7 +2328,7 @@ public class QueryParser extends InputParser {
             if(eq(uri, XMLURI)) error(XMLNSDEF, uri);
             ctx.sc.nsElem = uri;
           }
-          if(ns.get(pref) != -1) error(DUPLNSDEF, pref);
+          if(ns.contains(pref)) error(DUPLNSDEF, pref);
           ns.add(pref, uri);
         }
       } else {
