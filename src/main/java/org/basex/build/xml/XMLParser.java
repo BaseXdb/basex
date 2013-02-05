@@ -103,7 +103,8 @@ public class XMLParser extends SingleParser {
       scanner.more();
 
       // get tag name
-      final byte[] tag = consumeToken(Type.ELEMNAME);
+      byte[] tag = consumeToken(Type.ELEMNAME);
+      if(stripNS) tag = local(tag);
       skipSpace();
 
       if(tags.isEmpty()) throw new BuildException(OPEN, det(), tag);
