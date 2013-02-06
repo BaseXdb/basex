@@ -15,6 +15,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -32,7 +33,7 @@ public abstract class Expr extends ExprInfo {
     /** Non-deterministic. Example: random(). */             NDT,
     /** Context position. Example: position(). */            POS,
     /** Performs updates. Example: insert expression. */     UPD,
-    /** References a variable. Example: {@link VarRef}. */   VAR,
+    /** References a variable. Example: $x. */               VAR,
     /** Based on XQuery 3.0. Example: group by statement. */ X30,
   }
 
@@ -120,15 +121,6 @@ public abstract class Expr extends ExprInfo {
       throws QueryException;
 
   /**
-   * Copies an expression. Returns {@code null} if expression cannot be copied.
-   * Will be useful for inlining functions, or for copying static queries.
-   * @return copied expression
-   */
-  public Expr copy() {
-    return null;
-  }
-
-  /**
    * Tests if this is an empty sequence. This function is only overwritten
    * by the {@link Empty} class, which represents the empty sequence.
    * @return result of check
@@ -187,7 +179,7 @@ public abstract class Expr extends ExprInfo {
     // return true iff the the search was aborted, i.e. the variable is used
     return !visitVars(new VarVisitor() {
       @Override
-      public boolean used(final LocalVarRef ref) {
+      public boolean used(final VarRef ref) {
         // abort when the variable is used
         return !ref.var.is(v);
       }
@@ -209,7 +201,7 @@ public abstract class Expr extends ExprInfo {
   public abstract boolean removable(final Var v);
 
   /**
-   * Substitutes all {@link LocalVarRef} expressions for the given variable
+   * Substitutes all {@link VarRef} expressions for the given variable
    * by a {@link Context} reference. This method is called by
    * {@link GFLWOR#compile} to rewrite where clauses as predicates.
    * @param v variable to be replaced
@@ -249,6 +241,27 @@ public abstract class Expr extends ExprInfo {
     }
     return change;
   }
+
+  /**
+   * Copies an expression.
+   * Will be useful for inlining functions, or for copying static queries.
+   * @param ctx query context
+   * @param scp variable scope for creating new variables
+   * @return copied expression
+   */
+  public final Expr copy(final QueryContext ctx, final VarScope scp) {
+    return copy(ctx, scp, new IntMap<Var>());
+  }
+
+  /**
+   * Copies an expression.
+   * Will be useful for inlining functions, or for copying static queries.
+   * @param ctx query context
+   * @param scp variable scope for creating new variables
+   * @param vs mapping from old variable IDs to new variable copies
+   * @return copied expression
+   */
+  public abstract Expr copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
 
   /**
    * Adds the names of the databases that will be touched by the query.
@@ -361,7 +374,7 @@ public abstract class Expr extends ExprInfo {
       }
 
       @Override
-      public boolean used(final LocalVarRef ref) {
+      public boolean used(final VarRef ref) {
         return declared.get(ref.var.id);
       }
     });

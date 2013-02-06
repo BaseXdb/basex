@@ -6,7 +6,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.util.*;
 import org.basex.util.*;
 
@@ -29,10 +28,10 @@ public final class Var extends ExprInfo {
   /** Expected result size. */
   public long size = -1;
 
-  /** Expected return type, {@code null} if not important. */
-  private SeqType ret;
+  /** Declared type of this variable, {@code null} if not specified. */
+  private SeqType declared;
   /** Actual return type (by type inference). */
-  private SeqType type;
+  private SeqType inType;
   /** Flag for global variables. */
   public final boolean param;
 
@@ -45,11 +44,11 @@ public final class Var extends ExprInfo {
    */
   Var(final QueryContext ctx, final QNm n, final SeqType typ, final boolean fun) {
     name = n;
-    ret = typ;
-    type = typ != null ? typ : SeqType.ITEM_ZM;
+    declared = typ;
+    inType = SeqType.ITEM_ZM;
     id = ctx.varIDs++;
     param = fun;
-    size = type.occ();
+    size = inType.occ();
   }
 
   /**
@@ -63,39 +62,55 @@ public final class Var extends ExprInfo {
   }
 
   /**
+   * Copy constructor.
+   * @param ctx query context
+   * @param var variable to copy
+   */
+  Var(final QueryContext ctx, final Var var) {
+    this(ctx, var.name, var.declared, var.param);
+    inType = var.inType;
+    size = var.size;
+  }
+
+  /**
    * Type of values bound to this variable.
    * @return (non-{@code null}) type
    */
   public SeqType type() {
-    return type;
+    final SeqType intersect = declared != null ? declared.intersect(inType) : inType;
+    return intersect != null ? intersect : declared != null ? declared : inType;
+  }
+
+  /**
+   * Declared type of this variable.
+   * @return declared type, possibly {@code null}
+   */
+  public SeqType declaredType() {
+    return declared == null ? SeqType.ITEM_ZM : declared;
   }
 
   /**
    * Tries to refine the compile-time type of this variable through the type of the bound
    * expression.
    * @param t type of the bound expression
-   * @param ii input info for errors
-   * @throws QueryException if the types are incompatible
+   * @param ctx query context
+   * @param ii input info
+   * @throws QueryException query exception
    */
-  public void refineType(final SeqType t, final InputInfo ii) throws QueryException {
-    if(t == null || type == null || type.eq(t) || type.instance(t)) {
-      if(type == null) type = t;
-      return;
+  public void refineType(final SeqType t, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    if(declared != null && t != null && declared.intersect(t) == null)
+      throw Err.XPTYPE.thrw(ii, this, declared, t);
+    if(t != null && !inType.eq(t) && !inType.instanceOf(t)) {
+      final SeqType is = inType.intersect(t);
+      if(is != null) {
+        inType = is;
+        if(declared != null && inType.instanceOf(declared)) {
+          ctx.compInfo(QueryText.OPTCAST, this);
+          declared = null;
+        }
+      }
     }
-
-    final Type tp = type.type.instanceOf(t.type)
-        ? t.type
-        : t.type.instanceOf(type.type)
-            ? t.type
-            : null;
-    final Occ occ = type.occ.instance(t.occ)
-        ? t.occ
-        : t.occ.instance(type.occ)
-            ? t.occ
-            : null;
-
-    if(tp == null || occ == null) throw Err.XPTYPE.thrw(ii, toString(), type, t);
-    type = SeqType.get(tp, occ);
   }
 
   /**
@@ -103,7 +118,7 @@ public final class Var extends ExprInfo {
    * @return {@code true} if the type is checked or promoted, {@code false} otherwise
    */
   public boolean checksType() {
-    return ret != null;
+    return declared != null;
   }
 
   /**
@@ -118,8 +133,9 @@ public final class Var extends ExprInfo {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem(QueryText.NAM, Token.token(toString()),
+    final FElem e = planElem(QueryText.NAM, '$' + Token.string(name.string()),
         QueryText.ID, Token.token(id));
+    if(declared != null) e.add(planAttr(QueryText.AS, declared.toString()));
     addPlan(plan, e);
   }
 
@@ -128,9 +144,9 @@ public final class Var extends ExprInfo {
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) {
       tb.add(QueryText.DOLLAR).add(name.string());
-      if(ret != null) tb.add(' ' + QueryText.AS);
+      if(declared != null) tb.add(' ' + QueryText.AS);
     }
-    if(ret != null) tb.add(" " + ret);
+    if(declared != null) tb.add(" " + declared);
     return tb.toString();
   }
 
@@ -145,14 +161,11 @@ public final class Var extends ExprInfo {
   }
 
   /**
-   * Sets the return type of this variable.
-   * @param rt return type
-   * @param ii input info
-   * @throws QueryException if the return type is incompatible
+   * Sets the declared return type of this variable.
+   * @param t return type
    */
-  public void setRetType(final SeqType rt, final InputInfo ii) throws QueryException {
-    refineType(ret, ii);
-    ret = rt;
+  public void setDeclaredType(final SeqType t) {
+    declared = t;
   }
 
   /**
@@ -165,8 +178,8 @@ public final class Var extends ExprInfo {
    */
   public Value checkType(final Value val, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(ret == null || ret.instance(val)) return val;
-    if(param) return ret.promote(val, ctx, ii);
-    throw Err.XPTYPE.thrw(ii, val.description(), ret, val.type());
+    if(!checksType() || declared.instance(val)) return val;
+    if(param) return declared.funcConvert(ctx, ii, val);
+    throw Err.XPTYPE.thrw(ii, this, declared, val.type());
   }
 }

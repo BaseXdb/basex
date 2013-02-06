@@ -55,7 +55,10 @@ public final class FlworOptimizeTest extends QueryPlanTest {
 
   /** Tests the relocation of a let clause. */
   @Test public void dontMove2() {
-    check("let $a as element(a) := <a/> let $b := <b/> let $c as element(a) := $a " +
+    check("declare function local:id($x) { $x };" +
+        "let $a as element(a) := local:id(<a/>) " +
+        "let $b := <b/> " +
+        "let $c as element(a) := local:id($a) " +
         "for $i in 1 to 2 return ($c,$b)",
         "<a/>" + Prop.NL + "<b/>" + Prop.NL + "<a/>" + Prop.NL + "<b/>",
         Util.info("//Let[starts-with(Var/@name,'$a')] << //Let[Var/@name='$b'] and " +
@@ -65,9 +68,10 @@ public final class FlworOptimizeTest extends QueryPlanTest {
 
   /** Tests the relocation of a static let clause. */
   @Test public void moveFor() {
-    check("let $x := <x/> " +
+    check("declare function local:id($x) as item() { $x };" +
+        "let $x := <x/> " +
         "for $a in 1 to 2 " +
-        "for $b as element(x) in $x " +
+        "for $b as element(x) in local:id($x) " +
         "return $b",
 
         "<x/>" + Prop.NL + "<x/>",
@@ -138,9 +142,11 @@ public final class FlworOptimizeTest extends QueryPlanTest {
         "//GFLWOR/*[1] is //Let"
     );
 
-    check("for $len in 1 to 3 " +
+    check("declare function local:id($x) { $x };" +
+        "for $len in 1 to 3 " +
         "for sliding window $w in 1 to 3 start at $p when true() only " +
-        "end at $q when $q - $p + 1 eq $len let $x as xs:decimal := $len div 2 " +
+        "end at $q when $q - $p + 1 eq $len " +
+        "let $x as xs:decimal := local:id($len div 2) " +
         "return count($w) div (2 * $x)",
 
         "1 1 1 1 1 1",
@@ -150,8 +156,11 @@ public final class FlworOptimizeTest extends QueryPlanTest {
 
   /** Tests if multiple let clauses are all moved to their optimal position. */
   @Test public void slideMultipleLets() {
-    check("for $i in 1 to 2 for $j in 1 to 2 " +
-        "let $a as xs:integer := 3 * $i, $b as xs:integer := 2 * $i return $a - $b",
+    check("declare function local:id($x) { $x };" +
+        "for $i in 1 to 2 for $j in 1 to 2 " +
+        "let $a as xs:integer := local:id(3 * $i), " +
+        "    $b as xs:integer := local:id(2 * $i) " +
+        "return $a - $b",
         "1 1 2 2",
         "exists(//For[every $let in //Let satisfies . << $let])",
         "exists(//For[every $let in //Let satisfies . >> $let])",
@@ -177,7 +186,8 @@ public final class FlworOptimizeTest extends QueryPlanTest {
 
   /** Tests if let clauses containing node constructors are left alone. */
   @Test public void dontSlideLetCNS() {
-    check("for $i in 1 to 10 let $x as element(x) := <x/> return ($i, $x)",
+    check("declare function local:id($x) { $x };" +
+        "for $i in 1 to 10 let $x as element(x) := local:id(<x/>) return ($i, $x)",
         null,
         "exactly-one(//For) << exactly-one(//Let)"
     );
@@ -259,7 +269,8 @@ public final class FlworOptimizeTest extends QueryPlanTest {
 
   /** Tests if {@link And} expressions inside {@code where} are split. */
   @Test public void leaveTypecheckTest() {
-    check("for $x as xs:integer in 1 to 3 return $x",
+    check("declare function local:foo() { 1 to 3 ! . + 0 };" +
+        "for $x as xs:integer in local:foo() return $x",
         "1 2 3",
         "exists(//For)"
     );

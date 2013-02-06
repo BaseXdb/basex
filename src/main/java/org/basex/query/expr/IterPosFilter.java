@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.var.*;
+import org.basex.util.hash.*;
 
 /**
  * Iterative filter expression with numeric predicates.
@@ -105,5 +107,10 @@ final class IterPosFilter extends Filter {
         }
       }
     };
+  }
+
+  @Override
+  public Filter copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return copy(new IterPosFilter(super.copy(ctx, scp, vs), off));
   }
 }

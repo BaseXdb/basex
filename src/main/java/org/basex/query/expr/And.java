@@ -8,6 +8,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 
 /**
  * And expression.
@@ -78,6 +79,13 @@ public final class And extends Logical {
     }
     // no scoring - return default boolean
     return s == 0 ? Bln.TRUE : Bln.get(s);
+  }
+
+  @Override
+  public And copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vars) {
+    final Expr[] ex = new Expr[expr.length];
+    for(int i = 0; i < ex.length; i++) ex[i] = expr[i].copy(ctx, scp, vars);
+    return new And(info, ex);
   }
 
   @Override

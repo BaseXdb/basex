@@ -8,6 +8,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Except expression.
@@ -38,6 +39,13 @@ public final class Except extends Set {
     }
     // results must always be sorted
     return expr.length == 1 && iterable ? expr[0] : this;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Except ex = new Except(info, copyAll(ctx, scp, vs, expr));
+    ex.iterable = iterable;
+    return copyType(ex);
   }
 
   @Override

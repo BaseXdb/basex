@@ -10,6 +10,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 
 /**
  * FTUnaryNot expression.
@@ -100,6 +101,11 @@ public final class FTNot extends FTExpr {
     final boolean ia = expr[0].indexAccessible(ic);
     ic.not ^= true;
     return ia;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTNot(info, expr[0].copy(ctx, scp, vs));
   }
 
   @Override

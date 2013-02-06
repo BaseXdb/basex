@@ -10,6 +10,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -76,7 +77,7 @@ public final class Switch extends ParseExpr {
     // expression could not be pre-evaluated
     type = cases[0].expr[0].type();
     for(int c = 1; c < cases.length; c++) {
-      type = type.intersect(cases[c].expr[0].type());
+      type = type.union(cases[c].expr[0].type());
     }
     return ex;
   }
@@ -161,6 +162,11 @@ public final class Switch extends ParseExpr {
     }
     // will never be evaluated
     return null;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Switch(info, cond.copy(ctx, scp, vs), Arr.copyAll(ctx, scp, vs, cases));
   }
 
   @Override

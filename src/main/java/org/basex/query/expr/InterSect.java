@@ -6,6 +6,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Intersect expression.
@@ -47,6 +48,13 @@ public final class InterSect extends Set {
       nc = nt;
     }
     return nc;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final InterSect is = new InterSect(info, copyAll(ctx, scp, vs, expr));
+    is.iterable = iterable;
+    return copyType(is);
   }
 
   @Override

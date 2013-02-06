@@ -189,4 +189,16 @@ public abstract class Preds extends ParseExpr {
     for(final Expr e : preds) sb.append("[" + e + ']');
     return sb.toString();
   }
+
+  /**
+   * Copies fields to the given object.
+   * @param <T> object type
+   * @param p copy
+   * @return the copy
+   */
+  protected <T extends Preds> T copy(final T p) {
+    p.last = last;
+    p.pos = pos;
+    return copyType(p);
+  }
 }

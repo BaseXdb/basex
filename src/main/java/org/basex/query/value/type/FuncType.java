@@ -96,19 +96,65 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final boolean instanceOf(final Type t) {
+  public boolean eq(final Type t) {
+    if(this == t) return true;
+    if(t.getClass() != FuncType.class) return false;
+    final FuncType ft = (FuncType) t;
+    if(this == ANY_FUN || ft == ANY_FUN || args.length != ft.args.length) return false;
+    for(int i = 0; i < args.length; i++) if(!args[i].eq(ft.args[i])) return false;
+    return ret.eq(ft.ret);
+  }
+
+  @Override
+  public boolean instanceOf(final Type t) {
     // the only non-function super-type of function is item()
     if(!(t instanceof FuncType)) return t == AtomType.ITEM;
+    if(t instanceof MapType) return false;
     final FuncType ft = (FuncType) t;
 
     // takes care of FunType.ANY
     if(this == ft || ft == ANY_FUN) return true;
     if(this == ANY_FUN || args.length != ft.args.length ||
-        !ret.instance(ft.ret)) return false;
+        !ret.instanceOf(ft.ret)) return false;
     for(int a = 0; a < args.length; a++) {
-      if(!ft.args[a].instance(args[a])) return false;
+      if(!ft.args[a].instanceOf(args[a])) return false;
     }
     return true;
+  }
+
+  @Override
+  public Type union(final Type t) {
+    if(!(t instanceof FuncType)) return AtomType.ITEM;
+    final FuncType ft = (FuncType) t;
+    if(this == ANY_FUN || ft == ANY_FUN || args.length != ft.args.length) return ANY_FUN;
+    final SeqType[] arg = new SeqType[args.length];
+    for(int i = 0; i < arg.length; i++) {
+      arg[i] = args[i].intersect(ft.args[i]);
+      if(arg[i] == null) return ANY_FUN;
+    }
+    return get(ret.union(ft.ret), arg);
+  }
+
+  @Override
+  public Type intersect(final Type t) {
+    // ensure commutativity
+    if(t instanceof MapType) return t.intersect(this);
+
+    // the easy cases
+    if(this.instanceOf(t)) return this;
+    if(t.instanceOf(this)) return t;
+
+    if(t instanceof FuncType) {
+      final FuncType ft = (FuncType) t;
+      // ANY_FUN is excluded by the easy cases
+      final SeqType rt = ret.intersect(ft.ret);
+      if(rt != null && args.length == ft.args.length) {
+        final SeqType[] arg = new SeqType[args.length];
+        for(int i = 0; i < arg.length; i++) arg[i] = args[i].union(ft.args[i]);
+        return get(rt, arg);
+      }
+    }
+    return null;
   }
 
   /**
@@ -129,8 +175,8 @@ public class FuncType implements Type {
   public static Type find(final QNm type) {
     if(type.uri().length == 0) {
       final byte[] ln = type.local();
-      if(eq(ln, token(FUNCTION))) return FuncType.ANY_FUN;
-      if(eq(ln, MAP)) return SeqType.ANY_MAP;
+      if(Token.eq(ln, token(FUNCTION))) return FuncType.ANY_FUN;
+      if(Token.eq(ln, MAP)) return SeqType.ANY_MAP;
     }
     return null;
   }
@@ -154,28 +200,29 @@ public class FuncType implements Type {
   public static FuncType get(final UserFunc f) {
     final SeqType[] at = new SeqType[f.args.length];
     for(int a = 0; a < at.length; a++)
-      at[a] = f.args[a] == null ? SeqType.ITEM_ZM : f.args[a].type();
+      at[a] = f.args[a] == null ? SeqType.ITEM_ZM : f.args[a].declaredType();
     return new FuncType(at, f.ret == null ? SeqType.ITEM_ZM : f.ret);
   }
 
   /**
    * Sets the types of the given variables.
    * @param vars variables to type
+   * @param ii input info
    * @return the variables for convenience
    * @throws QueryException query exception
    */
-  public final Var[] type(final Var[] vars) throws QueryException {
+  public final Var[] type(final Var[] vars, final InputInfo ii) throws QueryException {
     if(this != ANY_FUN) {
       for(int v = 0; v < vars.length; v++)
         if(vars[v] != null && args[v] != SeqType.ITEM_ZM)
-          vars[v].refineType(args[v], null);
+          vars[v].refineType(args[v], null, ii);
     }
     return vars;
   }
 
   @Override
-  public int id() {
-    return 7;
+  public ID id() {
+    return Type.ID.FUN;
   }
 
   @Override
@@ -187,5 +234,10 @@ public class FuncType implements Type {
       tb.addSep(args, ", ").add(") as ").add(ret.toString());
     }
     return tb.toString();
+  }
+
+  @Override
+  public boolean nsSensitive() {
+    return false;
   }
 }

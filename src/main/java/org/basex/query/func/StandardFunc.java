@@ -18,6 +18,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Standard (built-in) functions.
@@ -60,6 +61,15 @@ public abstract class StandardFunc extends Arr {
   @SuppressWarnings("unused")
   Expr comp(final QueryContext ctx) throws QueryException {
     return this;
+  }
+
+  @Override
+  public
+  final StandardFunc copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
+    final Expr[] arg = new Expr[expr.length];
+    for(int i = 0; i < arg.length; i++) arg[i] = expr[i].copy(ctx, scp, vs);
+    return sig.get(info, arg);
   }
 
   /**

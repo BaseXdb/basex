@@ -80,6 +80,16 @@ public final class Nodes implements Result {
     ftpos = null;
   }
 
+  /**
+   * Copy constructor.
+   * @param nds nodes to copy
+   */
+  public Nodes(final Nodes nds) {
+    this(nds.pres.clone(), nds.data, nds.ftpos == null ? null : nds.ftpos.copy());
+    root = nds.root;
+    if(nds.sorted != null) sorted = nds.sorted.clone();
+  }
+
   @Override
   public long size() {
     return pres.length;

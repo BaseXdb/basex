@@ -3,7 +3,7 @@ package org.basex.query.gflwor;
 import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.gflwor.GFLWOR.Eval;
+import org.basex.query.gflwor.GFLWOR.*;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -13,6 +13,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.Scoring;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -60,7 +61,7 @@ public class Let extends GFLWOR.Clause {
    * @return let binding for the score variable
    */
   static Let fromForScore(final For fr) {
-    final Expr varRef = new LocalVarRef(fr.info, fr.var);
+    final Expr varRef = new VarRef(fr.info, fr.var);
     return new Let(fr.score, varRef, true, fr.info);
   }
 
@@ -112,7 +113,7 @@ public class Let extends GFLWOR.Clause {
   public Let compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     expr = expr.compile(ctx, scp);
     type = score ? SeqType.DBL : expr.type();
-    var.refineType(type, info);
+    var.refineType(type, ctx, info);
     size = score ? 1 : expr.size();
     return this;
   }
@@ -141,12 +142,24 @@ public class Let extends GFLWOR.Clause {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return expr.count(v);
+  }
+
+  @Override
   public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
     final Expr sub = expr.inline(ctx, scp, v, e);
     if(sub == null) return null;
     expr = sub;
     return optimize(ctx, scp);
+  }
+
+  @Override
+  public Let copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Var v = scp.newCopyOf(ctx, var);
+    vs.add(var.id, v);
+    return new Let(v, expr.copy(ctx, scp, vs), score, info);
   }
 
   @Override
@@ -167,10 +180,5 @@ public class Let extends GFLWOR.Clause {
   @Override
   long calcSize(final long cnt) {
     return cnt;
-  }
-
-  @Override
-  public VarUsage count(final Var v) {
-    return expr.count(v);
   }
 }

@@ -6,6 +6,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Map ("bang") operator. Only occurs as argument of the {@link MixedPath} expression.
@@ -38,6 +39,11 @@ public final class Bang extends Single {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     return ctx.value(expr);
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Bang(info, expr.copy(ctx, scp, vs));
   }
 
   @Override

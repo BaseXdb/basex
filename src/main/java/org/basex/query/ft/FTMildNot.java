@@ -8,7 +8,9 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * FTMildnot expression.
@@ -99,6 +101,16 @@ public final class FTMildNot extends FTExpr {
     }
     ic.costs(is);
     return true;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    try {
+      return new FTMildNot(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
+    } catch(final QueryException e) {
+      // checks were already done
+      throw Util.notexpected(e);
+    }
   }
 
   @Override

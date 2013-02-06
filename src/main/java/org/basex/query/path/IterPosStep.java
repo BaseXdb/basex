@@ -3,6 +3,8 @@ package org.basex.query.path;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
+import org.basex.util.hash.*;
 
 /**
  * Iterative step expression with numeric predicates.
@@ -71,5 +73,10 @@ final class IterPosStep extends AxisStep {
         return true;
       }
     };
+  }
+
+  @Override
+  public AxisStep copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return copy(new IterPosStep(super.copy(ctx, scp, vs)));
   }
 }

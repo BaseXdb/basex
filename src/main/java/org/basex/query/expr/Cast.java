@@ -9,6 +9,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Cast expression.
@@ -49,7 +50,12 @@ public final class Cast extends Single {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return type.cast(expr.item(ctx, ii), true, ctx, ii, this);
+    return type.cast(expr.item(ctx, ii), ctx, ii, this);
+  }
+
+  @Override
+  public Cast copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Cast(info, expr.copy(ctx, scp, vs), type);
   }
 
   @Override

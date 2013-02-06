@@ -10,6 +10,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -107,6 +108,12 @@ public final class FTDistance extends FTFilter {
       final Var v, final Expr e) throws QueryException {
     return inlineAll(ctx, scp, expr, v, e) | inlineAll(ctx, scp, dist, v, e)
         ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTDistance(info, expr[0].copy(ctx, scp, vs),
+        Arr.copyAll(ctx, scp, vs, dist), unit);
   }
 
   @Override

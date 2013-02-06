@@ -24,7 +24,6 @@ import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -162,9 +161,8 @@ public final class FNDb extends StandardFunc {
   private ValueAccess valueAccess(final boolean text, final QueryContext ctx)
       throws QueryException {
 
-    final IndexContext ic = new IndexContext(ctx, data(0, ctx), null, true);
     final IndexType it = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
-    return new ValueAccess(info, expr[1], it, ic);
+    return new ValueAccess(info, expr[1], it, data(0, ctx), true);
   }
 
   /**
@@ -177,12 +175,11 @@ public final class FNDb extends StandardFunc {
   private StringRangeAccess rangeAccess(final boolean text, final QueryContext ctx)
       throws QueryException {
 
-    final IndexContext ic = new IndexContext(ctx, data(0, ctx), null, true);
     final byte[] min = checkStr(expr[1], ctx);
     final byte[] max = checkStr(expr[2], ctx);
     final IndexType it = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
     final StringRange sr = new StringRange(it, min, true, max, true);
-    return new StringRangeAccess(info, sr, ic);
+    return new StringRangeAccess(info, sr, data(0, ctx), true);
   }
 
   /**

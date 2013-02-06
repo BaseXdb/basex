@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Single case of a switch expression.
@@ -40,6 +41,11 @@ public final class SwitchCase extends Arr {
       }
     }
     return this;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new SwitchCase(info, copyAll(ctx, scp, vs, expr));
   }
 
   @Override

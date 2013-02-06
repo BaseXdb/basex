@@ -1033,30 +1033,31 @@ public class QueryParser extends InputParser {
         do grp = groupSpec(clauses, grp); while(wsConsume(COMMA));
 
         // find all non-grouping variables that aren't shadowed
-        final ArrayList<LocalVarRef> ng = new ArrayList<LocalVarRef>();
+        final ArrayList<VarRef> ng = new ArrayList<VarRef>();
         for(final GroupBy.Spec spec : grp) curr.add(spec.var.name.id(), spec.var);
         vars: for(int i = 0; i < curr.size(); i++) {
           // weird quirk of TokenObjMap
           final Var v = curr.value(i + 1);
           for(final GroupBy.Spec spec : grp) if(spec.var.is(v)) continue vars;
-          ng.add(new LocalVarRef(grp[0].info, v));
+          ng.add(new VarRef(grp[0].info, v));
         }
 
         // add new copies for all non-grouping variables
         final Var[] ngrp = new Var[ng.size()];
         for(int i = ng.size(); --i >= 0;) {
-          final LocalVarRef v = ng.get(i);
+          final VarRef v = ng.get(i);
 
           // if one groups variables such as $x as xs:integer, then the resulting
           // sequence isn't compatible with the type and can't be assigned
           final Var nv = addLocal(v.var.name, null, false);
+          // [LW] should be done everywhere
           if(v.type().one())
-            nv.refineType(SeqType.get(v.type().type, Occ.ONE_MORE), grp[0].info);
+            nv.refineType(SeqType.get(v.type().type, Occ.ONE_MORE), ctx, info());
           ngrp[i] = nv;
           curr.add(nv.name.id(), nv);
         }
 
-        final LocalVarRef[] pre = new LocalVarRef[ng.size()];
+        final VarRef[] pre = new VarRef[ng.size()];
         clauses.add(new GroupBy(grp, ng.toArray(pre), ngrp, grp[0].info));
         alter = GRPBY;
       }
@@ -1069,9 +1070,9 @@ public class QueryParser extends InputParser {
         OrderBy.Key[] ob = null;
         do ob = orderSpec(ob); while(wsConsume(COMMA));
 
-        final LocalVarRef[] vs = new LocalVarRef[curr.size()];
+        final VarRef[] vs = new VarRef[curr.size()];
         for(int i = 0; i < vs.length; i++)
-          vs[i] = new LocalVarRef(ob[0].info, curr.value(i + 1));
+          vs[i] = new VarRef(ob[0].info, curr.value(i + 1));
         clauses.add(new OrderBy(vs, ob, stable, ob[0].info));
         alter = ORDERBY;
       }
@@ -1259,11 +1260,11 @@ public class QueryParser extends InputParser {
       if(type != null) wsCheck(ASSIGN);
       by = check(single(), NOVARDECL);
     } else {
-      final VarRef vr = checkVar(name, GVARNOTDEFINED);
+      final Expr vr = checkVar(name, GVARNOTDEFINED);
       // the grouping variable has to be declared by the same FLWOR expression
       boolean dec = false;
-      if(vr instanceof LocalVarRef) {
-        final Var v = ((LocalVarRef) vr).var;
+      if(vr instanceof VarRef) {
+        final Var v = ((VarRef) vr).var;
         for(final Clause f : cl) {
           if(f.declares(v)) {
             dec = true;
@@ -2019,7 +2020,7 @@ public class QueryParser extends InputParser {
         if(args[i] == null) {
           final Var arg = scope.uniqueVar(ctx, null, true);
           env.add(i, arg);
-          args[i] = new LocalVarRef(ii, arg);
+          args[i] = new VarRef(ii, arg);
         } else {
           fixScope(args[i]);
         }
@@ -2039,12 +2040,12 @@ public class QueryParser extends InputParser {
     try {
       e.visitVars(new VarVisitor() {
         @Override
-        public boolean used(final LocalVarRef ref) {
+        public boolean used(final VarRef ref) {
           try {
-            final VarRef lc = scope.resolve(ref.var.name, QueryParser.this, ctx,
+            final Expr lc = scope.resolve(ref.var.name, QueryParser.this, ctx,
                 ref.info, VARUNDEF);
             // downcast is safe because the new reference is just the closure equivalent
-            ref.var = ((LocalVarRef) lc).var;
+            ref.var = ((VarRef) lc).var;
             return true;
           } catch(QueryException ex) {
             throw new QueryRTException(ex);
@@ -3752,7 +3753,7 @@ public class QueryParser extends InputParser {
    * @return referenced variable
    * @throws QueryException if the variable isn't defined
    */
-  private VarRef checkVar(final QNm name, final Err err) throws QueryException {
+  private Expr checkVar(final QNm name, final Err err) throws QueryException {
     return scope.resolve(name, this, ctx, info(), err);
   }
 

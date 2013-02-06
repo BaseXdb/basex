@@ -190,7 +190,7 @@ public final class QueryContext extends Progress {
     if(ctxItem != null) {
       // evaluate initial expression
       try {
-        value = ctxItem.value(this);
+        value = ctxItem.compile(this, new VarScope()).value(this);
       } catch(final QueryException ex) {
         if(ex.err() != XPNOCTX) throw ex;
         // only {@link ParseExpr} instances may cause this error
@@ -204,8 +204,9 @@ public final class QueryContext extends Progress {
     }
 
     // if specified, convert context item to specified type
+    // [LW] should not be necessary
     if(value != null && sc.initType != null) {
-      value = SeqType.get(sc.initType, Occ.ONE).promote(value, this, null);
+      value = SeqType.get(sc.initType, Occ.ONE).funcConvert(this, null, value);
     }
 
     // dynamic compilation
@@ -228,7 +229,7 @@ public final class QueryContext extends Progress {
       if(root != null) root.compile(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      CIRCLDECL.thrw(null);
+      CIRCLDECL.thrw(null, ex);
     }
   }
 
@@ -542,9 +543,10 @@ public final class QueryContext extends Progress {
    * appropriate XQuery type.
    * @param name name of variable
    * @param val value to be bound
+   * @return {@code true} if the value could be bound, {@code false} otherwise
    * @throws QueryException query exception
    */
-  private void bind(final String name, final Expr val) throws QueryException {
+  private boolean bind(final String name, final Expr val) throws QueryException {
     // remove optional $ prefix
     String nm = name.indexOf('$') == 0 ? name.substring(1) : name;
     byte[] uri = EMPTY;
@@ -558,15 +560,11 @@ public final class QueryContext extends Progress {
       nm = m.group(6);
     }
     final byte[] ln = token(nm);
-    // [CG][LW] better throw an exception here, silent failure is the worst one
-    if(nm.isEmpty() || !XMLToken.isNCName(ln)) return;
+    if(nm.isEmpty() || !XMLToken.isNCName(ln)) return false;
 
     // bind variable
     final QNm qnm = uri.length == 0 ? new QNm(ln, this) : new QNm(ln, uri);
-    final GlobalVar gl = globals.get(qnm);
-    final Expr e = gl == null || gl.type == null ? val :
-      gl.type.type.cast(val.item(this, null), this, null);
-    globals.bind(qnm, null, e, this, null);
+    return globals.bind(qnm, val, this);
   }
 
   /**

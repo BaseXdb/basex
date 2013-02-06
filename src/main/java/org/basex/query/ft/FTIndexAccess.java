@@ -11,6 +11,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -22,19 +23,24 @@ import org.basex.util.list.*;
 public final class FTIndexAccess extends Simple {
   /** Full-text expression. */
   private final FTExpr ftexpr;
-  /** Index context. */
-  private final IndexContext ictx;
+  /** If the index results are ordered. */
+  private final boolean iterable;
+  /** Database name. */
+  private final String db;
 
   /**
    * Constructor.
    * @param ii input info
    * @param ex contains, select and optional ignore expression
-   * @param ic index context
+   * @param nm database name
+   * @param iter iterable flag
    */
-  public FTIndexAccess(final InputInfo ii, final FTExpr ex, final IndexContext ic) {
+  public FTIndexAccess(final InputInfo ii, final FTExpr ex, final String nm,
+      final boolean iter) {
     super(ii);
     ftexpr = ex;
-    ictx = ic;
+    iterable = iter;
+    db = nm;
   }
 
   @Override
@@ -86,25 +92,29 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add(ictx.data.meta.name);
-    return ftexpr.databases(db);
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTIndexAccess(info, ftexpr.copy(ctx, scp, vs), db, iterable);
+  }
+
+  @Override
+  public boolean databases(final StringList dbs) {
+    dbs.add(db);
+    return ftexpr.databases(dbs);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DATA, ictx.data.meta.name), ftexpr);
+    addPlan(plan, planElem(DATA, db), ftexpr);
   }
 
   @Override
   public boolean iterable() {
-    return ictx.iterable;
+    return iterable;
   }
 
   @Override
   public String toString() {
-    return Function._DB_FULLTEXT.get(info, Str.get(ictx.data.meta.name),
-        ftexpr).toString();
+    return Function._DB_FULLTEXT.get(info, Str.get(db), ftexpr).toString();
   }
 
   @Override

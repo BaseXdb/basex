@@ -33,28 +33,21 @@ public final class Globals extends ExprInfo {
   }
 
   /**
-   * Sets the given global variable.
+   * Sets the value of an external variable.
    * @param nm variable name
-   * @param t type
    * @param e expression
    * @param ctx query context
-   * @param ii input info
-   * @return static variable
+   * @return if the value could be bound
    * @throws QueryException query exception
    */
-  public GlobalVar bind(final QNm nm, final SeqType t, final Expr e,
-      final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public boolean bind(final QNm nm, final Expr e, final QueryContext ctx)
+      throws QueryException {
     final GlobalVar var = globals.get(nm);
-    if(var != null) {
-      var.refineType(t);
+    if(var != null) return var.bind(e, ctx);
 
-      if(e != null) var.bind(e, ctx);
-
-      return var;
-    }
-
-    // new variable
-    return addGlobal(ii, new Ann(), nm, t, e, false);
+    // add new variable
+    globals.put(nm, new GlobalVar(nm, e));
+    return true;
   }
 
   /**
@@ -66,43 +59,14 @@ public final class Globals extends ExprInfo {
    * @param ext {@code external} flag
    * @param ctx query context
    * @param ii input info
-   * @return declared variable
    * @throws QueryException query exception
    */
-  public GlobalVar declare(final QNm nm, final SeqType t, final Ann a, final Expr e,
+  public void declare(final QNm nm, final SeqType t, final Ann a, final Expr e,
       final boolean ext, final QueryContext ctx, final InputInfo ii)
           throws QueryException {
     final GlobalVar var = globals.get(nm);
-    if(var != null) {
-      if(var.declared) throw Err.VARDEFINE.thrw(ii, var);
-      var.declared = true;
-      if(a != null) for(int i = a.size(); --i >= 0;) var.ann.add(a.names[i], a.values[i]);
-      var.refineType(t);
-
-      if(e != null && (var.expr() == null || !ext)) var.bind(e, ctx);
-
-      return var;
-    }
-
-    // new variable
-    return addGlobal(ii, a, nm, t, e, true);
-  }
-
-  /**
-   * Adds a new global variable.
-   * @param ii input info
-   * @param a annotations
-   * @param nm variable name
-   * @param t variable type
-   * @param e bound expression
-   * @param decl declaration flag
-   * @return newly added variable
-   */
-  private GlobalVar addGlobal(final InputInfo ii, final Ann a, final QNm nm,
-      final SeqType t, final Expr e, final boolean decl) {
-    final GlobalVar nvar = new GlobalVar(ii, a, nm, t, e, decl);
-    globals.put(nm, nvar);
-    return nvar;
+    if(var != null) var.declare(t, a, e, ext, ctx, ii);
+    else globals.put(nm, new GlobalVar(ii, a, nm, t, e, ext));
   }
 
   /**

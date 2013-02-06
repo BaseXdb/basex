@@ -6,8 +6,10 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -59,6 +61,11 @@ public final class FTScope extends FTFilter {
       bl.set(p, true);
     }
     return c > 1;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTScope(info, expr[0].copy(ctx, scp, vs), unit, same);
   }
 
   @Override

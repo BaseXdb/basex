@@ -11,6 +11,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -51,7 +52,8 @@ public class Filter extends Preds {
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.uses(Use.POS))
-        return ((AxisPath) root).copy().addPreds(ctx, scp, preds).compile(ctx, scp);
+        return ((AxisPath) root.copy(ctx,
+            scp)).addPreds(ctx, scp, preds).compile(ctx, scp);
 
       // optimize filter expressions
       ctx.value = null;
@@ -211,6 +213,15 @@ public class Filter extends Preds {
     final Expr rt = root == null ? null : root.inline(ctx, scp, v, e);
     if(rt != null) root = rt;
     return pr || rt != null ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public Filter copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Filter f = new Filter(info, root == null ? null : root.copy(ctx, scp, vs),
+        Arr.copyAll(ctx, scp, vs, preds));
+    f.pos = pos;
+    f.last = last;
+    return f;
   }
 
   @Override

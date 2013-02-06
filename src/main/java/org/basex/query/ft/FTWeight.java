@@ -9,6 +9,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -116,6 +117,11 @@ public final class FTWeight extends FTExpr {
       change = true;
     }
     return change ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTWeight(info, expr[0].copy(ctx, scp, vs), weight.copy(ctx, scp, vs));
   }
 
   @Override

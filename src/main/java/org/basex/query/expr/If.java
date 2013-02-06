@@ -12,6 +12,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -84,7 +85,7 @@ public final class If extends Arr {
       return expr[0] == Bln.FALSE ? e : new Or(info, e, expr[0]);
     }
 
-    type = expr[0].type().intersect(expr[1].type());
+    type = expr[0].type().union(expr[1].type());
     return this;
   }
 
@@ -114,15 +115,6 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
-    final boolean te = inlineAll(ctx, scp, expr, v, e);
-    final Expr sub = cond.inline(ctx, scp, v, e);
-    if(sub != null) cond = sub;
-    return te || sub != null ? optimize(ctx, scp) : null;
-  }
-
-  @Override
   public boolean uses(final Use u) {
     return cond.uses(u) || super.uses(u);
   }
@@ -141,6 +133,21 @@ public final class If extends Arr {
   @Override
   public VarUsage count(final Var v) {
     return cond.count(v).plus(VarUsage.maximum(v, expr));
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final boolean te = inlineAll(ctx, scp, expr, v, e);
+    final Expr sub = cond.inline(ctx, scp, v, e);
+    if(sub != null) cond = sub;
+    return te || sub != null ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public If copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return copyType(new If(info, cond.copy(ctx, scp, vs),
+        expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs)));
   }
 
   @Override

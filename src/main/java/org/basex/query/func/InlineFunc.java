@@ -15,6 +15,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -68,7 +69,7 @@ public class InlineFunc extends UserFunc {
   @Override
   public FuncItem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final FuncType ft = FuncType.get(this);
-    final boolean c = ft.ret != null && !expr.type().instance(ft.ret);
+    final boolean c = ft.ret != null && !expr.type().instanceOf(ft.ret);
 
     // collect closure
     final Map<Var, Value> clos = new HashMap<Var, Value>();
@@ -132,6 +133,14 @@ public class InlineFunc extends UserFunc {
   @Override
   protected boolean tco() {
     return false;
+  }
+
+  @Override
+  public Expr copy(final QueryContext cx, final VarScope scp, final IntMap<Var> vs) {
+    final VarScope v = scope.copy(cx, scp, vs);
+    final Var[] a = args.clone();
+    for(int i = 0; i < a.length; i++) a[i] = vs.get(a[i].id);
+    return copyType(new InlineFunc(info, name, ret, a, expr.copy(cx, v, vs), ann, sc, v));
   }
 
   @Override

@@ -17,6 +17,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -135,7 +136,7 @@ public class For extends GFLWOR.Clause {
     final SeqType tp = expr.type();
     final boolean emp = empty && tp.mayBeZero();
     type = SeqType.get(tp.type, emp ? Occ.ZERO_ONE : Occ.ONE);
-    var.refineType(type, info);
+    var.refineType(type, ctx, info);
     size = emp ? -1 : 1;
     return this;
   }
@@ -163,6 +164,17 @@ public class For extends GFLWOR.Clause {
     if(sub == null) return null;
     expr = sub;
     return optimize(ctx, scp);
+  }
+
+  @Override
+  public For copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Var v = scp.newCopyOf(ctx, var);
+    vs.add(var.id, v);
+    final Var p = pos == null ? null : scp.newCopyOf(ctx, pos);
+    if(p != null) vs.add(pos.id, p);
+    final Var s = score == null ? null : scp.newCopyOf(ctx, score);
+    if(s != null) vs.add(score.id, s);
+    return new For(v, p, s, expr.copy(ctx, scp, vs), empty, info);
   }
 
   @Override

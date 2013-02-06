@@ -7,8 +7,10 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 
 /**
  * FTContent expression.
@@ -60,6 +62,11 @@ public final class FTContent extends FTFilter {
   @Override
   protected boolean content() {
     return end || !start;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTContent(info, expr[0].copy(ctx, scp, vs), start, end);
   }
 
   @Override

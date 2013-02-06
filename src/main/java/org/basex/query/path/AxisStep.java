@@ -19,6 +19,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Axis step expression.
@@ -254,6 +255,14 @@ public class AxisStep extends Preds {
       if(ct == NodeType.DOC) ctx.value.type = ct;
       ctx.leaf = leaf;
     }
+  }
+
+  @Override
+  public AxisStep copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
+    final Expr[] pred = new Expr[preds.length];
+    for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(ctx, scp, vs);
+    return copy(new AxisStep(info, axis, test.copy(), pred));
   }
 
   @Override

@@ -9,6 +9,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Text fragment.
@@ -48,6 +49,11 @@ public final class CTxt extends CFrag {
     } while((it = iter.next()) != null);
 
     return new FTxt(tb.finish());
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new CTxt(info, expr[0].copy(ctx, scp, vs));
   }
 
   @Override

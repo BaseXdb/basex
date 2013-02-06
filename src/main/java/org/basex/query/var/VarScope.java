@@ -3,6 +3,7 @@ package org.basex.query.var;
 import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.*;
 
 import org.basex.query.*;
@@ -12,6 +13,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * The scope of variables, either the query, a use-defined or an inline function.
@@ -67,26 +69,24 @@ public final class VarScope {
    * @return variable reference
    * @throws QueryException if the variable can't be found
    */
-  public VarRef resolve(final QNm name, final QueryParser qp, final QueryContext ctx,
+  public Expr resolve(final QNm name, final QueryParser qp, final QueryContext ctx,
       final InputInfo ii, final Err err) throws QueryException {
     final Var v = current.get(name);
-    if(v != null) return new LocalVarRef(ii, v);
+    if(v != null) return new VarRef(ii, v);
 
     if(parent != null) {
-      final VarRef nonLocal = parent.resolve(name, qp, ctx, ii, err);
-      if(!(nonLocal instanceof LocalVarRef)) return nonLocal;
+      final Expr nonLocal = parent.resolve(name, qp, ctx, ii, err);
+      if(!(nonLocal instanceof VarRef)) return nonLocal;
 
       // a variable in the closure
       final Var local = new Var(ctx, name, nonLocal.type());
       add(local);
       closure.put(local, nonLocal);
-      return new LocalVarRef(ii, local);
+      return new VarRef(ii, local);
     }
 
     // global variable
     GlobalVar global = ctx.globals.get(name);
-    // [LW] module variables?
-    // if(global == null) global = Variable.get(name, ctx);
     if(global == null && err != null) throw qp.error(err, '$' + string(name.string()));
     return global;
   }
@@ -147,6 +147,16 @@ public final class VarScope {
   public Var newLocal(final QueryContext ctx, final QNm name, final SeqType typ,
       final boolean param) {
     return add(new Var(ctx, name, typ, param));
+  }
+
+  /**
+   * Creates a new copy of the given variable in this scope.
+   * @param ctx query context
+   * @param var variable to copy
+   * @return the variable
+   */
+  public Var newCopyOf(final QueryContext ctx, final Var var) {
+    return add(new Var(ctx, var));
   }
 
   /**
@@ -228,5 +238,24 @@ public final class VarScope {
    */
   public int stackSize() {
     return vars.size();
+  }
+
+  /**
+   * Copies this VarScope.
+   * @param ctx query context
+   * @param scp new parent scope
+   * @param vs variable mapping
+   * @return copied scope
+   */
+  public VarScope copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final VarScope sc = new VarScope(scp);
+    for(final Var v : vars) vs.add(v.id, sc.newCopyOf(ctx, v));
+    for(final Entry<Var, Expr> e : closure.entrySet()) {
+      final Var v = vs.get(e.getKey().id);
+      final Expr ex = e.getValue().copy(ctx, scp, vs);
+      sc.closure.put(v, ex);
+    }
+    sc.current.clear();
+    return sc;
   }
 }

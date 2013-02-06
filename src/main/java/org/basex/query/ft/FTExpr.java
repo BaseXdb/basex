@@ -8,6 +8,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -96,6 +97,9 @@ public abstract class FTExpr extends ParseExpr {
       final Var v, final Expr e) throws QueryException {
     return inlineAll(ctx, scp, expr, v, e) ? optimize(ctx, scp) : null;
   }
+
+  @Override
+  public abstract FTExpr copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
 
   @Override
   public boolean databases(final StringList db) {

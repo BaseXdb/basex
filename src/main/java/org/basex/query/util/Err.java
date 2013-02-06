@@ -802,6 +802,8 @@ public enum Err {
   PATHNODE(XPTY, 19, "Steps within a path expression must yield nodes; % found."),
   /** XPTY0020. */
   STEPNODE(XPTY, 20, "Context node required for %; % found."),
+  /** XPTY0117. */
+  NSSENS(XPTY, 117, "Cannot cast % to namespace-sensitive type %."),
 
   /** XQDY0025. */
   CATTDUPL(XQDY, 25, "Duplicate attribute '%'."),
@@ -1207,13 +1209,13 @@ public enum Err {
    * Throws a type promoting exception.
    * @param ii input info
    * @param t expression cast type
-   * @param v value
+   * @param e expression
    * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static QueryException treat(final InputInfo ii, final SeqType t, final Value v)
+  public static QueryException treat(final InputInfo ii, final SeqType t, final Expr e)
       throws QueryException {
-    throw XPINVTREAT.thrw(ii, v.description(), t, v);
+    throw XPINVTREAT.thrw(ii, e.description(), t, e);
   }
 
   /**

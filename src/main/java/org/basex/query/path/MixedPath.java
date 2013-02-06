@@ -13,6 +13,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Mixed path expression.
@@ -116,6 +117,12 @@ public final class MixedPath extends Path {
       ctx.size = cs;
       ctx.pos = cp;
     }
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new MixedPath(info, root == null ? null : root.copy(ctx, scp, vs),
+        Arr.copyAll(ctx, scp, vs, steps));
   }
 
   @Override

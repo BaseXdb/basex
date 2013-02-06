@@ -95,7 +95,7 @@ public final class Functions extends TokenSet {
     final Var[] vars = new Var[args.length];
     for(int i = 0; i < args.length; i++) {
       vars[i] = sc.uniqueVar(ctx, null, true);
-      args[i] = new LocalVarRef(ii, vars[i]);
+      args[i] = new VarRef(ii, vars[i]);
     }
 
     final TypedFunc f = get(name, args, dyn, ctx, ii);

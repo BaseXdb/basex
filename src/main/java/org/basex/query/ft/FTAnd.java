@@ -4,12 +4,14 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 
 /**
  * FTAnd expression.
@@ -140,6 +142,13 @@ public final class FTAnd extends FTExpr {
 
     // no index access if first or all operators are negative
     return !neg[0] && n < expr.length;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final FTAnd copy = new FTAnd(info, Arr.copyAll(ctx, scp, vs, expr));
+    if(neg != null) copy.neg = neg.clone();
+    return copy;
   }
 
   @Override

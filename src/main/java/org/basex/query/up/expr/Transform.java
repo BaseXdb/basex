@@ -14,6 +14,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -112,6 +113,12 @@ public final class Transform extends Arr {
       final Var v, final Expr e) throws QueryException {
     final boolean cp = inlineAll(ctx, scp, copies, v, e);
     return inlineAll(ctx, scp, expr, v, e) || cp ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Transform(info, copyAll(ctx, scp, vs, copies), expr[0].copy(ctx, scp, vs),
+        expr[1].copy(ctx, scp, vs));
   }
 
   @Override

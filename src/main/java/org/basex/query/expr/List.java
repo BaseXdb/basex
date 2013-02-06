@@ -11,6 +11,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Expression list.
@@ -113,6 +114,11 @@ public final class List extends Arr {
     final ValueBuilder vb = new ValueBuilder();
     for(final Expr e : expr) vb.add(ctx.value(e));
     return vb.value();
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return copyType(new List(info, copyAll(ctx, scp, vs, expr)));
   }
 
   @Override

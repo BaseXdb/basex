@@ -13,6 +13,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -101,12 +102,11 @@ public class FTContains extends ParseExpr {
 
     // sequential evaluation with index access
     final FTExpr ie = ftexpr.indexEquivalent(ic);
-    if(ic.seq) return new FTContainsIndex(info, expr, ie, ic);
+    if(ic.seq) return new FTContainsIndex(info, expr, ie, ic.not);
 
     // standard index evaluation; first expression will always be an axis path
-    final FTIndexAccess root = new FTIndexAccess(info, ie, ic);
-    return expr instanceof Context ? root :
-      ((AxisPath) expr).invertPath(root, ic.step);
+    final FTIndexAccess rt = new FTIndexAccess(info, ie, ic.data.meta.name, ic.iterable);
+    return expr instanceof Context ? rt : ((AxisPath) expr).invertPath(rt, ic.step);
   }
 
   @Override
@@ -140,6 +140,14 @@ public class FTContains extends ParseExpr {
     if(fte != null) ftexpr = fte;
 
     return ex != null || fte != null ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final FTContains ftc =  new FTContains(expr.copy(ctx, scp, vs),
+        ftexpr.copy(ctx, scp, vs), info);
+    if(lex != null) ftc.lex = new FTLexer(new FTOpt());
+    return ftc;
   }
 
   @Override

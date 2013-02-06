@@ -9,6 +9,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Unary expression.
@@ -59,6 +60,11 @@ public final class Unary extends Single {
       case DEC: return Dec.get(it.dec(info).negate());
       default:  return Int.get(-it.itr(info));
     }
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return copyType(new Unary(info, expr.copy(ctx, scp, vs), minus));
   }
 
   @Override

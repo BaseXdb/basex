@@ -105,4 +105,18 @@ public final class FTPosData {
     }
     return -l - 1;
   }
+
+  /**
+   * Creates a copy.
+   * @return copy
+   */
+  public FTPosData copy() {
+    final FTPosData ftpos = new FTPosData();
+    ftpos.data = data;
+    ftpos.size = size;
+    ftpos.pos = pos.clone();
+    for(int i = 0; i < ftpos.pos.length; i++)
+      if(ftpos.pos[i] != null) ftpos.pos[i] = ftpos.pos[i].copy();
+    return ftpos;
+  }
 }

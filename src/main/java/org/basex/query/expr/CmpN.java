@@ -9,6 +9,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Node comparison.
@@ -108,6 +109,11 @@ public final class CmpN extends Cmp {
   @Override
   public CmpN invert() {
     throw Util.notexpected();
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new CmpN(expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs), op, info);
   }
 
   @Override

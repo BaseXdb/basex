@@ -13,6 +13,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -123,10 +124,10 @@ public class GFLWOR extends ParseExpr {
         return ret;
       }
 
-      if(ret instanceof LocalVarRef && clauses.getLast() instanceof For) {
+      if(ret instanceof VarRef && clauses.getLast() instanceof For) {
         // for $x in E return $x  ==>  return E
         final For last = (For) clauses.getLast();
-        if(!last.var.checksType() && last.var.is(((LocalVarRef) ret).var)) {
+        if(!last.var.checksType() && last.var.is(((VarRef) ret).var)) {
           clauses.removeLast();
           ret = last.expr;
           changed = true;
@@ -224,7 +225,7 @@ public class GFLWOR extends ParseExpr {
       final int next = iter.nextIndex();
       if(c instanceof Let) {
         final Let lt = (Let) c;
-        if(!lt.score && !lt.var.checksType() && lt.expr instanceof LocalVarRef) {
+        if(!lt.score && !lt.var.checksType() && lt.expr instanceof VarRef) {
           ctx.compInfo(QueryText.OPTINLINE, lt);
           inline(ctx, scp, lt.var, lt.expr, next);
           change = true;
@@ -255,7 +256,7 @@ public class GFLWOR extends ParseExpr {
     final BitArray used = new BitArray();
     final VarVisitor marker = new VarVisitor() {
       @Override
-      public boolean used(final LocalVarRef ref) {
+      public boolean used(final VarRef ref) {
         used.set(ref.var.id);
         return true;
       }
@@ -471,6 +472,13 @@ public class GFLWOR extends ParseExpr {
     return change;
   }
 
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final LinkedList<Clause> cls = new LinkedList<Clause>();
+    for(final Clause cl : clauses) cls.add(cl.copy(ctx, scp, vs));
+    return copyType(new GFLWOR(info, cls, ret.copy(ctx, scp, vs)));
+  }
+
   /**
    * Checks if this FLWOR expression only used for, let and where clauses.
    * @return result of check
@@ -604,6 +612,10 @@ public class GFLWOR extends ParseExpr {
       throw Util.notexpected();
     }
 
+    @Override
+    public
+    abstract GFLWOR.Clause copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
+
     /**
      * Checks if the given clause can be slided over this clause.
      * @param cl clause
@@ -612,7 +624,7 @@ public class GFLWOR extends ParseExpr {
     boolean skippable(final Clause cl) {
       return cl.visitVars(new VarVisitor() {
         @Override
-        public boolean used(final LocalVarRef ref) {
+        public boolean used(final VarRef ref) {
           for(final Var v : vars) if(v.is(ref.var)) return false;
           return true;
         }

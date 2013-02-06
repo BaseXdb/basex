@@ -70,4 +70,10 @@ public final class VarStack {
   public boolean contains(final Var v) {
     return indexOf(v) != -1;
   }
+
+  /** Empties this stack. */
+  public void clear() {
+    Arrays.fill(vars, null);
+    size = 0;
+  }
 }

@@ -8,6 +8,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -52,7 +53,7 @@ public final class Try extends Single {
 
     for(final Catch c : ctch) c.compile(ctx, scp);
     type = expr.type();
-    for(final Catch c : ctch) type = type.intersect(c.type());
+    for(final Catch c : ctch) type = type.union(c.type());
     return this;
   }
 
@@ -76,12 +77,22 @@ public final class Try extends Single {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return VarUsage.maximum(v, ctch).plus(super.count(v));
+  }
+
+  @Override
   public Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
     final boolean ct = inlineAll(ctx, scp, ctch, v, e);
     final Expr sub = expr.inline(ctx, scp, v, e);
     if(sub != null) expr = sub;
     return ct || sub != null ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Try(info, expr.copy(ctx, scp, vs), Arr.copyAll(ctx, scp, vs, ctch));
   }
 
   @Override
@@ -123,10 +134,5 @@ public final class Try extends Single {
   @Override
   public boolean visitVars(final VarVisitor visitor) {
     return expr.visitVars(visitor) && visitor.visitAll(ctch);
-  }
-
-  @Override
-  public VarUsage count(final Var v) {
-    return VarUsage.maximum(v, ctch).plus(super.count(v));
   }
 }

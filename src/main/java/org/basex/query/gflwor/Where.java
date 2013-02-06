@@ -8,6 +8,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.InputInfo;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 
@@ -88,6 +89,11 @@ public class Where extends GFLWOR.Clause {
     if(sub == null) return null;
     pred = sub;
     return optimize(ctx, scp);
+  }
+
+  @Override
+  public Where copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Where(pred.copy(ctx, scp, vs), info);
   }
 
   @Override

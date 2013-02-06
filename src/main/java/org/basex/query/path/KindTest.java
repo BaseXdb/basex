@@ -2,6 +2,7 @@ package org.basex.query.path;
 
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Simple node kind test.
@@ -19,6 +20,11 @@ class KindTest extends Test {
   }
 
   @Override
+  public Test copy() {
+    return Test.get(type);
+  }
+
+  @Override
   public boolean eq(final ANode node) {
     return node.type == type;
   }
@@ -26,5 +32,18 @@ class KindTest extends Test {
   @Override
   public String toString() {
     return String.valueOf(type);
+  }
+
+  @Override
+  public Test intersect(final Test other) {
+    if(other instanceof ExtTest || other instanceof DocTest) {
+      return other.type.instanceOf(type) ? other : null;
+    } else if(other instanceof KindTest) {
+      return type.instanceOf(other.type) ? this :
+        other.type.instanceOf(type) ? other : null;
+    } else if(other instanceof NameTest || other instanceof InvDocTest) {
+      throw Util.notexpected(other);
+    }
+    return null;
   }
 }

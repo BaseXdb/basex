@@ -14,9 +14,11 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * User-defined function.
@@ -174,8 +176,9 @@ public class UserFunc extends Single implements Scope {
     ctx.value = null;
     try {
       final Item it = expr.item(ctx, ii);
+      final Value v = it == null ? Empty.SEQ : it;
       // optionally promote return value to target type
-      return cast ? ret.cast(it, false, ctx, info, this) : it;
+      return cast ? ret.funcConvert(ctx, ii, v).item(ctx, ii) : it;
     } finally {
       ctx.value = cv;
       ctx.sc.ns.stack(ns);
@@ -191,7 +194,7 @@ public class UserFunc extends Single implements Scope {
     try {
       final Value v = ctx.value(expr);
       // optionally promote return value to target type
-      return cast ? ret.promote(v, ctx, info) : v;
+      return cast ? ret.funcConvert(ctx, info, v) : v;
     } finally {
       ctx.value = cv;
       ctx.sc.ns.stack(ns);
@@ -240,6 +243,11 @@ public class UserFunc extends Single implements Scope {
       }
     }
     return change ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    throw Util.notexpected();
   }
 
   @Override

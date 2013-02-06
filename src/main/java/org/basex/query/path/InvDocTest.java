@@ -64,7 +64,17 @@ final class InvDocTest extends Test {
   }
 
   @Override
+  public Test copy() {
+    return new InvDocTest(new Nodes(nodes));
+  }
+
+  @Override
   public String toString() {
     return new TokenBuilder(NodeType.DOC.string()).add("(...)").toString();
+  }
+
+  @Override
+  public Test intersect(final Test other) {
+    throw Util.notexpected(this);
   }
 }

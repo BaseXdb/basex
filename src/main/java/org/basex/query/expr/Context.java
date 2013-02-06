@@ -10,6 +10,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -61,6 +62,11 @@ public final class Context extends Simple {
   @Override
   public boolean removable(final Var v) {
     return false;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return copyType(new Context(info));
   }
 
   @Override

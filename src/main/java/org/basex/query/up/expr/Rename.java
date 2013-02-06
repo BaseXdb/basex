@@ -12,7 +12,9 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Rename expression.
@@ -68,6 +70,11 @@ public final class Rename extends Update {
     final DBNode dbn = ctx.updates.determineDataRef(targ, ctx);
     ctx.updates.add(new RenameNode(dbn.pre, dbn.data, info, rename), ctx);
     return null;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Rename(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
   }
 
   @Override

@@ -12,6 +12,7 @@ import org.basex.query.var.*;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -64,6 +65,14 @@ public final class TypeCase extends Single {
     }
     type = expr.type();
     return this;
+  }
+
+  @Override
+  public TypeCase copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Var v = var == null ? null : scp.newCopyOf(ctx, var);
+    if(var != null) vs.add(var.id, v);
+    final TypeCase tc = new TypeCase(info, v, types.clone(), expr.copy(ctx, scp, vs));
+    return tc;
   }
 
   @Override

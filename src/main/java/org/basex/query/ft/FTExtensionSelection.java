@@ -7,7 +7,9 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * FTExtensionSelection expression.
@@ -38,6 +40,13 @@ public final class FTExtensionSelection extends FTExpr {
   @Override
   public FTIter iter(final QueryContext ctx) throws QueryException {
     return expr[0].iter(ctx);
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Pragma[] prag = pragmas.clone();
+    for(int i = 0; i < prag.length; i++) prag[i] = prag[i].copy();
+    return copyType(new FTExtensionSelection(info, prag, expr[0].copy(ctx, scp, vs)));
   }
 
   @Override

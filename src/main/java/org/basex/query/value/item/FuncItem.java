@@ -12,6 +12,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -109,7 +110,7 @@ public final class FuncItem extends FItem {
       ctx.value = null;
       final Value v = ctx.value(expr);
       // optionally cast return value to target type
-      return cast != null ? cast.promote(v, ctx, ii) : v;
+      return cast != null ? cast.funcConvert(ctx, ii, v) : v;
     } finally {
       ctx.value = cv;
       ctx.stackFrame = sf;
@@ -134,8 +135,9 @@ public final class FuncItem extends FItem {
       bindVars(ctx, ii, args);
       ctx.value = null;
       final Item it = expr.item(ctx, ii);
+      final Value v = it == null ? Empty.SEQ : it;
       // optionally cast return value to target type
-      return cast != null ? cast.cast(it, false, ctx, ii, expr) : it;
+      return cast != null ? cast.funcConvert(ctx, ii, v).item(ctx, ii) : it;
     } finally {
       ctx.value = cv;
       ctx.stackFrame = sf;
@@ -172,7 +174,7 @@ public final class FuncItem extends FItem {
     final Expr[] refs = new Expr[vars.length];
     for(int i = vars.length; i-- > 0;) {
       vars[i] = sc.uniqueVar(ctx, t.args[i], true);
-      refs[i] = new LocalVarRef(ii, vars[i]);
+      refs[i] = new VarRef(ii, vars[i]);
     }
     return new FuncItem(fun.name, vars, new DynamicFunc(ii, fun, refs), t,
         fun.cast != null, null, sc);

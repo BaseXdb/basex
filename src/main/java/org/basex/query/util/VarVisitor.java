@@ -27,7 +27,7 @@ public abstract class VarVisitor {
    * @param ref used variable
    * @return if more variables should be visited
    */
-  public boolean used(final LocalVarRef ref) {
+  public boolean used(final VarRef ref) {
     return true;
   };
 

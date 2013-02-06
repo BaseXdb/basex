@@ -5,6 +5,8 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
+import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -53,8 +55,32 @@ public final class SeqType {
      * @param o occurrence indicator to check
      * @return result of check
      */
-    public boolean instance(final Occ o) {
+    public boolean instanceOf(final Occ o) {
       return min >= o.min && max <= o.max;
+    }
+
+    /**
+     * Computes the intersection between this occurrence indicator and the given one.
+     * If none exists (e.g. between {@link #ZERO} and {@link #ONE}), {@code null} is
+     * returned.
+     * @param other other occurrence indicator
+     * @return intersection or {@code null}
+     */
+    public Occ intersect(final Occ other) {
+      final int mn = Math.max(min, other.min), mx = Math.min(max, other.max);
+      return mx < mn ? null : mx == 0 ? ZERO : mn == mx ? ONE : mx == 1 ? ZERO_ONE :
+        mn == 0 ? ZERO_MORE : ONE_MORE;
+    }
+
+    /**
+     * Computes the union between this occurrence indicator and the given one.
+     * @param other other occurrence indicator
+     * @return union
+     */
+    public Occ union(final Occ other) {
+      final int mn = Math.min(min, other.min), mx = Math.max(max, other.max);
+      return mx == 0 ? ZERO : mn == mx ? ONE : mx == 1 ? ZERO_ONE :
+        mn == 0 ? ZERO_MORE : ONE_MORE;
     }
 
     /**
@@ -271,6 +297,15 @@ public final class SeqType {
   }
 
   /**
+   * Returns a version of this sequence type that is adapted to the given {@link Occ}.
+   * @param o occurrence indicator
+   * @return sequence type
+   */
+  public SeqType withOcc(final Occ o) {
+    return get(type, o, kind);
+  }
+
+  /**
    * Matches a value against this sequence type.
    * @param val value to be checked
    * @return result of check
@@ -278,149 +313,190 @@ public final class SeqType {
   public boolean instance(final Value val) {
     final long size = val.size();
     if(!occ.check(size)) return false;
-
-    // the empty sequence has every type
-    if(size == 0) return true;
-
-    final MapType mt = type instanceof MapType ? (MapType) type : null;
     for(long i = 0; i < size; i++) {
-      final Item it = val.itemAt(i);
-
       // maps don't have type information attached to them, you have to look...
-      if(mt == null) {
-        if(!(it.type.instanceOf(type) && checkKind(it))) return false;
-      } else {
-        if(!(it instanceof Map && ((Map) it).hasType(mt))) return false;
-      }
+      if(!instance(val.itemAt(i), true)) return false;
       if(i == 0 && val.homogeneous()) break;
     }
     return true;
   }
 
   /**
+   * Checks if an item can be part of a sequence that is instance of this type.
+   * @param it item to check
+   * @param knd check kind
+   * @return result of check
+   */
+  private boolean instance(final Item it, final boolean knd) {
+    // maps don't have type information attached to them, you have to look...
+    return type instanceof MapType
+      ? it instanceof Map && ((Map) it).hasType((MapType) type)
+      : it.type.instanceOf(type) && (!knd || checkKind(it));
+  }
+
+  /**
    * Tries to cast the given item to this sequence type.
    * @param it item to cast
-   * @param cast explicit cast flag
    * @param ctx query context
    * @param ii input info
-   * @param e producing expression, used for error output
+   * @param e expression for error message
    * @return promoted item
    * @throws QueryException query exception
    */
-  public Item cast(final Item it, final boolean cast, final QueryContext ctx,
+  public Item cast(final Item it, final QueryContext ctx,
       final InputInfo ii, final Expr e) throws QueryException {
 
     if(it == null) {
-      if(occ == Occ.ONE) XPEMPTY.thrw(ii, e.description());
+      if(!occ.check(0)) XPEMPTY.thrw(ii, e.description());
       return null;
     }
-    final boolean correct = cast ? it.type == type : instance(it, ii);
-    final Item i = correct ? it : type.cast(it, ctx, ii);
+
+    if(!occ.check(1)) XPTYPE.thrw(ii, e.description(), this, it.type);
+    final Item i = it.type.eq(type) ? it : type.cast(it, ctx, ii);
     if(!checkKind(i)) Err.cast(ii, type, i);
     return i;
+  }
+
+  /**
+   * Casts a sequence to this type.
+   * @param val value to cast
+   * @param ctx query context
+   * @param ii input info
+   * @param e expression
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  public Value cast(final Value val, final QueryContext ctx, final InputInfo ii,
+      final Expr e) throws QueryException {
+    if(val.size() < 2) return cast(val.isEmpty() ? null : val.itemAt(0), ctx, ii, e);
+
+    if(!occ.check(val.size())) XPTYPE.thrw(ii, e.description(), this, val);
+    final ValueBuilder vb = new ValueBuilder((int) val.size());
+    for(int i = 0; i < val.size(); i++) vb.add(cast(val.itemAt(i), ctx, ii, e));
+    return vb.value();
   }
 
   /**
    * Treats the specified value as this sequence type.
    * @param val value to promote
    * @param ii input info
+   * @return the value
    * @throws QueryException query exception
    */
-  public void treat(final Value val, final InputInfo ii) throws QueryException {
+  public Value treat(final Value val, final InputInfo ii) throws QueryException {
+    if(val.type().instanceOf(this)) return val;
+
     final int size = (int) val.size();
     if(!occ.check(size)) Err.treat(ii, this, val);
 
     // empty sequence has all types
-    if(size == 0) return;
+    if(size == 0) return Empty.SEQ;
     // check first item
-    Item n = val.itemAt(0);
-    boolean ins = n.type.instanceOf(type) && checkKind(n);
+    boolean ins = instance(val.itemAt(0), true);
 
     // check heterogeneous sequences
-    if(!val.homogeneous()) {
-      for(int i = 1; ins && i < size; i++) {
-        n = val.itemAt(i);
-        ins = n.type.instanceOf(type) && checkKind(n);
-      }
-    }
+    if(!val.homogeneous())
+      for(int i = 1; ins && i < size; i++) ins = instance(val.itemAt(i), true);
     if(!ins) Err.treat(ii, this, val);
+    return val;
   }
 
   /**
-   * Tries to promote the specified value to this sequence type.
-   * @param val value to promote
+   * Tries to promote an item to this type's element type.
    * @param ctx query context
    * @param ii input info
-   * @return resulting item
+   * @param it item to promote
+   * @return promoted item
    * @throws QueryException query exception
    */
-  public Value promote(final Value val, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
-    final int size = (int) val.size();
-    if(!occ.check(size)) Err.treat(ii, this, val);
-
-    // empty sequence has all types
-    if(size == 0) return val;
-    // check first item
-    Item n = val.itemAt(0);
-    final boolean in = instance(n, ii);
-    if(!in) {
-      if((n.type == NodeType.COM || n.type == NodeType.PI) && !instance(Str.ZERO, ii)) {
-        Err.treat(ii, this, n);
+  private Item funcConv(final QueryContext ctx, final InputInfo ii,
+      final Item it) throws QueryException {
+    if(type instanceof AtomType) {
+      final Item atom = StandardFunc.atom(it, ii);
+      if(atom != it && atom.type.instanceOf(type)) return it;
+      if(atom.type == AtomType.ATM) {
+        if(type.nsSensitive()) throw Err.NSSENS.thrw(ii, it, type);
+        return type.cast(atom, ctx, ii);
       }
-      n = type.cast(n, ctx, ii);
-    }
-    boolean ins = checkKind(n);
 
-    // return original sequence if no casting is necessary
-    if(in && ins && val.homogeneous()) return val;
-
-    // check heterogeneous sequences; no way around it...
-    final Item[] items = new Item[size];
-    items[0] = n;
-    for(int i = 1; ins && i < size; i++) {
-      n = val.itemAt(i);
-      if(!instance(n, ii)) n = type.cast(n, ctx, ii);
-      ins = checkKind(n);
-      items[i] = n;
+      final Type at = atom.type, tt = type;
+      if(tt == AtomType.DBL
+          && (at.instanceOf(AtomType.FLT) || at.instanceOf(AtomType.DEC)))
+        return Dbl.get(atom.dbl(ii));
+      if(tt == AtomType.FLT && at.instanceOf(AtomType.DEC))
+        return Flt.get(atom.flt(ii));
+      if(tt == AtomType.STR && at.instanceOf(AtomType.URI))
+        return Str.get(atom.string(ii));
+    } else if(it instanceof FItem && type instanceof FuncType) {
+      return ((FItem) it).coerceTo((FuncType) type, ctx, ii);
     }
-    if(!ins) Err.treat(ii, this, val);
-    return Seq.get(items, size);
+
+    throw Err.treat(ii, type.seqType(), it);
   }
 
   /**
-   * Returns whether item has already correct type.
-   * @param it input item
+   * Performs function conversion on the given value.
+   * @param ctx query context
    * @param ii input info
-   * @return result of check
-   * @throws QueryException query exception
+   * @param val value to convert
+   * @return converted value
+   * @throws QueryException if the conversion ws not possible
    */
-  private boolean instance(final Item it, final InputInfo ii) throws QueryException {
-    final Type ip = it.type;
-    final boolean ins = ip.instanceOf(type);
-    if(!ins && !ip.isUntyped() && !(it instanceof FItem) &&
-        // implicit type promotions:
-        // xs:float -> xs:double
-        (ip != AtomType.FLT || type != AtomType.DBL) &&
-        // xs:anyUri -> xs:string
-        (ip != AtomType.URI || type != AtomType.STR) &&
-        // xs:decimal -> xs:float/xs:double
-        (type != AtomType.FLT && type != AtomType.DBL || !ip.instanceOf(AtomType.DEC)))
-      Err.treat(ii, this, it);
-    return ins;
+  public Value funcConvert(final QueryContext ctx, final InputInfo ii,
+      final Value val) throws QueryException {
+    final long n = val.size();
+    if(!occ.check(n)) throw Err.treat(ii, this, val);
+    if(n == 0) return Empty.SEQ;
+    if(val.isItem())
+      return instance((Item) val, true) ? val : funcConv(ctx, ii, (Item) val);
+
+    ValueBuilder vb = null;
+    final Item fst = val.itemAt(0);
+    if(!instance(fst, true)) {
+      vb = new ValueBuilder(new Item[(int) val.size()], 0);
+      vb.add(funcConv(ctx, ii, fst));
+    } else if(val.homogeneous()) {
+      return val;
+    }
+
+    for(int i = 1; i < n; i++) {
+      final Item it = val.itemAt(i);
+      if(vb != null) {
+        vb.add(instance(it, true) ? it : funcConv(ctx, ii, it));
+      } else if(!instance(it, true)) {
+        vb = new ValueBuilder(new Item[(int) val.size()], 0);
+        for(int j = 0; j < i; j++) vb.add(val.itemAt(j));
+        vb.add(funcConv(ctx, ii, it));
+      }
+    }
+    return vb != null ? vb.value() : val;
   }
 
   /**
-   * Combine two sequence types.
+   * Computes the union of two sequence types, i.e. the lowest common ancestor of both
+   * types.
    * @param t second type
    * @return resulting type
    */
+  public SeqType union(final SeqType t) {
+    return get(type == t.type ? type : type.union(t.type), occ.union(t.occ));
+  }
+
+  /**
+   * Computes the intersection of two sequence types, i.e. the most general type that is
+   * sub-type of both types. If no such type exists, {@code null} is returned
+   * @param t second type
+   * @return resulting type or {@code null}
+   */
   public SeqType intersect(final SeqType t) {
-    final Type tp = type == t.type ? type : AtomType.ITEM;
-    final Occ oc = occ == t.occ ? occ : zeroOrOne() && t.zeroOrOne() ?
-        Occ.ZERO_ONE : Occ.ZERO_MORE;
-    return new SeqType(tp, oc);
+    final Occ o = occ.intersect(t.occ);
+    if(o == null) return null;
+    final Type tp = type.intersect(t.type);
+    if(tp == null) return null;
+    if(kind == null || t.kind == null || kind.sameAs(t.kind))
+      return get(tp, o, kind != null ? kind : t.kind);
+    final Test k = kind.intersect(t.kind);
+    return k == null ? null : get(tp, o, k);
   }
 
   /**
@@ -464,6 +540,14 @@ public final class SeqType {
   }
 
   /**
+   * Checks if this type is namespace-sensitive.
+   * @return result of check
+   */
+  public boolean nsSensitive() {
+    return kind != null && kind.nsSensitive() || type.nsSensitive();
+  }
+
+  /**
    * Checks the additional kind test.
    * @param it item
    * @return same item
@@ -478,7 +562,8 @@ public final class SeqType {
    * @return result of check
    */
   public boolean eq(final SeqType t) {
-    return type == t.type && occ == t.occ;
+    return type.eq(t.type) && occ == t.occ &&
+        (kind == null ? t.kind == null : t.kind != null && kind.sameAs(t.kind));
   }
 
   /**
@@ -486,8 +571,8 @@ public final class SeqType {
    * @param t SeqType to check
    * @return result of check
    */
-  public boolean instance(final SeqType t) {
-    return type.instanceOf(t.type) && occ.instance(t.occ);
+  public boolean instanceOf(final SeqType t) {
+    return type.instanceOf(t.type) && occ.instanceOf(t.occ);
   }
 
   @Override

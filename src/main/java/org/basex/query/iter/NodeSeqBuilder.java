@@ -296,4 +296,16 @@ public final class NodeSeqBuilder extends AxisIter {
   public String toString() {
     return Util.name(this) + Arrays.toString(Arrays.copyOf(nodes, size));
   }
+
+  /**
+   * Creates a copy of this sequence builder.
+   * @return copy
+   */
+  public NodeSeqBuilder copy() {
+    final NodeSeqBuilder b = new NodeSeqBuilder(nodes.clone(), size);
+    b.pos = pos;
+    b.sort = sort;
+    b.check = check;
+    return b;
+  }
 }

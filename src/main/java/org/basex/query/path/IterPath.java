@@ -9,7 +9,9 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Iterative path expression for location paths which return sorted and
@@ -103,5 +105,11 @@ final class IterPath extends AxisPath {
         return true;
       }
     };
+  }
+
+  @Override
+  public IterPath copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return copyType(new IterPath(info, root == null ? null : root.copy(ctx, scp, vs),
+        Arr.copyAll(ctx, scp, vs, steps), type, size));
   }
 }

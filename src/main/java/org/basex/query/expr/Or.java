@@ -8,6 +8,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 
 /**
  * Or expression.
@@ -67,6 +68,11 @@ public final class Or extends Logical {
       }
     }
     return d == 0 ? Bln.get(f) : Bln.get(d);
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Or(info, copyAll(ctx, scp, vs, expr));
   }
 
   @Override

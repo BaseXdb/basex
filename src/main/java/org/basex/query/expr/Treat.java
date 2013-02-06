@@ -13,6 +13,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Treat as expression.
@@ -96,6 +97,11 @@ public final class Treat extends Single {
         NOTREAT.thrw(info, description(), it.type, type);
     }
     return val;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Treat(info, expr.copy(ctx, scp, vs), type);
   }
 
   @Override

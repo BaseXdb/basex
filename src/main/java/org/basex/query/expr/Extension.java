@@ -8,6 +8,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Pragma extension.
@@ -40,6 +41,8 @@ public final class Extension extends Single {
     try {
       for(final Pragma p : pragmas) p.init(ctx, info);
       expr = expr.compile(ctx, scp);
+      type = expr.type();
+      size = expr.size();
     } finally {
       for(final Pragma p : pragmas) p.finish(ctx);
     }
@@ -59,6 +62,13 @@ public final class Extension extends Single {
     } finally {
       for(final Pragma p : pragmas) p.finish(ctx);
     }
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Pragma[] prag = pragmas.clone();
+    for(int i = 0; i < prag.length; i++) prag[i] = prag[i].copy();
+    return copyType(new Extension(info, prag, expr.copy(ctx, scp, vs)));
   }
 
   @Override

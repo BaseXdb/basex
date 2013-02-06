@@ -7,13 +7,14 @@ import java.util.Arrays;
 import java.util.List;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.gflwor.GFLWOR.Eval;
+import org.basex.query.gflwor.GFLWOR.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 
@@ -40,7 +41,7 @@ public class OrderBy extends GFLWOR.Clause {
    * @param stbl stable sort
    * @param ii input info
    */
-  public OrderBy(final LocalVarRef[] vs, final Key[] ks, final boolean stbl,
+  public OrderBy(final VarRef[] vs, final Key[] ks, final boolean stbl,
       final InputInfo ii) {
     super(ii);
     tvars = new Var[vs.length];
@@ -49,6 +50,23 @@ public class OrderBy extends GFLWOR.Clause {
       tvars[i] = vs[i].var;
       texpr[i] = vs[i];
     }
+    keys = ks;
+    stable = stbl;
+  }
+
+  /**
+   * Copy constructor.
+   * @param vs variables
+   * @param es expressions
+   * @param ks sort keys
+   * @param stbl stable sort
+   * @param ii input info
+   */
+  private OrderBy(final Var[] vs, final Expr[] es, final Key[] ks, final boolean stbl,
+      final InputInfo ii) {
+    super(ii);
+    tvars = vs;
+    texpr = es;
     keys = ks;
     stable = stbl;
   }
@@ -264,6 +282,17 @@ public class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
+  public OrderBy copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Var[] tv = tvars.clone();
+    for(int i = 0; i < tv.length; i++) {
+      final Var v = tv[i], cpy = vs.get(v.id);
+      if(cpy != null) tv[i] = cpy;
+    }
+    return new OrderBy(tv, Arr.copyAll(ctx, scp, vs, texpr),
+        Arr.copyAll(ctx, scp, vs, keys), stable, info);
+  }
+
+  @Override
   public boolean visitVars(final VarVisitor visitor) {
     return visitor.visitAll(texpr) && visitor.visitAll(keys);
   }
@@ -323,6 +352,11 @@ public class OrderBy extends GFLWOR.Clause {
       super(ii, k);
       desc = dsc;
       least = lst;
+    }
+
+    @Override
+    public Key copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+      return new Key(info, expr.copy(ctx, scp, vs), desc, least);
     }
 
     @Override

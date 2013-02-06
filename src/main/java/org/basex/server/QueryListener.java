@@ -146,7 +146,7 @@ final class QueryListener extends Progress {
             if(full) {
               po.write(it.xdmInfo());
             } else {
-              po.write(it.typeId());
+              po.write(it.typeId().asByte());
             }
             ser.reset();
           }

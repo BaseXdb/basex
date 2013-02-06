@@ -9,6 +9,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -66,7 +67,7 @@ public final class TypeSwitch extends ParseExpr {
 
     type = cases[0].type();
     for(int c = 1; c < cases.length; ++c) {
-      type = type.intersect(cases[c].type());
+      type = type.union(cases[c].type());
     }
     return this;
   }
@@ -123,6 +124,13 @@ public final class TypeSwitch extends ParseExpr {
       ts = t;
     }
     return change ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final TypeCase[] cs = new TypeCase[cases.length];
+    for(int i = 0; i < cs.length; i++) cs[i] = cases[i].copy(ctx, scp, vs);
+    return new TypeSwitch(info, ts.copy(ctx, scp, vs), cs);
   }
 
   @Override

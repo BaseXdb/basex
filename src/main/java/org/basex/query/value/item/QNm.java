@@ -221,7 +221,7 @@ public final class QNm extends Item {
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(typeId()).add(uri()).add(0).toArray();
+    return new ByteList().add(typeId().asByte()).add(uri()).add(0).toArray();
   }
 
   @Override

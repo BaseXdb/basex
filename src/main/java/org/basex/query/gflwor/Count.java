@@ -10,6 +10,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.util.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 
@@ -72,7 +73,7 @@ public class Count extends GFLWOR.Clause {
 
   @Override
   public Count compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    count.refineType(SeqType.ITR, info);
+    count.refineType(SeqType.ITR, ctx, info);
     return this;
   }
 
@@ -87,9 +88,21 @@ public class Count extends GFLWOR.Clause {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return VarUsage.NEVER;
+  }
+
+  @Override
   public Clause inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
     return null;
+  }
+
+  @Override
+  public Count copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Var v = scp.newCopyOf(ctx, count);
+    vs.add(count.id, v);
+    return new Count(v, info);
   }
 
   @Override
@@ -110,10 +123,5 @@ public class Count extends GFLWOR.Clause {
   @Override
   long calcSize(final long cnt) {
     return cnt;
-  }
-
-  @Override
-  public VarUsage count(final Var v) {
-    return VarUsage.NEVER;
   }
 }

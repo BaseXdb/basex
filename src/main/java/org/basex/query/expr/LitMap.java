@@ -6,6 +6,7 @@ import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * A literal map expression.
@@ -37,6 +38,11 @@ public final class LitMap extends Arr {
       map = map.insert(checkItem(expr[i], ctx), ctx.value(expr[++i]), ii);
     }
     return map;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new LitMap(info, copyAll(ctx, scp, vs, expr));
   }
 
   @Override

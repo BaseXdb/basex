@@ -19,6 +19,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -133,6 +134,12 @@ public abstract class Value extends Expr implements Iterable<Item> {
       final Var v, final Expr e) throws QueryException {
     // values do not contain variable references
     return null;
+  }
+
+  @Override
+  public Value copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
+    return this;
   }
 
   @Override

@@ -10,6 +10,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Range expression.
@@ -26,7 +27,7 @@ public final class Range extends Arr {
    */
   public Range(final InputInfo ii, final Expr e1, final Expr e2) {
     super(ii, e1, e2);
-    type = SeqType.ITR_OM;
+    type = SeqType.ITR_ZM;
   }
 
   @Override
@@ -51,6 +52,11 @@ public final class Range extends Arr {
   public Value value(final QueryContext ctx) throws QueryException {
     final long[] v = rng(ctx);
     return v == null ? Empty.SEQ : RangeSeq.get(v[0], v[1] - v[0] + 1, true);
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Range(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
   }
 
   /**

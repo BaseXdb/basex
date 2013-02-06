@@ -7,7 +7,9 @@ import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Pos expression.
@@ -77,6 +79,11 @@ public final class Pos extends Simple {
   public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCtx(ctx);
     return Bln.get(ctx.pos >= min && ctx.pos <= max);
+  }
+
+  @Override
+  public Pos copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Pos(min, max, info);
   }
 
   /**

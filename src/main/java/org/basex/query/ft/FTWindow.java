@@ -8,6 +8,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -108,6 +109,11 @@ public final class FTWindow extends FTFilter {
     final Expr w = win.inline(ctx, scp, v, e);
     if(w != null) win = w;
     return ex || w != null ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTWindow(info, expr[0].copy(ctx, scp, vs), win.copy(ctx, scp, vs), unit);
   }
 
   @Override

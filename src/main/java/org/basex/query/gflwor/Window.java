@@ -13,6 +13,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 import static org.basex.util.Token.token;
@@ -293,6 +294,20 @@ public class Window extends GFLWOR.Clause {
   }
 
   @Override
+  public Window copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
+    final Var v = scp.newCopyOf(ctx, var);
+    vs.add(var.id, v);
+    try {
+      return new Window(info, sliding, v, expr.copy(ctx, scp, vs),
+          start.copy(ctx, scp, vs), only, end != null ? end.copy(ctx, scp, vs) : null);
+    } catch(QueryException e) {
+      // checks have already been done
+      throw Util.notexpected(e);
+    }
+  }
+
+  @Override
   public boolean visitVars(final VarVisitor visitor) {
     return expr.visitVars(visitor) && start.visitVars(visitor)
         && (end == null || end.visitVars(visitor)) && visitor.declared(var);
@@ -392,6 +407,20 @@ public class Window extends GFLWOR.Clause {
     public Condition inline(final QueryContext ctx, final VarScope scp,
         final Var v, final Expr e) throws QueryException {
       return (Condition) super.inline(ctx, scp, v, e);
+    }
+
+    @Override
+    public Condition copy(final QueryContext ctx, final VarScope scp,
+        final IntMap<Var> vs) {
+      final Var it = item == null ? null : scp.newCopyOf(ctx, item),
+                ps = pos  == null ? null : scp.newCopyOf(ctx, pos),
+                pr = prev == null ? null : scp.newCopyOf(ctx, prev),
+                nx = next == null ? null : scp.newCopyOf(ctx, next);
+      if(it != null) vs.add(item.id, it);
+      if(ps != null) vs.add(pos.id,  ps);
+      if(pr != null) vs.add(prev.id, pr);
+      if(nx != null) vs.add(next.id, nx);
+      return new Condition(start, it, ps, pr, nx, expr.copy(ctx, scp, vs), info);
     }
 
     /**

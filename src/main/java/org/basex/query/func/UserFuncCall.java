@@ -9,6 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function call for user-defined functions.
@@ -55,6 +56,18 @@ public abstract class UserFuncCall extends Arr {
     }
     type = func.type();
     return this;
+  }
+
+  @Override
+  public final BaseFuncCall copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
+    final Expr[] arg = new Expr[expr.length];
+    for(int i = 0; i < arg.length; i++) arg[i] = expr[i].copy(ctx, scp, vs);
+    final BaseFuncCall call = new BaseFuncCall(info, name, arg);
+    call.func = func;
+    call.type = type;
+    call.size = size;
+    return call;
   }
 
   /**

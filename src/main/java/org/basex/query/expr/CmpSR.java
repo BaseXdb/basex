@@ -12,7 +12,9 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * String range expression.
@@ -151,7 +153,14 @@ public final class CmpSR extends Single {
   public Expr indexEquivalent(final IndexContext ic) {
     final boolean text = rt.type() == IndexType.TEXT;
     ic.ctx.compInfo(OPTSRNGINDEX);
-    return ic.invert(expr, new StringRangeAccess(info, rt, ic), text);
+    return ic.invert(expr, new StringRangeAccess(info, rt, ic.data, ic.iterable), text);
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final CmpSR res = new CmpSR(expr.copy(ctx, scp, vs), min, mni, max, mxi, info);
+    res.rt = rt;
+    return res;
   }
 
   @Override

@@ -7,6 +7,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 
 /**
  * FTOptions expression.
@@ -61,6 +62,11 @@ public final class FTOptions extends FTExpr {
   public FTIter iter(final QueryContext ctx) {
     // shouldn't be called, as compile returns argument
     throw Util.notexpected();
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTOptions(info, expr[0].copy(ctx, scp, vs), new FTOpt().copy(opt));
   }
 
   @Override

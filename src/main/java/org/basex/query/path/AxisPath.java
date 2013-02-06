@@ -20,6 +20,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Axis path expression.
@@ -393,10 +394,16 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public final Path copy() {
+  public AxisPath copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
     final Expr[] stps = new Expr[steps.length];
-    for(int s = 0; s < steps.length; ++s) stps[s] = AxisStep.get(step(s));
-    return new AxisPath(info, root, stps);
+    for(int s = 0; s < steps.length; ++s) stps[s] = step(s).copy(ctx, scp, vs);
+    final AxisPath ap = copyType(
+        new AxisPath(info, root == null ? null : root.copy(ctx, scp, vs), stps));
+    ap.cache = cache;
+    if(citer != null) ap.citer = citer.copy();
+    if(lvalue != null) ap.lvalue = lvalue;
+    return ap;
   }
 
   /**

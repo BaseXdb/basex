@@ -3,6 +3,7 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.ft.FTFlag.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
@@ -33,7 +34,7 @@ public final class FTWords extends FTExpr {
   TokenList txt;
 
   /** All matches. */
-  FTMatches matches = new FTMatches((byte) 0);
+  FTMatches matches = new FTMatches(0);
   /** Flag for first evaluation. */
   boolean first;
   /** Search mode; default: {@link FTMode#ANY}. */
@@ -98,7 +99,8 @@ public final class FTWords extends FTExpr {
       if(query.isValue()) txt = tokens(ctx);
       // choose fast evaluation for default settings
       fast = mode == FTMode.ANY && txt != null && occ == null;
-      if(ftt == null) ftt = new FTTokenizer(this, ctx.ftOpt(), ctx.context.prop);
+      if(ftt == null)
+        ftt = new FTTokenizer(this, ctx.ftOpt(), ctx.context.prop.num(Prop.LSERROR));
     }
     return this;
   }
@@ -429,6 +431,20 @@ public final class FTWords extends FTExpr {
       change = true;
     }
     return change ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final FTWords ftw = new FTWords(info, query.copy(ctx, scp, vs), mode,
+        occ == null ? null : Arr.copyAll(ctx, scp, vs, occ));
+    if(data != null) ftw.data = data;
+    if(ftt != null) ftw.ftt = ftt.copy(ftw);
+    if(matches != null) ftw.matches = matches.copy();
+    if(txt != null) ftw.txt = txt.copy();
+    ftw.first = first;
+    ftw.tokNum = tokNum;
+    ftw.fast = fast;
+    return ftw;
   }
 
   @Override

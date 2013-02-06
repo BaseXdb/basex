@@ -11,6 +11,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Catch clause.
@@ -77,6 +78,14 @@ public final class Catch extends Single {
       ctx.set(vars[i++], v, info);
     }
     return ctx.value(expr);
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Catch ctch = new Catch(info, codes.clone(), ctx, scp);
+    for(int i = 0; i < vars.length; i++) vs.add(vars[i].id, ctch.vars[i]);
+    ctch.expr = expr.copy(ctx, scp, vs);
+    return ctch;
   }
 
   /**

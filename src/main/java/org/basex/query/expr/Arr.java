@@ -7,6 +7,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -67,6 +68,23 @@ public abstract class Arr extends ParseExpr {
   public Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
     return inlineAll(ctx, scp, expr, v, e) ? optimize(ctx, scp) : null;
+  }
+
+  /**
+   * Creates a deep copy of the given array.
+   * @param <T> element type
+   * @param ctx query context
+   * @param scp variable scope
+   * @param vs variable mapping
+   * @param arr array to copy
+   * @return deep copy of the array
+   */
+  @SuppressWarnings("unchecked")
+  public static final <T extends Expr> T[] copyAll(final QueryContext ctx,
+      final VarScope scp, final IntMap<Var> vs, final T[] arr) {
+    final T[] copy = arr.clone();
+    for(int i = 0; i < copy.length; i++) copy[i] = (T) copy[i].copy(ctx, scp, vs);
+    return copy;
   }
 
   @Override

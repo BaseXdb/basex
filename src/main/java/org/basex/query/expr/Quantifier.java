@@ -12,6 +12,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Some/Every satisfier clause.
@@ -31,8 +32,18 @@ public final class Quantifier extends Single {
    * @param e every flag
    */
   public Quantifier(final InputInfo ii, final For[] f, final Expr s, final boolean e) {
-    super(ii, new GFLWOR(ii, new LinkedList<GFLWOR.Clause>(Arrays.asList(f)),
-        compBln(s, ii)));
+    this(ii, new GFLWOR(ii, new LinkedList<GFLWOR.Clause>(Arrays.asList(f)),
+        compBln(s, ii)), e);
+  }
+
+  /**
+   * Copy constructor.
+   * @param ii input info
+   * @param tests expression
+   * @param e every flag
+   */
+  private Quantifier(final InputInfo ii, final Expr tests, final boolean e) {
+    super(ii, tests);
     every = e;
     type = SeqType.BLN;
   }
@@ -53,6 +64,11 @@ public final class Quantifier extends Single {
     for(Item it; (it = iter.next()) != null;)
       if(every ^ it.ebv(ctx, ii).bool(ii)) return Bln.get(!every);
     return Bln.get(every);
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Quantifier(info, expr.copy(ctx, scp, vs), every);
   }
 
   @Override
