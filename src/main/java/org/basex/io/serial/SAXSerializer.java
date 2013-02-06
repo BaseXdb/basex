@@ -12,7 +12,7 @@ import org.xml.sax.helpers.*;
 
 /**
  * Bridge to translate XQuery items to SAX events.
- * The {@link #parse(Item)} method does the following:
+ * The {@link #parse} methods do the following:
  * <ol>
  *   <li>notify startDocument()</li>
  *   <li>serialize the item</li>
@@ -23,6 +23,9 @@ import org.xml.sax.helpers.*;
  * @author Michael Hedenus
  */
 public final class SAXSerializer extends Serializer implements XMLReader {
+  /** Item to be serialized. */
+  private final Item item;
+
   /** Content handler. */
   private ContentHandler contentHandler;
   /** Entity resolver. */
@@ -36,8 +39,11 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   /**
    * Constructor.
+   * @param it item to be serialized
    */
-  public SAXSerializer() { }
+  public SAXSerializer(final Item it) {
+    item = it;
+  }
 
   // XMLReader ==========================================================================
 
@@ -56,12 +62,13 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     return null;
   }
 
-  /**
-   * Parses the specified item.
-   * @param item item to be parsed
-   * @throws SAXException SAX exception
-   */
-  public void parse(final Item item) throws SAXException {
+  @Override
+  public void parse(final InputSource input) throws SAXException {
+    parse("");
+  }
+
+  @Override
+  public void parse(final String id) throws SAXException {
     try {
       contentHandler.startDocument();
       serialize(item);
@@ -69,16 +76,6 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     } catch(final Exception ex) {
       throw new SAXException(ex);
     }
-  }
-
-  @Override
-  public void parse(final InputSource input) throws SAXException {
-    Util.notimplemented("Call parse(Item) instead.");
-  }
-
-  @Override
-  public void parse(final String id) throws SAXException {
-    Util.notimplemented("Call parse(Item) instead.");
   }
 
   @Override
