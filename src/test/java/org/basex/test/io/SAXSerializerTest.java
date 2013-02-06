@@ -1,6 +1,8 @@
 package org.basex.test.io;
 
 import javax.xml.bind.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
 import javax.xml.transform.sax.*;
 
 import junit.framework.Assert;
@@ -32,14 +34,14 @@ public class SAXSerializerTest extends SandboxTest {
     final ArrayOutput marshalled = new ArrayOutput();
     jaxbContext.createMarshaller().marshal(
         new SAXSerializerObject("Object1", 42), marshalled);
-    new CreateDB("test1", marshalled.toString()).execute(context);
+    new CreateDB(NAME, marshalled.toString()).execute(context);
 
     // get object from DB
     QueryProcessor queryProcessor = new QueryProcessor(
         "//domain-object[@name='Object1']", context);
-    Item item1 = queryProcessor.iter().next();
+    Item item = queryProcessor.iter().next();
 
-    SAXSerializer saxSerializer = new SAXSerializer(item1);
+    SAXSerializer saxSerializer = new SAXSerializer(item);
     SAXSource saxSource = new SAXSource(saxSerializer, null);
 
     SAXSerializerObject dom = jaxbContext.createUnmarshaller().unmarshal(saxSource,
@@ -48,5 +50,24 @@ public class SAXSerializerTest extends SandboxTest {
     queryProcessor.close();
 
     Assert.assertEquals(42, dom.getValue());
+  }
+
+  /**
+   * Tests the handling of namespaces.
+   * @throws Exception exception
+   */
+  @Test
+  public void namespaces() throws Exception {
+    QueryProcessor queryProcessor = new QueryProcessor("<a xmlns='x'/>", context);
+    Item item = queryProcessor.iter().next();
+
+    SAXSerializer saxSerializer = new SAXSerializer(item);
+    SAXSource saxSource = new SAXSource(saxSerializer, null);
+
+    DOMResult result = new DOMResult();
+    TransformerFactory.newInstance().newTransformer().transform(saxSource, result);
+    Assert.assertEquals("x", result.getNode().getFirstChild().getNamespaceURI());
+
+    queryProcessor.close();
   }
 }

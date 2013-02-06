@@ -274,6 +274,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
      * @param uri namespace uri
      */
     void put(final byte[] prefix, final byte[] uri) {
+      if(decls == null) decls = new Atts();
       decls.add(prefix, uri);
     }
 
