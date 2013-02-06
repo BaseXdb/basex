@@ -3,6 +3,7 @@ package org.basex.query.up.primitives;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
+import java.util.List;
 
 import org.basex.build.*;
 import org.basex.core.cmd.*;
@@ -10,10 +11,8 @@ import org.basex.data.*;
 import org.basex.data.atomic.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Update primitive for the {@link Function#_DB_CREATE} function.
@@ -21,34 +20,22 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public final class DBCreate extends BasicOperation {
+public final class DBCreate extends DBNew {
   /** Name for created database. */
   public final String name;
-  /** Documents to add. */
-  private ValueBuilder inputs;
-  /** Path to which initial document(s) will be added. */
-  private final TokenList paths;
-  /** Insertion sequence. */
-  private Data md;
-  /** Query context. */
-  private final QueryContext ctx;
 
   /**
    * Constructor.
    * @param ii input info
    * @param nm name for created database
-   * @param in initial content item
-   * @param pt paths
+   * @param in input (ANode and QueryInput references)
    * @param c query context
    */
-  public DBCreate(final InputInfo ii, final String nm, final ValueBuilder in,
-      final TokenList pt, final QueryContext c) {
+  public DBCreate(final InputInfo ii, final String nm, final List<NewInput> in,
+      final QueryContext c) {
 
-    super(TYPE.DBCREATE, null, ii);
-    ctx = c;
+    super(TYPE.DBCREATE, null, in, c, ii);
     name = nm;
-    inputs = in;
-    paths = pt;
   }
 
   @Override
@@ -63,33 +50,22 @@ public final class DBCreate extends BasicOperation {
 
   @Override
   public void prepare(final MemData tmp) throws QueryException {
-    if(inputs == null) return;
-    // build data with all documents, to prevent dirty reads
-    md = new MemData(ctx.context.prop);
-    final long ds = inputs.size();
-    final int ps = paths.size();
-    for(int i = 0; i < ds; i++) {
-      final byte[] path = i < ps ? paths.get(i) : Token.EMPTY;
-      final Data d = docData(inputs.get(i), path, ctx.context, name);
-      md.insert(md.meta.size, -1, new DataClip(d));
-    }
-    // clear entries to recover memory
-    inputs = null;
+    if(inputs != null) addDocs(new MemData(qc.context.prop), name);
   }
 
   @Override
   public void apply() throws QueryException {
     // close data instance in query processor
-    ctx.resource.removeData(name);
+    qc.resource.removeData(name);
     // check if addressed databases are still pinned
-    if(ctx.context.pinned(name)) BXDB_OPENED.thrw(info, name);
+    if(qc.context.pinned(name)) BXDB_OPENED.thrw(info, name);
 
     try {
-      data = CreateDB.create(name, Parser.emptyParser(ctx.context.prop), ctx.context);
+      data = CreateDB.create(name, Parser.emptyParser(qc.context.prop), qc.context);
     } catch(final IOException ex) {
       UPDBOPTERR.thrw(info, ex);
     }
-    ctx.resource.addData(data);
+    qc.resource.addData(data);
 
     // add initial documents
     if(md != null) {

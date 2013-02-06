@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -28,6 +29,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -519,10 +521,9 @@ public final class FNDb extends StandardFunc {
    */
   private Item add(final QueryContext ctx) throws QueryException {
     final Data data = checkWrite(data(0, ctx), ctx);
-    final Item it = checkItem(expr[1], ctx);
-    final String path = expr.length < 3 ? "" : path(2, ctx);
-
-    ctx.updates.add(new DBAdd(data, it, path, ctx.context, info), ctx);
+    final byte[] path = expr.length < 3 ? Token.EMPTY : token(path(2, ctx));
+    final NewInput input = checkInput(checkItem(expr[1], ctx), path);
+    ctx.updates.add(new DBAdd(data, input, ctx, info), ctx);
     return null;
   }
 
@@ -535,7 +536,7 @@ public final class FNDb extends StandardFunc {
   private Item replace(final QueryContext ctx) throws QueryException {
     final Data data = checkWrite(data(0, ctx), ctx);
     final String path = path(1, ctx);
-    final Item doc = checkItem(expr[2], ctx);
+    final NewInput input = checkInput(checkItem(expr[2], ctx), token(path));
 
     // remove old documents
     final Resources res = data.resources;
@@ -549,9 +550,9 @@ public final class FNDb extends StandardFunc {
     if(bin != null) {
       if(bin.exists()) {
         if(bin.isDir()) BXDB_SINGLE.thrw(info);
-        ctx.updates.add(new DBStore(data, path, doc, info), ctx);
+        ctx.updates.add(new DBStore(data, path, input, info), ctx);
       } else {
-        ctx.updates.add(new DBAdd(data, doc, path, ctx.context, info), ctx);
+        ctx.updates.add(new DBAdd(data, input, ctx, info), ctx);
       }
     }
     return null;
@@ -592,12 +593,7 @@ public final class FNDb extends StandardFunc {
     final String name = string(checkStr(expr[0], ctx));
     if(!MetaData.validName(name, false)) BXDB_NAME.thrw(info, name);
 
-    final ValueBuilder inputs = new ValueBuilder();
     final TokenList paths = new TokenList();
-    if(expr.length > 1) {
-      final Iter ir = ctx.iter(expr[1]);
-      for(Item it; (it = ir.next()) != null;) inputs.add(it);
-    }
     if(expr.length > 2) {
       final Iter ir = ctx.iter(expr[2]);
       for(Item it; (it = ir.next()) != null;) {
@@ -607,11 +603,22 @@ public final class FNDb extends StandardFunc {
         paths.add(norm);
       }
     }
-    final long is = inputs.size();
-    final int ps = paths.size();
-    if(ps != 0 && is != ps) BXDB_CREATEARGS.thrw(info, is, ps);
 
-    ctx.updates.add(new DBCreate(info, name, inputs, paths, ctx), ctx);
+    final int ps = paths.size();
+    final List<NewInput> inputs = new ArrayList<NewInput>(ps);
+    if(expr.length > 1) {
+      final Value val = ctx.value(expr[1]);
+      // number of specified inputs and paths must be identical
+      final long is = val.size();
+      if(ps != 0 && is != ps) BXDB_CREATEARGS.thrw(info, is, ps);
+
+      for(int i = 0; i < is; i++) {
+        final byte[] path = i < ps ? paths.get(i) : Token.EMPTY;
+        inputs.add(checkInput(val.itemAt(i), path));
+      }
+    }
+
+    ctx.updates.add(new DBCreate(info, name, inputs, ctx), ctx);
     return null;
   }
 
@@ -775,6 +782,73 @@ public final class FNDb extends StandardFunc {
       ctx.output.add(it);
     }
     return null;
+  }
+
+  /**
+   * Creates a {@link Data} instance for the specified document.
+   * @param in input item
+   * @param path optional path argument
+   * @return database instance
+   * @throws QueryException query exception
+   */
+  private NewInput checkInput(final Item in, final byte[] path) throws QueryException {
+    final NewInput ni = new NewInput();
+
+    if(in.type.isNode()) {
+      if(endsWith(path, '.') || endsWith(path, '/')) RESINV.thrw(info, path);
+
+      // ensure that the final name is not empty
+      ANode nd = (ANode) in;
+      byte[] name = path;
+      if(name.length == 0) {
+        // adopt name from document node
+        name = nd.baseURI();
+        final Data d = nd.data();
+        // adopt path if node is part of disk database. otherwise, only adopt file name
+        final int i = d == null || d.inMemory() ? lastIndexOf(name, '/') :
+          indexOf(name, '/');
+        if(i != -1) name = substring(name, i + 1);
+        if(name.length == 0) RESINV.thrw(info, name);
+      }
+
+      // adding a document node
+      if(nd.type != NodeType.DOC) {
+        if(nd.type == NodeType.ATT) UPDOCTYPE.thrw(info, nd);
+        nd = new FDoc(name).add(nd);
+      }
+      ni.node = nd;
+      ni.path = name;
+      return ni;
+    }
+
+    if(!in.type.isStringOrUntyped()) throw STRNODTYPE.thrw(info, this, in.type);
+
+    final QueryInput qi = new QueryInput(Token.string(in.string(info)));
+    if(!qi.io.exists()) WHICHRES.thrw(info, qi.original);
+
+    // add slash to the target if the addressed file is an archive or directory
+    String name = string(path);
+    if(name.endsWith(".")) RESINV.thrw(info, path);
+    if(!name.endsWith("/") && (qi.io.isDir() || qi.io.isArchive())) name += "/";
+    String target = "";
+    final int s = name.lastIndexOf('/');
+    if(s != -1) {
+      target = name.substring(0, s);
+      name = name.substring(s + 1);
+    }
+
+    // set name of document
+    if(!name.isEmpty()) qi.io.name(name);
+    // get name from io reference
+    else if(!(qi.io instanceof IOContent)) name = qi.io.name();
+
+    // ensure that the final name is not empty
+    if(name.isEmpty()) RESINV.thrw(info, path);
+
+    ni.io = qi.io;
+    ni.dbname = token(name);
+    ni.path = token(target);
+    return ni;
   }
 
   @Override

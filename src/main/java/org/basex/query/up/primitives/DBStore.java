@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
  */
 public final class DBStore extends BasicOperation {
   /** Keys. */
-  private final TokenObjMap<Item> map = new TokenObjMap<Item>();
+  private final TokenObjMap<Object> map = new TokenObjMap<Object>();
 
   /**
    * Constructor.
@@ -30,7 +30,7 @@ public final class DBStore extends BasicOperation {
    * @param it item to be stored
    * @param ii input info
    */
-  public DBStore(final Data d, final String path, final Item it, final InputInfo ii) {
+  public DBStore(final Data d, final String path, final Object it, final InputInfo ii) {
     super(TYPE.DBSTORE, d, ii);
     map.add(token(path), it);
   }
@@ -50,7 +50,9 @@ public final class DBStore extends BasicOperation {
         final IOFile file = data.meta.binary(string(path));
         if(file == null) UPDBPUTERR.thrw(info, path);
         file.dir().md();
-        file.write(map.get(path).input(info));
+        final Object item = map.get(path);
+        file.write(item instanceof Item ? ((Item) item).input(info) :
+          ((QueryInput) item).io.inputStream());
       } catch(final IOException ex) {
         Util.debug(ex);
         UPDBPUTERR.thrw(info, path);
