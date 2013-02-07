@@ -107,7 +107,7 @@ public class MainModule extends ExprInfo implements Scope {
   }
 
   @Override
-  public boolean visit(final VarVisitor visitor) {
-    return expr.visitVars(visitor);
+  public boolean visit(final ASTVisitor visitor) {
+    return expr.accept(visitor);
   }
 }

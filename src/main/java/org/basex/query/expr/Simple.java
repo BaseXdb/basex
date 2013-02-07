@@ -68,7 +68,7 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
+  public boolean accept(final ASTVisitor visitor) {
     return true;
   }
 }

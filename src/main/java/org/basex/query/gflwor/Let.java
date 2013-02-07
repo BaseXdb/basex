@@ -163,8 +163,8 @@ public class Let extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return expr.visitVars(visitor) && visitor.declared(var);
+  public boolean accept(final ASTVisitor visitor) {
+    return expr.accept(visitor) && visitor.declared(var);
   }
 
   @Override

@@ -132,7 +132,7 @@ public final class Try extends Single {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return expr.visitVars(visitor) && visitor.visitAll(ctch);
+  public boolean accept(final ASTVisitor visitor) {
+    return expr.accept(visitor) && visitAll(visitor, ctch);
   }
 }

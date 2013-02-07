@@ -271,9 +271,9 @@ public class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    if(!visitor.visitAll(by)) return false;
-    for(final Expr ng : preExpr) if(!ng.visitVars(visitor)) return false;
+  public boolean accept(final ASTVisitor visitor) {
+    if(!visitAll(visitor, by)) return false;
+    for(final Expr ng : preExpr) if(!ng.accept(visitor)) return false;
     for(final Var ng : post) if(!visitor.declared(ng)) return false;
     return true;
   }
@@ -365,8 +365,8 @@ public class GroupBy extends GFLWOR.Clause {
     }
 
     @Override
-    public boolean visitVars(final VarVisitor visitor) {
-      return expr.visitVars(visitor) && visitor.declared(var);
+    public boolean accept(final ASTVisitor visitor) {
+      return expr.accept(visitor) && visitor.declared(var);
     }
   }
 

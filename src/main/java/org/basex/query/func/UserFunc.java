@@ -284,14 +284,28 @@ public class UserFunc extends Single implements Scope {
   }
 
   @Override
-  public boolean visit(final VarVisitor visitor) {
-    return visitor.withVars(args, expr);
+  public boolean visit(final ASTVisitor visitor) {
+    for(final Var v : args) if(!visitor.declared(v)) return false;
+    return expr.accept(visitor);
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
+  public boolean accept(final ASTVisitor visitor) {
     for(final Entry<Var, Expr> e : scope.closure().entrySet())
-      if(!e.getValue().visitVars(visitor)) return false;
+      if(!e.getValue().accept(visitor)) return false;
     return visitor.subScope(this);
+  }
+
+  /**
+   * Checks if this function calls itself recursively.
+   * @return result of check
+   */
+  public boolean selfRecursive() {
+    return !expr.accept(new ASTVisitor() {
+      @Override
+      public boolean funcCall(final UserFuncCall call) {
+        return call.func != UserFunc.this;
+      }
+    });
   }
 }

@@ -230,8 +230,8 @@ public final class GlobalVar extends ParseExpr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return expr.visitVars(visitor);
+  public boolean accept(final ASTVisitor visitor) {
+    return expr.accept(visitor);
   }
 
   /**

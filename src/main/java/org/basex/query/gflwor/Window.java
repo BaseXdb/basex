@@ -308,9 +308,9 @@ public class Window extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return expr.visitVars(visitor) && start.visitVars(visitor)
-        && (end == null || end.visitVars(visitor)) && visitor.declared(var);
+  public boolean accept(final ASTVisitor visitor) {
+    return expr.accept(visitor) && start.accept(visitor)
+        && (end == null || end.accept(visitor)) && visitor.declared(var);
   }
 
   @Override
@@ -526,12 +526,12 @@ public class Window extends GFLWOR.Clause {
     }
 
     @Override
-    public boolean visitVars(final VarVisitor visitor) {
+    public boolean accept(final ASTVisitor visitor) {
       return (item == null || visitor.declared(item))
           && (pos  == null || visitor.declared(pos))
           && (prev == null || visitor.declared(prev))
           && (next == null || visitor.declared(next))
-          && expr.visitVars(visitor);
+          && expr.accept(visitor);
     }
   }
 

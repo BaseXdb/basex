@@ -10,9 +10,9 @@ import org.basex.query.util.*;
  */
 public interface Scope {
   /**
-   * Traverses this scope with the given {@link VarVisitor}.
+   * Traverses this scope with the given {@link ASTVisitor}.
    * @param visitor visitor
    * @return continue flag
    */
-  boolean visit(final VarVisitor visitor);
+  boolean visit(final ASTVisitor visitor);
 }

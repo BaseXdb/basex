@@ -137,7 +137,8 @@ public final class Catch extends Single {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return visitor.withVars(vars, expr);
+  public boolean accept(final ASTVisitor visitor) {
+    for(final Var v : vars) if(!visitor.declared(v)) return false;
+    return visitAll(visitor, expr);
   }
 }

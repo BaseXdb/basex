@@ -166,7 +166,7 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return expr.visitVars(visitor) && ftexpr.visitVars(visitor);
+  public boolean accept(final ASTVisitor visitor) {
+    return expr.accept(visitor) && ftexpr.accept(visitor);
   }
 }

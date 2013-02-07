@@ -242,7 +242,7 @@ public class Filter extends Preds {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return root.visitVars(visitor) && visitor.visitAll(preds);
+  public boolean accept(final ASTVisitor visitor) {
+    return root.accept(visitor) && visitAll(visitor, preds);
   }
 }

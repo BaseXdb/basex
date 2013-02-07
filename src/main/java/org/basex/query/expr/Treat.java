@@ -111,6 +111,6 @@ public final class Treat extends Single {
 
   @Override
   public String toString() {
-    return expr + " " + TREAT + ' ' + AS + ' ' + type;
+    return '(' + expr.toString() + ')' + TREAT + ' ' + AS + ' ' + type;
   }
 }

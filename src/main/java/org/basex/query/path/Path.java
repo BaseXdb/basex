@@ -477,7 +477,7 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return (root == null || root.visitVars(visitor)) && visitor.visitAll(steps);
+  public boolean accept(final ASTVisitor visitor) {
+    return (root == null || root.accept(visitor)) && visitAll(visitor, steps);
   }
 }

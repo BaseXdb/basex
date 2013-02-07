@@ -2038,7 +2038,7 @@ public class QueryParser extends InputParser {
    */
   private Expr fixScope(final Expr e) throws QueryException {
     try {
-      e.visitVars(new VarVisitor() {
+      e.accept(new ASTVisitor() {
         @Override
         public boolean used(final VarRef ref) {
           try {

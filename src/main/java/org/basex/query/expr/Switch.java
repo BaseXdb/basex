@@ -188,7 +188,7 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return cond.visitVars(visitor) && visitor.visitAll(cases);
+  public boolean accept(final ASTVisitor visitor) {
+    return cond.accept(visitor) && visitAll(visitor, cases);
   }
 }

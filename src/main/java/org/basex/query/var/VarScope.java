@@ -195,7 +195,7 @@ public final class VarScope {
   public void cleanUp(final Scope expr) {
     final BitSet declared = new BitSet();
     final AtomicInteger counter = new AtomicInteger();
-    expr.visit(new VarVisitor() {
+    expr.visit(new ASTVisitor() {
       @Override
       public boolean declared(final Var var) {
         declared.set(var.id);

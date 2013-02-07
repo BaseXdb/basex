@@ -293,8 +293,8 @@ public class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return visitor.visitAll(texpr) && visitor.visitAll(keys);
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, texpr) && visitAll(visitor, keys);
   }
 
   @Override

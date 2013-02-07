@@ -254,7 +254,7 @@ public class GFLWOR extends ParseExpr {
    */
   private boolean cleanDeadVars(final QueryContext ctx) {
     final BitArray used = new BitArray();
-    final VarVisitor marker = new VarVisitor() {
+    final ASTVisitor marker = new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {
         used.set(ref.var.id);
@@ -262,12 +262,12 @@ public class GFLWOR extends ParseExpr {
       }
     };
 
-    ret.visitVars(marker);
+    ret.accept(marker);
     boolean change = false;
     for(int i = clauses.size(); --i >= 0;) {
       final Clause curr = clauses.get(i);
       change |= curr.clean(ctx, used);
-      curr.visitVars(marker);
+      curr.accept(marker);
     }
     return change;
   }
@@ -490,12 +490,9 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    for(final Clause cl : clauses) if(!cl.visitVars(visitor)) return false;
-    if(!ret.visitVars(visitor)) return false;
-    for(int i = clauses.size(); --i >= 0;)
-      if(!clauses.get(i).undeclare(visitor)) return false;
-    return true;
+  public boolean accept(final ASTVisitor visitor) {
+    for(final Clause cl : clauses) if(!cl.accept(visitor)) return false;
+    return ret.accept(visitor);
   }
 
   @Override
@@ -622,23 +619,13 @@ public class GFLWOR extends ParseExpr {
      * @return result of check
      */
     boolean skippable(final Clause cl) {
-      return cl.visitVars(new VarVisitor() {
+      return cl.accept(new ASTVisitor() {
         @Override
         public boolean used(final VarRef ref) {
           for(final Var v : vars) if(v.is(ref.var)) return false;
           return true;
         }
       });
-    }
-
-    /**
-     * Undeclares all declared variables.
-     * @param visitor variable visitor
-     * @return continue
-     */
-    final boolean undeclare(final VarVisitor visitor) {
-      for(int i = vars.length; --i >= 0;) if(!visitor.undeclared(vars[i])) return false;
-      return true;
     }
 
     /**

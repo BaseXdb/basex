@@ -111,7 +111,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
+  public boolean accept(final ASTVisitor visitor) {
     return visitor.used(this);
   }
 

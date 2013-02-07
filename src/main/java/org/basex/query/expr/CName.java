@@ -131,8 +131,8 @@ public abstract class CName extends CFrag {
   }
 
   @Override
-  public final boolean visitVars(final VarVisitor visitor) {
-    return name.visitVars(visitor) && visitor.visitAll(expr);
+  public final boolean accept(final ASTVisitor visitor) {
+    return name.accept(visitor) && visitAll(visitor, expr);
   }
 
   @Override

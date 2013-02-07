@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -147,6 +148,11 @@ public abstract class UserFuncCall extends Arr {
   public String toString() {
     return new TokenBuilder(name.string()).add(PAR1).add(
         toString(SEP)).add(PAR2).toString();
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitor.funcCall(this) && super.accept(visitor);
   }
 
   /**

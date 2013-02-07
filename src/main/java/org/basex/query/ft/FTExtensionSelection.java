@@ -62,7 +62,7 @@ public final class FTExtensionSelection extends FTExpr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return visitor.visitAll(expr);
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr);
   }
 }

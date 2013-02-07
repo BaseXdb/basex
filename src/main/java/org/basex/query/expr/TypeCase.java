@@ -149,8 +149,8 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return var == null ? expr.visitVars(visitor)
-        : visitor.declared(var) && expr.visitVars(visitor) && visitor.undeclared(var);
+  public boolean accept(final ASTVisitor visitor) {
+    return var == null ? expr.accept(visitor)
+                       : visitor.declared(var) && expr.accept(visitor);
   }
 }

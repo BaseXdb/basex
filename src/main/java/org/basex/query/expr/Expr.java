@@ -177,7 +177,7 @@ public abstract class Expr extends ExprInfo {
    */
   public final boolean uses(final Var v) {
     // return true iff the the search was aborted, i.e. the variable is used
-    return !visitVars(new VarVisitor() {
+    return !accept(new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {
         // abort when the variable is used
@@ -228,14 +228,23 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException;
 
-  @SuppressWarnings("javadoc")
-  public static boolean inlineAll(final QueryContext ctx, final VarScope scp,
-      final Expr[] expr, final Var v, final Expr e) throws QueryException {
+  /**
+   * Inlines the given expression into all elements of the given array.
+   * @param ctx query context
+   * @param scp variable scope
+   * @param arr array
+   * @param v variable to replace
+   * @param e expression to inline
+   * @return {@code true} if the array has changed, {@code false} otherwise
+   * @throws QueryException query exception
+   */
+  protected static boolean inlineAll(final QueryContext ctx, final VarScope scp,
+      final Expr[] arr, final Var v, final Expr e) throws QueryException {
     boolean change = false;
-    for(int i = 0; i < expr.length; i++) {
-      final Expr nw = expr[i].inline(ctx, scp, v, e);
+    for(int i = 0; i < arr.length; i++) {
+      final Expr nw = arr[i].inline(ctx, scp, v, e);
       if(nw != null) {
-        expr[i] = nw;
+        arr[i] = nw;
         change = true;
       }
     }
@@ -366,7 +375,7 @@ public abstract class Expr extends ExprInfo {
    */
   public boolean hasFreeVars() {
     final BitSet declared = new BitSet();
-    return !visitVars(new VarVisitor() {
+    return !accept(new ASTVisitor() {
       @Override
       public boolean declared(final Var var) {
         declared.set(var.id);
@@ -394,5 +403,16 @@ public abstract class Expr extends ExprInfo {
    * @param visitor variable visitor
    * @return if the walk should be continued
    */
-  public abstract boolean visitVars(final VarVisitor visitor);
+  public abstract boolean accept(final ASTVisitor visitor);
+
+  /**
+   * Visit all given expressions with the given visitor.
+   * @param visitor visitor
+   * @param exprs expressions to visit
+   * @return success flag
+   */
+  protected static final boolean visitAll(final ASTVisitor visitor, final Expr...exprs) {
+    for(final Expr e : exprs) if(!e.accept(visitor)) return false;
+    return true;
+  }
 }

@@ -157,7 +157,7 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return ts.visitVars(visitor) && visitor.visitAll(cases);
+  public boolean accept(final ASTVisitor visitor) {
+    return ts.accept(visitor) && visitAll(visitor, cases);
   }
 }

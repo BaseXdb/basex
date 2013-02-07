@@ -134,7 +134,7 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return visitor.visitAll(expr) && visitor.visitAll(dist);
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr) && visitAll(visitor, dist);
   }
 }

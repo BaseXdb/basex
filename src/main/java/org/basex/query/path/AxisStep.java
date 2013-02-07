@@ -288,7 +288,7 @@ public class AxisStep extends Preds {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return visitor.visitAll(preds);
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, preds);
   }
 }

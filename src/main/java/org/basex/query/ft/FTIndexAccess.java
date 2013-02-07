@@ -118,7 +118,7 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return ftexpr.visitVars(visitor);
+  public boolean accept(final ASTVisitor visitor) {
+    return ftexpr.accept(visitor);
   }
 }

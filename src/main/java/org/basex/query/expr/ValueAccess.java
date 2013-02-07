@@ -158,7 +158,7 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return expr.visitVars(visitor) && super.visitVars(visitor);
+  public boolean accept(final ASTVisitor visitor) {
+    return expr.accept(visitor) && super.accept(visitor);
   }
 }

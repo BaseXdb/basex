@@ -184,7 +184,7 @@ public final class If extends Arr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return cond.visitVars(visitor) && super.visitVars(visitor);
+  public boolean accept(final ASTVisitor visitor) {
+    return cond.accept(visitor) && super.accept(visitor);
   }
 }

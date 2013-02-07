@@ -140,7 +140,7 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return visitor.visitAll(expr) && weight.visitVars(visitor);
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr) && weight.accept(visitor);
   }
 }

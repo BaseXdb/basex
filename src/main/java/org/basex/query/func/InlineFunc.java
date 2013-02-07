@@ -144,18 +144,11 @@ public class InlineFunc extends UserFunc {
   }
 
   @Override
-  public boolean visit(final VarVisitor visitor) {
+  public boolean visit(final ASTVisitor visitor) {
     final Map<Var, Expr> clos = scope.closure();
-    if(clos.isEmpty()) return visitor.withVars(args, expr);
-
-    final Var[] cls = new Var[clos.size()];
-    int i = cls.length;
-    for(final Entry<Var, Expr> v : clos.entrySet()) {
-      if(!(v.getValue().visitVars(visitor) && visitor.declared(v.getKey()))) return false;
-      cls[--i] = v.getKey();
-    }
-    if(!visitor.withVars(args, expr)) return false;
-    for(final Var v : cls) if(!visitor.undeclared(v)) return false;
-    return true;
+    for(final Entry<Var, Expr> v : clos.entrySet())
+      if(!(v.getValue().accept(visitor) && visitor.declared(v.getKey()))) return false;
+    for(final Var v : args) if(!visitor.declared(v)) return false;
+    return visitAll(visitor, expr);
   }
 }

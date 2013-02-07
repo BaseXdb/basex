@@ -216,7 +216,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract boolean homogeneous();
 
   @Override
-  public final boolean visitVars(final VarVisitor visitor) {
+  public final boolean accept(final ASTVisitor visitor) {
     return true;
   }
 }

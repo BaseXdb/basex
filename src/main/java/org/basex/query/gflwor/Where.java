@@ -97,8 +97,8 @@ public class Where extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return pred.visitVars(visitor);
+  public boolean accept(final ASTVisitor visitor) {
+    return pred.accept(visitor);
   }
 
   @Override

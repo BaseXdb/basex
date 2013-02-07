@@ -142,10 +142,7 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    if(!(visitor.visitAll(copies) && visitor.visitAll(expr))) return false;
-    for(int i = copies.length; --i >= 0;)
-      if(!visitor.undeclared(copies[i].var)) return false;
-    return true;
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, copies) && visitAll(visitor, expr);
   }
 }

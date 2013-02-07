@@ -106,7 +106,7 @@ public class Count extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
+  public boolean accept(final ASTVisitor visitor) {
     return visitor.declared(count);
   }
 

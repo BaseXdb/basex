@@ -488,8 +488,8 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public boolean visitVars(final VarVisitor visitor) {
-    return visitor.visitAll(expr) && query.visitVars(visitor)
-        && (occ == null || visitor.visitAll(occ));
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr) && query.accept(visitor)
+        && (occ == null || visitAll(visitor, occ));
   }
 }
