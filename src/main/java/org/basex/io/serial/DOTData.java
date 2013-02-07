@@ -82,7 +82,7 @@ final class DOTData {
     { "66CC66", Var.class, Cast.class },
     // cyan
     { "009999", UserFuncCall.class, StandardFunc.class, Root.class, VarRef.class,
-                GlobalVar.class, ValueAccess.class, RangeAccess.class,
+                StaticVar.class, ValueAccess.class, RangeAccess.class,
                 StringRangeAccess.class, FTIndexAccess.class },
   };
 

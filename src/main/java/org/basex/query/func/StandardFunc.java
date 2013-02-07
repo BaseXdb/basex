@@ -47,19 +47,25 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
     // compile all arguments
     super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public final Expr optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     // skip context-based or non-deterministic functions, and non-values
-    return optPre(uses(Use.CTX) || uses(Use.NDT) || !allAreValues() ? comp(ctx) :
+    return optPre(uses(Use.CTX) || uses(Use.NDT) || !allAreValues() ? opt(ctx) :
       sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);
   }
 
   /**
-   * Performs function specific compilations.
+   * Performs function specific optimizations.
    * @param ctx query context
    * @return evaluated item
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  Expr comp(final QueryContext ctx) throws QueryException {
+  Expr opt(final QueryContext ctx) throws QueryException {
     return this;
   }
 

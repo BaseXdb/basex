@@ -473,6 +473,33 @@ public final class SeqType {
   }
 
   /**
+   * Checks if this type could be converted to the given one by function conversion.
+   * @param t type to convert to
+   * @return result of check
+   */
+  public boolean convertibleTo(final SeqType t) {
+    if(intersect(t) != null) return true;
+    if(occ.intersect(t.occ) == null) return false;
+    final Type to = t.type;
+    if(to instanceof AtomType) {
+      if(type.isUntyped()) return !to.nsSensitive();
+      return to == AtomType.DBL && (couldBe(AtomType.FLT) || couldBe(AtomType.DEC))
+          || to == AtomType.FLT && couldBe(AtomType.DEC)
+          || to == AtomType.STR && couldBe(AtomType.URI);
+    }
+    return t.type instanceof FuncType && type instanceof FuncType;
+  }
+
+  /**
+   * Checks if this type's item type could be instance of the given one.
+   * @param o other type
+   * @return result of check
+   */
+  private boolean couldBe(final Type o) {
+    return type.intersect(o) != null;
+  }
+
+  /**
    * Computes the union of two sequence types, i.e. the lowest common ancestor of both
    * types.
    * @param t second type
@@ -572,7 +599,9 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instanceOf(final SeqType t) {
-    return type.instanceOf(t.type) && occ.instanceOf(t.occ);
+    return type.instanceOf(t.type) && occ.instanceOf(t.occ)
+        // [LW] complete kind check
+        && t.kind == null || kind != null && kind.intersect(t.kind) != null;
   }
 
   @Override

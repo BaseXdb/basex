@@ -49,6 +49,25 @@ public final class SwitchCase extends Arr {
   }
 
   @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
+      final Expr e) throws QueryException {
+    boolean change = false;
+    for(int i = 0; i < expr.length; i++) {
+      Expr nw;
+      try {
+        nw = expr[i].inline(ctx, scp, v, e);
+      } catch(final QueryException qe) {
+        nw = FNInfo.error(qe, info);
+      }
+      if(nw != null) {
+        expr[i] = nw;
+        change = true;
+      }
+    }
+    return change ? optimize(ctx, scp) : null;
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(int e = 1; e < expr.length; ++e) sb.append(' ' + CASE + ' ' + expr[e]);

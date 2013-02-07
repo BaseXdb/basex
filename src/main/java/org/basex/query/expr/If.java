@@ -138,9 +138,21 @@ public final class If extends Arr {
   @Override
   public Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
-    final boolean te = inlineAll(ctx, scp, expr, v, e);
     final Expr sub = cond.inline(ctx, scp, v, e);
     if(sub != null) cond = sub;
+    boolean te = false;
+    for(int i = 0; i < expr.length; i++) {
+      Expr nw;
+      try {
+        nw = expr[i].inline(ctx, scp, v, e);
+      } catch(final QueryException qe) {
+        nw = FNInfo.error(qe, info);
+      }
+      if(nw != null) {
+        expr[i] = nw;
+        te = true;
+      }
+    }
     return te || sub != null ? optimize(ctx, scp) : null;
   }
 

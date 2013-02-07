@@ -9,7 +9,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -202,22 +201,6 @@ public class FuncType implements Type {
     for(int a = 0; a < at.length; a++)
       at[a] = f.args[a] == null ? SeqType.ITEM_ZM : f.args[a].declaredType();
     return new FuncType(at, f.ret == null ? SeqType.ITEM_ZM : f.ret);
-  }
-
-  /**
-   * Sets the types of the given variables.
-   * @param vars variables to type
-   * @param ii input info
-   * @return the variables for convenience
-   * @throws QueryException query exception
-   */
-  public final Var[] type(final Var[] vars, final InputInfo ii) throws QueryException {
-    if(this != ANY_FUN) {
-      for(int v = 0; v < vars.length; v++)
-        if(vars[v] != null && args[v] != SeqType.ITEM_ZM)
-          vars[v].refineType(args[v], null, ii);
-    }
-    return vars;
   }
 
   @Override

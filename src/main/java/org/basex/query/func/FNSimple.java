@@ -108,7 +108,7 @@ public final class FNSimple extends StandardFunc {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) {
+  Expr opt(final QueryContext ctx) throws QueryException {
     if(expr.length == 0) return this;
     final Expr e = expr[0];
 

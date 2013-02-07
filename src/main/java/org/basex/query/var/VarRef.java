@@ -61,11 +61,6 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.VAR;
-  }
-
-  @Override
   public boolean removable(final Var v) {
     return true;
   }
@@ -127,5 +122,10 @@ public final class VarRef extends ParseExpr {
   @Override
   public String toString() {
     return new TokenBuilder(DOLLAR).add(var.name.toString()).toString();
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return false;
   }
 }

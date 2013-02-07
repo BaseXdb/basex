@@ -68,7 +68,7 @@ public class Count extends GFLWOR.Clause {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.VAR || u == Use.X30;
+    return u == Use.X30;
   }
 
   @Override

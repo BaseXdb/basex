@@ -189,7 +189,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     check("declare function local:id($x) { $x };" +
         "for $i in 1 to 10 let $x as element(x) := local:id(<x/>) return ($i, $x)",
         null,
-        "exactly-one(//For) << exactly-one(//Let)"
+        "//For << //Let"
     );
   }
 
@@ -264,15 +264,6 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     // value with ebv == false in where
     check("for $x in 1 to 100 where () return $x",
         "", "exists(//Empty)"
-    );
-  }
-
-  /** Tests if {@link And} expressions inside {@code where} are split. */
-  @Test public void leaveTypecheckTest() {
-    check("declare function local:foo() { 1 to 3 ! . + 0 };" +
-        "for $x as xs:integer in local:foo() return $x",
-        "1 2 3",
-        "exists(//For)"
     );
   }
 

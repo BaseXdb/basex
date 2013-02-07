@@ -85,8 +85,8 @@ public final class VarScope {
       return new VarRef(ii, local);
     }
 
-    // global variable
-    GlobalVar global = ctx.globals.get(name);
+    // static variable
+    StaticVar global = ctx.vars.get(name);
     if(global == null && err != null) throw qp.error(err, '$' + string(name.string()));
     return global;
   }

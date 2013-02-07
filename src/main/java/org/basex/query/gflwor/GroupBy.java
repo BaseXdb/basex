@@ -205,7 +205,7 @@ public class GroupBy extends GFLWOR.Clause {
 
   @Override
   public boolean uses(final Use u) {
-    if(u == Use.VAR || u == Use.X30) return true;
+    if(u == Use.X30) return true;
     for(final Spec sp : by) if(sp.uses(u)) return true;
     return false;
   }

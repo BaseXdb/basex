@@ -20,13 +20,15 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class GlobalVar extends ParseExpr {
+public final class StaticVar extends ParseExpr implements Scope {
+  /** Variable scope. */
+  private final VarScope scope;
   /** Variable name. */
   private final QNm name;
   /** Annotations. */
   public final Ann ann;
   /** Declaration flag. */
-  private boolean declared;
+  boolean declared;
   /** External flag. */
   private boolean external = true;
   /** Type to be checked, {@code null} for no check. */
@@ -35,12 +37,15 @@ public final class GlobalVar extends ParseExpr {
   private Value value;
   /** Bound expression. */
   private Expr expr;
+  /** Usage flag. */
+  boolean used;
 
   /** Variables should only be compiled once. */
   private boolean compiled;
 
   /**
    * Constructor for a variable declared in a query.
+   * @param scp variable scope
    * @param ii input info
    * @param a annotations
    * @param n variable name
@@ -48,9 +53,10 @@ public final class GlobalVar extends ParseExpr {
    * @param e expression to be bound
    * @param ext external flag
    */
-  GlobalVar(final InputInfo ii, final Ann a, final QNm n, final SeqType t, final Expr e,
-      final boolean ext) {
+  StaticVar(final VarScope scp, final InputInfo ii, final Ann a, final QNm n,
+      final SeqType t, final Expr e, final boolean ext) {
     super(ii);
+    scope = scp;
     name = n;
     ann = a == null ? new Ann() : a;
     check = t;
@@ -65,8 +71,9 @@ public final class GlobalVar extends ParseExpr {
    * @param nm name
    * @param e bound expression
    */
-  GlobalVar(final QNm nm, final Expr e) {
+  StaticVar(final QNm nm, final Expr e) {
     super(null);
+    scope = new VarScope();
     name = nm;
     ann = new Ann();
     type = SeqType.ITEM_ZM;
@@ -79,16 +86,24 @@ public final class GlobalVar extends ParseExpr {
   }
 
   @Override
-  public Value compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Value compile(final QueryContext ctx, final VarScope o) throws QueryException {
     if(compiled) {
       if(value == null) throw Err.CIRCVAR.thrw(info, this);
       return value;
     }
     if(expr == null) throw VAREMPTY.thrw(info, this);
 
-    final Value val = expr.compile(ctx, scp).value(ctx);
+    final Value[] sf = scope.enter(ctx);
+    try {
+      expr = expr.compile(ctx, scope);
+      scope.cleanUp(this);
+    } finally {
+      scope.exit(ctx, sf);
+    }
+
+    final Value val = bind(value(ctx));
     compiled = true;
-    return bind(val);
+    return val;
   }
 
   @Override
@@ -100,7 +115,12 @@ public final class GlobalVar extends ParseExpr {
   public Value value(final QueryContext ctx) throws QueryException {
     if(value != null) return value;
     if(expr == null) throw VAREMPTY.thrw(info, this);
-    return bind(expr.value(ctx));
+    final Value[] sf = scope.enter(ctx);
+    try {
+      return bind(expr.value(ctx));
+    } finally {
+      scope.exit(ctx, sf);
+    }
   }
 
   /**
@@ -231,6 +251,11 @@ public final class GlobalVar extends ParseExpr {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
+    return visitor.subScope(this);
+  }
+
+  @Override
+  public boolean visit(final ASTVisitor visitor) {
     return expr.accept(visitor);
   }
 
@@ -267,7 +292,7 @@ public final class GlobalVar extends ParseExpr {
   }
 
   @Override
-  public GlobalVar copy(final QueryContext ctx, final VarScope scp,
+  public StaticVar copy(final QueryContext ctx, final VarScope scp,
       final IntMap<Var> vs) {
     return this;
   }

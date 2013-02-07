@@ -245,7 +245,6 @@ public class OrderBy extends GFLWOR.Clause {
 
   @Override
   public boolean uses(final Use u) {
-    if(u == Use.VAR) return true;
     for(final Key k : keys) if(k.uses(u)) return true;
     return false;
   }

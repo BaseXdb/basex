@@ -33,7 +33,6 @@ public abstract class Expr extends ExprInfo {
     /** Non-deterministic. Example: random(). */             NDT,
     /** Context position. Example: position(). */            POS,
     /** Performs updates. Example: insert expression. */     UPD,
-    /** References a variable. Example: $x. */               VAR,
     /** Based on XQuery 3.0. Example: group by statement. */ X30,
   }
 
@@ -54,8 +53,7 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr compile(QueryContext ctx, VarScope scp) throws QueryException;
 
   /**
-   * Recompiles and optimizes an already compiled expression without recompiling its
-   * sub-expressions.
+   * Optimizes an already compiled expression without recompiling its sub-expressions.
    * @param ctx query context
    * @param scp variable scope
    * @return optimized expression

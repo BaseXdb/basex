@@ -3,6 +3,7 @@ package org.basex.query.gflwor;
 import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.gflwor.GFLWOR.*;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.*;
@@ -106,14 +107,31 @@ public class Let extends GFLWOR.Clause {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.VAR || expr.uses(u);
+    return expr.uses(u);
   }
 
   @Override
   public Let compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     expr = expr.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Let optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+    if(!score && expr instanceof TypeCheck) {
+      final TypeCheck tc = (TypeCheck) expr;
+      if(tc.isRedundant(var) || var.adoptCheck(tc.type, tc.promote)) {
+        ctx.compInfo(QueryText.OPTCAST, tc.type);
+        expr = tc.expr;
+      }
+    }
+
     type = score ? SeqType.DBL : expr.type();
     var.refineType(type, ctx, info);
+    if(var.checksType() && expr.isValue()) {
+      expr = var.checkType((Value) expr, ctx, info);
+      var.refineType(expr.type(), ctx, info);
+    }
     size = score ? 1 : expr.size();
     return this;
   }
@@ -180,5 +198,18 @@ public class Let extends GFLWOR.Clause {
   @Override
   long calcSize(final long cnt) {
     return cnt;
+  }
+
+  /**
+   * Returns an expression that is appropriate for inlining.
+   * @param ctx query context
+   * @param scp variable scope
+   * @return inlineable expression
+   * @throws QueryException query exception
+   */
+  public Expr inlineExpr(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return score ? Function._FT_SCORE.get(expr).optimize(ctx, scp)
+                 : var.checked(expr, ctx, scp, info);
   }
 }

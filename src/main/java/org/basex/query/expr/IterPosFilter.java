@@ -113,4 +113,11 @@ final class IterPosFilter extends Filter {
   public Filter copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
     return copy(new IterPosFilter(super.copy(ctx, scp, vs), off));
   }
+
+  @Override
+  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
+      throws QueryException {
+    // [LW] should be fixed
+    return ((Filter) new Filter(info, root, preds).copy(ctx, scp)).addPred(ctx, scp, p);
+  }
 }

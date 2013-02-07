@@ -2,8 +2,11 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.gflwor.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -43,17 +46,36 @@ public abstract class UserFuncCall extends Arr {
     // currently, only functions with values as return expressions are inlined
     // otherwise, recursive functions might not be correctly evaluated
     func.compile(ctx, scp);
-    if(func.expr.isValue() && allAreValues() && !func.uses(Use.NDT)) {
-      // evaluate arguments to catch cast exceptions
-      final Value[] sf = func.scope.enter(ctx);
-      try {
-        for(int a = 0; a < expr.length; ++a)
-          ctx.set(func.args[a], (Value) expr[a], info);
-      } finally {
-        func.scope.exit(ctx, sf);
+
+    if(!func.uses(Use.NDT)) {
+      final boolean val = func.expr.isValue() && allAreValues();
+      if(val || !func.uses(Use.CTX) && !func.selfRecursive()) {
+        // inline the function
+        ctx.compInfo(OPTINLINE, func.name.string());
+
+        if(val) {
+          for(int i = 0; i < expr.length; i++)
+            func.args[i].checkType((Value) expr[i], ctx, info);
+          final Value v = func.expr.value(ctx);
+          return func.cast ? func.type.funcConvert(ctx, info, v) : v;
+        }
+
+        // create let bindings for all variables
+        final LinkedList<GFLWOR.Clause> cls = expr.length == 0 ? null :
+          new LinkedList<GFLWOR.Clause>();
+        final IntMap<Var> vs = new IntMap<Var>();
+        for(int i = 0; i < func.args.length; i++) {
+          final Var old = func.args[i], v = scp.newCopyOf(ctx, old);
+          vs.add(old.id, v);
+          cls.add(new Let(v, expr[i], false, func.info).optimize(ctx, scp));
+        }
+
+        // copy the function body
+        final Expr cpy = func.expr.copy(ctx, scp, vs), rt = !func.cast ? cpy :
+              new TypeCheck(func.info, cpy, func.ret, true).optimize(ctx, scp);
+
+        return cls == null ? rt : new GFLWOR(func.info, cls, rt).optimize(ctx, scp);
       }
-      ctx.compInfo(OPTINLINE, func.name.string());
-      return func.value(ctx);
     }
     type = func.type();
     return this;

@@ -60,6 +60,11 @@ public class InlineFunc extends UserFunc {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     comp(ctx, scp);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     type = FuncType.get(this).seqType();
     size = 1;
     // only evaluate if the closure is empty, so we don't lose variables

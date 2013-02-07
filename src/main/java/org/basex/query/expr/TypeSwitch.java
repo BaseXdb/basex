@@ -91,7 +91,6 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   public boolean uses(final Use u) {
-    if(u == Use.VAR) return true;
     for(final TypeCase tc : cases) if(tc.uses(u)) return true;
     return ts.uses(u);
   }

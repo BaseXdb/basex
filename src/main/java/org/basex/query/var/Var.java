@@ -6,6 +6,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 
@@ -32,8 +33,10 @@ public final class Var extends ExprInfo {
   private SeqType declared;
   /** Actual return type (by type inference). */
   private SeqType inType;
-  /** Flag for global variables. */
-  public final boolean param;
+  /** Flag for function parameters. */
+  protected final boolean param;
+  /** Flag for function conversion. */
+  private boolean promote;
 
   /**
    * Constructor.
@@ -48,6 +51,7 @@ public final class Var extends ExprInfo {
     inType = SeqType.ITEM_ZM;
     id = ctx.varIDs++;
     param = fun;
+    promote = fun;
     size = inType.occ();
   }
 
@@ -68,6 +72,7 @@ public final class Var extends ExprInfo {
    */
   Var(final QueryContext ctx, final Var var) {
     this(ctx, var.name, var.declared, var.param);
+    promote = var.promote;
     inType = var.inType;
     size = var.size;
   }
@@ -77,7 +82,7 @@ public final class Var extends ExprInfo {
    * @return (non-{@code null}) type
    */
   public SeqType type() {
-    final SeqType intersect = declared != null ? declared.intersect(inType) : inType;
+    final SeqType intersect = declared != null ? declared.intersect(inType) : null;
     return intersect != null ? intersect : declared != null ? declared : inType;
   }
 
@@ -99,9 +104,14 @@ public final class Var extends ExprInfo {
    */
   public void refineType(final SeqType t, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(declared != null && t != null && declared.intersect(t) == null)
-      throw Err.XPTYPE.thrw(ii, this, declared, t);
-    if(t != null && !inType.eq(t) && !inType.instanceOf(t)) {
+    if(t == null) return;
+    if(declared != null) {
+      if(declared.occ.intersect(t.occ) == null)
+        throw Err.XPTYPE.thrw(ii, this, declared, t);
+      if(!t.convertibleTo(declared)) return;
+    }
+
+    if(!inType.eq(t) && !inType.instanceOf(t)) {
       final SeqType is = inType.intersect(t);
       if(is != null) {
         inType = is;
@@ -122,6 +132,36 @@ public final class Var extends ExprInfo {
   }
 
   /**
+   * Returns an equivalent to the given expression that checks this variable's type.
+   * @param e expression
+   * @param scp variable scope
+   * @param ctx query context
+   * @param ii input info
+   * @return checked expression
+   * @throws QueryException query exception
+   */
+  public Expr checked(final Expr e, final QueryContext ctx, final VarScope scp,
+      final InputInfo ii) throws QueryException {
+    return checksType()
+        ? new TypeCheck(ii, e, declared, promotes()).optimize(ctx, scp) : e;
+  }
+
+  /**
+   * Checks the type of this value and casts/promotes it when necessary.
+   * @param val value to be checked
+   * @param ctx query context
+   * @param ii input info
+   * @return checked and possibly cast value
+   * @throws QueryException if the check failed
+   */
+  public Value checkType(final Value val, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    if(!checksType() || declared.instance(val)) return val;
+    if(promote) return declared.funcConvert(ctx, ii, val);
+    throw Err.XPTYPE.thrw(ii, this, declared, val.type());
+  }
+
+  /**
    * Checks whether the given variable is identical to this one, i.e. has the
    * same ID.
    * @param v variable to check
@@ -129,6 +169,14 @@ public final class Var extends ExprInfo {
    */
   public boolean is(final Var v) {
     return id == v.id;
+  }
+
+  /**
+   * Checks if this variable performs function conversion on its bound values.
+   * @return result of check
+   */
+  public boolean promotes() {
+    return promote;
   }
 
   @Override
@@ -169,17 +217,19 @@ public final class Var extends ExprInfo {
   }
 
   /**
-   * Checks the type of this value and casts/promotes it when necessary.
-   * @param val value to be checked
-   * @param ctx query context
-   * @param ii input info
-   * @return checked and possibly cast value
-   * @throws QueryException if the check failed
+   * Tries to adopt the given type check.
+   * @param t type to check
+   * @param prom if function conversion should be applied
+   * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
-  public Value checkType(final Value val, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-    if(!checksType() || declared.instance(val)) return val;
-    if(param) return declared.funcConvert(ctx, ii, val);
-    throw Err.XPTYPE.thrw(ii, this, declared, val.type());
+  public boolean adoptCheck(final SeqType t, final boolean prom) {
+    if(declared == null || t.instanceOf(declared)) {
+      declared = t;
+    } else if(!declared.instanceOf(t)) {
+      return false;
+    }
+
+    promote |= prom;
+    return true;
   }
 }

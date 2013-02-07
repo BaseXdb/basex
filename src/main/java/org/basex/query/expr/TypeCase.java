@@ -68,6 +68,17 @@ public final class TypeCase extends Single {
   }
 
   @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
+      final Expr e) throws QueryException {
+    try {
+      return super.inline(ctx, scp, v, e);
+    } catch(final QueryException qe) {
+      expr = FNInfo.error(qe, info);
+      return this;
+    }
+  }
+
+  @Override
   public TypeCase copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
     final Var v = var == null ? null : scp.newCopyOf(ctx, var);
     if(var != null) vs.add(var.id, v);
@@ -77,8 +88,7 @@ public final class TypeCase extends Single {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.VAR || u == Use.X30 && types != null && types.length > 1
-        || super.uses(u);
+    return u == Use.X30 && types != null && types.length > 1 || super.uses(u);
   }
 
   /**

@@ -46,4 +46,11 @@ final class IterFilter extends Filter {
   public Filter copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
     return copy(new IterFilter(super.copy(ctx, scp, vs)));
   }
+
+  @Override
+  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
+      throws QueryException {
+    // [LW] should be fixed
+    return ((Filter) new Filter(info, root, preds).copy(ctx, scp)).addPred(ctx, scp, p);
+  }
 }

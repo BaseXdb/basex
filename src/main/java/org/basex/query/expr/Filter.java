@@ -175,7 +175,7 @@ public class Filter extends Preds {
    * @return self reference
    * @throws QueryException query exception
    */
-  public final Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
+  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
       throws QueryException {
     preds = Array.add(preds, p);
     return optimize(ctx, scp);

@@ -37,55 +37,75 @@ public final class List extends Arr {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
 
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     // compute number of results
     size = 0;
+    boolean ne = false;
     for(final Expr e : expr) {
       final long c = e.size();
       if(c == -1) {
-        size = c;
+        size = -1;
         break;
       }
+      ne |= c > 0;
       size += c;
     }
 
-    // evaluate sequence type
-    type = SeqType.EMP;
-    Value[] val = new Value[expr.length];
-    for(int v = 0; v < expr.length; v++) {
-      final Expr e = expr[v];
-      // check if all expressions are values
-      if(val != null) {
-        if(e.isValue()) val[v] = (Value) e;
-        else val = null;
+    if(size >= 0) {
+      if(size == 0 && !uses(Use.NDT) && !uses(Use.UPD)) return optPre(null, ctx);
+      // [LW][CG] maybe we should use a smaller threshold, like 2^16
+      if(allAreValues() && size <= Integer.MAX_VALUE) {
+        // cannot be empty because values don't have effects
+        final int s = (int) size;
+        Type all = null;
+        final Value[] vs = new Value[expr.length];
+        int n = 0;
+        for(final Expr e : expr) {
+          final Value v = e.value(ctx);
+          if(v.size() > 0) {
+            vs[n++] = v;
+            if(n == 0) all = v.type;
+            else if(v.type != all || !v.homogeneous()) all = null;
+          }
+        }
+
+        Value val = null;
+        if(all != null) {
+          if(all == AtomType.STR)               val = StrSeq.get(vs, n);
+          else if(all == AtomType.BLN)          val = BlnSeq.get(vs, n);
+          else if(all == AtomType.FLT)          val = FltSeq.get(vs, n);
+          else if(all == AtomType.DBL)          val = DblSeq.get(vs, n);
+          else if(all == AtomType.DEC)          val = DecSeq.get(vs, n);
+          else if(all == AtomType.BYT)          val = BytSeq.get(vs, n);
+          else if(all.instanceOf(AtomType.ITR)) val = IntSeq.get(vs, n, all);
+        }
+
+        if(val == null) {
+          final ValueBuilder vb = new ValueBuilder(s);
+          for(int i = 0; i < n; i++) vb.add(vs[i]);
+          val = vb.value();
+        }
+        return optPre(val, ctx);
       }
-      // skip expression that will not add any results
-      if(e.isEmpty()) continue;
-      // evaluate sequence type
-      final SeqType et = e.type();
-      type = type == SeqType.EMP ? et :
-        SeqType.get(et.type == type.type ? et.type : AtomType.ITEM,
-            et.mayBeZero() && type.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE);
     }
 
-    // return cached integer sequence, cached values or self reference
-    Expr e = this;
-    final int s = (int) size;
-    if(val != null && size <= Integer.MAX_VALUE) {
-      if(type.type == AtomType.STR) e = StrSeq.get(val, s);
-      else if(type.type == AtomType.BLN) e = BlnSeq.get(val, s);
-      else if(type.type == AtomType.FLT) e = FltSeq.get(val, s);
-      else if(type.type == AtomType.DBL) e = DblSeq.get(val, s);
-      else if(type.type == AtomType.DEC) e = DecSeq.get(val, s);
-      else if(type.type == AtomType.BYT) e = BytSeq.get(val, s);
-      else if(type.type.instanceOf(AtomType.ITR)) e = IntSeq.get(val, s, type.type);
-      else {
-        final ValueBuilder vb = new ValueBuilder(s);
-        for(final Value v : val) vb.add(v);
-        e = vb.value();
+    if(size == 0) {
+      type = SeqType.EMP;
+    } else {
+      final Occ o = size == 1 ? Occ.ONE : size < 0 && !ne ? Occ.ZERO_MORE : Occ.ONE_MORE;
+      SeqType t = null;
+      for(final Expr e : expr) {
+        final SeqType st = e.type();
+        if(e.size() != 0 && st.occ != Occ.ZERO) t = t == null ? st : t.union(st);
       }
+      type = t == null ? SeqType.ITEM_ZM : SeqType.get(t.type, o);
     }
-    return optPre(e, ctx);
+
+    return this;
   }
 
   @Override

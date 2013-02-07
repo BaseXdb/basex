@@ -47,13 +47,19 @@ public final class Try extends Single {
       super.compile(ctx, scp);
       if(expr.isValue()) return optPre(expr, ctx);
     } catch(final QueryException ex) {
-      // replace original return expression with error
-      expr = FNInfo.error(ex, info);
+      for(final Catch c : ctch) {
+        if(c.matches(ex)) {
+          // found a matching clause, compile and inline error message
+          return optPre(c.compile(ctx, scp).asExpr(ex, ctx, scp), ctx);
+        }
+      }
+      throw ex;
     }
 
     for(final Catch c : ctch) c.compile(ctx, scp);
     type = expr.type();
-    for(final Catch c : ctch) type = type.union(c.type());
+    for(final Catch c : ctch)
+      if(!c.expr.isFunction(Function.ERROR)) type = type.union(c.type());
     return this;
   }
 
@@ -68,26 +74,39 @@ public final class Try extends Single {
     try {
       return ctx.value(expr);
     } catch(final QueryException ex) {
-      for(final Catch c : ctch) {
-        final Value val = c.value(ctx, ex);
-        if(val != null) return val;
-      }
+      for(final Catch c : ctch) if(c.matches(ex)) return c.value(ctx, ex);
       throw ex;
     }
   }
 
   @Override
   public VarUsage count(final Var v) {
-    return VarUsage.maximum(v, ctch).plus(super.count(v));
+    return VarUsage.maximum(v, ctch).plus(expr.count(v));
   }
 
   @Override
   public Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
-    final boolean ct = inlineAll(ctx, scp, ctch, v, e);
-    final Expr sub = expr.inline(ctx, scp, v, e);
-    if(sub != null) expr = sub;
-    return ct || sub != null ? optimize(ctx, scp) : null;
+    boolean change = false;
+    try {
+      final Expr sub = expr.inline(ctx, scp, v, e);
+      if(sub != null) {
+        if(sub.isValue()) return optPre(sub, ctx);
+        expr = sub;
+        change = true;
+      }
+    } catch(final QueryException qe) {
+      for(final Catch c : ctch) {
+        if(c.matches(qe)) {
+          // found a matching clause, inline variable and error message
+          return optPre(c.inline(ctx, scp, v, e).asExpr(qe, ctx, scp), ctx);
+        }
+      }
+      throw qe;
+    }
+
+    for(final Catch c : ctch) change |= c.inline(ctx, scp, v, e) != null;
+    return change ? this : null;
   }
 
   @Override

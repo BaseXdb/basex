@@ -88,7 +88,7 @@ public final class Transform extends Arr {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.VAR || u != Use.UPD && super.uses(u);
+    return u != Use.UPD && super.uses(u);
   }
 
   @Override

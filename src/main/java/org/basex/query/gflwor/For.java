@@ -127,12 +127,17 @@ public class For extends GFLWOR.Clause {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.VAR || expr.uses(u);
+    return empty && u == Use.X30 || expr.uses(u);
   }
 
   @Override
   public For compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     expr = expr.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public For optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     final SeqType tp = expr.type();
     final boolean emp = empty && tp.mayBeZero();
     type = SeqType.get(tp.type, emp ? Occ.ZERO_ONE : Occ.ONE);

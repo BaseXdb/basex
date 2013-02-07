@@ -19,17 +19,17 @@ import static org.basex.query.QueryText.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class Globals extends ExprInfo {
-  /** The global variables. */
-  private final HashMap<QNm, GlobalVar> globals = new HashMap<QNm, GlobalVar>();
+public final class Variables extends ExprInfo {
+  /** The variables. */
+  private final HashMap<QNm, StaticVar> vars = new HashMap<QNm, StaticVar>();
 
   /**
-   * Looks for a variable with the given name in the globally defined variables.
+   * Looks for a variable with the given name in the defined variables.
    * @param name variable name
    * @return declaration if found, {@null} otherwise
    */
-  public GlobalVar get(final QNm name) {
-    return globals.get(name);
+  public StaticVar get(final QNm name) {
+    return vars.get(name);
   }
 
   /**
@@ -42,11 +42,11 @@ public final class Globals extends ExprInfo {
    */
   public boolean bind(final QNm nm, final Expr e, final QueryContext ctx)
       throws QueryException {
-    final GlobalVar var = globals.get(nm);
+    final StaticVar var = vars.get(nm);
     if(var != null) return var.bind(e, ctx);
 
     // add new variable
-    globals.put(nm, new GlobalVar(nm, e));
+    vars.put(nm, new StaticVar(nm, e));
     return true;
   }
 
@@ -58,15 +58,16 @@ public final class Globals extends ExprInfo {
    * @param e bound expression, possibly {@code null}
    * @param ext {@code external} flag
    * @param ctx query context
+   * @param scp variable scope
    * @param ii input info
    * @throws QueryException query exception
    */
   public void declare(final QNm nm, final SeqType t, final Ann a, final Expr e,
-      final boolean ext, final QueryContext ctx, final InputInfo ii)
+      final boolean ext, final QueryContext ctx, final VarScope scp, final InputInfo ii)
           throws QueryException {
-    final GlobalVar var = globals.get(nm);
+    final StaticVar var = vars.get(nm);
     if(var != null) var.declare(t, a, e, ext, ctx, ii);
-    else globals.put(nm, new GlobalVar(ii, a, nm, t, e, ext));
+    else vars.put(nm, new StaticVar(scp, ii, a, nm, t, e, ext));
   }
 
   /**
@@ -74,29 +75,29 @@ public final class Globals extends ExprInfo {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    for(final GlobalVar var : globals.values()) var.checkUp();
+    for(final StaticVar var : vars.values()) var.checkUp();
   }
 
   /**
-   * Checks if no global variables are declared.
-   * @return {@code true} if no global variables are used, {@code false} otherwise
+   * Checks if no static variables are declared.
+   * @return {@code true} if no static variables are used, {@code false} otherwise
    */
   public boolean isEmpty() {
-    return globals.isEmpty();
+    return vars.isEmpty();
   }
 
   @Override
   public void plan(final FElem plan) {
-    if(globals.isEmpty()) return;
+    if(vars.isEmpty()) return;
     final FElem e = planElem();
-    for(final GlobalVar v : globals.values()) v.plan(e);
+    for(final StaticVar v : vars.values()) v.plan(e);
     plan.add(e);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final GlobalVar v : globals.values()) {
+    for(final StaticVar v : vars.values()) {
       sb.append(DECLARE).append(' ');
       if(!v.ann.isEmpty()) sb.append(v.ann).append(' ');
       sb.append(VARIABLE).append(' ').append(v).append(' ');

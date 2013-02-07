@@ -63,7 +63,7 @@ public class AxisPath extends Path {
    * @return resulting operator
    */
   private boolean useIterator() {
-    if(root == null || root.uses(Use.VAR) || !root.iterable()) return false;
+    if(root == null || root.hasFreeVars() || !root.iterable()) return false;
 
     final int sl = steps.length;
     for(int s = 0; s < sl; ++s) {
@@ -133,7 +133,7 @@ public class AxisPath extends Path {
       }
 
       // analyze if result set can be cached - no predicates/variables...
-      cache = root != null && !uses(Use.VAR);
+      cache = root != null && !hasFreeVars();
 
       // if applicable, use iterative evaluation
       return finish(ctx);

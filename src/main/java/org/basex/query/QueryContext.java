@@ -46,8 +46,8 @@ public final class QueryContext extends Progress {
 
   /** Static context of an expression. */
   public StaticContext sc;
-  /** Global variables. */
-  public final Globals globals = new Globals();
+  /** Static variables. */
+  public final Variables vars = new Variables();
   /** Functions. */
   public final UserFuncs funcs = new UserFuncs();
 
@@ -530,7 +530,7 @@ public final class QueryContext extends Progress {
     // only show root node if functions or variables exist
     final FElem e = new FElem(PLAN);
     funcs.plan(e);
-    globals.plan(e);
+    vars.plan(e);
     root.plan(e);
     doc.add(e);
   }
@@ -564,7 +564,7 @@ public final class QueryContext extends Progress {
 
     // bind variable
     final QNm qnm = uri.length == 0 ? new QNm(ln, this) : new QNm(ln, uri);
-    return globals.bind(qnm, val, this);
+    return vars.bind(qnm, val, this);
   }
 
   /**

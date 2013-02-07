@@ -5,7 +5,6 @@ import static org.basex.query.util.Err.*;
 
 import java.util.*;
 import java.util.Map.Entry;
-import static java.util.AbstractMap.SimpleImmutableEntry;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -48,7 +47,7 @@ public class UserFunc extends Single implements Scope {
   /** Static context. */
   protected final StaticContext sc;
   /** Cast flag. */
-  private boolean cast;
+  boolean cast;
   /** Compilation flag. */
   private boolean compiled;
 
@@ -126,24 +125,14 @@ public class UserFunc extends Single implements Scope {
     compiled = true;
 
     // compile closure
-    ArrayList<Entry<Var, Value>> propagate = null;
-    final Iterator<Entry<Var, Expr>> cls = scope.closure().entrySet().iterator();
-    while(cls.hasNext()) {
-      final Entry<Var, Expr> e = cls.next();
-      final Expr c = e.getValue().compile(ctx, outer);
-      if(c.isValue()) {
-        if(propagate == null) propagate = new ArrayList<Entry<Var, Value>>();
-        propagate.add(new SimpleImmutableEntry<Var, Value>(e.getKey(), (Value) c));
-        cls.remove();
-      }
-    }
+    for(Entry<Var, Expr> e : scope.closure().entrySet())
+      e.setValue(e.getValue().compile(ctx, outer));
 
     final Value[] sf = scope.enter(ctx);
     try {
       // constant propagation
-      if(propagate != null)
-        for(final Entry<Var, Value> e : propagate)
-          ctx.set(e.getKey(), e.getValue(), info);
+      for(final Entry<Var, Expr> e : staticBindings())
+        ctx.set(e.getKey(), e.getValue().value(ctx), info);
 
       expr = expr.compile(ctx, scope);
       scope.cleanUp(this);
@@ -164,6 +153,25 @@ public class UserFunc extends Single implements Scope {
       ctx.compInfo(OPTCAST, ret);
       cast = false;
     }
+  }
+
+  /**
+   * Removes and returns all static bindings from this function's closure.
+   * @return static variable bindings
+   */
+  private Collection<Entry<Var, Expr>> staticBindings() {
+    Collection<Entry<Var, Expr>> propagate = null;
+    final Iterator<Entry<Var, Expr>> cls = scope.closure().entrySet().iterator();
+    while(cls.hasNext()) {
+      final Entry<Var, Expr> e = cls.next();
+      final Expr c = e.getValue();
+      if(c.isValue()) {
+        if(propagate == null) propagate = new ArrayList<Entry<Var, Expr>>();
+        propagate.add(e);
+        cls.remove();
+      }
+    }
+    return propagate == null ? Collections.<Entry<Var, Expr>>emptyList() : propagate;
   }
 
   @Override
@@ -232,16 +240,32 @@ public class UserFunc extends Single implements Scope {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
+  public final Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
-    boolean change = false;
+    boolean change = false, val = false;
+
     for(final Entry<Var, Expr> entry : scope.closure().entrySet()) {
-      final Expr val = entry.getValue().inline(ctx, scp, v, e);
-      if(val != null) {
+      final Expr ex = entry.getValue().inline(ctx, scp, v, e);
+      if(ex != null) {
         change = true;
-        entry.setValue(val);
+        val |= ex.isValue();
+        entry.setValue(ex);
       }
     }
+
+    if(val) {
+      final Value[] sf = scope.enter(ctx);
+      try {
+        for(final Entry<Var, Expr> entry : staticBindings()) {
+          final Expr inl = expr.inline(ctx, scope, entry.getKey(), entry.getValue());
+          if(inl != null) expr = inl;
+        }
+        scope.cleanUp(this);
+      } finally {
+        scope.exit(ctx, sf);
+      }
+    }
+
     return change ? optimize(ctx, scp) : null;
   }
 

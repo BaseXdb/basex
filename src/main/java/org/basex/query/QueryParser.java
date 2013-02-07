@@ -234,7 +234,7 @@ public class QueryParser extends InputParser {
     // check placement of updating expressions if any updating expressions have been found
     if(ctx.updates != null) {
       ctx.funcs.checkUp();
-      ctx.globals.checkUp();
+      ctx.vars.checkUp();
       expr.checkUp();
     }
     return expr;
@@ -826,6 +826,7 @@ public class QueryParser extends InputParser {
     if(module != null && !eq(vn.uri(), module.uri())) error(MODNS, vn);
 
     final Expr bind;
+    final VarScope scp = scope = scope.child();
     final boolean external = wsConsumeWs(EXTERNAL);
     if(external) {
       bind = ctx.sc.xquery3() && wsConsumeWs(ASSIGN) ? check(single(), NOVARDECL) : null;
@@ -833,9 +834,10 @@ public class QueryParser extends InputParser {
       wsCheck(ASSIGN);
       bind = check(single(), NOVARDECL);
     }
+    scope = scope.parent();
 
     // bind variable if not done yet
-    ctx.globals.declare(vn, tp, ann, bind, external, ctx, info());
+    ctx.vars.declare(vn, tp, ann, bind, external, ctx, scp, info());
   }
 
   /**

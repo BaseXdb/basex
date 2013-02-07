@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -53,8 +54,12 @@ public final class Catch extends Single {
 
   @Override
   public Catch compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    super.compile(ctx, scp);
-    type = expr.type();
+    try {
+      expr = expr.compile(ctx, scp);
+      type = expr.type();
+    } catch(final QueryException qe) {
+      expr = FNInfo.error(qe, info);
+    }
     return this;
   }
 
@@ -66,8 +71,6 @@ public final class Catch extends Single {
    * @throws QueryException query exception
    */
   Value value(final QueryContext ctx, final QueryException ex) throws QueryException {
-    if(!find(ex.err(), ex.qname())) return null;
-
     int i = 0;
     final byte[] io = ex.file() == null ? EMPTY : token(ex.file());
     final Value val = ex.value();
@@ -88,6 +91,45 @@ public final class Catch extends Single {
     return ctch;
   }
 
+  @Override
+  public Catch inline(final QueryContext ctx, final VarScope scp, final Var v,
+      final Expr e) throws QueryException {
+    try {
+      final Expr sub = expr.inline(ctx, scp, v, e);
+      if(sub == null) return null;
+      expr = sub;
+    } catch(final QueryException qe) {
+      expr = FNInfo.error(qe, info);
+    }
+    return this;
+  }
+
+  /**
+   * Returns this clause as an inlineable expression.
+   * @param ex caught exception
+   * @param ctx query context
+   * @param scp variable scope
+   * @return equivalent expression
+   * @throws QueryException query exception during inlining
+   */
+  protected Expr asExpr(final QueryException ex, final QueryContext ctx,
+      final VarScope scp) throws QueryException {
+    if(expr.isValue()) return expr;
+    int i = 0;
+    final byte[] io = ex.file() == null ? EMPTY : token(ex.file());
+    final Value val = ex.value();
+    Expr e = expr;
+    for(final Value v : new Value[] { ex.qname(),
+        Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
+        Str.get(io), Int.get(ex.line()), Int.get(ex.col()),
+        Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) }) {
+      final Expr e2 = e.inline(ctx, scp, vars[i++], v);
+      if(e2 != null) e = e2;
+      if(e.isValue()) break;
+    }
+    return e;
+  }
+
   /**
    * Returns the variables used in the {@code catch} expression.
    * @return variables
@@ -97,16 +139,16 @@ public final class Catch extends Single {
   }
 
   /**
-   * Checks if one of the specified errors matches the thrown error.
-   * @param err error reference
-   * @param code error code
+   * Checks if one of the specified errors match the thrown error.
+   * @param qe thrown error
    * @return result of check
    */
-  private boolean find(final Err err, final QNm code) {
+  protected boolean matches(final QueryException qe) {
+    final QNm code = qe.qname();
     for(final QNm c : codes) {
       if(c != null) {
         final byte[] cu = c.uri();
-        final byte[] eu = err != null ? err.qname().uri() :
+        final byte[] eu = qe.err() != null ? qe.err().qname().uri() :
           code.hasURI() ? code.uri() : EMPTY;
         if(cu.length != 0 && !eq(eu, cu)) continue;
         final byte[] nm = c.local();
@@ -119,7 +161,7 @@ public final class Catch extends Single {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.VAR || super.uses(u);
+    return u == Use.X30 || super.uses(u);
   }
 
   @Override

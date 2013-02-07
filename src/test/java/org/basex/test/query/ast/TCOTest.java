@@ -41,7 +41,7 @@ public class TCOTest extends QueryPlanTest {
         "  if($n = 0) then true()" +
         "  else local:odd($n - 1)" +
         "};" +
-        "local:odd(12345)",
+        "local:odd(123)",
 
         "true",
 
