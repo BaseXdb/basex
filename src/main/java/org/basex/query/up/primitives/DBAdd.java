@@ -29,7 +29,6 @@ public final class DBAdd extends DBNew {
 
     super(TYPE.DBADD, d, new ArrayList<NewInput>(), c, ii);
     inputs.add(it);
-    size = inputs.size();
   }
 
   @Override
@@ -46,6 +45,7 @@ public final class DBAdd extends DBNew {
 
   @Override
   public void prepare(final MemData tmp) throws QueryException {
+    size = inputs.size();
     addDocs(new MemData(tmp), data.meta.name);
   }
 
