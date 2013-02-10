@@ -93,12 +93,6 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr remove(final Var v) {
-    for(int d = 0; d != dist.length; ++d) dist[d] = dist[d].remove(v);
-    return super.remove(v);
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return super.count(v).plus(VarUsage.sum(v, dist));
   }

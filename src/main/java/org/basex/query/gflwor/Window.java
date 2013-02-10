@@ -11,6 +11,8 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -254,6 +256,13 @@ public class Window extends GFLWOR.Clause {
     expr = expr.compile(cx, scp);
     start.compile(cx, scp);
     if(end != null) end.compile(cx, scp);
+    return optimize(cx, scp);
+  }
+
+  @Override
+  public Clause optimize(final QueryContext cx, final VarScope sc) throws QueryException {
+    final SeqType t = expr.type();
+    var.refineType(t.withOcc(Occ.ZERO_MORE), cx, info);
     return this;
   }
 
@@ -265,14 +274,6 @@ public class Window extends GFLWOR.Clause {
   @Override
   public boolean removable(final Var v) {
     return expr.removable(v) && start.removable(v) && (end == null || end.removable(v));
-  }
-
-  @Override
-  public Expr remove(final Var v) {
-    expr = expr.remove(v);
-    start.remove(v);
-    if(end != null) end.remove(v);
-    return this;
   }
 
   @Override

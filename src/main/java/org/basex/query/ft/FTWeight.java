@@ -97,12 +97,6 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr remove(final Var v) {
-    weight = weight.remove(v);
-    return super.remove(v);
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return weight.count(v).plus(super.count(v));
   }

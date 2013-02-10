@@ -78,13 +78,14 @@ public class Count extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return true;
+  public Count optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return this;
   }
 
   @Override
-  public Expr remove(final Var v) {
-    return this;
+  public boolean removable(final Var v) {
+    return true;
   }
 
   @Override

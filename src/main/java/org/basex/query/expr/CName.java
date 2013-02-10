@@ -99,12 +99,6 @@ public abstract class CName extends CFrag {
   }
 
   @Override
-  public final Expr remove(final Var v) {
-    name = name.remove(v);
-    return super.remove(v);
-  }
-
-  @Override
   public boolean databases(final StringList db) {
     return name.databases(db) && super.databases(db);
   }

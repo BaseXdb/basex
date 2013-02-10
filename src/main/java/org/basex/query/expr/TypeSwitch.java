@@ -102,13 +102,6 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    for(final TypeCase tc : cases) tc.remove(v);
-    ts = ts.remove(v);
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return ts.count(v).plus(VarUsage.maximum(v, cases));
   }

@@ -75,12 +75,6 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    ftexpr.remove(v);
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return ftexpr.count(v);
   }

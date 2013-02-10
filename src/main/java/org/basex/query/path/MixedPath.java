@@ -130,10 +130,4 @@ public final class MixedPath extends Path {
     for(final Expr e : steps) if(e.uses(v)) return false;
     return super.removable(v);
   }
-
-  @Override
-  public Expr remove(final Var v) {
-    for(int e = 0; e != steps.length; ++e) steps[e] = steps[e].remove(v);
-    return super.remove(v);
-  }
 }

@@ -199,15 +199,6 @@ public abstract class Expr extends ExprInfo {
   public abstract boolean removable(final Var v);
 
   /**
-   * Substitutes all {@link VarRef} expressions for the given variable
-   * by a {@link Context} reference. This method is called by
-   * {@link GFLWOR#compile} to rewrite where clauses as predicates.
-   * @param v variable to be replaced
-   * @return new expression
-   */
-  public abstract Expr remove(final Var v);
-
-  /**
    * Checks how often a variable is used in this expression.
    * @param v variable to look for
    * @return how often the variable is used, see {@link VarUsage}

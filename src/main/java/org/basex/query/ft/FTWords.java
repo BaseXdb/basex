@@ -408,15 +408,6 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTExpr remove(final Var v) {
-    if(occ != null) {
-      for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].remove(v);
-    }
-    query = query.remove(v);
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return occ != null ? VarUsage.sum(v, occ).plus(query.count(v)) : query.count(v);
   }

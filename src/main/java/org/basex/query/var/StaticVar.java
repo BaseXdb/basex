@@ -233,11 +233,6 @@ public final class StaticVar extends ParseExpr implements Scope {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return VarUsage.NEVER;
   }

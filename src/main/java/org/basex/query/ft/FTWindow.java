@@ -92,12 +92,6 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public FTExpr remove(final Var v) {
-    win = win.remove(v);
-    return super.remove(v);
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return win.count(v).plus(super.count(v));
   }

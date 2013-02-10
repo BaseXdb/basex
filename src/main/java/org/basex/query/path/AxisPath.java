@@ -433,12 +433,6 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public final Expr remove(final Var v) {
-    for(int s = 0; s != steps.length; ++s) steps[s].remove(v);
-    return super.remove(v);
-  }
-
-  @Override
   public final boolean iterable() {
     return true;
   }

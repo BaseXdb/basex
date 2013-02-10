@@ -98,12 +98,6 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    for(final Let c : copies) c.remove(v);
-    return super.remove(v);
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return VarUsage.sum(v, copies).plus(super.count(v));
   }

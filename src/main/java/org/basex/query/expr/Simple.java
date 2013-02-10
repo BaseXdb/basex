@@ -42,11 +42,6 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return VarUsage.NEVER;
   }

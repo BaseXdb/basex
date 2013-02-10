@@ -120,13 +120,6 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public final Expr remove(final Var v) {
-    expr = expr.remove(v);
-    ftexpr = ftexpr.remove(v);
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return expr.count(v).plus(ftexpr.count(v));
   }

@@ -66,11 +66,6 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    return var.is(v) ? new Context(info) : this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return var.is(v) ? VarUsage.ONCE : VarUsage.NEVER;
   }

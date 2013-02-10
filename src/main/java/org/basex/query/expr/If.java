@@ -125,12 +125,6 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    cond = cond.remove(v);
-    return super.remove(v);
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return cond.count(v).plus(VarUsage.maximum(v, expr));
   }

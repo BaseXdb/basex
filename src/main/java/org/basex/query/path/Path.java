@@ -419,13 +419,6 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    if(root != null) root = root.remove(v);
-    if(root instanceof Context) root = null;
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     final VarUsage inRoot = root == null ? VarUsage.NEVER : root.count(v);
     return VarUsage.sum(v, steps) == VarUsage.NEVER ? inRoot : VarUsage.MORE_THAN_ONCE;

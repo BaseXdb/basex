@@ -120,11 +120,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final Expr remove(final Var v) {
-    return this;
-  }
-
-  @Override
   public final VarUsage count(final Var v) {
     return VarUsage.NEVER;
   }

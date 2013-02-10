@@ -2,7 +2,7 @@ package org.basex.query.gflwor;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.gflwor.GFLWOR.Eval;
+import org.basex.query.gflwor.GFLWOR.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -63,18 +63,18 @@ public class Where extends GFLWOR.Clause {
   @Override
   public Where compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     pred = pred.compile(ctx, scp).compEbv(ctx);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Where optimize(final QueryContext cx, final VarScope sc) throws QueryException {
+    if(pred.isValue()) pred = pred.ebv(cx, info);
     return this;
   }
 
   @Override
   public boolean removable(final Var v) {
     return pred.removable(v);
-  }
-
-  @Override
-  public Expr remove(final Var v) {
-    pred = pred.remove(v);
-    return this;
   }
 
   @Override

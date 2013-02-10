@@ -54,12 +54,6 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].remove(v);
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return VarUsage.sum(v, expr);
   }

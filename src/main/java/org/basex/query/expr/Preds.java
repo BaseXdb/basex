@@ -156,12 +156,6 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    for(int p = 0; p < preds.length; ++p) preds[p] = preds[p].remove(v);
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return VarUsage.sum(v, preds);
   }

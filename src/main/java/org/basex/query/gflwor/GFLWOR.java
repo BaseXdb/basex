@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -82,13 +83,21 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    for(final Clause c : clauses) {
-      c.compile(ctx, scp);
-      // the first round of constant propagation is free
-      if(c instanceof Let) ((Let) c).bindConst(ctx);
+    int i = 0;
+    InputInfo ii = info;
+    try {
+      for(final Clause c : clauses) {
+        ii = c.info;
+        c.compile(ctx, scp);
+        // the first round of constant propagation is free
+        if(c instanceof Let) ((Let) c).bindConst(ctx);
+        i++;
+      }
+      ii = info;
+      ret = ret.compile(ctx, scp);
+    } catch(final QueryException qe) {
+      clauseError(qe, i, ii);
     }
-
-    ret = ret.compile(ctx, scp);
     return optimize(ctx, scp);
   }
 
@@ -248,6 +257,8 @@ public class GFLWOR extends ParseExpr {
             ctx.compInfo(QueryText.OPTINLINE, lt);
             inline(ctx, scp, lt.var, lt.inlineExpr(ctx, scp), next);
             thisRound = change = true;
+            // continue from the beginning as clauses below could have been deleted
+            break;
           }
         }
       }
@@ -476,13 +487,6 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    for(final Clause cl : clauses) cl.remove(v);
-    ret = ret.remove(v);
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return count(v, 0);
   }
@@ -526,20 +530,55 @@ public class GFLWOR extends ParseExpr {
     boolean change = false;
     final ListIterator<Clause> iter = clauses.listIterator(p);
     while(iter.hasNext()) {
-      final Clause c = iter.next().inline(ctx, scp, v, e);
-      if(c != null) {
-        change = true;
-        iter.set(c);
+      final Clause cl = iter.next();
+      try {
+        final Clause c = cl.inline(ctx, scp, v, e);
+        if(c != null) {
+          change = true;
+          iter.set(c);
+        }
+      } catch(final QueryException qe) {
+        return clauseError(qe, iter.previousIndex() + 1, cl.info);
       }
     }
 
-    final Expr rt = ret.inline(ctx, scp, v, e);
-    if(rt != null) {
-      change = true;
-      ret = rt;
+    try {
+      final Expr rt = ret.inline(ctx, scp, v, e);
+      if(rt != null) {
+        change = true;
+        ret = rt;
+      }
+    } catch(final QueryException qe) {
+      return clauseError(qe, clauses.size(), info);
     }
 
     return change;
+  }
+
+  /**
+   * Tries to recover from a compile-time exception inside a FLWOR clause.
+   * @param qe thrown exception
+   * @param idx index of the throwing clause, size of {@link #clauses} for return clause
+   * @param ii input info
+   * @return {@code true} if the GFLWOR expression has to stay
+   * @throws QueryException query exception if the whole expression fails
+   */
+  private boolean clauseError(final QueryException qe, final int idx, final InputInfo ii)
+      throws QueryException {
+    final ListIterator<Clause> iter = clauses.listIterator(idx);
+    while(iter.hasPrevious()) {
+      final Clause b4 = iter.previous();
+      if(b4 instanceof For || b4 instanceof Window || b4 instanceof Where) {
+        iter.next();
+        while(iter.hasNext()) {
+          iter.next();
+          iter.remove();
+        }
+        ret = FNInfo.error(qe, ii);
+        return true;
+      }
+    }
+    throw qe;
   }
 
   @Override
@@ -660,10 +699,8 @@ public class GFLWOR extends ParseExpr {
         throws QueryException;
 
     @Override
-    public Clause optimize(final QueryContext ctx, final VarScope scp)
-        throws QueryException {
-      return this;
-    }
+    public abstract Clause optimize(final QueryContext ctx, final VarScope scp)
+        throws QueryException;
 
     @Override
     public abstract Clause inline(QueryContext ctx, VarScope scp, Var v, Expr e)
@@ -688,8 +725,7 @@ public class GFLWOR extends ParseExpr {
     }
 
     @Override
-    public
-    abstract GFLWOR.Clause copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
+    public abstract GFLWOR.Clause copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
 
     /**
      * Checks if the given clause can be slided over this clause.

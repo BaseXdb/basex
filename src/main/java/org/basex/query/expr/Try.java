@@ -127,12 +127,6 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    for(final Catch c : ctch) c.remove(v);
-    return super.remove(v);
-  }
-
-  @Override
   public boolean databases(final StringList db) {
     for(final Catch c : ctch) if(!c.databases(db)) return false;
     return super.databases(db);

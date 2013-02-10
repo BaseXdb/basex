@@ -49,12 +49,6 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    expr = expr.remove(v);
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return expr.count(v);
   }

@@ -192,12 +192,6 @@ public class Filter extends Preds {
   }
 
   @Override
-  public final Expr remove(final Var v) {
-    root = root.remove(v);
-    return super.remove(v);
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     final VarUsage inPreds = super.count(v), inRoot = root.count(v);
     if(inPreds == VarUsage.NEVER) return inRoot;

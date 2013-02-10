@@ -27,8 +27,6 @@ import org.basex.util.list.*;
 public class GroupBy extends GFLWOR.Clause {
   /** Grouping specs. */
   final Spec[] by;
-  /** Pre-grouping variables, only for type propagation. */
-  Var[] pre;
   /** Non-grouping variable expressions. */
   Expr[] preExpr;
   /** Non-grouping variables. */
@@ -47,8 +45,6 @@ public class GroupBy extends GFLWOR.Clause {
       final InputInfo ii) {
     super(ii, vars(specs, pst));
     by = specs;
-    pre = new Var[pr.length];
-    for(int i = 0; i < pre.length; i++) pre[i] = pr[i].var;
     preExpr = new Expr[pr.length];
     System.arraycopy(pr, 0, preExpr, 0, pr.length);
     post = pst;
@@ -60,17 +56,15 @@ public class GroupBy extends GFLWOR.Clause {
   /**
    * Copy constructor.
    * @param specs grouping specs
-   * @param pr pre-grouping variables
    * @param pe pre-grouping expressions
    * @param pst post-grouping variables
    * @param no number of non-occluded grouping variables
    * @param ii input info
    */
-  private GroupBy(final Spec[] specs, final Var[] pr, final Expr[] pe, final Var[] pst,
+  private GroupBy(final Spec[] specs, final Expr[] pe, final Var[] pst,
       final int no, final InputInfo ii) {
     super(ii, vars(specs, pst));
     by = specs;
-    pre = pr;
     preExpr = pe;
     post = pst;
     nonOcc = no;
@@ -212,11 +206,18 @@ public class GroupBy extends GFLWOR.Clause {
 
   @Override
   public GroupBy compile(final QueryContext cx, final VarScope sc) throws QueryException {
+    for(final Expr e : preExpr) e.compile(cx, sc);
     for(int i = 0; i < by.length; i++) by[i].compile(cx, sc);
-    for(int i = 0; i < pre.length; i++) {
-      final SeqType it = pre[i].declaredType();
+    return optimize(cx, sc);
+  }
+
+  @Override
+  public GroupBy optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    for(int i = 0; i < preExpr.length; i++) {
+      final SeqType it = preExpr[i].type();
       post[i].refineType(it.withOcc(it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE),
-          cx, info);
+          ctx, info);
     }
     return this;
   }
@@ -225,12 +226,6 @@ public class GroupBy extends GFLWOR.Clause {
   public boolean removable(final Var v) {
     for(final Spec b : by) if(!b.removable(v)) return false;
     return true;
-  }
-
-  @Override
-  public Expr remove(final Var v) {
-    for(final Spec b : by) b.remove(v);
-    return this;
   }
 
   @Override
@@ -248,13 +243,6 @@ public class GroupBy extends GFLWOR.Clause {
 
   @Override
   public GroupBy copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
-    // update all pre-grouping variables
-    final Var[] pr = new Var[pre.length];
-    for(int i = 0; i < pr.length; i++) {
-      final Var p = pre[i], q = vs.get(p.id);
-      pr[i] = q == null ? p : q;
-    }
-
     // copy the pre-grouping expressions
     final Expr[] pEx = Arr.copyAll(ctx, scp, vs, preExpr);
 
@@ -267,7 +255,7 @@ public class GroupBy extends GFLWOR.Clause {
     }
 
     // done
-    return new GroupBy(Arr.copyAll(ctx, scp, vs, by), pr, pEx, ps, nonOcc, info);
+    return new GroupBy(Arr.copyAll(ctx, scp, vs, by), pEx, ps, nonOcc, info);
   }
 
   @Override
@@ -281,10 +269,9 @@ public class GroupBy extends GFLWOR.Clause {
   @Override
   boolean clean(final QueryContext ctx, final BitArray used) {
     // [LW] does not fix {@link #vars}
-    final int len = pre.length;
+    final int len = preExpr.length;
     for(int i = 0; i < post.length; i++) {
       if(!used.get(post[i].id)) {
-        pre  = Array.delete(pre, i);
         preExpr = Array.delete(preExpr, i);
         post = Array.delete(post, i--);
       }

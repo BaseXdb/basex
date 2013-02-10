@@ -110,13 +110,6 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    for(final SwitchCase sc : cases) sc.remove(v);
-    cond = cond.remove(v);
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     VarUsage all = cond.count(v);
     for(final SwitchCase cs : cases)

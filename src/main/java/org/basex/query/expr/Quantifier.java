@@ -50,12 +50,14 @@ public final class Quantifier extends Single {
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    // compile for clauses
     super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
 
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     // return pre-evaluated result
-    return expr.size() == 0 ? optPre(Bln.get(every), ctx) : expr.size() == 1
-        ? optPre(expr, ctx) : this;
+    return expr.isValue() ? optPre(item(ctx, info), ctx) : this;
   }
 
   @Override

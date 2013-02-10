@@ -105,11 +105,6 @@ public class InlineFunc extends UserFunc {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    throw Util.notexpected(v);
-  }
-
-  @Override
   public boolean databases(final StringList db) {
     return false;
   }

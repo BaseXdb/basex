@@ -152,12 +152,6 @@ public class For extends GFLWOR.Clause {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    expr = expr.remove(v);
-    return this;
-  }
-
-  @Override
   public VarUsage count(final Var v) {
     return expr.count(v);
   }

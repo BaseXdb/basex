@@ -256,15 +256,15 @@ public class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    for(final Key k : keys) if(!k.removable(v)) return false;
-    return true;
+  public OrderBy optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return this;
   }
 
   @Override
-  public OrderBy remove(final Var v) {
-    for(final Key k : keys) k.remove(v);
-    return this;
+  public boolean removable(final Var v) {
+    for(final Key k : keys) if(!k.removable(v)) return false;
+    return true;
   }
 
   @Override

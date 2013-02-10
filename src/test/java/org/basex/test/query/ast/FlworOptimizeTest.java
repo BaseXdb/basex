@@ -31,10 +31,10 @@ public final class FlworOptimizeTest extends QueryPlanTest {
         "for $i in 1 to count($seq) " +
         "for $j in $i + 1 to count($seq) " +
         "let $a as xs:string := $seq[$i] " +
-        "return concat($i, $j, $a)",
+        "return concat($i, $j, $a, $a)",
 
-        "12a 13a 23b",
-        "let $a := //Let[starts-with(Var/@name, '$a')] return " +
+        "12aa 13aa 23bb",
+        "let $a := //Let[Var/@name eq '$a'] return " +
         "//For[Var/@name eq '$i'] << $a and $a << //For[Var/@name eq '$j']"
     );
   }
@@ -45,9 +45,9 @@ public final class FlworOptimizeTest extends QueryPlanTest {
         "for $i in 1 to count($seq) " +
         "for $j in $i + 1 to count($seq) " +
         "let $b as xs:string := $seq[$j] " +
-        "return concat($i, $j, $b)",
+        "return concat($i, $j, $b, $b)",
 
-        "12b 13c 23c",
+        "12bb 13cc 23cc",
         Util.info("every $f in //% satisfies $f << //%[starts-with(Var/@name, '$b')]",
             For.class, Let.class)
     );
@@ -55,27 +55,23 @@ public final class FlworOptimizeTest extends QueryPlanTest {
 
   /** Tests the relocation of a let clause. */
   @Test public void dontMove2() {
-    check("declare function local:id($x) { $x };" +
-        "let $a as element(a) := local:id(<a/>) " +
-        "let $b := <b/> " +
-        "let $c as element(a) := local:id($a) " +
+    check("let $a := <a/>, $b := <b/>, $c := ($a,$a)[1] " +
         "for $i in 1 to 2 return ($c,$b)",
         "<a/>" + Prop.NL + "<b/>" + Prop.NL + "<a/>" + Prop.NL + "<b/>",
-        Util.info("//Let[starts-with(Var/@name,'$a')] << //Let[Var/@name='$b'] and " +
-            "//Let[Var/@name='$b'] << //Let[starts-with(Var/@name, '$c')]")
+        Util.info("//Let[Var/@name='$a'] << //Let[Var/@name='$b'] and " +
+            "//Let[Var/@name='$b'] << //Let[Var/@name='$c']")
     );
   }
 
   /** Tests the relocation of a static let clause. */
   @Test public void moveFor() {
-    check("declare function local:id($x) as item() { $x };" +
-        "let $x := <x/> " +
+    check("let $x := <x/> " +
         "for $a in 1 to 2 " +
-        "for $b as element(x) in local:id($x) " +
-        "return $b",
+        "for $b as element(x) in $x " +
+        "return ($b, $b)[1]",
 
         "<x/>" + Prop.NL + "<x/>",
-        "//(For | Let)[starts-with(Var/@name, '$b')] << //For[Var/@name eq '$a']",
+        "//(For | Let)[Var/@name='$b'] << //For[Var/@name='$a']",
         "every $let in //Let, $for in //For satisfies $let << $for"
     );
   }
@@ -85,7 +81,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     check("for $i at $p in 1 to 1000 " +
         "let $sum as xs:integer := sum(1 to $i * $i) " +
         "where $i lt 5 " +
-        "return $sum",
+        "return ($sum,$sum)[1]",
 
         "1 10 45 136",
         "//For << //Where and //Where << //Let"
@@ -142,12 +138,11 @@ public final class FlworOptimizeTest extends QueryPlanTest {
         "//GFLWOR/*[1] is //Let"
     );
 
-    check("declare function local:id($x) { $x };" +
-        "for $len in 1 to 3 " +
+    check("for $len in 1 to 3 " +
         "for sliding window $w in 1 to 3 start at $p when true() only " +
         "end at $q when $q - $p + 1 eq $len " +
-        "let $x as xs:decimal := local:id($len div 2) " +
-        "return count($w) div (2 * $x)",
+        "let $x := $len div 2 " +
+        "return count($w) div ($x + $x)",
 
         "1 1 1 1 1 1",
         "//For << //Let and //Let << //Window"
@@ -156,15 +151,14 @@ public final class FlworOptimizeTest extends QueryPlanTest {
 
   /** Tests if multiple let clauses are all moved to their optimal position. */
   @Test public void slideMultipleLets() {
-    check("declare function local:id($x) { $x };" +
-        "for $i in 1 to 2 for $j in 1 to 2 " +
-        "let $a as xs:integer := local:id(3 * $i), " +
-        "    $b as xs:integer := local:id(2 * $i) " +
-        "return $a - $b",
-        "1 1 2 2",
+    check("for $i in 1 to 2 for $j in 1 to 2 " +
+        "let $a as xs:integer := 3 * $i, " +
+        "    $b as xs:integer := 2 * $i " +
+        "return $a * $a + $b * $b",
+        "13 13 52 52",
         "exists(//For[every $let in //Let satisfies . << $let])",
         "exists(//For[every $let in //Let satisfies . >> $let])",
-        "//Let[starts-with(Var/@name, '$a')] << //Let[starts-with(Var/@name, '$b')]"
+        "//Let[Var/@name='$a'] << //Let[Var/@name='$b']"
     );
   }
 
@@ -186,8 +180,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
 
   /** Tests if let clauses containing node constructors are left alone. */
   @Test public void dontSlideLetCNS() {
-    check("declare function local:id($x) { $x };" +
-        "for $i in 1 to 10 let $x as element(x) := local:id(<x/>) return ($i, $x)",
+    check("for $i in 1 to 10 let $x := <x/> return ($i, $x, $x)",
         null,
         "//For << //Let"
     );
@@ -199,14 +192,14 @@ public final class FlworOptimizeTest extends QueryPlanTest {
         "1 2 3 4 5",
         "exists(//If) and empty(//GFLWOR)"
     );
-  }
 
-  /** Tests is where clauses are rewritten to if. */
-  @Test public void whereToIf2Test() {
     check("(1 to 3) ! (for $j at $p in 1 to 5 where . eq 1 return $j * $p)",
         "1 4 9 16 25",
         "exists(//If) and exists(//GFLWOR)"
     );
+
+    check("let $x := 0 where $x != <x>0</x> return 42 idiv $x", "",
+        "exists(//If) and starts-with(//If/*[2]/@name, 'error(')");
   }
 
   /** Tests if {@code for $x in E return $x} is rewritten to {@code E} inside FLWORs. */
