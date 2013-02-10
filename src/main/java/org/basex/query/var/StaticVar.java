@@ -28,7 +28,7 @@ public final class StaticVar extends ParseExpr implements Scope {
   /** Annotations. */
   public final Ann ann;
   /** Declaration flag. */
-  boolean declared;
+  private boolean declared;
   /** External flag. */
   private boolean external = true;
   /** Type to be checked, {@code null} for no check. */
@@ -37,8 +37,6 @@ public final class StaticVar extends ParseExpr implements Scope {
   private Value value;
   /** Bound expression. */
   private Expr expr;
-  /** Usage flag. */
-  boolean used;
 
   /** Variables should only be compiled once. */
   private boolean compiled;
@@ -246,7 +244,7 @@ public final class StaticVar extends ParseExpr implements Scope {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.subScope(this);
+    return visitor.staticVar(this);
   }
 
   @Override
@@ -255,29 +253,18 @@ public final class StaticVar extends ParseExpr implements Scope {
   }
 
   /**
-   * Tries to refine the compile-time type of this variable through the type of the bound
-   * expression.
-   * @param t type of the bound expression
-   * @return {@code true} if the type changed, {@code false} otherwise
-   * @throws QueryException if the types are incompatible
+   * Adds the description of this variable to the given string builder.
+   * @param sb string builder
+   * @return the string builder for convenience
    */
-  public boolean refineType(final SeqType t) throws QueryException {
-    if(t != null && type != t) {
-      if(type == null || type.instanceOf(t)) {
-        type = t;
-        return true;
-      }
-      if(!t.instanceOf(type)) throw XPTYPE.thrw(info, this, type, t);
-    }
-    return false;
-  }
-
-  /**
-   * Getter.
-   * @return the bound expression
-   */
-  protected Expr expr() {
-    return expr;
+  protected StringBuilder fullDesc(final StringBuilder sb) {
+    sb.append(DECLARE).append(' ');
+    if(!ann.isEmpty()) sb.append(ann).append(' ');
+    sb.append(VARIABLE).append(' ').append(DOLLAR).append(name.string()).append(' ');
+    if(check != null) sb.append(AS).append(' ').append(check).append(' ');
+    if(expr != null) sb.append(ASSIGN).append(' ').append(expr);
+    else sb.append(EXTERNAL);
+    return sb.append(';');
   }
 
   @Override

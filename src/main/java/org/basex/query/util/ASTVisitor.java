@@ -32,6 +32,15 @@ public abstract class ASTVisitor {
   }
 
   /**
+   * Notifies the visitor of a reference t oa static variable.
+   * @param var static variable
+   * @return if more expressions should be visited
+   */
+  public boolean staticVar(final StaticVar var) {
+    return true;
+  }
+
+  /**
    * Notifies the visitor of a sub-scope.
    * @param sub scope
    * @return if more expressions should be visited

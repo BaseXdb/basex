@@ -11,8 +11,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
-import static org.basex.query.QueryText.*;
-
 /**
  * Container of global variables of a module.
  *
@@ -97,14 +95,7 @@ public final class Variables extends ExprInfo {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final StaticVar v : vars.values()) {
-      sb.append(DECLARE).append(' ');
-      if(!v.ann.isEmpty()) sb.append(v.ann).append(' ');
-      sb.append(VARIABLE).append(' ').append(v).append(' ');
-      if(v.expr() != null) sb.append(ASSIGN).append(' ').append(v.expr());
-      else sb.append(EXTERNAL);
-      return sb.append(';').toString();
-    }
+    for(final StaticVar v : vars.values()) v.fullDesc(sb);
     return sb.toString();
   }
 }
