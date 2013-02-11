@@ -84,24 +84,46 @@ public final class StaticVar extends ParseExpr implements Scope {
   }
 
   @Override
-  public Value compile(final QueryContext ctx, final VarScope o) throws QueryException {
-    if(compiled) {
-      if(value == null) throw Err.CIRCVAR.thrw(info, this);
-      return value;
-    }
+  public void compile(final QueryContext ctx) throws QueryException {
+    compile(ctx, null);
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx, final VarScope o) throws QueryException {
     if(expr == null) throw VAREMPTY.thrw(info, this);
 
-    final Value[] sf = scope.enter(ctx);
-    try {
-      expr = expr.compile(ctx, scope);
-      scope.cleanUp(this);
-    } finally {
-      scope.exit(ctx, sf);
+    if(!compiled) {
+      final Value[] sf = scope.enter(ctx);
+      try {
+        expr = expr.compile(ctx, scope);
+        scope.cleanUp(this);
+      } finally {
+        scope.exit(ctx, sf);
+      }
+
+      if(expr.isValue()) bind((Value) expr);
+      compiled = true;
     }
 
-    final Value val = bind(value(ctx));
-    compiled = true;
-    return val;
+    return value != null ? value : this;
+
+//    if(compiled) {
+//      if(value == null) throw Err.CIRCVAR.thrw(info, this);
+//      return value;
+//    }
+//    if(expr == null) throw VAREMPTY.thrw(info, this);
+//
+//    final Value[] sf = scope.enter(ctx);
+//    try {
+//      expr = expr.compile(ctx, scope);
+//      scope.cleanUp(this);
+//    } finally {
+//      scope.exit(ctx, sf);
+//    }
+//
+//    final Value val = bind(value(ctx));
+//    compiled = true;
+//    return val;
   }
 
   @Override
@@ -111,14 +133,23 @@ public final class StaticVar extends ParseExpr implements Scope {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
+    if(!compiled) throw Util.notexpected(this + " was not compiled.");
     if(value != null) return value;
-    if(expr == null) throw VAREMPTY.thrw(info, this);
     final Value[] sf = scope.enter(ctx);
     try {
       return bind(expr.value(ctx));
     } finally {
       scope.exit(ctx, sf);
     }
+
+//  if(value != null) return value;
+//    if(expr == null) throw VAREMPTY.thrw(info, this);
+//    final Value[] sf = scope.enter(ctx);
+//    try {
+//      return bind(expr.value(ctx));
+//    } finally {
+//      scope.exit(ctx, sf);
+//    }
   }
 
   /**
@@ -257,10 +288,11 @@ public final class StaticVar extends ParseExpr implements Scope {
    * @param sb string builder
    * @return the string builder for convenience
    */
-  protected StringBuilder fullDesc(final StringBuilder sb) {
+  public StringBuilder fullDesc(final StringBuilder sb) {
     sb.append(DECLARE).append(' ');
     if(!ann.isEmpty()) sb.append(ann).append(' ');
-    sb.append(VARIABLE).append(' ').append(DOLLAR).append(name.string()).append(' ');
+    sb.append(VARIABLE).append(' ').append(DOLLAR).append(
+        Token.string(name.string())).append(' ');
     if(check != null) sb.append(AS).append(' ').append(check).append(' ');
     if(expr != null) sb.append(ASSIGN).append(' ').append(expr);
     else sb.append(EXTERNAL);

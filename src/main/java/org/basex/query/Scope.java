@@ -15,4 +15,11 @@ public interface Scope {
    * @return continue flag
    */
   boolean visit(final ASTVisitor visitor);
+
+  /**
+   * Compiles the expression contained in this scope.
+   * @param ctx query context
+   * @throws QueryException compilation errors
+   */
+  void compile(QueryContext ctx) throws QueryException;
 }

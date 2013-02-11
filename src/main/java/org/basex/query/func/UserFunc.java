@@ -50,6 +50,8 @@ public class UserFunc extends Single implements Scope {
   boolean cast;
   /** Compilation flag. */
   private boolean compiled;
+  /** Flag that is turned on during compilation and prevents premature inlining. */
+  boolean compiling;
 
   /**
    * Function constructor.
@@ -107,8 +109,17 @@ public class UserFunc extends Single implements Scope {
   }
 
   @Override
+  public void compile(final QueryContext ctx) throws QueryException {
+    compile(ctx, null);
+  }
+
+  @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    comp(ctx, scp);
+    if(!compiling) {
+      compiling = true;
+      comp(ctx, scp);
+      compiling = false;
+    }
     return this;
   }
 
@@ -217,6 +228,15 @@ public class UserFunc extends Single implements Scope {
   @Override
   public final boolean isVacuous() {
     return !uses(Use.UPD) && ret != null && ret.eq(SeqType.EMP);
+  }
+
+  /**
+   * Checks if this function can be inlined.
+   * @return result of check
+   */
+  boolean inline() {
+    return expr.isValue() ||
+        !(compiling || uses(Use.NDT) || uses(Use.CTX) || selfRecursive());
   }
 
   @Override
@@ -329,6 +349,11 @@ public class UserFunc extends Single implements Scope {
       @Override
       public boolean funcCall(final UserFuncCall call) {
         return call.func != UserFunc.this;
+      }
+
+      @Override
+      public boolean subScope(final Scope sub) {
+        return sub.visit(this);
       }
     });
   }

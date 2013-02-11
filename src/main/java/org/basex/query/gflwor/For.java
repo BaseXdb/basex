@@ -142,6 +142,8 @@ public class For extends GFLWOR.Clause {
     final boolean emp = empty && tp.mayBeZero();
     type = SeqType.get(tp.type, emp ? Occ.ZERO_ONE : Occ.ONE);
     var.refineType(type, ctx, info);
+    if(pos != null) pos.refineType(SeqType.ITR, ctx, info);
+    if(score != null) score.refineType(SeqType.DBL, ctx, info);
     size = emp ? -1 : 1;
     return this;
   }

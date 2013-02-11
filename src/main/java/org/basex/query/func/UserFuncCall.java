@@ -42,40 +42,28 @@ public abstract class UserFuncCall extends Arr {
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
 
-    // inline if result and arguments are all values.
-    // currently, only functions with values as return expressions are inlined
-    // otherwise, recursive functions might not be correctly evaluated
+    // compile mutually recursive functions
     func.compile(ctx, scp);
 
-    if(!func.uses(Use.NDT)) {
-      final boolean val = func.expr.isValue() && allAreValues();
-      if(val || !func.uses(Use.CTX) && !func.selfRecursive()) {
-        // inline the function
-        ctx.compInfo(OPTINLINE, func.name.string());
+    if(func.inline()) {
+      // inline the function
+      ctx.compInfo(OPTINLINEFN, func.name.string());
 
-        if(val) {
-          for(int i = 0; i < expr.length; i++)
-            func.args[i].checkType((Value) expr[i], ctx, info);
-          final Value v = func.expr.value(ctx);
-          return func.cast ? func.type.funcConvert(ctx, info, v) : v;
-        }
-
-        // create let bindings for all variables
-        final LinkedList<GFLWOR.Clause> cls = expr.length == 0 ? null :
-          new LinkedList<GFLWOR.Clause>();
-        final IntMap<Var> vs = new IntMap<Var>();
-        for(int i = 0; i < func.args.length; i++) {
-          final Var old = func.args[i], v = scp.newCopyOf(ctx, old);
-          vs.add(old.id, v);
-          cls.add(new Let(v, expr[i], false, func.info).optimize(ctx, scp));
-        }
-
-        // copy the function body
-        final Expr cpy = func.expr.copy(ctx, scp, vs), rt = !func.cast ? cpy :
-              new TypeCheck(func.info, cpy, func.ret, true).optimize(ctx, scp);
-
-        return cls == null ? rt : new GFLWOR(func.info, cls, rt).optimize(ctx, scp);
+      // create let bindings for all variables
+      final LinkedList<GFLWOR.Clause> cls = expr.length == 0 ? null :
+        new LinkedList<GFLWOR.Clause>();
+      final IntMap<Var> vs = new IntMap<Var>();
+      for(int i = 0; i < func.args.length; i++) {
+        final Var old = func.args[i], v = scp.newCopyOf(ctx, old);
+        vs.add(old.id, v);
+        cls.add(new Let(v, expr[i], false, func.info).optimize(ctx, scp));
       }
+
+      // copy the function body
+      final Expr cpy = func.expr.copy(ctx, scp, vs), rt = !func.cast ? cpy :
+            new TypeCheck(func.info, cpy, func.ret, true).optimize(ctx, scp);
+
+      return cls == null ? rt : new GFLWOR(func.info, cls, rt).optimize(ctx, scp);
     }
     type = func.type();
     return this;
@@ -137,7 +125,7 @@ public abstract class UserFuncCall extends Arr {
    * Getter for the called function.
    * @return user-defined function
    */
-  final UserFunc func() {
+  public final UserFunc func() {
     return func;
   }
 
@@ -168,8 +156,7 @@ public abstract class UserFuncCall extends Arr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(name.string()).add(PAR1).add(
-        toString(SEP)).add(PAR2).toString();
+    return new TokenBuilder(name.string()).add(toString(SEP)).toString();
   }
 
   @Override

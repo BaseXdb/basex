@@ -31,11 +31,7 @@ public class MainModule extends ExprInfo implements Scope {
     scope = scp;
   }
 
-  /**
-   * Compiles this module, see {@link Expr#compile(QueryContext, VarScope)}.
-   * @param ctx query context
-   * @throws QueryException query exception
-   */
+  @Override
   public void compile(final QueryContext ctx) throws QueryException {
     try {
       scope.enter(ctx);
@@ -65,18 +61,19 @@ public class MainModule extends ExprInfo implements Scope {
    * Creates a result iterator which lazily evaluates this module.
    * @param ctx query context
    * @return result iterator
-   * @throws QueryException evaluation exception
    */
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    scope.enter(ctx);
-    final Iter iter = expr.iter(ctx);
+  public Iter iter(final QueryContext ctx) {
     return new Iter() {
+      Iter iter;
       @Override
       public Item next() throws QueryException {
-        final Item nxt = iter.next();
-        if(nxt != null) return nxt;
-        scope.exit(ctx, null);
-        return null;
+        try {
+          scope.enter(ctx);
+          if(iter == null) iter = expr.iter(ctx);
+          return iter.next();
+        } finally {
+          scope.exit(ctx, null);
+        }
       }
 
       @Override

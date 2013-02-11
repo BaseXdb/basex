@@ -222,11 +222,10 @@ public final class QueryContext extends Progress {
    */
   public void analyze() throws QueryException {
     try {
-      // compile global functions.
-      // variables will be compiled if called for the first time
-      funcs.compile(this);
       // compile the expression
-      if(root != null) root.compile(this);
+      if(root != null) QueryCompiler.compile(this, root);
+      // compile global functions.
+      else funcs.compile(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       CIRCLDECL.thrw(null, ex);
