@@ -121,6 +121,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_CREATE_DIR.args(PATH3));
     query(_FILE_WRITE.args(PATH4, "()"));
     contains(_FILE_LIST.args(PATH1, "true()"), "y");
+    query(_FILE_LIST.args(PATH1, "true()", "x"), "x");
   }
 
   /** Test method. */
