@@ -404,4 +404,10 @@ public abstract class Expr extends ExprInfo {
     for(final Expr e : exprs) if(!e.accept(visitor)) return false;
     return true;
   }
+
+  /**
+   * Counts the number of expressions in this expression's sub-tree.
+   * @return number of expressions
+   */
+  public abstract int exprSize();
 }

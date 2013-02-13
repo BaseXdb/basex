@@ -23,7 +23,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class FuncItem extends FItem {
+public final class FuncItem extends FItem implements Scope {
   /** Variables. */
   private final Var[] vars;
   /** Function expression. */
@@ -102,8 +102,7 @@ public final class FuncItem extends FItem {
       final Value... args) throws QueryException {
 
     // bind variables and cache context
-    final Value[] sf = ctx.stackFrame;
-    ctx.stackFrame = stackSize == 0 ? null : new Value[stackSize];
+    final int fp = ctx.stack.enterFrame(stackSize);
     final Value cv = ctx.value;
     try {
       bindVars(ctx, ii, args);
@@ -113,7 +112,7 @@ public final class FuncItem extends FItem {
       return cast != null ? cast.funcConvert(ctx, ii, v) : v;
     } finally {
       ctx.value = cv;
-      ctx.stackFrame = sf;
+      ctx.stack.exitFrame(fp);
     }
   }
 
@@ -128,8 +127,7 @@ public final class FuncItem extends FItem {
       final Value... args) throws QueryException {
 
     // bind variables and cache context
-    final Value[] sf = ctx.stackFrame;
-    ctx.stackFrame = stackSize == 0 ? null : new Value[stackSize];
+    final int fp = ctx.stack.enterFrame(stackSize);
     final Value cv = ctx.value;
     try {
       bindVars(ctx, ii, args);
@@ -140,7 +138,7 @@ public final class FuncItem extends FItem {
       return cast != null ? cast.funcConvert(ctx, ii, v).item(ctx, ii) : it;
     } finally {
       ctx.value = cv;
-      ctx.stackFrame = sf;
+      ctx.stack.exitFrame(fp);
     }
   }
 
@@ -191,5 +189,22 @@ public final class FuncItem extends FItem {
   @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(TYPE, type), vars, expr);
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitor.funcItem(this);
+  }
+
+  @Override
+  public boolean visit(final ASTVisitor visitor) {
+    for(final Var var : vars) if(!visitor.declared(var)) return false;
+    for(final Var var : closure.keySet()) if(!visitor.declared(var)) return false;
+    return expr.accept(visitor);
+  }
+
+  @Override
+  public void compile(final QueryContext ctx) throws QueryException {
+    // nothing to do here
   }
 }

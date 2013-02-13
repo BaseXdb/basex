@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -21,6 +22,8 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public final class StaticVar extends ParseExpr implements Scope {
+  /** Annotation for lazy evaluation. */
+  private static final QNm LAZY = new QNm(QueryText.LAZY, QueryText.BASEXURI);
   /** Variable scope. */
   private final VarScope scope;
   /** Variable name. */
@@ -37,6 +40,8 @@ public final class StaticVar extends ParseExpr implements Scope {
   private Value value;
   /** Bound expression. */
   private Expr expr;
+  /** Flag for lazy evaluation. */
+  private boolean lazy;
 
   /** Variables should only be compiled once. */
   private boolean compiled;
@@ -62,6 +67,7 @@ public final class StaticVar extends ParseExpr implements Scope {
     expr = e;
     declared = true;
     external = ext;
+    lazy = ann.contains(LAZY);
   }
 
   /**
@@ -93,37 +99,29 @@ public final class StaticVar extends ParseExpr implements Scope {
     if(expr == null) throw VAREMPTY.thrw(info, this);
 
     if(!compiled) {
-      final Value[] sf = scope.enter(ctx);
+      final int fp = scope.enter(ctx);
       try {
         expr = expr.compile(ctx, scope);
-        scope.cleanUp(this);
+      } catch(final QueryException qe) {
+        compiled = true;
+        if(lazy) {
+          expr = FNInfo.error(qe, info);
+          return this;
+        }
+        throw qe.notCatchable();
       } finally {
-        scope.exit(ctx, sf);
+        scope.cleanUp(this);
+        scope.exit(ctx, fp);
       }
 
-      if(expr.isValue()) bind((Value) expr);
       compiled = true;
+      if(!lazy || expr.isValue()) {
+        final Value val = bind(value(ctx));
+        return val;
+      }
     }
 
     return value != null ? value : this;
-
-//    if(compiled) {
-//      if(value == null) throw Err.CIRCVAR.thrw(info, this);
-//      return value;
-//    }
-//    if(expr == null) throw VAREMPTY.thrw(info, this);
-//
-//    final Value[] sf = scope.enter(ctx);
-//    try {
-//      expr = expr.compile(ctx, scope);
-//      scope.cleanUp(this);
-//    } finally {
-//      scope.exit(ctx, sf);
-//    }
-//
-//    final Value val = bind(value(ctx));
-//    compiled = true;
-//    return val;
   }
 
   @Override
@@ -133,23 +131,27 @@ public final class StaticVar extends ParseExpr implements Scope {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    if(!compiled) throw Util.notexpected(this + " was not compiled.");
+    if(lazy) {
+      if(!compiled) throw Util.notexpected(this + " was not compiled.");
+      if(value != null) return value;
+      final int fp = scope.enter(ctx);
+      try {
+        return bind(expr.value(ctx));
+      } catch(final QueryException qe) {
+        throw qe.notCatchable();
+      } finally {
+        scope.exit(ctx, fp);
+      }
+    }
+
     if(value != null) return value;
-    final Value[] sf = scope.enter(ctx);
+    if(expr == null) throw VAREMPTY.thrw(info, this);
+    final int fp = scope.enter(ctx);
     try {
       return bind(expr.value(ctx));
     } finally {
-      scope.exit(ctx, sf);
+      scope.exit(ctx, fp);
     }
-
-//  if(value != null) return value;
-//    if(expr == null) throw VAREMPTY.thrw(info, this);
-//    final Value[] sf = scope.enter(ctx);
-//    try {
-//      return bind(expr.value(ctx));
-//    } finally {
-//      scope.exit(ctx, sf);
-//    }
   }
 
   /**
@@ -182,6 +184,7 @@ public final class StaticVar extends ParseExpr implements Scope {
       bind(v);
     } else {
       expr = checkType(e, ii);
+      value = null;
     }
     return true;
   }
@@ -203,6 +206,7 @@ public final class StaticVar extends ParseExpr implements Scope {
     check = t;
     info = ii;
     if(a != null) for(int i = 0; i < a.size(); i++) ann.add(a.names[i], a.values[i]);
+    lazy = ann.contains(LAZY);
     external = ext;
     if(ext && expr != null) {
       bind(expr, true, ctx, ii);
@@ -280,7 +284,7 @@ public final class StaticVar extends ParseExpr implements Scope {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    return expr.accept(visitor);
+    return expr == null || expr.accept(visitor);
   }
 
   /**
@@ -290,7 +294,7 @@ public final class StaticVar extends ParseExpr implements Scope {
    */
   public StringBuilder fullDesc(final StringBuilder sb) {
     sb.append(DECLARE).append(' ');
-    if(!ann.isEmpty()) sb.append(ann).append(' ');
+    if(!ann.isEmpty()) sb.append(ann);
     sb.append(VARIABLE).append(' ').append(DOLLAR).append(
         Token.string(name.string())).append(' ');
     if(check != null) sb.append(AS).append(' ').append(check).append(' ');
@@ -314,5 +318,10 @@ public final class StaticVar extends ParseExpr implements Scope {
   @Override
   public String toString() {
     return new TokenBuilder(DOLLAR).add(name.string()).toString();
+  }
+
+  @Override
+  public int exprSize() {
+    return 0;
   }
 }

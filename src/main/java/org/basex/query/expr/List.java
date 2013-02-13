@@ -47,12 +47,13 @@ public final class List extends Arr {
     boolean ne = false;
     for(final Expr e : expr) {
       final long c = e.size();
+      ne |= c > 0 || e.type().occ.min == 1;
       if(c == -1) {
         size = -1;
         break;
+      } else if(size >= 0) {
+        size += c;
       }
-      ne |= c > 0;
-      size += c;
     }
 
     if(size >= 0) {
@@ -102,7 +103,7 @@ public final class List extends Arr {
         final SeqType st = e.type();
         if(e.size() != 0 && st.occ != Occ.ZERO) t = t == null ? st : t.union(st);
       }
-      type = t == null ? SeqType.ITEM_ZM : SeqType.get(t.type, o);
+      type = SeqType.get(t == null ? AtomType.ITEM : t.type, o);
     }
 
     return this;

@@ -163,4 +163,9 @@ public final class TypeCase extends Single {
     return var == null ? expr.accept(visitor)
                        : visitor.declared(var) && expr.accept(visitor);
   }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize();
+  }
 }

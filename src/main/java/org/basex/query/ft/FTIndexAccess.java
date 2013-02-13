@@ -115,4 +115,9 @@ public final class FTIndexAccess extends Simple {
   public boolean accept(final ASTVisitor visitor) {
     return ftexpr.accept(visitor);
   }
+
+  @Override
+  public int exprSize() {
+    return ftexpr.exprSize() + 1;
+  }
 }

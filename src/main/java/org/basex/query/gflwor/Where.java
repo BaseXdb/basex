@@ -120,4 +120,9 @@ public class Where extends GFLWOR.Clause {
   long calcSize(final long cnt) {
     return pred == Bln.FALSE ? 0 : -1;
   }
+
+  @Override
+  public int exprSize() {
+    return pred.exprSize();
+  }
 }

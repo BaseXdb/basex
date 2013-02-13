@@ -206,4 +206,9 @@ public class Let extends GFLWOR.Clause {
     return score ? Function._FT_SCORE.get(expr).optimize(ctx, scp)
                  : var.checked(expr, ctx, scp, info);
   }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize();
+  }
 }

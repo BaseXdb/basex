@@ -183,4 +183,9 @@ public final class Catch extends Single {
     for(final Var v : vars) if(!visitor.declared(v)) return false;
     return visitAll(visitor, expr);
   }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize();
+  }
 }

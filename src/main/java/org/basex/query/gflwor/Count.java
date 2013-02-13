@@ -125,4 +125,9 @@ public class Count extends GFLWOR.Clause {
   long calcSize(final long cnt) {
     return cnt;
   }
+
+  @Override
+  public int exprSize() {
+    return 0;
+  }
 }

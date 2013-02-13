@@ -157,6 +157,8 @@ public interface QueryText {
   /** Parser token. */
   String LAX = "lax";
   /** Parser token. */
+  String LAZY = "lazy";
+  /** Parser token. */
   String LEAST = "least";
   /** Parser token. */
   String LET = "let";

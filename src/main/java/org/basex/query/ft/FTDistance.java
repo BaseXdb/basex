@@ -131,4 +131,12 @@ public final class FTDistance extends FTFilter {
   public boolean accept(final ASTVisitor visitor) {
     return visitAll(visitor, expr) && visitAll(visitor, dist);
   }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final FTExpr e : expr) sz += e.exprSize();
+    for(final Expr e : dist) sz += e.exprSize();
+    return sz;
+  }
 }

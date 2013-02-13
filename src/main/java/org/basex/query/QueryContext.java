@@ -142,8 +142,8 @@ public final class QueryContext extends Progress {
   /** Indicates if the query context has been closed. */
   private boolean closed;
 
-  /** The current stack frame. */
-  public Value[] stackFrame;
+  /** The evaluation stack. */
+  public final QueryStack stack = new QueryStack();
 
   /**
    * Constructor.
@@ -600,7 +600,7 @@ public final class QueryContext extends Progress {
    * @return bound value
    */
   public Value get(final Var var) {
-    final Value val = stackFrame[var.slot];
+    final Value val = stack.get(var);
     if(val == null) throw Util.notexpected(var);
     return val;
   }
@@ -614,7 +614,7 @@ public final class QueryContext extends Progress {
    */
   public void set(final Var vr, final Value vl, final InputInfo ii)
       throws QueryException {
-    stackFrame[vr.slot] = vr.checkType(vl, this, ii);
+    stack.set(vr, vl, this, ii);
   }
 
   /**
@@ -623,6 +623,6 @@ public final class QueryContext extends Progress {
    * @return {@code true} is a value is bound, {@code false} otherwise
    */
   public boolean isBound(final Var vr) {
-    return stackFrame[vr.slot] != null;
+    return stack.get(vr) != null;
   }
 }

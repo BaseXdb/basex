@@ -38,7 +38,7 @@ public class MainModule extends ExprInfo implements Scope {
       expr = expr.compile(ctx, scope);
       scope.cleanUp(this);
     } finally {
-      scope.exit(ctx, null);
+      scope.exit(ctx, 0);
     }
   }
 
@@ -53,7 +53,7 @@ public class MainModule extends ExprInfo implements Scope {
       scope.enter(ctx);
       return ctx.value(expr);
     } finally {
-      scope.exit(ctx, null);
+      scope.exit(ctx, 0);
     }
   }
 
@@ -61,19 +61,17 @@ public class MainModule extends ExprInfo implements Scope {
    * Creates a result iterator which lazily evaluates this module.
    * @param ctx query context
    * @return result iterator
+   * @throws QueryException query exception
    */
-  public Iter iter(final QueryContext ctx) {
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    scope.enter(ctx);
+    final Iter iter = expr.iter(ctx);
     return new Iter() {
-      Iter iter;
       @Override
       public Item next() throws QueryException {
-        try {
-          scope.enter(ctx);
-          if(iter == null) iter = expr.iter(ctx);
-          return iter.next();
-        } finally {
-          scope.exit(ctx, null);
-        }
+        final Item it = iter.next();
+        if(it == null) scope.exit(ctx, 0);
+        return it;
       }
 
       @Override

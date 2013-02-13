@@ -162,4 +162,9 @@ public class FTContains extends ParseExpr {
   public boolean accept(final ASTVisitor visitor) {
     return expr.accept(visitor) && ftexpr.accept(visitor);
   }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize() + ftexpr.exprSize() + 1;
+  }
 }

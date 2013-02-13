@@ -354,6 +354,11 @@ public class Window extends GFLWOR.Clause {
     return expr.size() == 0 ? 0 : -1;
   }
 
+  @Override
+  public int exprSize() {
+    return expr.exprSize() + start.exprSize() + (end == null ? 0 : end.exprSize());
+  }
+
   /**
    * A window {@code start} of {@code end} condition.
    *
@@ -533,6 +538,11 @@ public class Window extends GFLWOR.Clause {
           && (prev == null || visitor.declared(prev))
           && (next == null || visitor.declared(next))
           && expr.accept(visitor);
+    }
+
+    @Override
+    public int exprSize() {
+      return expr.exprSize();
     }
   }
 

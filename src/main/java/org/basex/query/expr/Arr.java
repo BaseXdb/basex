@@ -137,4 +137,11 @@ public abstract class Arr extends ParseExpr {
   public boolean accept(final ASTVisitor visitor) {
     return visitAll(visitor, expr);
   }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz;
+  }
 }

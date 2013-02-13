@@ -483,4 +483,12 @@ public final class FTWords extends FTExpr {
     return visitAll(visitor, expr) && query.accept(visitor)
         && (occ == null || visitAll(visitor, occ));
   }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    if(occ != null) for(final Expr o : occ) sz += o.exprSize();
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz + query.exprSize();
+  }
 }

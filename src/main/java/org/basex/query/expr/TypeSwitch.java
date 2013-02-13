@@ -152,4 +152,11 @@ public final class TypeSwitch extends ParseExpr {
   public boolean accept(final ASTVisitor visitor) {
     return ts.accept(visitor) && visitAll(visitor, cases);
   }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : cases) sz += e.exprSize();
+    return sz + ts.exprSize();
+  }
 }

@@ -3,6 +3,7 @@ package org.basex.query.util;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 
 /**
@@ -45,7 +46,7 @@ public abstract class ASTVisitor {
    * @param sub scope
    * @return if more expressions should be visited
    */
-  public boolean subScope(final Scope sub) {
+  public boolean inlineFunc(final Scope sub) {
     return true;
   }
 
@@ -55,6 +56,15 @@ public abstract class ASTVisitor {
    * @return if more expressions should be visited
    */
   public boolean funcCall(final UserFuncCall call) {
+    return true;
+  }
+
+  /**
+   * Notifies the visitor of a function item.
+   * @param func the function item
+   * @return if more expressions should be visited
+   */
+  public boolean funcItem(final FuncItem func) {
     return true;
   }
 }

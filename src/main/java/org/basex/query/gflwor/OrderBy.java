@@ -328,6 +328,14 @@ public class OrderBy extends GFLWOR.Clause {
     return cnt;
   }
 
+  @Override
+  public int exprSize() {
+    int sz = 0;
+    for(final Expr e : texpr) sz += e.exprSize();
+    for(final Expr e : keys) sz += e.exprSize();
+    return sz;
+  }
+
   /**
    * Sort key.
    *
@@ -372,6 +380,11 @@ public class OrderBy extends GFLWOR.Clause {
       if(desc) sb.append(' ').append(DESCENDING);
       sb.append(' ').append(EMPTYORD).append(' ').append(least ? LEAST : GREATEST);
       return sb.toString();
+    }
+
+    @Override
+    public int exprSize() {
+      return expr.exprSize();
     }
   }
 }

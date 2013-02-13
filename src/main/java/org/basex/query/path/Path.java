@@ -473,4 +473,11 @@ public abstract class Path extends ParseExpr {
   public boolean accept(final ASTVisitor visitor) {
     return (root == null || root.accept(visitor)) && visitAll(visitor, steps);
   }
+
+  @Override
+  public final int exprSize() {
+    int sz = 1;
+    for(final Expr e : steps) sz += e.exprSize();
+    return root == null ? sz : sz + root.exprSize();
+  }
 }

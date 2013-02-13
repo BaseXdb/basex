@@ -83,4 +83,9 @@ public final class Quantifier extends Single {
     final StringBuilder sb = new StringBuilder(every ? EVERY : SOME);
     return sb.append('(').append(expr).append(')').toString();
   }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize();
+  }
 }

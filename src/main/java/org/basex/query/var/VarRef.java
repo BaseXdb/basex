@@ -123,4 +123,9 @@ public final class VarRef extends ParseExpr {
   public boolean uses(final Use u) {
     return false;
   }
+
+  @Override
+  public int exprSize() {
+    return 1;
+  }
 }

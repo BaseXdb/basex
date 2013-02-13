@@ -45,7 +45,7 @@ public abstract class UserFuncCall extends Arr {
     // compile mutually recursive functions
     func.compile(ctx, scp);
 
-    if(func.inline()) {
+    if(func.inline(ctx)) {
       // inline the function
       ctx.compInfo(OPTINLINEFN, func.name.string());
 
@@ -88,15 +88,15 @@ public abstract class UserFuncCall extends Arr {
    * @param scp variable scope
    * @param vars formal parameters
    * @param vals values to add
-   * @return old stack frame
+   * @return old stack frame pointer
    * @throws QueryException if the arguments can't be bound
    */
-  static Value[] addArgs(final QueryContext ctx, final InputInfo ii, final VarScope scp,
+  static int addArgs(final QueryContext ctx, final InputInfo ii, final VarScope scp,
       final Var[] vars, final Value[] vals) throws QueryException {
     // move variables to stack
-    final Value[] old = scp.enter(ctx);
+    final int fp = scp.enter(ctx);
     for(int i = 0; i < vars.length; i++) ctx.set(vars[i], vals[i], ii);
-    return old;
+    return fp;
   }
 
   /**

@@ -291,4 +291,11 @@ public class AxisStep extends Preds {
   public boolean accept(final ASTVisitor visitor) {
     return visitAll(visitor, preds);
   }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : preds) sz += e.exprSize();
+    return sz;
+  }
 }

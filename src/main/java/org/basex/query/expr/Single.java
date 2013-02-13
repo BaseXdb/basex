@@ -76,4 +76,9 @@ public abstract class Single extends ParseExpr {
   public boolean accept(final ASTVisitor visitor) {
     return expr.accept(visitor);
   }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize() + 1;
+  }
 }

@@ -129,4 +129,11 @@ public final class FTWindow extends FTFilter {
   public boolean accept(final ASTVisitor visitor) {
     return visitAll(visitor, expr) && win.accept(visitor);
   }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final FTExpr e : expr) sz += e.exprSize();
+    return sz + win.exprSize();
+  }
 }

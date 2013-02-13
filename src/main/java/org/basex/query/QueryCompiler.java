@@ -17,15 +17,13 @@ import org.basex.util.list.*;
  */
 public final class QueryCompiler {
   /** Result list. */
-  private final ArrayList<int[]> result = new ArrayList<int[]>();
+  private final ArrayList<Scope[]> result = new ArrayList<Scope[]>();
   /** Node stack. */
   private final IntList stack = new IntList();
   /** Index and lowlink list. */
   private final IntList list = new IntList();
   /** Counter for the next free index. */
   private int nextIndex;
-  /** Nodes in the stack. */
-  private final BitArray inStack = new BitArray();
 
   /** Adjacency list. */
   final ArrayList<IntList> adjacent = new ArrayList<IntList>();
@@ -59,52 +57,19 @@ public final class QueryCompiler {
    */
   private void compile(final QueryContext ctx) throws QueryException {
     tarjan(0);
-    for(final int[] comp : result) {
+    for(final Scope[] comp : result) {
       if(comp.length > 1) {
-        for(final int s : comp) {
-          final Scope scp = scopes.get(s);
-          if(scp instanceof StaticVar)
+        for(final Scope scp : comp) {
+          if(scp instanceof StaticVar) {
             throw Err.CIRCVAR.thrw(((StaticVar) scp).info, scp);
+          }
         }
         // compile only the entry point, all other functions are compiled recursively
-        scopes.get(comp[comp.length - 1]).compile(ctx);
+        comp[comp.length - 1].compile(ctx);
       } else {
-        scopes.get(comp[0]).compile(ctx);
+        comp[0].compile(ctx);
       }
     }
-    // analyze((MainModule) scopes.get(0), new IdentityHashMap<Scope, Object>());
-  }
-
-  private void analyze(final MainModule root,
-      final IdentityHashMap<Scope, Object> identityHashMap) {
-    final StringBuilder sb = new StringBuilder();
-    root.visit(new ASTVisitor() {
-      @Override
-      public boolean staticVar(final StaticVar var) {
-        if(identityHashMap.put(var, var) == null) {
-          var.visit(this);
-          var.fullDesc(sb).append('\n');
-        }
-        return true;
-      }
-
-      @Override
-      public boolean funcCall(final UserFuncCall call) {
-        final UserFunc func = call.func();
-        if(identityHashMap.put(func, func) == null) {
-          func.visit(this);
-          sb.append(func).append('\n');
-        }
-        return true;
-      }
-
-      @Override
-      public boolean subScope(final Scope sub) {
-        return sub.visit(this);
-      }
-    });
-    System.out.println("Inlined:");
-    System.out.println(sb.append('\n').append(root).append('\n'));
   }
 
   /**
@@ -118,7 +83,6 @@ public final class QueryCompiler {
     list.set(llv, idx);
 
     stack.push(v);
-    inStack.set(v);
 
     for(int w : adjacentTo(v)) {
       final int ixw = 2 * w, llw = ixw + 1;
@@ -126,7 +90,7 @@ public final class QueryCompiler {
         // Successor w has not yet been visited; recurse on it
         tarjan(w);
         list.set(llv, Math.min(list.get(llv), list.get(llw)));
-      } else if(inStack.get(w)) {
+      } else if(stack.contains(w)) {
         // Successor w is in stack S and hence in the current SCC
         list.set(llv, Math.min(list.get(llv), list.get(ixw)));
       }
@@ -135,11 +99,11 @@ public final class QueryCompiler {
     // If v is a root node, pop the stack and generate an SCC
     if(list.get(llv) == list.get(ixv)) {
       int w;
-      int[] out = null;
+      Scope[] out = null;
       do {
         w = stack.pop();
-        inStack.clear(w);
-        out = out == null ? new int[] { w } : Array.add(out, w);
+        final Scope scp = scopes.get(w);
+        out = out == null ? new Scope[] { scp } : Array.add(out, scp);
       } while(w != v);
       result.add(out);
     }
@@ -178,7 +142,7 @@ public final class QueryCompiler {
       }
 
       @Override
-      public boolean subScope(final Scope sub) {
+      public boolean inlineFunc(final Scope sub) {
         return sub.visit(this);
       }
 

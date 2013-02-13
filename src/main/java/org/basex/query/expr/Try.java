@@ -47,6 +47,7 @@ public final class Try extends Single {
       super.compile(ctx, scp);
       if(expr.isValue()) return optPre(expr, ctx);
     } catch(final QueryException ex) {
+      if(!ex.isCatchable()) throw ex;
       for(final Catch c : ctch) {
         if(c.matches(ex)) {
           // found a matching clause, compile and inline error message
@@ -74,6 +75,7 @@ public final class Try extends Single {
     try {
       return ctx.value(expr);
     } catch(final QueryException ex) {
+      if(!ex.isCatchable()) throw ex;
       for(final Catch c : ctch) if(c.matches(ex)) return c.value(ctx, ex);
       throw ex;
     }
@@ -96,6 +98,7 @@ public final class Try extends Single {
         change = true;
       }
     } catch(final QueryException qe) {
+      if(!qe.isCatchable()) throw qe;
       for(final Catch c : ctch) {
         if(c.matches(qe)) {
           // found a matching clause, inline variable and error message
@@ -147,5 +150,12 @@ public final class Try extends Single {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return expr.accept(visitor) && visitAll(visitor, ctch);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : ctch) sz += e.exprSize();
+    return sz;
   }
 }

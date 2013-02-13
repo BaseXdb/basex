@@ -97,4 +97,11 @@ public final class SwitchCase extends Arr {
       if((all.plus(expr[i].count(v))) == VarUsage.MORE_THAN_ONCE) break;
     return all;
   }
+
+  @Override
+  public int exprSize() {
+    int sz = 0;
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz;
+  }
 }

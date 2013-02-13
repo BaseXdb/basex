@@ -31,14 +31,14 @@ public final class TailFuncCall extends UserFuncCall {
     checkHeight(ctx);
 
     // cache arguments, evaluate function and reset variable scope
-    final Value[] cs = addArgs(ctx, ii, func.scope, func.args, args(ctx));
+    final int fp = addArgs(ctx, ii, func.scope, func.args, args(ctx));
     try {
       return func.item(ctx, ii);
     } catch(final QueryException ex) {
       ex.add(info);
       throw ex;
     } finally {
-      func.scope.exit(ctx, cs);
+      func.scope.exit(ctx, fp);
     }
   }
 
@@ -47,14 +47,14 @@ public final class TailFuncCall extends UserFuncCall {
     checkHeight(ctx);
 
     // cache arguments, evaluate function and reset variable scope
-    final Value[] cs = addArgs(ctx, info, func.scope, func.args, args(ctx));
+    final int fp = addArgs(ctx, info, func.scope, func.args, args(ctx));
     try {
       return ctx.value(func);
     } catch(final QueryException ex) {
       ex.add(info);
       throw ex;
     } finally {
-      func.scope.exit(ctx, cs);
+      func.scope.exit(ctx, fp);
     }
   }
 

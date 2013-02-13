@@ -139,4 +139,12 @@ public final class Transform extends Arr {
   public boolean accept(final ASTVisitor visitor) {
     return visitAll(visitor, copies) && visitAll(visitor, expr);
   }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Let lt : copies) sz += lt.exprSize();
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz;
+  }
 }

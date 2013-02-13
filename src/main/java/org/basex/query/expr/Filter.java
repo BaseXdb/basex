@@ -239,4 +239,11 @@ public class Filter extends Preds {
   public boolean accept(final ASTVisitor visitor) {
     return root.accept(visitor) && visitAll(visitor, preds);
   }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : preds) sz += e.exprSize();
+    return sz + root.exprSize();
+  }
 }

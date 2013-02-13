@@ -300,6 +300,14 @@ public class GroupBy extends GFLWOR.Clause {
     return -1;
   }
 
+  @Override
+  public int exprSize() {
+    int sz = 0;
+    for(final Expr e : preExpr) sz += e.exprSize();
+    for(final Expr e : by) sz += e.exprSize();
+    return sz;
+  }
+
   /**
    * Grouping spec.
    *
@@ -354,6 +362,11 @@ public class GroupBy extends GFLWOR.Clause {
     @Override
     public boolean accept(final ASTVisitor visitor) {
       return expr.accept(visitor) && visitor.declared(var);
+    }
+
+    @Override
+    public int exprSize() {
+      return expr.exprSize();
     }
   }
 

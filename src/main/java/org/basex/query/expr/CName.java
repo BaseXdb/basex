@@ -142,4 +142,11 @@ public abstract class CName extends CFrag {
     if(sub != null) name = sub;
     return sub != null || ex ? optimize(ctx, scp) : null;
   }
+
+  @Override
+  public final int exprSize() {
+    int sz = 1;
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz + name.exprSize();
+  }
 }

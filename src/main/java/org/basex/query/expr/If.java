@@ -193,4 +193,11 @@ public final class If extends Arr {
   public boolean accept(final ASTVisitor visitor) {
     return cond.accept(visitor) && super.accept(visitor);
   }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz + cond.exprSize();
+  }
 }

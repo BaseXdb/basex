@@ -133,4 +133,11 @@ public abstract class FTExpr extends ParseExpr {
     }
     return sb.toString();
   }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz;
+  }
 }

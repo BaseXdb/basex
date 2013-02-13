@@ -192,6 +192,8 @@ public final class Prop extends AProp {
   public static final Object[] SINGLEGC = { "SINGLEGC", false };
   /** Hidden: flag for tail-call optimization. */
   public static final Object[] TAILCALLS = { "TAILCALLS", 42 };
+  /** Hidden: flag for the size limit on inlineable functions. */
+  public static final Object[] INLINELIMIT = { "INLINELIMIT", 128 };
   /** Hidden: maximum number of hits to be displayed in the GUI (will be overwritten). */
   public static final Object[] MAXHITS = { "MAXHITS", -1 };
 

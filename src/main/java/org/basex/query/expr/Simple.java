@@ -66,4 +66,9 @@ public abstract class Simple extends ParseExpr {
   public boolean accept(final ASTVisitor visitor) {
     return true;
   }
+
+  @Override
+  public int exprSize() {
+    return 1;
+  }
 }

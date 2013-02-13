@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.*;
 
 import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.expr.*;
@@ -170,21 +169,19 @@ public final class VarScope {
   /**
    * Enters this scope.
    * @param ctx query context
-   * @return old stack frame
+   * @return old frame pointer
    */
-  public Value[] enter(final QueryContext ctx) {
-    final Value[] old = ctx.stackFrame;
-    ctx.stackFrame = new Value[vars.size()];
-    return old;
+  public int enter(final QueryContext ctx) {
+    return ctx.stack.enterFrame(vars.size());
   }
 
   /**
    * Exits this scope.
    * @param ctx query context
-   * @param old stack frame of the enclosing scope, or {@code null}
+   * @param fp frame pointer
    */
-  public void exit(final QueryContext ctx, final Value[] old) {
-    ctx.stackFrame = old;
+  public void exit(final QueryContext ctx, final int fp) {
+    ctx.stack.exitFrame(fp);
   }
 
   /**

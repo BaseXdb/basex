@@ -137,4 +137,11 @@ public final class FTWeight extends FTExpr {
   public boolean accept(final ASTVisitor visitor) {
     return visitAll(visitor, expr) && weight.accept(visitor);
   }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final FTExpr e : expr) sz += e.exprSize();
+    return sz + weight.exprSize();
+  }
 }

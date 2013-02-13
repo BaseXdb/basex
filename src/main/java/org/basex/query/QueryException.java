@@ -33,6 +33,8 @@ public final class QueryException extends Exception {
   private InputInfo info;
   /** Marked error column. */
   private int markedCol;
+  /** Marks if this exception is catchable by a {@code try/catch} expression. */
+  private boolean catchable = true;
 
   /**
    * Constructor, specifying an exception or error. {@link Err#BASX_GENERIC} will be set
@@ -217,5 +219,22 @@ public final class QueryException extends Exception {
       for(final InputInfo ii : stack) tb.add(NL).add(LI).add(ii.toString());
     }
     return tb.toString();
+  }
+
+  /**
+   * Checks if this exception can be caught by a {@code try/catch} expression.
+   * @return result of check
+   */
+  public boolean isCatchable() {
+    return catchable;
+  }
+
+  /**
+   * Makes this exception uncatchable by a {@code try/catch} expression.
+   * @return self reference for convenience
+   */
+  public QueryException notCatchable() {
+    catchable = false;
+    return this;
   }
 }

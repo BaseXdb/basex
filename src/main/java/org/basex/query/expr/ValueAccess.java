@@ -155,4 +155,9 @@ public final class ValueAccess extends IndexAccess {
   public boolean accept(final ASTVisitor visitor) {
     return expr.accept(visitor) && super.accept(visitor);
   }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize() + 1;
+  }
 }

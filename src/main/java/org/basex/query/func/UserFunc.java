@@ -6,6 +6,7 @@ import static org.basex.query.util.Err.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -139,16 +140,18 @@ public class UserFunc extends Single implements Scope {
     for(Entry<Var, Expr> e : scope.closure().entrySet())
       e.setValue(e.getValue().compile(ctx, outer));
 
-    final Value[] sf = scope.enter(ctx);
+    final int fp = scope.enter(ctx);
     try {
       // constant propagation
       for(final Entry<Var, Expr> e : staticBindings())
         ctx.set(e.getKey(), e.getValue().value(ctx), info);
 
       expr = expr.compile(ctx, scope);
-      scope.cleanUp(this);
+    } catch(final QueryException qe) {
+      expr = FNInfo.error(qe, info);
     } finally {
-      scope.exit(ctx, sf);
+      scope.cleanUp(this);
+      scope.exit(ctx, fp);
     }
 
     // convert all function calls in tail position to proper tail calls
@@ -232,10 +235,11 @@ public class UserFunc extends Single implements Scope {
 
   /**
    * Checks if this function can be inlined.
+   * @param ctx query context
    * @return result of check
    */
-  boolean inline() {
-    return expr.isValue() ||
+  boolean inline(final QueryContext ctx) {
+    return expr.isValue() || expr.exprSize() < ctx.context.prop.num(Prop.INLINELIMIT) &&
         !(compiling || uses(Use.NDT) || uses(Use.CTX) || selfRecursive());
   }
 
@@ -274,15 +278,17 @@ public class UserFunc extends Single implements Scope {
     }
 
     if(val) {
-      final Value[] sf = scope.enter(ctx);
+      final int fp = scope.enter(ctx);
       try {
         for(final Entry<Var, Expr> entry : staticBindings()) {
           final Expr inl = expr.inline(ctx, scope, entry.getKey(), entry.getValue());
           if(inl != null) expr = inl;
         }
-        scope.cleanUp(this);
+      } catch(final QueryException qe) {
+        expr = FNInfo.error(qe, info);
       } finally {
-        scope.exit(ctx, sf);
+        scope.cleanUp(this);
+        scope.exit(ctx, fp);
       }
     }
 
@@ -337,7 +343,7 @@ public class UserFunc extends Single implements Scope {
   public boolean accept(final ASTVisitor visitor) {
     for(final Entry<Var, Expr> e : scope.closure().entrySet())
       if(!e.getValue().accept(visitor)) return false;
-    return visitor.subScope(this);
+    return visitor.inlineFunc(this);
   }
 
   /**
@@ -352,9 +358,17 @@ public class UserFunc extends Single implements Scope {
       }
 
       @Override
-      public boolean subScope(final Scope sub) {
+      public boolean inlineFunc(final Scope sub) {
         return sub.visit(this);
       }
     });
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Entry<Var, Expr> e : scope.closure().entrySet())
+      sz += e.getValue().exprSize();
+    return sz + expr.exprSize();
   }
 }

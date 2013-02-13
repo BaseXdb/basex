@@ -34,7 +34,7 @@ public final class BaseFuncCall extends UserFuncCall {
     try {
       do {
         // cache arguments, evaluate function and reset variable scope
-        final Value[] sf = addArgs(ctx, ii, fun.scope, fun.args, args);
+        final int fp = addArgs(ctx, ii, fun.scope, fun.args, args);
         ctx.tailCalls = 0;
         try {
           return fun.item(ctx, ii);
@@ -42,7 +42,7 @@ public final class BaseFuncCall extends UserFuncCall {
           fun = c.getFunc();
           args = c.getArgs();
         } finally {
-          fun.scope.exit(ctx, sf);
+          fun.scope.exit(ctx, fp);
         }
       } while(true);
     } catch(final QueryException ex) {
@@ -62,7 +62,7 @@ public final class BaseFuncCall extends UserFuncCall {
     try {
       do {
         // cache arguments, evaluate function and reset variable scope
-        final Value[] sf = addArgs(ctx, info, fun.scope, fun.args, args);
+        final int fp = addArgs(ctx, info, fun.scope, fun.args, args);
         ctx.tailCalls = 0;
         try {
           return ctx.value(fun);
@@ -70,7 +70,7 @@ public final class BaseFuncCall extends UserFuncCall {
           fun = c.getFunc();
           args = c.getArgs();
         } finally {
-          fun.scope.exit(ctx, sf);
+          fun.scope.exit(ctx, fp);
         }
       } while(true);
     } catch(final QueryException ex) {

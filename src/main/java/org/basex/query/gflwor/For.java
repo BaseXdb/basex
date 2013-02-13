@@ -262,4 +262,9 @@ public class For extends GFLWOR.Clause {
     final long sz = expr.size();
     return sz < 0 ? -1 : sz > 0 ? sz * count : empty ? 1 : 0;
   }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize();
+  }
 }

@@ -639,6 +639,13 @@ public class GFLWOR extends ParseExpr {
     return this;
   }
 
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Clause cl : clauses) sz += cl.exprSize();
+    return ret.exprSize() + sz;
+  }
+
   /**
    * Evaluator for FLWOR clauses.
    *
