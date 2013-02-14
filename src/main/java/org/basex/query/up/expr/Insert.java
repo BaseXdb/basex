@@ -11,7 +11,9 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Insert expression.
@@ -98,6 +100,12 @@ public final class Insert extends Update {
       ctx.updates.add(up, ctx);
     }
     return null;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Insert(info, expr[1].copy(ctx, scp, vs), first, last, before, after,
+        expr[0].copy(ctx, scp, vs));
   }
 
   @Override

@@ -41,6 +41,16 @@ public final class ValueBuilder extends ValueIter implements Result {
   }
 
   /**
+   * Constructor.
+   * @param arr initial array
+   * @param s initial size
+   */
+  public ValueBuilder(final Item[] arr, final int s) {
+    item = arr;
+    size = s;
+  }
+
+  /**
    * Adds the contents of a value.
    * @param val value to be added
    */

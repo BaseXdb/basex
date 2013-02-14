@@ -26,6 +26,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
@@ -44,9 +45,9 @@ public final class QueryContext extends Progress {
       Pattern.compile("^((\"|')(.*?)\\2:|(\\{(.*?)\\}))(.+)$");
 
   /** Static context of an expression. */
-  public StaticContext sc = new StaticContext();
-  /** Variables. */
-  public final VarContext vars = new VarContext();
+  public StaticContext sc;
+  /** Static variables. */
+  public final Variables vars = new Variables();
   /** Functions. */
   public final UserFuncs funcs = new UserFuncs();
 
@@ -128,7 +129,7 @@ public final class QueryContext extends Progress {
   /** Opened connections to relational databases. */
   ClientSessions sessions;
   /** Root expression of the query. */
-  Expr root;
+  MainModule root;
 
   /** String container for verbose query info. */
   private final TokenBuilder info = new TokenBuilder();
@@ -141,6 +142,9 @@ public final class QueryContext extends Progress {
   /** Indicates if the query context has been closed. */
   private boolean closed;
 
+  /** The evaluation stack. */
+  public final QueryStack stack = new QueryStack();
+
   /**
    * Constructor.
    * @param ctx database context
@@ -150,10 +154,9 @@ public final class QueryContext extends Progress {
     nodes = ctx.current();
     inf = ctx.prop.is(Prop.QUERYINFO) || Prop.debug;
     final String path = ctx.prop.get(Prop.QUERYPATH);
-    if(!path.isEmpty()) sc.baseURI(path);
+    sc = new StaticContext(path, ctx.prop.is(Prop.XQUERY3));
     maxCalls = ctx.prop.num(Prop.TAILCALLS);
     modules = new ModuleLoader(ctx);
-    sc.xquery3 = ctx.prop.is(Prop.XQUERY3);
   }
 
   /**
@@ -162,7 +165,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void parse(final String qu) throws QueryException {
-    root = new QueryParser(qu, this).parse();
+    root = new QueryParser(qu, this).parseMain();
   }
 
   /**
@@ -172,7 +175,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public QNm module(final String qu) throws QueryException {
-    return (QNm) new QueryParser(qu, this).parse(EMPTY);
+    return new QueryParser(qu, this).parseModule(EMPTY);
   }
 
   /**
@@ -187,7 +190,7 @@ public final class QueryContext extends Progress {
     if(ctxItem != null) {
       // evaluate initial expression
       try {
-        value = ctxItem.value(this);
+        value = ctxItem.compile(this, new VarScope()).value(this);
       } catch(final QueryException ex) {
         if(ex.err() != XPNOCTX) throw ex;
         // only {@link ParseExpr} instances may cause this error
@@ -201,8 +204,9 @@ public final class QueryContext extends Progress {
     }
 
     // if specified, convert context item to specified type
+    // [LW] should not be necessary
     if(value != null && sc.initType != null) {
-      value = SeqType.get(sc.initType, Occ.ONE).promote(value, this, null);
+      value = SeqType.get(sc.initType, Occ.ONE).funcConvert(this, null, value);
     }
 
     // dynamic compilation
@@ -218,14 +222,13 @@ public final class QueryContext extends Progress {
    */
   public void analyze() throws QueryException {
     try {
-      // compile global functions.
-      // variables will be compiled if called for the first time
-      funcs.compile(this);
       // compile the expression
-      if(root != null) root = root.compile(this);
+      if(root != null) QueryCompiler.compile(this, root);
+      // compile global functions.
+      else funcs.compile(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      CIRCLDECL.thrw(null);
+      CIRCLDECL.thrw(null, ex);
     }
   }
 
@@ -237,7 +240,7 @@ public final class QueryContext extends Progress {
   public Iter iter() throws QueryException {
     try {
       // evaluate lazily if query will perform no updates
-      return updating ? value().iter() : iter(root);
+      return updating ? value().iter() : root.iter(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw CIRCLDECL.thrw(null);
@@ -251,7 +254,7 @@ public final class QueryContext extends Progress {
    */
   public Value value() throws QueryException {
     try {
-      final Value v = value(root);
+      final Value v = root.value(this);
       final Value u = update();
       return u != null ? u : v;
     } catch(final StackOverflowError ex) {
@@ -338,16 +341,6 @@ public final class QueryContext extends Progress {
   public void bind(final String name, final Object val, final String type)
       throws QueryException {
     bind(name, cast(val, type));
-  }
-
-  /**
-   * Creates a variable with a unique, non-clashing variable name.
-   * @param ii input info
-   * @param type type
-   * @return variable
-   */
-  public Var uniqueVar(final InputInfo ii, final SeqType type) {
-    return Var.create(this, ii, new QNm(token(varIDs)), type, null);
   }
 
   /**
@@ -549,9 +542,10 @@ public final class QueryContext extends Progress {
    * appropriate XQuery type.
    * @param name name of variable
    * @param val value to be bound
+   * @return {@code true} if the value could be bound, {@code false} otherwise
    * @throws QueryException query exception
    */
-  private void bind(final String name, final Expr val) throws QueryException {
+  private boolean bind(final String name, final Expr val) throws QueryException {
     // remove optional $ prefix
     String nm = name.indexOf('$') == 0 ? name.substring(1) : name;
     byte[] uri = EMPTY;
@@ -565,20 +559,11 @@ public final class QueryContext extends Progress {
       nm = m.group(6);
     }
     final byte[] ln = token(nm);
-    if(nm.isEmpty() || !XMLToken.isNCName(ln)) return;
+    if(nm.isEmpty() || !XMLToken.isNCName(ln)) return false;
 
     // bind variable
     final QNm qnm = uri.length == 0 ? new QNm(ln, this) : new QNm(ln, uri);
-    final Var gl = vars.globals().get(qnm);
-    if(gl == null) {
-      // assign new variable
-      vars.updateGlobal(Var.create(this, null, qnm, null, null).bind(val, this));
-    } else {
-      // reset declaration state and bind new expression
-      gl.declared = false;
-      gl.bind(gl.type == null ? val :
-        gl.type.type.cast(val.item(this, null), this, null), this);
-    }
+    return vars.bind(qnm, val, this);
   }
 
   /**
@@ -607,5 +592,37 @@ public final class QueryContext extends Progress {
     final Type typ = type.endsWith(")") ? NodeType.find(nm) : AtomType.find(nm, false);
     if(typ == null) NOTYPE.thrw(null, type);
     return typ.cast(val, null);
+  }
+
+  /**
+   * Gets the value currently bound to the given variable.
+   * @param var variable
+   * @return bound value
+   */
+  public Value get(final Var var) {
+    final Value val = stack.get(var);
+    if(val == null) throw Util.notexpected(var);
+    return val;
+  }
+
+  /**
+   * Binds an expression to a local variable.
+   * @param vr variable
+   * @param vl expression to be bound
+   * @param ii input info
+   * @throws QueryException exception
+   */
+  public void set(final Var vr, final Value vl, final InputInfo ii)
+      throws QueryException {
+    stack.set(vr, vl, this, ii);
+  }
+
+  /**
+   * Checks if there's a value bound to the given variable.
+   * @param vr variable
+   * @return {@code true} is a value is bound, {@code false} otherwise
+   */
+  public boolean isBound(final Var vr) {
+    return stack.get(vr) != null;
   }
 }

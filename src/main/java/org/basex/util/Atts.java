@@ -140,4 +140,16 @@ public final class Atts {
     }
     return tb.add("]").toString();
   }
+
+  /**
+   * Creates a shallow copy which shares all keys and values.
+   * @return shallow copy
+   */
+  public Atts copy() {
+    final Atts copy = new Atts();
+    copy.nm = nm.clone();
+    copy.st = st.clone();
+    copy.size = size;
+    return copy;
+  }
 }

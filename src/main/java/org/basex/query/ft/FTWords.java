@@ -3,6 +3,7 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.ft.FTFlag.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
@@ -12,6 +13,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
@@ -32,7 +34,7 @@ public final class FTWords extends FTExpr {
   TokenList txt;
 
   /** All matches. */
-  FTMatches matches = new FTMatches((byte) 0);
+  FTMatches matches = new FTMatches(0);
   /** Flag for first evaluation. */
   boolean first;
   /** Search mode; default: {@link FTMode#ANY}. */
@@ -77,7 +79,7 @@ public final class FTWords extends FTExpr {
     query = t;
     mode = m;
     data = d;
-    compile(ctx);
+    compile(ctx, null);
   }
 
   @Override
@@ -87,16 +89,18 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTWords compile(final QueryContext ctx) throws QueryException {
-    if(occ != null) for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].compile(ctx);
+  public FTWords compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    if(occ != null) for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].compile(ctx, scp);
 
     // compile only once
     if(txt == null) {
-      query = query.compile(ctx);
+      query = query.compile(ctx, scp);
       if(query.isValue()) txt = tokens(ctx);
       // choose fast evaluation for default settings
       fast = mode == FTMode.ANY && txt != null && occ == null;
-      if(ftt == null) ftt = new FTTokenizer(this, ctx.ftOpt(), ctx.context.prop);
+      if(ftt == null)
+        ftt = new FTTokenizer(this, ctx.ftOpt(), ctx.context.prop.num(Prop.LSERROR));
     }
     return this;
   }
@@ -398,25 +402,40 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = 0;
-    if(occ != null) for(final Expr o : occ) c += o.count(v);
-    return c + query.count(v);
-  }
-
-  @Override
   public boolean removable(final Var v) {
     if(occ != null) for(final Expr o : occ) if(!o.removable(v)) return false;
     return query.removable(v);
   }
 
   @Override
-  public FTExpr remove(final Var v) {
-    if(occ != null) {
-      for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].remove(v);
+  public VarUsage count(final Var v) {
+    return occ != null ? VarUsage.sum(v, occ).plus(query.count(v)) : query.count(v);
+  }
+
+  @Override
+  public FTExpr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    boolean change = occ != null && inlineAll(ctx, scp, occ, v, e);
+    final Expr q = query.inline(ctx, scp, v, e);
+    if(q != null) {
+      query = q;
+      change = true;
     }
-    query = query.remove(v);
-    return this;
+    return change ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final FTWords ftw = new FTWords(info, query.copy(ctx, scp, vs), mode,
+        occ == null ? null : Arr.copyAll(ctx, scp, vs, occ));
+    if(data != null) ftw.data = data;
+    if(ftt != null) ftw.ftt = ftt.copy(ftw);
+    if(matches != null) ftw.matches = matches.copy();
+    if(txt != null) ftw.txt = txt.copy();
+    ftw.first = first;
+    ftw.tokNum = tokNum;
+    ftw.fast = fast;
+    return ftw;
   }
 
   @Override
@@ -457,5 +476,19 @@ public final class FTWords extends FTExpr {
       sb.append(OCCURS + ' ' + occ[0] + ' ' + TO + ' ' + occ[1] + ' ' + TIMES);
     }
     return sb.toString();
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr) && query.accept(visitor)
+        && (occ == null || visitAll(visitor, occ));
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    if(occ != null) for(final Expr o : occ) sz += o.exprSize();
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz + query.exprSize();
   }
 }

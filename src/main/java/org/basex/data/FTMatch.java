@@ -92,4 +92,17 @@ public final class FTMatch implements Iterable<FTStringMatch> {
     for(final FTStringMatch s : this) sb.append(' ').append(s);
     return sb.toString();
   }
+
+  /**
+   * Creates a deep copy of this container.
+   * @return copy
+   */
+  protected FTMatch copy() {
+    final FTMatch ftm = new FTMatch();
+    ftm.size = size;
+    ftm.match = match.clone();
+    for(int i = 0; i < ftm.match.length; i++)
+      if(ftm.match[i] != null) ftm.match[i] = ftm.match[i].copy();
+    return ftm;
+  }
 }

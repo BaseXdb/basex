@@ -46,13 +46,13 @@ public final class FNXQuery extends StandardFunc {
     switch(sig) {
       case _XQUERY_EVAL:   return eval(ctx);
       case _XQUERY_INVOKE: return invoke(ctx);
-      case _XQUERY_TYPE:   return comp(ctx).value(ctx);
+      case _XQUERY_TYPE:   return opt(ctx).value(ctx);
       default:             return super.value(ctx);
     }
   }
 
   @Override
-  Expr comp(final QueryContext ctx) throws QueryException {
+  Expr opt(final QueryContext ctx) throws QueryException {
     if(sig == Function._XQUERY_TYPE) {
       FNInfo.dump(Util.inf("{ type: %, size: % }", expr[0].type(), expr[0].size()),
           Token.token(expr[0].toString()), ctx);

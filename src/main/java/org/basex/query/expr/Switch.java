@@ -8,7 +8,9 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -46,9 +48,9 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    cond = cond.compile(ctx);
-    for(final SwitchCase sc : cases) sc.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    cond = cond.compile(ctx, scp);
+    for(final SwitchCase sc : cases) sc.compile(ctx, scp);
 
     // check if expression can be pre-evaluated
     Expr ex = this;
@@ -75,7 +77,7 @@ public final class Switch extends ParseExpr {
     // expression could not be pre-evaluated
     type = cases[0].expr[0].type();
     for(int c = 1; c < cases.length; c++) {
-      type = type.intersect(cases[c].expr[0].type());
+      type = type.union(cases[c].expr[0].type());
     }
     return ex;
   }
@@ -102,23 +104,29 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = cond.count(v);
-    for(final SwitchCase sc : cases) c += sc.count(v);
-    return c;
-  }
-
-  @Override
   public boolean removable(final Var v) {
     for(final SwitchCase sc : cases) if(!sc.removable(v)) return false;
     return cond.removable(v);
   }
 
   @Override
-  public Expr remove(final Var v) {
-    for(final SwitchCase sc : cases) sc.remove(v);
-    cond = cond.remove(v);
-    return this;
+  public VarUsage count(final Var v) {
+    VarUsage all = cond.count(v);
+    for(final SwitchCase cs : cases)
+      if((all = all.plus(cs.countCases(v))) == VarUsage.MORE_THAN_ONCE) break;
+    return all.plus(VarUsage.maximum(v, cases));
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    boolean change = inlineAll(ctx, scp, cases, v, e);
+    final Expr cn = cond.inline(ctx, scp, v, e);
+    if(cn != null) {
+      change = true;
+      cond = cn;
+    }
+    return change ? optimize(ctx, scp) : null;
   }
 
   @Override
@@ -150,6 +158,11 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Switch(info, cond.copy(ctx, scp, vs), Arr.copyAll(ctx, scp, vs, cases));
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), cond, cases);
   }
@@ -165,5 +178,17 @@ public final class Switch extends ParseExpr {
   public Expr markTailCalls() {
     for(final SwitchCase sc : cases) sc.markTailCalls();
     return this;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return cond.accept(visitor) && visitAll(visitor, cases);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : cases) sz += e.exprSize();
+    return sz;
   }
 }

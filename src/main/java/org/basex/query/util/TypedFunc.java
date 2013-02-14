@@ -15,25 +15,30 @@ public final class TypedFunc {
   public final Expr fun;
   /** Function type. */
   public final FuncType type;
+  /** Annotations. */
+  public final Ann ann;
 
   /**
    * Constructor.
    * @param f function expression
+   * @param a annotations
    * @param ret return type
    * @param args argument types
    */
-  private TypedFunc(final Expr f, final SeqType ret, final SeqType... args) {
-    this(f, FuncType.get(ret, args));
+  private TypedFunc(final Expr f, final Ann a, final SeqType ret, final SeqType... args) {
+    this(f, a, FuncType.get(ret, args));
   }
 
   /**
    * Constructor.
    * @param f function expression
+   * @param a annotations
    * @param ft function type
    */
-  public TypedFunc(final Expr f, final FuncType ft) {
+  public TypedFunc(final Expr f, final Ann a, final FuncType ft) {
     fun = f;
     type = ft;
+    ann = a;
   }
 
   /**
@@ -51,7 +56,7 @@ public final class TypedFunc {
    * @return typed function
    */
   public static TypedFunc constr(final Cast cast, final SeqType to) {
-    return new TypedFunc(cast, to, SeqType.AAT_ZO);
+    return new TypedFunc(cast, new Ann(), to, SeqType.AAT_ZO);
   }
 
   /**
@@ -60,6 +65,6 @@ public final class TypedFunc {
    * @return typed function
    */
   public static TypedFunc java(final JavaMapping f) {
-    return new TypedFunc(f, FuncType.arity(f.expr.length));
+    return new TypedFunc(f, new Ann(), FuncType.arity(f.expr.length));
   }
 }

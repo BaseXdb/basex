@@ -4,7 +4,9 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.path.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Container for all information needed to determine whether an index is
@@ -91,6 +93,22 @@ public final class IndexContext {
    */
   public void costs(final int c) {
     costs = c;
+  }
+
+  /**
+   * Creates a copy.
+   * @param cx query context
+   * @param scp variable scope
+   * @param vs variable mapping
+   * @return copy
+   */
+  public IndexContext copy(final QueryContext cx, final VarScope scp,
+      final IntMap<Var> vs) {
+    final IndexContext ic = new IndexContext(ctx, data, step.copy(cx, scp, vs), iterable);
+    ic.costs = costs;
+    ic.not = not;
+    ic.seq = seq;
+    return ic;
   }
 
   /**

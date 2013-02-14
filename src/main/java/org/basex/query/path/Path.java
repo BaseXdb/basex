@@ -17,6 +17,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -77,31 +78,37 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx) throws QueryException {
-    if(root != null) {
-      root = root.compile(ctx);
-      if(root instanceof Context) {
-        ctx.compInfo(OPTREMCTX);
-        root = null;
-      }
-    }
+  public final Expr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    if(root != null) setRoot(ctx, root.compile(ctx, scp));
 
     final Value v = ctx.value;
     try {
       ctx.value = root(ctx);
-      return compilePath(ctx);
+      return compilePath(ctx, scp);
     } finally {
       ctx.value = v;
     }
   }
 
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+    if(root instanceof Context) {
+      ctx.compInfo(OPTREMCTX);
+      root = null;
+    }
+    return this;
+  }
+
   /**
    * Compiles the location path.
    * @param ctx query context
+   * @param scp variable scope
    * @return optimized expression
    * @throws QueryException query exception
    */
-  protected abstract Expr compilePath(final QueryContext ctx) throws QueryException;
+  protected abstract Expr compilePath(final QueryContext ctx, VarScope scp)
+      throws QueryException;
 
   /**
    * Returns the root of the current context or {@code null}.
@@ -119,6 +126,19 @@ public abstract class Path extends ParseExpr {
     if(!(root instanceof Root) || v == null) return null;
     // return context sequence or root of current context
     return v.size() != 1 ? v : Root.root(v);
+  }
+
+  /**
+   * Sets a new root expression and eliminates a superfluous context item.
+   * @param ctx query context
+   * @param rt root expression
+   */
+  private void setRoot(final QueryContext ctx, final Expr rt) {
+    root = rt;
+    if(root instanceof Context) {
+      ctx.compInfo(OPTREMCTX);
+      root = null;
+    }
   }
 
   @Override
@@ -381,17 +401,16 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Adds a predicate to the last step.
+   * @param ctx query context
+   * @param scp variable scope
    * @param pred predicate to be added
    * @return resulting path instance
+   * @throws QueryException query exception
    */
-  public final Path addPreds(final Expr... pred) {
+  public final Expr addPreds(final QueryContext ctx, final VarScope scp,
+      final Expr... pred) throws QueryException {
     steps[steps.length - 1] = axisStep(steps.length - 1).addPreds(pred);
-    return get(info, root, steps);
-  }
-
-  @Override
-  public int count(final Var v) {
-    return root != null ? root.count(v) : 0;
+    return get(info, root, steps).optimize(ctx, scp);
   }
 
   @Override
@@ -400,10 +419,28 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    if(root != null) root = root.remove(v);
-    if(root instanceof Context) root = null;
-    return this;
+  public VarUsage count(final Var v) {
+    final VarUsage inRoot = root == null ? VarUsage.NEVER : root.count(v);
+    return VarUsage.sum(v, steps) == VarUsage.NEVER ? inRoot : VarUsage.MORE_THAN_ONCE;
+  }
+
+  @Override
+  public final Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+
+    final Value oldVal = ctx.value;
+    try {
+      ctx.value = root(ctx);
+      final Expr rt = root == null ? null : root.inline(ctx, scp, v, e);
+      if(rt != null) {
+        setRoot(ctx, rt);
+        ctx.value = oldVal;
+        ctx.value = root(ctx);
+      }
+      return inlineAll(ctx, scp, steps, v, e) || rt != null ? optimize(ctx, scp) : null;
+    } finally {
+      ctx.value = oldVal;
+    }
   }
 
   @Override
@@ -430,5 +467,17 @@ public abstract class Path extends ParseExpr {
       else sb.append(s);
     }
     return sb.toString();
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return (root == null || root.accept(visitor)) && visitAll(visitor, steps);
+  }
+
+  @Override
+  public final int exprSize() {
+    int sz = 1;
+    for(final Expr e : steps) sz += e.exprSize();
+    return root == null ? sz : sz + root.exprSize();
   }
 }

@@ -104,4 +104,25 @@ public abstract class Test {
   public final boolean sameAs(final Test t) {
     return mode == t.mode && type == t.type && (name == t.name || name.eq(t.name));
   }
+
+  /**
+   * Copies this test.
+   * @return deep copy
+   */
+  public abstract Test copy();
+
+  /**
+   * Checks if this test is namespace-sensitive.
+   * @return result of check
+   */
+  public boolean nsSensitive() {
+    return name != null;
+  }
+
+  /**
+   * Computes the intersection between two tests.
+   * @param other other test
+   * @return intersection if it exists, {@code null} otherwise
+   */
+  public abstract Test intersect(final Test other);
 }

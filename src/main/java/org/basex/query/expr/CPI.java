@@ -8,7 +8,9 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * PI fragment.
@@ -43,5 +45,10 @@ public final class CPI extends CName {
     while(++i != v.length && v[i] >= 0 && v[i] <= ' ');
     v = substring(v, i);
     return new FPI(new QNm(nm), FPI.parse(v, info));
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new CPI(info, name.copy(ctx, scp, vs), expr[0].copy(ctx, scp, vs));
   }
 }

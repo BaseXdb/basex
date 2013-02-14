@@ -7,7 +7,9 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Text fragment.
@@ -27,8 +29,8 @@ public final class CTxt extends CFrag {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
     return optPre(oneIsEmpty() ? null : this, ctx);
   }
 
@@ -47,6 +49,11 @@ public final class CTxt extends CFrag {
     } while((it = iter.next()) != null);
 
     return new FTxt(tb.finish());
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new CTxt(info, expr[0].copy(ctx, scp, vs));
   }
 
   @Override

@@ -12,10 +12,14 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.Type.ID;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -206,6 +210,11 @@ public class DBNode extends ANode {
     final DBNode n = new DBNode(data, pre, par, nodeType());
     n.score = score;
     return n;
+  }
+
+  @Override
+  public Value copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return copy();
   }
 
   @Override
@@ -442,16 +451,16 @@ public class DBNode extends ANode {
 
   @Override
   public byte[] xdmInfo() {
-    final ByteList bl = new ByteList().add(typeId());
+    final ByteList bl = new ByteList().add(typeId().asByte());
     if(type == NodeType.DOC) bl.add(baseURI()).add(0);
     else if(type == NodeType.ATT) bl.add(qname().uri()).add(0);
     return bl.toArray();
   }
 
   @Override
-  public int typeId() {
+  public ID typeId() {
     // check if a document has a single element as child
-    int t = type.id();
+    Type.ID t = type.id();
     if(type == NodeType.DOC) {
       final AxisMoreIter ai = children();
       if(ai.more() && ai.next().type == NodeType.ELM && !ai.more()) t = NodeType.DEL.id();

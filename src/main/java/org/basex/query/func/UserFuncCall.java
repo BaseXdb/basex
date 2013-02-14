@@ -2,12 +2,18 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.gflwor.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function call for user-defined functions.
@@ -33,34 +39,64 @@ public abstract class UserFuncCall extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
 
-    // inline if result and arguments are all values.
-    // currently, only functions with values as return expressions are inlined
-    // otherwise, recursive functions might not be correctly evaluated
-    func.compile(ctx);
-    if(func.expr.isValue() && allAreValues() && !func.uses(Use.NDT)) {
-      // evaluate arguments to catch cast exceptions
-      for(int a = 0; a < expr.length; ++a) func.args[a].bind(expr[a], ctx);
-      ctx.compInfo(OPTINLINE, func.name.string());
-      return func.value(ctx);
+    // compile mutually recursive functions
+    func.compile(ctx, scp);
+
+    if(func.inline(ctx)) {
+      // inline the function
+      ctx.compInfo(OPTINLINEFN, func.name.string());
+
+      // create let bindings for all variables
+      final LinkedList<GFLWOR.Clause> cls = expr.length == 0 ? null :
+        new LinkedList<GFLWOR.Clause>();
+      final IntMap<Var> vs = new IntMap<Var>();
+      for(int i = 0; i < func.args.length; i++) {
+        final Var old = func.args[i], v = scp.newCopyOf(ctx, old);
+        vs.add(old.id, v);
+        cls.add(new Let(v, expr[i], false, func.info).optimize(ctx, scp));
+      }
+
+      // copy the function body
+      final Expr cpy = func.expr.copy(ctx, scp, vs), rt = !func.cast ? cpy :
+            new TypeCheck(func.info, cpy, func.ret, true).optimize(ctx, scp);
+
+      return cls == null ? rt : new GFLWOR(func.info, cls, rt).optimize(ctx, scp);
     }
     type = func.type();
     return this;
   }
 
+  @Override
+  public final BaseFuncCall copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
+    final Expr[] arg = new Expr[expr.length];
+    for(int i = 0; i < arg.length; i++) arg[i] = expr[i].copy(ctx, scp, vs);
+    final BaseFuncCall call = new BaseFuncCall(info, name, arg);
+    call.func = func;
+    call.type = type;
+    call.size = size;
+    return call;
+  }
+
   /**
    * Adds the given arguments to the variable stack.
    * @param ctx query context
-   * @param vs variables to add
-   * @return old stack size
+   * @param ii input info
+   * @param scp variable scope
+   * @param vars formal parameters
+   * @param vals values to add
+   * @return old stack frame pointer
+   * @throws QueryException if the arguments can't be bound
    */
-  static VarStack addArgs(final QueryContext ctx, final Var[] vs) {
+  static int addArgs(final QueryContext ctx, final InputInfo ii, final VarScope scp,
+      final Var[] vars, final Value[] vals) throws QueryException {
     // move variables to stack
-    final VarStack vl = ctx.vars.cache(vs.length);
-    for(final Var v : vs) ctx.vars.add(v);
-    return vl;
+    final int fp = scp.enter(ctx);
+    for(int i = 0; i < vars.length; i++) ctx.set(vars[i], vals[i], ii);
+    return fp;
   }
 
   /**
@@ -69,12 +105,11 @@ public abstract class UserFuncCall extends Arr {
    * @return argument values
    * @throws QueryException query exception
    */
-  Var[] args(final QueryContext ctx) throws QueryException {
+  Value[] args(final QueryContext ctx) throws QueryException {
     final int al = expr.length;
-    final Var[] args = new Var[al];
+    final Value[] args = new Value[al];
     // evaluate arguments
-    for(int a = 0; a < al; ++a)
-      args[a] = func.args[a].bind(expr[a].value(ctx), ctx).copy();
+    for(int a = 0; a < al; ++a) args[a] = expr[a].value(ctx);
     return args;
   }
 
@@ -90,7 +125,7 @@ public abstract class UserFuncCall extends Arr {
    * Getter for the called function.
    * @return user-defined function
    */
-  final UserFunc func() {
+  public final UserFunc func() {
     return func;
   }
 
@@ -121,8 +156,12 @@ public abstract class UserFuncCall extends Arr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(name.string()).add(PAR1).add(
-        toString(SEP)).add(PAR2).toString();
+    return new TokenBuilder(name.string()).add(toString(SEP)).toString();
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitor.funcCall(this) && super.accept(visitor);
   }
 
   /**
@@ -131,13 +170,13 @@ public abstract class UserFuncCall extends Arr {
    */
   final class Continuation extends RuntimeException {
     /** Arguments. */
-    private final Var[] args;
+    private final Value[] args;
 
     /**
      * Constructor.
      * @param arg arguments
      */
-    Continuation(final Var[] arg) {
+    Continuation(final Value[] arg) {
       args = arg;
     }
 
@@ -145,7 +184,7 @@ public abstract class UserFuncCall extends Arr {
      * Getter for the continuation function.
      * @return the next function to call
      */
-    Expr getFunc() {
+    UserFunc getFunc() {
       return func;
     }
 
@@ -153,7 +192,7 @@ public abstract class UserFuncCall extends Arr {
      * Getter for the function arguments.
      * @return the next function call's arguments
      */
-    Var[] getArgs() {
+    Value[] getArgs() {
       return args;
     }
 

@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class TokenList extends ElementList implements Iterable<byte[]> {
+public final class TokenList extends ElementList implements Iterable<byte[]> {
   /** Element container. */
   byte[][] list;
 
@@ -202,5 +202,16 @@ public class TokenList extends ElementList implements Iterable<byte[]> {
       tb.add(list[i]);
     }
     return tb.add(']').toString();
+  }
+
+  /**
+   * Creates a copy of this list.
+   * @return copy of this list
+   */
+  public TokenList copy() {
+    final TokenList tl = new TokenList(list.length);
+    tl.factor = factor;
+    for(int i = 0; i < size; i++) tl.add(list[i].clone());
+    return tl;
   }
 }

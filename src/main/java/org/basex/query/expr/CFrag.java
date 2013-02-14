@@ -20,6 +20,7 @@ public abstract class CFrag extends Arr {
    */
   CFrag(final InputInfo ii, final Expr... n) {
     super(ii, n);
+    size = 1;
   }
 
   @Override

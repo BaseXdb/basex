@@ -8,10 +8,11 @@ import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This index class retrieves ranges from a value index.
@@ -27,17 +28,17 @@ public final class StringRangeAccess extends IndexAccess {
    * Constructor.
    * @param ii input info
    * @param t index reference
-   * @param ic index context
+   * @param d data reference
+   * @param it flag for iterative evaluation
    */
   public StringRangeAccess(final InputInfo ii, final StringRange t,
-      final IndexContext ic) {
-    super(ic, ii);
+      final Data d, final boolean it) {
+    super(d, it, ii);
     sr = t;
   }
 
   @Override
   public AxisIter iter(final QueryContext ctx) {
-    final Data data = ictx.data;
     final boolean text = sr.type == IndexType.TEXT;
     final byte kind = text ? Data.TEXT : Data.ATTR;
     final int ml = data.meta.maxlen;
@@ -60,7 +61,6 @@ public final class StringRangeAccess extends IndexAccess {
     return new IndexIterator() {
       final boolean text = sr.type == IndexType.TEXT;
       final byte kind = text ? Data.TEXT : Data.ATTR;
-      final Data data = ictx.data;
       int pre = -1;
 
       @Override
@@ -82,15 +82,20 @@ public final class StringRangeAccess extends IndexAccess {
   }
 
   @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new StringRangeAccess(info, sr, data, iterable);
+  }
+
+  @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DATA, ictx.data.meta.name,
+    addPlan(plan, planElem(DATA, data.meta.name,
         MIN, sr.min, MAX, sr.max, TYP, sr.type));
   }
 
   @Override
   public String toString() {
     return (sr.type == IndexType.TEXT ? Function._DB_TEXT_RANGE :
-      Function._DB_ATTRIBUTE_RANGE).get(info, Str.get(ictx.data.meta.name),
+      Function._DB_ATTRIBUTE_RANGE).get(info, Str.get(data.meta.name),
           Str.get(sr.min), Str.get(sr.max)).toString();
   }
 }

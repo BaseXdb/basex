@@ -6,7 +6,9 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -40,18 +42,25 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     try {
-      super.compile(ctx);
+      super.compile(ctx, scp);
       if(expr.isValue()) return optPre(expr, ctx);
     } catch(final QueryException ex) {
-      // replace original return expression with error
-      expr = FNInfo.error(ex, info);
+      if(!ex.isCatchable()) throw ex;
+      for(final Catch c : ctch) {
+        if(c.matches(ex)) {
+          // found a matching clause, compile and inline error message
+          return optPre(c.compile(ctx, scp).asExpr(ex, ctx, scp), ctx);
+        }
+      }
+      throw ex;
     }
 
-    for(final Catch c : ctch) c.compile(ctx);
+    for(final Catch c : ctch) c.compile(ctx, scp);
     type = expr.type();
-    for(final Catch c : ctch) type = type.intersect(c.type());
+    for(final Catch c : ctch)
+      if(!c.expr.isFunction(Function.ERROR)) type = type.union(c.type());
     return this;
   }
 
@@ -62,29 +71,50 @@ public final class Try extends Single {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final int s = ctx.vars.size();
+    // don't catch errors from error handlers
     try {
-      // don't catch errors from error handlers
-      try {
-        return ctx.value(expr);
-      } catch(final QueryException ex) {
-        for(final Catch c : ctch) {
-          final Value val = c.value(ctx, ex);
-          if(val != null) return val;
-        }
-        throw ex;
-      }
-    } finally {
-      // always reset the scope
-      ctx.vars.size(s);
+      return ctx.value(expr);
+    } catch(final QueryException ex) {
+      if(!ex.isCatchable()) throw ex;
+      for(final Catch c : ctch) if(c.matches(ex)) return c.value(ctx, ex);
+      throw ex;
     }
   }
 
   @Override
-  public int count(final Var v) {
-    int c = super.count(v);
-    for(final Catch ct : ctch) c += ct.count(v);
-    return c;
+  public VarUsage count(final Var v) {
+    return VarUsage.maximum(v, ctch).plus(expr.count(v));
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    boolean change = false;
+    try {
+      final Expr sub = expr.inline(ctx, scp, v, e);
+      if(sub != null) {
+        if(sub.isValue()) return optPre(sub, ctx);
+        expr = sub;
+        change = true;
+      }
+    } catch(final QueryException qe) {
+      if(!qe.isCatchable()) throw qe;
+      for(final Catch c : ctch) {
+        if(c.matches(qe)) {
+          // found a matching clause, inline variable and error message
+          return optPre(c.inline(ctx, scp, v, e).asExpr(qe, ctx, scp), ctx);
+        }
+      }
+      throw qe;
+    }
+
+    for(final Catch c : ctch) change |= c.inline(ctx, scp, v, e) != null;
+    return change ? this : null;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Try(info, expr.copy(ctx, scp, vs), Arr.copyAll(ctx, scp, vs, ctch));
   }
 
   @Override
@@ -97,12 +127,6 @@ public final class Try extends Single {
   public boolean removable(final Var v) {
     for(final Catch c : ctch) if(!c.removable(v)) return false;
     return super.removable(v);
-  }
-
-  @Override
-  public Expr remove(final Var v) {
-    for(final Catch c : ctch) c.remove(v);
-    return super.remove(v);
   }
 
   @Override
@@ -121,5 +145,17 @@ public final class Try extends Single {
     final StringBuilder sb = new StringBuilder("try { " + expr + " }");
     for(final Catch c : ctch) sb.append(' ').append(c);
     return sb.toString();
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return expr.accept(visitor) && visitAll(visitor, ctch);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : ctch) sz += e.exprSize();
+    return sz;
   }
 }

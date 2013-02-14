@@ -186,7 +186,7 @@ public final class GUIInput extends BaseXTextField {
     final QueryContext qc = new QueryContext(gui.context);
     try {
       final QuerySuggest qs = new QuerySuggest(query, qc, data);
-      qs.parse();
+      qs.parseMain();
       sl = qs.complete();
       pre = query.substring(0, qs.im);
     } catch(final QueryException ex) {

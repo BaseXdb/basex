@@ -6,7 +6,9 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -36,8 +38,15 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx) throws QueryException {
-    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx);
+  public FTExpr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx, scp);
+    return this;
+  }
+
+  @Override
+  public FTExpr optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     return this;
   }
 
@@ -67,23 +76,24 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final FTExpr e : expr) c += e.count(v);
-    return c;
-  }
-
-  @Override
   public boolean removable(final Var v) {
     for(final Expr e : expr) if(!e.removable(v)) return false;
     return true;
   }
 
   @Override
-  public FTExpr remove(final Var v) {
-    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].remove(v);
-    return this;
+  public VarUsage count(final Var v) {
+    return VarUsage.sum(v, expr);
   }
+
+  @Override
+  public FTExpr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return inlineAll(ctx, scp, expr, v, e) ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public abstract FTExpr copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
 
   @Override
   public boolean databases(final StringList db) {
@@ -122,5 +132,12 @@ public abstract class FTExpr extends ParseExpr {
       sb.append(e != 0 ? sep.toString() : "").append(expr[e]);
     }
     return sb.toString();
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz;
   }
 }

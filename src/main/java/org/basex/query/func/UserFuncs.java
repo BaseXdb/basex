@@ -11,6 +11,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -39,7 +40,7 @@ public final class UserFuncs extends ExprInfo {
     // function has already been declared
     final UserFuncCall call = add(ii, funcs[id].name, id, args);
     final FuncType type = FuncType.get(funcs[id]);
-    return new TypedFunc(call, type);
+    return new TypedFunc(call, funcs[id].ann, type);
   }
 
   /**
@@ -56,10 +57,11 @@ public final class UserFuncs extends ExprInfo {
 
     // add function call for function that has not been declared yet
     final int al = args.length;
-    final UserFunc uf = new UserFunc(ii, name, new Var[al], null, null, false, ctx);
+    final UserFunc uf = new UserFunc(ii, name, new Var[al], null, null, false, ctx.sc,
+        new VarScope());
     final UserFuncCall call = add(ii, name, add(uf, ii), args);
     final FuncType type = FuncType.arity(al);
-    return new TypedFunc(call, type);
+    return new TypedFunc(call, new Ann(), type);
   }
 
   /**
@@ -182,7 +184,7 @@ public final class UserFuncs extends ExprInfo {
   public void compile(final QueryContext ctx) throws QueryException {
     for(int i = 0; i < funcs.length; i++) {
       // only compile those functions that are used
-      if(calls[i].length != 0) funcs[i].compile(ctx);
+      if(calls[i].length != 0) funcs[i].compile(ctx, null);
     }
   }
 

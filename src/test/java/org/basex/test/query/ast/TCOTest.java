@@ -19,7 +19,7 @@ public class TCOTest extends QueryPlanTest {
         "  if($n = 0) then $f" +
         "  else local:fac($n - 1, $f * $n)" +
         "};" +
-        "local:fac(123, xs:decimal(1))",
+        "local:fac(123, xs:decimal('1'))",
 
         "12146304367025329675766243241881295855454217088483382315328918161829" +
         "23589236216766883115696061264020217073583522129404778259109157041165" +
@@ -41,7 +41,7 @@ public class TCOTest extends QueryPlanTest {
         "  if($n = 0) then true()" +
         "  else local:odd($n - 1)" +
         "};" +
-        "local:odd(12345)",
+        "local:odd(123)",
 
         "true",
 

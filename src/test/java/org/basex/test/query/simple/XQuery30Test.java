@@ -83,6 +83,8 @@ public final class XQuery30Test extends QueryTest {
           "declare function local:a($n) { try { local:b() } catch * { $n } };" +
           "declare function local:b() { (: fails at compile-time :) xs:QName('b:b') };" +
           "local:a(42)" },
+      { "Try/catch 7", itr(),
+          "let $seq := (1,2) return try { <x/>[*] } catch * { zero-or-one($seq) }" },
     };
   }
 }

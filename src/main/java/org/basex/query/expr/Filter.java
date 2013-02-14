@@ -9,7 +9,9 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -40,20 +42,22 @@ public class Filter extends Preds {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx) throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     // invalidate current context value (will be overwritten by filter)
     final Value cv = ctx.value;
     try {
-      root = root.compile(ctx);
+      root = root.compile(ctx, scp);
       // return empty root
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.uses(Use.POS))
-        return ((AxisPath) root).copy().addPreds(preds).compile(ctx);
+        return ((AxisPath) root.copy(ctx,
+            scp)).addPreds(ctx, scp, preds).compile(ctx, scp);
 
       // optimize filter expressions
       ctx.value = null;
-      final Expr e = super.compile(ctx);
+      final Expr e = super.compile(ctx, scp);
       if(e != this) return e;
 
       // no predicates.. return root; otherwise, do some advanced compilations
@@ -109,6 +113,12 @@ public class Filter extends Preds {
   }
 
   @Override
+  public Filter optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return this;
+  }
+
+  @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     Value val = root.value(ctx);
     final Value cv = ctx.value;
@@ -159,12 +169,16 @@ public class Filter extends Preds {
 
   /**
    * Adds a predicate to the filter.
+   * @param ctx query context
+   * @param scp variable scope
    * @param p predicate to be added
    * @return self reference
+   * @throws QueryException query exception
    */
-  public final Filter addPred(final Expr p) {
+  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
+      throws QueryException {
     preds = Array.add(preds, p);
-    return this;
+    return optimize(ctx, scp);
   }
 
   @Override
@@ -173,19 +187,35 @@ public class Filter extends Preds {
   }
 
   @Override
-  public final int count(final Var v) {
-    return root.count(v) + super.count(v);
-  }
-
-  @Override
   public final boolean removable(final Var v) {
     return root.removable(v) && super.removable(v);
   }
 
   @Override
-  public final Expr remove(final Var v) {
-    root = root.remove(v);
-    return super.remove(v);
+  public VarUsage count(final Var v) {
+    final VarUsage inPreds = super.count(v), inRoot = root.count(v);
+    if(inPreds == VarUsage.NEVER) return inRoot;
+    final long sz = root.size();
+    return sz >= 0 && sz <= 1 || root.type().zeroOrOne()
+        ? inRoot.plus(inPreds) : VarUsage.MORE_THAN_ONCE;
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final boolean pr = super.inline(ctx, scp, v, e) != null;
+    final Expr rt = root == null ? null : root.inline(ctx, scp, v, e);
+    if(rt != null) root = rt;
+    return pr || rt != null ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public Filter copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Filter f = new Filter(info, root == null ? null : root.copy(ctx, scp, vs),
+        Arr.copyAll(ctx, scp, vs, preds));
+    f.pos = pos;
+    f.last = last;
+    return f;
   }
 
   @Override
@@ -203,5 +233,17 @@ public class Filter extends Preds {
   @Override
   public final String toString() {
     return root + super.toString();
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return root.accept(visitor) && visitAll(visitor, preds);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : preds) sz += e.exprSize();
+    return sz + root.exprSize();
   }
 }

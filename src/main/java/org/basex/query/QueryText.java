@@ -19,6 +19,8 @@ public interface QueryText {
   /** Parser token. */
   String ALL = "all";
   /** Parser token. */
+  String ALLOWING = "allowing";
+  /** Parser token. */
   String AND = "and";
   /** Parser token. */
   String ANY = "any";
@@ -155,6 +157,8 @@ public interface QueryText {
   /** Parser token. */
   String LAX = "lax";
   /** Parser token. */
+  String LAZY = "lazy";
+  /** Parser token. */
   String LEAST = "least";
   /** Parser token. */
   String LET = "let";
@@ -172,6 +176,8 @@ public interface QueryText {
   String MODULE = "module";
   /** Parser token. */
   String MOST = "most";
+  /** Parser token. */
+  String NEXT = "next";
   /** Parser token. */
   String NSPACE = "namespace";
   /** Parser token. */
@@ -191,6 +197,8 @@ public interface QueryText {
   /** Parser token. */
   String OF = "of";
   /** Parser token. */
+  String ONLY = "only";
+  /** Parser token. */
   String OPTION = "option";
   /** Parser token. */
   String OR = "or";
@@ -208,6 +216,8 @@ public interface QueryText {
   String PHRASE = "phrase";
   /** Parser token. */
   String PRESERVE = "preserve";
+  /** Parser token. */
+  String PREVIOUS = "previous";
   /** Public token. */
   String PRIVATE = "private";
   /** Parser token. */
@@ -247,6 +257,8 @@ public interface QueryText {
   /** Parser token. */
   String SKIP = "skip";
   /** Parser token. */
+  String SLIDING = "sliding";
+  /** Parser token. */
   String SOME = "some";
   /** Parser token. */
   String STABLE = "stable";
@@ -277,6 +289,8 @@ public interface QueryText {
   /** Parser token. */
   String TRY = "try";
   /** Parser token. */
+  String TUMBLING = "tumbling";
+  /** Parser token. */
   String TYPE = "type";
   /** Parser token. */
   String TYPESWITCH = "typeswitch";
@@ -306,6 +320,8 @@ public interface QueryText {
   String GROUP = "group";
   /** Parser token. */
   String WILDCARDS = "wildcards";
+  /** Parser token. */
+  String WHEN = "when";
   /** Parser token. */
   String WINDOW = "window";
   /** Parser token. */
@@ -368,6 +384,8 @@ public interface QueryText {
   String CDATA = "<![CDATA[";
   /** Parser token. */
   String COLS = "::";
+  /** Parser token. */
+  String COUNT = "count";
   /** Parser token. */
   String COMMA = ",";
   /** Parser token. */
@@ -652,8 +670,6 @@ public interface QueryText {
   byte[] MAX = token("max");
   /** Minimum . */
   byte[] INF = token("inf");
-  /** Query Plan. */
-  byte[] COUNT = token("count");
 
   /** Example for a Date format. */
   String XDATE = "2000-12-31";
@@ -699,15 +715,21 @@ public interface QueryText {
   /** Optimization info. */
   String OPTFORLET = "moving for/let clauses";
   /** Optimization info. */
+  String OPTFORTOLET = "rewriting singleton for to let";
+  /** Optimization info. */
   String OPTSWAP = "swapping operands: %";
   /** Optimization info. */
   String OPTTEXT = "adding text() step";
   /** Optimization info. */
   String OPTFLWOR = "simplifying flwor expression";
   /** Optimization info. */
-  String OPTINLINE = "inlining function %(...)";
+  String OPTINLINEFN = "inlining function %(...)";
+  /** Optimization info. */
+  String OPTINLINE = "inlining %";
   /** Optimization info. */
   String OPTWHERE = "rewriting where clause to predicate(s)";
+  /** Optimization info. */
+  String OPTWHERE2 = "rewriting where clause(s)";
   /** Optimization info. */
   String OPTPRED = "rewriting % to predicate(s)";
   /** Optimization info. */

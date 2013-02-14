@@ -1,8 +1,8 @@
 package org.basex.query.expr;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -13,17 +13,21 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class IndexAccess extends Simple {
-  /** Index context. */
-  final IndexContext ictx;
+  /** Data reference. */
+  final Data data;
+  /** Flag for iterative evaluation. */
+  final boolean iterable;
 
   /**
    * Constructor.
-   * @param ic index context
+   * @param d data reference
+   * @param iter flag for iterative evaluation
    * @param ii input info
    */
-  protected IndexAccess(final IndexContext ic, final InputInfo ii) {
+  protected IndexAccess(final Data d, final boolean iter, final InputInfo ii) {
     super(ii);
-    ictx = ic;
+    data = d;
+    iterable = iter;
     type = SeqType.NOD_ZM;
   }
 
@@ -32,6 +36,6 @@ public abstract class IndexAccess extends Simple {
 
   @Override
   public final boolean iterable() {
-    return ictx.iterable;
+    return iterable;
   }
 }

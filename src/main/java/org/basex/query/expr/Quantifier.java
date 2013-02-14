@@ -2,15 +2,17 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
-import org.basex.query.flwor.*;
+import org.basex.query.gflwor.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
+import org.basex.util.hash.*;
 
 /**
  * Some/Every satisfier clause.
@@ -18,13 +20,9 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Quantifier extends ParseExpr {
+public final class Quantifier extends Single {
   /** Every flag. */
   private final boolean every;
-  /** For/Let expressions. */
-  private final For[] fl;
-  /** Satisfier. */
-  private Expr sat;
 
   /**
    * Constructor.
@@ -34,104 +32,60 @@ public final class Quantifier extends ParseExpr {
    * @param e every flag
    */
   public Quantifier(final InputInfo ii, final For[] f, final Expr s, final boolean e) {
-    super(ii);
-    sat = s;
-    fl = f;
+    this(ii, new GFLWOR(ii, new LinkedList<GFLWOR.Clause>(Arrays.asList(f)),
+        compBln(s, ii)), e);
+  }
+
+  /**
+   * Copy constructor.
+   * @param ii input info
+   * @param tests expression
+   * @param e every flag
+   */
+  private Quantifier(final InputInfo ii, final Expr tests, final boolean e) {
+    super(ii, tests);
     every = e;
     type = SeqType.BLN;
   }
 
   @Override
-  public void checkUp() throws QueryException {
-    for(final For f : fl) f.checkUp();
-    checkNoUp(sat);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
+    return optimize(ctx, scp);
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    // compile for clauses
-    final int vs = ctx.vars.size();
-    for(final For f : fl) f.compile(ctx);
-    sat = sat.compile(ctx).compEbv(ctx);
-    ctx.vars.size(vs);
-
-    // find empty sequences
-    boolean empty = false;
-    for(final For f : fl) empty |= f.isEmpty();
-
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     // return pre-evaluated result
-    return empty ? optPre(Bln.get(every), ctx) : this;
+    return expr.isValue() ? optPre(item(ctx, info), ctx) : this;
   }
 
   @Override
   public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Iter[] iter = new Iter[fl.length];
-    for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
-    return Bln.get(iter(ctx, iter, 0));
-  }
-
-  /**
-   * Performs a recursive iteration on the specified variable position.
-   * @param ctx query context
-   * @param it iterator
-   * @param p variable position
-   * @return satisfied flag
-   * @throws QueryException query exception
-   */
-  private boolean iter(final QueryContext ctx, final Iter[] it, final int p)
-      throws QueryException {
-
-    final boolean last = p + 1 == fl.length;
-    while(it[p].next() != null) {
-      if(every ^ (last ? sat.ebv(ctx, info).bool(info) :
-        iter(ctx, it, p + 1))) {
-        for(final Iter ri : it) ri.reset();
-        return !every;
-      }
-    }
-    return every;
+    final Iter iter = expr.iter(ctx);
+    for(Item it; (it = iter.next()) != null;)
+      if(every ^ it.ebv(ctx, ii).bool(ii)) return Bln.get(!every);
+    return Bln.get(every);
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.VAR || sat.uses(u);
-  }
-
-  @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final ForLet f : fl) c += f.count(v);
-    return c + sat.count(v);
-  }
-
-  @Override
-  public boolean removable(final Var v) {
-    for(final ForLet f : fl) if(!f.removable(v)) return false;
-    return sat.removable(v);
-  }
-
-  @Override
-  public Expr remove(final Var v) {
-    for(final ForLet f : fl) f.remove(v);
-    sat = sat.remove(v);
-    return this;
-  }
-
-  @Override
-  public boolean databases(final StringList db) {
-    for(final ForLet f : fl) if(!f.databases(db)) return false;
-    return sat.databases(db);
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Quantifier(info, expr.copy(ctx, scp, vs), every);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(TYP, every ? EVERY : SOME), fl, sat);
+    addPlan(plan, planElem(TYP, every ? EVERY : SOME), expr);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(every ? EVERY : SOME);
-    for(final For f : fl) sb.append(' ').append(f);
-    return sb.append(' ' + SATISFIES + ' ' + sat).toString();
+    return sb.append('(').append(expr).append(')').toString();
+  }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize();
   }
 }

@@ -16,7 +16,9 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * General comparison.
@@ -127,8 +129,8 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
 
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
@@ -284,12 +286,14 @@ public final class CmpG extends Cmp {
    * Creates a union of the existing and the specified expressions.
    * @param g general comparison
    * @param ctx query context
+   * @param scp variable scope
    * @return true if union was successful
    * @throws QueryException query exception
    */
-  boolean union(final CmpG g, final QueryContext ctx) throws QueryException {
+  boolean union(final CmpG g, final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     if(op != g.op || !expr[0].sameAs(g.expr[0])) return false;
-    expr[1] = new List(info, expr[1], g.expr[1]).compile(ctx);
+    expr[1] = new List(info, expr[1], g.expr[1]).compile(ctx, scp);
     atomic = atomic && expr[1].type().zeroOrOne();
     return true;
   }
@@ -321,7 +325,7 @@ public final class CmpG extends Cmp {
         return false;
 
       ic.addCosts(ic.data.meta.size / 10);
-      va = Array.add(va, new ValueAccess(info, arg, ind, ic));
+      va = Array.add(va, new ValueAccess(info, arg, ind, ic.data, ic.iterable));
       return true;
     }
 
@@ -335,7 +339,7 @@ public final class CmpG extends Cmp {
       final int is = ic.data.count(new StringToken(ind, it.string(info)));
       // add only expressions that yield results
       if(is != 0) {
-        va = Array.add(va, new ValueAccess(info, it, ind, ic));
+        va = Array.add(va, new ValueAccess(info, it, ind, ic.data, ic.iterable));
         ic.addCosts(is);
       }
     }
@@ -364,6 +368,11 @@ public final class CmpG extends Cmp {
     final AxisPath path = (AxisPath) expr;
     // path must contain no root node
     return path.root != null ? null : path.step(path.steps.length - 1);
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new CmpG(expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs), op, info);
   }
 
   @Override

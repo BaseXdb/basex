@@ -12,11 +12,14 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.Test.Mode;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Axis step expression.
@@ -70,7 +73,8 @@ public class AxisStep extends Preds {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx) throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     if(!test.compile(ctx)) return Empty.SEQ;
 
     // leaf flag indicates that a context node can be replaced by a text() step
@@ -88,7 +92,7 @@ public class AxisStep extends Preds {
       // as predicates will not necessarily start from the document node,
       // the context item type is temporarily generalized
       if(ct == NodeType.DOC) ctx.value.type = NodeType.NOD;
-      final Expr e = super.compile(ctx);
+      final Expr e = super.compile(ctx, scp);
 
       // return optimized step / don't re-optimize step
       if(e != this || e instanceof IterStep) return e;
@@ -231,6 +235,37 @@ public class AxisStep extends Preds {
   }
 
   @Override
+  public VarUsage count(final Var v) {
+    return super.count(v);
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    // leaf flag indicates that a context node can be replaced by a text() step
+    final Type ct = ctx.value != null ? ctx.value.type : null;
+    final boolean leaf = ctx.leaf;
+    ctx.leaf = false;
+    try {
+      // as predicates will not necessarily start from the document node,
+      // the context item type is temporarily generalized
+      if(ct == NodeType.DOC) ctx.value.type = NodeType.NOD;
+      return super.inline(ctx, scp, v, e);
+    } finally {
+      if(ct == NodeType.DOC) ctx.value.type = ct;
+      ctx.leaf = leaf;
+    }
+  }
+
+  @Override
+  public AxisStep copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
+    final Expr[] pred = new Expr[preds.length];
+    for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(ctx, scp, vs);
+    return copy(new AxisStep(info, axis, test.copy(), pred));
+  }
+
+  @Override
   public final void plan(final FElem plan) {
     final FElem el = planElem(AXIS, axis.name, TEST, test);
     addPlan(plan, el);
@@ -250,5 +285,17 @@ public class AxisStep extends Preds {
       sb.append(test);
     }
     return sb.append(super.toString()).toString();
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, preds);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : preds) sz += e.exprSize();
+    return sz;
   }
 }

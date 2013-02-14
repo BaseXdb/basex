@@ -8,6 +8,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -43,9 +44,9 @@ public abstract class CName extends CFrag {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    name = name.compile(ctx);
-    return super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    name = name.compile(ctx, scp);
+    return super.compile(ctx, scp);
   }
 
   /**
@@ -98,12 +99,6 @@ public abstract class CName extends CFrag {
   }
 
   @Override
-  public final Expr remove(final Var v) {
-    name = name.remove(v);
-    return super.remove(v);
-  }
-
-  @Override
   public boolean databases(final StringList db) {
     return name.databases(db) && super.databases(db);
   }
@@ -111,11 +106,6 @@ public abstract class CName extends CFrag {
   @Override
   public final boolean uses(final Use u) {
     return name.uses(u) || super.uses(u);
-  }
-
-  @Override
-  public final int count(final Var v) {
-    return name.count(v) + super.count(v);
   }
 
   @Override
@@ -132,5 +122,31 @@ public abstract class CName extends CFrag {
   public final String toString() {
     return toString(desc + (name.type().eq(SeqType.QNM) ? " " + name :
       " { " + name + " }"));
+  }
+
+  @Override
+  public final boolean accept(final ASTVisitor visitor) {
+    return name.accept(visitor) && visitAll(visitor, expr);
+  }
+
+  @Override
+  public final VarUsage count(final Var v) {
+    return name.count(v).plus(super.count(v));
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final boolean ex = inlineAll(ctx, scp, expr, v, e);
+    final Expr sub = name.inline(ctx, scp, v, e);
+    if(sub != null) name = sub;
+    return sub != null || ex ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public final int exprSize() {
+    int sz = 1;
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz + name.exprSize();
   }
 }

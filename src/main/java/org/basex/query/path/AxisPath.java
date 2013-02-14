@@ -18,7 +18,9 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Axis path expression.
@@ -61,7 +63,7 @@ public class AxisPath extends Path {
    * @return resulting operator
    */
   private boolean useIterator() {
-    if(root == null || root.uses(Use.VAR) || !root.iterable()) return false;
+    if(root == null || root.hasFreeVars() || !root.iterable()) return false;
 
     final int sl = steps.length;
     for(int s = 0; s < sl; ++s) {
@@ -81,7 +83,8 @@ public class AxisPath extends Path {
   }
 
   @Override
-  protected final Expr compilePath(final QueryContext ctx) throws QueryException {
+  protected final Expr compilePath(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     // merge two axis paths
     if(root instanceof AxisPath) {
       Expr[] st = ((AxisPath) root).steps;
@@ -97,32 +100,46 @@ public class AxisPath extends Path {
     if(s != null) COMPSELF.thrw(info, s);
 
     for(int i = 0; i != steps.length; ++i) {
-      final Expr e = steps[i].compile(ctx);
+      final Expr e = steps[i].compile(ctx, scp);
       if(!(e instanceof AxisStep)) return e;
       steps[i] = e;
     }
     optSteps(ctx);
 
-    // retrieve data reference
-    final Data data = ctx.data();
-    if(data != null && ctx.value.type == NodeType.DOC) {
-      // check index access
-      Expr e = index(ctx, data);
-      // check children path rewriting
-      if(e == this) e = children(ctx, data);
-      // return optimized expression
-      if(e != this) return e.compile(ctx);
-    }
-
-    // analyze if result set can be cached - no predicates/variables...
-    cache = root != null && !uses(Use.VAR);
-
-    // if applicable, use iterative evaluation
-    final Path path = finish(ctx);
+    final Expr path = optimize(ctx, scp);
 
     // heuristics: wrap with filter expression if only one result is expected
     return size() != 1 ? path :
       new Filter(info, this, Pos.get(1, size(), info)).comp2(ctx);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+
+    super.optimize(ctx, scp);
+    final Value v = ctx.value;
+    try {
+      ctx.value = root(ctx);
+      // retrieve data reference
+      final Data data = ctx.data();
+      if(data != null && ctx.value.type == NodeType.DOC) {
+        // check index access
+        Expr e = index(ctx, data);
+        // check children path rewriting
+        if(e == this) e = children(ctx, data);
+        // return optimized expression
+        if(e != this) return e.compile(ctx, scp);
+      }
+
+      // analyze if result set can be cached - no predicates/variables...
+      cache = root != null && !hasFreeVars();
+
+      // if applicable, use iterative evaluation
+      return finish(ctx);
+    } finally {
+      ctx.value = v;
+    }
   }
 
   /**
@@ -377,10 +394,16 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public final Path copy() {
+  public AxisPath copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
     final Expr[] stps = new Expr[steps.length];
-    for(int s = 0; s < steps.length; ++s) stps[s] = AxisStep.get(step(s));
-    return new AxisPath(info, root, stps);
+    for(int s = 0; s < steps.length; ++s) stps[s] = step(s).copy(ctx, scp, vs);
+    final AxisPath ap = copyType(
+        new AxisPath(info, root == null ? null : root.copy(ctx, scp, vs), stps));
+    ap.cache = cache;
+    if(citer != null) ap.citer = citer.copy();
+    if(lvalue != null) ap.lvalue = lvalue;
+    return ap;
   }
 
   /**
@@ -404,22 +427,9 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public final int count(final Var v) {
-    int c = 0;
-    for(final Expr s : steps) c += s.count(v);
-    return c + super.count(v);
-  }
-
-  @Override
   public final boolean removable(final Var v) {
     for(final Expr s : steps) if(!s.removable(v)) return false;
     return super.removable(v);
-  }
-
-  @Override
-  public final Expr remove(final Var v) {
-    for(int s = 0; s != steps.length; ++s) steps[s].remove(v);
-    return super.remove(v);
   }
 
   @Override

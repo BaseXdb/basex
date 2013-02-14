@@ -1,9 +1,11 @@
 package org.basex.query.expr;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.flwor.*;
 import org.basex.query.func.*;
+import org.basex.query.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
@@ -11,7 +13,9 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -29,7 +33,6 @@ public abstract class Expr extends ExprInfo {
     /** Non-deterministic. Example: random(). */             NDT,
     /** Context position. Example: position(). */            POS,
     /** Performs updates. Example: insert expression. */     UPD,
-    /** References a variable. Example: {@link VarRef}. */   VAR,
     /** Based on XQuery 3.0. Example: group by statement. */ X30,
   }
 
@@ -41,13 +44,26 @@ public abstract class Expr extends ExprInfo {
   public abstract void checkUp() throws QueryException;
 
   /**
-   * Compiles and optimizes the expression, assigns data types and
-   * cardinalities.
+   * Compiles and optimizes the expression, assigns data types and cardinalities.
    * @param ctx query context
+   * @param scp variable scope
    * @return optimized expression
    * @throws QueryException query exception
    */
-  public abstract Expr compile(final QueryContext ctx) throws QueryException;
+  public abstract Expr compile(QueryContext ctx, VarScope scp) throws QueryException;
+
+  /**
+   * Optimizes an already compiled expression without recompiling its sub-expressions.
+   * @param ctx query context
+   * @param scp variable scope
+   * @return optimized expression
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public Expr optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return this;
+  };
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
@@ -103,15 +119,6 @@ public abstract class Expr extends ExprInfo {
       throws QueryException;
 
   /**
-   * Copies an expression. Returns {@code null} if expression cannot be copied.
-   * Will be useful for inlining functions, or for copying static queries.
-   * @return copied expression
-   */
-  public Expr copy() {
-    return null;
-  }
-
-  /**
    * Tests if this is an empty sequence. This function is only overwritten
    * by the {@link Empty} class, which represents the empty sequence.
    * @return result of check
@@ -162,28 +169,27 @@ public abstract class Expr extends ExprInfo {
   public abstract boolean uses(final Use u);
 
   /**
-   * Counts how often the specified variable is used by an expression.
-   * This method is called by:
-   * <ul>
-   * <li> {@link GFLWOR#compile} to rewrite where clauses as predicates and
-   *  remove statically bound or unused clauses</li>
-   * <li> {@link GFLWOR#compHoist} to hoist independent variables</li>
-   * </ul>
+   * Checks if the given variable is used by this expression.
    * @param v variable to be checked
-   * @return number of occurrences
+   * @return {@code true} if the variable is used, {@code false} otherwise
    */
-  public abstract int count(final Var v);
+  public final boolean uses(final Var v) {
+    // return true iff the the search was aborted, i.e. the variable is used
+    return !accept(new ASTVisitor() {
+      @Override
+      public boolean used(final VarRef ref) {
+        // abort when the variable is used
+        return !ref.var.is(v);
+      }
+    });
+  }
 
   /**
    * Checks if the specified variable is replaceable by a context item.
    * The following tests might return false:
    * <ul>
-   * <li>{@link Preds#removable}, if one of the variables is used within
-   * a predicate.</li>
-   * <li>{@link MixedPath#removable}, if the variable occurs within
-   * the path.</li>
-   * <li>{@link Group#removable}, as the group by expression depends on
-   * variable references.</li>
+   * <li>{@link Preds#removable}, if one of the variables is used within a predicate.</li>
+   * <li>{@link MixedPath#removable}, if the variable occurs within the path.</li>
    * </ul>
    * This method is called by {@link GFLWOR#compile} to rewrite where clauses
    * into predicates.
@@ -193,13 +199,67 @@ public abstract class Expr extends ExprInfo {
   public abstract boolean removable(final Var v);
 
   /**
-   * Substitutes all {@link VarRef} expressions for the given variable
-   * by a {@link Context} reference. This method is called by
-   * {@link GFLWOR#compile} to rewrite where clauses as predicates.
-   * @param v variable to be replaced
-   * @return new expression
+   * Checks how often a variable is used in this expression.
+   * @param v variable to look for
+   * @return how often the variable is used, see {@link VarUsage}
    */
-  public abstract Expr remove(final Var v);
+  public abstract VarUsage count(final Var v);
+
+  /**
+   * Inlines an expression into this one, replacing all references to the given variable.
+   * @param ctx query context for recompilation
+   * @param scp variable scope for recompilation
+   * @param v variable to replace
+   * @param e expression to inline
+   * @return resulting expression in something changed, {@code null} otherwise
+   * @throws QueryException query exception
+   */
+  public abstract Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException;
+
+  /**
+   * Inlines the given expression into all elements of the given array.
+   * @param ctx query context
+   * @param scp variable scope
+   * @param arr array
+   * @param v variable to replace
+   * @param e expression to inline
+   * @return {@code true} if the array has changed, {@code false} otherwise
+   * @throws QueryException query exception
+   */
+  protected static boolean inlineAll(final QueryContext ctx, final VarScope scp,
+      final Expr[] arr, final Var v, final Expr e) throws QueryException {
+    boolean change = false;
+    for(int i = 0; i < arr.length; i++) {
+      final Expr nw = arr[i].inline(ctx, scp, v, e);
+      if(nw != null) {
+        arr[i] = nw;
+        change = true;
+      }
+    }
+    return change;
+  }
+
+  /**
+   * Copies an expression.
+   * Will be useful for inlining functions, or for copying static queries.
+   * @param ctx query context
+   * @param scp variable scope for creating new variables
+   * @return copied expression
+   */
+  public final Expr copy(final QueryContext ctx, final VarScope scp) {
+    return copy(ctx, scp, new IntMap<Var>());
+  }
+
+  /**
+   * Copies an expression.
+   * Will be useful for inlining functions, or for copying static queries.
+   * @param ctx query context
+   * @param scp variable scope for creating new variables
+   * @param vs mapping from old variable IDs to new variable copies
+   * @return copied expression
+   */
+  public abstract Expr copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
 
   /**
    * Adds the names of the databases that will be touched by the query.
@@ -299,20 +359,23 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks if this expression has free variables.
-   * @param ctx query context on the level of this expression
    * @return {@code true} if there are variables which are used but not declared
    *         in this expression, {@code false} otherwise
    */
-  public boolean hasFreeVars(final QueryContext ctx) {
-    final VarStack global = ctx.vars.globals();
-    for(int i = global.size; --i >= 0;) {
-      if(count(global.vars[i]) > 0) return true;
-    }
-    final VarStack vars = ctx.vars.locals();
-    for(int i = vars.size; --i >= 0;) {
-      if(count(vars.vars[i]) > 0) return true;
-    }
-    return false;
+  public boolean hasFreeVars() {
+    final BitSet declared = new BitSet();
+    return !accept(new ASTVisitor() {
+      @Override
+      public boolean declared(final Var var) {
+        declared.set(var.id);
+        return true;
+      }
+
+      @Override
+      public boolean used(final VarRef ref) {
+        return declared.get(ref.var.id);
+      }
+    });
   }
 
   /**
@@ -322,4 +385,29 @@ public abstract class Expr extends ExprInfo {
   public Expr markTailCalls() {
     return this;
   }
+
+  /**
+   * Traverses this expression, notifying the visitor of all declared and used variables.
+   * Variable declarations have to be reported before all uses of the variable.
+   * @param visitor variable visitor
+   * @return if the walk should be continued
+   */
+  public abstract boolean accept(final ASTVisitor visitor);
+
+  /**
+   * Visit all given expressions with the given visitor.
+   * @param visitor visitor
+   * @param exprs expressions to visit
+   * @return success flag
+   */
+  protected static final boolean visitAll(final ASTVisitor visitor, final Expr...exprs) {
+    for(final Expr e : exprs) if(!e.accept(visitor)) return false;
+    return true;
+  }
+
+  /**
+   * Counts the number of expressions in this expression's sub-tree.
+   * @return number of expressions
+   */
+  public abstract int exprSize();
 }

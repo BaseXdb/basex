@@ -96,7 +96,10 @@ public final class FTIndexQueryTest extends SandboxTest {
       assertEquals("Query failed:\n" + q + '\n',
           new XQuery(q).execute(context), new XQuery(q).execute(CTX_IX));
     } catch(final BaseXException ex) {
-      fail("Query failed:\n" + q + "\nMessage: " + Util.message(ex));
+      final AssertionError err = new AssertionError(
+          "Query failed:\n" + q + "\nMessage: " + Util.message(ex));
+      err.initCause(ex);
+      throw err;
     }
   }
 }

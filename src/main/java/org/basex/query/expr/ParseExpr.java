@@ -27,7 +27,7 @@ import org.basex.util.*;
  */
 public abstract class ParseExpr extends Expr {
   /** Input information. */
-  public final InputInfo info;
+  public InputInfo info;
   /** Cardinality of result; unknown if set to -1. */
   public long size = -1;
   /** Static type. */
@@ -71,6 +71,18 @@ public abstract class ParseExpr extends Expr {
       return v == null ? Empty.SEQ : v;
     }
     return ctx.iter(this).value();
+  }
+
+  /**
+   * Copies this expression's return type and size to the given expression.
+   * @param <T> expression type
+   * @param e expression
+   * @return the expression for convenience
+   */
+  protected final <T extends ParseExpr> T copyType(final T e) {
+    e.type = type;
+    e.size = size;
+    return e;
   }
 
   @Override
@@ -135,10 +147,11 @@ public abstract class ParseExpr extends Expr {
    * If the specified expression yields a boolean value anyway, it will be
    * returned as is. Otherwise, it will be wrapped into a boolean function.
    * @param e expression to be rewritten
+   * @param ii input info
    * @return expression
    */
-  protected final Expr compBln(final Expr e) {
-    return e.type().eq(SeqType.BLN) ? e : Function.BOOLEAN.get(info, e);
+  public static final Expr compBln(final Expr e, final InputInfo ii) {
+    return e.type().eq(SeqType.BLN) ? e : Function.BOOLEAN.get(ii, e);
   }
 
   // VALIDITY CHECKS ==========================================================

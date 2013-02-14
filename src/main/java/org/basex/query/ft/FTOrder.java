@@ -4,9 +4,12 @@ import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 
 /**
  * FTOrder expression.
@@ -43,6 +46,11 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTOrder(info, expr[0].copy(ctx, scp, vs));
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(QueryText.ORDERED, TRUE), expr);
   }
@@ -50,5 +58,10 @@ public final class FTOrder extends FTFilter {
   @Override
   public String toString() {
     return super.toString() + QueryText.ORDERED;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return expr[0].accept(visitor);
   }
 }

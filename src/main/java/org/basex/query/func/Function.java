@@ -165,9 +165,6 @@ public enum Function {
   /** XQuery function. */
   FOLD_RIGHT(FNFunc.class, "fold-right(function,zero,seq)", ITEM_ZM,
       FuncType.get(ITEM_ZM, ITEM, ITEM_ZM).seqType(), ITEM_ZM, ITEM_ZM),
-  /** XQuery function. */
-  PARTIAL_APPLY(FNFunc.class, "partial-apply(function,arg[,pos])",
-      FUN_O, 2, FUN_O, ITEM_ZM, ITR),
 
   /* FNGen functions. */
 
