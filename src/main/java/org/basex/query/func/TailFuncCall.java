@@ -19,10 +19,10 @@ public final class TailFuncCall extends UserFuncCall {
    * @param ii input info
    * @param nm name of the function to call
    * @param f function
-   * @param arg arguments
+   * @param a arguments
    */
-  TailFuncCall(final InputInfo ii, final QNm nm, final UserFunc f, final Expr[] arg) {
-    super(ii, nm, arg);
+  TailFuncCall(final InputInfo ii, final QNm nm, final StaticUserFunc f, final Expr[] a) {
+    super(ii, nm, a);
     func = f;
   }
 

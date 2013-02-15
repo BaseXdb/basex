@@ -23,7 +23,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class FNClient extends StandardFunc {
+public final class FNClient extends StandardFunc {
   /** Query pattern. */
   static final Pattern QUERYPAT = Pattern.compile("\\[(.*?)\\] (.*)", Pattern.MULTILINE);
 

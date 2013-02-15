@@ -134,7 +134,7 @@ public final class CmpSR extends Single {
   @Override
   public boolean indexAccessible(final IndexContext ic) {
     // accept only location path, string and equality expressions
-    final AxisStep s = CmpG.indexStep(expr);
+    final Step s = CmpG.indexStep(expr);
     // no range index support in main-memory index structures
     if(s == null || ic.data.inMemory()) return false;
 

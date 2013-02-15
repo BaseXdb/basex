@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class InlineFunc extends UserFunc {
+public final class InlineFunc extends UserFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -53,12 +53,13 @@ public class InlineFunc extends UserFunc {
    */
   InlineFunc(final InputInfo ii, final QNm nm, final SeqType r, final Var[] v,
       final Expr e, final Ann a, final StaticContext stc, final VarScope scp) {
-    super(ii, nm, v, r, a, stc, scp);
+    super(ii, nm, v, r, a, e, stc, scp);
     expr = e;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     comp(ctx, scp);
     return optimize(ctx, scp);
   }
@@ -110,29 +111,17 @@ public class InlineFunc extends UserFunc {
   }
 
   @Override
+  protected boolean tco() {
+    return false;
+  }
+
+  @Override
   public void plan(final FElem plan) {
     final FElem el = planElem();
     addPlan(plan, el, expr);
     for(int i = 0; i < args.length; ++i) {
       el.add(planAttr(ARG + i, args[i].name.string()));
     }
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(FUNCTION).append(PAR1);
-    for(int i = 0; i < args.length; i++) {
-      if(i > 0) sb.append(", ");
-      sb.append(args[i].toString());
-    }
-    sb.append(PAR2).append(' ');
-    if(ret != null) sb.append("as ").append(ret.toString()).append(' ');
-    return sb.append("{ ").append(expr).append(" }").toString();
-  }
-
-  @Override
-  protected boolean tco() {
-    return false;
   }
 
   @Override
@@ -150,5 +139,17 @@ public class InlineFunc extends UserFunc {
       if(!(v.getValue().accept(visitor) && visitor.declared(v.getKey()))) return false;
     for(final Var v : args) if(!visitor.declared(v)) return false;
     return visitAll(visitor, expr);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(FUNCTION).append(PAR1);
+    for(int i = 0; i < args.length; i++) {
+      if(i > 0) sb.append(", ");
+      sb.append(args[i].toString());
+    }
+    sb.append(PAR2).append(' ');
+    if(ret != null) sb.append("as ").append(ret.toString()).append(' ');
+    return sb.append("{ ").append(expr).append(" }").toString();
   }
 }

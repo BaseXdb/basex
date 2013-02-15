@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class FNFetch extends StandardFunc {
+public final class FNFetch extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
