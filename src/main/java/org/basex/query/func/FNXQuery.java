@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -109,10 +110,15 @@ public final class FNXQuery extends StandardFunc {
     final String path = string(checkStr(expr[0], ctx));
     final IO io = IO.get(path);
     if(!io.exists()) WHICHRES.thrw(info, path);
+    final Prop prop = ctx.context.prop;
+    final String tmp = prop.get(Prop.QUERYPATH);
     try {
+      prop.set(Prop.QUERYPATH, path);
       return eval(ctx, io.read());
     } catch(final IOException ex) {
       throw IOERR.thrw(info, ex);
+    } finally {
+      prop.set(Prop.QUERYPATH, tmp);
     }
   }
 
