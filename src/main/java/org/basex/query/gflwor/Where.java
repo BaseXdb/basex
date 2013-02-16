@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class Where extends GFLWOR.Clause {
+public final class Where extends GFLWOR.Clause {
   /** Predicate expression. */
   Expr pred;
 
@@ -102,7 +102,7 @@ public class Where extends GFLWOR.Clause {
   }
 
   @Override
-  final boolean skippable(final GFLWOR.Clause cl) {
+  boolean skippable(final GFLWOR.Clause cl) {
     return true;
   }
 

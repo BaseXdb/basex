@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class IterStep extends AxisStep {
+final class IterStep extends Step {
   /**
    * Constructor.
    * @param ii input info

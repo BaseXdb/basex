@@ -886,7 +886,7 @@ public class QueryParser extends InputParser {
     final Var[] args = paramList();
     wsCheck(PAR2);
 
-    final UserFunc func = new UserFunc(info(), name, args, optAsType(),
+    final StaticUserFunc func = new StaticUserFunc(info(), name, args, optAsType(),
         ann, true, ctx.sc, scope);
     if(func.updating) ctx.updating(false);
 
@@ -1474,7 +1474,7 @@ public class QueryParser extends InputParser {
       union();
       error(FTIGNORE);
     }
-    return new FTContains(e, select, info());
+    return new FTContainsExpr(e, select, info());
   }
 
   /**
@@ -1773,9 +1773,9 @@ public class QueryParser extends InputParser {
       if(ex == null) return null;
       // return non-step expression if no path or map operator follows
       final boolean nostep = curr() != '/' && (curr() != '!' || next() == '=');
-      if(nostep && !(ex instanceof AxisStep)) return ex;
+      if(nostep && !(ex instanceof Step)) return ex;
       el = new ExprList();
-      if(ex instanceof AxisStep) add(el, ex);
+      if(ex instanceof Step) add(el, ex);
       else root = ex;
       relativePath(el);
     }
@@ -1814,8 +1814,8 @@ public class QueryParser extends InputParser {
    * Returns a standard descendant-or-self::node() step.
    * @return step
    */
-  private AxisStep descOrSelf() {
-    return AxisStep.get(info(), Axis.DESCORSELF, Test.NOD);
+  private Step descOrSelf() {
+    return Step.get(info(), Axis.DESCORSELF, Test.NOD);
   }
 
   // methods for query suggestions
@@ -1862,7 +1862,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private AxisStep axisStep() throws QueryException {
+  private Step axisStep() throws QueryException {
     Axis ax = null;
     Test test = null;
     if(wsConsume(DOT2)) {
@@ -1908,7 +1908,7 @@ public class QueryParser extends InputParser {
       wsCheck(BR2);
       checkPred(false);
     }
-    return AxisStep.get(info(), ax, test, el.finish());
+    return Step.get(info(), ax, test, el.finish());
   }
 
   /**
@@ -1982,81 +1982,19 @@ public class QueryParser extends InputParser {
           add(el, expr());
           wsCheck(BR2);
         } while(wsConsume(BR1));
-        e = new Filter(info(), e, el.finish());
+        e = Filter.get(info(), e, el.finish());
       } else if(e != null) {
-        final Expr[] args = argumentList(e);
-        if(args == null) break;
+        if(!wsConsume(PAR1)) break;
 
-        final PartFunc.Env env = partial(args);
-        e = new DynamicFunc(info(), e, args);
-        if(env != null) {
-          // the function item expression can contain variables, too
-          scope = env.scope;
-          e = new PartFunc(info(), fixScope(e), env, ctx.sc);
-          scope = scope.parent();
-        }
+        final InputInfo ii = info();
+        final ArrayList<Expr> argList = new ArrayList<Expr>();
+        final int[] holes = argumentList(argList, e);
+        final Expr[] args = argList.toArray(new Expr[argList.size()]);
+
+        e = holes == null ? new DynFuncCall(ii, e, args) :
+          new PartFunc(ii, e, args, holes);
       }
     } while(e != old);
-    return e;
-  }
-
-  /**
-   * Fills gaps from place-holders with variable references.
-   * @param args argument array
-   * @return new scope if the expression was partially applied
-   * @throws QueryException exception
-   */
-  private PartFunc.Env partial(final Expr[] args) throws QueryException {
-    PartFunc.Env env = null;
-    for(final Expr e : args) {
-      if(e == null) {
-        scope = scope.child();
-        env = new PartFunc.Env(scope);
-        break;
-      }
-    }
-
-    if(env != null) {
-      final InputInfo ii = info();
-      for(int i = 0; i < args.length; i++) {
-        if(args[i] == null) {
-          final Var arg = scope.uniqueVar(ctx, null, true);
-          env.add(i, arg);
-          args[i] = new VarRef(ii, arg);
-        } else {
-          fixScope(args[i]);
-        }
-      }
-      scope = scope.parent();
-    }
-    return env;
-  }
-
-  /**
-   * Fixes all variable references for the new scope.
-   * @param e expression
-   * @return the expression for convenience
-   * @throws QueryException exception
-   */
-  private Expr fixScope(final Expr e) throws QueryException {
-    try {
-      e.accept(new ASTVisitor() {
-        @Override
-        public boolean used(final VarRef ref) {
-          try {
-            final Expr lc = scope.resolve(ref.var.name, QueryParser.this, ctx,
-                ref.info, VARUNDEF);
-            // downcast is safe because the new reference is just the closure equivalent
-            ref.var = ((VarRef) lc).var;
-            return true;
-          } catch(QueryException ex) {
-            throw new QueryRTException(ex);
-          }
-        }
-      });
-    } catch(final QueryRTException qe) {
-      throw qe.wrapped();
-    }
     return e;
   }
 
@@ -2318,17 +2256,27 @@ public class QueryParser extends InputParser {
     final int i = ip;
     final QNm name = eQName(null, ctx.sc.nsFunc);
     if(name != null && !keyword(name)) {
-      final Expr[] args = argumentList(name.string());
-      if(args != null) {
+      if(wsConsume(PAR1)) {
+        final InputInfo ii = info();
+        final ArrayList<Expr> argList = new ArrayList<Expr>();
+        final int[] holes = argumentList(argList, name.string());
+        final Expr[] args = argList.toArray(new Expr[argList.size()]);
         alter = FUNCUNKNOWN;
         alterFunc = name;
         ap = ip;
 
-        final PartFunc.Env env = partial(args);
-        final TypedFunc f = Functions.get(name, args, false, ctx, info());
-        if(f != null) {
+        final Expr ret;
+        if(holes != null) {
+          final FItem f = Functions.get(name, args.length + holes.length, false, ctx, ii);
+          ret = f == null ? null : new PartFunc(ii, f, args, holes);
+        } else {
+          final TypedFunc f = Functions.get(name, args, false, ctx, ii);
+          ret = f == null ? null : f.fun;
+        }
+
+        if(ret != null) {
           alter = null;
-          return env != null ? new PartFunc(name, info(), f, env, ctx.sc) : f.fun;
+          return ret;
         }
       }
     }
@@ -2338,30 +2286,30 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "ArgumentList" rule.
+   * Parses the "ArgumentList" rule after the opening parenthesis was read.
+   * @param args list to put the argument expressions into
    * @param name name of the function (item)
-   * @return array of arguments, place-holders '?' are represented as
-   *         {@code null} entries
+   * @return array of arguments, place-holders '?' are represented as {@code null} entries
    * @throws QueryException query exception
    */
-  private Expr[] argumentList(final Object name) throws QueryException {
-    if(!wsConsume(PAR1)) return null;
-    Expr[] args = { };
+  private int[] argumentList(final ArrayList<Expr> args, final Object name)
+      throws QueryException {
+    int[] holes = null;
     if(!wsConsume(PAR2)) {
+      int i = 0;
       do {
-        Expr arg = null;
-        if(!wsConsume(PLHOLDER) && (arg = single()) == null)
-          error(FUNCMISS, name);
-        // speeding up array creation
-        final int a = args.length;
-        final Expr[] tmp = new Expr[a + 1];
-        System.arraycopy(args, 0, tmp, 0, a);
-        tmp[a] = arg;
-        args = tmp;
+        if(wsConsume(PLHOLDER)) {
+          holes = holes == null ? new int[] { i } : Array.add(holes, i);
+        } else {
+          final Expr e = single();
+          if(e == null) error(FUNCMISS, name);
+          args.add(e);
+        }
+        i++;
       } while(wsConsume(COMMA));
       if(!wsConsume(PAR2)) error(FUNCMISS, name);
     }
-    return args;
+    return holes;
   }
 
   /**

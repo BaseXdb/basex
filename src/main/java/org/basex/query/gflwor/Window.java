@@ -27,7 +27,7 @@ import static org.basex.query.QueryText.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class Window extends GFLWOR.Clause {
+public final class Window extends GFLWOR.Clause {
   /** {@code sliding window} flag. */
   final boolean sliding;
   /** The window variable. */

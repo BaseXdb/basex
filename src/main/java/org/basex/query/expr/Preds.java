@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 
 /**
  * Abstract predicate expression, implemented by {@link Filter} and
- * {@link AxisStep}.
+ * {@link Step}.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

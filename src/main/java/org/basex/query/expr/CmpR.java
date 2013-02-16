@@ -122,7 +122,7 @@ public final class CmpR extends Single {
   @Override
   public boolean indexAccessible(final IndexContext ic) {
     // accept only location path, string and equality expressions
-    final AxisStep s = CmpG.indexStep(expr);
+    final Step s = CmpG.indexStep(expr);
     // sequential main memory is assumed to be faster than range index access
     if(s == null || ic.data.inMemory()) return false;
 
@@ -165,7 +165,7 @@ public final class CmpR extends Single {
     final AxisPath path = (AxisPath) expr;
     final int st = path.steps.length;
 
-    final AxisStep step;
+    final Step step;
     if(text) {
       step = st == 1 ? ic.step : path.step(st - 2);
       if(!(step.test.mode == Mode.NAME)) return null;

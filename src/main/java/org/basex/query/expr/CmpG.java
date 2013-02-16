@@ -131,7 +131,11 @@ public final class CmpG extends Cmp {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
 
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     // swap expressions; add text() to location paths to simplify optimizations
     if(swap()) {
       op = op.swap();
@@ -302,7 +306,7 @@ public final class CmpG extends Cmp {
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     // accept only location path, string and equality expressions
     if(op != OpG.EQ) return false;
-    final AxisStep s = expr[0] instanceof Context ? ic.step : indexStep(expr[0]);
+    final Step s = expr[0] instanceof Context ? ic.step : indexStep(expr[0]);
     if(s == null) return false;
 
     // check which index applies
@@ -361,7 +365,7 @@ public final class CmpG extends Cmp {
    * @param expr expression
    * @return location step
    */
-  public static AxisStep indexStep(final Expr expr) {
+  public static Step indexStep(final Expr expr) {
     // check if index can be applied
     if(!(expr instanceof AxisPath)) return null;
     // accept only single axis steps as first expression

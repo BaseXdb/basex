@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class For extends GFLWOR.Clause {
+public final class For extends GFLWOR.Clause {
   /** Item variable. */
   final Var var;
   /** Position variable. */
@@ -251,7 +251,7 @@ public class For extends GFLWOR.Clause {
     } else if(expr instanceof Filter) {
       expr = ((Filter) expr).addPred(ctx, scp, a);
     } else {
-      expr = new Filter(info, expr, a);
+      expr = Filter.get(info, expr, a).optimize(ctx, scp);
     }
 
     return true;

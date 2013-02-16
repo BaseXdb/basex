@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class OrderBy extends GFLWOR.Clause {
+public final class OrderBy extends GFLWOR.Clause {
   /** Variables to sort. */
   Var[] tvars;
   /** Expressions bound to the variables. */

@@ -1,7 +1,5 @@
 package org.basex.query.ft;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -68,11 +66,6 @@ final class FTContainsIndex extends FTContains {
 
     ctx.fttoken = tmp;
     return Bln.get(found ? 1 : 0);
-  }
-
-  @Override
-  public String toString() {
-    return expr + " " + CONTAINS + ' ' + TEXT + ' ' + ftexpr;
   }
 
   @Override

@@ -73,7 +73,7 @@ public class TCOTest extends QueryPlanTest {
 
         null,
 
-        "exists(//" + Util.name(UserFunc.class) + "/" +
+        "exists(//" + Util.name(StaticUserFunc.class) + "/" +
             Util.name(TailFuncCall.class) + ")",
         "exists(//" + Util.name(BaseFuncCall.class) + ")"
     );

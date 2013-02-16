@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class GroupBy extends GFLWOR.Clause {
+public final class GroupBy extends GFLWOR.Clause {
   /** Grouping specs. */
   final Spec[] by;
   /** Non-grouping variable expressions. */
@@ -175,7 +175,7 @@ public class GroupBy extends GFLWOR.Clause {
    * @return {@code true} if the compare as equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  final boolean eq(final Item[] as, final Item[] bs) throws QueryException {
+  boolean eq(final Item[] as, final Item[] bs) throws QueryException {
     for(int i = 0; i < as.length; i++) {
       final Item a = as[i], b = bs[i];
       if(a == null ^ b == null || a != null && !a.equiv(info, b)) return false;
