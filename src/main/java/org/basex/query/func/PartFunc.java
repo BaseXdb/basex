@@ -5,12 +5,13 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
-import org.basex.util.InputInfo;
+import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Partial function application.
@@ -18,106 +19,109 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class PartFunc extends InlineFunc {
-  /**
-   * Function constructor for static calls.
-   * @param nm function name
-   * @param ii input info
-   * @param fun typed function expression
-   * @param env environment
-   * @param stc static context
-   */
-  public PartFunc(final QNm nm, final InputInfo ii, final TypedFunc fun, final Env env,
-      final StaticContext stc) {
-    super(ii, nm, fun.ret(), args(env, fun.type), fun.fun, fun.ann, stc, env.scope);
-  }
+public final class PartFunc extends Arr {
+  /** Positions of the placeholders. */
+  private final int[] holes;
 
   /**
-   * Function constructor for dynamic calls.
+   * Constructor.
    * @param ii input info
-   * @param func function expression
-   * @param env environment
-   * @param stc static context
+   * @param fn function expression
+   * @param arg argument expressions
+   * @param hl positions of the placeholders
    */
-  public PartFunc(final InputInfo ii, final Expr func, final Env env,
-      final StaticContext stc) {
-    // [LW] XQuery/HOF: dynamic type propagation, annotations
-    super(ii, new QNm(), func.type(), args(env, null), func,
-        new Ann(), stc, env.scope);
+  public PartFunc(final InputInfo ii, final Expr fn, final Expr[] arg, final int[] hl) {
+    super(ii, Array.add(arg, fn));
+    holes = hl;
+    type = SeqType.FUN_O;
   }
 
-  /**
-   * Copy constructor.
-   * @param ii input info
-   * @param nm name
-   * @param r return type
-   * @param a argument variables
-   * @param f function body
-   * @param an annotations
-   * @param s static context
-   * @param scp variable scope
-   */
-  private PartFunc(final InputInfo ii, final QNm nm, final SeqType r, final Var[] a,
-      final Expr f, final Ann an, final StaticContext s, final VarScope scp) {
-    super(ii, nm, r, a, f, an, s, scp);
+  @Override
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
+    return optimize(ctx, scp);
   }
 
-  /**
-   * Gathers this partial function application's arguments and sets the types.
-   * @param env variables to type
-   * @param ft function type
-   * @return the variables for convenience
-   */
-  public static Var[] args(final Env env, final FuncType ft) {
-    final Var[] args = env.args.toArray(new Var[env.args.size()]);
-    if(ft != null && ft != FuncType.ANY_FUN) {
-      for(int i = 0; i < args.length; i++) {
-        final int pos = env.poss.get(i);
-        if(ft.args[pos] !=  null && ft.args[pos] != SeqType.ITEM_ZM)
-          args[i].setDeclaredType(ft.args[pos]);
-      }
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+    final Expr f = expr[expr.length - 1];
+    if(allAreValues()) return preEval(ctx);
+
+    final SeqType t = f.type();
+    if(t.instanceOf(SeqType.FUN_O) && t.type != FuncType.ANY_FUN) {
+      final FuncType ft = (FuncType) t.type;
+      final int arity = expr.length + holes.length - 1;
+      if(ft.args.length != arity) throw Err.INVARITY.thrw(info, f, arity);
+      final SeqType[] ar = new SeqType[holes.length];
+      for(int i = 0; i < holes.length; i++) ar[i] = ft.args[holes[i]];
+      type = FuncType.get(ft.ret, ar).seqType();
     }
-    return args;
+
+    return this;
+  }
+
+  @Override
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    final Expr fn = expr[expr.length - 1];
+    final FItem f = (FItem) checkType(fn.item(ctx, ii), FuncType.ANY_FUN);
+    final FuncType ft = (FuncType) f.type;
+
+    final int arity = expr.length + holes.length - 1;
+    if(f.arity() != arity) throw Err.INVARITY.thrw(ii, f, arity);
+    final Expr[] args = new Expr[arity];
+
+    final VarScope scp = new VarScope();
+    final Var[] vars = new Var[holes.length];
+    int p = -1;
+    for(int i = 0; i < holes.length; i++) {
+      while(++p < holes[i]) args[p] = expr[p - i].value(ctx);
+      vars[i] = scp.uniqueVar(ctx, ft.args[p], true);
+      args[p] = new VarRef(info, vars[i]);
+    }
+    while(++p < args.length) args[p] = expr[p - holes.length].value(ctx);
+
+    final Expr call = new DynFuncCall(info, f, args).optimize(ctx, scp);
+    // [LW] introduce annotations
+    final InlineFunc i = new InlineFunc(info, ft.ret, vars, call, new Ann(), ctx.sc, scp);
+    return i.optimize(ctx, null).item(ctx, ii);
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    return item(ctx, info);
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
-    final VarScope v = scope.copy(ctx, scp, vs);
-    final Var[] a = args.clone();
-    for(int i = 0; i < a.length; i++) a[i] = vs.get(a[i].id);
-    return copyType(new PartFunc(info, name, ret, a, expr.copy(ctx, v, vs), ann, sc, v));
+    return new PartFunc(info, expr[expr.length - 1].copy(ctx, scp, vs),
+        copyAll(ctx, scp, vs, Arrays.copyOf(expr, expr.length - 1)), holes.clone());
   }
 
-  /**
-   * Environment of a partial function application.
-   *
-   * @author BaseX Team 2005-12, BSD License
-   * @author Leo Woerteler
-   */
-  public static final class Env {
-    /** Position of the arguments. */
-    final IntList poss = new IntList();
-    /** Argument variables. */
-    final ArrayList<Var> args = new ArrayList<Var>();
-    /** Variable scope. */
-    public final VarScope scope;
-
-    /**
-     * Constructor.
-     * @param scp variable scope
-     */
-    public Env(final VarScope scp) {
-      scope = scp;
+  @Override
+  public void plan(final FElem plan) {
+    final FElem e = planElem();
+    expr[expr.length - 1].plan(e);
+    int p = -1;
+    for(int i = 0; i < holes.length; i++) {
+      while(++p < holes[i]) expr[p - i].plan(e);
+      final FElem a = new FElem(Token.token(QueryText.ARG));
+      e.add(a.add(planAttr(QueryText.POS, Token.token(i))));
     }
+    while(++p < expr.length + holes.length - 1) expr[p - holes.length].plan(e);
+    plan.add(e);
+  }
 
-    /**
-     * Adds a new argument to this environment.
-     * @param pos argument position
-     * @param var variable
-     */
-    public void add(final int pos, final Var var) {
-      poss.add(pos);
-      args.add(var);
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder(expr[expr.length - 1].toString()).add('(');
+    int p = -1;
+    for(int i = 0; i < holes.length; i++) {
+      while(++p < holes[i])
+        tb.add(p > 0 ? QueryText.SEP : "").add(expr[p - i].toString());
+      tb.add(p > 0 ? QueryText.SEP : "").add('?');
     }
+    while(++p < expr.length + holes.length - 1)
+      tb.add(QueryText.SEP).add(expr[p - holes.length].toString());
+    return tb.add(')').toString();
   }
 }

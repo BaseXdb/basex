@@ -25,7 +25,7 @@ public abstract class UserFuncCall extends Arr {
   /** Function name. */
   final QNm name;
   /** Function reference. */
-  UserFunc func;
+  StaticUserFunc func;
 
   /**
    * Function constructor.
@@ -116,16 +116,18 @@ public abstract class UserFuncCall extends Arr {
   /**
    * Initializes the function call after all functions have been declared.
    * @param f function reference
+   * @return self reference
    */
-  public void init(final UserFunc f) {
+  public UserFuncCall init(final StaticUserFunc f) {
     func = f;
+    return this;
   }
 
   /**
    * Getter for the called function.
    * @return user-defined function
    */
-  public final UserFunc func() {
+  public final StaticUserFunc func() {
     return func;
   }
 

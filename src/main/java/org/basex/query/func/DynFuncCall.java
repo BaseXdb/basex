@@ -23,14 +23,14 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class DynamicFunc extends Arr {
+public final class DynFuncCall extends Arr {
   /**
    * Function constructor.
    * @param ii input info
    * @param fun function expression
    * @param arg arguments
    */
-  public DynamicFunc(final InputInfo ii, final Expr fun, final Expr[] arg) {
+  public DynFuncCall(final InputInfo ii, final Expr fun, final Expr[] arg) {
     super(ii, Array.add(arg, fun));
   }
 
@@ -69,7 +69,7 @@ public final class DynamicFunc extends Arr {
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
     final Expr[] copy = copyAll(ctx, scp, vs, expr);
     final int last = copy.length - 1;
-    return copyType(new DynamicFunc(info, copy[last], Arrays.copyOf(copy, last)));
+    return copyType(new DynFuncCall(info, copy[last], Arrays.copyOf(copy, last)));
   }
 
   /**

@@ -22,7 +22,7 @@ public final class IndexContext {
   /** Data reference. */
   public final Data data;
   /** Index Step. */
-  public final AxisStep step;
+  public final Step step;
   /** Flag for iterative evaluation. */
   public final boolean iterable;
 
@@ -40,7 +40,7 @@ public final class IndexContext {
    * @param s index step
    * @param i iterable flag
    */
-  public IndexContext(final QueryContext c, final Data d, final AxisStep s,
+  public IndexContext(final QueryContext c, final Data d, final Step s,
       final boolean i) {
     ctx = c;
     data = d;
@@ -61,7 +61,7 @@ public final class IndexContext {
       if(text) return root;
       // add attribute step
       if(step.test.name == null) return root;
-      final AxisStep as = AxisStep.get(step.info, Axis.SELF, step.test);
+      final Step as = Step.get(step.info, Axis.SELF, step.test);
       return Path.get(root.info, root, as);
     }
 
@@ -69,9 +69,9 @@ public final class IndexContext {
     final AxisPath path = orig.invertPath(root, step);
     if(!text) {
       // add attribute step
-      final AxisStep s = orig.step(orig.steps.length - 1);
+      final Step s = orig.step(orig.steps.length - 1);
       if(s.test.name != null) {
-        Expr[] steps = { AxisStep.get(s.info, Axis.SELF, s.test) };
+        Expr[] steps = { Step.get(s.info, Axis.SELF, s.test) };
         for(final Expr e : path.steps) steps = Array.add(steps, e);
         path.steps = steps;
       }

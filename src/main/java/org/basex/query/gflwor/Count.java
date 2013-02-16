@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class Count extends GFLWOR.Clause {
+public final class Count extends GFLWOR.Clause {
   /** Count variable. */
   final Var count;
 
