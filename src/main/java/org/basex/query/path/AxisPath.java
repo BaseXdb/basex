@@ -14,6 +14,7 @@ import org.basex.query.path.Test.Mode;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -342,6 +343,24 @@ public abstract class AxisPath extends Path {
 
   @Override
   public final boolean iterable() {
+    return true;
+  }
+
+  /**
+   * Guesses if the evaluation of this axis path is cheap. This is used to determine if it
+   * can be inlined into a loop to enable index rewritings.
+   * @return guess
+   */
+  public boolean cheap() {
+    if(!(root instanceof ANode) || ((ANode) root).type != NodeType.DOC) return false;
+    final Axis[] expensive = { Axis.DESC, Axis.DESCORSELF, Axis.PREC, Axis.PRECSIBL,
+        Axis.FOLL, Axis.FOLLSIBL };
+    for(int i = 0; i < steps.length; i++) {
+      final Step s = step(i);
+      if(i < 2) for(final Axis a : expensive) if(s.axis == a) return false;
+      final Expr[] ps = s.preds;
+      if(!(ps.length == 0 || ps.length == 1 && ps[0] instanceof Pos)) return false;
+    }
     return true;
   }
 

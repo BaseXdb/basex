@@ -11,6 +11,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.iter.Iter;
+import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -265,7 +266,8 @@ public final class GFLWOR extends ParseExpr {
             iter.remove();
             change = true;
           } else if(lt.expr.isValue() || lt.expr instanceof VarRef && !lt.var.checksType()
-              || uses == VarUsage.ONCE && !lt.expr.uses(Use.CTX)) {
+              || uses == VarUsage.ONCE && !lt.expr.uses(Use.CTX)
+              || lt.expr instanceof AxisPath && ((AxisPath) lt.expr).cheap()) {
             ctx.compInfo(QueryText.OPTINLINE, lt);
             inline(ctx, scp, lt.var, lt.inlineExpr(ctx, scp), next);
             thisRound = change = true;
