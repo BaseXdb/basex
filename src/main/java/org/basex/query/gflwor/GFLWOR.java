@@ -11,6 +11,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.iter.Iter;
+import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -23,7 +24,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class GFLWOR extends ParseExpr {
+public final class GFLWOR extends ParseExpr {
   /** Return expression. */
   Expr ret;
   /** FLWOR clauses. */
@@ -151,7 +152,9 @@ public class GFLWOR extends ParseExpr {
           ret = last.expr;
           changed = true;
         }
-      } else if(clauses.getFirst() instanceof For) {
+      }
+
+      if(!clauses.isEmpty() && clauses.getFirst() instanceof For) {
         final For fst = (For) clauses.getFirst();
         if(!fst.empty && fst.expr instanceof GFLWOR) {
           ctx.compInfo(QueryText.OPTFLAT, fst);
@@ -161,13 +164,23 @@ public class GFLWOR extends ParseExpr {
           clauses.addAll(0, sub.clauses);
           changed = true;
         }
-      } else if(ret instanceof GFLWOR) {
+      }
+
+      if(!clauses.isEmpty() && ret instanceof GFLWOR) {
         final GFLWOR sub = (GFLWOR) ret;
         if(sub.isFLWR()) {
           // flatten nested FLWOR expressions
           ctx.compInfo(QueryText.OPTFLAT, this);
           clauses.addAll(sub.clauses);
           ret = sub.ret;
+          changed = true;
+        } else if(sub.clauses.getFirst() instanceof Let) {
+          ctx.compInfo(QueryText.OPTFLAT, this);
+          final LinkedList<Clause> cls = sub.clauses;
+          // propagate all leading let bindings into outer clauses
+          do clauses.add(cls.removeFirst());
+          while(!cls.isEmpty() && cls.getFirst() instanceof Let);
+          ret = ret.optimize(ctx, scp);
           changed = true;
         }
       }
@@ -253,7 +266,8 @@ public class GFLWOR extends ParseExpr {
             iter.remove();
             change = true;
           } else if(lt.expr.isValue() || lt.expr instanceof VarRef && !lt.var.checksType()
-              || uses == VarUsage.ONCE && !lt.expr.uses(Use.CTX)) {
+              || uses == VarUsage.ONCE && !lt.expr.uses(Use.CTX)
+              || lt.expr instanceof AxisPath && ((AxisPath) lt.expr).cheap()) {
             ctx.compInfo(QueryText.OPTINLINE, lt);
             inline(ctx, scp, lt.var, lt.inlineExpr(ctx, scp), next);
             thisRound = change = true;

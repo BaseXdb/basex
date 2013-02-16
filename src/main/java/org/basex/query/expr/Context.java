@@ -81,7 +81,7 @@ public final class Context extends Simple {
     // replacing context node with text() node to facilitate index rewritings
     if(!ctx.leaf) return this;
     ctx.compInfo(OPTTEXT);
-    return Path.get(info, null, AxisStep.get(info, Axis.CHILD, Test.TXT));
+    return Path.get(info, null, Step.get(info, Axis.CHILD, Test.TXT));
   }
 
   @Override

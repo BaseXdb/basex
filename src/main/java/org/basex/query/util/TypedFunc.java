@@ -59,6 +59,7 @@ public final class TypedFunc {
     return new TypedFunc(cast, new Ann(), to, SeqType.AAT_ZO);
   }
 
+
   /**
    * Creates a type constructor function.
    * @param f java function

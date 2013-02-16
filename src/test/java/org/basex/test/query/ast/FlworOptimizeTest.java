@@ -92,7 +92,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
         "end at $q when $q - $p + 1 eq $len where $len > 2 return <window>{$w}</window>",
 
         "<window>1 2 3</window>",
-        "//For << //Window and exists(//For/Filter)"
+        "//For << //Window and exists(//For/*[ends-with(name(), 'Filter')])"
     );
   }
 
@@ -111,7 +111,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
   @Test public void whereToPred() {
     check("for $i in 1 to 10 where <x/>[$i] and $i < 3 return $i",
         "1",
-        "exists(//Where) and exists(//For/Filter)"
+        "exists(//Where) and exists(//For/*[ends-with(name(), 'Filter')])"
     );
     check("for $i in 1 to 10 where (<a/>)[$i] return $i",
         "1",
@@ -121,7 +121,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
         "where count(for $j in 1 to $i group by $k := $j mod 2 return $i) > 1 " +
         "return $i",
         "2 3",
-        "empty(//Where) and exists(//Filter)"
+        "empty(//Where) and exists(//*[ends-with(name(), 'Filter')])"
     );
   }
 
@@ -215,7 +215,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
     check("for $i in 1 to 5, $j in 1 to 5 where $i < 3 and $j < 3 return $i * $j",
         "1 2 2 4",
         "empty(//Where)",
-        "every $for in //For satisfies exists($for/Filter)"
+        "every $for in //For satisfies exists($for/*[ends-with(name(), 'Filter')])"
     );
   }
 

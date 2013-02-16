@@ -20,7 +20,7 @@ public abstract class FItem extends Item {
    * Constructor.
    * @param t type
    */
-  protected FItem(final Type t) {
+  protected FItem(final FuncType t) {
     super(t);
   }
 

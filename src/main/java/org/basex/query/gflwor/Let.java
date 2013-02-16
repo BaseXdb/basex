@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class Let extends GFLWOR.Clause {
+public final class Let extends GFLWOR.Clause {
   /** Variable. */
   public final Var var;
   /** Bound expression. */
