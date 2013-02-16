@@ -9,6 +9,6 @@
 
    http://docs.basex.org/wiki/Server_Protocol
 
- BaseX Team, 2012
+ BaseX Team, 2013
 
 ========================================================================
