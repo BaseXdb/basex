@@ -35,17 +35,19 @@ public final class Variables extends ExprInfo {
    * @param nm variable name
    * @param e expression
    * @param ctx query context
+   * @param ii input info
    * @return if the value could be bound
    * @throws QueryException query exception
    */
-  public boolean bind(final QNm nm, final Expr e, final QueryContext ctx)
-      throws QueryException {
+  public StaticVar bind(final QNm nm, final Expr e, final QueryContext ctx,
+      final InputInfo ii) throws QueryException {
     final StaticVar var = vars.get(nm);
-    if(var != null) return var.bind(e, ctx);
+    if(var != null) return var.bind(e, ctx, ii);
 
     // add new variable
-    vars.put(nm, new StaticVar(nm, e));
-    return true;
+    final StaticVar sv = new StaticVar(nm, e, ii);
+    vars.put(nm, sv);
+    return sv;
   }
 
   /**

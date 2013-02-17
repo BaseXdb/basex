@@ -32,8 +32,8 @@ public final class StaticVar extends ParseExpr implements Scope {
   public final Ann ann;
   /** Declaration flag. */
   private boolean declared;
-  /** External flag. */
-  private boolean external = true;
+  /** If this variable can still be bound. */
+  private boolean bindable = true;
   /** Type to be checked, {@code null} for no check. */
   private SeqType check;
   /** Bound value. */
@@ -66,7 +66,7 @@ public final class StaticVar extends ParseExpr implements Scope {
     type = t == null ? SeqType.ITEM_ZM : t;
     expr = e;
     declared = true;
-    external = ext;
+    bindable = ext || e == null;
     lazy = ann.contains(LAZY);
   }
 
@@ -74,9 +74,10 @@ public final class StaticVar extends ParseExpr implements Scope {
    * Constructor for an externally bound variable.
    * @param nm name
    * @param e bound expression
+   * @param ii input info
    */
-  StaticVar(final QNm nm, final Expr e) {
-    super(null);
+  StaticVar(final QNm nm, final Expr e, final InputInfo ii) {
+    super(ii);
     scope = new VarScope();
     name = nm;
     ann = new Ann();
@@ -96,7 +97,7 @@ public final class StaticVar extends ParseExpr implements Scope {
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope o) throws QueryException {
-    if(expr == null) throw VAREMPTY.thrw(info, this);
+    if(expr == null) throw (declared ? VAREMPTY : VARUNDEF).thrw(info, this);
 
     if(!compiled) {
       final int fp = scope.enter(ctx);
@@ -158,11 +159,13 @@ public final class StaticVar extends ParseExpr implements Scope {
    * Binds a value to this variable from outside the query.
    * @param e expression to bind
    * @param ctx query context
-   * @return if the expression could be bound
+   * @param ii input info
+   * @return the variable if it could be bound, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public boolean bind(final Expr e, final QueryContext ctx) throws QueryException {
-    return bind(e, true, ctx, info);
+  public StaticVar bind(final Expr e, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return bind(e, true, ctx, info != null ? info : ii);
   }
 
   /**
@@ -171,12 +174,12 @@ public final class StaticVar extends ParseExpr implements Scope {
    * @param ext if the value is bound from outside the query
    * @param ctx query context
    * @param ii input info
-   * @return if the value could be bound
+   * @return the variable if it could be bound, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private boolean bind(final Expr e, final boolean ext, final QueryContext ctx,
+  private StaticVar bind(final Expr e, final boolean ext, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
-    if(!external || compiled) return false;
+    if(!bindable || compiled) return null;
 
     if(e instanceof Value) {
       Value v = (Value) e;
@@ -186,7 +189,7 @@ public final class StaticVar extends ParseExpr implements Scope {
       expr = checkType(e, ii);
       value = null;
     }
-    return true;
+    return this;
   }
 
   /**
@@ -207,13 +210,13 @@ public final class StaticVar extends ParseExpr implements Scope {
     info = ii;
     if(a != null) for(int i = 0; i < a.size(); i++) ann.add(a.names[i], a.values[i]);
     lazy = ann.contains(LAZY);
-    external = ext;
     if(ext && expr != null) {
       bind(expr, true, ctx, ii);
       if(e != null) checkType(e, ii);
     } else if(e != null) {
       bind(e, false, ctx, ii);
     }
+    bindable = ext;
   }
 
   /**

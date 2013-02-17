@@ -61,20 +61,20 @@ public final class VarScope {
   /**
    * Resolves a variable and adds it to all enclosing scopes.
    * @param name variable name
-   * @param qp parser
    * @param ctx query context
    * @param ii input info
    * @param err error to be thrown if the variable doesn't exist
+   * @param fixed if the set of static variables is fixed
    * @return variable reference
    * @throws QueryException if the variable can't be found
    */
-  public Expr resolve(final QNm name, final QueryParser qp, final QueryContext ctx,
-      final InputInfo ii, final Err err) throws QueryException {
+  public Expr resolve(final QNm name, final QueryContext ctx,
+      final InputInfo ii, final Err err, final boolean fixed) throws QueryException {
     final Var v = current.get(name);
     if(v != null) return new VarRef(ii, v);
 
     if(parent != null) {
-      final Expr nonLocal = parent.resolve(name, qp, ctx, ii, err);
+      final Expr nonLocal = parent.resolve(name, ctx, ii, err, fixed);
       if(!(nonLocal instanceof VarRef)) return nonLocal;
 
       // a variable in the closure
@@ -86,8 +86,9 @@ public final class VarScope {
 
     // static variable
     StaticVar global = ctx.vars.get(name);
-    if(global == null && err != null) throw qp.error(err, '$' + string(name.string()));
-    return global;
+    if(global != null) return global;
+    if(fixed) throw err.thrw(ii, '$' + string(name.string()));
+    return ctx.vars.bind(name, null, ctx, ii);
   }
 
   /**
