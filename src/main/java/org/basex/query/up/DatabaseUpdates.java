@@ -215,6 +215,9 @@ final class DatabaseUpdates {
         size += p.size();
       }
     }
+    for(int i = dbops.size() - 1; i >= 0; i--) {
+      size += dbops.get(i).size();
+    }
     updatePrimitives = null;
     nodes = null;
     Collections.sort(upd, new UpdatePrimitiveComparator());

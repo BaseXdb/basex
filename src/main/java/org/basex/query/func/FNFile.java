@@ -225,7 +225,7 @@ public final class FNFile extends StandardFunc {
     }
     // parse files. ignore directories if a pattern is specified
     for(final File f : ch) {
-      if(pat == null || pat.matcher(f.getName()).matches() && !f.isDirectory()) {
+      if(pat == null || pat.matcher(f.getName()).matches()) {
         list.add(f.getPath().substring(root));
       }
     }

@@ -136,7 +136,7 @@ public final class FNSql extends StandardFunc {
         final String pass = string(checkStr(expr[2], ctx));
         if(expr.length == 4) {
           // connection options
-          final Item opt = expr[3].item(ctx, info);
+          final Item opt = checkItem(expr[3], ctx);
           final TokenMap options = new FuncParams(E_OPS, info).parse(opt);
           // extract auto-commit mode from options
           boolean ac = true;
@@ -203,11 +203,11 @@ public final class FNSql extends StandardFunc {
    * @throws QueryException query exception
    */
   private NodeSeqBuilder execute(final QueryContext ctx) throws QueryException {
-    final int id = (int) checkItr(expr[0].item(ctx, info));
+    final int id = (int) checkItr(expr[0], ctx);
     final Object obj = ctx.jdbc().get(id);
     if(!(obj instanceof Connection)) BXSQ_CONN.thrw(info, id);
 
-    final String query = string(checkStr(ctx.iter(expr[1]).next(), ctx));
+    final String query = string(checkStr(expr[1], ctx));
     Statement stmt = null;
     try {
       stmt = ((Connection) obj).createStatement();
@@ -227,7 +227,7 @@ public final class FNSql extends StandardFunc {
    * @throws QueryException query exception
    */
   private NodeSeqBuilder executePrepared(final QueryContext ctx) throws QueryException {
-    final int id = (int) checkItr(expr[0].item(ctx, info));
+    final int id = (int) checkItr(expr[0], ctx);
     final Object obj = ctx.jdbc().get(id);
     if(!(obj instanceof PreparedStatement)) BXSQ_STATE.thrw(info, id);
 
@@ -235,7 +235,7 @@ public final class FNSql extends StandardFunc {
     long c = 0;
     ANode params = null;
     if(expr.length > 1) {
-      params = (ANode) checkType(expr[1].item(ctx, info), NodeType.ELM);
+      params = (ANode) checkType(checkItem(expr[1], ctx), NodeType.ELM);
       if(!params.qname().eq(E_PARAMS)) ELMOPTION.thrw(info, params.qname());
       c = countParams(params);
     }
@@ -438,7 +438,7 @@ public final class FNSql extends StandardFunc {
    */
   private Connection connection(final QueryContext ctx, final boolean del)
       throws QueryException {
-    final int id = (int) checkItr(expr[0].item(ctx, info));
+    final int id = (int) checkItr(expr[0], ctx);
     final Object obj = ctx.jdbc().get(id);
     if(!(obj instanceof Connection)) BXSQ_CONN.thrw(info, id);
     if(del) ctx.jdbc().remove(id);
