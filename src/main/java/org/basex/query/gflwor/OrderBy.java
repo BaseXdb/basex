@@ -291,7 +291,7 @@ public final class OrderBy extends GFLWOR.Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    for(final Key key : keys) key.checkUp();
+    checkNoneUp(keys);
   }
 
   @Override

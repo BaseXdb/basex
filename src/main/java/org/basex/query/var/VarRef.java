@@ -73,7 +73,8 @@ public final class VarRef extends ParseExpr {
   @Override
   public Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
-    return v.is(var) ? e : null;
+    // [LW] Is copying always necessary?
+    return !v.is(var) ? null : e.isValue() ? e : e.copy(ctx, scp);
   }
 
   @Override

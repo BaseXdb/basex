@@ -286,7 +286,8 @@ public final class GroupBy extends GFLWOR.Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    for(final Spec spec : by) spec.checkUp();
+    checkNoneUp(preExpr);
+    checkNoneUp(by);
   }
 
   @Override

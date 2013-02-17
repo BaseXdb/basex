@@ -640,7 +640,7 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public void checkUp() throws QueryException {
-    for(final Clause clause : clauses) clause.checkUp();
+    for(final Clause cl : clauses) cl.checkUp();
     ret.checkUp();
   }
 
