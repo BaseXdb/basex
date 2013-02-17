@@ -245,8 +245,7 @@ public final class OrderBy extends GFLWOR.Clause {
 
   @Override
   public VarUsage count(final Var v) {
-    return VarUsage.sum(v, refs) != VarUsage.NEVER
-        ? VarUsage.MORE_THAN_ONCE : VarUsage.sum(v, keys);
+    return VarUsage.sum(v, keys);
   }
 
   @Override
@@ -265,15 +264,24 @@ public final class OrderBy extends GFLWOR.Clause {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, refs) && visitAll(visitor, keys);
+    return visitAll(visitor, keys);
   }
 
   @Override
-  boolean clean(final QueryContext ctx, final BitArray used) {
+  boolean clean(final QueryContext ctx, final IntMap<Var> decl, final BitArray used) {
+    // delete unused variables
     final int len = refs.length;
     for(int i = refs.length; --i >= 0;)
       if(!used.get(refs[i].var.id)) refs = Array.delete(refs, i);
-    return refs.length < len;
+    if(refs.length == used.cardinality()) return refs.length != len;
+
+    // add new variables, possible when an expression is inlined below this clause
+    outer: for(int id = used.nextSet(0); id >= 0; id = used.nextSet(id + 1)) {
+      for(final VarRef ref : refs) if(ref.var.id == id) continue outer;
+      refs = Array.add(refs, new VarRef(info, decl.get(id)));
+    }
+
+    return true;
   }
 
   @Override

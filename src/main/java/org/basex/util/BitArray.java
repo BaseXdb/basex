@@ -83,6 +83,16 @@ public final class BitArray {
   }
 
   /**
+   * Returns the number of bits set to {@code true}.
+   * @return  the number of bits set to {@code true}
+   */
+  public int cardinality() {
+    int sum = 0, inUse = (size + WORD_SIZE - 1) >>> WORD_POWER;
+    for (int i = 0; i < inUse; i++) sum += bitCount(words[i]);
+    return sum;
+  }
+
+  /**
    * Get the value of the i<sup>th</sup> bit.
    * @param i index of the bit
    * @return <code>true</code> if the i<sup>th</sup> bit is set
@@ -142,6 +152,24 @@ public final class BitArray {
 
     // wi * 2^6:
     return wi << WORD_POWER;
+  }
+
+  /**
+   * Get the next bit set to 1, starting from the i<sup>th</sup> bit.
+   * @param i index from which to start the search (inclusive)
+   * @return index of the next set bit after the i<sup>th</sup> bit
+   */
+  public int nextSet(final int i) {
+    if(i >= size) return -1;
+
+    final int inUse = (size + WORD_SIZE - 1) >>> WORD_POWER;
+    int wi = i >>> WORD_POWER;
+    long word = words[wi] & (WORD_MASK << i);
+    while(true) {
+      if (word != 0) return (wi << WORD_POWER) + numberOfTrailingZeros(word);
+      if (++wi == inUse) return -1;
+      word = words[wi];
+    }
   }
 
   /**

@@ -348,14 +348,15 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    */
   private boolean cleanDeadVars(final QueryContext ctx) {
-    final BitArray decl = new BitArray(), used = new BitArray();
+    final IntMap<Var> decl = new IntMap<Var>();
+    final BitArray used = new BitArray();
 
-    for(final Clause cl : clauses) for(final Var v : cl.vars()) decl.set(v.id);
+    for(final Clause cl : clauses) for(final Var v : cl.vars()) decl.add(v.id, v);
     final ASTVisitor marker = new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {
         final int id = ref.var.id;
-        if(decl.get(id)) used.set(id);
+        if(decl.get(id) != null) used.set(id);
         return true;
       }
     };
@@ -364,8 +365,9 @@ public final class GFLWOR extends ParseExpr {
     boolean change = false;
     for(int i = clauses.size(); --i >= 0;) {
       final Clause curr = clauses.get(i);
-      change |= curr.clean(ctx, used);
+      change |= curr.clean(ctx, decl, used);
       curr.accept(marker);
+      for(final Var v : curr.vars()) used.clear(v.id);
     }
     return change;
   }
@@ -704,10 +706,11 @@ public final class GFLWOR extends ParseExpr {
      * Cleans unused variables from this clause.
      * @param ctx query context
      * @param used list of the IDs of all variables used in the following clauses
+     * @param decl variables declared by this FLWOR expression
      * @return {@code true} if something changed, {@code false} otherwise
      */
     @SuppressWarnings("unused")
-    boolean clean(final QueryContext ctx, final BitArray used) {
+    boolean clean(final QueryContext ctx, final IntMap<Var> decl, final BitArray used) {
       return false;
     }
 
