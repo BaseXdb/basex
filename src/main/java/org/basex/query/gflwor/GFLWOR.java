@@ -348,11 +348,14 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    */
   private boolean cleanDeadVars(final QueryContext ctx) {
-    final BitArray used = new BitArray();
+    final BitArray decl = new BitArray(), used = new BitArray();
+
+    for(final Clause cl : clauses) for(final Var v : cl.vars()) decl.set(v.id);
     final ASTVisitor marker = new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {
-        used.set(ref.var.id);
+        final int id = ref.var.id;
+        if(decl.get(id)) used.set(id);
         return true;
       }
     };
