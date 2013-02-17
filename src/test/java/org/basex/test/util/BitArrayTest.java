@@ -56,31 +56,8 @@ public final class BitArrayTest {
 
   /** Test method for {@link BitArray#nextFree(int)}. */
   @Test
-  public void nextClearBitInt() {
+  public void nextFreeInt() {
     a.init(new long[] {-1L, 0L}, 64);
     assertEquals("Incorrect next clear bit", 64, a.nextFree(0));
-  }
-
-  /** Test method for {@link BitArray#setAll}. */
-  @Test
-  public void setAll() {
-    a.init(new long[] {0L}, 32);
-    a.setAll();
-    assertTrue("First 32 should be true", a.get(0) && a.get(1) && a.get(31));
-    assertFalse("Bit 32+ should be false", a.get(32) || a.get(33) || a.get(63));
-    assertTrue("All bits should be true", a.getAll());
-    a.set(33);
-    assertFalse("Bit 32 should be false", a.get(32));
-    assertTrue("Bit 33 should be true", a.get(33));
-    assertFalse("All bits should be false", a.getAll());
-    a.set(32);
-    assertTrue("All bits should be true", a.getAll());
-    a.init();
-    a.set(31);
-    a.setAll();
-    a.clear(8);
-    assertFalse("All bits should be false", a.getAll());
-    assertTrue("Bits != 8 should be true", a.get(7) && a.get(9) && a.get(31));
-    assertFalse("Bit 8 should be false", a.get(8));
   }
 }
