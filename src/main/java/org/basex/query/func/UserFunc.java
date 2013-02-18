@@ -241,4 +241,9 @@ public abstract class UserFunc extends Single implements Scope {
       sz += e.getValue().exprSize();
     return sz + expr.exprSize();
   }
+
+  @Override
+  public final boolean compiled() {
+    return compiled;
+  }
 }

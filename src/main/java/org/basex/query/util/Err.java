@@ -31,8 +31,10 @@ public enum Err {
   BASX_VALUE(BASX, 2, "Invalid value for database option: %."),
   /** BASX0003. */
   BASX_RESTXQ(BASX, 3, "%"),
-  /** BASEX0004. */
-  BASEX_DBTRANSFORM(BASX, 4, "No database updates allowed within transform expression."),
+  /** BASX0004. */
+  BASX_DBTRANSFORM(BASX, 4, "No database updates allowed within transform expression."),
+  /** BASX0005. */
+  BASX_STACKOVERFLOW(BASX, 5, "Stack Overflow: Try tail recursion?"),
 
   // Client module
 
@@ -816,7 +818,7 @@ public enum Err {
   /** XQDY0044. */
   CAINV(XQDY, 44, "Invalid attribute prefix/namespace '%'."),
   /** XQDY0054. */
-  CIRCLDECL(XQDY, 54, "Stack Overflow: circular variable declaration?"),
+  CIRCVAR30(XQDY, 54, "Global variable depends on itself: %"),
   /** XQDY0054. */
   CIRCCTX(XQDY, 54, "Circular declaration of context item."),
   /** XQDY0064. */
@@ -1254,6 +1256,18 @@ public enum Err {
   public static QueryException value(final InputInfo ii, final Type t, final Object v)
       throws QueryException {
     throw INVALUE.thrw(ii, t, v);
+  }
+
+  /**
+   * Throws an exception for circular static variables.
+   * @param ctx query context
+   * @param var variable expression
+   * @return never
+   * @throws QueryException query exception
+   */
+  public static QueryException circVar(final QueryContext ctx, final ParseExpr var)
+      throws QueryException {
+    throw (ctx.sc.xquery3() ? CIRCVAR30 : CIRCVAR).thrw(var.info, var);
   }
 
   @Override

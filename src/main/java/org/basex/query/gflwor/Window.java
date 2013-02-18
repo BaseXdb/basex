@@ -338,9 +338,7 @@ public final class Window extends GFLWOR.Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    expr.checkUp();
-    if(start != null) start.checkUp();
-    if(end != null) end.checkUp();
+    checkNoneUp(expr, start, end);
   }
 
   @Override

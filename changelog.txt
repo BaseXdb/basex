@@ -3,7 +3,7 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
-VERSION 7.6 (February 5, 2012) -----------------------------------------
+VERSION 7.6 (February 5, 2013) -----------------------------------------
 
  DATABASE LOCKING:
  - updates on different databases can now be executed in parallel and
