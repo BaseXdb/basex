@@ -102,7 +102,8 @@ public final class BaseXHTTP {
     jetty.start();
     Util.outln(HTTP + ' ' + SRV_STARTED, SERVERMODE);
 
-    // initialize web.xml settings
+    // initialize web.xml settings, assign system properties and run database server
+    // if not done so already. this must be called after starting jetty
     HTTPContext.init(wac.getServletContext());
 
     // start daemon for stopping web server
@@ -131,15 +132,37 @@ public final class BaseXHTTP {
   public void stop() throws Exception {
     // notify the jetty monitor to stop
     final MainProp mprop = context.mprop;
-    final int stop = mprop.num(MainProp.STOPPORT);
+    final int stop = num(MainProp.STOPPORT, mprop);
     if(stop >= 0) stop(stop);
 
-    // server has been started as separate process and need to be stopped
-    if(!mprop.is(MainProp.HTTPLOCAL)) {
-      final int port = mprop.num(MainProp.SERVERPORT);
-      final int eport = mprop.num(MainProp.EVENTPORT);
+    // server has been started in a separate process and needs to be stopped
+    if(!bool(MainProp.HTTPLOCAL, mprop)) {
+      final int port = num(MainProp.SERVERPORT, mprop);
+      final int eport = num(MainProp.EVENTPORT, mprop);
       BaseXServer.stop(port, eport);
     }
+  }
+
+  /**
+   * Returns a numeric value for the specified option.
+   * @param option option to be retrieved
+   * @param mprop main properties
+   * @return numeric value
+   */
+  private static int num(final Object[] option, final MainProp mprop) {
+    final String val = AProp.getSystem(option);
+    return val.isEmpty() ? mprop.num(option) : Token.toInt(val);
+  }
+
+  /**
+   * Returns a boolean value for the specified option.
+   * @param option option to be retrieved
+   * @param mprop main properties
+   * @return boolean value
+   */
+  private static boolean bool(final Object[] option, final MainProp mprop) {
+    final String val = AProp.getSystem(option);
+    return val.isEmpty() ? mprop.is(option) : Boolean.parseBoolean(val);
   }
 
   /**
