@@ -10,7 +10,7 @@
         <Set name="host"><SystemProperty name="org.basex.serverhost" default="0.0.0.0"/></Set>
         <Set name="port"><SystemProperty name="org.basex.serverport" default="8984"/></Set>
         <Set name="maxIdleTime">60000</Set>
-        <Set name="reuseAddress">false</Set>
+        <Set name="reuseAddress">true</Set>
         <Set name="Acceptors">2</Set>
         <!-- Support for SSL connections .
         <Set name="confidentialPort">8986</Set>
