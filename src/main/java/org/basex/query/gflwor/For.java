@@ -207,7 +207,7 @@ public final class For extends GFLWOR.Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    expr.checkUp();
+    checkNoUp(expr);
   }
 
   @Override

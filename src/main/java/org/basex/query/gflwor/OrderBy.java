@@ -25,10 +25,8 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public final class OrderBy extends GFLWOR.Clause {
-  /** Variables to sort. */
-  Var[] tvars;
-  /** Expressions bound to the variables. */
-  Expr[] texpr;
+  /** References to the variables to be sorted. */
+  VarRef[] refs;
   /** Sort keys. */
   final Key[] keys;
   /** Stable sort flag. */
@@ -44,29 +42,7 @@ public final class OrderBy extends GFLWOR.Clause {
   public OrderBy(final VarRef[] vs, final Key[] ks, final boolean stbl,
       final InputInfo ii) {
     super(ii);
-    tvars = new Var[vs.length];
-    texpr = new Expr[vs.length];
-    for(int i = 0; i < vs.length; i++) {
-      tvars[i] = vs[i].var;
-      texpr[i] = vs[i];
-    }
-    keys = ks;
-    stable = stbl;
-  }
-
-  /**
-   * Copy constructor.
-   * @param vs variables
-   * @param es expressions
-   * @param ks sort keys
-   * @param stbl stable sort
-   * @param ii input info
-   */
-  private OrderBy(final Var[] vs, final Expr[] es, final Key[] ks, final boolean stbl,
-      final InputInfo ii) {
-    super(ii);
-    tvars = vs;
-    texpr = es;
+    refs = vs;
     keys = ks;
     stable = stbl;
   }
@@ -88,7 +64,7 @@ public final class OrderBy extends GFLWOR.Clause {
         final Value[] tuple = tpls[p];
         // free the space occupied by the tuple
         tpls[p] = null;
-        for(int i = 0; i < tvars.length; i++) ctx.set(tvars[i], tuple[i], info);
+        for(int i = 0; i < refs.length; i++) ctx.set(refs[i].var, tuple[i], info);
         return true;
       }
 
@@ -98,7 +74,7 @@ public final class OrderBy extends GFLWOR.Clause {
        * @throws QueryException evaluation exception
        */
       private void init(final QueryContext ctx) throws QueryException {
-        // keys are stored at off positions, values ad even ones
+        // keys are stored at odd positions, values at even ones
         List<Value[]> tuples = new ArrayList<Value[]>();
         while(sub.next(ctx)) {
           final Item[] key = new Item[keys.length];
@@ -106,8 +82,8 @@ public final class OrderBy extends GFLWOR.Clause {
             key[i] = keys[i].expr.item(ctx, keys[i].info);
           tuples.add(key);
 
-          final Value[] vals = new Value[tvars.length];
-          for(int i = 0; i < tvars.length; i++) vals[i] = texpr[i].value(ctx);
+          final Value[] vals = new Value[refs.length];
+          for(int i = 0; i < refs.length; i++) vals[i] = refs[i].value(ctx);
           tuples.add(vals);
         }
 
@@ -269,42 +245,43 @@ public final class OrderBy extends GFLWOR.Clause {
 
   @Override
   public VarUsage count(final Var v) {
-    return VarUsage.maximum(v, texpr) != VarUsage.NEVER
-        ? VarUsage.MORE_THAN_ONCE : VarUsage.sum(v, keys);
+    return VarUsage.sum(v, keys);
   }
 
   @Override
   public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
-    return inlineAll(ctx, scp, keys, v, e) | inlineAll(ctx, scp, texpr, v, e)
-        ? optimize(ctx, scp) : null;
+    for(int i = refs.length; --i >= 0;)
+      if(v.is(refs[i].var)) refs = Array.delete(refs, i);
+    return inlineAll(ctx, scp, keys, v, e) ? optimize(ctx, scp) : null;
   }
 
   @Override
   public OrderBy copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
-    final Var[] tv = tvars.clone();
-    for(int i = 0; i < tv.length; i++) {
-      final Var v = tv[i], cpy = vs.get(v.id);
-      if(cpy != null) tv[i] = cpy;
-    }
-    return new OrderBy(tv, Arr.copyAll(ctx, scp, vs, texpr),
+    return new OrderBy(Arr.copyAll(ctx, scp, vs, refs),
         Arr.copyAll(ctx, scp, vs, keys), stable, info);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, texpr) && visitAll(visitor, keys);
+    return visitAll(visitor, keys);
   }
 
   @Override
-  boolean clean(final QueryContext ctx, final BitArray used) {
-    final int len = tvars.length;
-    for(int i = 0; i < tvars.length; i++)
-      if(!used.get(tvars[i].id)) {
-        texpr = Array.delete(texpr, i);
-        tvars = Array.delete(tvars, i--);
-      }
-    return tvars.length < len;
+  boolean clean(final QueryContext ctx, final IntMap<Var> decl, final BitArray used) {
+    // delete unused variables
+    final int len = refs.length;
+    for(int i = refs.length; --i >= 0;)
+      if(!used.get(refs[i].var.id)) refs = Array.delete(refs, i);
+    if(refs.length == used.cardinality()) return refs.length != len;
+
+    // add new variables, possible when an expression is inlined below this clause
+    outer: for(int id = used.nextSet(0); id >= 0; id = used.nextSet(id + 1)) {
+      for(final VarRef ref : refs) if(ref.var.id == id) continue outer;
+      refs = Array.add(refs, new VarRef(info, decl.get(id)));
+    }
+
+    return true;
   }
 
   @Override
@@ -314,7 +291,7 @@ public final class OrderBy extends GFLWOR.Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    for(final Key key : keys) key.checkUp();
+    checkNoneUp(keys);
   }
 
   @Override
@@ -331,7 +308,7 @@ public final class OrderBy extends GFLWOR.Clause {
   @Override
   public int exprSize() {
     int sz = 0;
-    for(final Expr e : texpr) sz += e.exprSize();
+    for(final Expr e : refs) sz += e.exprSize();
     for(final Expr e : keys) sz += e.exprSize();
     return sz;
   }

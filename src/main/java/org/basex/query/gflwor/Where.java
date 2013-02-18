@@ -108,7 +108,7 @@ public final class Where extends GFLWOR.Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    pred.checkUp();
+    checkNoUp(pred);
   }
 
   @Override

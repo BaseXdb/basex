@@ -20,6 +20,8 @@ public class MainModule extends ExprInfo implements Scope {
   final VarScope scope;
   /** Root expression of this module. */
   public Expr expr;
+  /** Compilation flag. */
+  private boolean compiled;
 
   /**
    * Constructor.
@@ -33,7 +35,9 @@ public class MainModule extends ExprInfo implements Scope {
 
   @Override
   public void compile(final QueryContext ctx) throws QueryException {
+    if(compiled) return;
     try {
+      compiled = true;
       scope.enter(ctx);
       expr = expr.compile(ctx, scope);
       scope.cleanUp(this);
@@ -104,5 +108,10 @@ public class MainModule extends ExprInfo implements Scope {
   @Override
   public boolean visit(final ASTVisitor visitor) {
     return expr.accept(visitor);
+  }
+
+  @Override
+  public boolean compiled() {
+    return compiled;
   }
 }

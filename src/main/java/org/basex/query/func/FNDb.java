@@ -766,7 +766,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item output(final QueryContext ctx) throws QueryException {
-    if(ctx.updates.mod instanceof TransformModifier) BASEX_DBTRANSFORM.thrw(info);
+    if(ctx.updates.mod instanceof TransformModifier) BASX_DBTRANSFORM.thrw(info);
 
     final Iter ir = ctx.iter(expr[0]);
     for(Item it; (it = ir.next()) != null;) {

@@ -228,7 +228,7 @@ public final class QueryContext extends Progress {
       else funcs.compile(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      CIRCLDECL.thrw(null, ex);
+      BASX_STACKOVERFLOW.thrw(null, ex);
     }
   }
 
@@ -243,7 +243,7 @@ public final class QueryContext extends Progress {
       return updating ? value().iter() : root.iter(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      throw CIRCLDECL.thrw(null);
+      throw BASX_STACKOVERFLOW.thrw(null);
     }
   }
 
@@ -259,7 +259,7 @@ public final class QueryContext extends Progress {
       return u != null ? u : v;
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      throw CIRCLDECL.thrw(null);
+      throw BASX_STACKOVERFLOW.thrw(null);
     }
   }
 
@@ -542,10 +542,10 @@ public final class QueryContext extends Progress {
    * appropriate XQuery type.
    * @param name name of variable
    * @param val value to be bound
-   * @return {@code true} if the value could be bound, {@code false} otherwise
+   * @return the variable if it could be bound, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private boolean bind(final String name, final Expr val) throws QueryException {
+  private StaticVar bind(final String name, final Expr val) throws QueryException {
     // remove optional $ prefix
     String nm = name.indexOf('$') == 0 ? name.substring(1) : name;
     byte[] uri = EMPTY;
@@ -559,11 +559,11 @@ public final class QueryContext extends Progress {
       nm = m.group(6);
     }
     final byte[] ln = token(nm);
-    if(nm.isEmpty() || !XMLToken.isNCName(ln)) return false;
+    if(nm.isEmpty() || !XMLToken.isNCName(ln)) return null;
 
     // bind variable
     final QNm qnm = uri.length == 0 ? new QNm(ln, this) : new QNm(ln, uri);
-    return vars.bind(qnm, val, this);
+    return vars.bind(qnm, val, this, null);
   }
 
   /**

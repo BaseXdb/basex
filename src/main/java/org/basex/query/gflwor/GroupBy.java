@@ -267,7 +267,7 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  boolean clean(final QueryContext ctx, final BitArray used) {
+  boolean clean(final QueryContext ctx, final IntMap<Var> decl, final BitArray used) {
     // [LW] does not fix {@link #vars}
     final int len = preExpr.length;
     for(int i = 0; i < post.length; i++) {
@@ -286,7 +286,8 @@ public final class GroupBy extends GFLWOR.Clause {
 
   @Override
   public void checkUp() throws QueryException {
-    for(final Spec spec : by) spec.checkUp();
+    checkNoneUp(preExpr);
+    checkNoneUp(by);
   }
 
   @Override

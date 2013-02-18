@@ -22,4 +22,10 @@ public interface Scope {
    * @throws QueryException compilation errors
    */
   void compile(QueryContext ctx) throws QueryException;
+
+  /**
+   * Checks if this scope has already been compiled.
+   * @return result of check
+   */
+  boolean compiled();
 }
