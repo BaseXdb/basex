@@ -207,4 +207,9 @@ public final class FuncItem extends FItem implements Scope {
   public void compile(final QueryContext ctx) throws QueryException {
     // nothing to do here
   }
+
+  @Override
+  public boolean compiled() {
+    return true;
+  }
 }

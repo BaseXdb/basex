@@ -228,7 +228,7 @@ public final class QueryContext extends Progress {
       else funcs.compile(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      CIRCLDECL.thrw(null, ex);
+      BASX_STACKOVERFLOW.thrw(null, ex);
     }
   }
 
@@ -243,7 +243,7 @@ public final class QueryContext extends Progress {
       return updating ? value().iter() : root.iter(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      throw CIRCLDECL.thrw(null);
+      throw BASX_STACKOVERFLOW.thrw(null);
     }
   }
 
@@ -259,7 +259,7 @@ public final class QueryContext extends Progress {
       return u != null ? u : v;
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      throw CIRCLDECL.thrw(null);
+      throw BASX_STACKOVERFLOW.thrw(null);
     }
   }
 

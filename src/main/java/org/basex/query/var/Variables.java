@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class Variables extends ExprInfo {
+public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   /** The variables. */
   private final HashMap<QNm, StaticVar> vars = new HashMap<QNm, StaticVar>();
 
@@ -99,5 +99,10 @@ public final class Variables extends ExprInfo {
     final StringBuilder sb = new StringBuilder();
     for(final StaticVar v : vars.values()) v.fullDesc(sb);
     return sb.toString();
+  }
+
+  @Override
+  public Iterator<StaticVar> iterator() {
+    return Collections.unmodifiableCollection(vars.values()).iterator();
   }
 }

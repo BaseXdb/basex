@@ -327,4 +327,9 @@ public final class StaticVar extends ParseExpr implements Scope {
   public int exprSize() {
     return 0;
   }
+
+  @Override
+  public boolean compiled() {
+    return compiled;
+  }
 }
