@@ -269,9 +269,9 @@ public final class BaseXHTTP {
   private static void start(final int port, final String... args) throws BaseXException {
     Util.start(BaseXHTTP.class, args);
     // try to connect to the new server instance
-    for(int c = 0; c < 10; ++c) {
+    for(int c = 1; c < 10; ++c) {
       if(ping(LOCALHOST, port)) return;
-      Performance.sleep(100);
+      Performance.sleep(c * 100);
     }
     throw new BaseXException(CONNECTION_ERROR);
   }
