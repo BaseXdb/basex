@@ -96,11 +96,14 @@ public final class Add extends ACreate {
     // create disk instances for large documents
     // (does not work for input streams and directories)
     final long fl = parser.src.length();
-    boolean large = false;
-    final Runtime rt = Runtime.getRuntime();
-    if(fl > rt.freeMemory() / 3) {
-      Performance.gc(prop.is(Prop.SINGLEGC) ? 1 : 2);
-      large = fl > rt.freeMemory() / 3;
+    boolean large = prop.is(Prop.ADDCACHE);
+    if(!large) {
+      final Runtime rt = Runtime.getRuntime();
+      final long max = rt.maxMemory();
+      if(fl > (max - rt.freeMemory()) / 2) {
+        Performance.gc(prop.is(Prop.SINGLEGC) ? 1 : 2);
+        large = fl > (max - rt.freeMemory()) / 2;
+      }
     }
     // in main memory mode, never write to disk
     if(prop.is(Prop.MAINMEM)) large = false;
