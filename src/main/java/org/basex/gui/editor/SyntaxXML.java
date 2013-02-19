@@ -61,7 +61,7 @@ public final class SyntaxXML extends Syntax {
       if(ch == '?') {
         pi = 1;
         tag = false;
-        return COMMENT;
+        return FUNCTION;
       }
 
       if(elem) {
