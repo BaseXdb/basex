@@ -14,31 +14,29 @@ public final class SyntaxXML extends Syntax {
   private int quote;
   /** Tag flag. */
   private boolean tag;
-  /** Comment flag. */
-  private int comm;
   /** Flag for printing element name. */
   private boolean elem;
+  /** Current state of comment. */
+  private int comment;
+  /** Current state of processing instruction. */
+  private int pi;
 
   @Override
   public void init() {
     quote = 0;
     tag = false;
-    comm = 0;
     elem = false;
+    comment = 0;
+    pi = 0;
   }
 
   @Override
   public Color getColor(final EditorText text) {
     final int ch = text.curr();
-    if(comm > 0) {
-      if(ch == '<') {
-        comm++;
-      } else if(ch == '>') {
-        comm--;
-      }
-      return comm > 0 ? COMMENT : KEYWORD;
-    }
+    if(comment > 0) return comment(ch);
+    if(pi > 0) return pi(ch);
 
+    // last token was an opening angle bracket (<)
     if(tag) {
       if(quote != 0) {
         if(quote == ch) quote = 0;
@@ -56,7 +54,12 @@ public final class SyntaxXML extends Syntax {
         return KEYWORD;
       }
       if(ch == '!') {
-        comm++;
+        comment = 1;
+        tag = false;
+        return COMMENT;
+      }
+      if(ch == '?') {
+        pi = 1;
         tag = false;
         return COMMENT;
       }
@@ -67,12 +70,52 @@ public final class SyntaxXML extends Syntax {
       }
       return FUNCTION;
     }
+
+    // start of a new element, comment or processing instruction
     if(ch == '<') {
       tag = true;
       elem = true;
       return KEYWORD;
     }
     return TEXT;
+  }
+
+  /**
+   * Processes a comment or doctype declaration.
+   * @param ch current character
+   * @return color
+   */
+  private Color comment(final int ch) {
+    switch(comment) {
+      // "<!"
+      case 1: comment = ch == '-' ? comment + 1 : 6; break;
+      // "<!-"
+      case 2: comment = ch == '-' ? comment + 1 : 6; break;
+      // "<!--"
+      case 3: if(ch == '-') comment = 4; break;
+      // "<!-- ... -"
+      case 4: comment = ch == '-' ? comment + 1 : 3; break;
+      // "<!-- ... --"
+      case 5: comment = ch == '>' ? 0 : 3; break;
+      // "<! ... >"
+      case 6: if(ch == '>') comment = 0; break;
+    }
+    return comment > 0 ? COMMENT : KEYWORD;
+  }
+
+  /**
+   * Processes a processing instruction.
+   * @param ch current character
+   * @return color
+   */
+  private Color pi(final int ch) {
+    switch(pi) {
+      // "<?"
+      case 1: if(ch == '?') pi = 2; break;
+      // "<!? ... ?"
+      case 2: pi = ch == '>' ? 0 : 1; break;
+    }
+    return pi > 0 ? FUNCTION : KEYWORD;
   }
 
   @Override
