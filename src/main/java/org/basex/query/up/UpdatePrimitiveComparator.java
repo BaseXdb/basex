@@ -8,67 +8,66 @@ import org.basex.data.*;
 import org.basex.query.up.primitives.*;
 import org.basex.util.*;
 /**
- * Comparator for {@link UpdatePrimitive}.
+ * <p>Comparator for {@link UpdatePrimitive}.</p>
  *
- * In general, a list of updates is applied from the highest to the lowest PRE value in
+ * <p>In general, a list of updates is applied from the highest to the lowest PRE value in
  * BaseX. The higher the actual location of an update the sooner it is applied, hence
  * the 'greater' {@link UpdatePrimitive} is applied first. The order further relies on
- * the definition of {@link PrimitiveType}.
+ * the definition of {@link PrimitiveType}.</p>
  *
- * {@link UpdatePrimitive}s are identified by their target node's PRE values (T).
+ * <p>{@link UpdatePrimitive}s are identified by their target node's PRE values (T).
  * Depending on the {@link PrimitiveType} of the update, a specific PRE value on the
  * table is affected (L). Hence it is not sufficient to order primitives based on T
  * (see case 2,3 below). It is also not sufficient to order them based on L (see case
- * 2,3 below).
+ * 2,3 below).</p>
  *
- * The first {@link UpdatePrimitive} is referred to as P1, the target node of P1 is
+ * <p>The first {@link UpdatePrimitive} is referred to as P1, the target node of P1 is
  * referred to as T1, the (optional) insertion sequence for P1 is S1, the actually
- * affected PRE value on disk is L1.
- * For the second P2, T2, S2, L2.
+ * affected PRE value on disk is L1. For the second P2, T2, S2, L2.</p>
  *
- * The result of the comparison depends on several things:
+ * <p>The result of the comparison depends on several things:</p>
  *
- * 1) The PRE values of T1 and T2.
+ * <ol>
+ * <li> The PRE values of T1 and T2.
  * Consider D the document <DOC><N1/><N2/><DOC>. If P1 is a {@link DeleteNode} on N1
  * and P2 is a {@link DeleteNode} on N2, it follows that T2>T1. P2 wins the comparison
- * and is therefore executed first.
+ * and is therefore executed first.</li>
  *
- *
- * 2) Whether the order of P1, P2 must be switched to get the desired result.
+ * <li> Whether the order of P1, P2 must be switched to get the desired result.
  * Consider D the document <DOC><N1><N2/><\/N1><DOC>. If P1 is an {@link InsertInto} on
  * N1 and P2 is an {@link InsertInto} on N2, it follows that T2>T1. Yet, executing P2
- * first would lead to the following problem:
+ * first would lead to the following problem:<br/>
  *
- * The actual affected PRE value location on disk for both updates is L1=L2=L=4. P2
+ * The actually affected PRE value location on disk for both updates is L1=L2=L=4. P2
  * inserts a sequence of nodes S2 at L. After this P1 inserts a sequence of nodes S1 at
  * the same location L and shifts S2 further back on disk. S1 and S2 are now ordered
- * incorrectly (S1,S2) and invalidate the document.
+ * incorrectly (S1,S2) and invalidate the document.<br/>
  *
  * Hence the correct order (S2,S1) can only be achieved if P1 is executed first and S1
- * subsequently shifted by inserting S2.
+ * subsequently shifted by inserting S2.<br/>
  *
  * The problem can exist if P1 and/or P2 are of the kind {@link InsertInto} or
  * {@link InsertAfter} and T1+size(T1) is equal T2+size(T2), hence T1 and T2 have the
  * same following node. The correct order is realized by executing the update first, that
- * is on the ancestor axis of the other. In this case P1>P2.
+ * is on the ancestor axis of the other. In this case P1>P2.<br/>
  *
  * Another case similar to this is if P1 is an {@link InsertIntoAsFirst} on an element
  * T1 and P2 is i.e. a {@link ReplaceNode} on an attribute T2 of T1. To get the desired
- * order of insertion sequences (S2,S1) P1 must be executed first, hence P1>P2.
+ * order of insertion sequences (S2,S1) P1 must be executed first, hence P1>P2.</li>
  *
- *
- * 3) The {@link PrimitiveType} of P1, P2.
+ * <li> The {@link PrimitiveType} of P1, P2.
  * Consider D the document <DOC><N1/><DOC> with T=N1. P1 is an {@link InsertBefore}
  * on T and P2 is an {@link InsertIntoAsFirst} on the same target T. As they both operate
  * on the same target, both have not to be re-located because of their type (see case 2),
  * hence only differ in their {@link PrimitiveType}, it follows that P2>P1 as nodes
- * S2 are to be inserted on the following axis of S1.
+ * S2 are to be inserted on the following axis of S1.<br/>
  *
  * Another case: P2 a {@link DeleteNode} on T and P1 an {@link InsertBefore} on T. As
  * L2=L1, P2, the execution sequence must be (P2,P1). For (P1,P2) S1 would be deleted by
  * P2. The correct order is also determined by the order of {@link PrimitiveType}. Here
  * we see that ordering updates simply by the actually affected PRE value L is not
- * sufficient.
+ * sufficient.</li>
+ * </ol>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher

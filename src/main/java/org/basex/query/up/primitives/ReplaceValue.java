@@ -13,19 +13,18 @@ import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
- * ReplaceValue primitive. Replaces the value of a node.
+ * <p>ReplaceValue primitive. Replaces the value of a node.</p>
  *
- * If the target T is an element node this primitive represents a replaceElementContent
+ * <p>If the target T is an element node this primitive represents a replaceElementContent
  * expression (see XQUF). The children of T are deleted and a single (optional) text node
  * is inserted as the only child of T. The primitive for replaceElementContent is
- * substituted by <delete children(T), insertInto(T)>.
+ * substituted by <delete children(T), insertInto(T)>.</p>
  *
- * After the end of the snapshot, T has either no child node at all (if the given text
+ * <p>After the end of the snapshot, T has either no child node at all (if the given text
  * node has been empty), or the given (non-empty) text node as a single child. Attributes
- * of T are not affected by a replaceElementContent expression.
+ * of T are not affected by a replaceElementContent expression.</p>
  *
- *
- * If T is a text node and the new text value is empty, T is deleted.
+ * <p>If T is a text node and the new text value is empty, T is deleted.</p>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher

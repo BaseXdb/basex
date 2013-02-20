@@ -7,33 +7,36 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * A container/list for atomic updates. Updates are then carried out in the same order
+ * <p>A container/list for atomic updates. Updates are then carried out in the same order
  * that they have been added. No reordering takes place. The user is responsible to add
- * them in the correct order.
+ * them in the correct order.</p>
  *
- * Updates must be strictly ordered from the highest to the lowest PRE value, otherwise
- * an exception is returned.
+ * <p>Updates must be strictly ordered from the highest to the lowest PRE value, otherwise
+ * an exception is returned.</p>
  *
+ * <p>If a collection of updates is carried out via this container there are several
+ * benefits:</p>
  *
- * If a collection of updates is carried out via this container there are several
- * benefits:
+ * <ol>
+ *   <li> Caching distance updates of the table due to structural changes and carrying
+ *        them out in an efficient manner.</li>
+ *   <li> Tree-Aware Updates: identification of superfluous updates (like updating the
+ *        descendants of a deleted node).</li>
+ *   <li> Merging of adjacent text nodes which are not allowed (see XDM).</li>
+ * </ol>
  *
- * 1) Caching distance updates of the table due to structural changes and carrying them
- *    out in an efficient manner.
- * 2) Tree-Aware Updates: identification of superfluous updates (like updating the
- *    descendants of a deleted node).
- * 3) Merging of adjacent text nodes which are not allowed (see XDM).
- *
- *
- * Mind that two delete atomics on a list targeting the same PRE value location result in
- * two nodes A and B being deleted, due to PRE value shifts after the first delete,
+ * <p>Mind that two delete atomics on a list targeting the same PRE value location result
+ * in two nodes A and B being deleted, due to PRE value shifts after the first delete,
  * where pre(B) = pre(A) + 1. If a list of atomic updates is prepared for execution it
- * should be ordered from the highest to the lowest PRE value.
+ * should be ordered from the highest to the lowest PRE value.</p>
  *
- * To avoid ambiguity it is not allowed to add:
- * - more than one destructive update like {@link Delete} or {@link Replace} operating on
- *   the same node.
- * - more than one {@link Rename} or {@link UpdateValue} operating on the same node.
+ * <p>To avoid ambiguity it is not allowed to add:</p>
+ * <ul>
+ * <li> more than one destructive update like {@link Delete} or {@link Replace} operating
+ *      on the same node.</li>
+ * <li> more than one {@link Rename} or {@link UpdateValue} operating
+ *      on the same node.</li>
+ * </ul>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
