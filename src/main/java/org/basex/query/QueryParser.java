@@ -707,6 +707,7 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(NSPACE)) {
       ns = ncName(XPNAME);
       wsCheck(IS);
+      if(ctx.sc.ns.staticURI(ns) != null) error(DUPLNSDECL, ns);
     }
 
     final byte[] uri = trim(stringLiteral());
