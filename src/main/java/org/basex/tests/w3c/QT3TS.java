@@ -30,8 +30,8 @@ import org.basex.util.*;
 public final class QT3TS {
   /** Test suite id. */
   private final String testid = "qt3ts";
-  /** Path to the test suite. */
-  private String basePath = "";
+  /** Path to the test suite (ignored if {@code null}). */
+  private String basePath;
 
   /** Maximum length of result output. */
   private int maxout = 2000;
@@ -765,7 +765,8 @@ public final class QT3TS {
    * @return path to the file
    */
   private String file(final String b, final String file) {
-    return new File(b != null ? b : basePath, file).getAbsolutePath();
+    final String dir = b != null ? b : basePath;
+    return dir == null ? file : new File(dir, file).getAbsolutePath();
   }
 
   /**
