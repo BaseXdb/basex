@@ -40,6 +40,14 @@ public final class MixedTest extends AdvancedQueryTest {
   public void duplImportDiffUri() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace a='galaxy' at '" + XQMFILE + "'; 1",
+      Err.DUPLNSDECL);
+  }
+
+  /** Catches duplicate module import. */
+  @Test
+  public void duplLocation() {
+    error("import module namespace a='world' at '" + XQMFILE + "';" +
+      "import module namespace b='galaxy' at '" + XQMFILE + "'; 1",
       Err.WRONGMODULE);
   }
 

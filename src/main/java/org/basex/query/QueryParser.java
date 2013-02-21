@@ -707,7 +707,6 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(NSPACE)) {
       ns = ncName(XPNAME);
       wsCheck(IS);
-      if(ctx.sc.ns.staticURI(ns) != null) error(DUPLNSDECL, ns);
     }
 
     final byte[] uri = trim(stringLiteral());
@@ -717,7 +716,10 @@ public class QueryParser extends InputParser {
     modules.add(uri);
 
     // add non-default namespace
-    if(ns != EMPTY) ctx.sc.ns.add(ns, uri, info());
+    if(ns != EMPTY) {
+      if(ctx.sc.ns.staticURI(ns) != null) error(DUPLNSDECL, ns);
+      ctx.sc.ns.add(ns, uri, info());
+    }
 
     try {
       // check modules at specified locations
