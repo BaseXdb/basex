@@ -72,6 +72,14 @@ public final class FNProfTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void swallow() {
+    query(_PROF_SWALLOW.args("()"), "");
+    query(_PROF_SWALLOW.args("1"), "");
+    query(_PROF_SWALLOW.args("1,2"), "");
+  }
+
+  /** Test method. */
+  @Test
   public void currentMs() {
   }
 

@@ -43,6 +43,7 @@ public final class FNProf extends StandardFunc {
       case _PROF_CURRENT_NS: return Int.get(System.nanoTime());
       case _PROF_DUMP:       return dump(ctx);
       case _PROF_HUMAN:      return human(ctx);
+      case _PROF_SWALLOW:    return swallow(ctx);
       default:               return super.item(ctx, ii);
     }
   }
@@ -102,6 +103,18 @@ public final class FNProf extends StandardFunc {
     for(Item it; (it = ir.next()) != null;) {
       FNInfo.dump(it.serialize().toArray(), s, ctx);
     }
+    return null;
+  }
+
+  /**
+   * Swallows the input.
+   * @param ctx query context
+   * @return memory consumption
+   * @throws QueryException query exception
+   */
+  private Item swallow(final QueryContext ctx) throws QueryException {
+    final Iter ir = expr[0].iter(ctx);
+    while(ir.next() != null);
     return null;
   }
 

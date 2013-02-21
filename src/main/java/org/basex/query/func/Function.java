@@ -771,7 +771,7 @@ public enum Function {
   _HOF_SORT_WITH(FNHof.class, "sort-with(lt-fun,seq)", ITEM_ZM,
       FuncType.get(BLN, ITEM, ITEM).seqType(), ITEM_ZM),
   /** XQuery function. */
-  _HOF_ID(FNHof.class, "id(expr)", ITEM_ZM, ITEM_ZM),
+  _HOF_ID(FNHof.class, "id(value)", ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   _HOF_CONST(FNHof.class, "const(return,ignore)", ITEM_ZM, ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
@@ -839,14 +839,14 @@ public enum Function {
   /** XQuery function. */
   _XQUERY_INVOKE(FNXQuery.class, "invoke(string[,bindings])", ITEM_ZM, 1, STR, ITEM),
   /** XQuery function. */
-  _XQUERY_TYPE(FNXQuery.class, "type(expr)", ITEM_ZM, ITEM_ZM),
+  _XQUERY_TYPE(FNXQuery.class, "type(value)", ITEM_ZM, ITEM_ZM),
 
   /* FNProf functions. */
 
   /** XQuery function. */
-  _PROF_MEM(FNProf.class, "mem(expr[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
+  _PROF_MEM(FNProf.class, "mem(value[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
   /** XQuery function. */
-  _PROF_TIME(FNProf.class, "time(expr[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
+  _PROF_TIME(FNProf.class, "time(value[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
   /** XQuery function. */
   _PROF_SLEEP(FNProf.class, "sleep(ms)", EMP, ITR),
   /** XQuery function. */
@@ -854,9 +854,11 @@ public enum Function {
   /** XQuery function. */
   _PROF_CURRENT_NS(FNProf.class, "current-ns()", ITR),
   /** XQuery function. */
-  _PROF_DUMP(FNProf.class, "dump(expr[,label])", EMP, 1, ITEM_ZM, STR),
+  _PROF_DUMP(FNProf.class, "dump(value[,label])", EMP, 1, ITEM_ZM, STR),
   /** XQuery function. */
   _PROF_HUMAN(FNProf.class, "human(integer)", STR, ITR),
+  /** XQuery function. */
+  _PROF_SWALLOW(FNProf.class, "swallow(value)", STR, ITR),
 
   /* FNHash functions. */
 
