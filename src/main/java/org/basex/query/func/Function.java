@@ -858,7 +858,7 @@ public enum Function {
   /** XQuery function. */
   _PROF_HUMAN(FNProf.class, "human(integer)", STR, ITR),
   /** XQuery function. */
-  _PROF_SWALLOW(FNProf.class, "swallow(value)", STR, ITR),
+  _PROF_VOID(FNProf.class, "void(value)", STR, ITR),
 
   /* FNHash functions. */
 

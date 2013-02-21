@@ -43,7 +43,7 @@ public final class FNProf extends StandardFunc {
       case _PROF_CURRENT_NS: return Int.get(System.nanoTime());
       case _PROF_DUMP:       return dump(ctx);
       case _PROF_HUMAN:      return human(ctx);
-      case _PROF_SWALLOW:    return swallow(ctx);
+      case _PROF_VOID:       return voidd(ctx);
       default:               return super.item(ctx, ii);
     }
   }
@@ -112,7 +112,7 @@ public final class FNProf extends StandardFunc {
    * @return memory consumption
    * @throws QueryException query exception
    */
-  private Item swallow(final QueryContext ctx) throws QueryException {
+  private Item voidd(final QueryContext ctx) throws QueryException {
     final Iter ir = expr[0].iter(ctx);
     while(ir.next() != null);
     return null;
