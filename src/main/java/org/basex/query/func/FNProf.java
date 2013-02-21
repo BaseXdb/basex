@@ -107,14 +107,14 @@ public final class FNProf extends StandardFunc {
   }
 
   /**
-   * Swallows the input.
+   * Materializes and swallows the input.
    * @param ctx query context
    * @return memory consumption
    * @throws QueryException query exception
    */
   private Item voidd(final QueryContext ctx) throws QueryException {
     final Iter ir = expr[0].iter(ctx);
-    while(ir.next() != null);
+    for(Item it; (it = ir.next()) != null;) it.materialize(info);
     return null;
   }
 
