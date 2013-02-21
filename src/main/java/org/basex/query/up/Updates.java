@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.node.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * <p>Implementation of the W3C XQUERY UPDATE FACILITY 1.0.</p>
@@ -117,6 +118,16 @@ public final class Updates {
    */
   public void apply() throws QueryException {
     if(mod != null) mod.apply();
+  }
+
+  /**
+   * Adds all databases to be updated to the specified list.
+   * @return databases
+   */
+  public StringList databases() {
+    final StringList sl = new StringList(1);
+    if(mod != null) mod.databases(sl);
+    return sl;
   }
 
   /**
