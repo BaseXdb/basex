@@ -276,7 +276,7 @@ public abstract class ParseExpr extends Expr {
     final Uri uri = Uri.uri(u);
     if(uri.isAbsolute() || !eq(ctx.sc.baseURI().resolve(uri).string(), URLCOLL))
       IMPLCOL.thrw(info, e);
-    }
+  }
 
   /**
    * Checks if the specified expression yields a string.
@@ -288,8 +288,17 @@ public abstract class ParseExpr extends Expr {
    */
   public final byte[] checkStr(final Expr e, final QueryContext ctx)
       throws QueryException {
+    return checkStr(checkItem(e, ctx));
+  }
 
-    final Item it = checkItem(e, ctx);
+  /**
+   * Checks if the specified item is a string.
+   * Returns a token representation or an exception.
+   * @param it item to be checked
+   * @return string representation
+   * @throws QueryException query exception
+   */
+  public final byte[] checkStr(final Item it) throws QueryException {
     final Type ip = it.type;
     if(ip.isStringOrUntyped()) return it.string(info);
     throw Err.type(this, AtomType.STR, it);

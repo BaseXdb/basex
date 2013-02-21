@@ -837,9 +837,20 @@ public enum Function {
   /** XQuery function. */
   _XQUERY_EVAL(FNXQuery.class, "eval(string[,bindings])", ITEM_ZM, 1, STR, ITEM),
   /** XQuery function. */
-  _XQUERY_INVOKE(FNXQuery.class, "invoke(string[,bindings])", ITEM_ZM, 1, STR, ITEM),
+  _XQUERY_INVOKE(FNXQuery.class, "invoke(uri[,bindings])", ITEM_ZM, 1, STR, ITEM),
   /** XQuery function. */
   _XQUERY_TYPE(FNXQuery.class, "type(value)", ITEM_ZM, ITEM_ZM),
+
+  /* FNXQUnit functions. */
+
+  /** XQuery function. */
+  _XQUNIT_ASSERT(FNXQUnit.class, "assert(test[,message])", EMP, 1, ITEM_ZM, STR),
+  /** XQuery function. */
+  _XQUNIT_FAIL(FNXQUnit.class, "fail(message)", EMP, STR),
+  /** XQuery function. */
+  _XQUNIT_TEST(FNXQUnit.class, "test()", ELM),
+  /** XQuery function. */
+  _XQUNIT_TEST_LIBRARIES(FNXQUnit.class, "test-libraries(uris)", ELM, STR_ZM),
 
   /* FNProf functions. */
 
@@ -958,6 +969,7 @@ public enum Function {
     URIS.put(FNValidate.class, VALIDATEURI);
     URIS.put(FNXslt.class,     XSLTURI);
     URIS.put(FNXQuery.class,   XQUERYURI);
+    URIS.put(FNXQUnit.class,   XQUNITURI);
   }
 
   /** Minimum number of arguments. */

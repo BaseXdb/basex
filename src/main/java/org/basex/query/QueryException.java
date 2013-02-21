@@ -177,16 +177,16 @@ public final class QueryException extends Exception {
   }
 
   /**
-   * Returns the error code.
-   * @return error code
+   * Returns the error name.
+   * @return error name
    */
   public QNm qname() {
     return name;
   }
 
   /**
-   * Returns the error code.
-   * @return error code
+   * Returns the error.
+   * @return error
    */
   public Err err() {
     return err;

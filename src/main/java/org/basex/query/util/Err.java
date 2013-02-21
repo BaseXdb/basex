@@ -181,6 +181,21 @@ public enum Err {
   /** BXXQ0001. */
   BXXQ_UPDATING(BXXQ, 1, "No updating expression allowed."),
 
+  // XQUnit module
+
+  /** UNIT0001. */
+  BXUN_FAIL(UNIT, 1, "%."),
+  /** UNIT0001. */
+  BXUN_ASSERT(UNIT, 1, "Assertion failed."),
+  /** UNIT0001. */
+  BXUN_ERROR(UNIT, 1, "%"),
+  /** UNIT0002. */
+  BXUN_ARGS(UNIT, 2, "Test function '%(...)' has arguments."),
+  /** UNIT0003. */
+  BXUN_UPDATE(UNIT, 3, "Function '%' is updating."),
+  /** UNIT0004. */
+  BXUN_TWICE(UNIT, 4, "Annotation %restxq:% was declare twice."),
+
   // EXPath modules
 
   /** ARCH0001. */
@@ -861,7 +876,7 @@ public enum Err {
   /** XQST0046. */
   INVURI(XQST, 46, "URI \"%\" is invalid."),
   /** XQST0047. */
-  DUPLMODULE(XQST, 47, "Module is declared twice: '%'."),
+  DUPLMODULE(XQST, 47, "Module namespace is declared twice: '%'."),
   /** XQST0047. */
   MODNS(XQST, 48, "Declaration % does not match the module namespace."),
   /** XQST0049. */
@@ -1086,8 +1101,9 @@ public enum Err {
     /** BXSL Error type. */ BXSL(QueryText.BXERR, QueryText.BXERRORS),
     /** BXSQ Error type. */ BXSQ(QueryText.BXERR, QueryText.BXERRORS),
     /** BXVA Error type. */ BXVA(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXFT Error type. */ BXXQ(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXXQ Error type. */ BXXQ(QueryText.BXERR, QueryText.BXERRORS),
     /** HASH Error type. */ HASH(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXUN Error type. */ UNIT(QueryText.XQUNIT, QueryText.XQUNITURI),
 
     // EXPath errors
 

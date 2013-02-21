@@ -494,6 +494,8 @@ public interface QueryText {
   byte[] VLDT = token("validate");
   /** XQuery token. */
   byte[] XQRY = token(XQUERY);
+  /** XQUnit token. */
+  byte[] XQUNIT = token("xqunit");
   /** RestXQ token. */
   byte[] RESTXQ = token("restxq");
   /** EXErr token. */
@@ -583,6 +585,8 @@ public interface QueryText {
   byte[] OUTURI = token(BXMODULES + "out");
   /** XQuery module URI. */
   byte[] XQUERYURI = token(BXMODULES + "xquery");
+  /** XQUnit module URI. */
+  byte[] XQUNITURI = token(BXMODULES + "xqunit");
   /** Profiling module URI. */
   byte[] PROFURI = token(BXMODULES + "prof");
   /** Hash module URI. */
