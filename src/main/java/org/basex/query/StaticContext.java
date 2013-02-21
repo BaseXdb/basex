@@ -80,12 +80,12 @@ public final class StaticContext {
    * Returns an IO reference for the specified filename.
    * If a base URI exists, it is merged with the specified filename.
    * Otherwise, a plain reference is returned.
-   * @param fn filename
+   * @param path file path
    * @return io reference
    */
-  public IO io(final String fn) {
+  public IO io(final String path) {
     final IO base = baseIO();
-    return base != null ? base.merge(fn) : IO.get(fn);
+    return base != null ? base.merge(path) : IO.get(path);
   }
 
   /**
