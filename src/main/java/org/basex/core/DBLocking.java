@@ -164,6 +164,7 @@ public final class DBLocking implements Locking {
    * Only keeps given write locks, downgrades the others to read locks.
    * @param downgrade Write locks to keep
    */
+  @Override
   public void downgrade(final StringList downgrade) {
     final Long thread = Thread.currentThread().getId();
     if(null == downgrade)
