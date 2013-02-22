@@ -999,8 +999,8 @@ public interface Text {
 
   /** "No data available.". */
   String NO_DATA = lang("no_data");
-  /** "Not enough space". */
-  String NO_SPACE = lang("no_space");
+  /** "Not enough pixels". */
+  String NO_PIXELS = lang("no_pixels");
   /** "file". */
   String FILE = lang("file");
 
