@@ -107,7 +107,7 @@ final class XMLParser extends CmdParser {
       return new Find(value(root));
     if(e.equals(FLUSH) && check(root))
       return new Flush();
-    if(e.equals(GET) && check(root, OPTION))
+    if(e.equals(GET) && check(root, OPTION + '?'))
       return new Get(value(root, OPTION));
     if(e.equals(GRANT) && check(root, NAME, PERMISSION, DATABASE + '?'))
       return new Grant(value(root, PERMISSION), value(root, NAME), value(root, DATABASE));
@@ -237,7 +237,7 @@ final class XMLParser extends CmdParser {
    * </ul>
    * Arguments are optional, if they suffixed with "?". Examples:
    * <ul>
-   * <li> <code>{"name","#input?"}</code> means that the command must have one "name"
+   * <li> <code>{"name","#input?"}</code> indicates that the command must have one "name"
    *   attribute and may have one text node, but nothing else</li>
    * <li> <code>{}</code> means that the command must not have any arguments }</li>
    * </ul>

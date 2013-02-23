@@ -180,7 +180,7 @@ final class StringParser extends CmdParser {
       case CS:
         return new Cs(xquery(cmd));
       case GET:
-        return new Get(name(cmd));
+        return new Get(name(null));
       case SET:
         return new Set(name(cmd), string(null));
       case PASSWORD:

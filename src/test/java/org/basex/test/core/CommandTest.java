@@ -275,6 +275,7 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void get() {
+    ok(new Get());
     ok(new Get(Prop.CHOP));
     no(new Get(NAME2));
   }

@@ -16,20 +16,40 @@ import org.basex.util.list.*;
  */
 public final class Get extends AGet {
   /**
+   * Empty constructor.
+   */
+  public Get() {
+    this(null);
+  }
+
+  /**
    * Default constructor.
    * @param key property
    */
   public Get(final Object key) {
-    super(Perm.NONE, (key instanceof Object[] ? ((Object[]) key)[0] : key).toString());
+    super(Perm.NONE, key == null ? null :
+      (key instanceof Object[] ? ((Object[]) key)[0] : key).toString()
+    );
   }
 
   @Override
   protected boolean run() throws IOException {
-    final String key = args[0].toUpperCase(Locale.ENGLISH);
-    Object type = prop.get(key);
-    if(type == null && context.user.has(Perm.ADMIN)) type = mprop.get(key);
-    if(type == null) return error(prop.unknown(key));
-    out.println(key + COLS + type);
+    if(args[0] == null) {
+      // retrieve values of all options
+      if(context.user.has(Perm.ADMIN)) {
+        out.println(MAIN_OPTIONS + COL);
+        for(final String s : mprop) out.println(s + COLS + mprop.get(s));
+      }
+      out.println(NL + OPTIONS + COL);
+      for(final String s : prop) out.println(s + COLS + prop.get(s));
+    } else {
+      // retrieve value of specific option
+      final String key = args[0].toUpperCase(Locale.ENGLISH);
+      Object type = prop.get(key);
+      if(type == null && context.user.has(Perm.ADMIN)) type = mprop.get(key);
+      if(type == null) return error(prop.unknown(key));
+      out.println(key + COLS + type);
+    }
     return true;
   }
 
