@@ -36,7 +36,7 @@ public final class ShowBackups extends Command {
       final String name = f.name();
       if(!name.endsWith(IO.ZIPSUFFIX)) continue;
       final TokenList tl = new TokenList();
-      tl.add(name);
+      tl.add(name.split("\\.")[0]);
       tl.add(f.length());
       table.contents.add(tl);
     }
