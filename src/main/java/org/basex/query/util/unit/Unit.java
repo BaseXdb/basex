@@ -101,7 +101,7 @@ public final class Unit {
         // check arguments
         final Value values = uf.ann.values[pos];
         final long vs = values.size();
-        if(values.size() % 2 != 0) BXUN_ANN.thrw(info, '%', uf.ann.names[0]);
+        if(vs % 2 != 0) BXUN_ANN.thrw(info, '%', uf.ann.names[0]);
 
         // expected error code
         byte[] code = null;
@@ -121,9 +121,13 @@ public final class Unit {
         t++;
 
         final Performance pt = new Performance();
-        if(indexOf(uf, IGNORE) != -1) {
+        final int skip = indexOf(uf, IGNORE);
+        if(skip != -1) {
           // skip test
-          test.add(new FElem(Q_SKIPPED));
+          final FElem skipped = new FElem(Q_SKIPPED);
+          final Value sv = uf.ann.values[skip];
+          if(sv.size() > 0) skipped.add(Q_MESSAGE, sv.itemAt(0).string(info));
+          test.add(skipped);
           s++;
         } else {
           try {
