@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 
 /**
  * This class serializes data as JSON. The input must conform to the rules
- * defined in the {@link JSONConverter} class.
+ * defined in the {@link JsonCGConverter} class.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
