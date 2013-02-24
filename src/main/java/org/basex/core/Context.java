@@ -215,7 +215,7 @@ public final class Context {
    */
   public void register(final Progress pr) {
     // administrators will not be affected by the timeout
-    if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT));
+    if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT) * 1000L);
 
     // get touched databases
     StringList sl = new StringList(1);
