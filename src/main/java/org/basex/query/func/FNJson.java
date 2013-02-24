@@ -35,7 +35,7 @@ public final class FNJson extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case _JSON_PARSE:
-        return new JSONConverter(info).parse(checkStr(expr[0], ctx));
+        return new JsonCGConverter(info).parse(checkStr(expr[0], ctx));
       case _JSON_PARSE_ML:
         return new JsonMLConverter(info).parse(checkStr(expr[0], ctx));
       case _JSON_SERIALIZE:
