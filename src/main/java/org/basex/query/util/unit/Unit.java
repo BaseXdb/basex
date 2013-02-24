@@ -1,12 +1,11 @@
 package org.basex.query.util.unit;
 
-import static org.basex.query.util.unit.Constants.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.query.util.unit.Constants.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -89,7 +88,7 @@ public final class Unit {
 
     try {
       // call initializing functions before first test
-      for(final UserFunc uf : beforeModule) eval(uf, 0);
+      for(final UserFunc uf : beforeModule) eval(uf);
 
       for(final UserFunc uf : ctx.funcs.funcs()) {
         // consider only test functions that are defined in the same file
@@ -101,19 +100,14 @@ public final class Unit {
         // check arguments
         final Value values = uf.ann.values[pos];
         final long vs = values.size();
-        if(vs % 2 != 0) BXUN_ANN.thrw(info, '%', uf.ann.names[0]);
 
         // expected error code
         byte[] code = null;
-        long time = 0;
-        for(int v = 0; v < vs; v += 2) {
-          final byte[] key = values.itemAt(v).string(info);
-          final byte[] val = values.itemAt(v + 1).string(info);
-          if(eq(key, EXPECTED)) {
-            code = val;
-          } else if(eq(key, TIMEOUT)) {
-            time = toInt(val);
-            if(time < 0) BXUN_ANN.thrw(info, '%', uf.ann.names[0]);
+        if(vs != 0) {
+          if(vs == 2 && eq(EXPECTED, values.itemAt(0).string(info))) {
+            code = values.itemAt(1).string(info);
+          } else {
+            BXUN_ANN.thrw(info, '%', uf.ann.names[0]);
           }
         }
 
@@ -132,11 +126,11 @@ public final class Unit {
         } else {
           try {
             // call functions marked with "before"
-            for(final UserFunc fn : before) eval(fn, 0);
+            for(final UserFunc fn : before) eval(fn);
             // call functions
-            eval(uf, time);
+            eval(uf);
             // call functions marked with "after"
-            for(final UserFunc fn : after) eval(fn, 0);
+            for(final UserFunc fn : after) eval(fn);
 
             if(code != null) {
               f++;
@@ -145,13 +139,6 @@ public final class Unit {
               error.add(Q_TYPE, code);
               test.add(error);
             }
-
-          } catch(final ProgressException ex) {
-            final FElem error = new FElem(Q_ERROR);
-            error.add(Q_MESSAGE, "Timed out (" + time + " ms)");
-            error.add(Q_TYPE, QueryText.XQUNIT);
-            test.add(error);
-
           } catch(final QueryException ex) {
             final QNm name = ex.qname();
             if(code == null || !eq(code, name.local())) {
@@ -172,7 +159,7 @@ public final class Unit {
       }
 
       // run finalizing tests
-      for(final UserFunc uf : afterModule) eval(uf, 0);
+      for(final UserFunc uf : afterModule) eval(uf);
 
     } catch(final QueryException ex) {
       // handle initializers
@@ -192,18 +179,12 @@ public final class Unit {
   /**
    * Evaluates a function.
    * @param fn function to evaluate
-   * @param to timeout (0: disabled)
    * @throws QueryException query exception
    */
-  private void eval(final UserFunc fn, final long to) throws QueryException {
+  private void eval(final UserFunc fn) throws QueryException {
     current = fn;
-    try {
-      if(to > 0) ctx.startTimeout(to);
-      final Iter ir = fn.iter(ctx);
-      for(Item it; (it = ir.next()) != null;) it.materialize(info);
-    } finally {
-      if(to > 0) ctx.stopTimeout();
-    }
+    final Iter ir = fn.iter(ctx);
+    for(Item it; (it = ir.next()) != null;) it.materialize(info);
   }
 
   /**

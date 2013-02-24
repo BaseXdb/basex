@@ -25,8 +25,6 @@ public interface Constants {
   byte[] AFTER_MODULE = token("after-module");
   /** Token: expected. */
   byte[] EXPECTED = token("expected");
-  /** Token: timeout. */
-  byte[] TIMEOUT = token("timeout");
 
   /** QName: testsuites. */
   QNm Q_TESTSUITES = new QNm("testsuites");
