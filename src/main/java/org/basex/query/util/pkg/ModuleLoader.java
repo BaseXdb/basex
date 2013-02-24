@@ -151,8 +151,10 @@ public final class ModuleLoader {
    * URI transformation
    * (http://www.zorba-xquery.com/html/documentation/2.2.0/zorba/uriresolvers):</p>
    * <ul>
-   * <li>The URI authority is reversed, and dots are replaced by slashes.</li>
-   * <li>The URI path is appended. If no path exists, a slash is appended.</li>
+   * <li>In the URI authority, the order of all substrings separated by dots is reversed.
+   *     </li>
+   * <li>Dots in the authority and the path are replaced by slashes.
+   *     If no path exists, a single slash is appended.</li>
    * <li>If the resulting string ends with a slash, "index" is appended.</li>
    * <li>{@code null} is returned if the URI has an invalid syntax.</li>
    * </ul>
