@@ -27,6 +27,10 @@ public final class FTIndexQueryTest extends SandboxTest {
   /** Context of database with full-text index. */
   private static final Context CTX_IX = new Context();
 
+  /** Rule to create database without full-text index. */
+  @Rule
+  public final CreateDBRule createdb = new CreateDBRule(NAME, context);
+
   /** Rule to create database with full-text index. */
   @Rule
   public final CreateDBRule createdbix = new CreateDBRule(NAME_IX, CTX_IX);
