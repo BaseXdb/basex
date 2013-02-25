@@ -48,7 +48,7 @@ public final class JsonMapConverter implements JsonHandler {
    */
   public static Expr parse(final byte[] json, final InputInfo ii) throws QueryException {
     final JsonMapConverter conv = new JsonMapConverter();
-    JsonParser.parse(Token.string(json), Spec.RFC_4627, conv, ii);
+    JsonParser.parse(Token.string(json), Spec.RFC_4627, true, conv, ii);
     return conv.stack.pop();
   }
 

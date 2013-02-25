@@ -83,7 +83,7 @@ public final class JsonCGConverter extends XMLConverter {
   @Override
   public ANode parse(final byte[] in) throws QueryException {
     final JsonCGHandler handler = new JsonCGHandler();
-    JsonParser.parse(string(in), Spec.RFC_4627, handler, null);
+    JsonParser.parse(string(in), Spec.RFC_4627, true, handler, null);
     final ByteList[] types = new ByteList[TYPES.length];
     for(int n = 0; n < handler.names.size(); n++) {
       final TypedArray arr = handler.names.value(n + 1);

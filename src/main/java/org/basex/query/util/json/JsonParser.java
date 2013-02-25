@@ -34,32 +34,37 @@ public final class JsonParser extends InputParser {
 
   /** JSON spec. */
   private final Spec spec;
+  /** Unescape flag. */
+  private final boolean unescape;
   /** Token builder for string literals. */
   private final TokenBuilder tb = new TokenBuilder();
 
   /**
    * Constructor taking the input string and the spec according to which it is parsed.
    * @param in input string
-   * @param sp JSON spec
+   * @param s JSON spec
+   * @param u unescape flag
    * @param ii input info
    */
-  private JsonParser(final String in, final Spec sp, final InputInfo ii) {
+  private JsonParser(final String in, final Spec s, final boolean u, final InputInfo ii) {
     super(in);
+    spec = s != null ? s : Spec.RFC_4627;
+    unescape = u;
     info = ii;
-    spec = sp != null ? sp : Spec.RFC_4627;
   }
 
   /**
    * Parses the input JSON string and directs the parse events to the given handler.
    * @param json JSON string to parse
    * @param sp JSON spec to use
+   * @param unesc unescape flag
    * @param h JSON handler
    * @param ii input info
    * @throws QueryException parse exception
    */
-  public static void parse(final String json, final Spec sp, final JsonHandler h,
-      final InputInfo ii) throws QueryException {
-    new JsonParser(json, sp, ii).parse(h);
+  public static void parse(final String json, final Spec sp, final boolean unesc,
+      final JsonHandler h, final InputInfo ii) throws QueryException {
+    new JsonParser(json, sp, unesc, ii).parse(h);
   }
 
   /**
@@ -285,56 +290,84 @@ public final class JsonParser extends InputParser {
   private byte[] string() throws QueryException {
     if(!consume('"')) throw error("Expected string, found '%'", curr());
     tb.reset();
+    char hi = 0; // cached high surrogate
     while(ip < il) {
-      final int c = consume();
-      if(c == '"') {
+      int cp = consume();
+      if(cp == '"') {
+        if(hi != 0) tb.add(hi);
         skipWs();
         return tb.finish();
       }
 
-      if(c == '\\') {
+      if(cp == '\\') {
+        if(!unescape) {
+          if(hi != 0) {
+            tb.add(hi);
+            hi = 0;
+          }
+          tb.addByte((byte) '\\');
+        }
+
         final int n = consume();
         switch(n) {
           case '/':
           case '\\':
           case '"':
-            tb.addByte((byte) n);
+            cp = n;
             break;
           case 'b':
-            tb.addByte((byte) '\b');
+            cp = unescape ? '\b' : 'b';
             break;
           case 'f':
-            tb.addByte((byte) '\f');
+            cp = unescape ? '\f' : 'f';
             break;
           case 't':
-            tb.addByte((byte) '\t');
+            cp = unescape ? '\t' : 't';
             break;
           case 'r':
-            tb.addByte((byte) '\r');
+            cp = unescape ? '\r' : 'r';
             break;
           case 'n':
-            tb.addByte((byte) '\n');
+            cp = unescape ? '\n' : 'n';
             break;
           case 'u':
             if(ip + 4 >= il) throw eof(", expected four-digit hex value");
-            int cp = 0;
-            for(int i = 0; i < 4; i++) {
-              final char x = consume();
-              if(x >= '0' && x <= '9')      cp = 16 * cp + x      - '0';
-              else if(x >= 'a' && x <= 'f') cp = 16 * cp + x + 10 - 'a';
-              else if(x >= 'A' && x <= 'F') cp = 16 * cp + x + 10 - 'A';
-              else throw error("Illegal hexadecimal digit: '%'", x);
+            if(unescape) {
+              cp = 0;
+              for(int i = 0; i < 4; i++) {
+                final char x = consume();
+                if(x >= '0' && x <= '9')      cp = 16 * cp + x      - '0';
+                else if(x >= 'a' && x <= 'f') cp = 16 * cp + x + 10 - 'a';
+                else if(x >= 'A' && x <= 'F') cp = 16 * cp + x + 10 - 'A';
+                else throw error("Illegal hexadecimal digit: '%'", x);
+              }
+            } else {
+              tb.addByte((byte) 'u');
+              for(int i = 0; i < 4; i++) {
+                char x = consume();
+                if(x >= '0' && x <= '9' || x >= 'a' && x <= 'f' || x >= 'A' && x <= 'F') {
+                  if(i < 3) tb.addByte((byte) x);
+                  else cp = x;
+                } else throw error("Illegal hexadecimal digit: '%'", x);
+              }
             }
-            tb.add(cp);
             break;
           default:
             throw error("Unknown character escape: '\\%'", n);
         }
-      } else if(spec != Spec.LIBERAL && c <= 0x1F) {
-        throw error("Unescaped control character: '\\%'", CTRL[c]);
-      } else {
-        tb.add(c);
+      } else if(spec != Spec.LIBERAL && cp <= 0x1F) {
+        throw error("Non-escaped control character: '\\%'", CTRL[cp]);
       }
+
+      if(hi != 0) {
+        if(cp >= 0xDC00 && cp <= 0xDFFF)
+          cp = ((hi - 0xD800) << 10) + (cp - 0xDC00) + 0x10000;
+        else tb.add(hi);
+        hi = 0;
+      }
+
+      if(cp >= 0xD800 && cp <= 0xDBFF) hi = (char) cp;
+      else tb.add(cp);
     }
     throw eof(" in string literal");
   }

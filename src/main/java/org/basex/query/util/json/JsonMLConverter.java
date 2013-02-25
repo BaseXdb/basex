@@ -41,7 +41,7 @@ public class JsonMLConverter extends XMLConverter {
   public ANode parse(final byte[] in) throws QueryException {
     final JsonMLHandler handler = new JsonMLHandler();
     stack.clear();
-    JsonParser.parse(Token.string(in), Spec.RFC_4627, handler, null);
+    JsonParser.parse(Token.string(in), Spec.RFC_4627, true, handler, null);
     return stack.pop();
   }
 
