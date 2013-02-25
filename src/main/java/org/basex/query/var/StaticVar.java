@@ -47,6 +47,8 @@ public final class StaticVar extends ParseExpr implements Scope {
 
   /** Variables should only be compiled once. */
   private boolean compiled;
+  /** Flag that is set during compilation and execution and prevents infinite loops. */
+  private boolean dontEnter;
 
   /**
    * Constructor for a variable declared in a query.
@@ -105,11 +107,13 @@ public final class StaticVar extends ParseExpr implements Scope {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope o) throws QueryException {
     if(expr == null) throw (declared ? VAREMPTY : VARUNDEF).thrw(info, this);
+    if(dontEnter) throw Err.circVar(ctx, this);
 
     if(!compiled) {
       final StaticContext tmp = ctx.sc;
       ctx.sc = sc;
 
+      dontEnter = true;
       final int fp = scope.enter(ctx);
       try {
         expr = expr.compile(ctx, scope);
@@ -124,6 +128,7 @@ public final class StaticVar extends ParseExpr implements Scope {
         scope.cleanUp(this);
         scope.exit(ctx, fp);
         ctx.sc = tmp;
+        dontEnter = false;
       }
 
       compiled = true;
@@ -143,11 +148,13 @@ public final class StaticVar extends ParseExpr implements Scope {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
+    if(dontEnter) throw Err.circVar(ctx, this);
     if(lazy) {
       if(!compiled) throw Util.notexpected(this + " was not compiled.");
       if(value != null) return value;
       final StaticContext tmp = ctx.sc;
       ctx.sc = sc;
+      dontEnter = true;
       final int fp = scope.enter(ctx);
       try {
         return bind(expr.value(ctx));
@@ -156,11 +163,13 @@ public final class StaticVar extends ParseExpr implements Scope {
       } finally {
         scope.exit(ctx, fp);
         ctx.sc = tmp;
+        dontEnter = false;
       }
     }
 
     if(value != null) return value;
     if(expr == null) throw VAREMPTY.thrw(info, this);
+    dontEnter = true;
     final int fp = scope.enter(ctx);
     final StaticContext tmp = ctx.sc;
     ctx.sc = sc;
@@ -169,6 +178,7 @@ public final class StaticVar extends ParseExpr implements Scope {
     } finally {
       scope.exit(ctx, fp);
       ctx.sc = tmp;
+      dontEnter = false;
     }
   }
 
@@ -325,7 +335,6 @@ public final class StaticVar extends ParseExpr implements Scope {
 
   @Override
   public boolean databases(final StringList db) {
-    // [LW] what if {@code expr == null}?
     return expr != null && expr.databases(db);
   }
 
