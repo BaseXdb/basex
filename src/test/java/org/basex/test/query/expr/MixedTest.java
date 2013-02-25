@@ -60,6 +60,8 @@ public final class MixedTest extends AdvancedQueryTest {
         "$a:lazy", "hello:foo");
     contains("import module namespace a='world' at '" + XQMFILE + "';" +
         "$a:func()", "hello:foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "';" +
+        "a:inlined()", "hello:foo");
   }
 
   /**
