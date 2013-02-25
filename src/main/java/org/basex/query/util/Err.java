@@ -132,8 +132,6 @@ public enum Err {
   BXRE_INST(BXRE, 5, "Module % is already installed within another package."),
   /** BXRE0006. */
   BXRE_PARSE(BXRE, 6, "Package '%' could not be parsed: %."),
-  /** BXRE0006. */
-  BXRE_PARSENF(BXRE, 6, "Package '%' could not be parsed: '%' not found."),
   /** BXRE0007. */
   BXRE_DELETE(BXRE, 7, "File '%' could not be deleted."),
   /** BXRE0008. */

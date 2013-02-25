@@ -156,8 +156,8 @@ final class EditorArea extends Editor {
         gui.context.prop.set(Prop.QUERYPATH, file.path());
         final QueryContext qc = new QueryContext(gui.context);
         try {
-          if(!xquery) qc.module(input);
-          else qc.parse(input);
+          if(!xquery) qc.module(input, null);
+          else qc.parse(input, null);
           view.info(OK, true, false);
         } catch(final QueryException ex) {
           view.info(Util.message(ex), false, false);

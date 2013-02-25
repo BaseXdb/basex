@@ -107,14 +107,22 @@ public class QueryParser extends InputParser {
    * Constructor.
    * @param in input
    * @param c query context
+   * @param path file path (if {@code null}, {@link Prop#QUERYPATH} will be assigned)
    * @throws QueryException query exception
    */
-  public QueryParser(final String in, final QueryContext c) throws QueryException {
+  public QueryParser(final String in, final String path, final QueryContext c)
+      throws QueryException {
+
     super(in);
     ctx = c;
 
+    // set path to query file
+    final Prop prop = c.context.prop;
+    final String bi = path != null ? path : prop.get(Prop.QUERYPATH);
+    if(!bi.isEmpty()) c.sc.baseURI(bi);
+
     // parse pre-defined external variables
-    final String bind = ctx.context.prop.get(Prop.BINDINGS).trim();
+    final String bind = prop.get(Prop.BINDINGS).trim();
     final StringBuilder key = new StringBuilder();
     final StringBuilder val = new StringBuilder();
     boolean first = true;
@@ -781,9 +789,8 @@ public class QueryParser extends InputParser {
 
     final StaticContext sc = ctx.sc;
     ctx.sc = new StaticContext();
-    ctx.sc.baseURI(io.path());
     ctx.sc.xquery3 = sc.xquery3;
-    new QueryParser(qu, ctx).parse(uri);
+    new QueryParser(qu, io.path(), ctx).parse(uri);
     ctx.sc = sc;
   }
 

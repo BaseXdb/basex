@@ -14,7 +14,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * XQuery Unit tests.
+ * XQuery Unit tests: Testing multiple modules.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
@@ -45,13 +45,12 @@ public final class Suite {
     final FElem suites = new FElem(Q_TESTSUITES);
     for(final byte[] path : libs) {
       final IO io = IO.get(string(path));
-
       if(!io.exists()) WHICHRES.thrw(info, path);
+
       try {
         final QueryContext qc = new QueryContext(ctx.context);
-        qc.sc.baseURI(io.path());
         try {
-          qc.module(string(io.read()));
+          qc.module(string(io.read()), io.path());
           qc.compile();
           suites.add(new Unit(qc, info).test());
         } finally {

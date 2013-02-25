@@ -283,7 +283,7 @@ final class StringParser extends CmdParser {
     if(!eoc()) {
       final QueryContext qc = new QueryContext(ctx);
       try {
-        final QueryParser p = new QueryParser(parser.input, qc);
+        final QueryParser p = new QueryParser(parser.input, null, qc);
         p.ip = parser.ip;
         p.parse();
         sb.append(parser.input.substring(parser.ip, p.ip));

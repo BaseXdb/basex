@@ -50,7 +50,7 @@ public final class FNRepo extends StandardFunc {
 
     final RepoManager rm = new RepoManager(ctx.context, ii);
     // either path to package or package name
-    final byte[] pkg = expr.length == 0 ? null : checkStr(expr[0], ctx);
+    final String pkg = expr.length == 0 ? null : Token.string(checkStr(expr[0], ctx));
     switch(sig) {
       case _REPO_INSTALL:
         rm.install(pkg);

@@ -149,8 +149,6 @@ public final class QueryContext extends Progress {
     context = ctx;
     nodes = ctx.current();
     inf = ctx.prop.is(Prop.QUERYINFO) || Prop.debug;
-    final String path = ctx.prop.get(Prop.QUERYPATH);
-    if(!path.isEmpty()) sc.baseURI(path);
     maxCalls = ctx.prop.num(Prop.TAILCALLS);
     modules = new ModuleLoader(ctx);
     sc.xquery3 = ctx.prop.is(Prop.XQUERY3);
@@ -159,20 +157,22 @@ public final class QueryContext extends Progress {
   /**
    * Parses the specified query.
    * @param qu input query
+   * @param path file path (may be {@code null})
    * @throws QueryException query exception
    */
-  public void parse(final String qu) throws QueryException {
-    root = new QueryParser(qu, this).parse();
+  public void parse(final String qu, final String path) throws QueryException {
+    root = new QueryParser(qu, path, this).parse();
   }
 
   /**
    * Parses the specified module.
    * @param qu input query
+   * @param path file path (may be {@code null})
    * @return name of module
    * @throws QueryException query exception
    */
-  public QNm module(final String qu) throws QueryException {
-    return (QNm) new QueryParser(qu, this).parse(EMPTY);
+  public QNm module(final String qu, final String path) throws QueryException {
+    return (QNm) new QueryParser(qu, path, this).parse(EMPTY);
   }
 
   /**

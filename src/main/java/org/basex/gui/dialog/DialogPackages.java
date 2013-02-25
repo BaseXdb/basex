@@ -137,8 +137,8 @@ public final class DialogPackages extends BaseXDialog {
         type.setText(PkgText.EXPATH);
         path.setText(Token.string(pkg.get(key)));
       } else {
-        final IOFile file = RepoManager.file(key, ctx.repo);
         final String pp = Token.string(key);
+        final IOFile file = RepoManager.file(pp, ctx.repo);
         title.setText(key.length == 0 ? DOTS : pp);
         name.setText(file != null ? file.name() : "-");
         version.setText("-");
