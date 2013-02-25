@@ -1,15 +1,17 @@
 package org.basex.query.util.json;
 
-import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 
-import org.basex.query.*;
+import java.util.Stack;
+
+import org.basex.query.QueryException;
 import org.basex.query.util.*;
-import org.basex.query.value.item.*;
+import org.basex.query.util.json.JsonParser.*;
+import org.basex.query.value.item.QNm;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
+import org.basex.util.hash.TokenObjMap;
+
 
 /**
  * <p>This class converts a <a href="http://jsonml.org">JsonML</a>
@@ -19,10 +21,13 @@ import org.basex.util.hash.*;
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
+ * @author Leo Woerteler
  */
-public final class JsonMLConverter extends XMLConverter {
+public class JsonMLConverter extends XMLConverter {
   /** Cached names. */
   private final TokenObjMap<QNm> qnames = new TokenObjMap<QNm>();
+  /** Element stack. */
+  final Stack<FElem> stack = new Stack<FElem>();
 
   /**
    * Constructor.
@@ -34,62 +39,20 @@ public final class JsonMLConverter extends XMLConverter {
 
   @Override
   public ANode parse(final byte[] in) throws QueryException {
-    // create and return XML fragment
-    return create(new JSONParser(in, info).parse());
+    final JsonMLHandler handler = new JsonMLHandler();
+    stack.clear();
+    JsonParser.parse(Token.string(in), Spec.RFC_4627, handler, null);
+    return stack.pop();
   }
 
   /**
-   * Converts the JSON tree to XML.
-   * @param value node to be converted
-   * @return root node
+   * Raises an error with the specified message.
+   * @param msg error message
+   * @param ext error details
    * @throws QueryException query exception
    */
-  private FElem create(final JValue value) throws QueryException {
-    return elem((JArray) check(value, T_ARRAY, "element constructor"));
-  }
-
-  /**
-   * Converts an element node.
-   * @param value node to be converted
-   * @return root node
-   * @throws QueryException query exception
-   */
-  private FElem elem(final JArray value) throws QueryException {
-    FElem elem = null;
-    boolean txt = false;
-    for(int s = 0; s < value.size(); s++) {
-      final JValue val = value.value(s);
-      if(s == 0) {
-        final JString str = (JString) check(val, T_STRING, "element name");
-        elem = new FElem(qname(str.value));
-      } else if(s == 1 && val instanceof JObject) {
-        attr(elem, (JObject) val);
-      } else if(val instanceof JArray) {
-        elem.add(elem((JArray) val));
-        txt = false;
-      } else if(val instanceof JString) {
-        if(txt) error("No subsequent texts allowed");
-        txt = true;
-        elem.add(((JString) val).value);
-      } else {
-        error("No % allowed at this stage", val.type());
-      }
-    }
-    if(elem == null) error("No element name specified in array");
-    return elem;
-  }
-
-  /**
-   * Converts attributes.
-   * @param elem root node
-   * @param attr attributes
-   * @throws QueryException query exception
-   */
-  private void attr(final FElem elem, final JObject attr) throws QueryException {
-    for(int s = 0; s < attr.size(); s++) {
-      final JString v = (JString) check(attr.value(s), T_STRING, "attribute value");
-      elem.add(qname(attr.name(s)), v.value);
-    }
+  void error(final String msg, final Object... ext) throws QueryException {
+    throw BXJS_PARSEML.thrw(info, Util.inf(msg, ext));
   }
 
   /**
@@ -98,7 +61,7 @@ public final class JsonMLConverter extends XMLConverter {
    * @return cached QName
    * @throws QueryException query exception
    */
-  private QNm qname(final byte[] name) throws QueryException {
+  QNm qname(final byte[] name) throws QueryException {
     // retrieve name from cache, or create new instance
     QNm qname = qnames.get(name);
     if(qname == null) {
@@ -109,28 +72,113 @@ public final class JsonMLConverter extends XMLConverter {
     return qname;
   }
 
-  /**
-   * Checks the type of the specified value.
-   * @param val value to be checked
-   * @param type expected type
-   * @param ext error extension
-   * @return checked value
-   * @throws QueryException query exception
-   */
-  private JValue check(final JValue val, final byte[] type, final String ext)
-      throws QueryException {
-    if(!eq(val.type(), type))
-      error("% expected for %, % found", type, ext, val.type());
-    return val;
-  }
+  /** JSON handler. */
+  private class JsonMLHandler implements JsonHandler {
+    /** Current element. */
+    private FElem curr;
+    /** Current attribute name. */
+    private QNm attName;
 
-  /**
-   * Raises an error with the specified message.
-   * @param msg error message
-   * @param ext error details
-   * @throws QueryException query exception
-   */
-  private void error(final String msg, final Object... ext) throws QueryException {
-    throw BXJS_PARSEML.thrw(info, Util.inf(msg, ext));
+    /** Constructor for visibility. */
+    protected JsonMLHandler() { }
+
+    @Override
+    public void openObject() throws QueryException {
+      if(curr == null || attName != null || stack.peek() != null)
+        error("No object allowed at this stage");
+    }
+
+    @Override
+    public void openEntry(final byte[] key) throws QueryException {
+      attName = qname(key);
+    }
+
+    @Override
+    public void closeEntry() throws QueryException { }
+
+    @Override
+    public void closeObject() {
+      stack.pop();
+      stack.push(curr);
+      curr = null;
+    }
+
+    @Override
+    public void openArray() throws QueryException {
+      if(!stack.isEmpty()) {
+        if(attName == null && curr != null && stack.peek() == null) {
+          stack.pop();
+          stack.push(curr);
+          curr = null;
+        } else if(attName != null || curr != null || stack.peek() == null) {
+          error("No array allowed at this stage");
+        }
+      }
+      stack.push(null);
+      curr = null;
+    }
+
+    @Override
+    public void openArrayEntry() { }
+
+    @Override
+    public void closeArrayEntry() throws QueryException { }
+
+    @Override
+    public void closeArray() throws QueryException {
+      FElem val = stack.pop();
+      if(val == null) {
+        val = curr;
+        curr = null;
+      }
+
+      if(val == null) error("Missing element name");
+
+      if(stack.isEmpty()) stack.push(val);
+      else stack.peek().add(val);
+    }
+
+    @Override
+    public void stringLit(final byte[] val) throws QueryException {
+      if(attName == null && curr != null && stack.peek() == null) {
+        stack.pop();
+        stack.push(curr);
+        curr = null;
+      }
+
+      if(curr == null) {
+        final FElem elem = stack.peek();
+        if(elem == null) curr = new FElem(qname(val));
+        else elem.add(new FTxt(val));
+      } else if(attName != null) {
+        curr.add(attName, val);
+        attName = null;
+      } else {
+        error("No string allowed at this stage");
+      }
+    }
+
+    @Override
+    public void numberLit(final byte[] value) throws QueryException {
+      error("No numbers allowed");
+    }
+
+    @Override
+    public void nullLit() throws QueryException {
+      error("No 'null' allowed");
+    }
+
+    @Override
+    public void booleanLit(final boolean b) throws QueryException {
+      error("No booleans allowed");
+    }
+
+    @Override
+    public void openConstr(final byte[] nm) throws QueryException {
+      error("No constructor functions allowed");
+    }
+    @Override public void openArg() { }
+    @Override public void closeArg() throws QueryException { }
+    @Override public void closeConstr() throws QueryException { }
   }
 }

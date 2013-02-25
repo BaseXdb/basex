@@ -153,8 +153,7 @@ public final class QueryContext extends Progress {
     context = ctx;
     nodes = ctx.current();
     inf = ctx.prop.is(Prop.QUERYINFO) || Prop.debug;
-    final String path = ctx.prop.get(Prop.QUERYPATH);
-    sc = new StaticContext(path, ctx.prop.is(Prop.XQUERY3));
+    sc = new StaticContext(ctx.prop.is(Prop.XQUERY3));
     maxCalls = ctx.prop.num(Prop.TAILCALLS);
     modules = new ModuleLoader(ctx);
   }
@@ -162,20 +161,22 @@ public final class QueryContext extends Progress {
   /**
    * Parses the specified query.
    * @param qu input query
+   * @param path file path (may be {@code null})
    * @throws QueryException query exception
    */
-  public void parse(final String qu) throws QueryException {
-    root = new QueryParser(qu, this).parseMain();
+  public void parse(final String qu, final String path) throws QueryException {
+    root = new QueryParser(qu, path, this).parseMain();
   }
 
   /**
    * Parses the specified module.
    * @param qu input query
+   * @param path file path (may be {@code null})
    * @return name of module
    * @throws QueryException query exception
    */
-  public QNm module(final String qu) throws QueryException {
-    return new QueryParser(qu, this).parseModule(EMPTY);
+  public QNm module(final String qu, final String path) throws QueryException {
+    return new QueryParser(qu, path, this).parseModule(EMPTY);
   }
 
   /**
@@ -270,6 +271,7 @@ public final class QueryContext extends Progress {
    */
   public Value update() throws QueryException {
     if(updating) {
+      context.downgrade(updates.databases());
       updates.apply();
       if(updates.size() != 0 && context.data() != null) context.update();
       if(output.size() != 0) return output.value();

@@ -1,12 +1,17 @@
 package org.basex.query.util.json;
 
-import org.basex.query.*;
-import org.basex.query.value.*;
+import java.math.*;
+import java.util.*;
+
+import org.basex.query.QueryException;
+import org.basex.query.expr.*;
+import org.basex.query.util.json.JsonParser.*;
+import org.basex.query.value.Value;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
-import org.basex.query.value.seq.*;
+import org.basex.query.value.map.Map;
+import org.basex.query.value.seq.Empty;
 import org.basex.util.*;
-import org.basex.util.list.*;
+
 
 /**
  * <p>Provides a method for parsing a JSON string and converting it to an XQuery
@@ -28,45 +33,116 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class JsonMapConverter {
-
+public final class JsonMapConverter implements JsonHandler {
+  /** Stack for intermediate values. */
+  private Stack<Value> stack = new Stack<Value>();
   /** Hidden default constructor. */
-  private JsonMapConverter() { /* void */ }
+  private JsonMapConverter() { }
 
   /**
-   * Parses a JSON string and converts it to an XQuery item made of nested maps.
+   * Parses the given JSON string into an XQuery 3.0 value.
    * @param json JSON string
    * @param ii input info
-   * @return XQuery item
-   * @throws QueryException exception
+   * @return the resulting value
+   * @throws QueryException parse exception
    */
-  public static Value parse(final byte[] json, final InputInfo ii) throws QueryException {
-    return convert(new JSONParser(json, ii).parse());
+  public static Expr parse(final byte[] json, final InputInfo ii) throws QueryException {
+    final JsonMapConverter conv = new JsonMapConverter();
+    JsonParser.parse(Token.string(json), Spec.RFC_4627, conv, ii);
+    return conv.stack.pop();
   }
 
-  /**
-   * Converts a JSON AST into an XQuery expression.
-   * @param nd JSON node
-   * @return XQuery value
-   * @throws QueryException exception
-   */
-  private static Value convert(final JValue nd) throws QueryException {
-    if(nd instanceof JAtom) {
-      final byte[] type = nd.type(), val = ((JAtom) nd).value();
-      switch(type[0]) {
-        case 'b': return Bln.get(val[0] == 't');
-        case 'n': return type[2] == 'm' ? Dbl.get(val, null) : Empty.SEQ;
-        default:  return Str.get(val);
-      }
-    }
+  @Override
+  public void openObject() {
+    stack.push(Map.EMPTY);
+  }
 
-    Map map = Map.EMPTY;
-    final JStruct st = (JStruct) nd;
-    final TokenList names = st instanceof JObject ? ((JObject) st).names : null;
-    for(int i = st.size(); --i >= 0;) {
-      map = map.insert(names == null ? Int.get(i + 1) : Str.get(names.get(i)),
-          convert(st.value(i)), null);
+  @Override
+  public void openEntry(final byte[] key) {
+    stack.push(Str.get(key));
+  }
+
+  @Override
+  public void closeEntry() throws QueryException {
+    final Value val = stack.pop();
+    final Item key = (Item) stack.pop();
+    final Map map = (Map) stack.pop();
+    stack.push(map.insert(key, val, null));
+  }
+
+  @Override public void closeObject() { }
+
+  @Override
+  public void openArray() {
+    stack.push(Map.EMPTY);
+  }
+
+  @Override
+  public void openArrayEntry() {
+    stack.push(Int.get(((Map) stack.peek()).mapSize().itr() + 1));
+  }
+
+  @Override
+  public void closeArrayEntry() throws QueryException {
+    closeEntry();
+  }
+
+  @Override public void closeArray() { }
+
+  @Override
+  public void openConstr(final byte[] name) {
+    openObject();
+    openEntry(name);
+    openArray();
+  }
+
+  @Override public void openArg() {
+    openArrayEntry();
+  }
+
+  @Override public void closeArg() throws QueryException {
+    closeArrayEntry();
+  }
+
+  @Override
+  public void closeConstr() throws QueryException {
+    closeArray();
+    closeEntry();
+    closeObject();
+  }
+
+  @Override
+  public void numberLit(final byte[] val) {
+    final String value = Token.string(val);
+    if(value.matches("^-?[0-9]+$")) {
+      if(value.length() < 19) {
+        stack.push(Int.get(Long.valueOf(value)));
+      } else {
+        final BigInteger it = new BigInteger(value);
+        if(it.equals(BigInteger.valueOf(it.longValue())))
+          stack.push(Int.get(Long.valueOf(value)));
+        else stack.push(Dec.get(new BigDecimal(it)));
+      }
+    } else {
+      final BigDecimal dec = new BigDecimal(value);
+      final double dbl = dec.doubleValue();
+      if(Double.isInfinite(dbl) || Double.isNaN(dbl)) stack.push(Dec.get(dec));
+      else stack.push(Dbl.get(dbl));
     }
-    return map;
+  }
+
+  @Override
+  public void stringLit(final byte[] value) {
+    stack.push(Str.get(value));
+  }
+
+  @Override
+  public void nullLit() {
+    stack.push(Empty.SEQ);
+  }
+
+  @Override
+  public void booleanLit(final boolean b) {
+    stack.push(Bln.get(b));
   }
 }

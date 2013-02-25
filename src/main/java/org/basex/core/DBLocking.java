@@ -164,6 +164,7 @@ public final class DBLocking implements Locking {
    * Only keeps given write locks, downgrades the others to read locks.
    * @param downgrade Write locks to keep
    */
+  @Override
   public void downgrade(final StringList downgrade) {
     final Long thread = Thread.currentThread().getId();
     if(null == downgrade)
@@ -177,20 +178,22 @@ public final class DBLocking implements Locking {
     final StringList newReadObjects = new StringList();
     if(null != readObjects) newReadObjects.add(readObjects);
 
-    if(null != writeObjects && !writeObjects.containsAll(downgrade))
-      throw new IllegalMonitorStateException("Cannot downgrade write lock not aquired.");
+    if(null != writeObjects) {
+      if(!writeObjects.containsAll(downgrade)) throw new IllegalMonitorStateException(
+          "Cannot downgrade write lock not acquired.");
 
-    // Perform downgrades
-    for(final String object : writeObjects) {
-      if(downgrade.contains(object)) {
-        newWriteObjects.add(object);
-      } else {
-        final ReentrantReadWriteLock lock = getOrCreateLock(object);
-        assert 1 == lock.getWriteHoldCount() : "Unexpected write lock count: "
-            + lock.getWriteHoldCount();
-        lock.readLock().lock();
-        newReadObjects.add(object);
-        lock.writeLock().unlock();
+      // Perform downgrades
+      for(final String object : writeObjects) {
+        if(downgrade.contains(object)) {
+          newWriteObjects.add(object);
+        } else {
+          final ReentrantReadWriteLock lock = getOrCreateLock(object);
+          assert 1 == lock.getWriteHoldCount() : "Unexpected write lock count: "
+              + lock.getWriteHoldCount();
+          lock.readLock().lock();
+          newReadObjects.add(object);
+          lock.writeLock().unlock();
+        }
       }
     }
 
@@ -257,7 +260,8 @@ public final class DBLocking implements Locking {
     if(null != writeObjects && !writeObjects.isEmpty()) synchronized(globalLock) {
       localWriters--;
       globalLock.notifyAll();
-    } else if(null == readObjects) synchronized(globalLock) {
+    }
+    if(null == readObjects) synchronized(globalLock) {
       globalReaders--;
       globalLock.notifyAll();
     }

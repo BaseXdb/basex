@@ -51,7 +51,7 @@ public final class QueryProcessor extends Progress {
   public void parse() throws QueryException {
     if(parsed) return;
     parsed = true;
-    ctx.parse(query);
+    ctx.parse(query, null);
     updating = ctx.updating;
   }
 

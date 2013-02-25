@@ -10,6 +10,7 @@ import org.basex.util.*;
  * is carried out after all updates on the database have been made effective in the order
  * of the {@link TYPE}. Hence changes made during a snapshot will be reflected by this
  * task.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */

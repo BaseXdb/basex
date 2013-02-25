@@ -7,48 +7,48 @@ import org.basex.query.iter.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.node.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
- * ***** Implementation of the W3C XQUERY UPDATE FACILITY 1.0 *****
+ * <p>Implementation of the W3C XQUERY UPDATE FACILITY 1.0.</p>
  *
+ * <p>Holds all update operations and primitives a snapshot contains, checks
+ * constraints and finally executes the updates.</p>
  *
- * Holds all update operations and primitives a snapshot contains, checks
- * constraints and finally executes the updates.
- *
- * Fragment updates are treated like database updates. An artificial data
+ * <p>Fragment updates are treated like database updates. An artificial data
  * instance is created for each fragment. Ultimately the updating process for
- * a fragment is the same as for a database node.
+ * a fragment is the same as for a database node.</p>
  *
- * The complete updating process is custom-tailored to the
+ * <p>The complete updating process is custom-tailored to the
  * sequential table encoding of BaseX. As a general rule, all updates are
  * collected and applied for each database from bottom to top, regarding the
  * PRE values of the corresponding target nodes. Updates on the highest PRE
- * values are applied first.
+ * values are applied first.</p>
  *
+ * <p>Updates work like the following:</p>
  *
- * ***** Updates work like the following: *****
- *
- * 1. Each call of an updating expression creates an {@link UpdatePrimitive}
- * 2. All update primitives for a snapshot/query are collected here.
- * 3. Primitives are kept separately for each database that is addressed. This
- *    way we can operate on PRE values instead of node IDs, skip mapping
- *    overhead and further optimize the process.
- *    {@link DatabaseUpdates}
- * 4. Primitives are further kept separately for each database node - each
- *    individual target PRE value. There's a specific container for this:
- *    {@link NodeUpdates}
- * 5. Transform expressions are executed in an 'isolated' updating environment,
- *    see {@link TransformModifier}. All the other updates are executed by
- *    a {@link DatabaseModifier}.
- * 6. After the query has been parsed and all update primitives have been added
- *    to the list, constraints, which cannot be taken care of on the fly, are
- *    checked. If no problems occur, updates are TO BE carried out.
- * 7. Before applying the updates the {@link UpdatePrimitiveComparator} helps to order
- *    {@link UpdatePrimitive} for execution. Each primitive then creates a sequence of
- *    {@link BasicUpdate} which are passed to the {@link Data} layer via an
- *    {@link AtomicUpdateList}. This list takes care of optimization and also text node
- *    merging.
- *
+ * <ol>
+ * <li> Each call of an updating expression creates an {@link UpdatePrimitive}.</li>
+ * <li> All update primitives for a snapshot/query are collected here.</li>
+ * <li> Primitives are kept separately for each database that is addressed. This
+ *      way we can operate on PRE values instead of node IDs, skip mapping
+ *      overhead and further optimize the process.
+ *      {@link DatabaseUpdates}</li>
+ * <li> Primitives are further kept separately for each database node - each
+ *      individual target PRE value. There's a specific container for this:
+ *      {@link NodeUpdates}</li>
+ * <li> Transform expressions are executed in an 'isolated' updating environment,
+ *      see {@link TransformModifier}. All the other updates are executed by
+ *      a {@link DatabaseModifier}.</li>
+ * <li> After the query has been parsed and all update primitives have been added
+ *      to the list, constraints, which cannot be taken care of on the fly, are
+ *      checked. If no problems occur, updates are TO BE carried out.</li>
+ * <li> Before applying the updates the {@link UpdatePrimitiveComparator} helps to order
+ *      {@link UpdatePrimitive} for execution. Each primitive then creates a sequence of
+ *      {@link BasicUpdate} which are passed to the {@link Data} layer via an
+ *      {@link AtomicUpdateList}. This list takes care of optimization and also text node
+ *      merging.</li>
+ * </ol>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
@@ -118,6 +118,16 @@ public final class Updates {
    */
   public void apply() throws QueryException {
     if(mod != null) mod.apply();
+  }
+
+  /**
+   * Adds all databases to be updated to the specified list.
+   * @return databases
+   */
+  public StringList databases() {
+    final StringList sl = new StringList(1);
+    if(mod != null) mod.databases(sl);
+    return sl;
   }
 
   /**

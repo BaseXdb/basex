@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -69,18 +68,22 @@ public final class FNXQuery extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value eval(final QueryContext ctx) throws QueryException {
-    return eval(ctx, checkStr(expr[0], ctx));
+    return eval(ctx, checkStr(expr[0], ctx), null);
   }
 
   /**
    * Evaluates the specified string.
    * @param ctx query context
    * @param qu query string
+   * @param path path to query file (may be {@code null})
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Value eval(final QueryContext ctx, final byte[] qu) throws QueryException {
+  private Value eval(final QueryContext ctx, final byte[] qu, final String path)
+      throws QueryException {
+
     final QueryContext qc = new QueryContext(ctx.context);
+
     // bind variables and context item
     for(final Map.Entry<String, Value> it : bindings(1, ctx).entrySet()) {
       final String k = it.getKey();
@@ -90,7 +93,7 @@ public final class FNXQuery extends StandardFunc {
     }
     // evaluate query
     try {
-      qc.parse(string(qu));
+      qc.parse(string(qu), path);
       if(qc.updating) BXXQ_UPDATING.thrw(info);
       qc.compile();
       return qc.value();
@@ -110,15 +113,10 @@ public final class FNXQuery extends StandardFunc {
     final String path = string(checkStr(expr[0], ctx));
     final IO io = IO.get(path);
     if(!io.exists()) WHICHRES.thrw(info, path);
-    final Prop prop = ctx.context.prop;
-    final String tmp = prop.get(Prop.QUERYPATH);
     try {
-      prop.set(Prop.QUERYPATH, path);
-      return eval(ctx, io.read());
+      return eval(ctx, io.read(), path);
     } catch(final IOException ex) {
       throw IOERR.thrw(info, ex);
-    } finally {
-      prop.set(Prop.QUERYPATH, tmp);
     }
   }
 

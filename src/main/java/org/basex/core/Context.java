@@ -57,6 +57,8 @@ public final class Context {
   private Nodes current;
   /** Process locking. */
   private final Locking locks;
+  /** Indicates if a process is currently registered. */
+  private boolean registered;
   /** Data reference. */
   private Data data;
 
@@ -213,7 +215,7 @@ public final class Context {
    */
   public void register(final Progress pr) {
     // administrators will not be affected by the timeout
-    if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT));
+    if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT) * 1000L);
 
     // get touched databases
     StringList sl = new StringList(1);
@@ -222,14 +224,35 @@ public final class Context {
       sl = null;
     } else {
       // replace empty string with currently opened database and return array
-      for(int d = 0; d < sl.size(); d++) {
-        if(sl.get(d).isEmpty())
-          if(null == data) sl.deleteAt(d);
-          else sl.set(d, data.meta.name);
-      }
+      prepareLock(sl);
     }
+    assert !registered : "Already registered";
+    registered = true;
     locks.acquire(pr, pr.updating ? new StringList(0) : sl,
                                   pr.updating ? sl : new StringList(0));
+  }
+
+  /**
+   * Downgrades locks.
+   * @param sl string list
+   */
+  public void downgrade(final StringList sl) {
+    if(!registered) return;
+    prepareLock(sl);
+    //locks.downgrade(sl);
+  }
+
+  /**
+   * Prepares the string list for locking.
+   * @param sl string list
+   */
+  private void prepareLock(final StringList sl) {
+    // replace empty string with currently opened database and return array
+    for(int d = 0; d < sl.size(); d++) {
+      if(sl.get(d).isEmpty())
+        if(null == data) sl.deleteAt(d);
+        else sl.set(d, data.meta.name);
+    }
   }
 
   /**
@@ -237,6 +260,8 @@ public final class Context {
    * @param pr process
    */
   public void unregister(final Progress pr) {
+    assert registered : "Not registered";
+    registered = false;
     locks.release(pr);
     pr.stopTimeout();
   }

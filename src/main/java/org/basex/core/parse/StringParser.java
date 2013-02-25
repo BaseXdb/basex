@@ -180,7 +180,7 @@ final class StringParser extends CmdParser {
       case CS:
         return new Cs(xquery(cmd));
       case GET:
-        return new Get(name(cmd));
+        return new Get(name(null));
       case SET:
         return new Set(name(cmd), string(null));
       case PASSWORD:
@@ -283,7 +283,7 @@ final class StringParser extends CmdParser {
     if(!eoc()) {
       final QueryContext qc = new QueryContext(ctx);
       try {
-        final QueryParser p = new QueryParser(parser.input, qc);
+        final QueryParser p = new QueryParser(parser.input, null, qc);
         p.ip = parser.ip;
         p.parseMain();
         sb.append(parser.input.substring(parser.ip, p.ip));

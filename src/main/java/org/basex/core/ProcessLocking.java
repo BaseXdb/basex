@@ -78,6 +78,10 @@ final class ProcessLocking implements Locking {
   }
 
   @Override
+  public void downgrade(final StringList db) {
+  }
+
+  @Override
   public void release(final Progress pr) {
     synchronized(mutex) {
       if(pr.updating) {

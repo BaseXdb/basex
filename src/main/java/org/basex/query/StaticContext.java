@@ -51,22 +51,10 @@ public final class StaticContext {
   private Uri baseURI = Uri.EMPTY;
 
   /**
-   * Constructor setting the base URI and the XQuery version.
-   * @param uri base URI
+   * Constructor setting the XQuery version.
    * @param xq30 XQuery 3.0 flag
    */
-  public StaticContext(final String uri, final boolean xq30) {
-    baseURI(uri);
-    xquery3 = xq30;
-  }
-
-  /**
-   * Constructor setting the base URI and the XQuery version.
-   * @param uri base URI
-   * @param xq30 XQuery 3.0 flag
-   */
-  public StaticContext(final Uri uri, final boolean xq30) {
-    baseURI = uri;
+  public StaticContext(final boolean xq30) {
     xquery3 = xq30;
   }
 
@@ -100,12 +88,12 @@ public final class StaticContext {
    * Returns an IO reference for the specified filename.
    * If a base URI exists, it is merged with the specified filename.
    * Otherwise, a plain reference is returned.
-   * @param fn filename
+   * @param path file path
    * @return io reference
    */
-  public IO io(final String fn) {
+  public IO io(final String path) {
     final IO base = baseIO();
-    return base != null ? base.merge(fn) : IO.get(fn);
+    return base != null ? base.merge(path) : IO.get(path);
   }
 
   /**

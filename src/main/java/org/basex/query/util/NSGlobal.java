@@ -65,6 +65,7 @@ public final class NSGlobal {
     NS.add(VLDT, VALIDATEURI);
     NS.add(XSLT, XSLTURI);
     NS.add(XQRY, XQUERYURI);
+    NS.add(XQUNIT, XQUNITURI);
   }
 
   /** Private constructor. */

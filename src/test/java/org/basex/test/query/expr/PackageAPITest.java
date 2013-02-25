@@ -227,7 +227,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void repoInstall() throws BaseXException {
     // try to install non-existing package
     try {
-      new RepoManager(context).install(token("src/test/resources/pkg"));
+      new RepoManager(context).install("src/test/resources/pkg");
       fail("Not existing package not detected.");
     } catch(final QueryException ex) {
       check(null, ex, Err.BXRE_WHICH);
@@ -299,7 +299,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void delete() throws BaseXException {
     // try to delete a package which is not installed
     try {
-      new RepoManager(context).delete(token("xyz"));
+      new RepoManager(context).delete("xyz");
       fail("Not installed package not detected.");
     } catch(final QueryException ex) {
       check(null, ex, Err.BXRE_WHICH);
@@ -332,7 +332,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
     // try to delete pkg3
     try {
-      new RepoManager(context).delete(token(PKG3ID));
+      new RepoManager(context).delete(PKG3ID);
       fail("Package involved in a dependency was deleted.");
     } catch(final QueryException ex) {
       check(null, ex, Err.BXRE_DEP);

@@ -78,7 +78,7 @@ public final class JSONParser extends XMLParser {
     final ANode node;
     try {
       final XMLConverter conv = jsonml ?
-          new JsonMLConverter(null) : new JSONConverter(null);
+          new JsonMLConverter(null) : new JsonCGConverter(null);
       node = conv.parse(content);
 
       // create XML input container from serialized node

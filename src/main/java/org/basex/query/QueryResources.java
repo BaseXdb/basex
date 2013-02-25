@@ -261,10 +261,12 @@ public final class QueryResources {
           final String in = base.merge(input.original).path();
           if(!in.equals(input.original))
             d = CreateDB.create(IO.get(in), single, ctx.context);
-        } catch(final IOException exc) { /* ignore exception */ }
+        } catch(final IOException exc) {
+          // raise error
+          IOERR.thrw(info, exc);
+        }
       }
-
-      // handle exception
+      // no base URI: raise error
       if(d == null) IOERR.thrw(info, ex);
     }
 

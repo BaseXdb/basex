@@ -49,9 +49,7 @@ public final class FNProc extends StandardFunc {
     tl.add(checkStr(expr[0], ctx));
     if(expr.length > 1) {
       final Iter ir = ctx.iter(expr[1]);
-      for(Item it; (it = ir.next()) != null;) {
-        tl.add(checkStr(it, ctx));
-      }
+      for(Item it; (it = ir.next()) != null;) tl.add(checkStr(it));
     }
 
     final String c = expr.length > 2 ? string(checkStr(expr[2], ctx)) : Prop.ENCODING;

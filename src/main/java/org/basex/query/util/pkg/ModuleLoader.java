@@ -84,26 +84,19 @@ public final class ModuleLoader {
     String uriPath = uri2path(string(java ? substring(uri, JAVAPREF.length) : uri));
     if(uriPath == null) return false;
 
-    final boolean suffix = !IO.suffix(uriPath).isEmpty();
     if(!java) {
       // no "java:" prefix: first try to import module as XQuery
       final String path = context.mprop.get(MainProp.REPOPATH) + uriPath;
-      if(suffix) {
-        // check if file has XQuery suffix
-        final IOFile f = new IOFile(path);
-        if(f.hasSuffix(IO.XQSUFFIXES)) return addModule(f, uri, qp);
-      } else {
-        // check for any file with XQuery suffix
-        for(final String suf : IO.XQSUFFIXES) {
-          if(addModule(new IOFile(path + suf), uri, qp)) return true;
-        }
+      // check for any file with XQuery suffix
+      for(final String suf : IO.XQSUFFIXES) {
+        if(addModule(new IOFile(path + suf), uri, qp)) return true;
       }
     }
 
     // "java:" prefix, or no XQuery package found: try to load Java module
     uriPath = capitalize(uriPath);
     final String path = context.mprop.get(MainProp.REPOPATH) + uriPath;
-    final IOFile file = new IOFile(path + (suffix ? "" : IO.JARSUFFIX));
+    final IOFile file = new IOFile(path + IO.JARSUFFIX);
     if(file.exists()) addURL(file);
 
     // try to create Java class instance
@@ -151,8 +144,10 @@ public final class ModuleLoader {
    * URI transformation
    * (http://www.zorba-xquery.com/html/documentation/2.2.0/zorba/uriresolvers):</p>
    * <ul>
-   * <li>The URI authority is reversed, and dots are replaced by slashes.</li>
-   * <li>The URI path is appended. If no path exists, a slash is appended.</li>
+   * <li>In the URI authority, the order of all substrings separated by dots is reversed.
+   *     </li>
+   * <li>Dots in the authority and the path are replaced by slashes.
+   *     If no path exists, a single slash is appended.</li>
    * <li>If the resulting string ends with a slash, "index" is appended.</li>
    * <li>{@code null} is returned if the URI has an invalid syntax.</li>
    * </ul>

@@ -59,6 +59,22 @@ public final class Databases {
   }
 
   /**
+   * Lists all available backups matching the specified prefix.
+   * @param prefix prefix (may be {@code null})
+   * @return database list
+   */
+  public StringList backups(final String prefix) {
+    final StringList list = new StringList();
+    for(final IOFile f : mprop.dbpath().children()) {
+      final String name = f.name();
+      if(name.endsWith(IO.ZIPSUFFIX) && (prefix == null || name.startsWith(prefix))) {
+        list.add(name.replaceFirst("\\..*", ""));
+      }
+    }
+    return list;
+  }
+
+  /**
    * Returns the sorted names of all available databases and, optionally, backups.
    * Filters for {@code name} if not {@code null} with glob support.
    * @param db return databases?

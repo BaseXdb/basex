@@ -197,8 +197,7 @@ public final class FNDb extends StandardFunc {
     if(expr.length <= a) return ia.iter(ctx);
 
     // parse and compile the name test
-    final Item name = checkNoEmpty(expr[a].item(ctx, info));
-    final QNm nm = new QNm(checkStr(name, ctx), ctx);
+    final QNm nm = new QNm(checkStr(expr[a], ctx), ctx);
     if(!nm.hasPrefix()) nm.uri(ctx.sc.ns.uri(Token.EMPTY));
 
     final NameTest nt = new NameTest(nm, NameTest.Mode.STD, true);
@@ -275,23 +274,17 @@ public final class FNDb extends StandardFunc {
     final String prefix = expr.length == 0 ? null :
       Token.string(checkStr(expr[0], ctx)) + '-';
 
-    final ArrayList<IOFile> list = new ArrayList<IOFile>();
-    for(final IOFile f : ctx.context.mprop.dbpath().children()) {
-      final String name = f.name();
-      if(name.endsWith(IO.ZIPSUFFIX) && (prefix == null || name.startsWith(prefix))) {
-        list.add(f);
-      }
-    }
-
+    final StringList list = ctx.context.databases.backups(prefix);
+    final IOFile dbpath = ctx.context.mprop.dbpath();
     return new Iter() {
       int up = -1;
 
       @Override
       public Item next() throws QueryException {
         if(++up >= list.size()) return null;
-        final IOFile file = list.get(up);
-        return new FElem(Q_BACKUP).add(file.name()).
-            add(Q_SIZE, Token.token(file.length()));
+        final String name = list.get(up);
+        final long length = new IOFile(dbpath, name).length();
+        return new FElem(Q_BACKUP).add(name).add(Q_SIZE, Token.token(length));
       }
     };
   }
@@ -594,7 +587,7 @@ public final class FNDb extends StandardFunc {
     if(expr.length > 2) {
       final Iter ir = ctx.iter(expr[2]);
       for(Item it; (it = ir.next()) != null;) {
-        final String path = string(checkStr(it, ctx));
+        final String path = string(checkStr(it));
         final String norm = MetaData.normPath(path);
         if(norm == null) RESINV.thrw(info, path);
         paths.add(norm);

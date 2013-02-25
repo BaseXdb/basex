@@ -23,6 +23,12 @@ public interface Locking {
 
   /**
    * Unlock all string locked by a transaction.
+   * @param db databases
+   */
+  void downgrade(final StringList db);
+
+  /**
+   * Unlock all string locked by a transaction.
    * @param pr progress
    */
   void release(final Progress pr);

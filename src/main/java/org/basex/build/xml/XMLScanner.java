@@ -104,8 +104,10 @@ final class XMLScanner extends Progress {
           }
           if(sddecl() != null && !s) error(WSERROR);
           s();
-          final int ch = nextChar();
-          if(ch != '?' || nextChar() != '>') error(DECLWRONG);
+          int ch = nextChar();
+          if(ch != '?') error(WRONGCHAR, '?', (char) ch);
+          ch = nextChar();
+          if(ch != '>') error(WRONGCHAR, '>', (char) ch);
         } else {
           prev(5);
         }
@@ -715,7 +717,9 @@ final class XMLScanner extends Progress {
           s(); if(encoding() == null) error(TEXTENC);
           ch = nextChar();
           if(s(ch)) ch = nextChar();
-          if(ch != '?' || nextChar() != '>') error(DECLWRONG);
+          if(ch != '?') error(WRONGCHAR, '?', ch);
+          ch = nextChar();
+          if(ch != '>') error(WRONGCHAR, '>', ch);
           cont = Arrays.copyOfRange(cont, input.pos(), cont.length);
         }
 
