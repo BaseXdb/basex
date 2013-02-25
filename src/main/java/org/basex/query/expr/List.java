@@ -20,6 +20,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class List extends Arr {
+  /** Limit for the size of sequences that are materialized at compile time. */
+  private static final int MAX_MAT_SIZE = 1 << 20;
   /**
    * Constructor.
    * @param ii input info
@@ -58,8 +60,7 @@ public final class List extends Arr {
 
     if(size >= 0) {
       if(size == 0 && !uses(Use.NDT) && !uses(Use.UPD)) return optPre(null, ctx);
-      // [LW][CG] maybe we should use a smaller threshold, like 2^16
-      if(allAreValues() && size <= Integer.MAX_VALUE) {
+      if(allAreValues() && size <= MAX_MAT_SIZE) {
         // cannot be empty because values don't have effects
         final int s = (int) size;
         Type all = null;
