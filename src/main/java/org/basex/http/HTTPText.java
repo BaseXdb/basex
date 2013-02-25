@@ -24,6 +24,8 @@ public interface HTTPText {
   String JETTYCONF = WEB_INF + "jetty.xml";
   /** Path to web configuration file. */
   String WEBCONF = WEB_INF + "web.xml";
+  /** Application.wadl file. */
+  String WADL = "application.wadl";
 
   /** Error: no password. */
   String NOPASSWD = "No username/password specified.";

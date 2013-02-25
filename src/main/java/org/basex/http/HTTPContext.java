@@ -128,28 +128,29 @@ public final class HTTPContext {
    * @param sprop serialization properties
    */
   public void initResponse(final SerializerProp sprop) {
-    // set encoding
+    // set content type and encoding
     final String encoding = sprop.get(SerializerProp.S_ENCODING);
     res.setCharacterEncoding(encoding);
+    res.setContentType(mediaType(sprop) + MimeTypes.CHARSET + encoding);
+  }
 
+  /**
+   * Returns the media type defined in the specified serialization properties.
+   * @param sprop serialization properties
+   * @return media type
+   */
+  public static String mediaType(final SerializerProp sprop) {
     // set content type
-    String type = sprop.get(SerializerProp.S_MEDIA_TYPE);
-    if(type.isEmpty()) {
-      // determine content type dependent on output method
-      final String mt = sprop.get(SerializerProp.S_METHOD);
-      if(mt.equals(M_RAW)) {
-        type = APP_OCTET;
-      } else if(mt.equals(M_XML)) {
-        type = APP_XML;
-      } else if(eq(mt, M_JSON, M_JSONML)) {
-        type = APP_JSON;
-      } else if(eq(mt, M_XHTML, M_HTML)) {
-        type = TEXT_HTML;
-      } else {
-        type = TEXT_PLAIN;
-      }
-    }
-    res.setContentType(type + MimeTypes.CHARSET + encoding);
+    final String type = sprop.get(SerializerProp.S_MEDIA_TYPE);
+    if(!type.isEmpty()) return type;
+
+    // determine content type dependent on output method
+    final String mt = sprop.get(SerializerProp.S_METHOD);
+    if(mt.equals(M_RAW)) return APP_OCTET;
+    if(mt.equals(M_XML)) return APP_XML;
+    if(eq(mt, M_JSON, M_JSONML)) return APP_JSON;
+    if(eq(mt, M_XHTML, M_HTML)) return TEXT_HTML;
+    return TEXT_PLAIN;
   }
 
   /**

@@ -48,21 +48,21 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Path. */
   RestXqPath path;
 
+  /** Query parameters. */
+  final ArrayList<RestXqParam> queryParams = new ArrayList<RestXqParam>();
+  /** Form parameters. */
+  final ArrayList<RestXqParam> formParams = new ArrayList<RestXqParam>();
+  /** Header parameters. */
+  final ArrayList<RestXqParam> headerParams = new ArrayList<RestXqParam>();
+  /** Cookie parameters. */
+  final ArrayList<RestXqParam> cookieParams = new ArrayList<RestXqParam>();
+
   /** Query context. */
   private final QueryContext context;
   /** Consumed media types. */
   private final StringList consumes = new StringList();
   /** Returned media types. */
   private final StringList produces = new StringList();
-  /** Query parameters. */
-  private final ArrayList<RestXqParam> queryParams = new ArrayList<RestXqParam>();
-  /** Form parameters. */
-  private final ArrayList<RestXqParam> formParams = new ArrayList<RestXqParam>();
-  /** Header parameters. */
-  private final ArrayList<RestXqParam> headerParams = new ArrayList<RestXqParam>();
-  /** Cookie parameters. */
-  private final ArrayList<RestXqParam> cookieParams = new ArrayList<RestXqParam>();
-
   /** Post/Put variable. */
   private QNm requestBody;
 
