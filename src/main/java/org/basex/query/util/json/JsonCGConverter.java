@@ -3,7 +3,7 @@ package org.basex.query.util.json;
 import org.basex.query.QueryException;
 import org.basex.query.util.*;
 import org.basex.query.util.json.JsonParser.*;
-import org.basex.query.value.item.QNm;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 
 import static org.basex.util.Token.*;
@@ -55,7 +55,7 @@ import static org.basex.data.DataText.*;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public final class JsonCGConverter extends XMLConverter {
+public final class JsonCGConverter extends JsonXMLConverter {
   /** Type names. */
   private static final byte[][] NAMES = { T_ARRAY, T_OBJECT, T_STRING, T_NUMBER,
     T_BOOLEAN, NULL };
@@ -72,18 +72,27 @@ public final class JsonCGConverter extends XMLConverter {
     for(int i = 0; i < NAMES.length; i++) TYPES[i] = new QNm(concat(NAMES[i], s));
   }
 
+  /** Spec to use. */
+  private final Spec spec;
+  /** Flag for interpreting character escape sequences. */
+  private final boolean unescape;
+
   /**
    * Constructor.
+   * @param sp JSON spec to use
+   * @param unesc unescape flag
    * @param ii input info
    */
-  public JsonCGConverter(final InputInfo ii) {
+  public JsonCGConverter(final Spec sp, final boolean unesc, final InputInfo ii) {
     super(ii);
+    spec = sp;
+    unescape = unesc;
   }
 
   @Override
-  public ANode parse(final byte[] in) throws QueryException {
+  public ANode convert(final String in) throws QueryException {
     final JsonCGHandler handler = new JsonCGHandler();
-    JsonParser.parse(string(in), Spec.RFC_4627, handler, null);
+    JsonParser.parse(in, spec, unescape, handler, null);
     final ByteList[] types = new ByteList[TYPES.length];
     for(int n = 0; n < handler.names.size(); n++) {
       final TypedArray arr = handler.names.value(n + 1);
@@ -164,6 +173,7 @@ public final class JsonCGConverter extends XMLConverter {
         names.add(nm, new TypedArray(type, e));
       }
       if(elem != null) elem.add(e);
+      else elem = e;
       name = null;
       return e;
     }
@@ -236,22 +246,27 @@ public final class JsonCGConverter extends XMLConverter {
 
     @Override
     public void openConstr(final byte[] nm) throws QueryException {
-      // TODO Auto-generated method stub
+      // [LW] what can be done here?
+      openObject();
+      openEntry(nm);
+      openArray();
     }
 
     @Override
     public void openArg() throws QueryException {
-      // TODO Auto-generated method stub
+      openArrayEntry();
     }
 
     @Override
     public void closeArg() throws QueryException {
-      // TODO Auto-generated method stub
+      closeArrayEntry();
     }
 
     @Override
     public void closeConstr() throws QueryException {
-      // TODO Auto-generated method stub
+      closeArray();
+      closeEntry();
+      closeObject();
     }
 
     @Override

@@ -1,10 +1,8 @@
 package org.basex.query.util.json;
 
-import java.math.*;
 import java.util.*;
 
 import org.basex.query.QueryException;
-import org.basex.query.expr.*;
 import org.basex.query.util.json.JsonParser.*;
 import org.basex.query.value.Value;
 import org.basex.query.value.item.*;
@@ -33,23 +31,32 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class JsonMapConverter implements JsonHandler {
+public final class JsonMapConverter extends JsonConverter implements JsonHandler {
+  /**  */
   /** Stack for intermediate values. */
   private Stack<Value> stack = new Stack<Value>();
-  /** Hidden default constructor. */
-  private JsonMapConverter() { }
+  /** JSON spec. */
+  private final Spec spec;
+  /** Unescape flag. */
+  private final boolean unescape;
 
   /**
-   * Parses the given JSON string into an XQuery 3.0 value.
-   * @param json JSON string
+   * Constructor.
+   * @param sp JSON spec
+   * @param unesc unescape flag
    * @param ii input info
-   * @return the resulting value
-   * @throws QueryException parse exception
    */
-  public static Expr parse(final byte[] json, final InputInfo ii) throws QueryException {
-    final JsonMapConverter conv = new JsonMapConverter();
-    JsonParser.parse(Token.string(json), Spec.RFC_4627, conv, ii);
-    return conv.stack.pop();
+  public JsonMapConverter(final Spec sp, final boolean unesc, final InputInfo ii) {
+    super(ii);
+    spec = sp;
+    unescape = unesc;
+  }
+
+  @Override
+  public Item convert(final String in) throws QueryException {
+    stack.clear();
+    JsonParser.parse(in, spec, unescape, this, info);
+    return stack.peek().isEmpty() ? null : (Item) stack.pop();
   }
 
   @Override
@@ -112,23 +119,8 @@ public final class JsonMapConverter implements JsonHandler {
   }
 
   @Override
-  public void numberLit(final byte[] val) {
-    final String value = Token.string(val);
-    if(value.matches("^-?[0-9]+$")) {
-      if(value.length() < 19) {
-        stack.push(Int.get(Long.valueOf(value)));
-      } else {
-        final BigInteger it = new BigInteger(value);
-        if(it.equals(BigInteger.valueOf(it.longValue())))
-          stack.push(Int.get(Long.valueOf(value)));
-        else stack.push(Dec.get(new BigDecimal(it)));
-      }
-    } else {
-      final BigDecimal dec = new BigDecimal(value);
-      final double dbl = dec.doubleValue();
-      if(Double.isInfinite(dbl) || Double.isNaN(dbl)) stack.push(Dec.get(dec));
-      else stack.push(Dbl.get(dbl));
-    }
+  public void numberLit(final byte[] val) throws QueryException {
+    stack.push(Dbl.get(val, info));
   }
 
   @Override

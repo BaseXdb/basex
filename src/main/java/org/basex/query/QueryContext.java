@@ -20,6 +20,7 @@ import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.util.json.*;
+import org.basex.query.util.json.JsonParser.Spec;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -598,7 +599,7 @@ public final class QueryContext extends Progress {
 
     // convert to json
     if(type.equalsIgnoreCase(JSONSTR)) {
-      return JsonMapConverter.parse(token(val.toString()), null);
+      return new JsonMapConverter(Spec.ECMA_262, true, null).convert(val.toString());
     }
 
     // convert to the specified type
