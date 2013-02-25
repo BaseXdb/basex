@@ -75,8 +75,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
   };
 
   /** Test method. */
-  @Test
-  public void parse() {
+  @Test public void parse() {
     for(final String[] f : TOXML) {
       final String qu = _JSON_PARSE.args(f[0]);
       if(f.length == 1) {
@@ -90,8 +89,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
   }
 
   /** Test method. */
-  @Test
-  public void serialize() {
+  @Test public void serialize() {
     for(final String[] f : TOJSON) {
       final String qu = _JSON_SERIALIZE.args(f[0]);
       if(f.length == 1) {
@@ -102,5 +100,18 @@ public final class FNJsonTest extends AdvancedQueryTest {
         query(qu, f[1]);
       }
     }
+  }
+
+  /** Tests the configuration argument of {@code json:parse(...)}. */
+  @Test public void config() {
+    query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', map{'type':='jsonml'})",
+        "<foo test=\"asdf\"/>");
+    query("map:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map{'type':='maps'}))",
+        "2");
+    query("json:parse('\"\\t\\u000A\"'," +
+        "  map{'type':='maps','unescape':=false(),'spec':='liberal'})", "\\t\\u000A");
+    query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
+        "  map{'type':='maps','unescape':=true(),'spec':='liberal'}))", "9 10");
+    error("json:parse('42', map{'spec':='garbage'})", Err.BXJS_PARSE_CFG);
   }
 }

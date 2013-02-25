@@ -7,7 +7,7 @@ import java.util.Stack;
 import org.basex.query.QueryException;
 import org.basex.query.util.*;
 import org.basex.query.util.json.JsonParser.*;
-import org.basex.query.value.item.QNm;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.hash.TokenObjMap;
@@ -23,7 +23,7 @@ import org.basex.util.hash.TokenObjMap;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public class JsonMLConverter extends XMLConverter {
+public class JsonMLConverter extends JsonXMLConverter {
   /** Cached names. */
   private final TokenObjMap<QNm> qnames = new TokenObjMap<QNm>();
   /** Element stack. */
@@ -38,10 +38,10 @@ public class JsonMLConverter extends XMLConverter {
   }
 
   @Override
-  public ANode parse(final byte[] in) throws QueryException {
+  public ANode convert(final String in) throws QueryException {
     final JsonMLHandler handler = new JsonMLHandler();
     stack.clear();
-    JsonParser.parse(Token.string(in), Spec.RFC_4627, true, handler, null);
+    JsonParser.parse(in, Spec.RFC4627, true, handler, null);
     return stack.pop();
   }
 

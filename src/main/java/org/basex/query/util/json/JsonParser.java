@@ -15,9 +15,20 @@ import static org.basex.util.Token.*;
 public final class JsonParser extends InputParser {
   /** JSON specs. */
   public static enum Spec {
-    /** Parse the input according to RFC 4627.           */ RFC_4627,
-    /** Parse the input according to ECMA-262.           */ ECMA_262,
-    /** Parse the input being as compatible as possible. */ LIBERAL;
+    /** Parse the input according to RFC 4627.           */ RFC4627("RFC4627"),
+    /** Parse the input according to ECMA-262.           */ ECMA_262("ECMA-262"),
+    /** Parse the input being as compatible as possible. */ LIBERAL("liberal");
+
+    /** Description. */
+    public final byte[] desc;
+
+    /**
+     * Constructor.
+     * @param dsc description
+     */
+    Spec(final String dsc) {
+      desc = token(dsc);
+    }
   }
 
   /** Names of control characters not allowed in string literals. */
@@ -48,7 +59,7 @@ public final class JsonParser extends InputParser {
    */
   private JsonParser(final String in, final Spec s, final boolean u, final InputInfo ii) {
     super(in);
-    spec = s != null ? s : Spec.RFC_4627;
+    spec = s != null ? s : Spec.RFC4627;
     unescape = u;
     info = ii;
   }
@@ -74,7 +85,7 @@ public final class JsonParser extends InputParser {
    */
   private void parse(final JsonHandler h) throws QueryException {
     skipWs();
-    if(spec == Spec.RFC_4627 && !(curr() == '{' || curr() == '['))
+    if(spec == Spec.RFC4627 && !(curr() == '{' || curr() == '['))
       throw error("Expected '{' or '[', found %", rest());
     value(h);
     if(more()) throw error("Unexpected trailing content: %", rest());

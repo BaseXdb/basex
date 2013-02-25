@@ -3,6 +3,7 @@ package org.basex.build.file;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.query.util.json.JsonParser.Spec;
 import org.basex.util.*;
 
 /**
@@ -26,6 +27,10 @@ public final class ParserProp extends AProp {
   public static final Object[] ENCODING = { "encoding", Token.UTF8 };
   /** Parser option: jsonml format. */
   public static final Object[] JSONML = { "jsonml", false };
+  /** Parser option: JSON spec. */
+  public static final Object[] JSON_SPEC = { "json_spec", Spec.RFC4627.name() };
+  /** Parser option: JSON {@code unescape}. */
+  public static final Object[] JSON_UNESC = { "json_unesc", true };
 
   /**
    * Constructor.
