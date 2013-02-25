@@ -97,11 +97,7 @@ public abstract class AxisPath extends Path {
     }
     optSteps(ctx);
 
-    final Expr path = optimize(ctx, scp);
-
-    // heuristics: wrap with filter expression if only one result is expected
-    return size() != 1 ? path :
-      Filter.get(info, this, Pos.get(1, size(), info)).optimize(ctx, scp);
+    return optimize(ctx, scp);
   }
 
   @Override
