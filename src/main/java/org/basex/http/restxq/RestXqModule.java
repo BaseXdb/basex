@@ -122,8 +122,7 @@ final class RestXqModule {
     final QueryContext qc = new QueryContext(http.context());
     try {
       final String query = string(file.read());
-      qc.sc.baseURI(file.path());
-      qc.module(query);
+      qc.module(query, file.path());
       return qc;
     } catch(final IOException ex) {
       qc.close();
