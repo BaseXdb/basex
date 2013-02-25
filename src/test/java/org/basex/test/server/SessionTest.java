@@ -295,24 +295,6 @@ public abstract class SessionTest extends SandboxTest {
     assertFalse("No result was expected.", query.more());
   }
 
-  /** Calls the iterator more often than expected.
-   * @throws IOException expected exception*/
-  @Test(expected = BaseXException.class)
-  public void alreadyExecuted1() throws IOException {
-    final Query q = session.query("()");
-    assertFalse("No result was expected.", q.more());
-    q.next();
-  }
-
-  /** Calls the iterator more often than expected.
-   * @throws IOException expected exception*/
-  @Test(expected = BaseXException.class)
-  public void alreadyExecuted2() throws IOException {
-    final Query q = session.query("()");
-    q.execute();
-    q.more();
-  }
-
   /** Runs a query and retrieves multiple results as string.
    * @throws IOException I/O exception */
   @Test

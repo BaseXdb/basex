@@ -26,17 +26,19 @@ final class QueryListener extends Progress {
   final Performance perf = new Performance();
   /** Query info. */
   private final QueryInfo qi = new QueryInfo();
-  /** Query processor. */
-  private final QueryProcessor qp;
+  /** Query string. */
+  private final String query;
   /** Database context. */
   private final Context ctx;
 
-  /** Query info. */
-  private String info = "";
+  /** Query processor. */
+  private QueryProcessor qp;
   /** Serialization options. */
   private SerializerProp options;
-  /** Closed flag. */
-  private boolean closed;
+  /** Parsing flag. */
+  private boolean parsed;
+  /** Query info. */
+  private String info = "";
 
   /**
    * Constructor.
@@ -44,7 +46,7 @@ final class QueryListener extends Progress {
    * @param c database context
    */
   QueryListener(final String qu, final Context c) {
-    qp = new QueryProcessor(qu, c);
+    query = qu;
     ctx = c;
   }
 
@@ -56,9 +58,8 @@ final class QueryListener extends Progress {
    * @throws IOException query exception
    */
   void bind(final String n, final Object v, final String t) throws IOException {
-    check();
     try {
-      qp.bind(n, v, t);
+      init().bind(n, v, t);
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
@@ -71,9 +72,8 @@ final class QueryListener extends Progress {
    * @throws IOException query exception
    */
   void context(final Object v, final String t) throws IOException {
-    check();
     try {
-      qp.context(v, t);
+      init().context(v, t);
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
@@ -93,7 +93,7 @@ final class QueryListener extends Progress {
    * @throws IOException I/O Exception
    */
   String options() throws IOException {
-    init();
+    if(options == null) options = parse().ctx.serParams(false);
     return options.toString();
   }
 
@@ -103,8 +103,7 @@ final class QueryListener extends Progress {
    * @throws IOException I/O Exception
    */
   boolean updating() throws IOException {
-    init();
-    return qp.updating;
+    return parse().updating;
   }
 
   /**
@@ -118,21 +117,17 @@ final class QueryListener extends Progress {
   void execute(final boolean iter, final OutputStream out, final boolean enc,
       final boolean full) throws IOException {
 
-    check();
-    boolean init = false;
     try {
-      // parses the query
-      init();
       try {
-        // registers the process
-        ctx.register(qp);
-        init = true;
+        // parses the query and registers the process
+        ctx.register(parse());
 
         // create serializer
         qp.compile();
         qi.cmpl = perf.time();
         final Iter ir = qp.iter();
         qi.evlt = perf.time();
+        options();
         final boolean wrap = !options.get(S_WRAP_PREFIX).isEmpty();
 
         // iterate through results
@@ -173,36 +168,44 @@ final class QueryListener extends Progress {
         throw new BaseXException(TIMEOUT_EXCEEDED);
       }
     } finally {
-      // close processor and stop monitoring
-      qp.close();
-      closed = true;
-      // unregisters the process
-      if(init) ctx.unregister(qp);
+      // close processor and unregisters the process
+      if(qp != null) {
+        qp.close();
+        ctx.unregister(qp);
+        parsed = false;
+        qp = null;
+      }
     }
   }
 
   /**
    * Initializes the query.
+   * @return query processor
    * @throws IOException I/O Exception
    */
-  private void init() throws IOException {
-    if(options != null) return;
-    try {
-      perf.time();
-      check();
-      qp.parse();
-      qi.pars = perf.time();
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
+  private QueryProcessor parse() throws IOException {
+    if(!parsed) {
+      try {
+        perf.time();
+        init().parse();
+        qi.pars = perf.time();
+        parsed = true;
+      } catch(final QueryException ex) {
+        throw new BaseXException(ex);
+      }
     }
-    options = qp.ctx.serParams(false);
+    return qp;
   }
 
   /**
-   * Checks if the query has not been closed yet.
-   * @throws IOException I/O Exception
+   * Returns an instance of the query processor.
+   * @return query processor
    */
-  private void check() throws IOException {
-    if(closed) throw new BaseXException(ALREADY_EXECUTED);
+  private QueryProcessor init() {
+    if(parsed || qp == null) {
+      qp = new QueryProcessor(query, ctx);
+      parsed = false;
+    }
+    return qp;
   }
 }

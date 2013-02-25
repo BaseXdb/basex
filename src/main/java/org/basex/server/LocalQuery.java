@@ -11,8 +11,7 @@ import org.basex.io.out.*;
  * All data is interpreted by the {@link QueryListener}.
  *
  * @author BaseX Team 2005-12, BSD License
- * @author Rositsa Shadura
- * @author Dimitar Popov
+ * @author Christian Gruen
  */
 public class LocalQuery extends Query {
   /** Active query listener. */

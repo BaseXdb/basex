@@ -260,7 +260,7 @@ public final class Context {
    * @param pr process
    */
   public void unregister(final Progress pr) {
-    assert registered : "Not registered";
+    if(!registered) return;
     registered = false;
     locks.release(pr);
     pr.stopTimeout();
