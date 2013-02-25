@@ -106,23 +106,23 @@ public class JsonParserTest {
    * @throws QueryException query exception
    */
   @Test public void arrayTest() throws QueryException {
-    parse("[ ]", Spec.RFC_4627);
-    parse("[]", "[ ]", Spec.RFC_4627);
-    parse("[[[[[[42], {}]]]]]", "[ [ [ [ [ [ 42 ], { } ] ] ] ] ]", Spec.RFC_4627);
-    parse("[ 1, 2, 3, 4, 5, 6, 7, 8 ]", Spec.RFC_4627);
+    parse("[ ]", Spec.RFC4627);
+    parse("[]", "[ ]", Spec.RFC4627);
+    parse("[[[[[[42], {}]]]]]", "[ [ [ [ [ [ 42 ], { } ] ] ] ] ]", Spec.RFC4627);
+    parse("[ 1, 2, 3, 4, 5, 6, 7, 8 ]", Spec.RFC4627);
     parse("[1,2,3,]", "[ 1, 2, 3 ]", Spec.LIBERAL);
 
-    error("[1,2,3,]", Spec.RFC_4627);
-    error("[,42]", Spec.RFC_4627);
-    error("[1, ", Spec.RFC_4627);
+    error("[1,2,3,]", Spec.RFC4627);
+    error("[,42]", Spec.RFC4627);
+    error("[1, ", Spec.RFC4627);
   }
 
   /** Tests for the restrictions in RFC 4627. */
   @Test public void rfc4627() {
-    error("\"test\"", Spec.RFC_4627);
-    error("123", Spec.RFC_4627);
-    error("true", Spec.RFC_4627);
-    error("null", Spec.RFC_4627);
+    error("\"test\"", Spec.RFC4627);
+    error("123", Spec.RFC4627);
+    error("true", Spec.RFC4627);
+    error("null", Spec.RFC4627);
   }
 
   /**
@@ -130,13 +130,13 @@ public class JsonParserTest {
    * @throws QueryException query exception
    */
   @Test public void objectTest() throws QueryException {
-    parse("{ }", Spec.RFC_4627);
-    parse("{ \"\": 42 }", Spec.RFC_4627);
+    parse("{ }", Spec.RFC4627);
+    parse("{ \"\": 42 }", Spec.RFC4627);
     parse("{ a : 42, b: 23 }", "{ \"a\": 42, \"b\": 23 }", Spec.LIBERAL);
     parse("{ \"a\": 1, \"b\": 2, }", "{ \"a\": 1, \"b\": 2 }", Spec.LIBERAL);
 
-    error("{ a : 42 }", Spec.RFC_4627);
-    error("{ \"a\": 42, b: 23 }", Spec.RFC_4627);
+    error("{ a : 42 }", Spec.RFC4627);
+    error("{ \"a\": 42, b: 23 }", Spec.RFC4627);
   }
 
   /**
