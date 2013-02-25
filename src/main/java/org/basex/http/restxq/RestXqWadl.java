@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 final class RestXqWadl {
   /** WADL namespace. */
-  private static final byte[] WADL = Token.token("http://research.sun.com/wadl/2006/10");
+  private static final byte[] WADL = Token.token("http://wadl.dev.java.net/2009/02");
 
   /** Private constructor. */
   RestXqWadl() { }
@@ -53,7 +53,8 @@ final class RestXqWadl {
         final FElem request = new FElem(new QNm("request", WADL));
         method.add(request);
         addParams(func.queryParams,  "query",  request);
-        addParams(func.formParams,   "form",   request);
+        addParams(func.formParams,   "query",  request);
+        addParams(func.headerParams, "header", request);
         final FElem response = new FElem(new QNm("response", WADL));
         method.add(response);
         final FElem representation = new FElem(new QNm("representation", WADL));
