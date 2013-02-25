@@ -45,7 +45,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
     if(var != null) return var.bind(e, ctx, ii);
 
     // add new variable
-    final StaticVar sv = new StaticVar(nm, e, ii);
+    final StaticVar sv = new StaticVar(ctx.sc, nm, e, ii);
     vars.put(nm, sv);
     return sv;
   }
@@ -67,7 +67,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
           throws QueryException {
     final StaticVar var = vars.get(nm);
     if(var != null) var.declare(t, a, e, ext, ctx, ii);
-    else vars.put(nm, new StaticVar(scp, ii, a, nm, t, e, ext));
+    else vars.put(nm, new StaticVar(ctx.sc, scp, ii, a, nm, t, e, ext));
   }
 
   /**

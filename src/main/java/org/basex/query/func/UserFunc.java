@@ -105,6 +105,9 @@ public abstract class UserFunc extends Single implements Scope {
     for(Entry<Var, Expr> e : scope.closure().entrySet())
       e.setValue(e.getValue().compile(ctx, outer));
 
+    final StaticContext tmp = ctx.sc;
+    ctx.sc = sc;
+
     final int fp = scope.enter(ctx);
     try {
       // constant propagation
@@ -117,6 +120,7 @@ public abstract class UserFunc extends Single implements Scope {
     } finally {
       scope.cleanUp(this);
       scope.exit(ctx, fp);
+      ctx.sc = tmp;
     }
 
     // convert all function calls in tail position to proper tail calls
@@ -192,6 +196,9 @@ public abstract class UserFunc extends Single implements Scope {
       }
     }
 
+    final StaticContext tmp = ctx.sc;
+    ctx.sc = sc;
+
     if(val) {
       final int fp = scope.enter(ctx);
       try {
@@ -204,6 +211,7 @@ public abstract class UserFunc extends Single implements Scope {
       } finally {
         scope.cleanUp(this);
         scope.exit(ctx, fp);
+        ctx.sc = tmp;
       }
     }
 

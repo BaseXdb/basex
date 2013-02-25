@@ -24,6 +24,8 @@ import org.basex.util.list.*;
 public final class StaticVar extends ParseExpr implements Scope {
   /** Annotation for lazy evaluation. */
   private static final QNm LAZY = new QNm(QueryText.LAZY, QueryText.BASEXURI);
+  /** Static context. */
+  private final StaticContext sc;
   /** Variable scope. */
   private final VarScope scope;
   /** Variable name. */
@@ -48,6 +50,7 @@ public final class StaticVar extends ParseExpr implements Scope {
 
   /**
    * Constructor for a variable declared in a query.
+   * @param sctx static context
    * @param scp variable scope
    * @param ii input info
    * @param a annotations
@@ -56,9 +59,11 @@ public final class StaticVar extends ParseExpr implements Scope {
    * @param e expression to be bound
    * @param ext external flag
    */
-  StaticVar(final VarScope scp, final InputInfo ii, final Ann a, final QNm n,
-      final SeqType t, final Expr e, final boolean ext) {
+  StaticVar(final StaticContext sctx, final VarScope scp, final InputInfo ii, final Ann a,
+      final QNm n, final SeqType t, final Expr e, final boolean ext) {
+
     super(ii);
+    sc = sctx;
     scope = scp;
     name = n;
     ann = a == null ? new Ann() : a;
@@ -72,12 +77,14 @@ public final class StaticVar extends ParseExpr implements Scope {
 
   /**
    * Constructor for an externally bound variable.
+   * @param sctx static context
    * @param nm name
    * @param e bound expression
    * @param ii input info
    */
-  StaticVar(final QNm nm, final Expr e, final InputInfo ii) {
+  StaticVar(final StaticContext sctx, final QNm nm, final Expr e, final InputInfo ii) {
     super(ii);
+    sc = sctx;
     scope = new VarScope();
     name = nm;
     ann = new Ann();
@@ -100,6 +107,9 @@ public final class StaticVar extends ParseExpr implements Scope {
     if(expr == null) throw (declared ? VAREMPTY : VARUNDEF).thrw(info, this);
 
     if(!compiled) {
+      final StaticContext tmp = ctx.sc;
+      ctx.sc = sc;
+
       final int fp = scope.enter(ctx);
       try {
         expr = expr.compile(ctx, scope);
@@ -113,6 +123,7 @@ public final class StaticVar extends ParseExpr implements Scope {
       } finally {
         scope.cleanUp(this);
         scope.exit(ctx, fp);
+        ctx.sc = tmp;
       }
 
       compiled = true;
@@ -135,6 +146,8 @@ public final class StaticVar extends ParseExpr implements Scope {
     if(lazy) {
       if(!compiled) throw Util.notexpected(this + " was not compiled.");
       if(value != null) return value;
+      final StaticContext tmp = ctx.sc;
+      ctx.sc = sc;
       final int fp = scope.enter(ctx);
       try {
         return bind(expr.value(ctx));
@@ -142,16 +155,20 @@ public final class StaticVar extends ParseExpr implements Scope {
         throw qe.notCatchable();
       } finally {
         scope.exit(ctx, fp);
+        ctx.sc = tmp;
       }
     }
 
     if(value != null) return value;
     if(expr == null) throw VAREMPTY.thrw(info, this);
     final int fp = scope.enter(ctx);
+    final StaticContext tmp = ctx.sc;
+    ctx.sc = sc;
     try {
       return bind(expr.value(ctx));
     } finally {
       scope.exit(ctx, fp);
+      ctx.sc = tmp;
     }
   }
 

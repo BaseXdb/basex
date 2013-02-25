@@ -24,6 +24,8 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class FuncItem extends FItem implements Scope {
+  /** Static context. */
+  private final StaticContext sc;
   /** Variables. */
   private final Var[] vars;
   /** Function expression. */
@@ -47,9 +49,11 @@ public final class FuncItem extends FItem implements Scope {
    * @param cst cast flag
    * @param cls closure
    * @param scp variable scope
+   * @param sctx static context
    */
   public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
-      final boolean cst, final Map<Var, Value> cls, final VarScope scp) {
+      final boolean cst, final Map<Var, Value> cls, final VarScope scp,
+      final StaticContext sctx) {
     super(t);
     name = n;
     vars = arg;
@@ -57,6 +61,7 @@ public final class FuncItem extends FItem implements Scope {
     cast = cst && t.ret != null ? t.ret : null;
     closure = cls != null ? cls : Collections.<Var, Value>emptyMap();
     stackSize = scp.stackSize();
+    sc = sctx;
   }
 
   /**
@@ -67,10 +72,12 @@ public final class FuncItem extends FItem implements Scope {
    * @param cl variables in the closure
    * @param cst cast flag
    * @param scp variable scope
+   * @param sctx static context
    */
   public FuncItem(final Var[] arg, final Expr body, final FuncType t,
-      final Map<Var, Value> cl, final boolean cst, final VarScope scp) {
-    this(null, arg, body, t, cst, cl, scp);
+      final Map<Var, Value> cl, final boolean cst, final VarScope scp,
+      final StaticContext sctx) {
+    this(null, arg, body, t, cst, cl, scp, sctx);
   }
 
   @Override
@@ -102,6 +109,8 @@ public final class FuncItem extends FItem implements Scope {
       final Value... args) throws QueryException {
 
     // bind variables and cache context
+    final StaticContext tmp = ctx.sc;
+    ctx.sc = sc;
     final int fp = ctx.stack.enterFrame(stackSize);
     final Value cv = ctx.value;
     try {
@@ -113,6 +122,7 @@ public final class FuncItem extends FItem implements Scope {
     } finally {
       ctx.value = cv;
       ctx.stack.exitFrame(fp);
+      ctx.sc = tmp;
     }
   }
 
@@ -127,6 +137,8 @@ public final class FuncItem extends FItem implements Scope {
       final Value... args) throws QueryException {
 
     // bind variables and cache context
+    final StaticContext tmp = ctx.sc;
+    ctx.sc = sc;
     final int fp = ctx.stack.enterFrame(stackSize);
     final Value cv = ctx.value;
     try {
@@ -139,6 +151,7 @@ public final class FuncItem extends FItem implements Scope {
     } finally {
       ctx.value = cv;
       ctx.stack.exitFrame(fp);
+      ctx.sc = tmp;
     }
   }
 
@@ -175,7 +188,7 @@ public final class FuncItem extends FItem implements Scope {
       refs[i] = new VarRef(ii, vars[i]);
     }
     return new FuncItem(fun.name, vars, new DynFuncCall(ii, fun, refs), t,
-        fun.cast != null, null, sc);
+        fun.cast != null, null, sc, ctx.sc);
   }
 
   @Override

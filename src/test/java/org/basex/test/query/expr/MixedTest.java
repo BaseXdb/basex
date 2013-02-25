@@ -51,6 +51,17 @@ public final class MixedTest extends AdvancedQueryTest {
       Err.WRONGMODULE);
   }
 
+  /** Checks static context scoping in variables. */
+  @Test
+  public void varsInModules() {
+    contains("import module namespace a='world' at '" + XQMFILE + "';" +
+        "$a:eager", "hello:foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "';" +
+        "$a:lazy", "hello:foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "';" +
+        "$a:func()", "hello:foo");
+  }
+
   /**
    * Overwrites an empty attribute value.
    * @throws BaseXException database exception

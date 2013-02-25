@@ -89,12 +89,12 @@ public final class Functions extends TokenSet {
           throws QueryException {
 
     // use empty scope
-    final VarScope sc = new VarScope();
+    final VarScope scp = new VarScope();
 
     final Expr[] args = new Expr[(int) arity];
     final Var[] vars = new Var[args.length];
     for(int i = 0; i < args.length; i++) {
-      vars[i] = sc.uniqueVar(ctx, null, true);
+      vars[i] = scp.uniqueVar(ctx, null, true);
       args[i] = new VarRef(ii, vars[i]);
     }
 
@@ -107,11 +107,11 @@ public final class Functions extends TokenSet {
     // compile the function if it hasn't been done statically
     if(dyn && f.fun instanceof UserFuncCall) {
       final StaticUserFunc usf = ((UserFuncCall) f.fun).func();
-      if(usf != null && usf.declared) usf.compile(ctx, sc);
+      if(usf != null && usf.declared) usf.compile(ctx, scp);
     }
 
     final FuncType ft = f.type;
-    return new FuncItem(name, vars, f.fun, ft, false, null, sc);
+    return new FuncItem(name, vars, f.fun, ft, false, null, scp, ctx.sc);
   }
 
   /**

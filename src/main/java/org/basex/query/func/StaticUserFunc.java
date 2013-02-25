@@ -61,7 +61,8 @@ public final class StaticUserFunc extends UserFunc {
 
     // reset context and evaluate function
     final Value cv = ctx.value;
-    final Atts ns = ctx.sc.ns.reset();
+    final StaticContext tmp = ctx.sc;
+    ctx.sc = sc;
     ctx.value = null;
     try {
       final Item it = expr.item(ctx, ii);
@@ -70,7 +71,7 @@ public final class StaticUserFunc extends UserFunc {
       return cast ? ret.funcConvert(ctx, ii, v).item(ctx, ii) : it;
     } finally {
       ctx.value = cv;
-      ctx.sc.ns.stack(ns);
+      ctx.sc = tmp;
     }
   }
 
@@ -78,7 +79,8 @@ public final class StaticUserFunc extends UserFunc {
   public Value value(final QueryContext ctx) throws QueryException {
     // reset context and evaluate function
     final Value cv = ctx.value;
-    final Atts ns = ctx.sc.ns.reset();
+    final StaticContext tmp = ctx.sc;
+    ctx.sc = sc;
     ctx.value = null;
     try {
       final Value v = ctx.value(expr);
@@ -86,7 +88,7 @@ public final class StaticUserFunc extends UserFunc {
       return cast ? ret.funcConvert(ctx, info, v) : v;
     } finally {
       ctx.value = cv;
-      ctx.sc.ns.stack(ns);
+      ctx.sc = tmp;
     }
   }
 
