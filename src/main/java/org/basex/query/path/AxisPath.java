@@ -118,11 +118,7 @@ public class AxisPath extends Path {
     cache = root != null && !uses(Use.VAR);
 
     // if applicable, use iterative evaluation
-    final Path path = finish(ctx);
-
-    // heuristics: wrap with filter expression if only one result is expected
-    return size() != 1 ? path :
-      new Filter(info, this, Pos.get(1, size(), info)).comp2(ctx);
+    return finish(ctx);
   }
 
   /**
