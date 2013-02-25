@@ -10,6 +10,7 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -188,6 +189,27 @@ public abstract class StandardFunc extends Arr {
       }
     }
     return hm;
+  }
+
+  /**
+   * Caches and materializes all items of the specified iterator.
+   * @param ir iterator
+   * @param vb value builder
+   * @param ctx query context
+   * @throws QueryException query exception
+   */
+  protected void cache(final Iter ir, final ValueBuilder vb, final QueryContext ctx)
+      throws QueryException {
+
+    for(Item it; (it = ir.next()) != null;) {
+      final Data d = it.data();
+      if(d != null && !d.inMemory()) {
+        it = ((ANode) it).dbCopy(ctx.context.prop);
+      } else if(it instanceof FItem) {
+        FIVALUE.thrw(info, it);
+      }
+      vb.add(it.materialize(info));
+    }
   }
 
   /**

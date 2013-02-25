@@ -34,8 +34,8 @@ public final class FNXQuery extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _XQUERY_EVAL:   return eval(ctx).iter();
-      case _XQUERY_INVOKE: return invoke(ctx).iter();
+      case _XQUERY_EVAL:   return eval(ctx);
+      case _XQUERY_INVOKE: return invoke(ctx);
       case _XQUERY_TYPE:   return value(ctx).iter();
       default:             return super.iter(ctx);
     }
@@ -44,8 +44,8 @@ public final class FNXQuery extends StandardFunc {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _XQUERY_EVAL:   return eval(ctx);
-      case _XQUERY_INVOKE: return invoke(ctx);
+      case _XQUERY_EVAL:   return eval(ctx).value();
+      case _XQUERY_INVOKE: return invoke(ctx).value();
       case _XQUERY_TYPE:   return comp(ctx).value(ctx);
       default:             return super.value(ctx);
     }
@@ -67,7 +67,7 @@ public final class FNXQuery extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Value eval(final QueryContext ctx) throws QueryException {
+  private ValueBuilder eval(final QueryContext ctx) throws QueryException {
     return eval(ctx, checkStr(expr[0], ctx), null);
   }
 
@@ -79,7 +79,7 @@ public final class FNXQuery extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Value eval(final QueryContext ctx, final byte[] qu, final String path)
+  private ValueBuilder eval(final QueryContext ctx, final byte[] qu, final String path)
       throws QueryException {
 
     final QueryContext qc = new QueryContext(ctx.context);
@@ -96,7 +96,9 @@ public final class FNXQuery extends StandardFunc {
       qc.parse(string(qu), path);
       if(qc.updating) BXXQ_UPDATING.thrw(info);
       qc.compile();
-      return qc.value();
+      final ValueBuilder vb = new ValueBuilder();
+      cache(qc.iter(), vb, ctx);
+      return vb;
     } finally {
       qc.close();
     }
@@ -108,7 +110,7 @@ public final class FNXQuery extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Value invoke(final QueryContext ctx) throws QueryException {
+  private ValueBuilder invoke(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
     final String path = string(checkStr(expr[0], ctx));
     final IO io = IO.get(path);
