@@ -51,11 +51,13 @@ public class ClientQuery extends Query {
 
   @Override
   public void bind(final String n, final Object v, final String t) throws IOException {
+    cache = null;
     cs.exec(ServerCmd.BIND, id + '\0' + n + '\0' + v + '\0' + (t == null ? "" : t), null);
   }
 
   @Override
   public void context(final Object v, final String t) throws IOException {
+    cache = null;
     cs.exec(ServerCmd.CONTEXT, id + '\0' + v + '\0' + (t == null ? "" : t), null);
   }
 

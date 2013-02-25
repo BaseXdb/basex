@@ -409,8 +409,12 @@ public abstract class SessionTest extends SandboxTest {
   @Test
   public void queryBind() throws IOException {
     final Query query = session.query("declare variable $a external; $a");
+    query.bind("$a", "4");
+    assertEqual("4", query.execute());
     query.bind("$a", "5");
     assertEqual("5", query.next());
+    query.bind("$a", "6");
+    assertEqual("6", query.next());
     query.close();
   }
 
@@ -460,7 +464,6 @@ public abstract class SessionTest extends SandboxTest {
     query.bind("$a", "<a>XML</a>", "document-node()");
     assertEqual("XML", query.execute());
   }
-
 
   /** Runs a query with a bound context item.
    * @throws IOException I/O exception */

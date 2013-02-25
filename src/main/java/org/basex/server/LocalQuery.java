@@ -31,11 +31,13 @@ public class LocalQuery extends Query {
 
   @Override
   public void bind(final String n, final Object v, final String t) throws IOException {
+    cache = null;
     ql.bind(n, v, t);
   }
 
   @Override
   public void context(final Object v, final String t) throws IOException {
+    cache = null;
     ql.context(v, t);
   }
 
