@@ -1,5 +1,6 @@
 package org.basex.http.restxq;
 
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -9,7 +10,6 @@ import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.util.*;
 
 /**
  * This class caches information on a single XQuery module with RESTXQ annotations.
@@ -121,14 +121,10 @@ final class RestXqModule {
   private QueryContext parse(final HTTPContext http) throws QueryException {
     final QueryContext qc = new QueryContext(http.context());
     try {
-      final String query = string(file.read());
-      qc.sc.baseURI(file.path());
-      qc.module(query);
+      qc.module(string(file.read()), file.path());
       return qc;
     } catch(final IOException ex) {
-      qc.close();
-      // Unexpected: XQuery module could not be opened
-      throw new RuntimeException(Util.message(ex));
+      throw IOERR.thrw(null, ex);
     }
   }
 }
