@@ -32,15 +32,21 @@ final class RestXqWadl {
   synchronized void create(final HTTPContext http, final HashMap<String, RestXqModule>
       modules) throws IOException {
 
+    // create root nodes
     final Atts ns = new Atts(Token.EMPTY, WADL);
     final FElem appl = new FElem(new QNm("application", WADL), ns);
     final FElem ress = new FElem(new QNm("resources", WADL));
     final String base = http.req.getRequestURL().toString().replaceAll(HTTPText.WADL, "");
     appl.add(ress.add(new QNm("base"), base));
+
+    // create children
+    final TreeMap<String, FElem> map = new TreeMap<String, FElem>();
     for(final RestXqModule mod : modules.values()) {
       for(final RestXqFunction func : mod.functions) {
         final FElem res = new FElem(new QNm("resource", WADL));
-        ress.add(res.add(new QNm("path"), func.path.toString()));
+        final String path = func.path.toString();
+        res.add(new QNm("path"), path);
+        map.put(path, res);
         final FElem method = new FElem(new QNm("method", WADL));
         final String mths = func.methods.toString().replaceAll("[^A-Z ]", "");
         res.add(method.add(new QNm("name"), mths));
@@ -55,7 +61,9 @@ final class RestXqWadl {
             HTTPContext.mediaType(func.output)));
       }
     }
+    for(final FElem elem : map.values()) ress.add(elem);
 
+    // serialize node
     final Serializer ser = Serializer.get(http.res.getOutputStream());
     ser.serialize(appl);
     ser.close();
