@@ -44,6 +44,8 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   private boolean out;
   /** View Layout. */
   private ViewAlignment layout;
+  /** Current layout string. */
+  private String layoutString;
   /** View panels. */
   private final ViewPanel[] views;
   /** Source View. */
@@ -82,12 +84,20 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    * Updates and validates the views.
    */
   public void updateViews() {
-    removeAll();
+    // update visibility of all components, dependent of the existence of a database
     layout.setVisibility(gui.context.data() != null);
+
+    // check if the layout of visible components has changed
+    final String ls = layout.layoutString(false);
+    if(ls.equals(layoutString)) return;
+
+    // rebuild views
+    removeAll();
     layout.createView(this);
     validate();
     repaint();
-    gui.gprop.set(GUIProp.VIEWS, layout.layoutString());
+    gui.gprop.set(GUIProp.VIEWS, layout.layoutString(true));
+    layoutString = ls;
   }
 
   @Override

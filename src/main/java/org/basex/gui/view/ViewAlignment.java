@@ -90,9 +90,9 @@ final class ViewAlignment implements ViewLayout {
   }
 
   @Override
-  public String layoutString() {
+  public String layoutString(final boolean all) {
     final StringBuilder str = new StringBuilder(horiz ? "H " : "V ");
-    for(final ViewLayout c : comp) str.append(c.layoutString());
+    for(final ViewLayout c : comp) str.append(c.layoutString(all));
     str.append("- ");
     return str.toString();
   }

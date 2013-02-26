@@ -36,7 +36,8 @@ interface ViewLayout {
 
   /**
    * Constructs a build string.
+   * @param all also include invisible components
    * @return build string
    */
-  String layoutString();
+  String layoutString(boolean all);
 }
