@@ -2432,7 +2432,9 @@ public class ProdDirAttributeList extends QT3TestSet {
   public void k2DirectConElemAttr75() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirAttributeList/K2-DirectConElemAttr-75.xq"
+        file(
+            "prod/DirAttributeList/K2-DirectConElemAttr-75.xq"
+        )
       ),
       ctx);
     try {
@@ -2443,7 +2445,7 @@ public class ProdDirAttributeList extends QT3TestSet {
       query.close();
     }
     test(
-      assertSerialization("<e attribute=\"abc def ghi 1 2 3 abc a text node a text node def ghi FF abc def ghi textNode xs:string textNode xs:string textNode xs:string text a text node, xs:string xs:stringtextnode\" name=\"a text node a text node abc def a text node ghi 1 2 a text node 3 abc def a text node ghi FF abc def ghi xs:string ghi xs:string xs:string xs:string ghi\">a text nodea text nodeabc defa text nodeghi 1 2a text node3 abca text nodedef ghi FF abc def ghi\r\ntextNode\r\nxs:string\r\ntextNode\r\nxs:string\r\ntextNode\r\nxs:stringxs:stringxs:string\r\ntext a text node,\r\ntext a text node,\r\ntext a text node,\r\ntext a text node,\r\n\r\n<!--abc def ghi 1 2 3 abc def ghi FF abc def ghi xs:string xs:string ghi xs:string a text node a text node xs:string ghi xs:string--><?target abc def ghi 1 2 3 abc def ghi a text node a text node FF abc def ghi xs:string xs:string ghi xs:string xs:string ghi a text node xs:string?>a text node a text node a text node a text node abc def ghi 1 2 a text node 3 abc a text node def ghi FF abc def ghi xs:string xs:string ghi xs:string xs:string ghi xs:string a text node</e>", false)
+      assertSerialization("<e attribute=\"abc def ghi 1 2 3 abc a text node a text node def ghi FF abc def ghi textNode xs:string textNode xs:string textNode xs:string text a text node, xs:string xs:stringtextnode\" name=\"a text node a text node abc def a text node ghi 1 2 a text node 3 abc def a text node ghi FF abc def ghi xs:string ghi xs:string xs:string xs:string ghi\">a text nodea text nodeabc defa text nodeghi 1 2a text node3 abca text nodedef ghi FF abc def ghi\ntextNode\nxs:string\ntextNode\nxs:string\ntextNode\nxs:stringxs:stringxs:string\ntext a text node,\ntext a text node,\ntext a text node,\ntext a text node,\n\n<!--abc def ghi 1 2 3 abc def ghi FF abc def ghi xs:string xs:string ghi xs:string a text node a text node xs:string ghi xs:string--><?target abc def ghi 1 2 3 abc def ghi a text node a text node FF abc def ghi xs:string xs:string ghi xs:string xs:string ghi a text node xs:string?>a text node a text node a text node a text node abc def ghi 1 2 a text node 3 abc a text node def ghi FF abc def ghi xs:string xs:string ghi xs:string xs:string ghi xs:string a text node</e>", false)
     );
   }
 

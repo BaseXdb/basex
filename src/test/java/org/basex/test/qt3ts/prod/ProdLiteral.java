@@ -1443,7 +1443,9 @@ public class ProdLiteral extends QT3TestSet {
   public void k2Literals28() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/Literal/K2-Literals-28.xq"
+        file(
+            "prod/Literal/K2-Literals-28.xq"
+        )
       ),
       ctx);
     try {
@@ -1695,7 +1697,9 @@ public class ProdLiteral extends QT3TestSet {
   public void k2Literals39() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/Literal/K2-Literals-39.xq"
+        file(
+            "prod/Literal/K2-Literals-39.xq"
+        )
       ),
       ctx);
     try {

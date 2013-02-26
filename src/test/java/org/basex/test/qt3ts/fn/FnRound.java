@@ -36,6 +36,26 @@ public class FnRound extends QT3TestSet {
    *  A test whose essence is: `round(1, 2)`. .
    */
   @org.junit.Test
+  public void kRoundFunc2() {
+    final XQuery query = new XQuery(
+      "round(1, 2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   *  A test whose essence is: `round(1, 2)`. .
+   */
+  @org.junit.Test
   public void kRoundFunc2a() {
     final XQuery query = new XQuery(
       "round(1, 2)",

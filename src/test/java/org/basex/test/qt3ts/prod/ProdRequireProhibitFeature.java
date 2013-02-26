@@ -344,64 +344,6 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
   }
 
   /**
-   * An error must be thrown if the feature is prohibited and used..
-   */
-  @org.junit.Test
-  public void prohibitSchemaAware2Ns() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "    declare option prohibit-feature \"schema-aware\";\n" +
-      "    (validate lax { <element\n" +
-      "                         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-      "                         xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" +
-      "                         xsi:type=\"xs:integer\">42</element> }) instance of element(*, xs:integer)\n" +
-      "      \n" +
-      "    ",
-      ctx);
-    try {
-      result = new QT3Result(query.value());
-    } catch(final Throwable trw) {
-      result = new QT3Result(trw);
-    } finally {
-      query.close();
-    }
-    test(
-      error("XQST0075")
-    );
-  }
-
-  /**
-   * An error must be thrown if the feature is prohibited and used..
-   */
-  @org.junit.Test
-  public void prohibitSchemaAware2S() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "    declare option prohibit-feature \"schema-aware\";\n" +
-      "    (validate lax { <element\n" +
-      "                         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-      "                         xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" +
-      "                         xsi:type=\"xs:integer\">42</element> }) instance of element(*, xs:integer)\n" +
-      "      \n" +
-      "    ",
-      ctx);
-    try {
-      result = new QT3Result(query.value());
-    } catch(final Throwable trw) {
-      result = new QT3Result(trw);
-    } finally {
-      query.close();
-    }
-    test(
-      (
-        error("XQST0075")
-      ||
-        error("XQST0128")
-      )
-    );
-  }
-
-  /**
    * All extensions features cannot be activated..
    */
   @org.junit.Test
@@ -421,30 +363,6 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
     }
     test(
       error("XQST0126")
-    );
-  }
-
-  /**
-   * An error must be thrown if the feature is prohibited and used. .
-   */
-  @org.junit.Test
-  public void requireAllOptionalFeatures2Ns1() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "      declare option require-feature \"all-optional-features\";\n" +
-      "      declare option prohibit-feature \"higher-order-function\";\n" +
-      "      1 instance of function(*)\n" +
-      "    ",
-      ctx);
-    try {
-      result = new QT3Result(query.value());
-    } catch(final Throwable trw) {
-      result = new QT3Result(trw);
-    } finally {
-      query.close();
-    }
-    test(
-      error("XQST0120")
     );
   }
 
@@ -477,30 +395,6 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
    */
   @org.junit.Test
   public void requireAllOptionalFeatures3Ns1() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "      declare option prohibit-feature \"higher-order-function\";\n" +
-      "      declare option require-feature \"all-optional-features\";\n" +
-      "      1 instance of function(*)\n" +
-      "    ",
-      ctx);
-    try {
-      result = new QT3Result(query.value());
-    } catch(final Throwable trw) {
-      result = new QT3Result(trw);
-    } finally {
-      query.close();
-    }
-    test(
-      error("XQST0120")
-    );
-  }
-
-  /**
-   * An error must be thrown if the feature is prohibited and used. .
-   */
-  @org.junit.Test
-  public void requireAllOptionalFeatures3Ns2() {
     final XQuery query = new XQuery(
       "\n" +
       "      declare option prohibit-feature \"higher-order-function\";\n" +
@@ -1289,33 +1183,6 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
     }
     test(
       error("XQST0127")
-    );
-  }
-
-  /**
-   * An error must be thrown if the feature is not supported..
-   */
-  @org.junit.Test
-  public void requireSchemaAware2Ns() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "      declare option require-feature \"schema-aware\";\n" +
-      "      (validate lax { <element\n" +
-      "                         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-      "                         xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n" +
-      "                         xsi:type=\"xs:integer\">42</element> }) instance of element(*, xs:integer)\n" +
-      "      \n" +
-      "    ",
-      ctx);
-    try {
-      result = new QT3Result(query.value());
-    } catch(final Throwable trw) {
-      result = new QT3Result(trw);
-    } finally {
-      query.close();
-    }
-    test(
-      error("XQST0120")
     );
   }
 

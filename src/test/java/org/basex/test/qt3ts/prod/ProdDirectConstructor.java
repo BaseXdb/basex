@@ -1286,7 +1286,9 @@ public class ProdDirectConstructor extends QT3TestSet {
   public void k2DirectConOther49() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirectConstructor/K2-DirectConOther-49.xq"
+        file(
+            "prod/DirectConstructor/K2-DirectConOther-49.xq"
+        )
       ),
       ctx);
     try {
@@ -1328,7 +1330,9 @@ public class ProdDirectConstructor extends QT3TestSet {
   public void k2DirectConOther50() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirectConstructor/K2-DirectConOther-50.xq"
+        file(
+            "prod/DirectConstructor/K2-DirectConOther-50.xq"
+        )
       ),
       ctx);
     try {
@@ -1350,7 +1354,9 @@ public class ProdDirectConstructor extends QT3TestSet {
   public void k2DirectConOther51() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirectConstructor/K2-DirectConOther-51.xq"
+        file(
+            "prod/DirectConstructor/K2-DirectConOther-51.xq"
+        )
       ),
       ctx);
     try {
@@ -1372,7 +1378,9 @@ public class ProdDirectConstructor extends QT3TestSet {
   public void k2DirectConOther52() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirectConstructor/K2-DirectConOther-52.xq"
+        file(
+            "prod/DirectConstructor/K2-DirectConOther-52.xq"
+        )
       ),
       ctx);
     try {
@@ -1383,7 +1391,7 @@ public class ProdDirectConstructor extends QT3TestSet {
       query.close();
     }
     test(
-      assertSerialization("<e>a \r\n\r\n\r\n \r\nstring literal \r\n</e>", false)
+      assertSerialization("<e>a \n\n\n \nstring literal \n</e>", false)
     );
   }
 
@@ -1394,7 +1402,9 @@ public class ProdDirectConstructor extends QT3TestSet {
   public void k2DirectConOther53() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirectConstructor/K2-DirectConOther-53.xq"
+        file(
+            "prod/DirectConstructor/K2-DirectConOther-53.xq"
+        )
       ),
       ctx);
     try {
@@ -1405,7 +1415,7 @@ public class ProdDirectConstructor extends QT3TestSet {
       query.close();
     }
     test(
-      assertSerialization("<e><!--a \r\n\r\n\r\n \r\nstring literal \r\n--></e>", false)
+      assertSerialization("<e><!--a \n\n\n \nstring literal \n--></e>", false)
     );
   }
 
@@ -1416,7 +1426,9 @@ public class ProdDirectConstructor extends QT3TestSet {
   public void k2DirectConOther54() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirectConstructor/K2-DirectConOther-54.xq"
+        file(
+            "prod/DirectConstructor/K2-DirectConOther-54.xq"
+        )
       ),
       ctx);
     try {
@@ -1427,7 +1439,7 @@ public class ProdDirectConstructor extends QT3TestSet {
       query.close();
     }
     test(
-      assertSerialization("<e><?target a \r\n\r\n\r\n \r\nstring literal \r\n?></e>", false)
+      assertSerialization("<e><?target a \n\n\n \nstring literal \n?></e>", false)
     );
   }
 

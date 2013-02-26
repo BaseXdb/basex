@@ -296,6 +296,26 @@ public class ProdDefaultNamespaceDecl extends QT3TestSet {
    *  Ensure that default namespaces override each other properly. .
    */
   @org.junit.Test
+  public void k2DefaultNamespaceProlog12() {
+    final XQuery query = new XQuery(
+      "<a xmlns=\"http://www.w3.org/2001/XMLSchema\"> {1 cast as byte} <b xmlns=\"http://www.w3.org/1999/XSL/Transform\"> {count(1), 2 cast as byte} </b> {2 cast as byte} </a>",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0051")
+    );
+  }
+
+  /**
+   *  Ensure that default namespaces override each other properly. .
+   */
+  @org.junit.Test
   public void k2DefaultNamespaceProlog12a() {
     final XQuery query = new XQuery(
       "<a xmlns=\"http://www.w3.org/2001/XMLSchema\"> {1 cast as byte} <b xmlns=\"http://www.w3.org/1999/XSL/Transform\"> {count(1), 2 cast as byte} </b> {2 cast as byte} </a>",

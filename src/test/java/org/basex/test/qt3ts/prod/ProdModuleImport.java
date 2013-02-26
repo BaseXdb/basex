@@ -167,6 +167,31 @@ public class ProdModuleImport extends QT3TestSet {
    *  Test XQST0093 by importing a module with a circular dependency .
    */
   @org.junit.Test
+  public void errata8001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        import module namespace errata8_1a=\"http://www.w3.org/TestModules/errata8_1a\"; \n" +
+      "        errata8_1a:fun()\n" +
+      "      ",
+      ctx);
+    try {
+      query.addModule("http://www.w3.org/TestModules/errata8_1a", file("prod/ModuleImport/errata8-module1a.xq"));
+      query.addModule("http://www.w3.org/TestModules/errata8_1b", file("prod/ModuleImport/errata8-module1b.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0093")
+    );
+  }
+
+  /**
+   *  Test XQST0093 by importing a module with a circular dependency .
+   */
+  @org.junit.Test
   public void errata8001a() {
     final XQuery query = new XQuery(
       "\n" +
@@ -185,6 +210,30 @@ public class ProdModuleImport extends QT3TestSet {
     }
     test(
       error("XQDY0054")
+    );
+  }
+
+  /**
+   *  Test XQST0093 by importing a module with a circular dependency .
+   */
+  @org.junit.Test
+  public void errata8002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        import module namespace errata8_2a=\"http://www.w3.org/TestModules/errata8_2a\"; \n" +
+      "        errata8_2a:fun()",
+      ctx);
+    try {
+      query.addModule("http://www.w3.org/TestModules/errata8_2a", file("prod/ModuleImport/errata8-module2a.xq"));
+      query.addModule("http://www.w3.org/TestModules/errata8_2b", file("prod/ModuleImport/errata8-module2b.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0093")
     );
   }
 
@@ -705,7 +754,7 @@ public class ProdModuleImport extends QT3TestSet {
       "      ",
       ctx);
     try {
-      query.addModule("http://www.w3.org/TestModules/test", file("prod/ModuleImport/module-uris1-lib.xq"));
+      query.addModule("http://www.w3.org/TestModules/test", file("prod/ModuleImport/module-urisi1-lib.xq"));
       result = new QT3Result(query.value());
     } catch(final Throwable trw) {
       result = new QT3Result(trw);
@@ -1060,6 +1109,35 @@ public class ProdModuleImport extends QT3TestSet {
     }
     test(
       assertSerialization("<foo:anElement xmlns:foo=\"http://example.org\">some Content</foo:anElement>", false)
+    );
+  }
+
+  /**
+   *  Cyclic module imports .
+   */
+  @org.junit.Test
+  public void modules28() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        import module namespace defs1 = \"http://www.w3.org/TestModules/defs1\"; \n" +
+      "        $defs1:var\n" +
+      "      ",
+      ctx);
+    try {
+      query.addModule("http://www.w3.org/TestModules/defs1", file("prod/ModuleImport/modules-recursive1.xq"));
+      query.addModule("http://www.w3.org/TestModules/defs2", file("prod/ModuleImport/modules-recursive2.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XQST0093")
+      ||
+        error("XQST0054")
+      )
     );
   }
 

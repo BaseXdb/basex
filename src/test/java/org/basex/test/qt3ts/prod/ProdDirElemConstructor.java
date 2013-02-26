@@ -1247,6 +1247,26 @@ public class ProdDirElemConstructor extends QT3TestSet {
   }
 
   /**
+   *  There is no 'namespace' constructor in XQuery 1.0. .
+   */
+  @org.junit.Test
+  public void k2DirectConElem53() {
+    final XQuery query = new XQuery(
+      "namespace {\"p\"} {\"abc\"}",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
    *  There is a 'namespace' constructor in XQuery 3.0. .
    */
   @org.junit.Test

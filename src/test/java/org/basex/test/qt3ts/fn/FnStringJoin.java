@@ -13,6 +13,26 @@ import org.basex.test.qt3ts.QT3TestSet;
 public class FnStringJoin extends QT3TestSet {
 
   /**
+   *  A test whose essence is: `string-join("a string")`. .
+   */
+  @org.junit.Test
+  public void kStringJoinFunc1() {
+    final XQuery query = new XQuery(
+      "string-join(\"a string\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
    *  A test whose essence is: `string-join("a string")`. Allowed in 3.0.
    */
   @org.junit.Test

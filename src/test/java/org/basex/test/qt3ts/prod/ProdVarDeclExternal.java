@@ -743,6 +743,26 @@ public class ProdVarDeclExternal extends QT3TestSet {
   }
 
   /**
+   *  XQuery 1.0 doesn't allow externals to have a default value. .
+   */
+  @org.junit.Test
+  public void k2ExternalVariablesWithout18() {
+    final XQuery query = new XQuery(
+      "declare variable $var external := 1; 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
    *  XQuery 3.0 does allow externals to have a default value. .
    */
   @org.junit.Test
@@ -1916,7 +1936,9 @@ public class ProdVarDeclExternal extends QT3TestSet {
   public void extvardeclwithtype23() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/VarDecl.external/extvardeclwithtype-23.xq"
+        file(
+            "prod/VarDecl.external/extvardeclwithtype-23.xq"
+        )
       ),
       ctx);
     try {

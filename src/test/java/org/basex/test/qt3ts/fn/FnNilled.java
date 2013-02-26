@@ -13,6 +13,26 @@ import org.basex.test.qt3ts.QT3TestSet;
 public class FnNilled extends QT3TestSet {
 
   /**
+   *  A test whose essence is: `nilled()`. .
+   */
+  @org.junit.Test
+  public void kNilledFunc1() {
+    final XQuery query = new XQuery(
+      "nilled()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
    *  A test whose essence is: `nilled((), "wrong param")`. .
    */
   @org.junit.Test

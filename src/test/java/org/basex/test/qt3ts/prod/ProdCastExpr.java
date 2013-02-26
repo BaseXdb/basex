@@ -13528,6 +13528,26 @@ public class ProdCastExpr extends QT3TestSet {
    *  Try to cast a variable to xs:QName.
    */
   @org.junit.Test
+  public void castAs673a() {
+    final XQuery query = new XQuery(
+      "let $var := \"ABC\" return $var cast as xs:QName",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Try to cast a variable to xs:QName.
+   */
+  @org.junit.Test
   public void castAs673b() {
     final XQuery query = new XQuery(
       "let $var := \"ABC\" return $var cast as xs:QName",
@@ -13541,6 +13561,28 @@ public class ProdCastExpr extends QT3TestSet {
     }
     test(
       assertStringValue(false, "ABC")
+    );
+  }
+
+  /**
+   *  Try to cast an element to xs:QName.
+   *         Fails in 1.0 because only a string literal can be cast to xs:QName
+   *         Fails in 3.0 because atomization of the argument is not allowed - see bug 11964.
+   */
+  @org.junit.Test
+  public void castAs674() {
+    final XQuery query = new XQuery(
+      "let $var := <e>xml:space</e> return $var cast as xs:QName",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
     );
   }
 
@@ -13567,6 +13609,34 @@ public class ProdCastExpr extends QT3TestSet {
       &&
         assertType("xs:QName")
       )
+    );
+  }
+
+  /**
+   *  Try to do an implicit cast from untypedAtomic to xs:QName as part of a function call
+   *         Fails in 1.0 because only a string literal can be cast to xs:QName
+   *         Fails in 3.0 because implicit cast to xs:QName during a function call is not allowed - see bug 11964.
+   */
+  @org.junit.Test
+  public void castAs675() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:clarkname($q as xs:QName) as xs:string { \n" +
+      "          concat('{', namespace-uri-from-QName($q), '}', local-name-from-QName($q)) \n" +
+      "        }; \n" +
+      "        let $var := <e>xml:space</e> \n" +
+      "        return (local:clarkname(node-name($var)), local:clarkname(xs:untypedAtomic($var)))\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
     );
   }
 
@@ -13793,6 +13863,30 @@ public class ProdCastExpr extends QT3TestSet {
     }
     test(
       error("XPST0003")
+    );
+  }
+
+  /**
+   *  A non-atomic type is referenced, leading to a syntax error..
+   */
+  @org.junit.Test
+  public void kSeqExprCast10() {
+    final XQuery query = new XQuery(
+      "'string' cast as item()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XPST0003")
+      ||
+        error("XPST0051")
+      )
     );
   }
 
@@ -16018,6 +16112,30 @@ public class ProdCastExpr extends QT3TestSet {
         error("XPST0003")
       ||
         error("XQST0052")
+      )
+    );
+  }
+
+  /**
+   *  A non-atomic type is referenced, leading to a syntax error..
+   */
+  @org.junit.Test
+  public void kSeqExprCast11() {
+    final XQuery query = new XQuery(
+      "'string' cast as node()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XPST0003")
+      ||
+        error("XPST0051")
       )
     );
   }
@@ -18249,6 +18367,30 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
+   *  A non-atomic type is referenced, leading to a syntax error..
+   */
+  @org.junit.Test
+  public void kSeqExprCast12() {
+    final XQuery query = new XQuery(
+      "'string' cast as attribute()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XPST0003")
+      ||
+        error("XPST0051")
+      )
+    );
+  }
+
+  /**
    *  An invalid lexical representation for xs:base64Binary..
    */
   @org.junit.Test
@@ -20471,6 +20613,30 @@ public class ProdCastExpr extends QT3TestSet {
         error("XPST0003")
       ||
         error("XQST0052")
+      )
+    );
+  }
+
+  /**
+   *  A non-atomic type is referenced, leading to a syntax error..
+   */
+  @org.junit.Test
+  public void kSeqExprCast13() {
+    final XQuery query = new XQuery(
+      "'string' cast as empty-sequence()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XPST0003")
+      ||
+        error("XPST0051")
       )
     );
   }
@@ -28055,6 +28221,30 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
+   *  Syntax: only ? is allowed as occurence indicator in 'cast as' expressions..
+   */
+  @org.junit.Test
+  public void kSeqExprCast3() {
+    final XQuery query = new XQuery(
+      "'string' cast as xs:anyType*",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XPST0003")
+      ||
+        error("XPST0051")
+      )
+    );
+  }
+
+  /**
    *  A test whose essence is: `xs:boolean(-0) eq false()`..
    */
   @org.junit.Test
@@ -30279,6 +30469,26 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
+   *  'cast as' where the type is invalid..
+   */
+  @org.junit.Test
+  public void kSeqExprCast4() {
+    final XQuery query = new XQuery(
+      "'string' cast as xs:anySimpleType",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0051")
+    );
+  }
+
+  /**
    *  A test whose essence is: `xs:boolean('0') cast as xs:string eq 'false'`..
    */
   @org.junit.Test
@@ -30756,6 +30966,26 @@ public class ProdCastExpr extends QT3TestSet {
     }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Casting from xs:untypedAtomic to xs:QName isn't allowed..
+   */
+  @org.junit.Test
+  public void kSeqExprCast422() {
+    final XQuery query = new XQuery(
+      "xs:untypedAtomic(\"an arbitrary string(untypedAtomic source)\") cast as xs:QName",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
     );
   }
 
@@ -32479,6 +32709,26 @@ public class ProdCastExpr extends QT3TestSet {
     }
     test(
       error("XPST0080")
+    );
+  }
+
+  /**
+   *  'cast as' where the type is invalid..
+   */
+  @org.junit.Test
+  public void kSeqExprCast5() {
+    final XQuery query = new XQuery(
+      "'string' cast as xs:untyped",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0051")
     );
   }
 
@@ -36945,6 +37195,26 @@ public class ProdCastExpr extends QT3TestSet {
   }
 
   /**
+   *  'cast as' where the type is invalid..
+   */
+  @org.junit.Test
+  public void kSeqExprCast7() {
+    final XQuery query = new XQuery(
+      "'string' cast as xs:anyType",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0051")
+    );
+  }
+
+  /**
    *  Casting a xs:QName value to xs:QName is possible..
    */
   @org.junit.Test
@@ -37361,6 +37631,26 @@ public class ProdCastExpr extends QT3TestSet {
     }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  Casting xs:untypedAtomic to xs:QName is an error..
+   */
+  @org.junit.Test
+  public void kSeqExprCast71a() {
+    final XQuery query = new XQuery(
+      "xs:untypedAtomic(\"ncname\") cast as xs:QName?",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
     );
   }
 
@@ -41385,6 +41675,26 @@ public class ProdCastExpr extends QT3TestSet {
     }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  A type is specified which doesn't exist..
+   */
+  @org.junit.Test
+  public void kSeqExprCast9() {
+    final XQuery query = new XQuery(
+      "3 cast as xs:doesNotExist",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0051")
     );
   }
 

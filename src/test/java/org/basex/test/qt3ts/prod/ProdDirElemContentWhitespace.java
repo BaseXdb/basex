@@ -19,7 +19,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsAdjcdata1() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-adjcdata-1.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-adjcdata-1.xq"
+        )
       ),
       ctx);
     try {
@@ -41,7 +43,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsAdjcdata2() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-adjcdata-2.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-adjcdata-2.xq"
+        )
       ),
       ctx);
     try {
@@ -63,7 +67,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsAdjcdata3() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-adjcdata-3.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-adjcdata-3.xq"
+        )
       ),
       ctx);
     try {
@@ -105,7 +111,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsAdjchref2() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-adjchref-2.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-adjchref-2.xq"
+        )
       ),
       ctx);
     try {
@@ -127,7 +135,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsAdjchref3() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-adjchref-3.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-adjchref-3.xq"
+        )
       ),
       ctx);
     try {
@@ -272,7 +282,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsEnclexpr15() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-15.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-enclexpr-15.xq"
+        )
       ),
       ctx);
     try {
@@ -294,7 +306,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsEnclexpr16() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-16.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-enclexpr-16.xq"
+        )
       ),
       ctx);
     try {
@@ -316,7 +330,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsEnclexpr17() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-17.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-enclexpr-17.xq"
+        )
       ),
       ctx);
     try {
@@ -338,7 +354,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsEnclexpr18() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-18.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-enclexpr-18.xq"
+        )
       ),
       ctx);
     try {
@@ -360,7 +378,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsEnclexpr19() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-19.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-enclexpr-19.xq"
+        )
       ),
       ctx);
     try {
@@ -402,7 +422,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsEnclexpr20() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-20.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-enclexpr-20.xq"
+        )
       ),
       ctx);
     try {
@@ -424,7 +446,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsEnclexpr21() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-21.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-enclexpr-21.xq"
+        )
       ),
       ctx);
     try {
@@ -446,7 +470,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsEnclexpr22() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-22.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-enclexpr-22.xq"
+        )
       ),
       ctx);
     try {
@@ -468,7 +494,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsEnclexpr23() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-23.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-enclexpr-23.xq"
+        )
       ),
       ctx);
     try {
@@ -490,7 +518,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsEnclexpr24() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-enclexpr-24.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-enclexpr-24.xq"
+        )
       ),
       ctx);
     try {
@@ -672,7 +702,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsGencdata3() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-gencdata-3.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-gencdata-3.xq"
+        )
       ),
       ctx);
     try {
@@ -794,7 +826,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsGenenclexpr2() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-genenclexpr-2.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-genenclexpr-2.xq"
+        )
       ),
       ctx);
     try {
@@ -816,7 +850,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsGenenclexpr3() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-genenclexpr-3.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-genenclexpr-3.xq"
+        )
       ),
       ctx);
     try {
@@ -858,7 +894,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsNobound2() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-nobound-2.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-nobound-2.xq"
+        )
       ),
       ctx);
     try {
@@ -880,7 +918,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsNobound3() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-nobound-3.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-nobound-3.xq"
+        )
       ),
       ctx);
     try {
@@ -922,7 +962,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsNobound5() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-nobound-5.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-nobound-5.xq"
+        )
       ),
       ctx);
     try {
@@ -944,7 +986,9 @@ public class ProdDirElemContentWhitespace extends QT3TestSet {
   public void constrWsNobound6() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/prod/DirElemContent.whitespace/Constr-ws-nobound-6.xq"
+        file(
+            "prod/DirElemContent.whitespace/Constr-ws-nobound-6.xq"
+        )
       ),
       ctx);
     try {

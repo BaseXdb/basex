@@ -1555,6 +1555,38 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   }
 
   /**
+   *  instance-of tests on user-defined function, varying the result types  .
+   */
+  @org.junit.Test
+  public void hof053() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:f($x as xs:long, $y as xs:NCName) as element(e, xs:anyAtomicType) { <e x=\"{$x}\" y=\"{$y}\"/> }; \n" +
+      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(), \n" +
+      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element()+, \n" +
+      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element()?, \n" +
+      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element()*, \n" +
+      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(e)*, \n" +
+      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(e, xs:anyType?)*, \n" +
+      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(*, xs:anyType?)?, \n" +
+      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(e, xs:anyType)*, \n" +
+      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(*, xs:anyType)?, \n" +
+      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(*, xs:untyped)?\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "true true true true true true true true true false")
+    );
+  }
+
+  /**
    *  inline function literal, unknown user-defined function  .
    */
   @org.junit.Test

@@ -33,13 +33,11 @@ declare function qt3ts:to-junit(
         qt3ts-java:test-suites(
           $package,
           map:new((
-            for $test-set in
-              if($test-sets = '*') then $catalog//test-set
-              else
-                for $name in $test-sets
-                let $set := $catalog//test-set[@name = $name]
-                return if($set) then $set else qt3ts:debug('Test-set not found', $name)
-            return qt3ts:test-set($test-set, $root, $package, $supports, $envs)
+            for $name in (if($test-sets = '*') then $catalog//test-set/@name else $test-sets)
+            let $test-set := $catalog//test-set[@name = $name]
+            return
+              if(not($test-set)) then qt3ts:debug('Test-set not found', $name)
+              else qt3ts:test-set($test-set, $root, $package, $supports, $envs)
           ))
         )
   for $name in map:keys($files)
@@ -79,13 +77,16 @@ declare function qt3ts:test-set(
       satisfies $supports($dep/@type, tokenize($dep/@value, ' '))
     return map{ $test-case/@name := qt3ts:test-case($test-set, $test-case, $root, $envs, $file) }
   ))
-  return if(map:size($tests) gt 0)
-    then
+  return
+    if($doc/*/dependency[not($supports(@type, tokenize(@value, ' ')))])
+    then qt3ts:debug('Test-set skipped because of dependency', $name)
+    else if(map:size($tests) eq 0)
+    then qt3ts:debug('Test-set skipped', $name)
+    else
       let $ts := qt3ts-java:test-set($package, $dir, $name, $desc, $tests)
       return if(contains($ts[2], ' void '))
         then map:entry($dir || '/' || $ts[1], $ts[2])
-        else qt3ts:debug('Test-set skipped after serialization', $name)
-    else qt3ts:debug('Test-set skipped', $name)
+        else  () (: qt3ts:debug('Test-set skipped after serialization', $name) :)
 };
 
 declare function qt3ts:test-case(
@@ -118,7 +119,7 @@ declare function qt3ts:test-case(
         else map{},
       $is_file := exists($test-case/test/@file),
       $test := if($is_file)
-        then replace(base-uri($test-case), '[^/]+$', $test-case/test/@file)
+        then $file($test-case/test/@file)
         else $test-case/test/string(),
       $result := qt3ts:result($test-case/result/*, $file, $root)
   return map{

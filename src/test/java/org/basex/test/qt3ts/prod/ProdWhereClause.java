@@ -233,6 +233,26 @@ public class ProdWhereClause extends QT3TestSet {
   }
 
   /**
+   *  Multiple where clauses is not allowed in XQuery 1.0. .
+   */
+  @org.junit.Test
+  public void k2WhereExpr1() {
+    final XQuery query = new XQuery(
+      "for $a in 1 where true() where true() return $a",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
    *  Multiple where clauses are allowed in XQuery 3.0. .
    */
   @org.junit.Test
@@ -642,12 +662,54 @@ public class ProdWhereClause extends QT3TestSet {
   }
 
   /**
+   *  Multiple 'where' clauses (XQuery 1.0).
+   */
+  @org.junit.Test
+  public void whereExpr020() {
+    final XQuery query = new XQuery(
+      "for $file in (//Folder)[1]/File where true() where false() return $file/FileName",
+      ctx);
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
    *  Multiple 'where' clauses (XQuery 3,0).
    */
   @org.junit.Test
   public void whereExpr020a() {
     final XQuery query = new XQuery(
       "for $file in (//Folder)[1]/File where true() where false() return $file/FileName",
+      ctx);
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEmpty()
+    );
+  }
+
+  /**
+   *  Check that context item is NOT changed when evaluating the where clause.
+   */
+  @org.junit.Test
+  public void whereExpr021() {
+    final XQuery query = new XQuery(
+      "for $file in (//Folder)[1]/File where (. instance of element(File)) return $file/FileName",
       ctx);
     try {
       query.context(node(file("prod/ForClause/fsx.xml")));

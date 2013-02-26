@@ -79,6 +79,29 @@ public class ProdFunctionDecl extends QT3TestSet {
   }
 
   /**
+   *  XQuery 1.0: Variable appearing after a function declaration is not in scope inside the function. .
+   */
+  @org.junit.Test
+  public void kFunctionProlog12a() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare function local:computeSum() { $myVariable };\n" +
+      "        declare variable $myVariable := 1;\n" +
+      "        1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0008")
+    );
+  }
+
+  /**
    *  XQuery 3.0: Variable appearing after a function declaration is in scope inside the function. .
    */
   @org.junit.Test
@@ -2497,6 +2520,30 @@ public class ProdFunctionDecl extends QT3TestSet {
    * Check that reserved function name attribute is handled correctly. .
    */
   @org.junit.Test
+  public void functionDeclReservedFunctionNames001() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function attribute() { fn:true() };\n" +
+      "\tlocal:attribute()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Check that reserved function name attribute is handled correctly. .
+   */
+  @org.junit.Test
   public void functionDeclReservedFunctionNames002() {
     final XQuery query = new XQuery(
       "\n" +
@@ -2514,6 +2561,30 @@ public class ProdFunctionDecl extends QT3TestSet {
     }
     test(
       error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name comment is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames003() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function comment() { fn:true() };\n" +
+      "\tlocal:comment()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -2545,6 +2616,30 @@ public class ProdFunctionDecl extends QT3TestSet {
    * Check that reserved function name document-node is handled correctly. .
    */
   @org.junit.Test
+  public void functionDeclReservedFunctionNames005() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function document-node() { fn:true() };\n" +
+      "\tlocal:document-node()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Check that reserved function name document-node is handled correctly. .
+   */
+  @org.junit.Test
   public void functionDeclReservedFunctionNames006() {
     final XQuery query = new XQuery(
       "\n" +
@@ -2562,6 +2657,30 @@ public class ProdFunctionDecl extends QT3TestSet {
     }
     test(
       error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name element is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames007() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function element() { fn:true() };\n" +
+      "\tlocal:element()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -2593,6 +2712,30 @@ public class ProdFunctionDecl extends QT3TestSet {
    * Check that reserved function name empty-sequence is handled correctly. .
    */
   @org.junit.Test
+  public void functionDeclReservedFunctionNames009() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function empty-sequence() { fn:true() };\n" +
+      "\tlocal:empty-sequence()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Check that reserved function name empty-sequence is handled correctly. .
+   */
+  @org.junit.Test
   public void functionDeclReservedFunctionNames010() {
     final XQuery query = new XQuery(
       "\n" +
@@ -2610,6 +2753,30 @@ public class ProdFunctionDecl extends QT3TestSet {
     }
     test(
       error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name function is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames011() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function function() { fn:true() };\n" +
+      "\tlocal:function()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -2641,6 +2808,30 @@ public class ProdFunctionDecl extends QT3TestSet {
    * Check that reserved function name if is handled correctly. .
    */
   @org.junit.Test
+  public void functionDeclReservedFunctionNames013() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function if() { fn:true() };\n" +
+      "\tlocal:if()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Check that reserved function name if is handled correctly. .
+   */
+  @org.junit.Test
   public void functionDeclReservedFunctionNames014() {
     final XQuery query = new XQuery(
       "\n" +
@@ -2658,6 +2849,30 @@ public class ProdFunctionDecl extends QT3TestSet {
     }
     test(
       error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name item is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames015() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function item() { fn:true() };\n" +
+      "\tlocal:item()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -2689,6 +2904,30 @@ public class ProdFunctionDecl extends QT3TestSet {
    * Check that reserved function name namespace-node is handled correctly. .
    */
   @org.junit.Test
+  public void functionDeclReservedFunctionNames017() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function namespace-node() { fn:true() };\n" +
+      "\tlocal:namespace-node()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Check that reserved function name namespace-node is handled correctly. .
+   */
+  @org.junit.Test
   public void functionDeclReservedFunctionNames018() {
     final XQuery query = new XQuery(
       "\n" +
@@ -2706,6 +2945,30 @@ public class ProdFunctionDecl extends QT3TestSet {
     }
     test(
       error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name node is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames019() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function node() { fn:true() };\n" +
+      "\tlocal:node()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -2737,6 +3000,30 @@ public class ProdFunctionDecl extends QT3TestSet {
    * Check that reserved function name processing-instruction is handled correctly. .
    */
   @org.junit.Test
+  public void functionDeclReservedFunctionNames021() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function processing-instruction() { fn:true() };\n" +
+      "\tlocal:processing-instruction()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Check that reserved function name processing-instruction is handled correctly. .
+   */
+  @org.junit.Test
   public void functionDeclReservedFunctionNames022() {
     final XQuery query = new XQuery(
       "\n" +
@@ -2754,6 +3041,30 @@ public class ProdFunctionDecl extends QT3TestSet {
     }
     test(
       error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name schema-attribute is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames023() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function schema-attribute() { fn:true() };\n" +
+      "\tlocal:schema-attribute()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -2785,6 +3096,30 @@ public class ProdFunctionDecl extends QT3TestSet {
    * Check that reserved function name schema-element is handled correctly. .
    */
   @org.junit.Test
+  public void functionDeclReservedFunctionNames025() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function schema-element() { fn:true() };\n" +
+      "\tlocal:schema-element()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Check that reserved function name schema-element is handled correctly. .
+   */
+  @org.junit.Test
   public void functionDeclReservedFunctionNames026() {
     final XQuery query = new XQuery(
       "\n" +
@@ -2802,6 +3137,30 @@ public class ProdFunctionDecl extends QT3TestSet {
     }
     test(
       error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name switch is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames027() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function switch() { fn:true() };\n" +
+      "\tlocal:switch()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -2833,6 +3192,30 @@ public class ProdFunctionDecl extends QT3TestSet {
    * Check that reserved function name text is handled correctly. .
    */
   @org.junit.Test
+  public void functionDeclReservedFunctionNames029() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function text() { fn:true() };\n" +
+      "\tlocal:text()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Check that reserved function name text is handled correctly. .
+   */
+  @org.junit.Test
   public void functionDeclReservedFunctionNames030() {
     final XQuery query = new XQuery(
       "\n" +
@@ -2850,6 +3233,30 @@ public class ProdFunctionDecl extends QT3TestSet {
     }
     test(
       error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name typeswitch is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionDeclReservedFunctionNames031() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function typeswitch() { fn:true() };\n" +
+      "\tlocal:typeswitch()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 

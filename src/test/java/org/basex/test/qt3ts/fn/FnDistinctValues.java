@@ -388,6 +388,135 @@ public class FnDistinctValues extends QT3TestSet {
    *  test fn:distinct-values with a mix of types .
    */
   @org.junit.Test
+  public void cbclDistinctValues002() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      \tdeclare function local:create($arg) as xs:anyAtomicType* {\n" +
+      "       \t\t( if ($arg castable as xs:untypedAtomic) \n" +
+      "       \t\t  \tthen $arg cast as xs:untypedAtomic else () ), \n" +
+      "       \t\t( if ($arg castable as xs:dateTime) \n" +
+      "       \t\t  \tthen $arg cast as xs:dateTime else () ), \n" +
+      "       \t\t( if ($arg castable as xs:date) \n" +
+      "       \t\t \tthen $arg cast as xs:date else () ), \n" +
+      "       \t\t( if ($arg castable as xs:time) \n" +
+      "       \t\t\tthen $arg cast as xs:time else () ), \n" +
+      "       \t\t( if ($arg castable as xs:time) \n" +
+      "       \t\t\tthen $arg cast as xs:time else () ), \n" +
+      "       \t\t( if ($arg castable as xs:duration) \n" +
+      "       \t\t\tthen $arg cast as xs:duration else () ), \n" +
+      "       \t\t( if ($arg castable as xs:yearMonthDuration) \n" +
+      "       \t\t\tthen $arg cast as xs:yearMonthDuration else () ), \n" +
+      "       \t\t( if ($arg castable as xs:dayTimeDuration) \n" +
+      "       \t\t\tthen $arg cast as xs:dayTimeDuration else () ), \n" +
+      "       \t\t( if ($arg castable as xs:float) \n" +
+      "       \t\t\tthen $arg cast as xs:float else () ), \n" +
+      "       \t\t( if ($arg castable as xs:double) \n" +
+      "       \t\t\tthen $arg cast as xs:double else () ), \n" +
+      "       \t\t( if ($arg castable as xs:decimal) \n" +
+      "       \t\t\tthen $arg cast as xs:decimal else () ), \n" +
+      "       \t\t( if ($arg castable as xs:integer) \n" +
+      "       \t\t\tthen $arg cast as xs:integer else () ), \n" +
+      "       \t\t( if ($arg castable as xs:nonPositiveInteger) \n" +
+      "       \t\t\tthen $arg cast as xs:nonPositiveInteger else () ), \n" +
+      "       \t\t( if ($arg castable as xs:negativeInteger) \n" +
+      "       \t\t\tthen $arg cast as xs:negativeInteger else () ), \n" +
+      "       \t\t( if ($arg castable as xs:long) \n" +
+      "       \t\t\tthen $arg cast as xs:long else () ), \n" +
+      "       \t\t( if ($arg castable as xs:int) \n" +
+      "       \t\t\tthen $arg cast as xs:int else () ), \n" +
+      "       \t\t( if ($arg castable as xs:short) \n" +
+      "       \t\t\tthen $arg cast as xs:short else () ), \n" +
+      "       \t\t( if ($arg castable as xs:byte) \n" +
+      "       \t\t\tthen $arg cast as xs:byte else () ), \n" +
+      "       \t\t( if ($arg castable as xs:byte) \n" +
+      "       \t\t\tthen $arg cast as xs:byte else () ), \n" +
+      "       \t\t( if ($arg castable as xs:nonNegativeInteger) \n" +
+      "       \t\t\tthen $arg cast as xs:nonNegativeInteger else () ), \n" +
+      "       \t\t( if ($arg castable as xs:unsignedLong) \n" +
+      "       \t\t\tthen $arg cast as xs:unsignedLong else () ), \n" +
+      "       \t\t( if ($arg castable as xs:unsignedInt) \n" +
+      "       \t\t\tthen $arg cast as xs:unsignedInt else () ), \n" +
+      "       \t\t( if ($arg castable as xs:unsignedShort) \n" +
+      "       \t\t\tthen $arg cast as xs:unsignedShort else () ), \n" +
+      "       \t\t( if ($arg castable as xs:unsignedByte) \n" +
+      "       \t\t\tthen $arg cast as xs:unsignedByte else () ), \n" +
+      "       \t\t( if ($arg castable as xs:positiveInteger) \n" +
+      "       \t\t\tthen $arg cast as xs:positiveInteger else () ), \n" +
+      "       \t\t( if ($arg castable as xs:gYearMonth) \n" +
+      "       \t\t\tthen $arg cast as xs:gYearMonth else () ), \n" +
+      "       \t\t( if ($arg castable as xs:gYear) \n" +
+      "       \t\t\tthen $arg cast as xs:gYear else () ), \n" +
+      "       \t\t( if ($arg castable as xs:gMonthDay) \n" +
+      "       \t\t\tthen $arg cast as xs:gMonthDay else () ), \n" +
+      "       \t\t( if ($arg castable as xs:gDay) \n" +
+      "       \t\t\tthen $arg cast as xs:gDay else () ), \n" +
+      "       \t\t( if ($arg castable as xs:gMonth) \n" +
+      "       \t\t\tthen $arg cast as xs:gMonth else () ), \n" +
+      "       \t\t( if ($arg castable as xs:string) \n" +
+      "       \t\t\tthen $arg cast as xs:string else () ), \n" +
+      "       \t\t( if ($arg castable as xs:normalizedString) \n" +
+      "       \t\t\tthen $arg cast as xs:normalizedString else () ), \n" +
+      "       \t\t( if ($arg castable as xs:token) \n" +
+      "       \t\t\tthen $arg cast as xs:token else () ), \n" +
+      "       \t\t( if ($arg castable as xs:language) \n" +
+      "       \t\t\tthen $arg cast as xs:language else () ), \n" +
+      "       \t\t( if ($arg castable as xs:NMTOKEN) \n" +
+      "       \t\t\tthen $arg cast as xs:NMTOKEN else () ), \n" +
+      "       \t\t( if ($arg castable as xs:Name) \n" +
+      "       \t\t\tthen $arg cast as xs:Name else () ), \n" +
+      "       \t\t( if ($arg castable as xs:NCName) \n" +
+      "       \t\t\tthen $arg cast as xs:NCName else () ), \n" +
+      "       \t\t( if ($arg castable as xs:ID) \n" +
+      "       \t\t\tthen $arg cast as xs:ID else () ), \n" +
+      "       \t\t( if ($arg castable as xs:IDREF) \n" +
+      "       \t\t\tthen $arg cast as xs:IDREF else () ), \n" +
+      "       \t\t( if ($arg castable as xs:ENTITY) \n" +
+      "       \t\t\tthen $arg cast as xs:ENTITY else () ), \n" +
+      "       \t\t( if ($arg castable as xs:boolean) \n" +
+      "       \t\t\tthen $arg cast as xs:boolean else () ), \n" +
+      "       \t\t( if ($arg castable as xs:base64Binary) \n" +
+      "       \t\t\tthen $arg cast as xs:base64Binary else () ), \n" +
+      "       \t\t( if ($arg castable as xs:hexBinary) \n" +
+      "       \t\t\tthen $arg cast as xs:hexBinary else () ), \n" +
+      "       \t\t( if ($arg castable as xs:QName) \n" +
+      "       \t\t\tthen $arg cast as xs:QName else () ) \n" +
+      "       \t}; \n" +
+      "       \tfor $value in fn:distinct-values( ( local:create(0), local:create(-1), local:create(1), local:create(3.141),\n" +
+      "       \t \tlocal:create(3.141e0), local:create(3.333), local:create(3.141e0), local:create(3.333e2),\n" +
+      "       \t  \tlocal:create('NaN'), local:create('zero'), local:create('false'), local:create('true'),\n" +
+      "       \t   \tlocal:create('http://www.example.com/'), local:create('2008-06-01'), local:create('1972-06-01Z'), \n" +
+      "       \t   \tlocal:create('2008-06-01T12:00:00'), local:create('1972-06-01T12:00:00+01:00'), \n" +
+      "       \t   \tlocal:create('00:00:00'), local:create('12:00:00'), local:create('2008'), local:create('1972Z'), \n" +
+      "       \t   \tlocal:create('--06'), local:create('--12Z'), local:create('2008-06'), local:create('1972-12Z'), \n" +
+      "       \t   \tlocal:create('--06-01'), local:create('--12-15Z'), local:create('---01'), local:create('---15Z'), \n" +
+      "       \t   \tlocal:create('P20Y15M'), local:create('P10Y15M'), local:create('-P2DT15H0M0S'), \n" +
+      "       \t   \tlocal:create('-P1DT15H0M0S'), local:create(fn:QName(\"http://www.example.com/example\", \"person\")), \n" +
+      "       \t   \tlocal:create(fn:QName(\"http://www.example.com/example\", \"ht:person\")), local:create('-P2DT15H0M0S'), \n" +
+      "       \t   \tlocal:create('FFFEFDFC'), local:create('aGVsbG8=') )) \n" +
+      "       \t order by string($value) return $value",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertStringValue(false, "---01 ---01 ---15Z ---15Z --06 --06 --06-01 --06-01 --12-15Z --12-15Z --12Z --12Z -1 -1 -P1DT15H -P1DT15H0M0S -P2DT15H -P2DT15H0M0S 0 0 00:00:00 00:00:00 1 1 12:00:00 12:00:00 1972-06-01T12:00:00+01:00 1972-06-01T12:00:00+01:00 1972-06-01Z 1972-06-01Z 1972-12Z 1972-12Z 1972Z 1972Z 2008 2008 2008 2008 2008 2008-06 2008-06 2008-06-01 2008-06-01 2008-06-01T12:00:00 2008-06-01T12:00:00 3 3.141 3.141 3.141 3.333 3.333 3.333 333 333.3 333.3 333.3 FFFEFDFC FFFEFDFC FFFEFDFC NaN NaN P10Y15M P11Y3M P20Y15M P21Y3M aGVsbG8= aGVsbG8= false false ht:person ht:person http://www.example.com/ person true true true zero zero")
+      ||
+        assertStringValue(false, "---01 ---01 ---15Z ---15Z --06 --06 --06-01 --06-01 --12-15Z --12-15Z --12Z --12Z -1 -1 -P1DT15H -P1DT15H0M0S -P2DT15H -P2DT15H0M0S 0 0 00:00:00 00:00:00 1 1 12:00:00 12:00:00 1972-06-01T12:00:00+01:00 1972-06-01T12:00:00+01:00 1972-06-01Z 1972-06-01Z 1972-12Z 1972-12Z 1972Z 1972Z 2008 2008 2008 2008 2008 2008-06 2008-06 2008-06-01 2008-06-01 2008-06-01T12:00:00 2008-06-01T12:00:00 3 3.141 3.141 3.141 3.333 3.333 3.333 333 333.3 333.3 333.3 FFFEFDFC FFFEFDFC FFFEFDFC NaN NaN P10Y15M P11Y3M P20Y15M P21Y3M aGVsbG8= aGVsbG8= false false ht:person http://www.example.com/ person person true true true zero zero")
+      ||
+        assertStringValue(false, "---01 ---01 ---15Z ---15Z --06 --06 --06-01 --06-01 --12-15Z --12-15Z --12Z --12Z -1 -1 -P1DT15H -P1DT15H0M0S -P2DT15H -P2DT15H0M0S 0 0 00:00:00 00:00:00 1 1 12:00:00 12:00:00 1972-06-01T12:00:00+01:00 1972-06-01T12:00:00+01:00 1972-06-01Z 1972-06-01Z 1972-12Z 1972-12Z 1972Z 1972Z 2008 2008 2008 2008 2008 2008-06 2008-06 2008-06-01 2008-06-01 2008-06-01T12:00:00 2008-06-01T12:00:00 3 3.141 3.141 3.141 3.333 3.333 3.333 333 333.3 333.3 333.3 FFFEFDFC FFFEFDFC FFFEFDFC FFFEFDFC NaN NaN NaN P10Y15M P10Y15M P11Y3M P20Y15M P20Y15M P21Y3M aGVsbG8= aGVsbG8= false false false ht:person http://www.example.com/ person person true true true true zero zero zero")
+      )
+    );
+  }
+
+  /**
+   *  test fn:distinct-values with a mix of types .
+   */
+  @org.junit.Test
   public void cbclDistinctValues002b() {
     final XQuery query = new XQuery(
       "declare function local:create($arg) as xs:anyAtomicType* { ( if ($arg castable as xs:untypedAtomic) then $arg cast as xs:untypedAtomic else () ), ( if ($arg castable as xs:dateTime) then $arg cast as xs:dateTime else () ), ( if ($arg castable as xs:date) then $arg cast as xs:date else () ), ( if ($arg castable as xs:time) then $arg cast as xs:time else () ), ( if ($arg castable as xs:time) then $arg cast as xs:time else () ), ( if ($arg castable as xs:duration) then $arg cast as xs:duration else () ), ( if ($arg castable as xs:yearMonthDuration) then $arg cast as xs:yearMonthDuration else () ), ( if ($arg castable as xs:dayTimeDuration) then $arg cast as xs:dayTimeDuration else () ), ( if ($arg castable as xs:float) then $arg cast as xs:float else () ), ( if ($arg castable as xs:double) then $arg cast as xs:double else () ), ( if ($arg castable as xs:decimal) then $arg cast as xs:decimal else () ), ( if ($arg castable as xs:integer) then $arg cast as xs:integer else () ), ( if ($arg castable as xs:nonPositiveInteger) then $arg cast as xs:nonPositiveInteger else () ), ( if ($arg castable as xs:negativeInteger) then $arg cast as xs:negativeInteger else () ), ( if ($arg castable as xs:long) then $arg cast as xs:long else () ), ( if ($arg castable as xs:int) then $arg cast as xs:int else () ), ( if ($arg castable as xs:short) then $arg cast as xs:short else () ), ( if ($arg castable as xs:byte) then $arg cast as xs:byte else () ), ( if ($arg castable as xs:byte) then $arg cast as xs:byte else () ), ( if ($arg castable as xs:nonNegativeInteger) then $arg cast as xs:nonNegativeInteger else () ), ( if ($arg castable as xs:unsignedLong) then $arg cast as xs:unsignedLong else () ), ( if ($arg castable as xs:unsignedInt) then $arg cast as xs:unsignedInt else () ), ( if ($arg castable as xs:unsignedShort) then $arg cast as xs:unsignedShort else () ), ( if ($arg castable as xs:unsignedByte) then $arg cast as xs:unsignedByte else () ), ( if ($arg castable as xs:positiveInteger) then $arg cast as xs:positiveInteger else () ), ( if ($arg castable as xs:gYearMonth) then $arg cast as xs:gYearMonth else () ), ( if ($arg castable as xs:gYear) then $arg cast as xs:gYear else () ), ( if ($arg castable as xs:gMonthDay) then $arg cast as xs:gMonthDay else () ), ( if ($arg castable as xs:gDay) then $arg cast as xs:gDay else () ), ( if ($arg castable as xs:gMonth) then $arg cast as xs:gMonth else () ), ( if ($arg castable as xs:string) then $arg cast as xs:string else () ), ( if ($arg castable as xs:normalizedString) then $arg cast as xs:normalizedString else () ), ( if ($arg castable as xs:token) then $arg cast as xs:token else () ), ( if ($arg castable as xs:language) then $arg cast as xs:language else () ), ( if ($arg castable as xs:NMTOKEN) then $arg cast as xs:NMTOKEN else () ), ( if ($arg castable as xs:Name) then $arg cast as xs:Name else () ), ( if ($arg castable as xs:NCName) then $arg cast as xs:NCName else () ), ( if ($arg castable as xs:ID) then $arg cast as xs:ID else () ), ( if ($arg castable as xs:IDREF) then $arg cast as xs:IDREF else () ), ( if ($arg castable as xs:ENTITY) then $arg cast as xs:ENTITY else () ), ( if ($arg castable as xs:boolean) then $arg cast as xs:boolean else () ), ( if ($arg castable as xs:base64Binary) then $arg cast as xs:base64Binary else () ), ( if ($arg castable as xs:hexBinary) then $arg cast as xs:hexBinary else () ), ( if ($arg castable as xs:QName) then $arg cast as xs:QName else () ) }; for $value in fn:distinct-values( ( local:create(0), local:create(-1), local:create(1), local:create(3.141), local:create(3.141e0), local:create(3.333), local:create(3.141e0), local:create(3.333e2), local:create('NaN'), local:create('zero'), local:create('false'), local:create('true'), local:create('http://www.example.com/'), local:create('2008-06-01'), local:create('1972-06-01Z'), local:create('2008-06-01T12:00:00'), local:create('1972-06-01T12:00:00+01:00'), local:create('00:00:00'), local:create('12:00:00'), local:create('2008'), local:create('1972Z'), local:create('--06'), local:create('--12Z'), local:create('2008-06'), local:create('1972-12Z'), local:create('--06-01'), local:create('--12-15Z'), local:create('---01'), local:create('---15Z'), local:create('P20Y15M'), local:create('P10Y15M'), local:create('-P2DT15H0M0S'), local:create('-P1DT15H0M0S'), local:create(fn:QName(\"http://www.example.com/example\", \"person\")), local:create(fn:QName(\"http://www.example.com/example\", \"ht:person\")), local:create('-P2DT15H0M0S'), local:create('FFFEFDFC'), local:create('aGVsbG8=') )) order by string($value) return $value",

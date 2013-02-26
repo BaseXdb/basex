@@ -104,7 +104,9 @@ public class ',  $class-name, ' extends QT3TestSet {
     final XQuery query = new XQuery(
 ',  if($test-case('is_file')) then (
 '      queryFile(
-',      qt3ts-java:string-literal($test-case('test'), '          '), '
+        file(
+',        qt3ts-java:string-literal($test-case('test'), '            '), '
+        )
       )'
     ) else qt3ts-java:string-literal($test-case('test'), '      '), ',
       ctx);
@@ -131,7 +133,7 @@ public class ',  $class-name, ' extends QT3TestSet {
   }
 '
   } catch qt3ts-java:NSUP0001 {
-    trace('', 'Skipped test because of environment')[2]
+    () (: trace($err:description, 'Skipped test "' || $name || '" because of environment: ')[2] :)
   },
 '}
 '), '')
@@ -146,7 +148,7 @@ declare function qt3ts-java:environment(
   let $vals := $env($name)
   return switch($name)
     case 'source'
-      return if(exists($vals('validation'))) then error($qt3ts-java:not-supported)
+      return if(exists($vals('validation'))) then error($qt3ts-java:not-supported, 'validation')
         else if($vals('role') = '.')
           then 'query.context(node(file("' || qt3ts-java:escape-string($vals('file')) || '")));'
         else if(exists($vals('role')))
@@ -160,7 +162,7 @@ declare function qt3ts-java:environment(
         '", "' || qt3ts-java:escape-string($vals('uri')) || '");'
     case 'collation'
       return if($vals('uri') != 'http://www.w3.org/2005/xpath-functions/collation/codepoint')
-        then error($qt3ts-java:not-supported)
+        then error($qt3ts-java:not-supported, 'uri: ' || $vals('uri'))
         else ()
     case 'collection'
       return 'query.addCollection("' || qt3ts-java:escape-string($vals('uri')) || '", ' ||
@@ -173,7 +175,7 @@ declare function qt3ts-java:environment(
     case 'resource'
       return '// resource: ' || $vals('uri')
     case 'schema'
-      return error($qt3ts-java:not-supported)
+      return error($qt3ts-java:not-supported, 'schema')
     case 'static-base-uri'
       return 'query.baseURI("' || qt3ts-java:escape-string($vals) || '");'
     case 'param'

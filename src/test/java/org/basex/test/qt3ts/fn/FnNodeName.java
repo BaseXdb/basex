@@ -13,6 +13,26 @@ import org.basex.test.qt3ts.QT3TestSet;
 public class FnNodeName extends QT3TestSet {
 
   /**
+   *  node-name() must be passed one argument, it doesn't use the context item by default in XPath 2.0. .
+   */
+  @org.junit.Test
+  public void kNodeNameFunc1() {
+    final XQuery query = new XQuery(
+      "node-name()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
    * Written by: Frans Englich modified by Michael Kay  node-name() does use the context item by default in XPath 3.0. .
    */
   @org.junit.Test
