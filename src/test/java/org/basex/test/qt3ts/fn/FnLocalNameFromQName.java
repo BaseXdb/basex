@@ -176,6 +176,27 @@ public class FnLocalNameFromQName extends QT3TestSet {
    *  Test function fn:local-name-from-QName. Error case - invalid parameter type (simple type) .
    */
   @org.junit.Test
+  public void localNameFromQNameFunc015() {
+    final XQuery query = new XQuery(
+      "fn:local-name-from-QName((//Folder)[1])",
+      ctx);
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test function fn:local-name-from-QName. Error case - invalid parameter type (simple type) .
+   */
+  @org.junit.Test
   public void localNameFromQNameFunc015a() {
     final XQuery query = new XQuery(
       "fn:local-name-from-QName((//Folder)[1])",

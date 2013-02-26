@@ -406,7 +406,9 @@ public class FnNormalizeUnicode extends QT3TestSet {
   public void fnNormalizeUnicode11() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/fn/normalize-unicode/fn-normalize-unicode-11.xq"
+        file(
+            "fn/normalize-unicode/fn-normalize-unicode-11.xq"
+        )
       ),
       ctx);
     try {

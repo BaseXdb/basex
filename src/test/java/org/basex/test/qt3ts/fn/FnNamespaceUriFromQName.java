@@ -289,6 +289,28 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
    *       				Error case - invalid parameter type (simple type) .
    */
   @org.junit.Test
+  public void namespaceURIFromQNameFunc015() {
+    final XQuery query = new XQuery(
+      "fn:namespace-uri-from-QName((//Folder)[1])",
+      ctx);
+    try {
+      query.context(node(file("prod/ForClause/fsx.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   *  Test function fn:namespace-uri-from-QName. 
+   *       				Error case - invalid parameter type (simple type) .
+   */
+  @org.junit.Test
   public void namespaceURIFromQNameFunc015a() {
     final XQuery query = new XQuery(
       "fn:namespace-uri-from-QName((//Folder)[1])",

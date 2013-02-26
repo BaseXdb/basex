@@ -13,19 +13,24 @@ qt3ts:to-junit(
   function($type, $vals) {
     switch($type)
       case 'spec'
-        return $vals = ('XQ10+', 'XQ30', 'XQ30+', 'XT30', 'XT30+')
+        return $vals = ('XQ10', 'XQ10+', 'XQ30', 'XQ30+')
       case 'xsd-version'
         return $vals = '1.0'
       case 'feature'
         return switch($vals)
-          case 'schemaValidation' return false()
-          case 'schemaImport' return false()
-          case 'collection-stability' return true()
-          case 'directory-as-collection-uri' return true()
-          case 'staticTyping' return false()
-          case 'namespace-axis' return false()
-          case 'schema-location-hint' return false()
-          case 'higherOrderFunctions' return true()
+          case 'collection-stability'
+          case 'directory-as-collection-uri'
+          case 'moduleImport'
+          case 'higherOrderFunctions'
+            return true()
+          case 'schemaAware'
+          case 'schemaValidation'
+          case 'schemaImport'
+          case 'staticTyping'
+          case 'namespace-axis'
+          case 'schema-location-hint'
+          case 'xpath-1.0-compatibility'
+             return false()
           default return (qt3ts:debug('Unknown feature', $vals), true())
       case 'xml-version'
         return some $v in $vals satisfies tokenize($v, ':')[1] = '1.0'

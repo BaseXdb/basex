@@ -4546,6 +4546,27 @@ public class ProdAxisStep extends QT3TestSet {
   }
 
   /**
+   *  The namespace axis is not recognized in XQuery.  The namespace-node() kind test is new in XQuery 3.0..
+   */
+  @org.junit.Test
+  public void axes127() {
+    final XQuery query = new XQuery(
+      "/*/namespace-node()",
+      ctx);
+    try {
+      query.context(node(file("prod/AxisStep/TreeTrunc.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
    *  A complex set of root path expressions..
    */
   @org.junit.Test

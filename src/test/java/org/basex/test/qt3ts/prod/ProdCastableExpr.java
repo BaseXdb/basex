@@ -12956,6 +12956,26 @@ public class ProdCastableExpr extends QT3TestSet {
    * Try variable castable as xs:QName .
    */
   @org.junit.Test
+  public void castableAs648() {
+    final XQuery query = new XQuery(
+      "for $var in \"ABC\" return $var castable as xs:QName",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(false)
+    );
+  }
+
+  /**
+   * Try variable castable as xs:QName .
+   */
+  @org.junit.Test
   public void castableAs648a() {
     final XQuery query = new XQuery(
       "let $var := \"ABC\" return $var castable as xs:QName",
@@ -13078,9 +13098,57 @@ public class ProdCastableExpr extends QT3TestSet {
    *  An invalid type for 'castable as' is specified. .
    */
   @org.junit.Test
+  public void kSeqExprCastable12() {
+    final XQuery query = new XQuery(
+      "(xs:double(1), xs:double(2), xs:double(3)) castable as xs:double*",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XPST0003")
+      ||
+        error("XQST0052")
+      )
+    );
+  }
+
+  /**
+   *  An invalid type for 'castable as' is specified. .
+   */
+  @org.junit.Test
   public void kSeqExprCastable12a() {
     final XQuery query = new XQuery(
       "(xs:double(1), xs:double(2), xs:double(3)) castable as xs:double*",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XPST0003")
+      ||
+        error("XPST0051")
+      )
+    );
+  }
+
+  /**
+   *  An invalid type for 'castable as' is specified, leading to a syntax error. .
+   */
+  @org.junit.Test
+  public void kSeqExprCastable13() {
+    final XQuery query = new XQuery(
+      "'string' castable as item()",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -13682,6 +13750,30 @@ public class ProdCastableExpr extends QT3TestSet {
    *  '+' nor '?' is allowed as a cardinality specifier in 'castable as'. .
    */
   @org.junit.Test
+  public void kSeqExprCastable4() {
+    final XQuery query = new XQuery(
+      "'string' castable as xs:anyType*",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XPST0003")
+      ||
+        error("XPST0051")
+      )
+    );
+  }
+
+  /**
+   *  '+' nor '?' is allowed as a cardinality specifier in 'castable as'. .
+   */
+  @org.junit.Test
   public void kSeqExprCastable4a() {
     final XQuery query = new XQuery(
       "'string' castable as xs:anyType*",
@@ -13706,6 +13798,26 @@ public class ProdCastableExpr extends QT3TestSet {
    *  An invalid type for 'castable as' is specified. .
    */
   @org.junit.Test
+  public void kSeqExprCastable5() {
+    final XQuery query = new XQuery(
+      "'string' castable as xs:anySimpleType",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0051")
+    );
+  }
+
+  /**
+   *  An invalid type for 'castable as' is specified. .
+   */
+  @org.junit.Test
   public void kSeqExprCastable5a() {
     final XQuery query = new XQuery(
       "'string' castable as xs:anySimpleType",
@@ -13719,6 +13831,26 @@ public class ProdCastableExpr extends QT3TestSet {
     }
     test(
       error("XPST0080")
+    );
+  }
+
+  /**
+   *  An invalid type for 'castable as' is specified. .
+   */
+  @org.junit.Test
+  public void kSeqExprCastable6() {
+    final XQuery query = new XQuery(
+      "'string' castable as xs:untyped",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0051")
     );
   }
 

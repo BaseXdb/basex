@@ -794,6 +794,31 @@ public class ProdTypeswitchExpr extends QT3TestSet {
   }
 
   /**
+   * Typeswitch with union of types disallowed in XQuery 1.0.
+   */
+  @org.junit.Test
+  public void typeswitchUnionInXquery10() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\t for $x in (<e/>, 1, \"x\") return\n" +
+      "\t typeswitch ($x) \n" +
+      "\t case $i as xs:integer | xs:boolean | element() return 1\n" +
+      "\t default $v return 0\n" +
+      "\t ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
    * Typeswitch with N-way union.
    */
   @org.junit.Test

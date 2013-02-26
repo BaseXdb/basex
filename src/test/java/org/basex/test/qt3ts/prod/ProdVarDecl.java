@@ -140,6 +140,26 @@ public class ProdVarDecl extends QT3TestSet {
    *  One prolog variable depending on itself. .
    */
   @org.junit.Test
+  public void kInternalVariablesWith15a() {
+    final XQuery query = new XQuery(
+      "declare variable $var1 := $var1; true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0008")
+    );
+  }
+
+  /**
+   *  One prolog variable depending on itself. .
+   */
+  @org.junit.Test
   public void kInternalVariablesWith15b() {
     final XQuery query = new XQuery(
       "declare variable $var1 := $var1; true()",
@@ -153,6 +173,32 @@ public class ProdVarDecl extends QT3TestSet {
     }
     test(
       error("XPST0008")
+    );
+  }
+
+  /**
+   *  A prolog variable having a circular dependency, stretching through many functions. .
+   */
+  @org.junit.Test
+  public void kInternalVariablesWith16() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare variable $var := local:func1(); \n" +
+      "      declare function local:func1() { local:func2() }; \n" +
+      "      declare function local:func2() { local:func3() }; \n" +
+      "      declare function local:func3() { local:func4() }; \n" +
+      "      declare function local:func4() { $var }; \n" +
+      "      boolean($var)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
     );
   }
 
@@ -183,6 +229,26 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
+   *  A prolog variable having a circular dependency, by having a variable reference in a call site argument. This is an error even though the variable isn't used, because implementations cannot skip reporting static errors. .
+   */
+  @org.junit.Test
+  public void kInternalVariablesWith17() {
+    final XQuery query = new XQuery(
+      "declare variable $var := local:func1(); declare function local:func1() { local:func2($var) }; declare function local:func2($arg2) { 1 }; true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
+    );
+  }
+
+  /**
    * Test case based on K-InternalVariablesWith-17. XQuery 3.0 error code..
    */
   @org.junit.Test
@@ -203,6 +269,26 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
+   *  A prolog variable having a circular dependency, by having a variable reference in a call site argument. .
+   */
+  @org.junit.Test
+  public void kInternalVariablesWith18() {
+    final XQuery query = new XQuery(
+      "declare variable $var := local:func1(); declare function local:func1() { local:func2($var) }; declare function local:func2($arg2) { $arg2 }; $var",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
+    );
+  }
+
+  /**
    * Test case based on K-InternalVariablesWith-18 with XQuery 3.0 error code..
    */
   @org.junit.Test
@@ -219,6 +305,26 @@ public class ProdVarDecl extends QT3TestSet {
     }
     test(
       error("XQDY0054")
+    );
+  }
+
+  /**
+   *  A prolog variable having a circular dependency, stretching through functions and variables. .
+   */
+  @org.junit.Test
+  public void kInternalVariablesWith19() {
+    final XQuery query = new XQuery(
+      "declare variable $var2 := local:func1(); declare variable $var := ($var2 treat as xs:integer) + 1; declare function local:func1() { local:func2() }; declare function local:func2() { local:func3() }; declare function local:func3() { local:func4() }; declare function local:func4() { $var }; boolean($var)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
     );
   }
 
@@ -259,6 +365,26 @@ public class ProdVarDecl extends QT3TestSet {
     }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  A prolog variable having a circular dependency, stretching through functions and variables(#2). .
+   */
+  @org.junit.Test
+  public void kInternalVariablesWith20() {
+    final XQuery query = new XQuery(
+      "declare variable $var := local:func1(); declare function local:func1() { local:func2() }; declare function local:func2() { local:func3() }; declare variable $var2 := local:func2(); declare function local:func3() { $var2 }; boolean($var)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
     );
   }
 
@@ -367,6 +493,27 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
+   *  A prolog variable depending on a variable which is not in scope, 
+   *       and the variable is not used. .
+   */
+  @org.junit.Test
+  public void kInternalVariablesWith6a() {
+    final XQuery query = new XQuery(
+      "declare variable $var1 := $var2; declare variable $var2 := 2; true()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0008")
+    );
+  }
+
+  /**
    *  A prolog variable depending on a variable which is (in XQuery 3.0) in scope, 
    *       and the variable is not used. .
    */
@@ -428,6 +575,26 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
+   *  A prolog variable depending on a variable which is not in scope. .
+   */
+  @org.junit.Test
+  public void kInternalVariablesWith9a() {
+    final XQuery query = new XQuery(
+      "declare variable $var1 := $var2; declare variable $var2 := 2; $var1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0008")
+    );
+  }
+
+  /**
    *  A prolog variable depending on a variable which is (in XQuery 3.0) in scope. .
    */
   @org.junit.Test
@@ -464,6 +631,30 @@ public class ProdVarDecl extends QT3TestSet {
     }
     test(
       error("XPTY0004")
+    );
+  }
+
+  /**
+   *  A variable depending on a recursive function. .
+   */
+  @org.junit.Test
+  public void k2InternalVariablesWithout1() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare variable $local:myVar := local:myFunction(); \n" +
+      "        declare function local:myFunction() { local:myFunction(), 1, $local:myVar }; \n" +
+      "        $local:myVar\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
     );
   }
 
@@ -616,6 +807,30 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
+   *  A variable depending on a recursive function. .
+   */
+  @org.junit.Test
+  public void k2InternalVariablesWithout2() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        declare variable $local:myVar := local:myFunction(); \n" +
+      "        declare function local:myFunction() { $local:myVar, 1, local:myFunction() }; \n" +
+      "        $local:myVar\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
+    );
+  }
+
+  /**
    * Test case based on K2-InterVariablesWithout-2 with XQuery 3.0 error code.
    */
   @org.junit.Test
@@ -640,6 +855,26 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
+   *  A variable depending on a recursive function. .
+   */
+  @org.junit.Test
+  public void k2InternalVariablesWithout3() {
+    final XQuery query = new XQuery(
+      "declare variable $local:myVar := local:myFunction(); declare function local:myFunction() { $local:myVar, 1, local:myFunction() }; $local:myVar",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
+    );
+  }
+
+  /**
    * Test case based on K2-InterVariablesWithout-3 with XQuery 3.0 error code.
    */
   @org.junit.Test
@@ -656,6 +891,26 @@ public class ProdVarDecl extends QT3TestSet {
     }
     test(
       error("XQDY0054")
+    );
+  }
+
+  /**
+   *  A variable depending on a recursive function. .
+   */
+  @org.junit.Test
+  public void k2InternalVariablesWithout4() {
+    final XQuery query = new XQuery(
+      "declare variable $local:myVar := local:myFunction(); declare function local:myFunction() { $local:myVar, 1, local:myFunction() }; $local:myVar",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
     );
   }
 
@@ -680,6 +935,26 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
+   *  A variable depending indirectly on a recursive function. .
+   */
+  @org.junit.Test
+  public void k2InternalVariablesWithout5() {
+    final XQuery query = new XQuery(
+      "declare variable $local:myVar := local:myFunction(); declare function local:myFunction2() { $local:myVar, 1, local:myFunction() }; declare function local:myFunction() { local:myFunction2() }; $local:myVar",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
+    );
+  }
+
+  /**
    * Test case based on K2-InterVariablesWithout-5 with XQuery 3.0 error code.
    */
   @org.junit.Test
@@ -696,6 +971,26 @@ public class ProdVarDecl extends QT3TestSet {
     }
     test(
       error("XQDY0054")
+    );
+  }
+
+  /**
+   *  A variable depending indirectly on a recursive function. .
+   */
+  @org.junit.Test
+  public void k2InternalVariablesWithout6() {
+    final XQuery query = new XQuery(
+      "declare variable $local:myVar := local:myFunction(); declare function local:myFunction2() { local:myFunction(), $local:myVar }; declare function local:myFunction() { local:myFunction2() }; local:myFunction()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
     );
   }
 
@@ -720,6 +1015,26 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
+   *  A variable depending indirectly on a recursive function. .
+   */
+  @org.junit.Test
+  public void k2InternalVariablesWithout7() {
+    final XQuery query = new XQuery(
+      "declare variable $local:myVar := local:myFunction(); declare function local:myFunction2() { local:myFunction(), $local:myVar }; declare function local:myFunction4() { local:myFunction2() }; declare function local:myFunction3() { local:myFunction4() }; declare function local:myFunction() { local:myFunction3() }; local:myFunction()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
+    );
+  }
+
+  /**
    * Test case based on K2-InterVariablesWithout-7 with XQuery 3.0 error code.
    */
   @org.junit.Test
@@ -740,6 +1055,26 @@ public class ProdVarDecl extends QT3TestSet {
   }
 
   /**
+   *  A variable depending indirectly on a recursive function. .
+   */
+  @org.junit.Test
+  public void k2InternalVariablesWithout8() {
+    final XQuery query = new XQuery(
+      "declare variable $local:myVar := local:myFunction(); declare function local:myFunction2() { local:myFunction4() }; declare function local:myFunction4() { local:myFunction2(), $local:myVar }; declare function local:myFunction3() { local:myFunction4() }; declare function local:myFunction() { local:myFunction3() }; local:myFunction()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
+    );
+  }
+
+  /**
    * Test case based on K2-InterVariablesWithout-8 with XQuery 3.0 error code.
    */
   @org.junit.Test
@@ -756,6 +1091,26 @@ public class ProdVarDecl extends QT3TestSet {
     }
     test(
       error("XQDY0054")
+    );
+  }
+
+  /**
+   *  A variable depending on its self through the argument of a user function callsite. .
+   */
+  @org.junit.Test
+  public void k2InternalVariablesWithout9() {
+    final XQuery query = new XQuery(
+      "declare variable $local:myVar := local:myFunc(3); declare function local:myFunc($arg) { local:myFunc($local:myVar) }; $local:myVar",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
     );
   }
 
@@ -2091,6 +2446,31 @@ public class ProdVarDecl extends QT3TestSet {
    *  Test circularity on variable/function declaration . .
    */
   @org.junit.Test
+  public void vardeclerr() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare namespace foo = \"http://www..oracle.com/xquery/test\"; \n" +
+      "      declare variable $var1 as xs:integer := foo:price(xs:integer(2)); \n" +
+      "      declare function foo:price ($b as xs:integer) as xs:integer { $var1 + 1 }; \n" +
+      "      declare variable $input-context1 external; \n" +
+      "      $var1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
+    );
+  }
+
+  /**
+   *  Test circularity on variable/function declaration . .
+   */
+  @org.junit.Test
   public void vardeclerr1() {
     final XQuery query = new XQuery(
       "\n" +
@@ -2229,6 +2609,30 @@ public class ProdVarDecl extends QT3TestSet {
     }
     test(
       assertEq("11")
+    );
+  }
+
+  /**
+   *  Evaluates an internal variable declaration with type and expression. 
+   *       Test usage of variable with no assigned value at time of expression definition. .
+   */
+  @org.junit.Test
+  public void vardeclwithtype15a() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare variable $var as xs:integer := $e +1; \n" +
+      "      declare variable $e as xs:integer := 10;  \n" +
+      "      $var",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0008")
     );
   }
 

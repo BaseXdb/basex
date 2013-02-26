@@ -41,6 +41,26 @@ public class ProdVersionDecl extends QT3TestSet {
    *  A simple version declaration excluding encoding. .
    */
   @org.junit.Test
+  public void kVersionProlog2() {
+    final XQuery query = new XQuery(
+      "xquery version \"1.0\" ; 1 eq 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   *  A simple version declaration excluding encoding. .
+   */
+  @org.junit.Test
   public void kVersionProlog2V3() {
     final XQuery query = new XQuery(
       "xquery version \"3.0\" ; 1 eq 1",
@@ -61,9 +81,49 @@ public class ProdVersionDecl extends QT3TestSet {
    *  Whitespace is not allowed in EncName. .
    */
   @org.junit.Test
+  public void kVersionProlog3() {
+    final XQuery query = new XQuery(
+      "xquery version \"1.0\" encoding \"UTF-8 \"; 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0087")
+    );
+  }
+
+  /**
+   *  Whitespace is not allowed in EncName. .
+   */
+  @org.junit.Test
   public void kVersionProlog3V3() {
     final XQuery query = new XQuery(
       "xquery version \"3.0\" encoding \"UTF-8 \"; 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0087")
+    );
+  }
+
+  /**
+   *  Vertical bar is not allowed in EncName. .
+   */
+  @org.junit.Test
+  public void kVersionProlog4() {
+    final XQuery query = new XQuery(
+      "xquery version \"1.0\" encoding \"ISO-8859-1|\"; 1",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -94,6 +154,39 @@ public class ProdVersionDecl extends QT3TestSet {
     }
     test(
       error("XQST0087")
+    );
+  }
+
+  /**
+   *  A prolog containing many different declarations. TODO function declarations missing TODO variable declarations missing .
+   */
+  @org.junit.Test
+  public void kVersionProlog5() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        xquery version \"1.0\" encoding \"ISO-8859-1\"; \n" +
+      "        declare boundary-space preserve; \n" +
+      "        declare default collation \"http://www.w3.org/2005/xpath-functions/collation/codepoint\"; \n" +
+      "        declare base-uri \"http://example.com/\"; \n" +
+      "        declare construction strip; \n" +
+      "        declare ordering ordered; \n" +
+      "        declare default order empty greatest; \n" +
+      "        declare copy-namespaces no-preserve, no-inherit; \n" +
+      "        declare namespace ex = \"http://example.com/a/Namespace\"; \n" +
+      "        declare default element namespace \"http://example.com/\"; \n" +
+      "        declare default function namespace \"http://example.com/\"; \n" +
+      "        declare option fn:x-notRecognized \"option content\"; \n" +
+      "        1 eq 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 
@@ -174,6 +267,26 @@ public class ProdVersionDecl extends QT3TestSet {
    *  Use an invalid keyword as encoding. .
    */
   @org.junit.Test
+  public void k2VersionProlog3() {
+    final XQuery query = new XQuery(
+      "xquery version \"1.0\" default; 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   *  Use an invalid keyword as encoding. .
+   */
+  @org.junit.Test
   public void k2VersionProlog3V3() {
     final XQuery query = new XQuery(
       "xquery version \"3.0\" default; 1",
@@ -231,6 +344,26 @@ public class ProdVersionDecl extends QT3TestSet {
   }
 
   /**
+   *  An XQuery 1.0 processor presumably doesn't support version 3.0. .
+   */
+  @org.junit.Test
+  public void versionDeclV1ProcessorAndV3Query() {
+    final XQuery query = new XQuery(
+      "xquery version \"3.0\"; <bib/>",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0031")
+    );
+  }
+
+  /**
    *  An XQuery 3.0 processor might or might not accept version "1.0". .
    */
   @org.junit.Test
@@ -255,12 +388,52 @@ public class ProdVersionDecl extends QT3TestSet {
   }
 
   /**
+   *  Prolog version declaration with both version and encoding information (set to 1.0 and "utf-8" respectively. .
+   */
+  @org.junit.Test
+  public void prologVersion1() {
+    final XQuery query = new XQuery(
+      "xquery version \"1.0\" encoding \"utf-8\"; 1,2",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1 2")
+    );
+  }
+
+  /**
    *  Prolog version declaration with both version and encoding information (set to 3.0 and "utf-8" respectively. .
    */
   @org.junit.Test
   public void prologVersion1V3() {
     final XQuery query = new XQuery(
       "xquery version \"3.0\" encoding \"utf-8\"; 1,2",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1 2")
+    );
+  }
+
+  /**
+   *  Prolog version declaration with both version and encoding information (set to 1.0 and "US-ASCII" respectively. .
+   */
+  @org.junit.Test
+  public void prologVersion3() {
+    final XQuery query = new XQuery(
+      "xquery version \"1.0\" encoding \"US-ASCII\"; 1,2",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -298,6 +471,26 @@ public class ProdVersionDecl extends QT3TestSet {
    *  Simple version decl. .
    */
   @org.junit.Test
+  public void prologVersion4() {
+    final XQuery query = new XQuery(
+      "xquery version \"1.0\"; 1,2",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertStringValue(false, "1 2")
+    );
+  }
+
+  /**
+   *  Simple version decl. .
+   */
+  @org.junit.Test
   public void prologVersion4V3() {
     final XQuery query = new XQuery(
       "xquery version \"3.0\"; 1,2",
@@ -311,6 +504,26 @@ public class ProdVersionDecl extends QT3TestSet {
     }
     test(
       assertStringValue(false, "1 2")
+    );
+  }
+
+  /**
+   *  An XQuery 1.0 processor must accept version "1.0". .
+   */
+  @org.junit.Test
+  public void prologVersion5() {
+    final XQuery query = new XQuery(
+      "xquery version \"1.0\"; <bib/>",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialization("<bib/>", false)
     );
   }
 
@@ -338,6 +551,33 @@ public class ProdVersionDecl extends QT3TestSet {
    *  A more realistic query with a version decl, no encoding. .
    */
   @org.junit.Test
+  public void prologVersion6() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        xquery version '1.0'; \n" +
+      "        declare boundary-space preserve; \n" +
+      "        declare default order empty greatest; \n" +
+      "        declare namespace ns = \"http://www.example.org/\"; \n" +
+      "        for $b in//book stable order by xs:decimal($b/price[1]) empty greatest \n" +
+      "        return $b/title",
+      ctx);
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialization("<title>Data on the Web</title><title>TCP/IP Illustrated</title><title>Advanced Programming in the Unix environment</title><title>The Economics of Technology and Content for Digital TV</title>", false)
+    );
+  }
+
+  /**
+   *  A more realistic query with a version decl, no encoding. .
+   */
+  @org.junit.Test
   public void prologVersion6V3() {
     final XQuery query = new XQuery(
       "\n" +
@@ -346,6 +586,33 @@ public class ProdVersionDecl extends QT3TestSet {
       "        declare default order empty greatest; \n" +
       "        declare namespace ns = \"http://www.example.org/\"; \n" +
       "        for $b in//book stable order by xs:decimal($b/price[1]) empty greatest \n" +
+      "        return $b/title",
+      ctx);
+    try {
+      query.context(node(file("op/union/bib2.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertSerialization("<title>Data on the Web</title><title>TCP/IP Illustrated</title><title>Advanced Programming in the Unix environment</title><title>The Economics of Technology and Content for Digital TV</title>", false)
+    );
+  }
+
+  /**
+   *  A more realitic query with a version decl, no encoding. .
+   */
+  @org.junit.Test
+  public void prologVersion7() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "        xquery version \"1.0\"; \n" +
+      "        declare boundary-space preserve; \n" +
+      "        declare default order empty greatest; \n" +
+      "        declare namespace ns = \"http://www.example.org/\"; \n" +
+      "        for $b in //book stable order by xs:decimal($b/price[1]) empty greatest \n" +
       "        return $b/title",
       ctx);
     try {
@@ -504,6 +771,26 @@ public class ProdVersionDecl extends QT3TestSet {
    *  Asterisk is not allowed in EncName. .
    */
   @org.junit.Test
+  public void versionDeclaration010() {
+    final XQuery query = new XQuery(
+      "xquery version \"1.0\" encoding \"999-UTF-8-*\"; \"ABC\"",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0087")
+    );
+  }
+
+  /**
+   *  Asterisk is not allowed in EncName. .
+   */
+  @org.junit.Test
   public void versionDeclaration010V3() {
     final XQuery query = new XQuery(
       "xquery version \"3.0\" encoding \"999-UTF-8-*\"; \"ABC\"",
@@ -564,9 +851,49 @@ public class ProdVersionDecl extends QT3TestSet {
    *  You can't swap the order of the 'version' and 'encoding' clauses. .
    */
   @org.junit.Test
+  public void versionDeclaration022V1() {
+    final XQuery query = new XQuery(
+      "xquery encoding \"utf-8\" version \"1.0\"; 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   *  You can't swap the order of the 'version' and 'encoding' clauses. .
+   */
+  @org.junit.Test
   public void versionDeclaration022V3() {
     final XQuery query = new XQuery(
       "xquery encoding \"utf-8\" version \"3.0\"; 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0003")
+    );
+  }
+
+  /**
+   *  In XQuery 1.0, you can't omit the 'version' clause. .
+   */
+  @org.junit.Test
+  public void versionDeclaration023V1() {
+    final XQuery query = new XQuery(
+      "xquery encoding \"utf-8\"; 1",
       ctx);
     try {
       result = new QT3Result(query.value());

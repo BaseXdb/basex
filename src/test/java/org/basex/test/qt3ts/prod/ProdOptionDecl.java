@@ -13,6 +13,26 @@ import org.basex.test.qt3ts.QT3TestSet;
 public class ProdOptionDecl extends QT3TestSet {
 
   /**
+   *  The name of an option must be a full QName in XQuery 1.0. .
+   */
+  @org.junit.Test
+  public void kOptionDeclarationProlog1() {
+    final XQuery query = new XQuery(
+      "declare option myopt \"option value\"; 1",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0081")
+    );
+  }
+
+  /**
    * 
    *       	The name of an option need not be a full QName in XQuery 3.0. 
    *       .

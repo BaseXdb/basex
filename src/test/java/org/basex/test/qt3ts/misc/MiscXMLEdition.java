@@ -80,7 +80,9 @@ public class MiscXMLEdition extends QT3TestSet {
   public void xML104edExcludedChar2() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/misc/XMLEdition/XML10-4ed-Excluded-char-2.xq"
+        file(
+            "misc/XMLEdition/XML10-4ed-Excluded-char-2.xq"
+        )
       ),
       ctx);
     try {

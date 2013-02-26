@@ -269,12 +269,72 @@ public class ProdFunctionCall extends QT3TestSet {
   }
 
   /**
+   *  No function by name fn:unparsed-text() exists(although one does in XSL-T). .
+   */
+  @org.junit.Test
+  public void kFunctionCallExpr12() {
+    final XQuery query = new XQuery(
+      "unparsed-text(\"example.com/file.ext\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   *  No function by name fn:unparsed-text() exists(although one does in XSL-T). .
+   */
+  @org.junit.Test
+  public void kFunctionCallExpr13() {
+    final XQuery query = new XQuery(
+      "unparsed-text-available(\"example.com/file.ext\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
    *  No function by name fn:key() exists(although one does in XSL-T). .
    */
   @org.junit.Test
   public void kFunctionCallExpr14() {
     final XQuery query = new XQuery(
       "key('func', \"a value\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   *  No function by name fn:format-number() exists in XQuery 1.0 (although one does in XSLT and in XQuery 3.0). .
+   */
+  @org.junit.Test
+  public void kFunctionCallExpr15() {
+    final XQuery query = new XQuery(
+      "format-number(3, \"0000\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -312,6 +372,26 @@ public class ProdFunctionCall extends QT3TestSet {
    *  No function by name fn:format-time() exists in XQuery 1.0 (although one does in XSLT). .
    */
   @org.junit.Test
+  public void kFunctionCallExpr16() {
+    final XQuery query = new XQuery(
+      "matches(format-time(current-time(), \"[H01]:[m01]\"), \"[0-2][0-9]:[0-5][0-9]\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   *  No function by name fn:format-time() exists in XQuery 1.0 (although one does in XSLT). .
+   */
+  @org.junit.Test
   public void kFunctionCallExpr16a() {
     final XQuery query = new XQuery(
       "matches(format-time(current-time(), \"[H01]:[m01]\"), \"[0-2][0-9]:[0-5][0-9]\")",
@@ -325,6 +405,26 @@ public class ProdFunctionCall extends QT3TestSet {
     }
     test(
       assertBoolean(true)
+    );
+  }
+
+  /**
+   *  No function by name fn:format-time() exists in XQuery 1.0 (although one does in XSLT). .
+   */
+  @org.junit.Test
+  public void kFunctionCallExpr17() {
+    final XQuery query = new XQuery(
+      "matches(format-time(current-time(), \"[H01]:[m01]\", (), (), ()), \"..:..\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
     );
   }
 
@@ -511,6 +611,26 @@ public class ProdFunctionCall extends QT3TestSet {
   public void kFunctionCallExpr24() {
     final XQuery query = new XQuery(
       "unparsed-entity-public-id(\"entity\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   *  No function by name fn:generate-id() exists(although one does in XSLT). .
+   */
+  @org.junit.Test
+  public void kFunctionCallExpr25() {
+    final XQuery query = new XQuery(
+      "generate-id(<a/>) castable as xs:NCName",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -941,6 +1061,46 @@ public class ProdFunctionCall extends QT3TestSet {
   public void k2FunctionCallExpr5() {
     final XQuery query = new XQuery(
       "unparsed-entity-public-id(\"str\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   *  Function generate-id() is not available in XQuery. .
+   */
+  @org.junit.Test
+  public void k2FunctionCallExpr6() {
+    final XQuery query = new XQuery(
+      "generate-id(\"str\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   *  Function generate-id() is not available in XQuery(#2). .
+   */
+  @org.junit.Test
+  public void k2FunctionCallExpr7() {
+    final XQuery query = new XQuery(
+      "generate-id()",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -1465,6 +1625,78 @@ public class ProdFunctionCall extends QT3TestSet {
     }
     test(
       error("XPST0003")
+    );
+  }
+
+  /**
+   * Check that reserved function name function is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames014() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:function() { fn:true() };\n" +
+      "\tfunction()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Check that reserved function name namespace-node is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames015() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function namespace-node($arg) { fn:true() };\n" +
+      "\tnamespace-node(1)\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * Check that reserved function name switch is handled correctly. .
+   */
+  @org.junit.Test
+  public void functionCallReservedFunctionNames016() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
+      "\tdeclare function local:switch() { fn:true() };\n" +
+      "\tswitch()\n" +
+      "      ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
     );
   }
 

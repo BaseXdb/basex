@@ -19,7 +19,9 @@ public class AppDemos extends QT3TestSet {
   public void currencysvg() {
     final XQuery query = new XQuery(
       queryFile(
-          "file:///C:/Users/Leo/Documents/Workspaces/GitHub/QT3-test-suite/app/Demos/currencysvg.xq"
+        file(
+            "app/Demos/currencysvg.xq"
+        )
       ),
       ctx);
     try {

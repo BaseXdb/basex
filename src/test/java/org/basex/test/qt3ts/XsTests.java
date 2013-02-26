@@ -14,8 +14,8 @@ import org.basex.test.qt3ts.xs.*;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
+  XsAnyURI.class,
   XsBase64Binary.class,
-  XsDateTimeStamp.class,
   XsDouble.class,
   XsFloat.class,
   XsHexBinary.class,

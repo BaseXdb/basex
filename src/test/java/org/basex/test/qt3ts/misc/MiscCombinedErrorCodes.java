@@ -3001,6 +3001,26 @@ public class MiscCombinedErrorCodes extends QT3TestSet {
   }
 
   /**
+   *  test bad casts .
+   */
+  @org.junit.Test
+  public void xPTY000445() {
+    final XQuery query = new XQuery(
+      "concat('prefix:', 'localname') cast as xs:QName",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
    *  test runtime cardinality checks .
    */
   @org.junit.Test
@@ -4152,6 +4172,26 @@ public class MiscCombinedErrorCodes extends QT3TestSet {
    *  check that cyclic variable definitions are reported correctly .
    */
   @org.junit.Test
+  public void xQST0054() {
+    final XQuery query = new XQuery(
+      "declare namespace foo = \"http://www.example.org/\"; declare variable $a := foo:bar(); declare function foo:bar() { $a + 1 }; $a",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0054")
+    );
+  }
+
+  /**
+   *  check that cyclic variable definitions are reported correctly .
+   */
+  @org.junit.Test
   public void xQST0055() {
     final XQuery query = new XQuery(
       "declare copy-namespaces preserve,inherit; declare copy-namespaces preserve,no-inherit; 1",
@@ -4749,6 +4789,27 @@ public class MiscCombinedErrorCodes extends QT3TestSet {
     }
     test(
       error("XQST0090")
+    );
+  }
+
+  /**
+   *  Test generating XQST0093 .
+   */
+  @org.junit.Test
+  public void xQST0093() {
+    final XQuery query = new XQuery(
+      "import module namespace foo=\"http://www.example.org/foo\"; $foo:variable2",
+      ctx);
+    try {
+      query.addModule("http://www.example.org/foo", file("misc/CombinedErrorCodes/XQST0093_lib2.xq"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0093")
     );
   }
 

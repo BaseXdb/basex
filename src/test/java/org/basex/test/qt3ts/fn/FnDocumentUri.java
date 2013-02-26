@@ -36,6 +36,26 @@ public class FnDocumentUri extends QT3TestSet {
    *  A test whose essence is: `document-uri()`. .
    */
   @org.junit.Test
+  public void kDocumentURIFunc2() {
+    final XQuery query = new XQuery(
+      "document-uri()",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPST0017")
+    );
+  }
+
+  /**
+   *  A test whose essence is: `document-uri()`. .
+   */
+  @org.junit.Test
   public void kDocumentURIFunc2a() {
     final XQuery query = new XQuery(
       "ends-with(document-uri(),\"works-mod.xml\")",
