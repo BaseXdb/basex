@@ -68,8 +68,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Item test(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return bool(ii) ? this : null;
   }
 

@@ -2,6 +2,7 @@ package org.basex.query.value.item;
 
 import static java.lang.Float.*;
 
+import org.basex.query.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -66,6 +67,11 @@ public abstract class ANum extends Item {
    * @return float value
    */
   public abstract float flt();
+
+  @Override
+  public Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    return dbl() == ctx.pos ? this : null;
+  }
 
   @Override
   public final int hash(final InputInfo ii) {

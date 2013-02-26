@@ -88,6 +88,11 @@ public final class Int extends ANum {
   }
 
   @Override
+  public Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    return val == ctx.pos ? this : null;
+  }
+
+  @Override
   public BigDecimal dec(final InputInfo ii) {
     return BigDecimal.valueOf(val);
   }
