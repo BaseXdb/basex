@@ -763,8 +763,8 @@ public abstract class Data {
           preStack.push(pre);
           break;
         case ELEM:
-          nspaces.open();
           // add element
+          nspaces.open();
           boolean ne = false;
           if(data.nsFlag(dpre)) {
             final Atts at = data.ns(dpre);
