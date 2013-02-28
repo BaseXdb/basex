@@ -72,6 +72,12 @@ public final class MetaData {
   /** Maximum token length. */
   public volatile int maxlen;
 
+  /** Maximum number of text/attribute index entries
+   *  to keep in memory during index creation. */
+  public volatile int indSliceSize;
+  /** Maximum number of fulltext index entries to keep in memory during index creation. */
+  public volatile int ftIndSliceSize;
+
   /** Language of full-text search index. */
   public volatile Language language;
 
@@ -132,6 +138,8 @@ public final class MetaData {
     updindex = prop.is(Prop.UPDINDEX);
     maxlen = prop.num(Prop.MAXLEN);
     maxcats = prop.num(Prop.MAXCATS);
+    indSliceSize = prop.num(Prop.INDEXSLICESIZE);
+    ftIndSliceSize = prop.num(Prop.FTINDEXSLICESIZE);
     language = Language.get(prop);
     users = new Users(null);
   }

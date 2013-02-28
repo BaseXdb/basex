@@ -29,6 +29,8 @@ public final class FTBuilder extends IndexBuilder {
   int pos;
   /** Number of indexed tokens. */
   private long ntok;
+  /** Counter variable for check against data.meta.ftIndSliceSize. */
+  private int currentSliceSize;
 
   /**
    * Constructor.
@@ -65,6 +67,7 @@ public final class FTBuilder extends IndexBuilder {
 
     final Performance perf = Prop.debug ? new Performance() : null;
     Util.debug(det());
+    currentSliceSize = 0;
 
     for(pre = 0; pre < size; ++pre) {
       if((pre & 0xFFFF) == 0) check();
@@ -81,9 +84,9 @@ public final class FTBuilder extends IndexBuilder {
         // skip too long and stopword tokens
         if(tok.length <= data.meta.maxlen && (sw.isEmpty() || !sw.contains(tok))) {
           // check if main memory is exhausted
-          if((ntok++ & 0xFFF) == 0 && memFull()) {
+          if((ntok++ & 0xFFF) == 0 && temporaryFlushToDiskNeeded()) {
             writeIndex(csize++);
-            Performance.gc(singlegc ? 1 : 2);
+            memoryCleanupAfterFlushToDisk();
           }
           index(tok);
         }
@@ -97,6 +100,31 @@ public final class FTBuilder extends IndexBuilder {
     Util.memory(perf);
   }
 
+  /**
+   * Decides whether in-memory temporary index structures are so large
+   * that we must flush them to disk before continuing.
+   * @return true if structures shall be flushed to disk
+   * @throws IOException I/O Exception
+   */
+  private boolean temporaryFlushToDiskNeeded() throws IOException {
+    if (data.meta.ftIndSliceSize > 0) {
+      return currentSliceSize >= data.meta.ftIndSliceSize;
+    }
+    return memFull();
+  }
+
+  /**
+   * Performs memory cleanup after flusing to disk, if necessary.
+   */
+  private void memoryCleanupAfterFlushToDisk() {
+    if (data.meta.ftIndSliceSize > 0) {
+      currentSliceSize = 0;
+    } else {
+      Performance.gc(singlegc ? 1 : 2);
+    }
+  }
+
+
   @Override
   public FTIndex build() throws IOException {
     index();
@@ -109,6 +137,7 @@ public final class FTBuilder extends IndexBuilder {
    */
   void index(final byte[] tok) {
     tree.index(tok, pre, pos, csize);
+    currentSliceSize++;
   }
 
   /**
