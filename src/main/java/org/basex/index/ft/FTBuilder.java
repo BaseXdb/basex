@@ -108,6 +108,7 @@ public final class FTBuilder extends IndexBuilder {
    */
   private boolean temporaryFlushToDiskNeeded() throws IOException {
     if (data.meta.ftIndSliceSize > 0) {
+      merge = true;
       return currentSliceSize >= data.meta.ftIndSliceSize;
     }
     return memFull();
@@ -146,6 +147,8 @@ public final class FTBuilder extends IndexBuilder {
    */
   public void write() throws IOException {
     writeIndex(csize++);
+    Util.debug("Finalizing FTIndex " + data.meta.name + " with " + csize +
+        " slices, current slice size = " + currentSliceSize);
     if(!merge) return;
 
     // merges temporary index files

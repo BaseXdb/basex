@@ -81,6 +81,8 @@ public final class ValueIndexBuilder extends IndexBuilder {
       }
     }
 
+    Util.debug("Finalizing Index " + data.meta.name + " with " + (csize + 1) +
+        " slices, current slice size = " + currentSliceSize);
     if(merge) {
       write(f + csize++, false);
       index = null;
@@ -106,6 +108,7 @@ public final class ValueIndexBuilder extends IndexBuilder {
    */
   private boolean temporaryFlushToDiskNeeded() throws IOException {
     if (data.meta.indSliceSize > 0) {
+      merge = true;
       return currentSliceSize >= data.meta.indSliceSize;
     }
     return memFull();
