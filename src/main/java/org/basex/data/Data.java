@@ -763,6 +763,7 @@ public abstract class Data {
           preStack.push(pre);
           break;
         case ELEM:
+          nspaces.open();
           // add element
           boolean ne = false;
           if(data.nsFlag(dpre)) {
@@ -782,7 +783,6 @@ public abstract class Data {
               }
             }
           }
-          nspaces.open();
           byte[] nm = data.name(dpre, dkind);
           elem(dis, tagindex.index(nm, null, false), data.attSize(dpre, dkind),
               data.size(dpre, dkind), nspaces.uri(nm, true), ne);

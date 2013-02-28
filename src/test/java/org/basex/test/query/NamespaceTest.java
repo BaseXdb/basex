@@ -269,6 +269,26 @@ public final class NamespaceTest extends AdvancedQueryTest {
         context.data().nspaces.toString());
   }
 
+  /**
+   * Detects malformed namespace hierarchy.
+   * @throws BaseXException exception
+   */
+  @Test
+  public void nsHierarchy3() throws BaseXException {
+    query(transform(
+        "<a xmlns='x'/>",
+        "insert node <a xmlns='y'/> into $input"),
+        "<a xmlns='x'><a xmlns='y'/></a>");
+
+    // in-depth test
+    create(2);
+    query("insert node <a xmlns='y'/> into doc('d2')//*:x");
+    assertEquals(NL +
+        "  Pre[1] xmlns=\"xx\" " + NL +
+        "    Pre[2] xmlns=\"y\" ",
+        context.data().nspaces.toString());
+  }
+
   /** Test query. */
   @Test
   public void copy5() {
