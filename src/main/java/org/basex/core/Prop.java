@@ -120,6 +120,12 @@ public final class Prop extends AProp {
   /** Flag for creating a full-text index. */
   public static final Object[] FTINDEX = { "FTINDEX", false };
 
+  /** Maximum number of text/attribute index entries
+   *  to keep in memory during index creation. */
+  public static final Object[] INDEXSLICESIZE = { "INDEXSLICESIZE", -1 };
+  /** Maximum number of fulltext index entries to keep in memory during index creation. */
+  public static final Object[] FTINDEXSLICESIZE = { "FTINDEXSLICESIZE", -1 };
+
   /** Maximum length of index entries. */
   public static final Object[] MAXLEN = { "MAXLEN", 96 };
   /** Maximum number of name categories. */
