@@ -39,6 +39,8 @@ public final class ValueIndexBuilder extends IndexBuilder {
   private IndexTree index = new IndexTree();
   /** Index type (attributes/texts). */
   private final boolean text;
+  /** Counter variable for check against data.meta.indSliceSize. */
+  private int currentSliceSize;
 
   /**
    * Constructor.
@@ -60,22 +62,27 @@ public final class ValueIndexBuilder extends IndexBuilder {
 
     final String f = text ? DATATXT : DATAATV;
     final int k = text ? Data.TEXT : Data.ATTR;
+    currentSliceSize = 0;
 
     for(pre = 0; pre < size; ++pre) {
       if((pre & 0x0FFF) == 0) {
         check();
         // check if main memory is exhausted
-        if(memFull()) {
+        if(temporaryFlushToDiskNeeded()) {
           write(f + csize++, false);
           index = new IndexTree();
-          Performance.gc(singlegc ? 1 : 2);
+          memoryCleanupAfterFlushToDisk();
         }
       }
       // skip too long values
-      if(data.kind(pre) == k && data.textLen(pre, text) <= data.meta.maxlen)
+      if(data.kind(pre) == k && data.textLen(pre, text) <= data.meta.maxlen) {
         index.index(data.text(pre, text), data.meta.updindex ? data.id(pre) : pre);
+        currentSliceSize++;
+      }
     }
 
+    Util.debug("Finalizing Index " + data.meta.name + " with " + (csize + 1) +
+        " slices, current slice size = " + currentSliceSize);
     if(merge) {
       write(f + csize++, false);
       index = null;
@@ -91,6 +98,31 @@ public final class ValueIndexBuilder extends IndexBuilder {
     Util.memory(perf);
     return data.meta.updindex ?
         new UpdatableDiskValues(data, text) : new DiskValues(data, text);
+  }
+
+  /**
+   * Decides whether in-memory temporary index structures are so large
+   * that we must flush them to disk before continuing.
+   * @return true if structures shall be flushed to disk
+   * @throws IOException I/O Exception
+   */
+  private boolean temporaryFlushToDiskNeeded() throws IOException {
+    if (data.meta.indSliceSize > 0) {
+      merge = true;
+      return currentSliceSize >= data.meta.indSliceSize;
+    }
+    return memFull();
+  }
+
+  /**
+   * Performs memory cleanup after flusing to disk, if necessary.
+   */
+  private void memoryCleanupAfterFlushToDisk() {
+    if (data.meta.indSliceSize > 0) {
+      currentSliceSize = 0;
+    } else {
+      Performance.gc(singlegc ? 1 : 2);
+    }
   }
 
   /**
