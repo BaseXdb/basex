@@ -240,7 +240,8 @@ public final class QueryProcessor extends Progress {
    */
   @Override
   public boolean databases(final StringList db) {
-    return ctx.root != null && ctx.root.expr.databases(db);
+    return ctx.root != null &&
+        ctx.root.expr.databases(db.add(ctx.userReadLocks).add(ctx.userWriteLocks));
   }
 
   /**

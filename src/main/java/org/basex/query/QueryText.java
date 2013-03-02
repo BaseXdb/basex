@@ -460,6 +460,12 @@ public interface QueryText {
   byte[] ADMIN = token("admin");
   /** DB token. */
   byte[] DB = token("db");
+  /** QUERY token. */
+  byte[] QUERY = token("query");
+  /** READ_LOCK token. */
+  byte[] READ_LOCK = token("read-lock");
+  /** WRITE token. */
+  byte[] WRITE_LOCK = token("write-lock");
   /** Index token. */
   byte[] INDEX = token("index");
   /** FETCH token. */
@@ -585,6 +591,8 @@ public interface QueryText {
   byte[] ADMINURI = token(BXMODULES + "admin");
   /** Database module URI. */
   byte[] DBURI = token(BXMODULES + "db");
+  /** Query module URI. */
+  byte[] QUERYURI = token(BXMODULES + "query");
   /** Fetch module URI. */
   byte[] FETCHURI = token(BXMODULES + "fetch");
   /** Full-text module URI. */

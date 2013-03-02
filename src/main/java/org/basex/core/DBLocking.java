@@ -39,6 +39,8 @@ public final class DBLocking implements Locking {
   public static final String EVENT = PREFIX + "EVENT";
   /** Special lock identifier for repository commands. */
   public static final String REPO = PREFIX + "REPO";
+  /** Prefix for user defined locks. */
+  public static final String USER_PREFIX = "+";
 
   /** Lock for running thread counters. */
   private final Object globalLock = new Object();
