@@ -27,7 +27,7 @@ public abstract class BaseXServlet extends HttpServlet {
   protected String pass;
 
   @Override
-  public void init(final ServletConfig config) throws ServletException {
+  public final void init(final ServletConfig config) throws ServletException {
     try {
       HTTPContext.init(config.getServletContext());
       final Enumeration<String> en = config.getInitParameterNames();
