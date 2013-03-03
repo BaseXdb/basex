@@ -96,6 +96,11 @@ public final class QueryContext extends Progress {
   /** Full-text token counter (needed for highlighting of full-text results). */
   public byte ftoknum;
 
+  /** Strings to lock defined by lock:read option. */
+  public StringList userReadLocks = new StringList(0);
+  /** Strings to lock defined by lock:write option. */
+  public StringList userWriteLocks = new StringList(0);
+
   /** Pending updates. */
   public Updates updates;
   /** Pending output. */

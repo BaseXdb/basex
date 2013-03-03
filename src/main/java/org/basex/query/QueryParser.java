@@ -572,6 +572,11 @@ public class QueryParser extends InputParser {
       ctx.globalOpt.put(key, obj);
       ctx.dbOptions.add(key);
       ctx.dbOptions.add(string(val));
+    } else if(eq(name.prefix(), LOCK)) {
+      if(eq(name.local(), READ)) ctx.userReadLocks.add(string(val).split("\\s*,\\s*"));
+      else if(eq(name.local(), WRITE)) {
+        ctx.userReadLocks.add(string(val).split("\\s*,\\s*"));
+      } else error(BASX_OPTIONS, string(name.local()));
     }
     // ignore unknown options
   }
