@@ -138,7 +138,7 @@ public final class JsonStringConverter implements JsonHandler {
           if(Character.isISOControl(cp)) {
             tb.addByte((byte) '\\').addByte((byte) 'u');
             for(int j = 4; --j >= 0;) {
-              final int hex = (cp >>> (j << 2)) & 0xF;
+              final int hex = cp >>> (j << 2) & 0xF;
               tb.addByte((byte) (hex + (hex > 9 ? 'A' - 10 : '0')));
             }
           } else {

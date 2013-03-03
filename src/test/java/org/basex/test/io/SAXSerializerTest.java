@@ -28,7 +28,7 @@ public class SAXSerializerTest extends SandboxTest {
    */
   @Test
   public void unmarshallJAXBObjectWithSAXSerializer() throws Exception {
-    JAXBContext jaxbContext = JAXBContext.newInstance(SAXSerializerObject.class);
+    final JAXBContext jaxbContext = JAXBContext.newInstance(SAXSerializerObject.class);
 
     // create XML
     final ArrayOutput marshalled = new ArrayOutput();
@@ -37,14 +37,14 @@ public class SAXSerializerTest extends SandboxTest {
     new CreateDB(NAME, marshalled.toString()).execute(context);
 
     // get object from DB
-    QueryProcessor queryProcessor = new QueryProcessor(
+    final QueryProcessor queryProcessor = new QueryProcessor(
         "//domain-object[@name='Object1']", context);
-    Item item = queryProcessor.iter().next();
+    final Item item = queryProcessor.iter().next();
 
-    SAXSerializer saxSerializer = new SAXSerializer(item);
-    SAXSource saxSource = new SAXSource(saxSerializer, null);
+    final SAXSerializer saxSerializer = new SAXSerializer(item);
+    final SAXSource saxSource = new SAXSource(saxSerializer, null);
 
-    SAXSerializerObject dom = jaxbContext.createUnmarshaller().unmarshal(saxSource,
+    final SAXSerializerObject dom = jaxbContext.createUnmarshaller().unmarshal(saxSource,
         SAXSerializerObject.class).getValue();
 
     queryProcessor.close();
@@ -58,13 +58,13 @@ public class SAXSerializerTest extends SandboxTest {
    */
   @Test
   public void namespaces() throws Exception {
-    QueryProcessor queryProcessor = new QueryProcessor("<a xmlns='x'/>", context);
-    Item item = queryProcessor.iter().next();
+    final QueryProcessor queryProcessor = new QueryProcessor("<a xmlns='x'/>", context);
+    final Item item = queryProcessor.iter().next();
 
-    SAXSerializer saxSerializer = new SAXSerializer(item);
-    SAXSource saxSource = new SAXSource(saxSerializer, null);
+    final SAXSerializer saxSerializer = new SAXSerializer(item);
+    final SAXSource saxSource = new SAXSource(saxSerializer, null);
 
-    DOMResult result = new DOMResult();
+    final DOMResult result = new DOMResult();
     TransformerFactory.newInstance().newTransformer().transform(saxSource, result);
     Assert.assertEquals("x", result.getNode().getFirstChild().getNamespaceURI());
 

@@ -179,7 +179,7 @@ public final class InfoView extends View implements LinkListener {
           line.startsWith(TOTAL_TIME_CC)) {
 
         final int t = line.indexOf(" ms");
-        int tm = (int) (Double.parseDouble(line.substring(s + 1, t)) * 100);
+        final int tm = (int) (Double.parseDouble(line.substring(s + 1, t)) * 100);
         times.add(tm);
         final String key = line.substring(0, s).trim();
         final String val = Performance.getTime(tm * 10000L * runs, runs);

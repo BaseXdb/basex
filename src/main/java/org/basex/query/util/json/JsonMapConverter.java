@@ -32,9 +32,8 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class JsonMapConverter extends JsonConverter implements JsonHandler {
-  /**  */
   /** Stack for intermediate values. */
-  private Stack<Value> stack = new Stack<Value>();
+  private final Stack<Value> stack = new Stack<Value>();
   /** JSON spec. */
   private final Spec spec;
   /** Unescape flag. */

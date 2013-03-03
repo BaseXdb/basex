@@ -123,9 +123,9 @@ public final class JsonCGConverter extends JsonXMLConverter {
     tb.addByte(UNDERSCORE[0]);
     final int a = cp >>> 12;
     tb.addByte((byte) (a + (a > 9 ? 'A' : '0')));
-    final int b = (cp >>> 8) & 0x0F;
+    final int b = cp >>> 8 & 0x0F;
     tb.addByte((byte) (b + (b > 9 ? 'A' : '0')));
-    final int c = (cp >>> 4) & 0x0F;
+    final int c = cp >>> 4 & 0x0F;
     tb.addByte((byte) (c + (c > 9 ? 'A' : '0')));
     final int d = cp & 0x0F;
     tb.addByte((byte) (d + (d > 9 ? 'A' : '0')));

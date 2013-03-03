@@ -234,7 +234,7 @@ public final class JsonParser extends InputParser {
       tb.addByte((byte) c);
     }
 
-    boolean zero = c == '0';
+    final boolean zero = c == '0';
     c = curr();
     if(zero && c >= '0' && c <= '9') throw error("No digit allowed after '0'.");
     loop: while(true) {
@@ -355,7 +355,7 @@ public final class JsonParser extends InputParser {
             } else {
               tb.addByte((byte) 'u');
               for(int i = 0; i < 4; i++) {
-                char x = consume();
+                final char x = consume();
                 if(x >= '0' && x <= '9' || x >= 'a' && x <= 'f' || x >= 'A' && x <= 'F') {
                   if(i < 3) tb.addByte((byte) x);
                   else cp = x;
@@ -372,7 +372,7 @@ public final class JsonParser extends InputParser {
 
       if(hi != 0) {
         if(cp >= 0xDC00 && cp <= 0xDFFF)
-          cp = ((hi - 0xD800) << 10) + (cp - 0xDC00) + 0x10000;
+          cp = (hi - 0xD800 << 10) + cp - 0xDC00 + 0x10000;
         else tb.add(hi);
         hi = 0;
       }

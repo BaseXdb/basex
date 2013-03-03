@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  */
 public final class QueryException extends Exception {
   /** Stack. */
-  private ArrayList<InputInfo> stack = new ArrayList<InputInfo>();
+  private final ArrayList<InputInfo> stack = new ArrayList<InputInfo>();
   /** Error QName. */
   private final QNm name;
   /** Error value. */
