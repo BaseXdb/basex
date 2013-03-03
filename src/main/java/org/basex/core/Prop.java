@@ -122,9 +122,9 @@ public final class Prop extends AProp {
 
   /** Maximum number of text/attribute index entries
    *  to keep in memory during index creation. */
-  public static final Object[] INDEXSLICESIZE = { "INDEXSLICESIZE", -1 };
+  public static final Object[] INDEXSPLITSIZE = { "INDEXSPLITSIZE", 0 };
   /** Maximum number of fulltext index entries to keep in memory during index creation. */
-  public static final Object[] FTINDEXSLICESIZE = { "FTINDEXSLICESIZE", -1 };
+  public static final Object[] FTINDEXSPLITSIZE = { "FTINDEXSPLITSIZE", 0 };
 
   /** Maximum length of index entries. */
   public static final Object[] MAXLEN = { "MAXLEN", 96 };
@@ -196,8 +196,6 @@ public final class Prop extends AProp {
 
   // Other
 
-  /** Hidden: garbage collecting mode. */
-  public static final Object[] SINGLEGC = { "SINGLEGC", false };
   /** Hidden: flag for tail-call optimization. */
   public static final Object[] TAILCALLS = { "TAILCALLS", 42 };
   /** Hidden: maximum number of hits to be displayed in the GUI (will be overwritten). */

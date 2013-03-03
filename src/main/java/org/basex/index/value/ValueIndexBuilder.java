@@ -39,8 +39,6 @@ public final class ValueIndexBuilder extends IndexBuilder {
   private IndexTree index = new IndexTree();
   /** Index type (attributes/texts). */
   private final boolean text;
-  /** Counter variable for check against data.meta.indSliceSize. */
-  private int currentSliceSize;
 
   /**
    * Constructor.
@@ -48,7 +46,7 @@ public final class ValueIndexBuilder extends IndexBuilder {
    * @param txt value type (text/attribute)
    */
   public ValueIndexBuilder(final Data d, final boolean txt) {
-    super(d);
+    super(d, d.meta.prop.num(Prop.INDEXSPLITSIZE));
     text = txt;
   }
 
@@ -60,69 +58,39 @@ public final class ValueIndexBuilder extends IndexBuilder {
     final Performance perf = Prop.debug ? new Performance() : null;
     Util.debug(det());
 
-    final String f = text ? DATATXT : DATAATV;
     final int k = text ? Data.TEXT : Data.ATTR;
-    currentSliceSize = 0;
 
     for(pre = 0; pre < size; ++pre) {
       if((pre & 0x0FFF) == 0) {
         check();
         // check if main memory is exhausted
-        if(temporaryFlushToDiskNeeded()) {
-          write(f + csize++, false);
+        if(split()) {
+          writeIndex(true);
           index = new IndexTree();
-          memoryCleanupAfterFlushToDisk();
+          finishSplit();
         }
       }
       // skip too long values
       if(data.kind(pre) == k && data.textLen(pre, text) <= data.meta.maxlen) {
         index.index(data.text(pre, text), data.meta.updindex ? data.id(pre) : pre);
-        currentSliceSize++;
+        count++;
       }
     }
 
-    Util.debug("Finalizing Index " + data.meta.name + " with " + (csize + 1) +
-        " slices, current slice size = " + currentSliceSize);
-    if(merge) {
-      write(f + csize++, false);
+    writeIndex(splits > 0);
+    // merge partial index structures
+    if(splits > 1) {
       index = null;
-      if(!singlegc) Performance.gc(1);
+      Performance.gc(1);
       merge();
-    } else {
-      write(f, true);
     }
 
     if(text) data.meta.textindex = true;
     else data.meta.attrindex = true;
 
-    Util.memory(perf);
+    finishIndex(perf);
     return data.meta.updindex ?
         new UpdatableDiskValues(data, text) : new DiskValues(data, text);
-  }
-
-  /**
-   * Decides whether in-memory temporary index structures are so large
-   * that we must flush them to disk before continuing.
-   * @return true if structures shall be flushed to disk
-   * @throws IOException I/O Exception
-   */
-  private boolean temporaryFlushToDiskNeeded() throws IOException {
-    if (data.meta.indSliceSize > 0) {
-      merge = true;
-      return currentSliceSize >= data.meta.indSliceSize;
-    }
-    return memFull();
-  }
-
-  /**
-   * Performs memory cleanup after flusing to disk, if necessary.
-   */
-  private void memoryCleanupAfterFlushToDisk() {
-    if (data.meta.indSliceSize > 0) {
-      currentSliceSize = 0;
-    } else {
-      Performance.gc(singlegc ? 1 : 2);
-    }
   }
 
   /**
@@ -138,8 +106,8 @@ public final class ValueIndexBuilder extends IndexBuilder {
     // initialize cached index iterators
     final IntList ml = new IntList();
     final IntList il = new IntList();
-    final ValueIndexMerger[] vm = new ValueIndexMerger[csize];
-    for(int i = 0; i < csize; ++i) vm[i] = new ValueIndexMerger(data, text, i);
+    final ValueIndexMerger[] vm = new ValueIndexMerger[splits];
+    for(int i = 0; i < splits; ++i) vm[i] = new ValueIndexMerger(data, text, i);
     int sz = 0;
 
     // parse through all values
@@ -148,12 +116,12 @@ public final class ValueIndexBuilder extends IndexBuilder {
 
       // find first index which is not completely parsed yet
       int min = -1;
-      while(++min < csize && vm[min].values.length == 0);
-      if(min == csize) break;
+      while(++min < splits && vm[min].values.length == 0);
+      if(min == splits) break;
 
       // find index entry with smallest key
       ml.reset();
-      for(int i = min; i < csize; ++i) {
+      for(int i = min; i < splits; ++i) {
         if(vm[i].values.length == 0) continue;
         final int d = diff(vm[min].key, vm[i].key);
         if(d < 0) continue;
@@ -191,13 +159,13 @@ public final class ValueIndexBuilder extends IndexBuilder {
   }
 
   /**
-   * Writes the current value tree to disk.
-   * @param name name
-   * @param all writes the complete tree
+   * Writes the current index tree to disk.
+   * @param partial partial flag
    * @throws IOException I/O exception
    */
-  private void write(final String name, final boolean all) throws IOException {
+  private void writeIndex(final boolean partial) throws IOException {
     // write id arrays and references
+    final String name = (text ? DATATXT : DATAATV) + (partial ? splits : "");
     final DataOutput outL = new DataOutput(data.meta.dbfile(name + 'l'));
     final DataOutput outR = new DataOutput(data.meta.dbfile(name + 'r'));
     outL.write4(index.size());
@@ -208,29 +176,31 @@ public final class ValueIndexBuilder extends IndexBuilder {
       final byte[] values = index.values.get(index.next());
       final int vs = Num.size(values);
 
-      if(all) {
+      if(partial) {
+        // write temporary structure to disk: number of entries, absolute values
+        outR.write5(outL.size());
+        outL.write(values, 0, vs);
+      } else {
         // cache and sort all values
         for(int ip = 4; ip < vs; ip += Num.length(values, ip)) {
           il.add(Num.get(values, ip));
         }
         // write final structure to disk
         write(outL, outR, il);
-      } else {
-        // write temporary structure to disk: number of entries, absolute values
-        outR.write5(outL.size());
-        outL.write(values, 0, vs);
       }
     }
     outL.close();
     outR.close();
 
     // temporarily write texts
-    if(!all) {
+    if(partial) {
       final DataOutput outT = new DataOutput(data.meta.dbfile(name + 't'));
       index.init();
       while(index.more()) outT.writeToken(index.keys.get(index.next()));
       outT.close();
     }
+    // increase split counter
+    splits++;
   }
 
   /**

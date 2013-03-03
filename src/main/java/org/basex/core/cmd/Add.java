@@ -101,7 +101,7 @@ public final class Add extends ACreate {
       final Runtime rt = Runtime.getRuntime();
       final long max = rt.maxMemory();
       if(fl > (max - rt.freeMemory()) / 2) {
-        Performance.gc(prop.is(Prop.SINGLEGC) ? 1 : 2);
+        Performance.gc(2);
         large = fl > (max - rt.freeMemory()) / 2;
       }
     }

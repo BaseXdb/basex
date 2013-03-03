@@ -29,8 +29,6 @@ public final class FTBuilder extends IndexBuilder {
   int pos;
   /** Number of indexed tokens. */
   private long ntok;
-  /** Counter variable for check against data.meta.ftIndSliceSize. */
-  private int currentSliceSize;
 
   /**
    * Constructor.
@@ -38,7 +36,7 @@ public final class FTBuilder extends IndexBuilder {
    * @throws IOException IOException
    */
   public FTBuilder(final Data d) throws IOException {
-    super(d);
+    super(d, d.meta.prop.num(Prop.FTINDEXSPLITSIZE));
     tree = new FTIndexTrees(d.meta.maxlen);
 
     final Prop prop = d.meta.prop;
@@ -67,7 +65,6 @@ public final class FTBuilder extends IndexBuilder {
 
     final Performance perf = Prop.debug ? new Performance() : null;
     Util.debug(det());
-    currentSliceSize = 0;
 
     for(pre = 0; pre < size; ++pre) {
       if((pre & 0xFFFF) == 0) check();
@@ -84,47 +81,22 @@ public final class FTBuilder extends IndexBuilder {
         // skip too long and stopword tokens
         if(tok.length <= data.meta.maxlen && (sw.isEmpty() || !sw.contains(tok))) {
           // check if main memory is exhausted
-          if((ntok++ & 0xFFF) == 0 && temporaryFlushToDiskNeeded()) {
-            writeIndex(csize++);
-            memoryCleanupAfterFlushToDisk();
+          if((ntok++ & 0x0FFF) == 0 && split()) {
+            writeIndex(true);
+            finishSplit();
           }
-          index(tok);
+          tree.index(tok, pre, pos, splits);
+          count++;
         }
       }
     }
 
-    // write tokens
-    write();
+    // finalize partial or all index structures
+    write(splits > 0);
 
     data.meta.ftxtindex = true;
-    Util.memory(perf);
+    finishIndex(perf);
   }
-
-  /**
-   * Decides whether in-memory temporary index structures are so large
-   * that we must flush them to disk before continuing.
-   * @return true if structures shall be flushed to disk
-   * @throws IOException I/O Exception
-   */
-  private boolean temporaryFlushToDiskNeeded() throws IOException {
-    if (data.meta.ftIndSliceSize > 0) {
-      merge = true;
-      return currentSliceSize >= data.meta.ftIndSliceSize;
-    }
-    return memFull();
-  }
-
-  /**
-   * Performs memory cleanup after flusing to disk, if necessary.
-   */
-  private void memoryCleanupAfterFlushToDisk() {
-    if (data.meta.ftIndSliceSize > 0) {
-      currentSliceSize = 0;
-    } else {
-      Performance.gc(singlegc ? 1 : 2);
-    }
-  }
-
 
   @Override
   public FTIndex build() throws IOException {
@@ -133,23 +105,13 @@ public final class FTBuilder extends IndexBuilder {
   }
 
   /**
-   * Indexes a single token.
-   * @param tok token to be indexed
-   */
-  void index(final byte[] tok) {
-    tree.index(tok, pre, pos, csize);
-    currentSliceSize++;
-  }
-
-  /**
    * Writes the index data to disk.
+   * @param partial write partial index
    * @throws IOException I/O exception
    */
-  public void write() throws IOException {
-    writeIndex(csize++);
-    Util.debug("Finalizing FTIndex " + data.meta.name + " with " + csize +
-        " slices, current slice size = " + currentSliceSize);
-    if(!merge) return;
+  private void write(final boolean partial) throws IOException {
+    writeIndex(partial);
+    if(!partial) return;
 
     // merges temporary index files
     final DataOutput outX = new DataOutput(data.meta.dbfile(DATAFTX + 'x'));
@@ -158,8 +120,8 @@ public final class FTBuilder extends IndexBuilder {
     final IntList ind = new IntList();
 
     // open all temporary sorted lists
-    final FTList[] v = new FTList[csize];
-    for(int b = 0; b < csize; ++b) v[b] = new FTList(data, b);
+    final FTList[] v = new FTList[splits];
+    for(int b = 0; b < splits; ++b) v[b] = new FTList(data, b);
 
     final IntList il = new IntList();
     while(check(v)) {
@@ -167,7 +129,7 @@ public final class FTBuilder extends IndexBuilder {
       il.reset();
       il.add(m);
       // find next token to write on disk
-      for(int i = 0; i < csize; ++i) {
+      for(int i = 0; i < splits; ++i) {
         if(m == i || v[i].tok.length == 0) continue;
         final int l = v[i].tok.length - v[m].tok.length;
         final int d = diff(v[m].tok, v[i].tok);
@@ -222,21 +184,21 @@ public final class FTBuilder extends IndexBuilder {
 
   /**
    * Writes the current index to disk.
-   * @param cs current file pointer
+   * @param partial partial flag
    * @throws IOException I/O exception
    */
-  protected void writeIndex(final int cs) throws IOException {
-    final String s = DATAFTX + (merge ? cs : "");
-    final DataOutput outX = new DataOutput(data.meta.dbfile(s + 'x'));
-    final DataOutput outY = new DataOutput(data.meta.dbfile(s + 'y'));
-    final DataOutput outZ = new DataOutput(data.meta.dbfile(s + 'z'));
+  private void writeIndex(final boolean partial) throws IOException {
+    final String name = DATAFTX + (partial ? splits : "");
+    final DataOutput outX = new DataOutput(data.meta.dbfile(name + 'x'));
+    final DataOutput outY = new DataOutput(data.meta.dbfile(name + 'y'));
+    final DataOutput outZ = new DataOutput(data.meta.dbfile(name + 'z'));
 
     final IntList ind = new IntList();
     long dr = 0;
     int tr = 0;
     int j = 0;
     tree.init();
-    while(tree.more(cs)) {
+    while(tree.more(splits)) {
       final FTIndexTree t = tree.nextTree();
       t.next();
       final byte[] key = t.nextTok();
@@ -264,6 +226,9 @@ public final class FTBuilder extends IndexBuilder {
     outY.close();
     outZ.close();
     tree.initFT();
+
+    // increase split counter
+    splits++;
   }
 
   /**
