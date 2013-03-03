@@ -60,10 +60,11 @@ public final class HTTPContext {
    * Constructor.
    * @param rq request
    * @param rs response
+   * @param servlet calling servlet instance
    * @throws IOException I/O exception
    */
-  public HTTPContext(final HttpServletRequest rq, final HttpServletResponse rs)
-      throws IOException {
+  public HTTPContext(final HttpServletRequest rq, final HttpServletResponse rs,
+      final BaseXServlet servlet) throws IOException {
 
     req = rq;
     res = rs;
@@ -80,10 +81,11 @@ public final class HTTPContext {
     segments = toSegments(req.getPathInfo());
 
     final MainProp mprop = context().mprop;
-    user = mprop.get(MainProp.USER);
-    pass = mprop.get(MainProp.PASSWORD);
+    // adopt servlet-specific credentials or use global ones
+    user = servlet.user != null ? servlet.user : mprop.get(MainProp.USER);
+    pass = servlet.pass != null ? servlet.pass : mprop.get(MainProp.PASSWORD);
 
-    // set session-specific credentials
+    // overwrite credentials with session-specific data
     final String auth = req.getHeader(AUTHORIZATION);
     if(auth != null) {
       final String[] values = auth.split(" ");

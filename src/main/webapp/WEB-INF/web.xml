@@ -75,6 +75,16 @@
     <servlet-name>WebDAV</servlet-name>
     <servlet-class>org.basex.http.webdav.WebDAVServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
+    <!-- service-specific credentials
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value/>
+    </init-param>
+    <init-param>
+      <param-name>org.basex.password</param-name>
+      <param-value/>
+    </init-param>
+    -->
   </servlet>
   <servlet-mapping>
     <servlet-name>WebDAV</servlet-name>
@@ -86,6 +96,16 @@
     <servlet-name>REST</servlet-name>
     <servlet-class>org.basex.http.rest.RESTServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
+    <!-- service-specific credentials
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value/>
+    </init-param>
+    <init-param>
+      <param-name>org.basex.password</param-name>
+      <param-value/>
+    </init-param>
+    -->
   </servlet>
   <servlet-mapping>
     <servlet-name>REST</servlet-name>
@@ -97,6 +117,16 @@
     <servlet-name>RESTXQ</servlet-name>
     <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
+    <!-- service-specific credentials
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value/>
+    </init-param>
+    <init-param>
+      <param-name>org.basex.password</param-name>
+      <param-value/>
+    </init-param>
+    -->
   </servlet>
   <servlet-mapping>
     <servlet-name>RESTXQ</servlet-name>
@@ -110,6 +140,14 @@
     <servlet-name>Direct</servlet-name>
     <servlet-class>org.basex.http.direct.DirectServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value/>
+    </init-param>
+    <init-param>
+      <param-name>org.basex.password</param-name>
+      <param-value/>
+    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>Direct</servlet-name>
