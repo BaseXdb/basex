@@ -131,7 +131,7 @@ public abstract class Progress {
    * @return {@code false} if databases cannot be statically determined
    */
   @SuppressWarnings("unused")
-  protected boolean databases(final StringList db) {
+  public boolean databases(final StringList db) {
     return false;
   }
 

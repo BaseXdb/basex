@@ -55,8 +55,8 @@ public final class ShowUsers extends Command {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
-    return true;
+  public boolean databases(final StringList db) {
+    return null == args[0] || super.databases(db.add(DBLocking.ADMIN), 0);
   }
 
   @Override

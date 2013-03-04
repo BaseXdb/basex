@@ -50,7 +50,7 @@ public abstract class ACreate extends Command {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
+  public boolean databases(final StringList db) {
     // default implementation for commands accessing (exclusively) the opened database
     db.add("");
     return true;

@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Restore extends Command {
+public class Restore extends ABackup {
   /** States if current database was closed. */
   private boolean closed;
 
@@ -26,7 +26,7 @@ public final class Restore extends Command {
    * @param arg optional argument
    */
   public Restore(final String arg) {
-    super(Perm.CREATE, arg);
+    super(arg);
   }
 
   @Override
@@ -56,9 +56,11 @@ public final class Restore extends Command {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
-    db.add(args[0]);
-    return true;
+  public boolean databases(final StringList db) {
+    String name = args[0];
+    // Not sure whether database or backup name is provided, lock both
+    String dbName = Pattern.compile(DateTime.PATTERN + '$').split(name)[0];
+    return super.databases(db.add(name).add(dbName));
   }
 
   /**

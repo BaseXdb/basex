@@ -67,7 +67,7 @@ public final class InfoStorage extends AQuery {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
+  public boolean databases(final StringList db) {
     db.add("");
     return true;
   }

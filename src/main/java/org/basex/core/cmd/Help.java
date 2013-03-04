@@ -38,7 +38,7 @@ public final class Help extends Command {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
+  public boolean databases(final StringList db) {
     return true;
   }
 }

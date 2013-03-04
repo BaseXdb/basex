@@ -44,7 +44,7 @@ public final class Open extends Command {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
+  public boolean databases(final StringList db) {
     db.add("").add(args[0]);
     return true;
   }

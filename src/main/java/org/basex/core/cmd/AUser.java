@@ -81,6 +81,12 @@ abstract class AUser extends Command {
     return ok;
   }
 
+  @Override
+  public boolean databases(final StringList db) {
+    db.add(DBLocking.ADMIN);
+    return true;
+  }
+
   /**
    * Checks if the specified string is a valid MD5 hash value.
    * @param md5 string to be checked
