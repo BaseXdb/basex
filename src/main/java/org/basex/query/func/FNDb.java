@@ -760,17 +760,7 @@ public final class FNDb extends StandardFunc {
    */
   private Item output(final QueryContext ctx) throws QueryException {
     if(ctx.updates.mod instanceof TransformModifier) BASX_DBTRANSFORM.thrw(info);
-
-    final Iter ir = ctx.iter(expr[0]);
-    for(Item it; (it = ir.next()) != null;) {
-      final Data d = it.data();
-      if(d != null && !d.inMemory()) {
-        it = ((ANode) it).dbCopy(ctx.context.prop);
-      } else if(it instanceof FItem) {
-        FIVALUE.thrw(info, it);
-      }
-      ctx.output.add(it);
-    }
+    cache(ctx.iter(expr[0]), ctx.output, ctx);
     return null;
   }
 

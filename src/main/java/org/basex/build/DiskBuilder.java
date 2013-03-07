@@ -88,7 +88,7 @@ public final class DiskBuilder extends Builder {
       final Performance perf = Prop.debug ? new Performance() : null;
       Util.debug(tit() + DOTS);
       parse();
-      Util.memory(perf);
+      if(Prop.debug) Util.errln(" " + perf + " (" + Performance.getMemory() + ')');
 
     } finally {
       close();

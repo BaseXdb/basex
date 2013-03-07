@@ -111,9 +111,11 @@ public enum Err {
   /** BXJS0001. */
   BXJS_PARSE(BXJS, 1, "JSON parser (%:%): %."),
   /** BXJS0001. */
+  BXJS_PARSE_CFG(BXJS, 1, "JSON parser config: %."),
+  /** BXJS0001. */
   BXJS_PARSEML(BXJS, 1, "JsonML parser: %."),
   /** BXJS0002. */
-  BXJS_SER(BXJS, 1, "JSON serialization: %."),
+  BXJS_SER(BXJS, 2, "JSON serialization: %."),
 
   // Process module
 

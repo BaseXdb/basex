@@ -52,7 +52,7 @@ final class FTIndexTrees {
 
   /**
    * Checks for more tokens.
-   * @param cf current file
+   * @param cf current index split counter
    * @return boolean more
    */
   boolean more(final int cf) {

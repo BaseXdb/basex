@@ -60,12 +60,13 @@ final class FTIndexTree extends IndexTree {
 
   /**
    * Checks for more tokens.
-   * @param cf current file
+   * @param cf current index split counter
    * @return boolean more
    */
   boolean more(final int cf) {
     while(more()) {
       lcn = cn;
+      // write compressed representation if the index has already been split
       pft = cf > 0 ? maps.value(Num.num(lcn)) : lcn;
       if(pft > -1) return true;
       next();

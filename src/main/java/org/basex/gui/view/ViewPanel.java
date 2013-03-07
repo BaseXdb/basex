@@ -51,8 +51,8 @@ final class ViewPanel extends BaseXBack implements ViewLayout {
   }
 
   @Override
-  public String layoutString() {
-    return view.getName() + ' ';
+  public String layoutString(final boolean all) {
+    return all || isVisible() ? view.getName() + ' ' : "";
   }
 
   @Override

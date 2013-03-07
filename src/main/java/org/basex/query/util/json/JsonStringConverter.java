@@ -28,13 +28,14 @@ public final class JsonStringConverter implements JsonHandler {
    * Writes a pretty-printed representation of the given JSON string to the given builder.
    * @param json JSON string
    * @param spec JSON spec for parsing
+   * @param un unescape flag
    * @param tb token builder
    * @return the token builder
    * @throws QueryException parse exception
    */
   public static TokenBuilder print(final String json, final Spec spec,
-      final TokenBuilder tb) throws QueryException {
-    JsonParser.parse(json, spec, new JsonStringConverter(tb), null);
+      final boolean un, final TokenBuilder tb) throws QueryException {
+    JsonParser.parse(json, spec, un, new JsonStringConverter(tb), null);
     return tb;
   }
 
@@ -137,7 +138,7 @@ public final class JsonStringConverter implements JsonHandler {
           if(Character.isISOControl(cp)) {
             tb.addByte((byte) '\\').addByte((byte) 'u');
             for(int j = 4; --j >= 0;) {
-              final int hex = (cp >>> (j << 2)) & 0xF;
+              final int hex = cp >>> (j << 2) & 0xF;
               tb.addByte((byte) (hex + (hex > 9 ? 'A' - 10 : '0')));
             }
           } else {

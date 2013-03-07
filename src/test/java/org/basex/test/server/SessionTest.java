@@ -295,24 +295,6 @@ public abstract class SessionTest extends SandboxTest {
     assertFalse("No result was expected.", query.more());
   }
 
-  /** Calls the iterator more often than expected.
-   * @throws IOException expected exception*/
-  @Test(expected = BaseXException.class)
-  public void alreadyExecuted1() throws IOException {
-    final Query q = session.query("()");
-    assertFalse("No result was expected.", q.more());
-    q.next();
-  }
-
-  /** Calls the iterator more often than expected.
-   * @throws IOException expected exception*/
-  @Test(expected = BaseXException.class)
-  public void alreadyExecuted2() throws IOException {
-    final Query q = session.query("()");
-    q.execute();
-    q.more();
-  }
-
   /** Runs a query and retrieves multiple results as string.
    * @throws IOException I/O exception */
   @Test
@@ -427,8 +409,12 @@ public abstract class SessionTest extends SandboxTest {
   @Test
   public void queryBind() throws IOException {
     final Query query = session.query("declare variable $a external; $a");
+    query.bind("$a", "4");
+    assertEqual("4", query.execute());
     query.bind("$a", "5");
     assertEqual("5", query.next());
+    query.bind("$a", "6");
+    assertEqual("6", query.next());
     query.close();
   }
 
@@ -478,7 +464,6 @@ public abstract class SessionTest extends SandboxTest {
     query.bind("$a", "<a>XML</a>", "document-node()");
     assertEqual("XML", query.execute());
   }
-
 
   /** Runs a query with a bound context item.
    * @throws IOException I/O exception */

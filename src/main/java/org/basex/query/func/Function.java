@@ -812,7 +812,7 @@ public enum Function {
   /* FNJson functions. */
 
   /** XQuery function. */
-  _JSON_PARSE(FNJson.class, "parse(string)", NOD, STR),
+  _JSON_PARSE(FNJson.class, "parse(string[,config])", ITEM_ZO, 1, STR, MAP_O),
   /** XQuery function. */
   _JSON_PARSE_ML(FNJson.class, "parse-ml(string)", NOD, STR),
   /** XQuery function. */

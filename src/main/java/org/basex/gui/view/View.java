@@ -70,13 +70,13 @@ public abstract class View extends BaseXPanel {
   public abstract void refreshUpdate();
 
   /**
-   * Tests if this view is currently visible.
+   * Tests if this view is currently marked as visible.
    * @return result of check
    */
   public abstract boolean visible();
 
   /**
-   * Sets the visibility of the view.
+   * Sets a flag denoting the visibility of the view.
    * @param v visibility flag
    */
   public abstract void visible(final boolean v);

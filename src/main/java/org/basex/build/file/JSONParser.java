@@ -9,7 +9,11 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.util.json.*;
+import org.basex.query.util.json.JsonParser.Spec;
 import org.basex.query.value.node.*;
+import org.basex.util.*;
+
+import static org.basex.util.Token.*;
 
 /**
  * This class parses files in the JSON format
@@ -68,8 +72,14 @@ public final class JSONParser extends XMLParser {
   private static IO toXML(final IO io, final String options) throws IOException {
     // set parser properties
     final ParserProp props = new ParserProp(options);
-    final boolean jsonml = props.is(ParserProp.JSONML);
-    final String encoding = props.get(ParserProp.ENCODING);
+    final boolean jsonml = props.is(ParserProp.JSONML),
+        unescape = props.is(ParserProp.JSON_UNESC);
+    final String encoding = props.get(ParserProp.ENCODING),
+        spec = props.get(ParserProp.JSON_SPEC);
+
+    Spec sp = Spec.RFC4627;
+    for(final Spec s : Spec.values())
+      if(Token.string(s.desc).equalsIgnoreCase(spec)) sp = s;
 
     // parse input, using specified encoding
     final byte[] content = new NewlineInput(io).encoding(encoding).content();
@@ -77,9 +87,9 @@ public final class JSONParser extends XMLParser {
     // parse input and convert to XML node
     final ANode node;
     try {
-      final XMLConverter conv = jsonml ?
-          new JsonMLConverter(null) : new JsonCGConverter(null);
-      node = conv.parse(content);
+      final JsonXMLConverter conv = jsonml ? new JsonMLConverter(null) :
+        new JsonCGConverter(sp, unescape, null);
+      node = conv.convert(string(content));
 
       // create XML input container from serialized node
       final IOContent xml = new IOContent(node.serialize().toArray());

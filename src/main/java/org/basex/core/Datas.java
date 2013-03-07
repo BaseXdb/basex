@@ -5,7 +5,7 @@ import java.util.*;
 import org.basex.data.*;
 
 /**
- * This class organizes all currently opened database.
+ * This class organizes all currently opened databases.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

@@ -126,9 +126,10 @@ public final class FNClient extends StandardFunc {
   private Value query(final QueryContext ctx) throws QueryException {
     final ClientSession cs = session(ctx, false);
     final String query = Token.string(checkStr(expr[1], ctx));
+    final ValueBuilder vb = new ValueBuilder();
+    ClientQuery cq = null;
     try {
-      final ValueBuilder vb = new ValueBuilder();
-      final ClientQuery cq = cs.query(query);
+      cq = cs.query(query);
       // bind variables and context item
       for(final Map.Entry<String, Value> it : bindings(2, ctx).entrySet()) {
         final String k = it.getKey();
@@ -151,6 +152,8 @@ public final class FNClient extends StandardFunc {
       throw BXCL_QUERY.thrw(info, ex);
     } catch(final IOException ex) {
       throw BXCL_COMM.thrw(info, ex);
+    } finally {
+      if(cq != null) try { cq.close(); } catch(final IOException ex) { }
     }
   }
 

@@ -11,8 +11,7 @@ import org.basex.io.out.*;
  * All data is interpreted by the {@link QueryListener}.
  *
  * @author BaseX Team 2005-12, BSD License
- * @author Rositsa Shadura
- * @author Dimitar Popov
+ * @author Christian Gruen
  */
 public class LocalQuery extends Query {
   /** Active query listener. */
@@ -32,11 +31,13 @@ public class LocalQuery extends Query {
 
   @Override
   public void bind(final String n, final Object v, final String t) throws IOException {
+    cache = null;
     ql.bind(n, v, t);
   }
 
   @Override
   public void context(final Object v, final String t) throws IOException {
+    cache = null;
     ql.context(v, t);
   }
 

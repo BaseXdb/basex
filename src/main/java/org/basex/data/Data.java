@@ -764,6 +764,7 @@ public abstract class Data {
           break;
         case ELEM:
           // add element
+          nspaces.open();
           boolean ne = false;
           if(data.nsFlag(dpre)) {
             final Atts at = data.ns(dpre);
@@ -782,7 +783,6 @@ public abstract class Data {
               }
             }
           }
-          nspaces.open();
           byte[] nm = data.name(dpre, dkind);
           elem(dis, tagindex.index(nm, null, false), data.attSize(dpre, dkind),
               data.size(dpre, dkind), nspaces.uri(nm, true), ne);

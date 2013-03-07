@@ -20,12 +20,13 @@ import org.basex.util.list.*;
 public abstract class Query {
   /** Client output stream. */
   protected OutputStream out;
+
   /** Cached results. */
   protected TokenList cache;
   /** Cached result types. */
-  protected ByteList types;
+  private ByteList types;
   /** Cache pointer. */
-  protected int pos;
+  private int pos;
 
   /**
    * Binds a value to an external variable.
@@ -121,6 +122,7 @@ public abstract class Query {
       types.add(t);
       bl.reset();
     }
+    pos = 0;
   }
 
   /**

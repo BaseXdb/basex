@@ -12,11 +12,10 @@ import org.junit.Test;
  * @author Dimitar Popov
  */
 public class FNPutTest extends AdvancedQueryTest {
-
   /** Test output URI is correctly resolved. */
   @Test
   public void resolveUri() {
-    String output = sandbox().merge("test.xml").url();
+    final String output = sandbox().merge("test.xml").url();
     query(PUT.args("<a/>", output));
   }
 }

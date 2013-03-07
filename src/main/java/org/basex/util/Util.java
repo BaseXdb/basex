@@ -183,15 +183,6 @@ public final class Util {
   }
 
   /**
-   * Prints performance information if the {@link Prop#debug} flag is set.
-   * @param perf performance reference
-   */
-  public static void memory(final Performance perf) {
-    if(!Prop.debug) return;
-    errln(" " + perf + " (" + Performance.getMemory() + ')');
-  }
-
-  /**
    * Returns a string and replaces all % characters by the specified extensions
    * (see {@link TokenBuilder#addExt} for details).
    * @param str string to be extended

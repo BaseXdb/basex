@@ -120,6 +120,12 @@ public final class Prop extends AProp {
   /** Flag for creating a full-text index. */
   public static final Object[] FTINDEX = { "FTINDEX", false };
 
+  /** Maximum number of text/attribute index entries
+   *  to keep in memory during index creation. */
+  public static final Object[] INDEXSPLITSIZE = { "INDEXSPLITSIZE", 0 };
+  /** Maximum number of fulltext index entries to keep in memory during index creation. */
+  public static final Object[] FTINDEXSPLITSIZE = { "FTINDEXSPLITSIZE", 0 };
+
   /** Maximum length of index entries. */
   public static final Object[] MAXLEN = { "MAXLEN", 96 };
   /** Maximum number of name categories. */
@@ -190,8 +196,6 @@ public final class Prop extends AProp {
 
   // Other
 
-  /** Hidden: garbage collecting mode. */
-  public static final Object[] SINGLEGC = { "SINGLEGC", false };
   /** Hidden: flag for tail-call optimization. */
   public static final Object[] TAILCALLS = { "TAILCALLS", 42 };
   /** Hidden: flag for the size limit on inlineable functions. */

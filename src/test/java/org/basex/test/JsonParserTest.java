@@ -71,17 +71,24 @@ public class JsonParserTest {
     parse("\"test\"", Spec.ECMA_262);
     parse("\"ä\"", Spec.ECMA_262);
     parse("\"\uD834\uDD1E\"", Spec.ECMA_262);
+    parse("\"\uD834\"", Spec.ECMA_262);
     parse("\"\uD853\uDF5C\"", Spec.ECMA_262);
     parse("\"\uD853\uFFFF\"", Spec.ECMA_262);
     parse("\"\uFFFF\"", Spec.ECMA_262);
     parse("\"\uD853a\"", Spec.ECMA_262);
     parse("\"\\n\"", Spec.ECMA_262);
     parse("\"\\b\\f\\t\\r\\n\"", Spec.ECMA_262);
+    unescape("\"\\b\\f\\t\\r\\n\"", "\"\\\\b\\\\f\\\\t\\\\r\\\\n\"");
     parse("\"\\u0000\\u001F\"", Spec.ECMA_262);
     parse("\"\\\"\\\\\"", Spec.ECMA_262);
     parse("\"\\u000a\"", "\"\\n\"", Spec.ECMA_262);
     parse("\"\\u000A\"", "\"\\n\"", Spec.ECMA_262);
     parse("\"\n\"", "\"\\n\"", Spec.LIBERAL);
+    unescape("\"\\uD853\\uDF5C\"", "\"\\\\uD853\\\\uDF5C\"");
+    unescape("\"\\uD853asdf\"", "\"\\\\uD853asdf\"");
+    unescape("\"\\uD853\"", "\"\\\\uD853\"");
+    unescape("\"\uD853\\t\"", "\"\uD853\\\\t\"");
+    unescape("\"\uD853\\uD853\\t\"", "\"\uD853\\\\uD853\\\\t\"");
 
     error("\"\\u0A", Spec.ECMA_262);
     error("\"\\uXX0A\"", Spec.ECMA_262);
@@ -99,23 +106,23 @@ public class JsonParserTest {
    * @throws QueryException query exception
    */
   @Test public void arrayTest() throws QueryException {
-    parse("[ ]", Spec.RFC_4627);
-    parse("[]", "[ ]", Spec.RFC_4627);
-    parse("[[[[[[42], {}]]]]]", "[ [ [ [ [ [ 42 ], { } ] ] ] ] ]", Spec.RFC_4627);
-    parse("[ 1, 2, 3, 4, 5, 6, 7, 8 ]", Spec.RFC_4627);
+    parse("[ ]", Spec.RFC4627);
+    parse("[]", "[ ]", Spec.RFC4627);
+    parse("[[[[[[42], {}]]]]]", "[ [ [ [ [ [ 42 ], { } ] ] ] ] ]", Spec.RFC4627);
+    parse("[ 1, 2, 3, 4, 5, 6, 7, 8 ]", Spec.RFC4627);
     parse("[1,2,3,]", "[ 1, 2, 3 ]", Spec.LIBERAL);
 
-    error("[1,2,3,]", Spec.RFC_4627);
-    error("[,42]", Spec.RFC_4627);
-    error("[1, ", Spec.RFC_4627);
+    error("[1,2,3,]", Spec.RFC4627);
+    error("[,42]", Spec.RFC4627);
+    error("[1, ", Spec.RFC4627);
   }
 
   /** Tests for the restrictions in RFC 4627. */
   @Test public void rfc4627() {
-    error("\"test\"", Spec.RFC_4627);
-    error("123", Spec.RFC_4627);
-    error("true", Spec.RFC_4627);
-    error("null", Spec.RFC_4627);
+    error("\"test\"", Spec.RFC4627);
+    error("123", Spec.RFC4627);
+    error("true", Spec.RFC4627);
+    error("null", Spec.RFC4627);
   }
 
   /**
@@ -123,13 +130,13 @@ public class JsonParserTest {
    * @throws QueryException query exception
    */
   @Test public void objectTest() throws QueryException {
-    parse("{ }", Spec.RFC_4627);
-    parse("{ \"\": 42 }", Spec.RFC_4627);
+    parse("{ }", Spec.RFC4627);
+    parse("{ \"\": 42 }", Spec.RFC4627);
     parse("{ a : 42, b: 23 }", "{ \"a\": 42, \"b\": 23 }", Spec.LIBERAL);
     parse("{ \"a\": 1, \"b\": 2, }", "{ \"a\": 1, \"b\": 2 }", Spec.LIBERAL);
 
-    error("{ a : 42 }", Spec.RFC_4627);
-    error("{ \"a\": 42, b: 23 }", Spec.RFC_4627);
+    error("{ a : 42 }", Spec.RFC4627);
+    error("{ \"a\": 42, b: 23 }", Spec.RFC4627);
   }
 
   /**
@@ -175,7 +182,7 @@ public class JsonParserTest {
   }
 
   /**
-   * checks if the given JSON string is correct and is reproduced by the parser.
+   * Checks if the given JSON string is correct and is reproduced by the parser.
    * @param json JSON string
    * @param spec specification
    * @throws QueryException parse error
@@ -185,7 +192,7 @@ public class JsonParserTest {
   }
 
   /**
-   * checks if the given JSON string is correct and produces the given output.
+   * Checks if the given JSON string is correct and produces the given output.
    * @param json JSON string
    * @param exp expected output
    * @param spec specification
@@ -194,7 +201,20 @@ public class JsonParserTest {
   private void parse(final String json, final String exp, final Spec spec)
       throws QueryException {
     tb.reset();
-    JsonStringConverter.print(json, spec, tb);
+    JsonStringConverter.print(json, spec, true, tb);
+    assertEquals(exp, tb.toString());
+  }
+
+  /**
+   * Checks if the given JSON string is correct and produces the given output with the
+   * {@code ECMA_262} spec and unescaping deactivated.
+   * @param json JSON string
+   * @param exp expected output
+   * @throws QueryException parse error
+   */
+  private void unescape(final String json, final String exp) throws QueryException {
+    tb.reset();
+    JsonStringConverter.print(json, Spec.ECMA_262, false, tb);
     assertEquals(exp, tb.toString());
   }
 }
