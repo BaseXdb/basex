@@ -9,7 +9,9 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Value comparison.
@@ -154,8 +156,8 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
 
     // swap expressions
     if(swap()) {
@@ -214,6 +216,11 @@ public final class CmpV extends Cmp {
   public CmpV invert() {
     return expr[0].size() != 1 || expr[1].size() != 1 ? this :
       new CmpV(expr[0], expr[1], op.invert(), info);
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new CmpV(expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs), op, info);
   }
 
   @Override

@@ -41,6 +41,16 @@ public final class Check extends Command {
   }
 
   @Override
+  public boolean supportsProg() {
+    return true;
+  }
+
+  @Override
+  public boolean stoppable() {
+    return true;
+  }
+
+  @Override
   protected boolean databases(final StringList db) {
     db.add("").add(new QueryInput(args[0]).io.dbname());
     return true;

@@ -285,7 +285,7 @@ final class StringParser extends CmdParser {
       try {
         final QueryParser p = new QueryParser(parser.input, null, qc);
         p.ip = parser.ip;
-        p.parse();
+        p.parseMain();
         sb.append(parser.input.substring(parser.ip, p.ip));
         parser.ip = p.ip;
       } finally {

@@ -8,7 +8,9 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Attribute constructor.
@@ -55,5 +57,10 @@ public final class CAttr extends CName {
     if(eq(cp, XML) && eq(nm.local(), ID)) val = norm(val);
 
     return new FAttr(nm, val);
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new CAttr(info, comp, name.copy(ctx, scp, vs), copyAll(ctx, scp, vs, expr));
   }
 }

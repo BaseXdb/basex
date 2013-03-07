@@ -149,7 +149,7 @@ public final class Map extends FItem {
   public Map coerceTo(final FuncType ft, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
 
-    if(!(ft instanceof MapType) || !hasType((MapType) ft)) cast(ii, ft, this);
+    if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw cast(ii, ft, this);
     return this;
   }
 

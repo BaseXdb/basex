@@ -4,11 +4,14 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 
 /**
  * FTAnd expression.
@@ -31,8 +34,9 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public FTExpr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    super.compile(ctx, scp);
     boolean not = true;
     for(final FTExpr e : expr) not &= e instanceof FTNot;
     if(not) {
@@ -141,7 +145,19 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final FTAnd copy = new FTAnd(info, Arr.copyAll(ctx, scp, vs, expr));
+    if(neg != null) copy.neg = neg.clone();
+    return copy;
+  }
+
+  @Override
   public String toString() {
     return PAR1 + toString(' ' + FTAND + ' ') + PAR2;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr);
   }
 }

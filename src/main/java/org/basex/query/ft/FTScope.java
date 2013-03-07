@@ -4,9 +4,12 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -61,6 +64,11 @@ public final class FTScope extends FTFilter {
   }
 
   @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTScope(info, expr[0].copy(ctx, scp, vs), unit, same);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(same ? SAME : DIFFERENT, unit), expr);
   }
@@ -68,5 +76,10 @@ public final class FTScope extends FTFilter {
   @Override
   public String toString() {
     return super.toString() + (same ? SAME : DIFFERENT) + ' ' + unit;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr);
   }
 }

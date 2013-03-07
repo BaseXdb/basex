@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -39,12 +38,12 @@ final class FTTokenizer {
    * Constructor.
    * @param w full-text words
    * @param o full-text options
-   * @param pr database properties
+   * @param lsr Levenshtein error
    */
-  public FTTokenizer(final FTWords w, final FTOpt o, final Prop pr) {
+  public FTTokenizer(final FTWords w, final FTOpt o, final int lsr) {
     words = w;
     opt = o;
-    lserr = pr.num(Prop.LSERROR);
+    lserr = lsr;
 
     cmp = new TokenComparator() {
       @Override
@@ -143,5 +142,14 @@ final class FTTokenizer {
     words.matches.sTokenNum++;
     words.first = false;
     return c;
+  }
+
+  /**
+   * Copies this FTTokenizer.
+   * @param ftw calling expression
+   * @return copy
+   */
+  protected FTTokenizer copy(final FTWords ftw) {
+    return new FTTokenizer(ftw, opt, lserr);
   }
 }

@@ -31,7 +31,7 @@ public final class RangeSeq extends Seq {
    * @param a ascending
    */
   private RangeSeq(final long s, final long sz, final boolean a) {
-    super(sz);
+    super(sz, AtomType.ITR);
     start = s;
     asc = a;
   }

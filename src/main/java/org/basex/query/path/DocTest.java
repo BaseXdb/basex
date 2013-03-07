@@ -24,6 +24,11 @@ public final class DocTest extends Test {
   }
 
   @Override
+  public Test copy() {
+    return new DocTest(test);
+  }
+
+  @Override
   public boolean eq(final ANode node) {
     if(node.type != NodeType.DOC) return false;
     final AxisMoreIter ai = node.children();
@@ -35,5 +40,27 @@ public final class DocTest extends Test {
     final StringBuilder sb = new StringBuilder().append(type).append('(');
     if(test != null) sb.append(test);
     return sb.append(')').toString();
+  }
+
+  @Override
+  public boolean nsSensitive() {
+    return test != null && test.nsSensitive();
+  }
+
+  @Override
+  public Test intersect(final Test other) {
+    if(other instanceof DocTest) {
+      final DocTest o = (DocTest) other;
+      if(test == null || o.test == null || test.sameAs(o.test))
+        return test != null ? this : other;
+      final Test t = test.intersect(o.test);
+      return t == null ? null : new DocTest(t);
+    } else if(other instanceof KindTest) {
+      return NodeType.DOC.instanceOf(other.type) ? this : null;
+    } else if(other instanceof InvDocTest) {
+      return this;
+    }
+
+    return null;
   }
 }

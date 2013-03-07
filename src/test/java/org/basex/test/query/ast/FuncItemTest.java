@@ -45,8 +45,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("for $sub in ('foo', 'bar')" +
         "return starts-with(?, $sub)('foobar')",
         "true false",
-        "empty(//" + Util.name(FuncItem.class) + ")",
-        "exists(//" + Util.name(InlineFunc.class) + ")"
+        "exists(//" + Util.name(PartFunc.class) + ")"
     );
   }
 
@@ -59,8 +58,8 @@ public final class FuncItemTest extends QueryPlanTest {
         "}(function($f) { 42 })",
         "42",
         // both outer inline functions are pre-compiled
-        "exists(//" + Util.name(DynamicFunc.class) + ")",
-        "every $f in outermost(//" + Util.name(DynamicFunc.class) + ")/* satisfies" +
+        "exists(//" + Util.name(DynFuncCall.class) + ")",
+        "every $f in outermost(//" + Util.name(DynFuncCall.class) + ")/* satisfies" +
         "  $f instance of element(" + Util.name(FuncItem.class) + ")"
     );
   }

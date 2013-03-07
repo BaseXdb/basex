@@ -5,8 +5,11 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * FTExtensionSelection expression.
@@ -40,6 +43,13 @@ public final class FTExtensionSelection extends FTExpr {
   }
 
   @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Pragma[] prag = pragmas.clone();
+    for(int i = 0; i < prag.length; i++) prag[i] = prag[i].copy();
+    return copyType(new FTExtensionSelection(info, prag, expr[0].copy(ctx, scp, vs)));
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), pragmas, expr);
   }
@@ -49,5 +59,10 @@ public final class FTExtensionSelection extends FTExpr {
     final StringBuilder sb = new StringBuilder();
     for(final Pragma p : pragmas) sb.append(p).append(' ');
     return sb.append(BRACE1 + ' ' + expr[0] + ' ' + BRACE2).toString();
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr);
   }
 }

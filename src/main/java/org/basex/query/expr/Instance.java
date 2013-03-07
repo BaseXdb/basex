@@ -6,7 +6,9 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Instance test.
@@ -31,14 +33,19 @@ public final class Instance extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
     return expr.isValue() ? preEval(ctx) : this;
   }
 
   @Override
   public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return Bln.get(seq.instance(ctx.value(expr)));
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Instance(info, expr.copy(ctx, scp, vs), seq);
   }
 
   @Override

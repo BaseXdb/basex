@@ -6,7 +6,9 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Except expression.
@@ -25,8 +27,8 @@ public final class Except extends Set {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
     if(expr[0].isEmpty()) return optPre(null, ctx);
 
     for(int e = 1; e < expr.length; ++e) {
@@ -37,6 +39,13 @@ public final class Except extends Set {
     }
     // results must always be sorted
     return expr.length == 1 && iterable ? expr[0] : this;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Except ex = new Except(info, copyAll(ctx, scp, vs, expr));
+    ex.iterable = iterable;
+    return copyType(ex);
   }
 
   @Override

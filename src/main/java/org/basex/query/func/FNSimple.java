@@ -108,7 +108,7 @@ public final class FNSimple extends StandardFunc {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) {
+  Expr opt(final QueryContext ctx) throws QueryException {
     if(expr.length == 0) return this;
     final Expr e = expr[0];
 
@@ -138,7 +138,7 @@ public final class FNSimple extends StandardFunc {
           return c == e ? this : c;
         } else if(e.isFunction(Function.NOT)) {
           // simplify: not(not(A)) -> boolean(A)
-          return compBln(((StandardFunc) e).expr[0]);
+          return compBln(((StandardFunc) e).expr[0], info);
         } else {
           // simplify, e.g.: not(boolean(A)) -> not(A)
           expr[0] = e.compEbv(ctx);

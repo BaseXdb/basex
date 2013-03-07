@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.var.*;
+import org.basex.util.hash.*;
 
 /**
  * Iterative filter expression with numeric predicates.
@@ -105,5 +107,20 @@ final class IterPosFilter extends Filter {
         }
       }
     };
+  }
+
+  @Override
+  public Filter copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Filter f = new CachedFilter(info, root == null ? null : root.copy(ctx, scp, vs),
+        Arr.copyAll(ctx, scp, vs, preds));
+    return copy(new IterPosFilter(f, off));
+  }
+
+  @Override
+  public Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
+      throws QueryException {
+    // [LW] should be fixed
+    return ((Filter) new CachedFilter(info, root, preds).copy(ctx, scp)
+        ).addPred(ctx, scp, p);
   }
 }

@@ -7,7 +7,9 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Unary expression.
@@ -31,8 +33,8 @@ public final class Unary extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
     type = expr.type();
     if(!type.type.isNumber()) {
       // expression will always yield a number, empty sequence or error
@@ -58,6 +60,11 @@ public final class Unary extends Single {
       case DEC: return Dec.get(it.dec(info).negate());
       default:  return Int.get(-it.itr(info));
     }
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return copyType(new Unary(info, expr.copy(ctx, scp, vs), minus));
   }
 
   @Override

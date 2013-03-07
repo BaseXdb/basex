@@ -9,7 +9,9 @@ import org.basex.query.iter.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Delete expression.
@@ -39,6 +41,11 @@ public final class Delete extends Update {
       ctx.updates.add(new DeleteNode(dbn.pre, dbn.data, info), ctx);
     }
     return null;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Delete(info, expr[0].copy(ctx, scp, vs));
   }
 
   @Override

@@ -17,7 +17,9 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Standard (built-in) functions.
@@ -42,23 +44,39 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx) throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     // compile all arguments
-    super.compile(ctx);
+    super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public final Expr optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     // skip context-based or non-deterministic functions, and non-values
-    return optPre(uses(Use.CTX) || uses(Use.NDT) || !allAreValues() ? comp(ctx) :
+    return optPre(uses(Use.CTX) || uses(Use.NDT) || !allAreValues() ? opt(ctx) :
       sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);
   }
 
   /**
-   * Performs function specific compilations.
+   * Performs function specific optimizations.
    * @param ctx query context
    * @return evaluated item
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  Expr comp(final QueryContext ctx) throws QueryException {
+  Expr opt(final QueryContext ctx) throws QueryException {
     return this;
+  }
+
+  @Override
+  public
+  final StandardFunc copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
+    final Expr[] arg = new Expr[expr.length];
+    for(int i = 0; i < arg.length; i++) arg[i] = expr[i].copy(ctx, scp, vs);
+    return sig.get(info, arg);
   }
 
   /**

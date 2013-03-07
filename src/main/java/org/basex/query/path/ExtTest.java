@@ -41,6 +41,11 @@ public class ExtTest extends Test {
   }
 
   @Override
+  public Test copy() {
+    return new ExtTest(type, name, ext, strip);
+  }
+
+  @Override
   public boolean eq(final ANode node) {
     return node.type == type &&
       (name == null || node.qname(tmpq).eq(name)) &&
@@ -57,5 +62,25 @@ public class ExtTest extends Test {
     else tb.add(name.string());
     if(ext != null) tb.add(',').addExt(ext);
     return tb.toString();
+  }
+
+  @Override
+  public Test intersect(final Test other) {
+    if(other instanceof ExtTest) {
+      final ExtTest o = (ExtTest) other;
+      if(type != null && o.type != null && type != o.type) return null;
+      final NodeType nt = type != null ? type : o.type;
+      if(name != null && o.name != null && !name.eq(o.name)) return null;
+      final QNm n = name != null ? name : o.name;
+      final boolean both = ext != null && o.ext != null;
+      final Type e = ext == null ? o.ext : o.ext == null ? ext : ext.intersect(o.ext);
+      return both && e == null ? null : new ExtTest(nt, n, e, strip || o.strip);
+    } else if(other instanceof KindTest) {
+      return type.instanceOf(other.type) ? this : null;
+    } else if(other instanceof NameTest) {
+      throw Util.notexpected(other);
+    }
+
+    return null;
   }
 }

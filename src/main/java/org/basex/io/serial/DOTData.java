@@ -4,13 +4,13 @@ import static org.basex.core.Text.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.flwor.*;
 import org.basex.query.ft.*;
 import org.basex.query.func.*;
+import org.basex.query.gflwor.*;
 import org.basex.query.path.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -63,7 +63,7 @@ final class DOTData {
                 CNSpace.class, CPI.class, CTxt.class },
     { "9933CC", And.class, Or.class, Union.class, InterSect.class, Except.class },
     // pink
-    { "CC3399", If.class, Quantifier.class, Order.class, QueryText.WHR },
+    { "CC3399", If.class, Quantifier.class, QueryText.WHR },
     { "CC6699", OrderBy.class },
     // red
     { "FF3333", Arith.class, CmpG.class, CmpN.class, CmpV.class, CmpR.class,
@@ -75,15 +75,15 @@ final class DOTData {
     { "CC6600", Path.class },
     { "FF9900", Preds.class },
     // green
-    { "009900", FLWR.class, GFLWOR.class },
+    { "009900", GFLWOR.class },
     { "339933", VarStack.class },
     { "33CC33", For.class, Let.class, List.class, Range.class, Context.class,
                 QueryText.RET },
     { "66CC66", Var.class, Cast.class },
     // cyan
     { "009999", UserFuncCall.class, StandardFunc.class, Root.class, VarRef.class,
-                ValueAccess.class, RangeAccess.class, StringRangeAccess.class,
-                FTIndexAccess.class },
+                StaticVar.class, ValueAccess.class, RangeAccess.class,
+                StringRangeAccess.class, FTIndexAccess.class },
   };
 
   /**
