@@ -7,6 +7,7 @@ import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Use;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -15,6 +16,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.list.*;
 
 /**
@@ -78,20 +80,21 @@ final class RestXqResponse {
    * @throws Exception exception
    */
   void create() throws Exception {
-    // wrap function with a function call
-    final UserFunc uf = function.function;
-    final BaseFuncCall bfc = new BaseFuncCall(null, uf.name, uf.args);
-    bfc.init(uf);
 
+    // wrap function with a function call
+    final StaticUserFunc uf = function.function;
     // bind variables
-    function.bind(http);
+    final Expr[] args = new Expr[uf.args.length];
+    function.bind(http, args);
+    final MainModule mod = new MainModule(new BaseFuncCall(null, uf.name, args).init(uf),
+        new VarScope());
 
     // compile and evaluate function
     String redirect = null;
     String forward = null;
     try {
       // assign local updating flag
-      qc.updating = bfc.uses(Use.UPD);
+      qc.updating = mod.expr.uses(Use.UPD);
       qc.context(http, null);
       qc.context.register(qc);
 
@@ -99,7 +102,8 @@ final class RestXqResponse {
       final StringList o = qc.dbOptions;
       for(int s = 0; s < o.size(); s += 2) qc.context.prop.set(o.get(s), o.get(s + 1));
 
-      Value result = qc.value(bfc.compile(qc));
+      mod.compile(qc);
+      Value result = mod.value(qc);
       final Value update = qc.update();
       if(update != null) result = update;
 

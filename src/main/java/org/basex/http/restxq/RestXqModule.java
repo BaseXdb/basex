@@ -46,7 +46,7 @@ final class RestXqModule {
     // loop through all functions
     final QueryContext qc = parse(http);
     try {
-      for(final UserFunc uf : qc.funcs.funcs()) {
+      for(final StaticUserFunc uf : qc.funcs.funcs()) {
         // consider only functions that are defined in this module
         if(!file.name().equals(new IOFile(uf.info.file()).name())) continue;
         final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
@@ -95,7 +95,7 @@ final class RestXqModule {
     final QueryContext qc = parse(http);
     try {
       // loop through all functions
-      for(final UserFunc uf : qc.funcs.funcs()) {
+      for(final StaticUserFunc uf : qc.funcs.funcs()) {
         // compare input info
         if(func.function.info.equals(uf.info)) {
           // find and evaluate relevant function
