@@ -12,10 +12,11 @@ import org.basex.query.path.*;
 import org.basex.query.path.Test.Mode;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.item.ANum;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Numeric range expression.
@@ -121,7 +122,7 @@ public final class CmpR extends Single {
   @Override
   public boolean indexAccessible(final IndexContext ic) {
     // accept only location path, string and equality expressions
-    final AxisStep s = CmpG.indexStep(expr);
+    final Step s = CmpG.indexStep(expr);
     // sequential main memory is assumed to be faster than range index access
     if(s == null || ic.data.inMemory()) return false;
 
@@ -148,7 +149,7 @@ public final class CmpR extends Single {
   public Expr indexEquivalent(final IndexContext ic) {
     final boolean text = rt.type() == IndexType.TEXT;
     ic.ctx.compInfo(OPTRNGINDEX);
-    return ic.invert(expr, new RangeAccess(info, rt, ic), text);
+    return ic.invert(expr, new RangeAccess(info, rt, ic.data, ic.iterable), text);
   }
 
   /**
@@ -164,7 +165,7 @@ public final class CmpR extends Single {
     final AxisPath path = (AxisPath) expr;
     final int st = path.steps.length;
 
-    final AxisStep step;
+    final Step step;
     if(text) {
       step = st == 1 ? ic.step : path.step(st - 2);
       if(!(step.test.mode == Mode.NAME)) return null;
@@ -177,6 +178,11 @@ public final class CmpR extends Single {
     final Stats key = names.stat(names.id(((NameTest) step.test).ln));
     return key == null || key.type == StatsType.INTEGER ||
         key.type == StatsType.DOUBLE ? key : null;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new CmpR(expr.copy(ctx, scp, vs), min, mni, max, mxi, info);
   }
 
   @Override

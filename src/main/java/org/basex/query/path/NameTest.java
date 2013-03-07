@@ -70,6 +70,11 @@ public final class NameTest extends Test {
   }
 
   @Override
+  public Test copy() {
+    return this;
+  }
+
+  @Override
   public boolean eq(final ANode node) {
     // only elements and attributes will yield results
     if(node.type != type) return false;
@@ -98,5 +103,10 @@ public final class NameTest extends Test {
     final String uri = name.uri().length == 0 || name.hasPrefix() ? "" :
             '{' + Token.string(name.uri()) + '}';
     return uri + (mode == Mode.NS ? "*" : Token.string(name.string()));
+  }
+
+  @Override
+  public Test intersect(final Test other) {
+    throw Util.notexpected(other);
   }
 }

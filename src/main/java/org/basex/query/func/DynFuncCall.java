@@ -2,16 +2,20 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
+import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Dynamic function call.
@@ -19,20 +23,20 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class DynamicFunc extends Arr {
+public final class DynFuncCall extends Arr {
   /**
    * Function constructor.
    * @param ii input info
    * @param fun function expression
    * @param arg arguments
    */
-  public DynamicFunc(final InputInfo ii, final Expr fun, final Expr[] arg) {
+  public DynFuncCall(final InputInfo ii, final Expr fun, final Expr[] arg) {
     super(ii, Array.add(arg, fun));
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
     final int ar = expr.length - 1;
     final Expr f = expr[ar];
     final Type t = f.type().type;
@@ -59,6 +63,13 @@ public final class DynamicFunc extends Arr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     return getFun(ctx).invIter(ctx, info, argv(ctx));
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Expr[] copy = copyAll(ctx, scp, vs, expr);
+    final int last = copy.length - 1;
+    return copyType(new DynFuncCall(info, copy[last], Arrays.copyOf(copy, last)));
   }
 
   /**
@@ -90,7 +101,6 @@ public final class DynamicFunc extends Arr {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem());
     final FElem el = planElem();
     addPlan(plan, el, expr[expr.length - 1]);
     for(int i = 0; i < expr.length - 1; i++) expr[i].plan(el);

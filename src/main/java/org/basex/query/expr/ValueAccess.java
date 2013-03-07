@@ -12,7 +12,9 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -32,11 +34,12 @@ public final class ValueAccess extends IndexAccess {
    * @param ii input info
    * @param e index expression
    * @param t access type
-   * @param ic index context
+   * @param d data reference
+   * @param it flag for iterative evaluation
    */
   public ValueAccess(final InputInfo ii, final Expr e, final IndexType t,
-      final IndexContext ic) {
-    super(ic, ii);
+      final Data d, final boolean it) {
+    super(d, it, ii);
     expr = e;
     itype = t;
   }
@@ -62,8 +65,6 @@ public final class ValueAccess extends IndexAccess {
    * @return iterator
    */
   private AxisIter index(final byte[] term) {
-    final Data data = ictx.data;
-
     // access index if term is not too long, and if index exists.
     // otherwise, scan data sequentially
     final IndexIterator ii = term.length <= data.meta.maxlen &&
@@ -89,7 +90,6 @@ public final class ValueAccess extends IndexAccess {
     return new IndexIterator() {
       final boolean text = itype == IndexType.TEXT;
       final byte kind = text ? Data.TEXT : Data.ATTR;
-      final Data data = ictx.data;
       int pre = -1;
 
       @Override
@@ -112,19 +112,27 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public int count(final Var v) {
-    return expr.count(v);
-  }
-
-  @Override
   public boolean removable(final Var v) {
     return expr.removable(v);
   }
 
   @Override
-  public Expr remove(final Var v) {
-    expr = expr.remove(v);
-    return this;
+  public VarUsage count(final Var v) {
+    return expr.count(v);
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final Expr sub = expr.inline(ctx, scp, v, e);
+    if(sub == null) return null;
+    expr = sub;
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new ValueAccess(info, expr.copy(ctx, scp, vs), itype, data, iterable);
   }
 
   @Override
@@ -134,12 +142,22 @@ public final class ValueAccess extends IndexAccess {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DATA, ictx.data.meta.name, TYP, itype), expr);
+    addPlan(plan, planElem(DATA, data.meta.name, TYP, itype), expr);
   }
 
   @Override
   public String toString() {
     return (itype == IndexType.TEXT ? Function._DB_TEXT : Function._DB_ATTRIBUTE).get(
-        info, Str.get(ictx.data.meta.name), expr).toString();
+        info, Str.get(data.meta.name), expr).toString();
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return expr.accept(visitor) && super.accept(visitor);
+  }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize() + 1;
   }
 }

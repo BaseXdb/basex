@@ -97,6 +97,9 @@ public final class Compare {
         FICMP.thrw(info, it1 instanceof FItem ? it1 : it2);
       }
 
+      // identical items are also equal
+      if(it1 == it2) continue;
+
       // check atomic values
       if(!(it1 instanceof ANode || it2 instanceof ANode)) {
         if(!it1.equiv(info, it2)) return false;
@@ -108,6 +111,7 @@ public final class Compare {
       if(t1 != t2) return false;
 
       ANode s1 = (ANode) it1, s2 = (ANode) it2;
+      if(s1.is(s2)) continue;
       AxisIter ch1 = s1.children(), ch2 = s2.children();
 
       final Stack<AxisIter> stack = new Stack<AxisIter>();

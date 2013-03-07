@@ -10,7 +10,9 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -42,15 +44,15 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    cond = cond.compile(ctx).compEbv(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    cond = cond.compile(ctx, scp).compEbv(ctx);
     // static condition: return branch in question
-    if(cond.isValue()) return optPre(eval(ctx).compile(ctx), ctx);
+    if(cond.isValue()) return optPre(eval(ctx).compile(ctx, scp), ctx);
 
     // compile and simplify branches
     for(int e = 0; e < expr.length; e++) {
       try {
-        expr[e] = expr[e].compile(ctx);
+        expr[e] = expr[e].compile(ctx, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
         expr[e] = FNInfo.error(ex, info);
@@ -72,7 +74,7 @@ public final class If extends Arr {
     // if A then true() else false() -> boolean(A)
     if(expr[0] == Bln.TRUE && expr[1] == Bln.FALSE) {
       ctx.compInfo(OPTWRITE, this);
-      return compBln(cond);
+      return compBln(cond, info);
     }
 
     // if A then false() else true() -> not(A)
@@ -83,7 +85,7 @@ public final class If extends Arr {
       return expr[0] == Bln.FALSE ? e : new Or(info, e, expr[0]);
     }
 
-    type = expr[0].type().intersect(expr[1].type());
+    type = expr[0].type().union(expr[1].type());
     return this;
   }
 
@@ -111,14 +113,10 @@ public final class If extends Arr {
   private Expr eval(final QueryContext ctx) throws QueryException {
     return expr[cond.ebv(ctx, info).bool(info) ? 0 : 1];
   }
+
   @Override
   public boolean uses(final Use u) {
     return cond.uses(u) || super.uses(u);
-  }
-
-  @Override
-  public int count(final Var v) {
-    return cond.count(v) + super.count(v);
   }
 
   @Override
@@ -127,9 +125,35 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    cond = cond.remove(v);
-    return super.remove(v);
+  public VarUsage count(final Var v) {
+    return cond.count(v).plus(VarUsage.maximum(v, expr));
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final Expr sub = cond.inline(ctx, scp, v, e);
+    if(sub != null) cond = sub;
+    boolean te = false;
+    for(int i = 0; i < expr.length; i++) {
+      Expr nw;
+      try {
+        nw = expr[i].inline(ctx, scp, v, e);
+      } catch(final QueryException qe) {
+        nw = FNInfo.error(qe, info);
+      }
+      if(nw != null) {
+        expr[i] = nw;
+        te = true;
+      }
+    }
+    return te || sub != null ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public If copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return copyType(new If(info, cond.copy(ctx, scp, vs),
+        expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs)));
   }
 
   @Override
@@ -163,5 +187,17 @@ public final class If extends Arr {
   @Override
   public String toString() {
     return IF + '(' + cond + ") " + THEN + ' ' + expr[0] + ' ' + ELSE + ' ' + expr[1];
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return cond.accept(visitor) && super.accept(visitor);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz + cond.exprSize();
   }
 }

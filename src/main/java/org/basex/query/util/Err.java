@@ -31,8 +31,10 @@ public enum Err {
   BASX_VALUE(BASX, 2, "Invalid value for database option: %."),
   /** BASX0003. */
   BASX_RESTXQ(BASX, 3, "%"),
-  /** BASEX0004. */
-  BASEX_DBTRANSFORM(BASX, 4, "No database updates allowed within transform expression."),
+  /** BASX0004. */
+  BASX_DBTRANSFORM(BASX, 4, "No database updates allowed within transform expression."),
+  /** BASX0005. */
+  BASX_STACKOVERFLOW(BASX, 5, "Stack Overflow: Try tail recursion?"),
 
   // Client module
 
@@ -693,6 +695,10 @@ public enum Err {
   /** XPST0003. */
   NOLET(XPST, 3, "Incomplete 'let' expression."),
   /** XPST0003. */
+  NOWINDOW(XPST, 3, "Incomplete 'window' expression."),
+  /** XPST0003. */
+  NOCOUNT(XPST, 3, "Incomplete 'count' expression."),
+  /** XPST0003. */
   NOCLOSING(XPST, 3, "Expecting closing tag </%>."),
   /** XPST0003. */
   COMCLOSE(XPST, 3, "Unclosed XQuery comment (: ..."),
@@ -815,6 +821,8 @@ public enum Err {
   PATHNODE(XPTY, 19, "Steps within a path expression must yield nodes; % found."),
   /** XPTY0020. */
   STEPNODE(XPTY, 20, "Context node required for %; % found."),
+  /** XPTY0117. */
+  NSSENS(XPTY, 117, "Cannot cast % to namespace-sensitive type %."),
 
   /** XQDY0025. */
   CATTDUPL(XQDY, 25, "Duplicate attribute '%'."),
@@ -827,7 +835,7 @@ public enum Err {
   /** XQDY0044. */
   CAINV(XQDY, 44, "Invalid attribute prefix/namespace '%'."),
   /** XQDY0054. */
-  CIRCLDECL(XQDY, 54, "Stack Overflow: circular variable declaration?"),
+  CIRCVAR30(XQDY, 54, "Global variable depends on itself: %"),
   /** XQDY0054. */
   CIRCCTX(XQDY, 54, "Circular declaration of context item."),
   /** XQDY0064. */
@@ -883,6 +891,8 @@ public enum Err {
   MODNS(XQST, 48, "Declaration % does not match the module namespace."),
   /** XQST0049. */
   VARDEFINE(XQST, 49, "Duplicate declaration of %."),
+  /** XQST0054. */
+  CIRCVAR(XQST, 54, "Global variable depends on itself: %"),
   /** XQST0055. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
   /** XQST0057. */
@@ -943,6 +953,8 @@ public enum Err {
   DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format '%'."),
   /** XQST0099. */
   DUPLITEM(XQST, 99, "Duplicate declaration of context item."),
+  /** XQST0103. */
+  WINDOWUNIQ(XQST, 103, "Duplicate variable name in window clause: %"),
   /** XQST0106. */
   DUPLUPD(XQST, 106, "More than one updating annotation declared."),
   /** XQST0106. */
@@ -1217,13 +1229,13 @@ public enum Err {
    * Throws a type promoting exception.
    * @param ii input info
    * @param t expression cast type
-   * @param v value
+   * @param e expression
    * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static QueryException treat(final InputInfo ii, final SeqType t, final Value v)
+  public static QueryException treat(final InputInfo ii, final SeqType t, final Expr e)
       throws QueryException {
-    throw XPINVTREAT.thrw(ii, v.description(), t, v);
+    throw XPINVTREAT.thrw(ii, e.description(), t, e);
   }
 
   /**
@@ -1262,6 +1274,18 @@ public enum Err {
   public static QueryException value(final InputInfo ii, final Type t, final Object v)
       throws QueryException {
     throw INVALUE.thrw(ii, t, v);
+  }
+
+  /**
+   * Throws an exception for circular static variables.
+   * @param ctx query context
+   * @param var variable expression
+   * @return never
+   * @throws QueryException query exception
+   */
+  public static QueryException circVar(final QueryContext ctx, final ParseExpr var)
+      throws QueryException {
+    throw (ctx.sc.xquery3() ? CIRCVAR30 : CIRCVAR).thrw(var.info, var);
   }
 
   @Override

@@ -12,6 +12,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -68,7 +69,8 @@ public final class Functions extends TokenSet {
 
     final StandardFunc f = fl.get(ii, args);
     // check number of arguments
-    if(args.length < fl.min || args.length > fl.max) XPARGS.thrw(ii, fl);
+    if(args.length < fl.min || args.length > fl.max)
+      XPARGS.thrw(ii, fl);
     return f;
   }
 
@@ -83,12 +85,16 @@ public final class Functions extends TokenSet {
    * @throws QueryException query exception
    */
   public static FItem get(final QNm name, final long arity, final boolean dyn,
-      final QueryContext ctx, final InputInfo ii) throws QueryException {
+      final QueryContext ctx, final InputInfo ii)
+          throws QueryException {
+
+    // use empty scope
+    final VarScope scp = new VarScope();
 
     final Expr[] args = new Expr[(int) arity];
     final Var[] vars = new Var[args.length];
     for(int i = 0; i < args.length; i++) {
-      vars[i] = ctx.uniqueVar(ii, null);
+      vars[i] = scp.uniqueVar(ctx, null, true);
       args[i] = new VarRef(ii, vars[i]);
     }
 
@@ -100,12 +106,12 @@ public final class Functions extends TokenSet {
 
     // compile the function if it hasn't been done statically
     if(dyn && f.fun instanceof UserFuncCall) {
-      final UserFunc usf = ((UserFuncCall) f.fun).func();
-      if(usf != null && usf.declared) usf.compile(ctx);
+      final StaticUserFunc usf = ((UserFuncCall) f.fun).func();
+      if(usf != null && usf.declared) usf.compile(ctx, scp);
     }
 
     final FuncType ft = f.type;
-    return new FuncItem(name, vars, f.fun, ft, false);
+    return new FuncItem(name, vars, f.fun, ft, false, null, scp, ctx.sc);
   }
 
   /**
@@ -148,14 +154,15 @@ public final class Functions extends TokenSet {
     // pre-defined functions
     final StandardFunc fun = Functions.get().get(name, args, ii);
     if(fun != null) {
-      if(!ctx.sc.xquery3 && fun.xquery3()) FEATURE30.thrw(ii);
+      if(!ctx.sc.xquery3() && fun.xquery3()) FEATURE30.thrw(ii);
       for(final Function f : Function.UPDATING) {
         if(fun.sig == f) {
           ctx.updating(true);
           break;
         }
       }
-      return new TypedFunc(fun, fun.sig.type(args.length));
+      // [LW] correct annotations
+      return new TypedFunc(fun, new Ann(), fun.sig.type(args.length));
     }
 
     // user-defined function

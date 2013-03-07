@@ -17,6 +17,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -57,17 +58,18 @@ public abstract class Path extends ParseExpr {
     for(int p = 0; p < path.length; p++) {
       Expr e = path[p];
       if(e instanceof Context) {
-        e = AxisStep.get(((Context) e).info, Axis.SELF, Test.NOD);
+        e = Step.get(((Context) e).info, Axis.SELF, Test.NOD);
       } else if(e instanceof Filter) {
         final Filter f = (Filter) e;
         if(f.root instanceof Context) {
-          e = AxisStep.get(f.info, Axis.SELF, Test.NOD, f.preds);
+          e = Step.get(f.info, Axis.SELF, Test.NOD, f.preds);
         }
       }
-      axes &= e instanceof AxisStep;
+      axes &= e instanceof Step;
       path[p] = e;
     }
-    return axes ? new AxisPath(ii, r, path).finish(null) : new MixedPath(ii, r, path);
+    return axes ? new CachedPath(ii, r, path).finish(null) :
+      new MixedPath(ii, r, path);
   }
 
   @Override
@@ -77,31 +79,37 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx) throws QueryException {
-    if(root != null) {
-      root = root.compile(ctx);
-      if(root instanceof Context) {
-        ctx.compInfo(OPTREMCTX);
-        root = null;
-      }
-    }
+  public final Expr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    if(root != null) setRoot(ctx, root.compile(ctx, scp));
 
     final Value v = ctx.value;
     try {
       ctx.value = root(ctx);
-      return compilePath(ctx);
+      return compilePath(ctx, scp);
     } finally {
       ctx.value = v;
     }
   }
 
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+    if(root instanceof Context) {
+      ctx.compInfo(OPTREMCTX);
+      root = null;
+    }
+    return this;
+  }
+
   /**
    * Compiles the location path.
    * @param ctx query context
+   * @param scp variable scope
    * @return optimized expression
    * @throws QueryException query exception
    */
-  protected abstract Expr compilePath(final QueryContext ctx) throws QueryException;
+  protected abstract Expr compilePath(final QueryContext ctx, VarScope scp)
+      throws QueryException;
 
   /**
    * Returns the root of the current context or {@code null}.
@@ -121,6 +129,19 @@ public abstract class Path extends ParseExpr {
     return v.size() != 1 ? v : Root.root(v);
   }
 
+  /**
+   * Sets a new root expression and eliminates a superfluous context item.
+   * @param ctx query context
+   * @param rt root expression
+   */
+  private void setRoot(final QueryContext ctx, final Expr rt) {
+    root = rt;
+    if(root instanceof Context) {
+      ctx.compInfo(OPTREMCTX);
+      root = null;
+    }
+  }
+
   @Override
   public final boolean uses(final Use use) {
     // first step or root expression will be used as context
@@ -137,10 +158,10 @@ public abstract class Path extends ParseExpr {
     boolean opt = false;
     Expr[] st = steps;
     for(int l = 1; l < st.length; ++l) {
-      if(!(st[l - 1] instanceof AxisStep && st[l] instanceof AxisStep)) continue;
+      if(!(st[l - 1] instanceof Step && st[l] instanceof Step)) continue;
 
-      final AxisStep prev = (AxisStep) st[l - 1];
-      final AxisStep curr = (AxisStep) st[l];
+      final Step prev = (Step) st[l - 1];
+      final Step curr = (Step) st[l];
       if(!prev.simple(DESCORSELF, false)) continue;
 
       if(curr.axis == CHILD && !curr.uses(Use.POS)) {
@@ -161,8 +182,8 @@ public abstract class Path extends ParseExpr {
     if(opt) ctx.compInfo(OPTDESC);
 
     // set atomic type for single attribute steps to speedup predicate tests
-    if(root == null && st.length == 1 && st[0] instanceof AxisStep) {
-      final AxisStep curr = (AxisStep) st[0];
+    if(root == null && st.length == 1 && st[0] instanceof Step) {
+      final Step curr = (Step) st[0];
       if(curr.axis == ATTR && curr.test.mode == Mode.STD) curr.type = SeqType.NOD_ZO;
     }
     steps = st;
@@ -186,7 +207,7 @@ public abstract class Path extends ParseExpr {
     ArrayList<PathNode> nodes = data.paths.root();
     long m = 1;
     for(int s = 0; s < steps.length; s++) {
-      final AxisStep curr = axisStep(s);
+      final Step curr = axisStep(s);
       if(curr != null) {
         nodes = curr.nodes(nodes, data);
         if(nodes == null) return -1;
@@ -209,9 +230,9 @@ public abstract class Path extends ParseExpr {
    * @return empty step, or {@code null}
    * @throws QueryException query exception
    */
-  AxisStep voidStep(final Expr[] stps) throws QueryException {
+  Step voidStep(final Expr[] stps) throws QueryException {
     for(int l = 0; l < stps.length; ++l) {
-      final AxisStep s = axisStep(l);
+      final Step s = axisStep(l);
       if(s == null) continue;
       final Axis sa = s.axis;
       if(l == 0) {
@@ -225,7 +246,7 @@ public abstract class Path extends ParseExpr {
             s.test != Test.NOD && s.test != Test.DOC)) DOCAXES.thrw(info, root, sa);
         }
       } else {
-        final AxisStep ls = axisStep(l - 1);
+        final Step ls = axisStep(l - 1);
         if(ls == null) continue;
         final Axis lsa = ls.axis;
         if(sa == SELF || sa == DESCORSELF) {
@@ -271,11 +292,11 @@ public abstract class Path extends ParseExpr {
     Path path = this;
     for(int s = 0; s < steps.length; ++s) {
       // don't allow predicates in preceding location steps
-      final AxisStep prev = s > 0 ? axisStep(s - 1) : null;
+      final Step prev = s > 0 ? axisStep(s - 1) : null;
       if(prev != null && prev.preds.length != 0) break;
 
       // ignore axes other than descendant, or numeric predicates
-      final AxisStep curr = axisStep(s);
+      final Step curr = axisStep(s);
       if(curr == null || curr.axis != DESC || curr.uses(Use.POS)) continue;
 
       // check if child steps can be retrieved for current step
@@ -301,11 +322,11 @@ public abstract class Path extends ParseExpr {
       final Expr[] stps = new Expr[ts + steps.length - s - 1];
       for(int t = 0; t < ts; ++t) {
         final Expr[] preds = t == ts - 1 ?
-            ((AxisStep) steps[s]).preds : new Expr[0];
+            ((Step) steps[s]).preds : new Expr[0];
         final QNm nm = qnm.get(ts - t - 1);
         final NameTest nt = nm == null ? new NameTest(false) :
           new NameTest(nm, Mode.NAME, false);
-        stps[t] = AxisStep.get(info, CHILD, nt, preds);
+        stps[t] = Step.get(info, CHILD, nt, preds);
       }
       while(++s < steps.length) stps[ts++] = steps[s];
       path = get(info, root, stps);
@@ -317,7 +338,7 @@ public abstract class Path extends ParseExpr {
       LOOP:
       for(int s = 0; s < path.steps.length; ++s) {
         // only verify child steps; ignore namespaces
-        final AxisStep st = path.axisStep(s);
+        final Step st = path.axisStep(s);
         if(st == null || st.axis != CHILD) break;
         if(st.test.mode == Mode.ALL || st.test.mode == null) continue;
         if(st.test.mode != Mode.NAME) break;
@@ -340,8 +361,8 @@ public abstract class Path extends ParseExpr {
    * @param i index
    * @return step
    */
-  AxisStep axisStep(final int i) {
-    return steps[i] instanceof AxisStep ? (AxisStep) steps[i] : null;
+  Step axisStep(final int i) {
+    return steps[i] instanceof Step ? (Step) steps[i] : null;
   }
 
   /**
@@ -357,7 +378,7 @@ public abstract class Path extends ParseExpr {
 
     ArrayList<PathNode> in = data.paths.root();
     for(int s = 0; s <= l; ++s) {
-      final AxisStep curr = axisStep(s);
+      final Step curr = axisStep(s);
       if(curr == null) return null;
       final boolean desc = curr.axis == DESC;
       if(!desc && curr.axis != CHILD || curr.test.mode != Mode.NAME)
@@ -381,17 +402,16 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Adds a predicate to the last step.
+   * @param ctx query context
+   * @param scp variable scope
    * @param pred predicate to be added
    * @return resulting path instance
+   * @throws QueryException query exception
    */
-  public final Path addPreds(final Expr... pred) {
+  public final Expr addPreds(final QueryContext ctx, final VarScope scp,
+      final Expr... pred) throws QueryException {
     steps[steps.length - 1] = axisStep(steps.length - 1).addPreds(pred);
-    return get(info, root, steps);
-  }
-
-  @Override
-  public int count(final Var v) {
-    return root != null ? root.count(v) : 0;
+    return get(info, root, steps).optimize(ctx, scp);
   }
 
   @Override
@@ -400,10 +420,28 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    if(root != null) root = root.remove(v);
-    if(root instanceof Context) root = null;
-    return this;
+  public VarUsage count(final Var v) {
+    final VarUsage inRoot = root == null ? VarUsage.NEVER : root.count(v);
+    return VarUsage.sum(v, steps) == VarUsage.NEVER ? inRoot : VarUsage.MORE_THAN_ONCE;
+  }
+
+  @Override
+  public final Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+
+    final Value oldVal = ctx.value;
+    try {
+      ctx.value = root(ctx);
+      final Expr rt = root == null ? null : root.inline(ctx, scp, v, e);
+      if(rt != null) {
+        setRoot(ctx, rt);
+        ctx.value = oldVal;
+        ctx.value = root(ctx);
+      }
+      return inlineAll(ctx, scp, steps, v, e) || rt != null ? optimize(ctx, scp) : null;
+    } finally {
+      ctx.value = oldVal;
+    }
   }
 
   @Override
@@ -426,9 +464,21 @@ public abstract class Path extends ParseExpr {
     if(root != null) sb.append(root);
     for(final Expr s : steps) {
       if(sb.length() != 0) sb.append(s instanceof Bang ? " ! " : "/");
-      if(s instanceof AxisStep) sb.append(s);
+      if(s instanceof Step) sb.append(s);
       else sb.append(s);
     }
     return sb.toString();
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return (root == null || root.accept(visitor)) && visitAll(visitor, steps);
+  }
+
+  @Override
+  public final int exprSize() {
+    int sz = 1;
+    for(final Expr e : steps) sz += e.exprSize();
+    return root == null ? sz : sz + root.exprSize();
   }
 }

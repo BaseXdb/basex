@@ -11,7 +11,9 @@ import org.basex.query.QueryModule.FocusDependent;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Java function binding.
@@ -68,6 +70,11 @@ public final class JavaModuleFunc extends JavaMapping {
     }
     throw JAVAMOD.thrw(info, mth.getName() + '(' + expect + ')',
         mth.getName() + '(' + foundArgs(vals) + ')');
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new JavaModuleFunc(info, module, mth, copyAll(ctx, scp, vs, expr));
   }
 
   @Override

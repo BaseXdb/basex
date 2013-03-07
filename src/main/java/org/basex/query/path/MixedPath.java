@@ -6,13 +6,14 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Mixed path expression.
@@ -32,12 +33,13 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  protected Expr compilePath(final QueryContext ctx) throws QueryException {
-    final AxisStep v = voidStep(steps);
+  protected Expr compilePath(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    final Step v = voidStep(steps);
     if(v != null) COMPSELF.thrw(info, v);
 
     for(int s = 0; s != steps.length; ++s) {
-      steps[s] = steps[s].compile(ctx);
+      steps[s] = steps[s].compile(ctx, scp);
       if(steps[s].isEmpty()) return optPre(Empty.SEQ, ctx);
     }
     optSteps(ctx);
@@ -47,7 +49,7 @@ public final class MixedPath extends Path {
     if(data != null && ctx.value.type == NodeType.DOC) {
       final Expr e = children(ctx, data);
       // return optimized expression
-      if(e != this) return e.compile(ctx);
+      if(e != this) return e.compile(ctx, scp);
     }
 
     size = size(ctx);
@@ -118,21 +120,14 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final Expr e : steps) c += e.count(v);
-    return c + super.count(v);
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new MixedPath(info, root == null ? null : root.copy(ctx, scp, vs),
+        Arr.copyAll(ctx, scp, vs, steps));
   }
 
   @Override
   public boolean removable(final Var v) {
-    for(final Expr e : steps) if(e.uses(Use.VAR)) return false;
-    return true;
-  }
-
-  @Override
-  public Expr remove(final Var v) {
-    for(int e = 0; e != steps.length; ++e) steps[e] = steps[e].remove(v);
-    return super.remove(v);
+    for(final Expr e : steps) if(e.uses(v)) return false;
+    return super.removable(v);
   }
 }

@@ -7,7 +7,9 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -43,17 +45,18 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    ts = ts.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    ts = ts.compile(ctx, scp);
     // static condition: return branch in question
     if(ts.isValue()) {
+      final Value val = ts.value(ctx);
       for(final TypeCase tc : cases) {
-        if(tc.var.type == null || tc.var.type.instance(ts.value(ctx)))
-          return optPre(tc.compile(ctx, (Value) ts).expr, ctx);
+        if(tc.matches(val))
+          return optPre(tc.compile(ctx, scp, (Value) ts).expr, ctx);
       }
     }
     // compile branches
-    for(final TypeCase tc : cases) tc.compile(ctx);
+    for(final TypeCase tc : cases) tc.compile(ctx, scp);
 
     // return result if all branches are equal (e.g., empty)
     boolean eq = true;
@@ -64,7 +67,7 @@ public final class TypeSwitch extends ParseExpr {
 
     type = cases[0].type();
     for(int c = 1; c < cases.length; ++c) {
-      type = type.intersect(cases[c].type());
+      type = type.union(cases[c].type());
     }
     return this;
   }
@@ -88,16 +91,8 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   public boolean uses(final Use u) {
-    if(u == Use.VAR) return true;
     for(final TypeCase tc : cases) if(tc.uses(u)) return true;
     return ts.uses(u);
-  }
-
-  @Override
-  public int count(final Var v) {
-    int c = ts.count(v);
-    for(final TypeCase tc : cases) c += tc.count(v);
-    return c;
   }
 
   @Override
@@ -107,10 +102,27 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr remove(final Var v) {
-    for(final TypeCase tc : cases) tc.remove(v);
-    ts = ts.remove(v);
-    return this;
+  public VarUsage count(final Var v) {
+    return ts.count(v).plus(VarUsage.maximum(v, cases));
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    boolean change = inlineAll(ctx, scp, cases, v, e);
+    final Expr t = ts.inline(ctx, scp, v, e);
+    if(t != null) {
+      change = true;
+      ts = t;
+    }
+    return change ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final TypeCase[] cs = new TypeCase[cases.length];
+    for(int i = 0; i < cs.length; i++) cs[i] = cases[i].copy(ctx, scp, vs);
+    return new TypeSwitch(info, ts.copy(ctx, scp, vs), cs);
   }
 
   @Override
@@ -127,12 +139,24 @@ public final class TypeSwitch extends ParseExpr {
   @Override
   public String toString() {
     return new TokenBuilder(TYPESWITCH + PAR1 + ts + PAR2 + ' ').addSep(
-        cases, SEP).toString();
+        cases, " ").toString();
   }
 
   @Override
   public Expr markTailCalls() {
     for(final TypeCase t : cases) t.markTailCalls();
     return this;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return ts.accept(visitor) && visitAll(visitor, cases);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : cases) sz += e.exprSize();
+    return sz + ts.exprSize();
   }
 }

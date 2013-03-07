@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class FNHtml extends StandardFunc {
+public final class FNHtml extends StandardFunc {
   /** Element: options. */
   private static final QNm E_OPTIONS = new QNm("options", HTMLURI);
 

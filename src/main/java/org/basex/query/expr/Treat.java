@@ -11,7 +11,9 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Treat as expression.
@@ -32,8 +34,13 @@ public final class Treat extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     return expr.isValue() ? optPre(value(ctx), ctx) : this;
   }
 
@@ -98,12 +105,17 @@ public final class Treat extends Single {
   }
 
   @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Treat(info, expr.copy(ctx, scp, vs), type);
+  }
+
+  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(TYP, type), expr);
   }
 
   @Override
   public String toString() {
-    return expr + " " + TREAT + ' ' + AS + ' ' + type;
+    return '(' + expr.toString() + ") " + TREAT + ' ' + AS + ' ' + type;
   }
 }

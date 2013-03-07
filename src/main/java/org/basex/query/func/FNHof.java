@@ -69,8 +69,8 @@ public final class FNHof extends StandardFunc {
   }
 
   @Override
-  Expr comp(final QueryContext ctx) throws QueryException {
-    return oneOf(sig, _HOF_ID, _HOF_CONST) ? expr[0] : super.comp(ctx);
+  Expr opt(final QueryContext ctx) throws QueryException {
+    return oneOf(sig, _HOF_ID, _HOF_CONST) ? expr[0] : this;
   }
 
   /**
@@ -235,6 +235,6 @@ public final class FNHof extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return sig == Function.PARTIAL_APPLY && u == Use.CTX || u == Use.X30 || super.uses(u);
+    return u == Use.X30 || super.uses(u);
   }
 }

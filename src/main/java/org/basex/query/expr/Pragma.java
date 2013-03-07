@@ -55,4 +55,10 @@ public abstract class Pragma extends ExprInfo {
     if(value.length != 0) tb.add(value).add(' ');
     return tb.add(PRAGMA2).toString();
   }
+
+  /**
+   * Creates a copy of this pragma.
+   * @return copy
+   */
+  public abstract Pragma copy();
 }

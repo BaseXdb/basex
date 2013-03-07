@@ -10,7 +10,9 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Element constructor.
@@ -39,9 +41,9 @@ public final class CElem extends CName {
   }
 
   @Override
-  public CElem compile(final QueryContext ctx) throws QueryException {
+  public CElem compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     final int s = prepare(ctx);
-    super.compile(ctx);
+    super.compile(ctx, scp);
     ctx.sc.ns.size(s);
     return this;
   }
@@ -139,6 +141,12 @@ public final class CElem extends CName {
     } finally {
       ctx.sc.ns.size(s);
     }
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new CElem(info, name.copy(ctx, scp, vs), comp ? null : nspaces.copy(),
+        copyAll(ctx, scp, vs, expr));
   }
 
   /**

@@ -43,4 +43,9 @@ public final class DBPragma extends Pragma {
   void finish(final QueryContext ctx) {
     ctx.context.prop.setObject(key, old);
   }
+
+  @Override
+  public Pragma copy() {
+    return new DBPragma(name, value);
+  }
 }

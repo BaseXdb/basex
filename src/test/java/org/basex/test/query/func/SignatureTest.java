@@ -49,7 +49,7 @@ public class SignatureTest extends AdvancedQueryTest {
             qu.append('1');
           } else { // any type (skip test)
             qu.append("'X'");
-            if(SeqType.STR.instance(def.args[a])) any++;
+            if(SeqType.STR.instanceOf(def.args[a])) any++;
           }
         } else {
           // test wrong number of arguments

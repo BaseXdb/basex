@@ -11,7 +11,9 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.Type;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Java function binding.
@@ -54,6 +56,11 @@ public final class JavaFunc extends JavaMapping {
       Util.debug(ex);
       throw JAVAFUN.thrw(info, name(), foundArgs(args));
     }
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new JavaFunc(info, cls, mth, copyAll(ctx, scp, vs, expr));
   }
 
   /**

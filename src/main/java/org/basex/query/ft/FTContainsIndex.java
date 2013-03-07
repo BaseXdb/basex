@@ -1,15 +1,14 @@
 package org.basex.query.ft;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 
 /**
  * Sequential FTContains expression with index access.
@@ -18,24 +17,23 @@ import org.basex.util.ft.*;
  * @author Sebastian Gath
  */
 final class FTContainsIndex extends FTContains {
-  /** Index context. */
-  private final IndexContext ictx;
   /** Current node item. */
   private FTNode ftn;
   /** Node iterator. */
   private FTIter fti;
+  /** {@code not} flag. */
+  private final boolean not;
 
   /**
    * Constructor.
    * @param ii input info
    * @param e contains, select and optional ignore expression
    * @param f full-text expression
-   * @param ic index context
+   * @param nt {@code not} flag
    */
-  FTContainsIndex(final InputInfo ii, final Expr e, final FTExpr f,
-      final IndexContext ic) {
+  FTContainsIndex(final InputInfo ii, final Expr e, final FTExpr f, final boolean nt) {
     super(e, f, ii);
-    ictx = ic;
+    not = nt;
   }
 
   @Override
@@ -56,13 +54,13 @@ final class FTContainsIndex extends FTContains {
     while(!found && (n = (DBNode) ir.next()) != null) {
       // find entry with pre value equal to or larger than current node
       while(ftn != null && n.pre > ftn.pre) ftn = fti.next();
-      found = (ftn != null && n.pre == ftn.pre) ^ ictx.not;
+      found = (ftn != null && n.pre == ftn.pre) ^ not;
     }
     // reset index iterator after all nodes have been processed
     if(n == null) fti = null;
 
     // add entry to visualization
-    if(found && ctx.ftpos != null && !ictx.not) {
+    if(found && ctx.ftpos != null && !not) {
       ctx.ftpos.add(ftn.data, ftn.pre, ftn.all);
     }
 
@@ -71,7 +69,8 @@ final class FTContainsIndex extends FTContains {
   }
 
   @Override
-  public String toString() {
-    return expr + " " + CONTAINS + ' ' + TEXT + ' ' + ftexpr;
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return copyType(new FTContainsIndex(info, expr.copy(ctx, scp, vs),
+        ftexpr.copy(ctx, scp, vs), not));
   }
 }

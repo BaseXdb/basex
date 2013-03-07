@@ -7,7 +7,9 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Arithmetic expression.
@@ -33,9 +35,13 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
 
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     final SeqType s0 = expr[0].type();
     final SeqType s1 = expr[1].type();
     final Type t0 = s0.type;
@@ -56,6 +62,11 @@ public final class Arith extends Arr {
     final Item b = expr[1].item(ctx, info);
     if(b == null) return null;
     return calc.ev(info, a, b);
+  }
+
+  @Override
+  public Arith copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Arith(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs), calc);
   }
 
   @Override

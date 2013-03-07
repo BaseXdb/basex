@@ -1015,9 +1015,9 @@ public final class UpdateTest extends AdvancedQueryTest {
   */
  @Test
  public void dbUpdateTransform() {
-   error("copy $c := <a/> modify db:output('x') return $c", Err.BASEX_DBTRANSFORM);
+   error("copy $c := <a/> modify db:output('x') return $c", Err.BASX_DBTRANSFORM);
    error("copy $c := <a/> modify db:add('" + NAME + "','<x/>','x.xml') return $c",
-       Err.BASEX_DBTRANSFORM);
-   error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", Err.BASEX_DBTRANSFORM);
+       Err.BASX_DBTRANSFORM);
+   error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", Err.BASX_DBTRANSFORM);
  }
 }

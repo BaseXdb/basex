@@ -1,24 +1,23 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Filter expression.
+ * Abstract filter expression.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class Filter extends Preds {
+public abstract class Filter extends Preds {
   /** Expression. */
   public Expr root;
 
@@ -28,9 +27,20 @@ public class Filter extends Preds {
    * @param r expression
    * @param p predicates
    */
-  public Filter(final InputInfo ii, final Expr r, final Expr... p) {
+  Filter(final InputInfo ii, final Expr r, final Expr... p) {
     super(ii, p);
     root = r;
+  }
+
+  /**
+   * Creates a filter expression for the given root and predicates.
+   * @param ii input info
+   * @param r root expression
+   * @param p predicate expressions
+   * @return filter expression
+   */
+  public static Filter get(final InputInfo ii, final Expr r, final Expr... p) {
+    return new CachedFilter(ii, r, p);
   }
 
   @Override
@@ -40,24 +50,26 @@ public class Filter extends Preds {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx) throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
     // invalidate current context value (will be overwritten by filter)
     final Value cv = ctx.value;
     try {
-      root = root.compile(ctx);
+      root = root.compile(ctx, scp);
       // return empty root
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.uses(Use.POS))
-        return ((AxisPath) root).copy().addPreds(preds).compile(ctx);
+        return ((AxisPath) root.copy(ctx,
+            scp)).addPreds(ctx, scp, preds).compile(ctx, scp);
 
       // optimize filter expressions
       ctx.value = null;
-      final Expr e = super.compile(ctx);
+      final Expr e = super.compile(ctx, scp);
       if(e != this) return e;
 
       // no predicates.. return root; otherwise, do some advanced compilations
-      return preds.length == 0 ? root : comp2(ctx);
+      return preds.length == 0 ? root : opt(ctx);
     } finally {
       ctx.value = cv;
     }
@@ -68,7 +80,7 @@ public class Filter extends Preds {
    * @param ctx query context
    * @return compiled expression
    */
-  public final Expr comp2(final QueryContext ctx) {
+  private Expr opt(final QueryContext ctx) {
     // evaluate return type
     final SeqType t = root.type();
 
@@ -108,63 +120,34 @@ public class Filter extends Preds {
     return off || useIterator() ? new IterPosFilter(this, off) : this;
   }
 
-  @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    Value val = root.value(ctx);
-    final Value cv = ctx.value;
-    final long cs = ctx.size;
-    final long cp = ctx.pos;
-
-    try {
-      // evaluate first predicate, based on incoming value
-      final ValueBuilder vb = new ValueBuilder();
-      Expr p = preds[0];
-      long is = val.size();
-      ctx.size = is;
-      ctx.pos = 1;
-      for(int s = 0; s < is; ++s) {
-        final Item it = val.itemAt(s);
-        ctx.value = it;
-        if(p.test(ctx, info) != null) vb.add(it);
-        ctx.pos++;
-      }
-      // save memory
-      val = null;
-
-      // evaluate remaining predicates, based on value builder
-      final int pl = preds.length;
-      for(int i = 1; i < pl; i++) {
-        is = vb.size();
-        p = preds[i];
-        ctx.size = is;
-        ctx.pos = 1;
-        int c = 0;
-        for(int s = 0; s < is; ++s) {
-          final Item it = vb.get(s);
-          ctx.value = it;
-          if(p.test(ctx, info) != null) vb.set(it, c++);
-          ctx.pos++;
-        }
-        vb.size(c);
-      }
-
-      // return resulting values
-      return vb;
-    } finally {
-      ctx.value = cv;
-      ctx.size = cs;
-      ctx.pos = cp;
-    }
-  }
-
   /**
    * Adds a predicate to the filter.
+   * @param ctx query context
+   * @param scp variable scope
    * @param p predicate to be added
    * @return self reference
+   * @throws QueryException query exception
    */
-  public final Filter addPred(final Expr p) {
-    preds = Array.add(preds, p);
-    return this;
+  public abstract Filter addPred(final QueryContext ctx, final VarScope scp, final Expr p)
+      throws QueryException;
+
+  @Override
+  public final Expr optimize(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    // invalidate current context value (will be overwritten by filter)
+    final Value cv = ctx.value;
+    try {
+      // return empty root
+      if(root.isEmpty()) return optPre(null, ctx);
+      // convert filters without numeric predicates to axis paths
+      if(root instanceof AxisPath && !super.uses(Use.POS))
+        return ((AxisPath) root.copy(ctx, scp)).addPreds(ctx, scp, preds);
+
+      // no predicates.. return root; otherwise, do some advanced compilations
+      return preds.length == 0 ? root : opt(ctx);
+    } finally {
+      ctx.value = cv;
+    }
   }
 
   @Override
@@ -173,19 +156,26 @@ public class Filter extends Preds {
   }
 
   @Override
-  public final int count(final Var v) {
-    return root.count(v) + super.count(v);
-  }
-
-  @Override
   public final boolean removable(final Var v) {
     return root.removable(v) && super.removable(v);
   }
 
   @Override
-  public final Expr remove(final Var v) {
-    root = root.remove(v);
-    return super.remove(v);
+  public VarUsage count(final Var v) {
+    final VarUsage inPreds = super.count(v), inRoot = root.count(v);
+    if(inPreds == VarUsage.NEVER) return inRoot;
+    final long sz = root.size();
+    return sz >= 0 && sz <= 1 || root.type().zeroOrOne()
+        ? inRoot.plus(inPreds) : VarUsage.MORE_THAN_ONCE;
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final boolean pr = super.inline(ctx, scp, v, e) != null;
+    final Expr rt = root == null ? null : root.inline(ctx, scp, v, e);
+    if(rt != null) root = rt;
+    return pr || rt != null ? optimize(ctx, scp) : null;
   }
 
   @Override
@@ -203,5 +193,17 @@ public class Filter extends Preds {
   @Override
   public final String toString() {
     return root + super.toString();
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return root.accept(visitor) && visitAll(visitor, preds);
+  }
+
+  @Override
+  public final int exprSize() {
+    int sz = 1;
+    for(final Expr e : preds) sz += e.exprSize();
+    return sz + root.exprSize();
   }
 }

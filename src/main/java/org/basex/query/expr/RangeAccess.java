@@ -9,9 +9,10 @@ import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This index class retrieves range values from the index.
@@ -27,16 +28,16 @@ public final class RangeAccess extends IndexAccess {
    * Constructor.
    * @param ii input info
    * @param t index reference
-   * @param ic index context
+   * @param d data reference
+   * @param it flag for iterative evaluation
    */
-  RangeAccess(final InputInfo ii, final NumericRange t, final IndexContext ic) {
-    super(ic, ii);
+  RangeAccess(final InputInfo ii, final NumericRange t, final Data d, final boolean it) {
+    super(d, it, ii);
     ind = t;
   }
 
   @Override
   public AxisIter iter(final QueryContext ctx) {
-    final Data data = ictx.data;
     final byte kind = ind.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
 
     return new AxisIter() {
@@ -49,8 +50,13 @@ public final class RangeAccess extends IndexAccess {
   }
 
   @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new RangeAccess(info, ind, data, iterable);
+  }
+
+  @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DATA, ictx.data.meta.name,
+    addPlan(plan, planElem(DATA, data.meta.name,
         MIN, ind.min, MAX, ind.max, TYP, ind.type));
   }
 

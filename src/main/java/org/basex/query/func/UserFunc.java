@@ -4,15 +4,14 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -21,13 +20,11 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class UserFunc extends Single {
+public abstract class UserFunc extends Single implements Scope {
   /** Function name. */
   public final QNm name;
   /** Arguments. */
   public final Var[] args;
-  /** Declaration flag. */
-  public final boolean declared;
   /** Return type. */
   public final SeqType ret;
   /** Annotations. */
@@ -40,23 +37,12 @@ public class UserFunc extends Single {
   /** Static context. */
   protected final StaticContext sc;
   /** Cast flag. */
-  private boolean cast;
+  boolean cast;
   /** Compilation flag. */
   private boolean compiled;
 
-  /**
-   * Function constructor.
-   * @param ii input info
-   * @param n function name
-   * @param v arguments
-   * @param r return type
-   * @param a annotations
-   * @param qc query context
-   */
-  protected UserFunc(final InputInfo ii, final QNm n, final Var[] v, final SeqType r,
-      final Ann a, final QueryContext qc) {
-    this(ii, n, v, r, a, true, qc);
-  }
+  /** Local variables in the scope of this function. */
+  protected final VarScope scope;
 
   /**
    * Function constructor.
@@ -65,21 +51,23 @@ public class UserFunc extends Single {
    * @param v arguments
    * @param r return type
    * @param a annotations
-   * @param d declaration flag
-   * @param qc query context
+   * @param e function body expression
+   * @param stc static context
+   * @param scp variable scope
    */
   public UserFunc(final InputInfo ii, final QNm n, final Var[] v, final SeqType r,
-      final Ann a, final boolean d, final QueryContext qc) {
+      final Ann a, final Expr e, final StaticContext stc,
+      final VarScope scp) {
 
-    super(ii, null);
+    super(ii, e);
     name = n;
     args = v;
     ret = r;
     cast = r != null;
     ann = a == null ? new Ann() : a;
-    declared = d;
     updating = ann.contains(Ann.Q_UPDATING);
-    sc = qc.sc;
+    scope = scp;
+    sc = stc;
   }
 
   @Override
@@ -97,42 +85,48 @@ public class UserFunc extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    compile(ctx, true);
-    return this;
+  public final void compile(final QueryContext ctx) throws QueryException {
+    compile(ctx, null);
   }
 
   /**
    * Compiles the expression.
    * @param ctx query context
-   * @param cache cache variables
+   * @param outer outer variable scope
    * @throws QueryException query exception
    */
-  protected final void compile(final QueryContext ctx, final boolean cache)
+  protected final void comp(final QueryContext ctx, final VarScope outer)
       throws QueryException {
 
     if(compiled) return;
     compiled = true;
 
-    final StaticContext s = ctx.sc;
+    // compile closure
+    for(Entry<Var, Expr> e : scope.closure().entrySet())
+      e.setValue(e.getValue().compile(ctx, outer));
+
+    final StaticContext tmp = ctx.sc;
     ctx.sc = sc;
-    final Atts ns = ctx.sc.ns.reset();
-    final int vs = ctx.vars.size();
-    final VarStack vl = cache ? ctx.vars.cache(args.length) : null;
+
+    final int fp = scope.enter(ctx);
     try {
-      for(final Var v : args) ctx.vars.add(v);
-      expr = expr.compile(ctx);
+      // constant propagation
+      for(final Entry<Var, Expr> e : staticBindings())
+        ctx.set(e.getKey(), e.getValue().value(ctx), info);
+
+      expr = expr.compile(ctx, scope);
+    } catch(final QueryException qe) {
+      expr = FNInfo.error(qe, info);
     } finally {
-      if(cache) ctx.vars.reset(vl);
-      else ctx.vars.size(vs);
-      ctx.sc.ns.stack(ns);
-      ctx.sc = s;
+      scope.cleanUp(this);
+      scope.exit(ctx, fp);
+      ctx.sc = tmp;
     }
 
     // convert all function calls in tail position to proper tail calls
     if(tco()) expr = expr.markTailCalls();
-    if(ret == null) return;
 
+    if(ret == null) return;
     // adopt expected return type
     type = ret;
     // remove redundant casts
@@ -144,47 +138,23 @@ public class UserFunc extends Single {
     }
   }
 
-  @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    // reset context and evaluate function
-    final Value cv = ctx.value;
-    ctx.value = null;
-    final StaticContext s = ctx.sc;
-    ctx.sc = sc;
-    final Atts ns = ctx.sc.ns.reset();
-    try {
-      final Item it = expr.item(ctx, ii);
-      // optionally promote return value to target type
-      return cast ? ret.cast(it, false, ctx, info, this) : it;
-    } finally {
-      ctx.sc.ns.stack(ns);
-      ctx.sc = s;
-      ctx.value = cv;
+  /**
+   * Removes and returns all static bindings from this function's closure.
+   * @return static variable bindings
+   */
+  private Collection<Entry<Var, Expr>> staticBindings() {
+    Collection<Entry<Var, Expr>> propagate = null;
+    final Iterator<Entry<Var, Expr>> cls = scope.closure().entrySet().iterator();
+    while(cls.hasNext()) {
+      final Entry<Var, Expr> e = cls.next();
+      final Expr c = e.getValue();
+      if(c.isValue()) {
+        if(propagate == null) propagate = new ArrayList<Entry<Var, Expr>>();
+        propagate.add(e);
+        cls.remove();
+      }
     }
-  }
-
-  @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    // reset context and evaluate function
-    final Value cv = ctx.value;
-    ctx.value = null;
-    final StaticContext s = ctx.sc;
-    ctx.sc = sc;
-    final Atts ns = ctx.sc.ns.reset();
-    try {
-      final Value v = ctx.value(expr);
-      // optionally promote return value to target type
-      return cast ? ret.promote(v, ctx, info) : v;
-    } finally {
-      ctx.sc.ns.stack(ns);
-      ctx.sc = s;
-      ctx.value = cv;
-    }
-  }
-
-  @Override
-  public ValueIter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
+    return propagate == null ? Collections.<Entry<Var, Expr>>emptyList() : propagate;
   }
 
   @Override
@@ -205,12 +175,47 @@ public class UserFunc extends Single {
   }
 
   @Override
-  public void plan(final FElem plan) {
-    final FElem el = planElem(NAM, name.string());
-    addPlan(plan, el, expr);
-    for(int i = 0; i < args.length; ++i) {
-      el.add(planAttr(ARG + i, args[i].name.string()));
+  public VarUsage count(final Var v) {
+    VarUsage all = VarUsage.NEVER;
+    for(final Entry<Var, Expr> e : scope.closure().entrySet())
+      if((all = all.plus(e.getValue().count(v))) == VarUsage.MORE_THAN_ONCE) break;
+    return all;
+  }
+
+  @Override
+  public final Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    boolean change = false, val = false;
+
+    for(final Entry<Var, Expr> entry : scope.closure().entrySet()) {
+      final Expr ex = entry.getValue().inline(ctx, scp, v, e);
+      if(ex != null) {
+        change = true;
+        val |= ex.isValue();
+        entry.setValue(ex);
+      }
     }
+
+    final StaticContext tmp = ctx.sc;
+    ctx.sc = sc;
+
+    if(val) {
+      final int fp = scope.enter(ctx);
+      try {
+        for(final Entry<Var, Expr> entry : staticBindings()) {
+          final Expr inl = expr.inline(ctx, scope, entry.getKey(), entry.getValue());
+          if(inl != null) expr = inl;
+        }
+      } catch(final QueryException qe) {
+        expr = FNInfo.error(qe, info);
+      } finally {
+        scope.cleanUp(this);
+        scope.exit(ctx, fp);
+        ctx.sc = tmp;
+      }
+    }
+
+    return change ? optimize(ctx, scp) : null;
   }
 
   @Override
@@ -218,22 +223,35 @@ public class UserFunc extends Single {
     return updating ? SeqType.EMP : super.type();
   }
 
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(ann);
-    if(updating) tb.add(UPDATING).add(' ');
-    tb.add(FUNCTION).add(' ').add(name.string());
-    tb.add(PAR1).addSep(args, SEP).add(PAR2);
-    if(ret != null) tb.add(' ' + AS + ' ' + ret);
-    if(expr != null) tb.add(" { " + expr + " }; ");
-    return tb.toString();
-  }
-
   /**
    * Checks if this function is tail-call optimizable.
    * @return {@code true} if it is optimizable, {@code false} otherwise
    */
-  protected boolean tco() {
-    return true;
+  protected  abstract boolean tco();
+
+  @Override
+  public boolean visit(final ASTVisitor visitor) {
+    for(final Var v : args) if(!visitor.declared(v)) return false;
+    return expr.accept(visitor);
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    for(final Entry<Var, Expr> e : scope.closure().entrySet())
+      if(!e.getValue().accept(visitor)) return false;
+    return visitor.inlineFunc(this);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Entry<Var, Expr> e : scope.closure().entrySet())
+      sz += e.getValue().exprSize();
+    return sz + expr.exprSize();
+  }
+
+  @Override
+  public final boolean compiled() {
+    return compiled;
   }
 }

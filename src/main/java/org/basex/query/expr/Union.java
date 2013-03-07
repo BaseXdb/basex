@@ -7,7 +7,9 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Union expression.
@@ -26,8 +28,8 @@ public final class Union extends Set {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
 
     for(int e = 0; e != expr.length; ++e) {
       // remove empty operands
@@ -38,6 +40,13 @@ public final class Union extends Set {
     }
     // results must always be sorted
     return expr.length == 0 ? Empty.SEQ : expr.length == 1 && iterable ? expr[0] : this;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Union un = new Union(info, copyAll(ctx, scp, vs, expr));
+    un.iterable = iterable;
+    return copyType(un);
   }
 
   @Override

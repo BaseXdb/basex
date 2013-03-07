@@ -67,7 +67,10 @@ public abstract class ANode extends Item {
     return it.type.isUntyped() ? Token.diff(string(), it.string(ii)) : -it.diff(ii, this);
   }
 
-  @Override
+  /**
+   * Creates a copy of this node.
+   * @return copy
+   */
   public abstract ANode copy();
 
   /**

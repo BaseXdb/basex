@@ -70,7 +70,7 @@ public final class FAttr extends FNode {
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(typeId()).add(name.uri()).add(0).toArray();
+    return new ByteList().add(typeId().asByte()).add(name.uri()).add(0).toArray();
   }
 
   @Override

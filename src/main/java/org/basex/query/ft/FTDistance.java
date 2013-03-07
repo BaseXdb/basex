@@ -7,8 +7,10 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -41,9 +43,10 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx) throws QueryException {
-    for(int d = 0; d < dist.length; d++) dist[d] = dist[d].compile(ctx);
-    return super.compile(ctx);
+  public FTExpr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    for(int d = 0; d < dist.length; d++) dist[d] = dist[d].compile(ctx, scp);
+    return super.compile(ctx, scp);
   }
 
   @Override
@@ -84,22 +87,27 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final Expr d : dist) c += d.count(v);
-    return c + super.count(v);
-  }
-
-  @Override
   public boolean removable(final Var v) {
     for(final Expr d : dist) if(!d.removable(v)) return false;
     return super.removable(v);
   }
 
   @Override
-  public FTExpr remove(final Var v) {
-    for(int d = 0; d != dist.length; ++d) dist[d] = dist[d].remove(v);
-    return super.remove(v);
+  public VarUsage count(final Var v) {
+    return super.count(v).plus(VarUsage.sum(v, dist));
+  }
+
+  @Override
+  public FTExpr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return inlineAll(ctx, scp, expr, v, e) | inlineAll(ctx, scp, dist, v, e)
+        ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTDistance(info, expr[0].copy(ctx, scp, vs),
+        Arr.copyAll(ctx, scp, vs, dist), unit);
   }
 
   @Override
@@ -117,5 +125,18 @@ public final class FTDistance extends FTFilter {
   public String toString() {
     return super.toString() + DISTANCE + PAR1 +
       dist[0] + '-' + dist[1] + ' ' + unit + PAR2;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr) && visitAll(visitor, dist);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final FTExpr e : expr) sz += e.exprSize();
+    for(final Expr e : dist) sz += e.exprSize();
+    return sz;
   }
 }
