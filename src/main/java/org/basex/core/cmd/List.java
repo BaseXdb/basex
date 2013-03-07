@@ -51,7 +51,7 @@ public final class List extends Command {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
+  public boolean databases(final StringList db) {
     return false;
   }
 

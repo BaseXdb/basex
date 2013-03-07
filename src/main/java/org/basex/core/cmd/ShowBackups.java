@@ -16,12 +16,12 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class ShowBackups extends Command {
+public final class ShowBackups extends ABackup {
   /**
    * Default constructor.
    */
   public ShowBackups() {
-    super(Perm.CREATE);
+    super();
   }
 
   @Override
@@ -44,8 +44,8 @@ public final class ShowBackups extends Command {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
-    return true;
+  public boolean updating(final Context ctx) {
+    return false;
   }
 
   @Override

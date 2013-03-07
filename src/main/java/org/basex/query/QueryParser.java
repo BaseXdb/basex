@@ -572,7 +572,7 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(QNAMEINV, URICHECK);
     final byte[] val = stringLiteral();
 
-    if(ctx.sc.xquery3() && eq(name.prefix(), OUTPUT)) {
+    if(ctx.sc.xquery3() && eq(name.uri(), OUTPUTURI)) {
       // output declaration
       final String key = string(name.local());
       if(module != null) error(MODOUT);
@@ -583,7 +583,7 @@ public class QueryParser extends InputParser {
 
       ctx.serProp.set(key, string(val));
       serial.add(key);
-    } else if(eq(name.prefix(), DB)) {
+    } else if(eq(name.uri(), DBURI)) {
       // project-specific declaration
       final String key = string(uc(name.local()));
       final Object obj = ctx.context.prop.get(key);
@@ -592,6 +592,15 @@ public class QueryParser extends InputParser {
       ctx.globalOpt.put(key, obj);
       ctx.dbOptions.add(key);
       ctx.dbOptions.add(string(val));
+    } else if(eq(name.uri(), QUERYURI)) {
+      // Query-specific options
+      if(eq(name.local(), READ_LOCK))
+        for (String lock : string(val).split("\\s*,\\s*"))
+          ctx.userReadLocks.add(DBLocking.USER_PREFIX + lock);
+      else if(eq(name.local(), WRITE_LOCK)) {
+        for (String lock : string(val).split("\\s*,\\s*"))
+          ctx.userWriteLocks.add(DBLocking.USER_PREFIX + lock);
+      } else error(BASX_OPTIONS, string(name.local()));
     }
     // ignore unknown options
   }

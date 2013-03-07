@@ -15,13 +15,13 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DropBackup extends Command {
+public class DropBackup extends ABackup {
   /**
    * Default constructor.
    * @param name name of database
    */
   public DropBackup(final String name) {
-    super(Perm.CREATE, name);
+    super(name);
   }
 
   @Override
@@ -39,11 +39,6 @@ public final class DropBackup extends Command {
     if(dbs.size() == 0) drop(name, context);
 
     return info(BACKUP_DROPPED_X, name + '*' + IO.ZIPSUFFIX);
-  }
-
-  @Override
-  protected boolean databases(final StringList db) {
-    return databases(db, 0);
   }
 
   /**

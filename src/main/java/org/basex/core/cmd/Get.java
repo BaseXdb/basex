@@ -54,7 +54,7 @@ public final class Get extends AGet {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
+  public boolean databases(final StringList db) {
     return true;
   }
 }

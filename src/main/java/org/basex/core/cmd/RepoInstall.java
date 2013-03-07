@@ -43,7 +43,8 @@ public final class RepoInstall extends Command {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
+  public boolean databases(final StringList db) {
+    db.add(DBLocking.REPO);
     return true;
   }
 

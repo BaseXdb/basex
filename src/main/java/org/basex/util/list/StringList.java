@@ -33,7 +33,7 @@ public class StringList extends ElementList implements Iterable<String> {
    * Lightweight constructor, assigning the specified array.
    * @param l initial array
    */
-  public StringList(final String[] l) {
+  public StringList(final String... l) {
     list = l;
     size = l.length;
   }
@@ -145,7 +145,7 @@ public class StringList extends ElementList implements Iterable<String> {
   /**
    * Sorts the elements.
    * @param cs respect case sensitivity
-   * @param asc ascending/descending flag
+   * @param asc ascending (true)/descending (false) flag
    * @param pos position where sorting starts
    * @return self reference
    */
