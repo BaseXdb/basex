@@ -3,7 +3,6 @@ package org.basex.query.func;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -26,15 +25,16 @@ public final class BaseFuncCall extends UserFuncCall {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    Expr fun = func;
-    Var[] args = args(ctx);
+  public Item item(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    UserFunc fun = func;
+    Value[] args = args(ctx);
 
     final int calls = ctx.tailCalls;
     try {
       do {
         // cache arguments, evaluate function and reset variable scope
-        final VarStack cs = addArgs(ctx, args);
+        final int fp = addArgs(ctx, ii, fun.scope, fun.args, args);
         ctx.tailCalls = 0;
         try {
           return fun.item(ctx, ii);
@@ -42,7 +42,7 @@ public final class BaseFuncCall extends UserFuncCall {
           fun = c.getFunc();
           args = c.getArgs();
         } finally {
-          ctx.vars.reset(cs);
+          fun.scope.exit(ctx, fp);
         }
       } while(true);
     } catch(final QueryException ex) {
@@ -55,14 +55,14 @@ public final class BaseFuncCall extends UserFuncCall {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    Expr fun = func;
-    Var[] args = args(ctx);
+    UserFunc fun = func;
+    Value[] args = args(ctx);
 
     final int calls = ctx.tailCalls;
     try {
       do {
         // cache arguments, evaluate function and reset variable scope
-        final VarStack cs = addArgs(ctx, args);
+        final int fp = addArgs(ctx, info, fun.scope, fun.args, args);
         ctx.tailCalls = 0;
         try {
           return ctx.value(fun);
@@ -70,7 +70,7 @@ public final class BaseFuncCall extends UserFuncCall {
           fun = c.getFunc();
           args = c.getArgs();
         } finally {
-          ctx.vars.reset(cs);
+          fun.scope.exit(ctx, fp);
         }
       } while(true);
     } catch(final QueryException ex) {
@@ -83,7 +83,6 @@ public final class BaseFuncCall extends UserFuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    // [LW] XQuery: make result streamable
     return value(ctx).iter();
   }
 

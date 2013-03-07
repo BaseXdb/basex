@@ -45,10 +45,18 @@ public final class StaticContext {
   /** Copy-namespaces mode: (no-)inherit. */
   public boolean nsInherit = true;
   /** XQuery version flag. */
-  public boolean xquery3;
+  boolean xquery3;
 
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
+
+  /**
+   * Constructor setting the XQuery version.
+   * @param xq30 XQuery 3.0 flag
+   */
+  public StaticContext(final boolean xq30) {
+    xquery3 = xq30;
+  }
 
   /**
    * Declares a namespace.
@@ -107,6 +115,14 @@ public final class StaticContext {
       final IO io = IO.get(uri);
       baseURI = Uri.uri(io instanceof IOFile ? io.url() : uri);
     }
+  }
+
+  /**
+   * Checks if XQuery 3.0 features are allowed.
+   * @return {@code true} if XQuery 3.0 is allowed, {@code false} otherwise
+   */
+  public boolean xquery3() {
+    return xquery3;
   }
 
   @Override

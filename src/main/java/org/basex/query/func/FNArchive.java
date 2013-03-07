@@ -28,7 +28,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class FNArchive extends StandardFunc {
+public final class FNArchive extends StandardFunc {
   /** Archive namespace. */
   private static final Atts NS = new Atts(ARCHIVE, ARCHIVEURI);
   /** Element: Entry. */

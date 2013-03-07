@@ -7,7 +7,9 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -38,9 +40,10 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx) throws QueryException {
-    weight = weight.compile(ctx);
-    return super.compile(ctx);
+  public FTExpr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    weight = weight.compile(ctx, scp);
+    return super.compile(ctx, scp);
   }
 
   // called by sequential variant
@@ -89,19 +92,30 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public int count(final Var v) {
-    return weight.count(v) + super.count(v);
-  }
-
-  @Override
   public boolean removable(final Var v) {
     return weight.removable(v) && super.removable(v);
   }
 
   @Override
-  public FTExpr remove(final Var v) {
-    weight = weight.remove(v);
-    return super.remove(v);
+  public VarUsage count(final Var v) {
+    return weight.count(v).plus(super.count(v));
+  }
+
+  @Override
+  public FTExpr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    boolean change = inlineAll(ctx, scp, expr, v, e);
+    final Expr w = weight.inline(ctx, scp, v, e);
+    if(w != null) {
+      weight = w;
+      change = true;
+    }
+    return change ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTWeight(info, expr[0].copy(ctx, scp, vs), weight.copy(ctx, scp, vs));
   }
 
   @Override
@@ -117,5 +131,17 @@ public final class FTWeight extends FTExpr {
   @Override
   public String toString() {
     return expr[0] + " " + QueryText.WEIGHT + ' ' + weight;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr) && weight.accept(visitor);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final FTExpr e : expr) sz += e.exprSize();
+    return sz + weight.exprSize();
   }
 }

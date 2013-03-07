@@ -5,8 +5,10 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -40,9 +42,10 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx) throws QueryException {
-    win = win.compile(ctx);
-    return super.compile(ctx);
+  public FTExpr compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    win = win.compile(ctx, scp);
+    return super.compile(ctx, scp);
   }
 
   @Override
@@ -84,19 +87,27 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public int count(final Var v) {
-    return win.count(v) + super.count(v);
-  }
-
-  @Override
   public boolean removable(final Var v) {
     return win.removable(v) && super.removable(v);
   }
 
   @Override
-  public FTExpr remove(final Var v) {
-    win = win.remove(v);
-    return super.remove(v);
+  public VarUsage count(final Var v) {
+    return win.count(v).plus(super.count(v));
+  }
+
+  @Override
+  public FTExpr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    final boolean ex = inlineAll(ctx, scp, expr, v, e);
+    final Expr w = win.inline(ctx, scp, v, e);
+    if(w != null) win = w;
+    return ex || w != null ? optimize(ctx, scp) : null;
+  }
+
+  @Override
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new FTWindow(info, expr[0].copy(ctx, scp, vs), win.copy(ctx, scp, vs), unit);
   }
 
   @Override
@@ -112,5 +123,17 @@ public final class FTWindow extends FTFilter {
   @Override
   public String toString() {
     return super.toString() + QueryText.WINDOW + ' ' + win + ' ' + unit;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr) && win.accept(visitor);
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final FTExpr e : expr) sz += e.exprSize();
+    return sz + win.exprSize();
   }
 }

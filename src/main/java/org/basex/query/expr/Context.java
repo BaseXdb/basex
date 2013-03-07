@@ -5,11 +5,12 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -30,7 +31,7 @@ public final class Context extends Simple {
   }
 
   @Override
-  public Context compile(final QueryContext ctx) {
+  public Context compile(final QueryContext ctx, final VarScope scp) {
     if(ctx.value != null) {
       type = ctx.value.type();
       size = ctx.value.size();
@@ -64,6 +65,11 @@ public final class Context extends Simple {
   }
 
   @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return copyType(new Context(info));
+  }
+
+  @Override
   public boolean databases(final StringList db) {
     // [JE] XQuery: should only be added if placed outside a predicate
     db.add("");
@@ -75,7 +81,7 @@ public final class Context extends Simple {
     // replacing context node with text() node to facilitate index rewritings
     if(!ctx.leaf) return this;
     ctx.compInfo(OPTTEXT);
-    return Path.get(info, null, AxisStep.get(info, Axis.CHILD, Test.TXT));
+    return Path.get(info, null, Step.get(info, Axis.CHILD, Test.TXT));
   }
 
   @Override

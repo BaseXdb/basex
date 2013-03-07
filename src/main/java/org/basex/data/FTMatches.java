@@ -131,4 +131,17 @@ public final class FTMatches implements Iterable<FTMatch> {
     for(final FTMatch m : this) sb.append("\n  ").append(m);
     return sb.toString();
   }
+
+  /**
+   * Creates a deep copy of this container.
+   * @return copy
+   */
+  public FTMatches copy() {
+    final FTMatches ftm = new FTMatches(sTokenNum);
+    ftm.size = size;
+    ftm.match = match.clone();
+    for(int i = 0; i < ftm.match.length; i++)
+      if(ftm.match[i] != null) ftm.match[i] = ftm.match[i].copy();
+    return ftm;
+  }
 }

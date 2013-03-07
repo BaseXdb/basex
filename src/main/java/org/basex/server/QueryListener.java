@@ -141,7 +141,7 @@ final class QueryListener extends Progress {
             if(full) {
               po.write(it.xdmInfo());
             } else {
-              po.write(it.typeId());
+              po.write(it.typeId().asByte());
             }
             ser.reset();
           }
@@ -163,7 +163,7 @@ final class QueryListener extends Progress {
         throw new BaseXException(ex);
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
-        throw new BaseXException(CIRCLDECL.desc);
+        throw new BaseXException(BASX_STACKOVERFLOW.desc);
       } catch(final ProgressException ex) {
         throw new BaseXException(TIMEOUT_EXCEEDED);
       }

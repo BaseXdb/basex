@@ -76,4 +76,14 @@ public final class FTPos {
   public int size() {
     return pos.length;
   }
+
+  /**
+   * Creates a copy.
+   * @return the copy
+   */
+  public FTPos copy() {
+    final FTPos ftp = new FTPos(pre, pos.clone());
+    ftp.sorted = sorted;
+    return ftp;
+  }
 }

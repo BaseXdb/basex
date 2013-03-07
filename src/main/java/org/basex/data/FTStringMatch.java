@@ -64,4 +64,15 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
     sb.append(s == e ? String.valueOf(s) : s + "-" + e);
     return sb.append(']').toString();
   }
+
+  /**
+   * Creates a copy of this string match.
+   * @return copy
+   */
+  protected FTStringMatch copy() {
+    final FTStringMatch fts = new FTStringMatch(s, e, q);
+    fts.ex = ex;
+    fts.g = g;
+    return fts;
+  }
 }

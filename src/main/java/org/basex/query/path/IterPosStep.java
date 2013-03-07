@@ -1,8 +1,11 @@
 package org.basex.query.path;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
+import org.basex.util.hash.*;
 
 /**
  * Iterative step expression with numeric predicates.
@@ -10,12 +13,12 @@ import org.basex.query.value.node.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class IterPosStep extends AxisStep {
+final class IterPosStep extends Step {
   /**
    * Constructor.
    * @param s step reference
    */
-  IterPosStep(final AxisStep s) {
+  IterPosStep(final Step s) {
     super(s.info, s.axis, s.test, s.preds);
     last = s.last;
     pos = s.pos;
@@ -71,5 +74,13 @@ final class IterPosStep extends AxisStep {
         return true;
       }
     };
+  }
+
+  @Override
+  public Step copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
+    final Expr[] pred = new Expr[preds.length];
+    for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(ctx, scp, vs);
+    return copy(new IterPosStep(new AxisStep(info, axis, test.copy(), pred)));
   }
 }

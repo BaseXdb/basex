@@ -4,7 +4,9 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Iterative step expression without numeric predicates.
@@ -12,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class IterStep extends AxisStep {
+final class IterStep extends Step {
   /**
    * Constructor.
    * @param ii input info
@@ -47,5 +49,13 @@ final class IterStep extends AxisStep {
         return true;
       }
     };
+  }
+
+  @Override
+  public IterStep copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
+    final Expr[] pred = new Expr[preds.length];
+    for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(ctx, scp, vs);
+    return copy(new IterStep(info, axis, test.copy(), pred));
   }
 }

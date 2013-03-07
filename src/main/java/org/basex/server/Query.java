@@ -103,10 +103,7 @@ public abstract class Query {
    * @return item type
    */
   public final Type type() {
-    final byte id = types.get(pos - 1);
-    for(final AtomType t : AtomType.values()) if(t.id() == id) return t;
-    for(final NodeType t : NodeType.values()) if(t.id() == id) return t;
-    return null;
+    return Type.ID.getType(types.get(pos - 1));
   }
 
   /**

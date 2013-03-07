@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -26,7 +27,7 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) {
+  public Expr compile(final QueryContext ctx, final VarScope scp) {
     return this;
   }
 
@@ -36,18 +37,19 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public int count(final Var v) {
-    return 0;
-  }
-
-  @Override
   public boolean removable(final Var v) {
     return true;
   }
 
   @Override
-  public Expr remove(final Var v) {
-    return this;
+  public VarUsage count(final Var v) {
+    return VarUsage.NEVER;
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return null;
   }
 
   @Override
@@ -58,5 +60,15 @@ public abstract class Simple extends ParseExpr {
   @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem());
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return true;
+  }
+
+  @Override
+  public int exprSize() {
+    return 1;
   }
 }

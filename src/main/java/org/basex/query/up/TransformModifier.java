@@ -38,7 +38,7 @@ public final class TransformModifier extends ContextModifier {
     /* Disallow side-effecting updates within transform expressions.
      * Currently, also fn:put() is rejected
      * (future discussion: https://www.w3.org/Bugs/Public/show_bug.cgi?id=13970). */
-    if(o instanceof BasicOperation) BASEX_DBTRANSFORM.thrw(o.getInfo());
+    if(o instanceof BasicOperation) BASX_DBTRANSFORM.thrw(o.getInfo());
 
     add(o);
     /* check if the target node of the given primitive has been copied in the

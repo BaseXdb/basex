@@ -6,7 +6,9 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Castable expression.
@@ -31,19 +33,24 @@ public final class Castable extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    super.compile(ctx, scp);
     return expr.isValue() ? preEval(ctx) : this;
   }
 
   @Override
   public Bln item(final QueryContext ctx, final InputInfo ii) {
     try {
-      seq.cast(expr.item(ctx, ii), true, ctx, ii, this);
+      seq.cast(expr.item(ctx, ii), ctx, ii, this);
       return Bln.TRUE;
     } catch(final QueryException ex) {
       return Bln.FALSE;
     }
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Castable(info, expr.copy(ctx, scp, vs), seq);
   }
 
   @Override

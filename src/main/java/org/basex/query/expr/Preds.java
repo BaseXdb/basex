@@ -9,17 +9,17 @@ import org.basex.query.expr.CmpG.OpG;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
 import org.basex.query.path.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
  * Abstract predicate expression, implemented by {@link Filter} and
- * {@link AxisStep}.
+ * {@link Step}.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -48,9 +48,9 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) throws QueryException {
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     for(int p = 0; p < preds.length; ++p) {
-      Expr pr = preds[p].compile(ctx).compEbv(ctx);
+      Expr pr = preds[p].compile(ctx, scp).compEbv(ctx);
       pr = Pos.get(OpV.EQ, pr, pr, info);
 
       // position() = last() -> last()
@@ -150,22 +150,20 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public int count(final Var v) {
-    int c = 0;
-    for(final Expr p : preds) c += p.count(v);
-    return c;
-  }
-
-  @Override
   public boolean removable(final Var v) {
-    for(final Expr p : preds) if(p.count(v) != 0) return false;
+    for(final Expr p : preds) if(p.uses(v)) return false;
     return true;
   }
 
   @Override
-  public Expr remove(final Var v) {
-    for(int p = 0; p < preds.length; ++p) preds[p] = preds[p].remove(v);
-    return this;
+  public VarUsage count(final Var v) {
+    return VarUsage.sum(v, preds);
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    return inlineAll(ctx, scp, preds, v, e) ? optimize(ctx, scp) : null;
   }
 
   @Override
@@ -184,5 +182,17 @@ public abstract class Preds extends ParseExpr {
     final StringBuilder sb = new StringBuilder();
     for(final Expr e : preds) sb.append("[" + e + ']');
     return sb.toString();
+  }
+
+  /**
+   * Copies fields to the given object.
+   * @param <T> object type
+   * @param p copy
+   * @return the copy
+   */
+  protected <T extends Preds> T copy(final T p) {
+    p.last = last;
+    p.pos = pos;
+    return copyType(p);
   }
 }

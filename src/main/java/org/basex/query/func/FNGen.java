@@ -77,7 +77,7 @@ public final class FNGen extends StandardFunc {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  Expr opt(final QueryContext ctx) throws QueryException {
     if(sig == Function.DATA && expr.length == 1) {
       final SeqType t = expr[0].type();
       type = t.type.isNode() ? SeqType.get(AtomType.ATM, t.occ) : t;

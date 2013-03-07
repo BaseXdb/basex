@@ -6,7 +6,9 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Document fragment.
@@ -31,6 +33,11 @@ public final class CDoc extends CFrag {
     if(c.errAtt || c.atts.size() != 0) XPATT.thrw(ii);
     if(c.errNS || c.nspaces.size() != 0) XPNS.thrw(ii);
     return new FDoc(c.children, Token.EMPTY);
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new CDoc(info, expr[0].copy(ctx, scp, vs));
   }
 
   @Override

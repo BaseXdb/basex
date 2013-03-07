@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public class FNCrypto extends StandardFunc {
+public final class FNCrypto extends StandardFunc {
 
   /**
    * Constructor.

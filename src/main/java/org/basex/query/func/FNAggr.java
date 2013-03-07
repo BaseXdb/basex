@@ -58,7 +58,7 @@ public final class FNAggr extends StandardFunc {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  Expr opt(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
     final long c = e.size();
     if(c < 0 || e.uses(Use.NDT)) return this;

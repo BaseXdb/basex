@@ -8,7 +8,9 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -28,7 +30,7 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx) {
+  public Expr compile(final QueryContext ctx, final VarScope scp) {
     return ctx.value != null && ctx.value.type == NodeType.DOC ? ctx.value : this;
   }
 
@@ -42,6 +44,11 @@ public final class Root extends Simple {
       nc.add(n);
     }
     return nc;
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    return new Root(info);
   }
 
   /**

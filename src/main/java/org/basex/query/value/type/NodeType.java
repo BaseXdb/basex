@@ -27,10 +27,10 @@ import org.w3c.dom.Text;
  */
 public enum NodeType implements Type {
   /** Node type. */
-  NOD("node", AtomType.ITEM, 8),
+  NOD("node", AtomType.ITEM, ID.NOD),
 
   /** Text type. */
-  TXT("text", NOD, 9) {
+  TXT("text", NOD, ID.TXT) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) {
       if(o instanceof BXText) return ((BXText) o).getNode();
@@ -40,7 +40,7 @@ public enum NodeType implements Type {
   },
 
   /** PI type. */
-  PI("processing-instruction", NOD, 10) {
+  PI("processing-instruction", NOD, ID.PI) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXPI) return ((BXPI) o).getNode();
@@ -54,7 +54,7 @@ public enum NodeType implements Type {
   },
 
   /** Element type. */
-  ELM("element", NOD, 11) {
+  ELM("element", NOD, ID.ELM) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXElem)  return ((BXElem) o).getNode();
@@ -70,7 +70,7 @@ public enum NodeType implements Type {
   },
 
   /** Document type. */
-  DOC("document-node", NOD, 12) {
+  DOC("document-node", NOD, ID.DOC) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXDoc) return ((BXDoc) o).getNode();
@@ -95,7 +95,7 @@ public enum NodeType implements Type {
   },
 
   /** Document element type. */
-  DEL("document-node(element())", NOD, 13) {
+  DEL("document-node(element())", NOD, ID.DEL) {
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
       return DOC.cast(o, ii);
@@ -103,7 +103,7 @@ public enum NodeType implements Type {
   },
 
   /** Attribute type. */
-  ATT("attribute", NOD, 14) {
+  ATT("attribute", NOD, ID.ATT) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXAttr) return ((BXAttr) o).getNode();
@@ -115,7 +115,7 @@ public enum NodeType implements Type {
   },
 
   /** Comment type. */
-  COM("comment", NOD, 15) {
+  COM("comment", NOD, ID.COM) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXComm) return ((BXComm) o).getNode();
@@ -127,20 +127,20 @@ public enum NodeType implements Type {
   },
 
   /** Namespace type. */
-  NSP("namespace-node", NOD, 16),
+  NSP("namespace-node", NOD, ID.NSP),
 
   /** Schema-element. */
-  SCE("schema-element", NOD, 17),
+  SCE("schema-element", NOD, ID.SCE),
 
   /** Schema-attribute. */
-  SCA("schema-attribute", NOD, 18);
+  SCA("schema-attribute", NOD, ID.SCA);
 
   /** String representation. */
   private final byte[] string;
   /** Parent type. */
   private final Type par;
   /** Type id . */
-  private final byte id;
+  private final ID id;
   /** Sequence type. */
   private SeqType seq;
 
@@ -150,10 +150,10 @@ public enum NodeType implements Type {
    * @param pr parent type
    * @param i type id
    */
-  NodeType(final String nm, final Type pr, final int i) {
+  NodeType(final String nm, final Type pr, final ID i) {
     string = Token.token(nm);
     par = pr;
-    id = (byte) i;
+    id = i;
   }
 
   @Override
@@ -206,12 +206,28 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public final boolean instanceOf(final Type t) {
-    return this == t || par != null && par.instanceOf(t);
+  public boolean eq(final Type t) {
+    return this == t;
   }
 
   @Override
-  public int id() {
+  public final boolean instanceOf(final Type t) {
+    return this == t || par.instanceOf(t);
+  }
+
+  @Override
+  public Type union(final Type t) {
+    return !t.isNode() ? AtomType.ITEM : this == t ? this : NOD;
+  }
+
+  @Override
+  public NodeType intersect(final Type t) {
+    if(!(t instanceof NodeType)) return instanceOf(t) ? this : null;
+    return this == t ? this : this == NOD ? ((NodeType) t) : t == NOD ? this : null;
+  }
+
+  @Override
+  public ID id() {
     return id;
   }
 
@@ -249,6 +265,21 @@ public enum NodeType implements Type {
         if(Token.eq(ln, t.string)) return t;
       }
     }
+    return null;
+  }
+
+  @Override
+  public boolean nsSensitive() {
+    return false;
+  }
+
+  /**
+   * Gets the type instance for the given ID.
+   * @param id type ID
+   * @return corresponding type if found, {@code null} otherwise
+   */
+  static Type getType(final Type.ID id) {
+    for(final NodeType t : values()) if(t.id == id) return t;
     return null;
   }
 }

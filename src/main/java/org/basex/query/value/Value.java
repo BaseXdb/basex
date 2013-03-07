@@ -17,7 +17,9 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -47,7 +49,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final Value compile(final QueryContext ctx) {
+  public final Value compile(final QueryContext ctx, final VarScope scp) {
     return this;
   }
 
@@ -113,17 +115,25 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public int count(final Var v) {
-    return 0;
-  }
-
-  @Override
   public final boolean removable(final Var v) {
     return true;
   }
 
   @Override
-  public final Expr remove(final Var v) {
+  public final VarUsage count(final Var v) {
+    return VarUsage.NEVER;
+  }
+
+  @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp,
+      final Var v, final Expr e) throws QueryException {
+    // values do not contain variable references
+    return null;
+  }
+
+  @Override
+  public Value copy(final QueryContext ctx, final VarScope scp,
+      final IntMap<Var> vs) {
     return this;
   }
 
@@ -199,4 +209,14 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @return result of check
    */
   public abstract boolean homogeneous();
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return true;
+  }
+
+  @Override
+  public final int exprSize() {
+    return 1;
+  }
 }

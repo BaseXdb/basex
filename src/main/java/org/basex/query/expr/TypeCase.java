@@ -1,14 +1,19 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
+import org.basex.query.iter.Iter;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
+import org.basex.query.value.type.*;
+import org.basex.query.var.*;
+import org.basex.util.InputInfo;
+import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Case expression for typeswitch.
@@ -18,48 +23,83 @@ import org.basex.util.*;
  */
 public final class TypeCase extends Single {
   /** Variable. */
-  final Var var;
+  private final Var var;
+  /** Matched sequence types. */
+  final SeqType[] types;
 
   /**
    * Constructor.
    * @param ii input info
    * @param v variable
+   * @param ts sequence types this case matches, the empty array means {@code default}
    * @param r return expression
    */
-  public TypeCase(final InputInfo ii, final Var v, final Expr r) {
+  public TypeCase(final InputInfo ii, final Var v, final SeqType[] ts, final Expr r) {
     super(ii, r);
     var = v;
+    types = ts;
   }
 
   @Override
-  public TypeCase compile(final QueryContext ctx) throws QueryException {
-    return compile(ctx, null);
+  public TypeCase compile(final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return compile(ctx, scp, null);
   }
 
   /**
    * Compiles the expression.
    * @param ctx query context
+   * @param scp variable scope
    * @param v value to be bound
    * @return resulting item
    * @throws QueryException query exception
    */
-  TypeCase compile(final QueryContext ctx, final Value v) throws QueryException {
-    final int s = ctx.vars.size();
-    if(var.name != null) ctx.vars.add(v == null ? var : var.bind(v, ctx).copy());
+  TypeCase compile(final QueryContext ctx, final VarScope scp, final Value v)
+      throws QueryException {
+    if(var != null && v != null) ctx.set(var, v, info);
     try {
-      super.compile(ctx);
+      super.compile(ctx, scp);
     } catch(final QueryException ex) {
       // replace original expression with error
       expr = FNInfo.error(ex, info);
     }
-    ctx.vars.size(s);
     type = expr.type();
     return this;
   }
 
   @Override
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
+      final Expr e) throws QueryException {
+    try {
+      return super.inline(ctx, scp, v, e);
+    } catch(final QueryException qe) {
+      expr = FNInfo.error(qe, info);
+      return this;
+    }
+  }
+
+  @Override
+  public TypeCase copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    final Var v = var == null ? null : scp.newCopyOf(ctx, var);
+    if(var != null) vs.add(var.id, v);
+    final TypeCase tc = new TypeCase(info, v, types.clone(), expr.copy(ctx, scp, vs));
+    return tc;
+  }
+
+  @Override
   public boolean uses(final Use u) {
-    return u == Use.VAR || super.uses(u);
+    return u == Use.X30 && types != null && types.length > 1 || super.uses(u);
+  }
+
+  /**
+   * Checks if the given value matches this case.
+   * @param val value to be matched
+   * @return {@code true} if it matches, {@code false} otherwise
+   */
+  public boolean matches(final Value val) {
+    if(types.length == 0) return true;
+    for(final SeqType t : types) if(t.instance(val)) return true;
+    return false;
   }
 
   /**
@@ -70,33 +110,62 @@ public final class TypeCase extends Single {
    * @throws QueryException query exception
    */
   Iter iter(final QueryContext ctx, final Value seq) throws QueryException {
-    if(var.type != null && !var.type.instance(seq)) return null;
-    if(var.name == null) return ctx.iter(expr);
+    if(!matches(seq)) return null;
 
-    final int s = ctx.vars.size();
-    ctx.vars.add(var.bind(seq, ctx).copy());
-    try {
-      return ctx.value(expr).iter();
-    } finally {
-      ctx.vars.size(s);
-    }
+    if(var == null) return ctx.iter(expr);
+    ctx.set(var, seq, info);
+    return ctx.value(expr).iter();
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(VAR, var.name != null ? var.name.string() : ""), expr);
+    final FElem e = planElem();
+    if(types.length == 0) {
+      e.add(planAttr(Token.token(DEFAULT), Token.TRUE));
+    } else {
+      final byte[] or = new byte[] { ' ', '|', ' ' };
+      final ByteList bl = new ByteList();
+      for(final SeqType t : types) {
+        if(bl.size() > 0) bl.add(or);
+        bl.add(Token.token(t.toString()));
+      }
+      e.add(planAttr(Token.token(TYPE), bl.toArray()));
+    }
+    if(var != null) e.add(planAttr(VAR, Token.token(var.toString())));
+    expr.plan(e);
+    plan.add(e);
   }
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(var.type == null ? DEFAULT : CASE);
-    if(var.name != null) tb.add(' ');
-    return tb.add(var + " " + RETURN + ' ' + expr).toString();
+    final TokenBuilder tb = new TokenBuilder(types.length == 0 ? DEFAULT : CASE);
+    if(var != null) {
+      tb.add(' ').add(var.toString());
+      if(types.length != 0) tb.add(' ').add(AS);
+    }
+    if(types.length != 0) {
+      for(int i = 0; i < types.length; i++) {
+        if(i > 0) tb.add(" |");
+        tb.add(' ').add(types[i].toString());
+      }
+    }
+    return tb.add(" " + RETURN + ' ' + expr).toString();
   }
 
   @Override
   public TypeCase markTailCalls() {
     expr = expr.markTailCalls();
     return this;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return var == null ? expr.accept(visitor)
+                       : visitor.declared(var) && expr.accept(visitor);
+  }
+
+  @Override
+  public int exprSize() {
+    return expr.exprSize();
   }
 }
