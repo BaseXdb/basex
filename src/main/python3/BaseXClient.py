@@ -96,7 +96,6 @@ class Session(object):
     see http://docs.basex.org/wiki/Server_Protocol
     """
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def __init__(self, host, port, user, password,
                  receive_bytes_encoding='utf-8',
                  send_bytes_encoding='utf-8'):
@@ -131,7 +130,6 @@ class Session(object):
         if not self.server_response_success():
             raise IOError('Access Denied.')
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def execute(self, com):
         """Execute a command and return the result"""
         # send command to server
@@ -144,27 +142,22 @@ class Session(object):
             raise IOError(self.__info)
         return result
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def query(self, querytxt):
         """Creates a new query instance (having id returned from server)."""
         return Query(self, querytxt)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def create(self, name, content):
         """Creates a new database with the specified input (may be empty)."""
         self.__send_input(8, name, content)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def add(self, path, content):
         """Adds a new resource to the opened database."""
         self.__send_input(9, path, content)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def replace(self, path, content):
         """Replaces a resource with the specified input."""
         self.__send_input(12, path, content)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def store(self, path, content):
         """Stores a binary resource in the opened database.
 
@@ -176,12 +169,10 @@ yourself explicitly."""
         #
         # ------------------------------------------
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def info(self):
         """Return process information"""
         return self.__info
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def close(self):
         """Close the session"""
         self.send('exit')
@@ -265,7 +256,6 @@ yourself explicitly."""
         """Send the defined string"""
         self.__swrapper.sendall(value + chr(0))
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def __send_input(self, code, arg, content):
         """internal. don't care."""
         self.__swrapper.sendall(chr(code) + arg + chr(0) + content + chr(0))
@@ -330,60 +320,49 @@ class Query():
     see http://docs.basex.org/wiki/Server_Protocol
     """
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def __init__(self, session, querytxt):
         """Create query object with session and query"""
         self.__session = session
         self.__id = self.__exc(chr(0), querytxt)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def bind(self, name, value, datatype=''):
         """Binds a value to a variable.
 An empty string can be specified as data type."""
         self.__exc(chr(3), self.__id + chr(0) + name + chr(0) + value + chr(0) + datatype)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def context(self, value, datatype=''):
         """Bind the context item"""
         self.__exc(chr(14), self.__id + chr(0) + value + chr(0) + datatype)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def iter(self):
         """iterate while the query returns items"""
         self.__session.send(chr(4) + self.__id)
         return self.__session.iter_receive()
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def execute(self):
         """Execute the query and return the result"""
         return self.__exc(chr(5), self.__id)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def info(self):
         """Return query information"""
         return self.__exc(chr(6), self.__id)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def options(self):
         """Return serialization parameters"""
         return self.__exc(chr(7), self.__id)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def updating(self):
         """Returns true if the query may perform updates; false otherwise."""
         return self.__exc(chr(30), self.__id)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def full(self):
         """Returns all resulting items as strings, prefixed by XDM Meta Data."""
         return self.__exc(chr(31), self.__id)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def close(self):
         """Close the query"""
         self.__exc(chr(2), self.__id)
 
-    # see http://docs.basex.org/wiki/Server_Protocol
     def __exc(self, cmd, arg):
         """internal. don't care."""
         #should we expose this?

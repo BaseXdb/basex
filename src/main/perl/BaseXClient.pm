@@ -132,7 +132,7 @@ package Query;
 
 our $session;
 our @cache;
-our $pos = 0;
+our $pos;
 our $id;
 
 sub new {
@@ -149,14 +149,18 @@ sub bind {
   my $name = shift;
   my $value = shift;
   my $type = shift;
+  $type = "" if !$type;
   exc(chr(3), $id.chr(0).$name.chr(0).$value.chr(0).$type);
+  undef @cache;
 }
 
 sub context {
   shift;
   my $value = shift;
   my $type = shift;
+  $type = "" if !$type;
   exc(chr(14), $id.chr(0).$value.chr(0).$type);
+  undef @cache;
 }
 
 sub execute {
@@ -168,8 +172,11 @@ sub more {
     $session->send(chr(4).$id.chr(0));
     push(@cache, $session->_receive()) while $session->_read();
     die $session->_receive() if !$session->ok();
+    $pos = 0;
   }
-  return $pos < @cache;
+  my $more = $pos < @cache;
+  undef @cache if !$more;
+  return $more;
 }
 
 sub next {
@@ -193,9 +200,7 @@ sub exc {
   my $arg = shift;
   $session->send($cmd.$arg);
   my $s = $session->_receive();
-  if (!$session->ok()) {
-    die $session->_receive();
-  }
+  die $session->_receive() if !$session->ok();
   return $s;
 }
 

@@ -37,6 +37,17 @@ final class RestXqModules {
   }
 
   /**
+   * Lists all available URIs.
+   * @param http HTTP context
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  synchronized void wadl(final HTTPContext http) throws QueryException, IOException {
+    analyze(http);
+    new RestXqWadl().create(http, modules);
+  }
+
+  /**
    * Returns the module that matches the specified request, or {@code null}.
    * @param http HTTP context
    * @throws QueryException query exception

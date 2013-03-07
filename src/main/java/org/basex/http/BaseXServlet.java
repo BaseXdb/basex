@@ -21,10 +21,26 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class BaseXServlet extends HttpServlet {
+  /** Servlet-specific user. */
+  protected String user;
+  /** Servlet-specific password. */
+  protected String pass;
+
   @Override
   public final void init(final ServletConfig config) throws ServletException {
     try {
       HTTPContext.init(config.getServletContext());
+      final Enumeration<String> en = config.getInitParameterNames();
+      while(en.hasMoreElements()) {
+        String key = en.nextElement().toLowerCase();
+        final String val = config.getInitParameter(key);
+        if(key.startsWith(Prop.DBPREFIX)) key = key.substring(Prop.DBPREFIX.length());
+        if(key.equalsIgnoreCase(MainProp.USER[0].toString())) {
+          user = val;
+        } else if(key.equalsIgnoreCase(MainProp.PASSWORD[0].toString())) {
+          pass = val;
+        }
+      }
     } catch(final IOException ex) {
       throw new ServletException(ex);
     }
@@ -34,7 +50,7 @@ public abstract class BaseXServlet extends HttpServlet {
   public final void service(final HttpServletRequest req, final HttpServletResponse res)
       throws IOException {
 
-    final HTTPContext http = new HTTPContext(req, res);
+    final HTTPContext http = new HTTPContext(req, res, this);
     try {
       run(http);
       http.log("", SC_OK);

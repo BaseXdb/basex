@@ -20,11 +20,17 @@ public final class RestXqServlet extends BaseXServlet {
     // authenticate user
     http.session();
 
-    // selects an XQuery function for the specified annotation
-    final RestXqFunction func = RestXqModules.get().find(http);
-    // no function found: return 404
-    if(func == null) HTTPErr.NO_XQUERY.thrw();
-    // process function
-    func.process(http);
+    // analyze input path
+    final RestXqModules rxm = RestXqModules.get();
+    if(http.req.getPathInfo().equals('/' + HTTPText.WADL)) {
+      // return application.wadl
+      rxm.wadl(http);
+    } else {
+      // select XQuery function
+      final RestXqFunction func = rxm.find(http);
+      if(func == null) HTTPErr.NO_XQUERY.thrw();
+      // process function
+      func.process(http);
+    }
   }
 }

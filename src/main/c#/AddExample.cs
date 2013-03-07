@@ -33,7 +33,7 @@ namespace BaseXClient
         Console.WriteLine(session.Info);
         
         // define InputStream
-        MemoryStream ms = new MemoryStream(
+        ms = new MemoryStream(
           System.Text.Encoding.UTF8.GetBytes("<xml>Hello Universe!</xml>"));
           
         // add document

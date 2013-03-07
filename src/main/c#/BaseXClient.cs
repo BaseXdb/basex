@@ -262,7 +262,6 @@ namespace BaseXClient
 
     public Query(Session s, string query)
     {
-      pos = 0;
       session = s;
       id = Exec(0, query);
     }
@@ -274,6 +273,7 @@ namespace BaseXClient
 
     public void Bind(string name, string value, string type)
     {
+      cache = null;
       Exec(3, id + '\0' + name + '\0' + value + '\0' + type);
     }
 
@@ -284,6 +284,7 @@ namespace BaseXClient
 
     public void Context(string value, string type)
     {
+      cache = null;
       Exec(14, id + '\0' + value + '\0' + type);
     }
 
@@ -302,8 +303,11 @@ namespace BaseXClient
         {
           throw new IOException(session.Receive());
         }
+        pos = 0;
       }
-      return pos < cache.Count;
+      if(pos < cache.Count) return true;
+      cache = null;
+      return false;
     }
 
     public string Next()
