@@ -97,8 +97,8 @@ public final class Grant extends AUser {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
-    return databases(db, 2);
+  public boolean databases(final StringList db) {
+    return super.databases(db) && databases(db, 2);
   }
 
   @Override

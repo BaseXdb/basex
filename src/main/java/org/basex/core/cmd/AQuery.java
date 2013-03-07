@@ -171,7 +171,7 @@ public abstract class AQuery extends Command {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
+  public boolean databases(final StringList db) {
     final boolean ok = qp != null && qp.databases(db);
     if(ok) qi.locked = db;
     return ok;

@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
@@ -18,14 +17,14 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CreateBackup extends Command {
+public final class CreateBackup extends ABackup {
 
   /**
    * Default constructor.
    * @param arg optional argument
    */
   public CreateBackup(final String arg) {
-    super(Perm.CREATE, arg);
+    super(arg);
   }
 
   @Override
@@ -74,8 +73,8 @@ public final class CreateBackup extends Command {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
-    return databases(db, 0);
+  public boolean databases(final StringList db) {
+    return super.databases(db) && databases(db, 0);
   }
 
   @Override

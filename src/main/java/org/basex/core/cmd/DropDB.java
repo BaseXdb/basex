@@ -90,7 +90,7 @@ public final class DropDB extends ACreate {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
+  public boolean databases(final StringList db) {
     return databases(db, 0);
   }
 

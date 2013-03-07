@@ -19,7 +19,7 @@ public final class Inspect extends Command {
    * Default constructor.
    */
   public Inspect() {
-    super(Perm.WRITE, true);
+    super(Perm.READ, true);
   }
 
   @Override
@@ -30,7 +30,7 @@ public final class Inspect extends Command {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
+  public boolean databases(final StringList db) {
     db.add("");
     return true;
   }

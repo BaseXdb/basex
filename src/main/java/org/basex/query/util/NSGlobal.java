@@ -56,6 +56,7 @@ public final class NSGlobal {
     NS.add(HTML, HTMLURI);
     NS.add(INDEX, INDEXURI);
     NS.add(JSON, JSONURI);
+    NS.add(QUERY, QUERYURI);
     NS.add(OUT, OUTURI);
     NS.add(PROC, PROCURI);
     NS.add(PROF, PROFURI);

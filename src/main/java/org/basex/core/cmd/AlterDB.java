@@ -51,7 +51,7 @@ public final class AlterDB extends ACreate {
   }
 
   @Override
-  protected boolean databases(final StringList db) {
+  public boolean databases(final StringList db) {
     db.add(args);
     return true;
   }

@@ -2,10 +2,8 @@ package org.basex.core.cmd;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'show events' command and lists all existing events.
@@ -14,22 +12,17 @@ import org.basex.util.list.*;
  * @author Roman Raedle
  * @author Andreas Weiler
  */
-public final class ShowEvents extends Command {
+public final class ShowEvents extends AEvent {
   /**
    * Default constructor.
    */
   public ShowEvents() {
-    super(Perm.ADMIN);
+    super();
   }
 
   @Override
   protected boolean run() throws IOException {
     out.println(context.events.info());
-    return true;
-  }
-
-  @Override
-  protected boolean databases(final StringList db) {
     return true;
   }
 
