@@ -1,5 +1,7 @@
 package org.basex.test.query.func;
 
+import java.util.logging.*;
+
 import org.basex.test.query.*;
 import org.junit.*;
 
@@ -10,6 +12,11 @@ import org.junit.*;
  * @author Lukas Kircher
  */
 public class FNCryptoTest extends AdvancedQueryTest {
+  /** Set higher log level to avoid INFO output. */
+  public FNCryptoTest() {
+    Logger.getLogger("com.sun.org.apache.xml.internal").setLevel(Level.WARNING);
+  }
+
   /** Checks default/empty arguments. */
   @Test
   public void check() {
