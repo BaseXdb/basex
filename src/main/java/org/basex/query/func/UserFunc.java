@@ -102,7 +102,7 @@ public abstract class UserFunc extends Single implements Scope {
     compiled = true;
 
     // compile closure
-    for(Entry<Var, Expr> e : scope.closure().entrySet())
+    for(final Entry<Var, Expr> e : scope.closure().entrySet())
       e.setValue(e.getValue().compile(ctx, outer));
 
     final StaticContext tmp = ctx.sc;

@@ -87,7 +87,8 @@ public final class BitArray {
    * @return  the number of bits set to {@code true}
    */
   public int cardinality() {
-    int sum = 0, inUse = (size + WORD_SIZE - 1) >>> WORD_POWER;
+    int sum = 0;
+    final int inUse = size + WORD_SIZE - 1 >>> WORD_POWER;
     for (int i = 0; i < inUse; i++) sum += bitCount(words[i]);
     return sum;
   }
@@ -162,9 +163,9 @@ public final class BitArray {
   public int nextSet(final int i) {
     if(i >= size) return -1;
 
-    final int inUse = (size + WORD_SIZE - 1) >>> WORD_POWER;
+    final int inUse = size + WORD_SIZE - 1 >>> WORD_POWER;
     int wi = i >>> WORD_POWER;
-    long word = words[wi] & (WORD_MASK << i);
+    long word = words[wi] & WORD_MASK << i;
     while(true) {
       if (word != 0) return (wi << WORD_POWER) + numberOfTrailingZeros(word);
       if (++wi == inUse) return -1;

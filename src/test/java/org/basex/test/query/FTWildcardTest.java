@@ -74,15 +74,13 @@ public final class FTWildcardTest {
       assertTrue(wc.parse());
 
       final String[] good = TEXTS_GOOD[i];
-      for(final String element : good) {
-        assertTrue('"' + q + "\" did NOT match \"" + element + '"',
-            wc.match(token(element)));
+      for(final String g : good) {
+        assertTrue('"' + q + "\" did NOT match \"" + g + '"', wc.match(token(g)));
       }
 
       final String[] bad = TEXTS_BAD[i];
-      for(final String element : bad) {
-        assertFalse('"' + q + "\" matched \"" + element + '"',
-            wc.match(token(element)));
+      for(final String b : bad) {
+        assertFalse('"' + q + "\" matched \"" + b + '"', wc.match(token(b)));
       }
     }
   }

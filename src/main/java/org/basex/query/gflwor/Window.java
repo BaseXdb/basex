@@ -302,7 +302,7 @@ public final class Window extends GFLWOR.Clause {
     try {
       return new Window(info, sliding, v, expr.copy(ctx, scp, vs),
           start.copy(ctx, scp, vs), only, end != null ? end.copy(ctx, scp, vs) : null);
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
       // checks have already been done
       throw Util.notexpected(e);
     }

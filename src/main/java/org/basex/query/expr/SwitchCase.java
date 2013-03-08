@@ -92,9 +92,9 @@ public final class SwitchCase extends Arr {
    * @return number of occurrences
    */
   protected VarUsage countCases(final Var v) {
-    VarUsage all = VarUsage.NEVER;
+    final VarUsage all = VarUsage.NEVER;
     for(int i = 1; i < expr.length; i++)
-      if((all.plus(expr[i].count(v))) == VarUsage.MORE_THAN_ONCE) break;
+      if(all.plus(expr[i].count(v)) == VarUsage.MORE_THAN_ONCE) break;
     return all;
   }
 

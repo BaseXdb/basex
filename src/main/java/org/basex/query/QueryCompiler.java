@@ -111,7 +111,7 @@ public final class QueryCompiler {
 
     stack.push(v);
 
-    for(int w : adjacentTo(v)) {
+    for(final int w : adjacentTo(v)) {
       final int ixw = 2 * w, llw = ixw + 1;
       if(list.size() <= ixw || list.get(ixw) < 0) {
         // Successor w has not yet been visited; recurse on it

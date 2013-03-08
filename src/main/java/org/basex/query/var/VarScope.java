@@ -85,7 +85,7 @@ public final class VarScope {
     }
 
     // static variable
-    StaticVar global = ctx.vars.get(name);
+    final StaticVar global = ctx.vars.get(name);
     if(global != null) return global;
     if(fixed) throw err.thrw(ii, '$' + string(name.string()));
     return ctx.vars.bind(name, null, ctx, ii);

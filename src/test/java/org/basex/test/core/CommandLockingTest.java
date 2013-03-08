@@ -139,8 +139,8 @@ public class CommandLockingTest extends SandboxTest {
       final StringList allow) {
     // Fetch databases BaseX thinks it needs to lock
     StringList result = new StringList();
-    boolean updating = cmd.updating(DUMMY_CONTEXT);
-    boolean all = !cmd.databases(result);
+    final boolean updating = cmd.updating(DUMMY_CONTEXT);
+    final boolean all = !cmd.databases(result);
     // Need sorted lists for compareAll
     StringList required = req, allowed = allow;
     if (null != required) required = required.sort(false, true).unique();

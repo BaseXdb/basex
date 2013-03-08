@@ -56,7 +56,7 @@ public class SeqTypeTest {
     assertFalse(Occ.ZERO_MORE.instanceOf(Occ.ONE));
     for(int i = 0; i < occs.length; i++) {
       for(int j = 0; j < occs.length; j++) {
-        final boolean inst = ((bits >>> (5 * j + i)) & 1) != 0;
+        final boolean inst = (bits >>> 5 * j + i & 1) != 0;
         assertEquals("(" + i + ", " + j + ")", inst, occs[i].instanceOf(occs[j]));
       }
     }

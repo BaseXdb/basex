@@ -57,9 +57,9 @@ public class Restore extends ABackup {
 
   @Override
   public boolean databases(final StringList db) {
-    String name = args[0];
+    final String name = args[0];
     // Not sure whether database or backup name is provided, lock both
-    String dbName = Pattern.compile(DateTime.PATTERN + '$').split(name)[0];
+    final String dbName = Pattern.compile(DateTime.PATTERN + '$').split(name)[0];
     return super.databases(db.add(name).add(dbName));
   }
 

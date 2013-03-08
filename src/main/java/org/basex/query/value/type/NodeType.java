@@ -223,7 +223,7 @@ public enum NodeType implements Type {
   @Override
   public NodeType intersect(final Type t) {
     if(!(t instanceof NodeType)) return instanceOf(t) ? this : null;
-    return this == t ? this : this == NOD ? ((NodeType) t) : t == NOD ? this : null;
+    return this == t ? this : this == NOD ? (NodeType) t : t == NOD ? this : null;
   }
 
   @Override

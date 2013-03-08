@@ -123,7 +123,7 @@ public interface Type {
       final ID id = get(b);
       if(id == null) return null;
       if(id == FUN) return FuncType.ANY_FUN;
-      Type t = AtomType.getType(id);
+      final Type t = AtomType.getType(id);
       return t != null ? t : NodeType.getType(id);
     }
   }
