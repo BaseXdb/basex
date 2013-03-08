@@ -258,9 +258,10 @@ public abstract class Path extends ParseExpr {
           if(ls.test == Test.TXT && s.test != Test.TXT) return s;
           if(sa == DESCORSELF) continue;
           // .../self::
-          final QNm n1 = s.test.name;
           final QNm n0 = ls.test.name;
-          if(n0 == null || n1 == null) continue;
+          final QNm n1 = s.test.name;
+          if(n0 == null || n1 == null || n0.local().length == 0 ||
+              n1.local().length == 0) continue;
           // ...X/...Y
           if(!n1.eq(n0)) return s;
         } else if(sa == FOLLSIBL || sa == PRECSIBL) {
