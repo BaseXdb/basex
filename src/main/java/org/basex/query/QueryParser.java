@@ -719,7 +719,8 @@ public class QueryParser extends InputParser {
    */
   private void schemaImport() throws QueryException {
     if(wsConsumeWs(NSPACE)) {
-      ncName(XPNAME);
+      final byte[] pref = ncName(XPNAME);
+      if(eq(pref, XML, XMLNS)) error(BINDXML, pref);
       wsCheck(IS);
     } else if(wsConsumeWs(DEFAULT)) {
       wsCheck(ELEMENT);
