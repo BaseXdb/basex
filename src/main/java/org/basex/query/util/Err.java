@@ -186,19 +186,17 @@ public enum Err {
   // XQUnit module
 
   /** UNIT0001. */
-  BXUN_FAIL(UNIT, 1, "%."),
+  UNIT_ASSERT(UNIT, 1, "Assertion failed."),
   /** UNIT0001. */
-  BXUN_ASSERT(UNIT, 1, "Assertion failed."),
-  /** UNIT0001. */
-  BXUN_ERROR(UNIT, 2, "%"),
+  UNIT_MESSAGE(UNIT, 1, "%"),
   /** UNIT0002. */
-  BXUN_ARGS(UNIT, 3, "Test function '%(...)' must have no arguments."),
+  UNIT_ARGS(UNIT, 2, "Test function '%(...)' must have no arguments."),
   /** UNIT0003. */
-  BXUN_UPDATE(UNIT, 4, "Function '%' is updating."),
+  UNIT_UPDATE(UNIT, 3, "Function '%' is updating."),
   /** UNIT0004. */
-  BXUN_TWICE(UNIT, 5, "Annotation %restxq:% was declare twice."),
+  UNIT_TWICE(UNIT, 4, "Annotation %restxq:% was declare twice."),
   /** UNIT0005. */
-  BXUN_ANN(UNIT, 6, "Annotation '%%' has invalid arguments."),
+  UNIT_ANN(UNIT, 5, "Annotation '%%' has invalid arguments."),
 
   // EXPath modules
 
@@ -1117,7 +1115,7 @@ public enum Err {
     /** BXVA Error type. */ BXVA(QueryText.BXERR, QueryText.BXERRORS),
     /** BXXQ Error type. */ BXXQ(QueryText.BXERR, QueryText.BXERRORS),
     /** HASH Error type. */ HASH(QueryText.BXERR, QueryText.BXERRORS),
-    /** BXUN Error type. */ UNIT(QueryText.XQUNIT, QueryText.XQUNITURI),
+    /** UNIT Error type. */ UNIT(QueryText.XQUNIT, QueryText.XQUNITURI),
 
     // EXPath errors
 

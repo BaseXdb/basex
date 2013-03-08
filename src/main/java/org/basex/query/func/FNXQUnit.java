@@ -47,7 +47,7 @@ public final class FNXQUnit extends StandardFunc {
   private Item assrt(final QueryContext ctx) throws QueryException {
     final byte[] str = expr.length < 2 ? null : checkStr(expr[1], ctx);
     if(expr[0].ebv(ctx, info).bool(info)) return null;
-    throw str == null ? BXUN_ASSERT.thrw(info) : BXUN_ERROR.thrw(info, str);
+    throw str == null ? UNIT_ASSERT.thrw(info) : UNIT_MESSAGE.thrw(info, str);
   }
 
   /**
@@ -57,7 +57,7 @@ public final class FNXQUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item fail(final QueryContext ctx) throws QueryException {
-    throw BXUN_FAIL.thrw(info, checkStr(expr[0], ctx));
+    throw UNIT_MESSAGE.thrw(info, checkStr(expr[0], ctx));
   }
 
   /**

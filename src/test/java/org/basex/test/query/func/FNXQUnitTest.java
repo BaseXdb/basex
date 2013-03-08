@@ -16,7 +16,7 @@ public final class FNXQUnitTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void faill() {
-    error(_XQUNIT_FAIL.args("1"), Err.BXUN_FAIL);
+    error(_XQUNIT_FAIL.args("1"), Err.UNIT_MESSAGE);
   }
 
   /** Test method. */
@@ -24,8 +24,8 @@ public final class FNXQUnitTest extends AdvancedQueryTest {
   public void assrt() {
     query(_XQUNIT_ASSERT.args("1"), "");
     query(_XQUNIT_ASSERT.args("(<a/>,<b/>)"), "");
-    error(_XQUNIT_ASSERT.args("()"), Err.BXUN_ASSERT);
-    error(_XQUNIT_ASSERT.args("()", "X"), Err.BXUN_ERROR);
+    error(_XQUNIT_ASSERT.args("()"), Err.UNIT_ASSERT);
+    error(_XQUNIT_ASSERT.args("()", "X"), Err.UNIT_MESSAGE);
   }
 
   /** Test method. */

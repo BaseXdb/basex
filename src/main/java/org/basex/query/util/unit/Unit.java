@@ -77,8 +77,8 @@ public final class Unit {
       if(!xq) continue;
 
       // XQUnit function:
-      if(uf.updating) BXUN_UPDATE.thrw(info, uf.name.local());
-      if(uf.args.length > 0) BXUN_ARGS.thrw(info, uf.name.local());
+      if(uf.updating) UNIT_UPDATE.thrw(info, uf.name.local());
+      if(uf.args.length > 0) UNIT_ARGS.thrw(info, uf.name.local());
 
       if(indexOf(uf, BEFORE) != -1) before.add(uf);
       if(indexOf(uf, AFTER) != -1) after.add(uf);
@@ -107,7 +107,7 @@ public final class Unit {
           if(vs == 2 && eq(EXPECTED, values.itemAt(0).string(info))) {
             code = values.itemAt(1).string(info);
           } else {
-            BXUN_ANN.thrw(info, '%', uf.ann.names[0]);
+            UNIT_ANN.thrw(info, '%', uf.ann.names[0]);
           }
         }
 
@@ -203,7 +203,7 @@ public final class Unit {
     for(int a = 0; a < as; a++) {
       final QNm nm = ann.names[a];
       if(eq(nm.uri(), QueryText.XQUNITURI) && eq(nm.local(), name)) {
-        if(pos != -1) BXUN_TWICE.thrw(info, '%', nm.local());
+        if(pos != -1) UNIT_TWICE.thrw(info, '%', nm.local());
         pos = a;
       }
     }
