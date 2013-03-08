@@ -190,15 +190,15 @@ public enum Err {
   /** UNIT0001. */
   BXUN_ASSERT(UNIT, 1, "Assertion failed."),
   /** UNIT0001. */
-  BXUN_ERROR(UNIT, 1, "%"),
+  BXUN_ERROR(UNIT, 2, "%"),
   /** UNIT0002. */
-  BXUN_ARGS(UNIT, 2, "Test function '%(...)' must have no arguments."),
+  BXUN_ARGS(UNIT, 3, "Test function '%(...)' must have no arguments."),
   /** UNIT0003. */
-  BXUN_UPDATE(UNIT, 3, "Function '%' is updating."),
+  BXUN_UPDATE(UNIT, 4, "Function '%' is updating."),
   /** UNIT0004. */
-  BXUN_TWICE(UNIT, 4, "Annotation %restxq:% was declare twice."),
+  BXUN_TWICE(UNIT, 5, "Annotation %restxq:% was declare twice."),
   /** UNIT0005. */
-  BXUN_ANN(UNIT, 5, "Annotation '%%' has invalid arguments."),
+  BXUN_ANN(UNIT, 6, "Annotation '%%' has invalid arguments."),
 
   // EXPath modules
 
