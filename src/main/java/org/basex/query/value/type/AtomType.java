@@ -78,7 +78,13 @@ public enum AtomType implements Type {
     @Override
     public Str cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return new Str(it.string(ii), this);
+
+      final byte[] str = it.string(ii);
+      for(int s = 0; s < str.length; s++) {
+        final byte b = str[s];
+        if(b == '\t' || b == '\r' || b == '\n') str[s] = ' ';
+      }
+      return new Str(str, this);
     }
     @Override
     public Str cast(final Object o, final InputInfo ii) throws QueryException {
