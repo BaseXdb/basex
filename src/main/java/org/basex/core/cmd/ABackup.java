@@ -14,17 +14,8 @@ abstract class ABackup extends Command {
    * Protected constructor.
    * @param a arguments
    */
-  ABackup(final String... a) {
+  protected ABackup(final String... a) {
     super(Perm.CREATE, false, a);
-  }
-
-  /**
-   * Protected constructor.
-   * @param d requires opened database
-   * @param a arguments
-   */
-  ABackup(final boolean d, final String... a) {
-    super(Perm.CREATE, d, a);
   }
 
   @Override

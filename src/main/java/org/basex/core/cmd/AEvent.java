@@ -14,17 +14,8 @@ abstract class AEvent extends Command {
    * Protected constructor.
    * @param a arguments
    */
-  AEvent(final String... a) {
+  protected AEvent(final String... a) {
     super(Perm.ADMIN, false, a);
-  }
-
-  /**
-   * Protected constructor.
-   * @param d requires opened database
-   * @param a arguments
-   */
-  AEvent(final boolean d, final String... a) {
-    super(Perm.ADMIN, d, a);
   }
 
   @Override

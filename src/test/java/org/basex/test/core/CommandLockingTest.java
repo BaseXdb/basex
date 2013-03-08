@@ -41,8 +41,6 @@ public class CommandLockingTest extends SandboxTest {
   private static final StringList NAME_CTX = new StringList(NAME, CTX);
   /** StringList containing ADMIN lock string. */
   private static final StringList ADMIN_LIST = new StringList(DBLocking.ADMIN);
-  /** StringList containing ADMIN lock string and context. */
-  private static final StringList ADMIN_CTX = new StringList(DBLocking.ADMIN, CTX);
   /** StringList containing ADMIN lock string and name. */
   private static final StringList ADMIN_NAME = new StringList(DBLocking.ADMIN, NAME);
   /** StringList containing REPO lock string. */
