@@ -22,7 +22,7 @@ public final class RestXqServlet extends BaseXServlet {
 
     // analyze input path
     final RestXqModules rxm = RestXqModules.get();
-    if(http.req.getPathInfo().equals('/' + HTTPText.WADL)) {
+    if(('/' + HTTPText.WADL).equals(http.req.getPathInfo())) {
       // return application.wadl
       rxm.wadl(http);
     } else {
