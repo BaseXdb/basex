@@ -357,6 +357,7 @@ public class BaseXClient {
      */
     public void bind(final String name, final String value, final String type)
         throws IOException {
+      cache = null;
       exec(3, id + '\0' + name + '\0' + value + '\0' + type);
     }
 
@@ -376,6 +377,7 @@ public class BaseXClient {
      * @throws IOException I/O exception
      */
     public void context(final String value, final String type) throws IOException {
+      cache = null;
       exec(14, id + '\0' + value + '\0' + type);
     }
 
@@ -396,8 +398,11 @@ public class BaseXClient {
           os.reset();
         }
         if(!ok()) throw new IOException(receive());
+        pos = 0;
       }
-      return pos < cache.size();
+      if(pos < cache.size()) return true;
+      cache = null;
+      return false;
     }
 
     /**
