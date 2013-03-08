@@ -594,13 +594,15 @@ public class QueryParser extends InputParser {
       ctx.dbOptions.add(string(val));
     } else if(eq(name.uri(), QUERYURI)) {
       // Query-specific options
-      if(eq(name.local(), READ_LOCK))
-        for (String lock : string(val).split("\\s*,\\s*"))
-          ctx.userReadLocks.add(DBLocking.USER_PREFIX + lock);
-      else if(eq(name.local(), WRITE_LOCK)) {
-        for (String lock : string(val).split("\\s*,\\s*"))
-          ctx.userWriteLocks.add(DBLocking.USER_PREFIX + lock);
-      } else error(BASX_OPTIONS, string(name.local()));
+      if(eq(name.local(), READ_LOCK)) {
+        for(final byte[] lock : split(val, ','))
+          ctx.userReadLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
+      } else if(eq(name.local(), WRITE_LOCK)) {
+        for(final byte[] lock : split(val, ','))
+          ctx.userWriteLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
+      } else {
+        error(BASX_OPTIONS, string(name.local()));
+      }
     }
     // ignore unknown options
   }
@@ -1030,10 +1032,10 @@ public class QueryParser extends InputParser {
   private Expr flwor() throws QueryException {
 
     final int s = scope.open();
-    LinkedList<Clause> clauses = initialClause(null);
+    final LinkedList<Clause> clauses = initialClause(null);
     if(clauses == null) return null;
 
-    TokenObjMap<Var> curr = new TokenObjMap<Var>();
+    final TokenObjMap<Var> curr = new TokenObjMap<Var>();
     for(final Clause fl : clauses)
       for(final Var v : fl.vars()) curr.add(v.name.id(), v);
 
@@ -2229,7 +2231,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Uri uriLiteral() throws QueryException {
-    Uri uri = Uri.uri(stringLiteral());
+    final Uri uri = Uri.uri(stringLiteral());
     if(!uri.isValid()) throw INVURI.thrw(info(), uri);
     return uri.isAbsolute() ? uri : ctx.sc.baseURI().resolve(uri);
   }
