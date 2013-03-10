@@ -56,9 +56,8 @@ public class FNCryptoTest {
    */
   @Test
   public void validateSignatureWithCertificate() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','','',''," + CT
-        + "))", "true");
+    query("crypto:validate-signature(" +
+        "crypto:generate-signature(<a/>,'','','','',''," + CT + "))", "true");
   }
 
   /**
@@ -67,8 +66,7 @@ public class FNCryptoTest {
    */
   @Test
   public void validateSignatureWithXPathAndCertificate() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a><n/><n/></a>," +
+    query("crypto:validate-signature(crypto:generate-signature(<a><n/><n/></a>," +
         "'','','','','','/a/n'," + CT + "))", "true");
   }
 
@@ -78,8 +76,7 @@ public class FNCryptoTest {
    */
   @Test
   public void validateSignatureFullySpecified() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a><n/></a>," +
+    query("crypto:validate-signature(crypto:generate-signature(<a><n/></a>," +
         "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n'," + CT +
         "))", "true");
   }
@@ -104,9 +101,8 @@ public class FNCryptoTest {
      e.printStackTrace();
    }
 
-   query("declare namespace c = 'http://expath.org/ns/crypto';" +
-      "let $e := c:encrypt('" + msg + "','asymmetric','" + prk + "','RSA')" +
-       "return c:decrypt($e,'asymmetric','" + puk + "','RSA')", msg);
+   query("let $e := crypto:encrypt('" + msg + "','asymmetric','" + prk + "','RSA')" +
+       "return crypto:decrypt($e,'asymmetric','" + puk + "','RSA')", msg);
   }
 
   /**
