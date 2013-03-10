@@ -56,8 +56,10 @@ public final class FNNode extends StandardFunc {
         Uri base = Uri.EMPTY;
         do {
           if(n == null) return ctx.sc.baseURI().resolve(base);
-          base = Uri.uri(n.baseURI(), false).resolve(base);
-          if(n.type == NodeType.DOC && n instanceof DBNode) return base;
+          final Uri bu = Uri.uri(n.baseURI(), false);
+          if(!bu.isValid()) URIINV.thrw(ii, base);
+          base = bu.resolve(base);
+          if(n.type == NodeType.DOC && n instanceof DBNode) break;
           n = n.parent();
         } while(!base.isAbsolute());
         return base;

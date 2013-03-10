@@ -629,7 +629,7 @@ public enum AtomType implements Type {
   /** Any URI type. */
   URI("anyURI", AAT, XSURI, false, false, true, Type.ID.URI) {
     @Override
-    public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
+    public Uri cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
 
       if(!it.type.isStringOrUntyped()) invCast(it, ii);
