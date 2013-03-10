@@ -379,7 +379,7 @@ public abstract class OutputSerializer extends Serializer {
   protected void code(final int ch) throws IOException {
     if(!format) {
       printChar(ch);
-    } else if(ch < ' ' && ch != '\n' && ch != '\t' || ch > 0x7F && ch < 0xA0) {
+    } else if(ch < ' ' && ch != '\n' && ch != '\t' || ch >= 0x7F && ch < 0xA0) {
       hex(ch);
     } else if(ch == '&') {
       print(E_AMP);
@@ -387,6 +387,8 @@ public abstract class OutputSerializer extends Serializer {
       print(E_GT);
     } else if(ch == '<') {
       print(E_LT);
+    } else if(ch == 0x2028) {
+      print(E_2028);
     } else {
       printChar(ch);
     }
@@ -442,7 +444,8 @@ public abstract class OutputSerializer extends Serializer {
    */
   protected final void hex(final int ch) throws IOException {
     print("&#x");
-    print(HEX[ch >> 4]);
+    final int h = ch >> 4;
+    if(h != 0) print(HEX[h]);
     print(HEX[ch & 15]);
     print(';');
   }
