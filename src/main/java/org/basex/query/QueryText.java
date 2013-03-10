@@ -509,7 +509,7 @@ public interface QueryText {
   /** SQL token. */
   byte[] SQL = token("sql");
   /** Cryptography token. */
-  byte[] CRYPTO = token("crytpo");
+  byte[] CRYPTO = token("crypto");
   /** Random token. */
   byte[] RANDOM = token("random");
   /** Repository token. */

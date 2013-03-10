@@ -20,12 +20,11 @@ public class FNCryptoTest extends AdvancedQueryTest {
   /** Checks default/empty arguments. */
   @Test
   public void check() {
-    final String pl = "declare namespace c = 'http://expath.org/ns/crypto';";
-    query(pl + "c:hmac('msg','key','','')");
-    query(pl + "c:encrypt('msg','','keykeyke','')");
-    query(pl + "c:decrypt(c:encrypt('msg','','keykeyke',''),'','keykeyke','')");
-    query(pl + "c:generate-signature(<a/>,'','','','','')");
-    query(pl + "c:validate-signature(c:generate-signature(<a/>,'','','','',''))");
+    query("crypto:hmac('msg','key','','')");
+    query("crypto:encrypt('msg','','keykeyke','')");
+    query("crypto:decrypt(crypto:encrypt('msg','','keykeyke',''),'','keykeyke','')");
+    query("crypto:generate-signature(<a/>,'','','','','')");
+    query("crypto:validate-signature(crypto:generate-signature(<a/>,'','','','',''))");
   }
 
   /**
@@ -35,9 +34,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
   public void encryption1() {
     final String msg = "messagemessagemessagemessagemessagemessagemessage";
 
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "let $e := c:encrypt('" + msg + "','symmetric','aaabbbaa'," +
-        "'DES') return c:decrypt($e,'symmetric'," +
+    query("let $e := crypto:encrypt('" + msg + "','symmetric','aaabbbaa'," +
+        "'DES') return crypto:decrypt($e,'symmetric'," +
         "'aaabbbaa','DES')", msg);
   }
 
@@ -48,10 +46,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
   public void encryption2() {
     final String msg = "messagemessagemessagemessagemessagemessagemessage";
 
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "let $e := c:encrypt('" + msg + "','symmetric','abababababababab'," +
-        "'AES') return c:decrypt($e,'symmetric'," +
-        "'abababababababab','AES')", msg);
+    query("let $e := crypto:encrypt('" + msg + "','symmetric','abababababababab'," +
+        "'AES') return crypto:decrypt($e,'symmetric','abababababababab','AES')", msg);
   }
 
   /**
@@ -59,9 +55,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void hmacMD5defencoding() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','md5')",
-        "TkdI5itGNSH2d1+/khI0tQ==");
+    query("crypto:hmac('message','key','md5')", "TkdI5itGNSH2d1+/khI0tQ==");
   }
 
   /**
@@ -69,8 +63,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void hmacMD5hex() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','md5', 'hex')",
+    query("crypto:hmac('message','key','md5', 'hex')",
         "4E4748E62B463521F6775FBF921234B5");
   }
 
@@ -79,9 +72,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void hmacMD5base64() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','md5', 'base64')",
-        "TkdI5itGNSH2d1+/khI0tQ==");
+    query("crypto:hmac('message','key','md5', 'base64')", "TkdI5itGNSH2d1+/khI0tQ==");
   }
 
   /**
@@ -89,8 +80,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void hmacSHA1hex() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','sha1', 'hex')",
+    query("crypto:hmac('message','key','sha1', 'hex')",
         "2088DF74D5F2146B48146CAF4965377E9D0BE3A4");
   }
 
@@ -99,8 +89,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void hmacSHA1base64() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','sha1', 'base64')",
+    query("crypto:hmac('message','key','sha1', 'base64')",
         "IIjfdNXyFGtIFGyvSWU3fp0L46Q=");
   }
 
@@ -110,8 +99,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void hmacSHA256hex() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','sha256', 'hex')",
+    query("crypto:hmac('message','key','sha256', 'hex')",
         "6E9EF29B75FFFC5B7ABAE527D58FDADB2FE42E7219011976917343065F58ED4A");
   }
 
@@ -121,8 +109,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void hmacSHA256base64() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','sha256', 'base64')",
+    query("crypto:hmac('message','key','sha256', 'base64')",
         "bp7ym3X//Ft6uuUn1Y/a2y/kLnIZARl2kXNDBl9Y7Uo=");
   }
 
@@ -132,8 +119,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void hmacSHA384hex() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','sha384', 'hex')",
+    query("crypto:hmac('message','key','sha384', 'hex')",
         "2088DF74D5F2146B48146CAF4965377E9D0BE3A4");
   }
 
@@ -143,8 +129,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void hmacSHA384base64() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','sha384', 'base64')",
+    query("crypto:hmac('message','key','sha384', 'base64')",
         "IIjfdNXyFGtIFGyvSWU3fp0L46Q=");
   }
 
@@ -154,8 +139,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void hmacSHA512hex() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','sha512', 'hex')",
+    query("crypto:hmac('message','key','sha512', 'hex')",
         "E477384D7CA229DD1426E64B63EBF2D36EBD6D7E669A6735424E72EA6C01D3F8" +
         "B56EB39C36D8232F5427999B8D1A3F9CD1128FC69F4D75B434216810FA367E98");
   }
@@ -166,8 +150,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void hmacSHA512base64() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','sha512', 'base64')",
+    query("crypto:hmac('message','key','sha512', 'base64')",
         "5Hc4TXyiKd0UJuZLY+vy0269bX5mmmc1Qk5y6mwB0/i1brOcNtgjL1QnmZuNGj+c0RK" +
         "Pxp9NdbQ0IWgQ+jZ+mA==");
   }
@@ -178,8 +161,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignature1() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','','',''))",
+    query("crypto:validate-signature(crypto:generate-signature(<a/>,'','','','',''))",
         "true");
   }
 
@@ -189,11 +171,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignature1b() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(" +
-        "c:generate-signature(" +
-        "<a/>,'','SHA1','DSA_SHA1','','enveloped'))",
-        "true");
+    query("crypto:validate-signature(" +
+        "crypto:generate-signature(<a/>,'','SHA1','DSA_SHA1','','enveloped'))", "true");
   }
 
   /**
@@ -218,9 +197,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue>" +
         "</KeyInfo></Signature></a>";
 
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(" + input + ')',
-        "true");
+    query("crypto:validate-signature(" + input + ')', "true");
   }
 
   /**
@@ -229,10 +206,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithCanonicalization() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>," +
-        "'exclusive','','','',''))",
-        "true");
+    query("crypto:validate-signature(crypto:generate-signature(<a/>," +
+        "'exclusive','','','',''))", "true");
   }
 
   /**
@@ -241,10 +216,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithCanonicalization2() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>," +
-        "'exclusive-with-comments','','','',''))",
-        "true");
+    query("crypto:validate-signature(crypto:generate-signature(<a/>," +
+        "'exclusive-with-comments','','','',''))", "true");
   }
 
   /**
@@ -253,10 +226,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithCanonicalization3() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>," +
-        "'inclusive','','','',''))",
-        "true");
+    query("crypto:validate-signature(crypto:generate-signature(<a/>," +
+        "'inclusive','','','',''))", "true");
   }
 
   /**
@@ -265,10 +236,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithCanonicalization4() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>," +
-        "'inclusive-with-comments','','','',''))",
-        "true");
+    query("crypto:validate-signature(crypto:generate-signature(<a/>," +
+        "'inclusive-with-comments','','','',''))", "true");
   }
 
   /**
@@ -277,8 +246,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithDigestAlgorithm() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','SHA1','','',''))",
+    query("crypto:validate-signature(crypto:generate-signature(<a/>,'','SHA1','','',''))",
         "true");
   }
 
@@ -288,9 +256,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithDigestAlgorithm2() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','SHA256','','',''))",
-        "true");
+    query("crypto:validate-signature(crypto:generate-signature(" +
+        "<a/>,'','SHA256','','',''))", "true");
   }
 
   /**
@@ -299,9 +266,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithDigestAlgorithm3() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','SHA512','','',''))",
-        "true");
+    query("crypto:validate-signature(crypto:generate-signature(" +
+        "<a/>,'','SHA512','','',''))", "true");
   }
 
   /**
@@ -310,10 +276,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithSignatureAlgorithm() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'',''," +
-        "'DSA_SHA1','',''))",
-        "true");
+    query("crypto:validate-signature(crypto:generate-signature(<a/>,'',''," +
+        "'DSA_SHA1','',''))", "true");
   }
 
   /**
@@ -322,8 +286,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithSignatureAlgorithm2() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'',''," +
+    query("crypto:validate-signature(crypto:generate-signature(<a/>,'',''," +
         "'RSA_SHA1','',''))",
         "true");
   }
@@ -334,9 +297,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithSignatureNamespace3() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','','prefix',''))",
-        "true");
+    query("crypto:validate-signature(crypto:generate-signature(" +
+        "<a/>,'','','','prefix',''))", "true");
   }
 
   /**
@@ -345,10 +307,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithSignatureType() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
-        "'enveloped'))",
-        "true");
+    query("crypto:validate-signature(crypto:generate-signature(<a/>,'','','',''," +
+        "'enveloped'))", "true");
   }
 
   /**
@@ -357,10 +317,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithSignatureType2() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
-        "'enveloping'))",
-        "true");
+    query("crypto:validate-signature(crypto:generate-signature(<a/>,'','','',''," +
+        "'enveloping'))", "true");
   }
 
   /**
@@ -369,11 +327,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureWithXPath() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a><n/><n/></a>," +
-        "'','','',''," +
-        "'','/a/n'))",
-        "true");
+    query("crypto:validate-signature(crypto:generate-signature(<a><n/><n/></a>," +
+        "'','','','','','/a/n'))", "true");
   }
 
   /**
@@ -382,9 +337,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureFullySpecified() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a><n/></a>," +
-        "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n'))",
-        "true");
+    query("crypto:validate-signature(crypto:generate-signature(<a><n/></a>," +
+        "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n'))", "true");
   }
 }
