@@ -839,7 +839,7 @@ public class QueryParser extends InputParser {
     else if(!wsConsumeWs(ASSIGN)) return;
     ctx.ctxItem = check(single(), NOVARDECL);
     if(module != null) error(DECITEM);
-    if(ctx.ctxItem.uses(Use.UPD)) UPCTX.thrw(info(), ctx.ctxItem);
+    if(ctx.ctxItem.uses(Use.UPD)) error(UPCTX, ctx.ctxItem);
   }
 
   /**
@@ -1301,13 +1301,13 @@ public class QueryParser extends InputParser {
           }
         }
       }
-      if(!dec) throw error(GVARNOTDEFINED, vr);
+      if(!dec) error(GVARNOTDEFINED, vr);
       by = vr;
     }
 
     if(wsConsumeWs(COLLATION)) {
       final byte[] coll = stringLiteral();
-      if(!eq(URLCOLL, coll)) throw error(WHICHCOLL, coll);
+      if(!eq(URLCOLL, coll)) error(WHICHCOLL, coll);
     }
 
     final GroupBy.Spec grp = new GroupBy.Spec(ii, addLocal(name, type, false), by);
@@ -2233,7 +2233,7 @@ public class QueryParser extends InputParser {
    */
   private Uri uriLiteral() throws QueryException {
     final Uri uri = Uri.uri(stringLiteral());
-    if(!uri.isValid()) throw INVURI.thrw(info(), uri);
+    if(!uri.isValid()) error(INVURI, uri);
     return uri.isAbsolute() ? uri : ctx.sc.baseURI().resolve(uri);
   }
 
@@ -2920,7 +2920,7 @@ public class QueryParser extends InputParser {
     wsCheck(PAR2);
     if(tp != null) return tp;
     tp = Test.get(t);
-    if(tp == Test.NSP && !ctx.sc.xquery3) throw error(NSNOTALL);
+    if(tp == Test.NSP && !ctx.sc.xquery3) error(NSNOTALL);
     return tp;
   }
 
@@ -3852,7 +3852,7 @@ public class QueryParser extends InputParser {
    */
   private QueryException error() throws QueryException {
     ip = ap;
-    if(alter != FUNCUNKNOWN) throw error(alter);
+    if(alter != FUNCUNKNOWN) error(alter);
     ctx.funcs.funError(alterFunc, info());
     throw error(alter, alterFunc.string());
   }
