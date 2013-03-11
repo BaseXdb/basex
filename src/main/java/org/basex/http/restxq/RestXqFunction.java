@@ -165,7 +165,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(found) {
       if(path == null) error(ANN_MISSING, PATH);
       for(int i = 0; i < declared.length; i++)
-        if(!declared[i]) error(VAR_UNDEFINED, function.args[i]);
+        if(!declared[i]) error(VAR_UNDEFINED, function.args[i].name.string());
     }
     return found;
   }
