@@ -52,7 +52,6 @@ public final class VarScope {
    */
   private Var add(final Var var) {
     var.slot = vars.size();
-    for(final Var v : vars) if(v.is(var)) throw Util.notexpected(var);
     vars.add(var);
     current.push(var);
     return var;
