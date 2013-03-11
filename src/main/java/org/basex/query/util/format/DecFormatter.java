@@ -297,7 +297,7 @@ public final class DecFormatter extends FormatUtil {
     if(pics.length == 2) num = FNNum.abs(num, ii);
 
     // convert to string representation
-    String str = num.toString();
+    String str = (num instanceof Dbl || num instanceof Flt ? Dec.get(d) : num).toString();
     if(str.startsWith("0.")) str = str.substring(1);
     else if(str.startsWith("-0.")) str = '-' + str.substring(2);
     if(str.startsWith("-")) str = (char) minus + str.substring(1);
