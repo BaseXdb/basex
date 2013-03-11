@@ -63,7 +63,7 @@ public final class TypeSwitch extends ParseExpr {
     for(int i = 1; i < cases.length; ++i) {
       eq &= cases[i - 1].expr.sameAs(cases[i].expr);
     }
-    if(eq) return optPre(null, ctx);
+    if(eq) return preEval(ctx);
 
     type = cases[0].type();
     for(int c = 1; c < cases.length; ++c) {

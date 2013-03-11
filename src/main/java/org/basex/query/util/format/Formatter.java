@@ -120,8 +120,8 @@ public abstract class Formatter extends FormatUtil {
     final TokenBuilder tb = new TokenBuilder();
     final DateParser dp = new DateParser(ii, pic);
     while(dp.more()) {
-      final int ch = dp.next();
-      if(ch != 0) {
+      final int ch = dp.literal();
+      if(ch != -1) {
         // print literal
         tb.add(ch);
       } else {

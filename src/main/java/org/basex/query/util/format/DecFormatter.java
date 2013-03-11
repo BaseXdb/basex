@@ -66,7 +66,6 @@ public final class DecFormatter extends FormatUtil {
       throws QueryException {
 
     // assign map values
-    /* Zero-digit sign. */
     int zero = '0';
     if(map != null) {
       for(final Entry<String, String> e : map.entrySet()) {
@@ -300,6 +299,8 @@ public final class DecFormatter extends FormatUtil {
     // convert to string representation
     String str = num.toString();
     if(str.startsWith("0.")) str = str.substring(1);
+    else if(str.startsWith("-0.")) str = '-' + str.substring(2);
+    if(str.startsWith("-")) str = (char) minus + str.substring(1);
 
     // integer/fractional separator
     final int sp = str.indexOf(decimal);
@@ -333,8 +334,8 @@ public final class DecFormatter extends FormatUtil {
 
     // squeeze in grouping separators in a reverse manner
     final int sl = suf.size();
-    for(int i = pic.group[1].length - 1; i >= 0; i--) {
-      final int pos = pic.group[1][i];
+    for(int p = pic.group[1].length - 1; p >= 0; p--) {
+      final int pos = pic.group[1][p];
       if(pos < sl) suf.insert(pos, grouping);
     }
 

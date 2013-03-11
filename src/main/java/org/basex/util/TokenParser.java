@@ -8,9 +8,9 @@ import static org.basex.util.Token.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class TokenParser {
+public class TokenParser {
   /** Token to be parsed. */
-  private final byte[] token;
+  protected final byte[] token;
   /** Token length. */
   private final int size;
   /** Current position. */
@@ -33,7 +33,7 @@ public final class TokenParser {
   }
 
   /**
-   * Returns if the parser can return more codepoints.
+   * Checks if the parser will return more codepoints.
    * @return result of check
    */
   public boolean more() {
