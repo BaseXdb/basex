@@ -2,6 +2,8 @@ package org.basex.util;
 
 import static org.basex.util.Token.*;
 
+import org.basex.util.list.*;
+
 /**
  * <p>This class can be used to iterate through all codepoints of a token.</p>
  *
@@ -63,6 +65,16 @@ public class TokenParser {
     if(p >= size || cp(token, p) != ch) return false;
     pos += cl(token, p);
     return true;
+  }
+
+  /**
+   * Returns a list with all codepoints.
+   * @return array
+   */
+  public final IntList toList() {
+    final IntList il = new IntList();
+    while(more()) il.add(next());
+    return il;
   }
 
   @Override

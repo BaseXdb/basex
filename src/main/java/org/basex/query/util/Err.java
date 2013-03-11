@@ -381,8 +381,6 @@ public enum Err {
   /** FODF1310. */
   GROUPSTART(FODF, 1310, "Picture begins with grouping separator: '%'."),
   /** FODF1310. */
-  PICDATE(FODF, 1310, "Invalid picture string: '%'."),
-  /** FODF1310. */
   INVORDINAL(FODF, 1310, "Invalid specification of ordinal numbering: '%'."),
 
   // [CG] obsolete error codes?
@@ -409,9 +407,11 @@ public enum Err {
   FUNERR1(FOER, 0, "Halted on error()."),
 
   /** FOFD1340. */
-  ERRDTM(FOFD, 1340, "Invalid component in string: '%'."),
+  INVCOMPSPEC(FOFD, 1340, "Invalid variable marker: '[%]'."),
+  /** FOFD1340. */
+  PICDATE(FOFD, 1340, "Invalid picture string: '%'."),
   /** FOFD1350. */
-  PICINVCOMP(FOFD, 1350, "Invalid component in string: '%'."),
+  PICINVCOMP(FOFD, 1350, "Component '[%]' not applicable to % values."),
 
   /** FONS0004. */
   NSDECL(FONS, 4, "No namespace declared for prefix '%'."),

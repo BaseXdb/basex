@@ -19,9 +19,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Formatter extends FormatUtil {
-  /** Language code: English. */
+  /** Default language: English. */
   private static final String EN = "en";
-
   /** Formatter instances. */
   private static final HashMap<String, Formatter> MAP =
     new HashMap<String, Formatter>();
@@ -125,10 +124,12 @@ public abstract class Formatter extends FormatUtil {
         // print literal
         tb.add(ch);
       } else {
-        byte[] p = dp.marker();
-        if(p.length == 0) PICDATE.thrw(ii, pic);
-        final int spec = ch(p, 0);
-        p = substring(p, cl(p, 0));
+        // retrieve variable marker
+        final byte[] marker = dp.marker();
+        if(marker.length == 0) PICDATE.thrw(ii, pic);
+
+        // parse component specifier
+        final int compSpec = ch(marker, 0);
         byte[] pres = ONE;
         boolean max = false;
         long num = 0;
@@ -136,7 +137,7 @@ public abstract class Formatter extends FormatUtil {
         final boolean dat = date.type == AtomType.DAT;
         final boolean tim = date.type == AtomType.TIM;
         boolean err = false;
-        switch(spec) {
+        switch(compSpec) {
           case 'Y':
             num = Math.abs(date.yea());
             max = true;
@@ -155,7 +156,6 @@ public abstract class Formatter extends FormatUtil {
             err = tim;
             break;
           case 'F':
-            // [CG] XQuery, DateTime: slow conversion (3x)
             num = date.toJava().toGregorianCalendar().get(Calendar.DAY_OF_WEEK) - 1;
             pres = new byte[] { 'n' };
             err = tim;
@@ -209,12 +209,13 @@ public abstract class Formatter extends FormatUtil {
             pres = new byte[] { 'n' };
             break;
           default:
-            ERRDTM.thrw(ii, pic);
+            INVCOMPSPEC.thrw(ii, marker);
         }
-        if(err) PICINVCOMP.thrw(ii, pic);
+        if(err) PICINVCOMP.thrw(ii, marker, date.type);
         if(pres == null) continue;
 
-        final DateFormat fp = new DateFormat(p, pres, ii);
+        // parse presentation modifier(s) and width modifier
+        final DateFormat fp = new DateFormat(substring(marker, 1), pres, ii);
         if(max) {
           // limit maximum length of numeric output
           int mx = 0;
@@ -224,15 +225,15 @@ public abstract class Formatter extends FormatUtil {
 
         if(fp.digit == 'n') {
           byte[] in = EMPTY;
-          if(spec == 'M') {
+          if(compSpec == 'M') {
             in = month((int) num - 1, fp.min, fp.max);
-          } else if(spec == 'F') {
+          } else if(compSpec == 'F') {
             in = day((int) num, fp.min, fp.max);
-          } else if(spec == 'P') {
+          } else if(compSpec == 'P') {
             in = ampm(num == 0);
-          } else if(spec == 'C') {
+          } else if(compSpec == 'C') {
             in = calendar();
-          } else if(spec == 'E') {
+          } else if(compSpec == 'E') {
             in = era((int) num);
           }
           if(fp.cs == Case.LOWER) in = lc(in);
@@ -260,13 +261,13 @@ public abstract class Formatter extends FormatUtil {
 
     final TokenBuilder tb = new TokenBuilder();
     final int ch = fp.digit;
-    final boolean single = fp.primary.length == cl(fp.primary, 0);
 
     if(ch == 'w') {
       tb.add(word(n, fp.ordinal));
     } else if(ch == KANJI[1]) {
       japanese(tb, n);
-    } else if(single && ch == 'i') {
+      // [CG] check if length can be different than 1
+    } else if(fp.primary.length == cl(fp.primary, 0) && ch == 'i') {
       roman(tb, n);
     } else if(ch == '\u2460' || ch == '\u2474' || ch == '\u2488') {
       if(num < 1 || num > 20) tb.addLong(num);
@@ -379,10 +380,7 @@ public abstract class Formatter extends FormatUtil {
    */
   private byte[] number(final long num, final FormatParser fp, final int z) {
     // cache characters of presentation modifier
-    final IntList pr = new IntList(fp.primary.length);
-    for(int p = 0; p < fp.primary.length; p += cl(fp.primary, p)) {
-      pr.add(cp(fp.primary, p));
-    }
+    final IntList pr = new TokenParser(fp.primary).toList();
 
     // check for a regular separator pattern
     int rp = -1;

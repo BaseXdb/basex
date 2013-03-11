@@ -23,11 +23,12 @@ public final class IntFormat extends FormatParser {
     super(ii);
 
     final int sc = lastIndexOf(p, ';');
-    final byte[] pres = pres(sc == -1 ? p : substring(p, 0, sc));
+    final byte[] pres = presentation(sc == -1 ? p : substring(p, 0, sc));
     if(sc != -1) format(substring(p, sc + 1));
 
+    // skip correction of case if modifier has more than one codepoint (Ww)
     cs = cl(pres, 0) < pres.length ? Case.STANDARD :
-      (ch(pres, 0) & ' ') == 0 ? Case.UPPER : Case.LOWER;
+        (ch(pres, 0) & ' ') == 0 ? Case.UPPER : Case.LOWER;
     primary = lc(pres);
     if(digit == -1) digit = ch(primary, 0);
   }
@@ -35,10 +36,10 @@ public final class IntFormat extends FormatParser {
   /**
    * Parses and returns the presentation modifier.
    * @param pic picture
-   * @return offset to last parsed character
+   * @return presentation modifier
    * @throws QueryException query exception
    */
-  protected byte[] pres(final byte[] pic) throws QueryException {
+  protected byte[] presentation(final byte[] pic) throws QueryException {
     final int cl = pic.length;
     if(cl == 0) PICEMPTY.thrw(info, pic);
 
@@ -89,13 +90,11 @@ public final class IntFormat extends FormatParser {
         if(gss) INVGROUP.thrw(info, pic);
         gss = true;
       } else {
-        // any other letter
+        // any other letter: return default primary token
         return ONE;
       }
     }
     if(gss) INVGROUP.thrw(info, pic);
-
-    // no decimal-digit-pattern: return default primary token
     return pic;
   }
 
