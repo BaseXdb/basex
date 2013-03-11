@@ -295,7 +295,7 @@ public final class DecFormatter extends FormatUtil {
     if(pic.pc) num = Calc.MULT.ev(ii, num, Int.get(100));
     if(pic.pm) num = Calc.MULT.ev(ii, num, Int.get(1000));
     num = FNNum.round(num, num.dbl(ii), pic.maxFrac, true, ii);
-    // remove sign: num = FNNum.abs(num);
+    if(pics.length == 2) num = FNNum.abs(num, ii);
 
     // convert to string representation
     String str = num.toString();
@@ -314,7 +314,7 @@ public final class DecFormatter extends FormatUtil {
     if(pic.group[0].length == 1) {
       // regular pattern with repeating separators
       final int pos = pic.group[0][0];
-      for(int p = pre.size() - 1; p > 0; --p) {
+      for(int p = pre.size() - (d < 0 ? 2 : 1); p > 0; --p) {
         if(p % pos == 0) pre.insert(pre.size() - p, grouping);
       }
     } else {

@@ -175,10 +175,10 @@ public final class FNQName extends StandardFunc {
       throws QueryException {
     if(it == null) return null;
     final Uri rel = Uri.uri(checkEStr(it));
-    if(!rel.isValid()) URIINV.thrw(info, rel);
+    if(!rel.isValid()) URIINVRES.thrw(info, rel);
     if(rel.isAbsolute()) return rel;
     final Uri base = it2 == null ? ctx.sc.baseURI() : Uri.uri(checkEStr(it2));
-    if(!base.isValid()) URIINV.thrw(info, base);
+    if(!base.isValid()) URIINVRES.thrw(info, base);
     if(!base.isAbsolute()) URIABS.thrw(info, base);
     return base.resolve(rel);
   }

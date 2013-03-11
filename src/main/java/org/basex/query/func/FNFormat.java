@@ -9,6 +9,7 @@ import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Formatting functions.
@@ -17,6 +18,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FNFormat extends StandardFunc {
+  /** Pattern cache. */
+  private final TokenObjMap<FormatParser> formats = new TokenObjMap<FormatParser>();
+
   /**
    * Constructor.
    * @param ii input info
@@ -62,8 +66,11 @@ public final class FNFormat extends StandardFunc {
     if(expr[0].isEmpty()) return Str.ZERO;
     final long num = checkItr(expr[0], ctx);
 
-    if(pic.length == 0) PICEMPTY.thrw(info, pic);
-    final FormatParser fp = new FormatParser(pic, null, info);
+    FormatParser fp = formats.get(pic);
+    if(fp == null) {
+      fp = new IntFormat(pic, info);
+      formats.add(pic, fp);
+    }
     return Str.get(Formatter.get(string(lng)).formatInt(num, fp));
   }
 

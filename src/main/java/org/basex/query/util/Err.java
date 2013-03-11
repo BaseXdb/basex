@@ -371,13 +371,9 @@ public enum Err {
   /** FODF1310. */
   PICNUM(FODF, 1310, "Invalid picture string: '%'."),
   /** FODF1310. */
-  OPTAFTER(FODF, 1310, "Optional digit follows mandatory digits: '%'."),
+  OPTAFTER(FODF, 1310, "Optional digit sign follows mandatory digit signs: '%'."),
   /** FODF1310. */
-  NOMAND(FODF, 1310, "No mandatory digit specified: '%'."),
-  /** FODF1310. */
-  GROUPEND(FODF, 1310, "Picture ends with grouping separator: '%'."),
-  /** FODF1310. */
-  GROUPADJ(FODF, 1310, "Adjacent grouping separators: '%'."),
+  INVGROUP(FODF, 1310, "Invalid position of grouping separator signs: '%'."),
   /** FODF1310. */
   PICCOMP(FODF, 1310, "Invalid component in string: '%'."),
   /** FODF1310. */
@@ -387,7 +383,12 @@ public enum Err {
   /** FODF1310. */
   PICDATE(FODF, 1310, "Invalid picture string: '%'."),
   /** FODF1310. */
-  ORDCLOSED(FODF, 1310, "Ordinal is not closed: '%'."),
+  INVORDINAL(FODF, 1310, "Invalid specification of ordinal numbering: '%'."),
+
+  // [CG] obsolete error codes?
+
+  /** FODF1310. */
+  NOMAND(FODF, 1310, "No mandatory digit specified: '%'."),
 
   /** FODT0001. */
   DATERANGE(FODT, 1, "%: '%' out of range."),
@@ -424,7 +425,7 @@ public enum Err {
   /** FORG0001. */
   DATEFORMAT(FORG, 1, "Wrong % format: '%' (try e.g. '%')."),
   /** FORG0002. */
-  URIINV(FORG, 2, "Invalid URI: %."),
+  URIINVRES(FORG, 2, "Invalid URI: %."),
   /** FORG0002. */
   URIABS(FORG, 2, "Base URI % is not absolute."),
 

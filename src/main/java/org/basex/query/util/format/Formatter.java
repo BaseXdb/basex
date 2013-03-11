@@ -214,7 +214,7 @@ public abstract class Formatter extends FormatUtil {
         if(err) PICINVCOMP.thrw(ii, pic);
         if(pres == null) continue;
 
-        final FormatParser fp = new FormatParser(p, pres, ii);
+        final DateFormat fp = new DateFormat(p, pres, ii);
         if(max) {
           // limit maximum length of numeric output
           int mx = 0;
@@ -253,7 +253,7 @@ public abstract class Formatter extends FormatUtil {
    * @return string representation
    */
   public final byte[] formatInt(final long num, final FormatParser fp) {
-    // choose sign
+    // prepend minus sign to negative values
     long n = num;
     final boolean sign = n < 0;
     if(sign) n = -n;
@@ -268,7 +268,7 @@ public abstract class Formatter extends FormatUtil {
       japanese(tb, n);
     } else if(single && ch == 'i') {
       roman(tb, n);
-    } else if(ch >= '\u2460' && ch <= '\u249b') {
+    } else if(ch == '\u2460' || ch == '\u2474' || ch == '\u2488') {
       if(num < 1 || num > 20) tb.addLong(num);
       else tb.add((int) (ch + num - 1));
     } else {
@@ -290,9 +290,7 @@ public abstract class Formatter extends FormatUtil {
    * @param n number to be formatted
    * @param a alphabet
    */
-  private static void alpha(final TokenBuilder tb, final long n,
-      final String a) {
-
+  private static void alpha(final TokenBuilder tb, final long n, final String a) {
     final int al = a.length();
     if(n > al) alpha(tb, (n - 1) / al, a);
     if(n > 0) tb.add(a.charAt((int) ((n - 1) % al)));
