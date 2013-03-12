@@ -446,21 +446,14 @@ public enum Function {
   /** XQuery function. */
   _MATH_CRC32(FNMath.class, "crc32(string)", HEX, STR),
 
-  /* FNRandom functions. */
+  /* FNAdmin functions. */
+
   /** XQuery function. */
-  _RANDOM_DOUBLE(FNRandom.class, "double()", DBL),
+  _ADMIN_USERS(FNAdmin.class, "users([database])", ELM_ZM, 0, STR),
   /** XQuery function. */
-  _RANDOM_INTEGER(FNRandom.class, "integer([max])", ITR, 0, ITR),
+  _ADMIN_SESSIONS(FNAdmin.class, "sessions()", ELM_ZM),
   /** XQuery function. */
-  _RANDOM_SEEDED_DOUBLE(FNRandom.class, "seeded-double(seed,num)", ITEM_ZM, ITR,
-      ITR),
-  /** XQuery function. */
-  _RANDOM_SEEDED_INTEGER(FNRandom.class, "seeded-integer(seed,num[,max])", ITEM_ZM,
-      2, ITR, ITR, ITR),
-  /** XQuery function. */
-  _RANDOM_GAUSSIAN(FNRandom.class, "gaussian(num)", ITEM_ZM, ITR),
-  /** XQuery function. */
-  _RANDOM_UUID(FNRandom.class, "uuid()", STR),
+  _ADMIN_LOGS(FNAdmin.class, "logs([name])", ELM_ZM, 0, STR),
 
   /* FNArchive functions. */
 
@@ -482,6 +475,19 @@ public enum Function {
   _ARCHIVE_DELETE(FNArchive.class, "delete(archive,entries)", B64, B64, ITEM_ZM),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(FNArchive.class, "options(archive)", ELM, B64),
+
+  /* FNClient functions. */
+
+  /** XQuery function. */
+  _CLIENT_CONNECT(FNClient.class, "connect(url,port,user,pass)", URI, STR, ITR, STR, STR),
+  /** XQuery function. */
+  _CLIENT_EXECUTE(FNClient.class, "execute(id,command)", STR, URI, STR),
+  /** XQuery function. */
+  _CLIENT_INFO(FNClient.class, "info(id)", STR, URI),
+  /** XQuery function. */
+  _CLIENT_QUERY(FNClient.class, "query(id,query[,bindings])", ITEM_ZO, 2, URI, STR, ITEM),
+  /** XQuery function. */
+  _CLIENT_CLOSE(FNClient.class, "close(id)", EMP, URI),
 
   /* FNConvert functions. */
 
@@ -516,6 +522,24 @@ public enum Function {
   /** XQuery function. */
   _CONVERT_DAYTIME_TO_INTEGER(FNConvert.class, "dayTime-to-integer(duration)",
       ITR, DTD),
+
+  /* FNCrypto functions (EXPath Cryptographic module). */
+
+  /** XQuery function. */
+  _CRYPTO_HMAC(FNCrypto.class, "hmac(string,string,string[,string])",
+      STR, 3, STR, STR, STR, STR_ZO),
+  /** XQuery function. */
+  _CRYPTO_ENCRYPT(FNCrypto.class, "encrypt(string,string,string,string)",
+      STR, STR, STR, STR, STR),
+  /** XQuery function. */
+  _CRYPTO_DECRYPT(FNCrypto.class, "decrypt(string,string,string,string)",
+      STR, STR, STR, STR, STR),
+  /** XQuery function. */
+  _CRYPTO_GENERATE_SIGNATURE(FNCrypto.class, "generate-signature" +
+      "(node,string,string,string,string,string[,item][,item])",
+      NOD, 6, NOD, STR, STR, STR, STR, STR, ITEM_ZO, ITEM_ZO),
+  /** XQuery function. */
+  _CRYPTO_VALIDATE_SIGNATURE(FNCrypto.class, "validate-signature(node)", BLN, NOD),
 
   /* FNDb functions. */
 
@@ -584,19 +608,6 @@ public enum Function {
   /** XQuery function. */
   _DB_FLUSH(FNDb.class, "flush(database)", EMP, ITEM),
 
-  /* FNAdmin functions. */
-
-  /** XQuery function. */
-  _ADMIN_USERS(FNAdmin.class, "users([database])", ELM_ZM, 0, STR),
-  /** XQuery function. */
-  _ADMIN_SESSIONS(FNAdmin.class, "sessions()", ELM_ZM),
-  /** XQuery function. */
-  _ADMIN_LOGS(FNAdmin.class, "logs([name])", ELM_ZM, 0, STR),
-  /** XQuery function: needs to be implemented as updating function.
-  _ADMIN_CREATE_USER(FNAdmin.class, "create-user(name,password[,database])",
-      EMP, 2, STR, STR, STR),
-  */
-
   /* FNFetch functions. */
 
   /** XQuery function. */
@@ -605,27 +616,6 @@ public enum Function {
   _FETCH_BINARY(FNFetch.class, "binary(uri)", B64, STR),
   /** XQuery function. */
   _FETCH_CONTENT_TYPE(FNFetch.class, "content-type(uri)", STR, STR),
-
-  /* FNHTML functions. */
-
-  /** XQuery function. */
-  _HTML_PARSER(FNHtml.class, "parser()", STR),
-  /** XQuery function. */
-  _HTML_PARSE(FNHtml.class, "parse(input[,options)", DOC_O, 1, STR, ITEM),
-
-  /* FNIndex functions. */
-
-  /** XQuery function. */
-  _INDEX_FACETS(FNIndex.class, "facets(database,format)", DOC_O, 1, STR, STR),
-  /** XQuery function. */
-  _INDEX_TEXTS(FNIndex.class, "texts(database,entry[,order])", NOD_ZM, 1, STR, STR, BLN),
-  /** XQuery function. */
-  _INDEX_ATTRIBUTES(FNIndex.class, "attributes(database,prefix[,order])",
-      NOD_ZM, 1, STR, STR, BLN),
-  /** XQuery function. */
-  _INDEX_ELEMENT_NAMES(FNIndex.class, "element-names(database)", NOD_ZM, STR),
-  /** XQuery function. */
-  _INDEX_ATTRIBUTE_NAMES(FNIndex.class, "attribute-names(database)", NOD_ZM, STR),
 
   /* FNFile functions (EXPath). */
 
@@ -693,58 +683,6 @@ public enum Function {
   /** XQuery function. */
   _FILE_MOVE(FNFile.class, "move(source,target)", EMP, STR, STR),
 
-  /* FNProc functions. */
-
-  /** XQuery function. */
-  _PROC_SYSTEM(FNProc.class, "system(command[,args[,encoding]])",
-      STR, 1, STR, STR_ZM, STR),
-  /** XQuery function. */
-  _PROC_EXECUTE(FNProc.class, "execute(command[,args[,encoding]]])",
-      ELM, 1, STR, STR_ZM, STR),
-
-  /* FNClient functions. */
-
-  /** XQuery function. */
-  _CLIENT_CONNECT(FNClient.class, "connect(url,port,user,pass)", URI, STR, ITR, STR, STR),
-  /** XQuery function. */
-  _CLIENT_EXECUTE(FNClient.class, "execute(id,command)", STR, URI, STR),
-  /** XQuery function. */
-  _CLIENT_INFO(FNClient.class, "info(id)", STR, URI),
-  /** XQuery function. */
-  _CLIENT_QUERY(FNClient.class, "query(id,query[,bindings])", ITEM_ZO, 2, URI, STR, ITEM),
-  /** XQuery function. */
-  _CLIENT_CLOSE(FNClient.class, "close(id)", EMP, URI),
-
-  /* FNSql functions. */
-
-  /** XQuery function. */
-  _SQL_INIT(FNSql.class, "init(class)", EMP, 1, STR),
-  /** XQuery function. */
-  _SQL_CONNECT(FNSql.class, "connect(url[,user[,pass[,options]]]]])",
-      ITR, 1, STR, STR, STR, NOD_ZO),
-  /** XQuery function. */
-  _SQL_PREPARE(FNSql.class, "prepare(id,statement)", ITR, ITR, STR),
-  /** XQuery function. */
-  _SQL_EXECUTE(FNSql.class, "execute(id,query)", ELM_ZM, 1, ITR, STR),
-  /** XQuery function. */
-  _SQL_EXECUTE_PREPARED(FNSql.class, "execute-prepared(id[,params])",
-      ELM_ZM, 1, ITR, ELM),
-  /** XQuery function. */
-  _SQL_CLOSE(FNSql.class, "close(id)", EMP, ITR),
-  /** XQuery function. */
-  _SQL_COMMIT(FNSql.class, "commit(id)", EMP, ITR),
-  /** XQuery function. */
-  _SQL_ROLLBACK(FNSql.class, "rollback(id)", EMP, ITR),
-
-  /* FNRepo functions. */
-
-  /** XQuery function. */
-  _REPO_INSTALL(FNRepo.class, "install(uri)", EMP, STR),
-  /** XQuery function. */
-  _REPO_DELETE(FNRepo.class, "delete(uri)", EMP, STR),
-  /** XQuery function. */
-  _REPO_LIST(FNRepo.class, "list()", STR_ZM),
-
   /* FNFt functions. */
 
   /** XQuery function. */
@@ -761,6 +699,17 @@ public enum Function {
   _FT_TOKENS(FNFt.class, "tokens(database,entry[,order])", ITEM_ZM, 1, STR, STR, BLN),
   /** XQuery function. */
   _FT_TOKENIZE(FNFt.class, "tokenize(string)", STR_ZM, STR),
+
+  /* FNHash functions. */
+
+  /** XQuery function. */
+  _HASH_MD5(FNHash.class, "md5(value)", B64, AAT),
+  /** XQuery function. */
+  _HASH_SHA1(FNHash.class, "sha1(value)", B64, AAT),
+  /** XQuery function. */
+  _HASH_SHA256(FNHash.class, "sha256(value)", B64, AAT),
+  /** XQuery function. */
+  _HASH_HASH(FNHash.class, "hash(value,algorithm)", B64, AAT, STR),
 
   /* FNHof functions. */
 
@@ -785,29 +734,32 @@ public enum Function {
   _HOF_TOP_K_WITH(FNHof.class, "top-k-with(seq,less-than,k)", ITEM_ZM, ITEM_ZM,
       FuncType.get(BLN, ITEM_ZO, ITEM_ZO).seqType(), ITR),
 
-  /* FNCrypto functions (EXPath Cryptographic module). */
+  /* FNHtml functions. */
 
   /** XQuery function. */
-  _CRYPTO_HMAC(FNCrypto.class, "hmac(string,string,string[,string])",
-      STR, 3, STR, STR, STR, STR_ZO),
+  _HTML_PARSER(FNHtml.class, "parser()", STR),
   /** XQuery function. */
-  _CRYPTO_ENCRYPT(FNCrypto.class, "encrypt(string,string,string,string)",
-      STR, STR, STR, STR, STR),
-  /** XQuery function. */
-  _CRYPTO_DECRYPT(FNCrypto.class, "decrypt(string,string,string,string)",
-      STR, STR, STR, STR, STR),
-  /** XQuery function. */
-  _CRYPTO_GENERATE_SIGNATURE(FNCrypto.class, "generate-signature" +
-      "(node,string,string,string,string,string[,item][,item])",
-      NOD, 6, NOD, STR, STR, STR, STR, STR, ITEM_ZO, ITEM_ZO),
-  /** XQuery function. */
-  _CRYPTO_VALIDATE_SIGNATURE(FNCrypto.class, "validate-signature(node)", BLN, NOD),
+  _HTML_PARSE(FNHtml.class, "parse(input[,options)", DOC_O, 1, STR, ITEM),
 
   /* FNHttp functions (EXPath). */
 
   /** XQuery function. */
   _HTTP_SEND_REQUEST(FNHttp.class, "send-request(request[,href,[bodies]])",
       ITEM_ZM, 1, NOD, STR_ZO, ITEM_ZM),
+
+  /* FNIndex functions. */
+
+  /** XQuery function. */
+  _INDEX_FACETS(FNIndex.class, "facets(database,format)", DOC_O, 1, STR, STR),
+  /** XQuery function. */
+  _INDEX_TEXTS(FNIndex.class, "texts(database,entry[,order])", NOD_ZM, 1, STR, STR, BLN),
+  /** XQuery function. */
+  _INDEX_ATTRIBUTES(FNIndex.class, "attributes(database,prefix[,order])",
+      NOD_ZM, 1, STR, STR, BLN),
+  /** XQuery function. */
+  _INDEX_ELEMENT_NAMES(FNIndex.class, "element-names(database)", NOD_ZM, STR),
+  /** XQuery function. */
+  _INDEX_ATTRIBUTE_NAMES(FNIndex.class, "attribute-names(database)", NOD_ZM, STR),
 
   /* FNJson functions. */
 
@@ -829,25 +781,14 @@ public enum Function {
   /** XQuery function. */
   _OUT_FORMAT(FNOut.class, "format(format,item1[,...])", STR, -2, STR, ITEM),
 
-  /* FNXQuery functions. */
+  /* FNProc functions. */
 
   /** XQuery function. */
-  _XQUERY_EVAL(FNXQuery.class, "eval(string[,bindings])", ITEM_ZM, 1, STR, ITEM),
+  _PROC_SYSTEM(FNProc.class, "system(command[,args[,encoding]])",
+      STR, 1, STR, STR_ZM, STR),
   /** XQuery function. */
-  _XQUERY_INVOKE(FNXQuery.class, "invoke(uri[,bindings])", ITEM_ZM, 1, STR, ITEM),
-  /** XQuery function. */
-  _XQUERY_TYPE(FNXQuery.class, "type(value)", ITEM_ZM, ITEM_ZM),
-
-  /* FNXQUnit functions. */
-
-  /** XQuery function. */
-  _XQUNIT_ASSERT(FNXQUnit.class, "assert(test[,message])", EMP, 1, ITEM_ZM, STR),
-  /** XQuery function. */
-  _XQUNIT_FAIL(FNXQUnit.class, "fail(message)", EMP, STR),
-  /** XQuery function. */
-  _XQUNIT_TEST(FNXQUnit.class, "test()", ELM),
-  /** XQuery function. */
-  _XQUNIT_TEST_LIBRARIES(FNXQUnit.class, "test-libraries(uris)", ELM, STR_ZM),
+  _PROC_EXECUTE(FNProc.class, "execute(command[,args[,encoding]]])",
+      ELM, 1, STR, STR_ZM, STR),
 
   /* FNProf functions. */
 
@@ -868,16 +809,52 @@ public enum Function {
   /** XQuery function. */
   _PROF_VOID(FNProf.class, "void(value)", EMP, ITEM_ZM),
 
-  /* FNHash functions. */
+  /* FNRandom functions. */
 
   /** XQuery function. */
-  _HASH_MD5(FNHash.class, "md5(value)", B64, AAT),
+  _RANDOM_DOUBLE(FNRandom.class, "double()", DBL),
   /** XQuery function. */
-  _HASH_SHA1(FNHash.class, "sha1(value)", B64, AAT),
+  _RANDOM_INTEGER(FNRandom.class, "integer([max])", ITR, 0, ITR),
   /** XQuery function. */
-  _HASH_SHA256(FNHash.class, "sha256(value)", B64, AAT),
+  _RANDOM_SEEDED_DOUBLE(FNRandom.class, "seeded-double(seed,num)", ITEM_ZM, ITR,
+      ITR),
   /** XQuery function. */
-  _HASH_HASH(FNHash.class, "hash(value,algorithm)", B64, AAT, STR),
+  _RANDOM_SEEDED_INTEGER(FNRandom.class, "seeded-integer(seed,num[,max])", ITEM_ZM,
+      2, ITR, ITR, ITR),
+  /** XQuery function. */
+  _RANDOM_GAUSSIAN(FNRandom.class, "gaussian(num)", ITEM_ZM, ITR),
+  /** XQuery function. */
+  _RANDOM_UUID(FNRandom.class, "uuid()", STR),
+
+  /* FNRepo functions. */
+
+  /** XQuery function. */
+  _REPO_INSTALL(FNRepo.class, "install(uri)", EMP, STR),
+  /** XQuery function. */
+  _REPO_DELETE(FNRepo.class, "delete(uri)", EMP, STR),
+  /** XQuery function. */
+  _REPO_LIST(FNRepo.class, "list()", STR_ZM),
+
+  /* FNSql functions. */
+
+  /** XQuery function. */
+  _SQL_INIT(FNSql.class, "init(class)", EMP, 1, STR),
+  /** XQuery function. */
+  _SQL_CONNECT(FNSql.class, "connect(url[,user[,pass[,options]]]]])",
+      ITR, 1, STR, STR, STR, NOD_ZO),
+  /** XQuery function. */
+  _SQL_PREPARE(FNSql.class, "prepare(id,statement)", ITR, ITR, STR),
+  /** XQuery function. */
+  _SQL_EXECUTE(FNSql.class, "execute(id,query)", ELM_ZM, 1, ITR, STR),
+  /** XQuery function. */
+  _SQL_EXECUTE_PREPARED(FNSql.class, "execute-prepared(id[,params])",
+      ELM_ZM, 1, ITR, ELM),
+  /** XQuery function. */
+  _SQL_CLOSE(FNSql.class, "close(id)", EMP, ITR),
+  /** XQuery function. */
+  _SQL_COMMIT(FNSql.class, "commit(id)", EMP, ITR),
+  /** XQuery function. */
+  _SQL_ROLLBACK(FNSql.class, "rollback(id)", EMP, ITR),
 
   /* FNValidate functions. */
 
@@ -889,6 +866,26 @@ public enum Function {
   _VALIDATE_DTD(FNValidate.class, "dtd(input[,schema])", EMP, 1, ITEM, ITEM),
   /** XQuery function. */
   _VALIDATE_DTD_INFO(FNValidate.class, "dtd-info(input[,schema])", STR_ZM, 1, ITEM, ITEM),
+
+  /* FNXQuery functions. */
+
+  /** XQuery function. */
+  _XQUERY_EVAL(FNXQuery.class, "eval(string[,bindings])", ITEM_ZM, 1, STR, ITEM),
+  /** XQuery function. */
+  _XQUERY_INVOKE(FNXQuery.class, "invoke(uri[,bindings])", ITEM_ZM, 1, STR, ITEM),
+  /** XQuery function. */
+  _XQUERY_TYPE(FNXQuery.class, "type(value)", ITEM_ZM, ITEM_ZM),
+
+  /* FNXQUnit functions. */
+
+  /** XQuery function. */
+  _XQUNIT_ASSERT(FNXQUnit.class, "assert(test[,message])", EMP, 1, ITEM_ZM, STR),
+  /** XQuery function. */
+  _XQUNIT_FAIL(FNXQUnit.class, "fail(message)", EMP, STR),
+  /** XQuery function. */
+  _XQUNIT_TEST(FNXQUnit.class, "test()", ELM),
+  /** XQuery function. */
+  _XQUNIT_TEST_LIBRARIES(FNXQUnit.class, "test-libraries(uris)", ELM, STR_ZM),
 
   /* FNXslt functions. */
 
