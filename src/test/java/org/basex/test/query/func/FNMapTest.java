@@ -9,7 +9,7 @@ import org.basex.util.*;
 import org.junit.*;
 
 /**
- * This class tests the XQuery functions prefixed with "map".
+ * This class tests the functions of the Map Module.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

@@ -7,7 +7,7 @@ import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the functions of the {@link org.basex.query.func.FNHof} class.
+ * This class tests the functions of the Higher-Order Module.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler

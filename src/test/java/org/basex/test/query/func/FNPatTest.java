@@ -1,11 +1,12 @@
 package org.basex.test.query.func;
 
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the functions of the <code>FNPat</code> class.
+ * This class tests XQuery functions placed in the {@link FNPat} class.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler

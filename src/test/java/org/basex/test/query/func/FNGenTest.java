@@ -2,12 +2,13 @@ package org.basex.test.query.func;
 
 import static org.basex.query.func.Function.*;
 
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the functions of the <code>FNGen</code> class.
+ * This class tests XQuery functions placed in the {@link FNGen} class.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

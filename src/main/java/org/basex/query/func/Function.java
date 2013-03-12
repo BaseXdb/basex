@@ -856,6 +856,13 @@ public enum Function {
   /** XQuery function. */
   _SQL_ROLLBACK(FNSql.class, "rollback(id)", EMP, ITR),
 
+  /* FNStream functions. */
+
+  /** XQuery function. */
+  _STREAM_MATERIALIZE(FNStream.class, "materialize(item)", ITEM, ITEM),
+  /** XQuery function. */
+  _STREAM_IS_STREAMABLE(FNStream.class, "is-streamable(item)", BLN, ITEM),
+
   /* FNValidate functions. */
 
   /** XQuery function. */
@@ -960,6 +967,7 @@ public enum Function {
     URIS.put(FNProf.class,     PROFURI);
     URIS.put(FNRandom.class,   RANDOMURI);
     URIS.put(FNSql.class,      SQLURI);
+    URIS.put(FNStream.class,   STREAMURI);
     URIS.put(FNValidate.class, VALIDATEURI);
     URIS.put(FNXslt.class,     XSLTURI);
     URIS.put(FNXQuery.class,   XQUERYURI);

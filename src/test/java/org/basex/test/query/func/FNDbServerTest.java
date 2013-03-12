@@ -14,7 +14,7 @@ import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the XQuery database functions prefixed with "db".
+ * This class tests the functions of the Database Module in a client/server environment.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -55,7 +55,7 @@ public final class FNDbServerTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests client / server functionality of database functions.
+   * Tests client/server functionality of database functions.
    * @throws IOException I/O exception
    */
   @Test
@@ -69,7 +69,7 @@ public final class FNDbServerTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests client / server functionality of database functions.
+   * Tests client/server functionality of database functions.
    * @throws IOException I/O exception
    * @throws InterruptedException interrupted exception
    */

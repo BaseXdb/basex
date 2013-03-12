@@ -508,6 +508,8 @@ public interface QueryText {
   byte[] PROC = token("proc");
   /** SQL token. */
   byte[] SQL = token("sql");
+  /** SQL token. */
+  byte[] STREAM = token("stream");
   /** Cryptography token. */
   byte[] CRYPTO = token("crypto");
   /** Random token. */
@@ -581,6 +583,9 @@ public interface QueryText {
   String BXMODULES = Text.URL + "/modules/";
   /** Project errors. */
   byte[] BXERRORS = token(Text.URL + "/errors");
+
+  /** Database module URI. */
+  byte[] ADMINURI = token(BXMODULES + "admin");
   /** Archive module URI.*/
   byte[] ARCHIVEURI = token(BXMODULES + "archive");
   /** Client module URI. */
@@ -588,15 +593,13 @@ public interface QueryText {
   /** Convert module URI. */
   byte[] CONVERTURI = token(BXMODULES + "convert");
   /** Database module URI. */
-  byte[] ADMINURI = token(BXMODULES + "admin");
-  /** Database module URI. */
   byte[] DBURI = token(BXMODULES + "db");
-  /** Query module URI. */
-  byte[] QUERYURI = token(BXMODULES + "query");
   /** Fetch module URI. */
   byte[] FETCHURI = token(BXMODULES + "fetch");
   /** Full-text module URI. */
   byte[] FTURI = token(BXMODULES + "ft");
+  /** Hash module URI. */
+  byte[] HASHURI = token(BXMODULES + "hash");
   /** Higher-order module URI. */
   byte[] HOFURI = token(BXMODULES + "hof");
   /** Html module URI. */
@@ -605,28 +608,30 @@ public interface QueryText {
   byte[] INDEXURI = token(BXMODULES + "index");
   /** JSON module URI. */
   byte[] JSONURI = token(BXMODULES + "json");
-  /** Process module URI. */
-  byte[] PROCURI = token(BXMODULES + "proc");
   /** Output module URI. */
   byte[] OUTURI = token(BXMODULES + "out");
-  /** XQuery module URI. */
-  byte[] XQUERYURI = token(BXMODULES + "xquery");
-  /** XQUnit module URI. */
-  byte[] XQUNITURI = token(BXMODULES + "xqunit");
+  /** Process module URI. */
+  byte[] PROCURI = token(BXMODULES + "proc");
   /** Profiling module URI. */
   byte[] PROFURI = token(BXMODULES + "prof");
-  /** Hash module URI. */
-  byte[] HASHURI = token(BXMODULES + "hash");
-  /** XSLT module URI. */
-  byte[] XSLTURI = token(BXMODULES + "xslt");
-  /** SQL module URI. */
-  byte[] SQLURI = token(BXMODULES + "sql");
+  /** Query module URI. */
+  byte[] QUERYURI = token(BXMODULES + "query");
   /** Random module URI. */
   byte[] RANDOMURI = token(BXMODULES + "random");
   /** Repository module URI. */
   byte[] REPOURI = token(BXMODULES + "repo");
+  /** SQL module URI. */
+  byte[] SQLURI = token(BXMODULES + "sql");
+  /** Streaming module URI. */
+  byte[] STREAMURI = token(BXMODULES + "stream");
   /** Validate module URI. */
   byte[] VALIDATEURI = token(BXMODULES + "validate");
+  /** XSLT module URI. */
+  byte[] XSLTURI = token(BXMODULES + "xslt");
+  /** XQuery module URI. */
+  byte[] XQUERYURI = token(BXMODULES + "xquery");
+  /** XQUnit module URI. */
+  byte[] XQUNITURI = token(BXMODULES + "xqunit");
 
   /** Java prefix. */
   byte[] JAVAPREF = token("java:");

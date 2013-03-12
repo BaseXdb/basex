@@ -13,7 +13,7 @@ import org.basex.test.server.*;
 import org.junit.*;
 
 /**
- * This class tests the XQuery database functions prefixed with "client".
+ * This class tests the functions of the Client Module.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

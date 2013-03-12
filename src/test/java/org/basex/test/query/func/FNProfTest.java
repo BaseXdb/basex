@@ -6,7 +6,7 @@ import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the XQuery utility functions prefixed with "util".
+ * This class tests the functions of the Profiling Module.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

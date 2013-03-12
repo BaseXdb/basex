@@ -44,10 +44,11 @@ public final class NSGlobal {
     // BaseX namespaces
     NS.add(BXERR, BXERRORS);
     NS.add(BASEX, BASEXURI);
+
+    NS.add(ADMIN, ADMINURI);
     NS.add(ARCHIVE, ARCHIVEURI);
     NS.add(CLIENT, CLIENTURI);
     NS.add(CONVERT, CONVERTURI);
-    NS.add(ADMIN, ADMINURI);
     NS.add(DB, DBURI);
     NS.add(FETCH, FETCHURI);
     NS.add(FT, FTURI);
@@ -56,13 +57,14 @@ public final class NSGlobal {
     NS.add(HTML, HTMLURI);
     NS.add(INDEX, INDEXURI);
     NS.add(JSON, JSONURI);
-    NS.add(QUERY, QUERYURI);
     NS.add(OUT, OUTURI);
     NS.add(PROC, PROCURI);
     NS.add(PROF, PROFURI);
+    NS.add(QUERY, QUERYURI);
     NS.add(RANDOM, RANDOMURI);
     NS.add(REPO, REPOURI);
     NS.add(SQL, SQLURI);
+    NS.add(STREAM, STREAMURI);
     NS.add(VLDT, VALIDATEURI);
     NS.add(XSLT, XSLTURI);
     NS.add(XQRY, XQUERYURI);

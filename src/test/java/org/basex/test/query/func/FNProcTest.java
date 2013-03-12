@@ -7,7 +7,7 @@ import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the XQuery process functions prefixed with "proc".
+ * This class tests the functions of the Process Module.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

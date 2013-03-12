@@ -9,7 +9,7 @@ import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests some XQuery random functions prefixed with "random".
+ * This class tests the functions of the Random Module.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Dirk Kirsten

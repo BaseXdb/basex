@@ -11,7 +11,7 @@ import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the functions for EXPath package management.
+ * This class tests the functions of the Repository Module.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura

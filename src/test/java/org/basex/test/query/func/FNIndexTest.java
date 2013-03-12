@@ -8,7 +8,7 @@ import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the XQuery index functions prefixed with "ix".
+ * This class tests the functions of the Index Module.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
