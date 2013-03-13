@@ -493,6 +493,11 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
+  public boolean isVacuous() {
+    return ret.isVacuous();
+  }
+
+  @Override
   public boolean uses(final Use u) {
     if(u == Use.X30 && xq30) return true;
     for(final Clause cls : clauses) if(cls.uses(u)) return true;
