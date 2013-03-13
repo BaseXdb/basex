@@ -1,6 +1,8 @@
 package org.basex.http.webdav;
 
+import static com.bradmcevoy.http.LockResult.*;
 import java.io.*;
+import java.util.UUID;
 
 import org.basex.core.cmd.*;
 import org.basex.http.*;
@@ -17,7 +19,7 @@ import com.bradmcevoy.http.exceptions.*;
  * @author Dimitar Popov
  */
 public abstract class BXAbstractResource extends BXResource implements
-    CopyableResource, DeletableResource, MoveableResource {
+    CopyableResource, DeletableResource, MoveableResource, LockableResource {
 
   /**
    * Constructor.
@@ -69,6 +71,64 @@ public abstract class BXAbstractResource extends BXResource implements
           moveTo((BXFolder) target, name);
       }
     }.eval();
+  }
+
+  /**
+   * Lock this resource and return a token
+   *
+   * @param timeout - in seconds, or null
+   * @param lockInfo
+   * @return - a result containing the token representing the lock if successful,
+   * otherwise a failure reason code
+   */
+  @Override
+  public LockResult lock(final LockTimeout timeout, final LockInfo lockInfo) throws
+    NotAuthorizedException, PreConditionFailedException, LockedException {
+
+    final String tokenId = UUID.randomUUID().toString();
+
+    final FailureReason failureReason = new BXCode<FailureReason>(this) {
+      @Override
+      public FailureReason get() throws IOException {
+        return lock(tokenId, timeout, lockInfo);
+      }
+    }.evalNoEx();
+
+    return failureReason == null ?
+      success(new LockToken(tokenId, lockInfo, timeout)) :
+      failed(failureReason);
+  }
+
+  /**
+   * Renew the lock and return new lock info
+   *
+   * @param token
+   * @return
+   */
+  @Override
+  public LockResult refreshLock(final String token) throws NotAuthorizedException,
+    PreConditionFailedException {
+    return null;  //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  /**
+   * If the resource is currently locked, and the tokenId  matches the current
+   * one, unlock the resource
+   *
+   * @param tokenId
+   */
+  @Override
+  public void unlock(final String tokenId) throws NotAuthorizedException,
+    PreConditionFailedException {
+    //To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  /**
+   * @return - the current lock, if the resource is locked, or null
+   */
+  @Override
+  public LockToken getCurrentLock() {
+    return null;  //To change body of implemented methods use File | Settings | File Templates.
   }
 
   /**
@@ -145,5 +205,39 @@ public abstract class BXAbstractResource extends BXResource implements
       copyTo(f, n);
       del();
     }
+  }
+
+  protected FailureReason lock(final String tokenId, final LockTimeout timeout,
+    final LockInfo lockInfo) throws IOException {
+
+
+
+    return null;
+  }
+
+  protected void createLock(final String tokenId, final LockTimeout timeout,
+    final LockInfo lockInfo) throws IOException {
+    final String queryStr =
+      "import module namespace w = 'http://basex.org/webdav';" +
+        "w:create-lock(" +
+        "$resource," +
+        "$lock-token," +
+        "$lock-scope," +
+        "$lock-type," +
+        "$lock-depth," +
+        "$lock-owner," +
+        "$lock-timeout)";
+
+    LocalQuery q = http.session().query(queryStr);
+    q.bind("resource", path);
+    q.bind("lock-token", tokenId);
+    q.bind("lock-scope", lockInfo.scope.name().toLowerCase());
+    q.bind("lock-type", lockInfo.type.name().toLowerCase());
+    q.bind("lock-depth", lockInfo.depth.name().toLowerCase());
+    q.bind("lock-owner", lockInfo.lockedByUser);
+    final Long timeoutSeconds = timeout.getSeconds();
+    q.bind("lock-timeout", timeoutSeconds == null ? Long.MAX_VALUE : timeoutSeconds);
+
+    q.execute();
   }
 }
