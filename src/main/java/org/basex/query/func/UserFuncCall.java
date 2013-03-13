@@ -14,6 +14,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Function call for user-defined functions.
@@ -79,6 +80,11 @@ public abstract class UserFuncCall extends Arr {
     call.type = type;
     call.size = size;
     return call;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    return func.databases(db) && super.databases(db);
   }
 
   /**
