@@ -263,8 +263,6 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Adds the names of the databases that will be touched by the query.
-   * The {@code abstract} modifier can be replaced as soon as the function is
-   * implemented by all expressions.
    * @param db set
    * @return {@code false} if databases cannot be statically determined
    */
