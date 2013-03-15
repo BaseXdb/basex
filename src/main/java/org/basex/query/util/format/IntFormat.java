@@ -91,7 +91,7 @@ public final class IntFormat extends FormatParser {
         gss = true;
       } else {
         // any other letter: return default primary token
-        return ONE;
+        INVDDPATTERN.thrw(info, pic);
       }
     }
     if(gss) INVGROUP.thrw(info, pic);

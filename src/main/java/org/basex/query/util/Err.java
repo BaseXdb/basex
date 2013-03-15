@@ -382,6 +382,8 @@ public enum Err {
   GROUPSTART(FODF, 1310, "Picture begins with grouping separator: '%'."),
   /** FODF1310. */
   INVORDINAL(FODF, 1310, "Invalid specification of ordinal numbering: '%'."),
+  /** FODF1310. */
+  INVDDPATTERN(FODF, 1310, "Invalid decimal-digit-pattern: '%'."),
 
   // [CG] obsolete error codes?
 
