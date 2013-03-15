@@ -183,13 +183,14 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public void checkAllUp(final Expr... expr) throws QueryException {
+    // updating state: 0 = initial state, 1 = updating, -1 = non-updating
     int s = 0;
     for(final Expr e : expr) {
       e.checkUp();
       if(e.isVacuous()) continue;
       final boolean u = e.uses(Use.UPD);
-      if(u && s == 2 || !u && s == 1) UPALL.thrw(info, description());
-      s = u ? 1 : 2;
+      if(u && s == -1 || !u && s == 1) UPALL.thrw(info, description());
+      s = u ? 1 : -1;
     }
   }
 
