@@ -10,6 +10,12 @@ import org.basex.server.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * WebDAV resource representing an abstract folder within a collection database.
@@ -74,7 +80,7 @@ public abstract class BXAbstractResource extends BXResource implements
   }
 
   /**
-   * Lock this resource and return a token
+   * Lock this resource and return a token.
    *
    * @param timeout - in seconds, or null
    * @param lockInfo
@@ -100,7 +106,7 @@ public abstract class BXAbstractResource extends BXResource implements
   }
 
   /**
-   * Renew the lock and return new lock info
+   * Renew the lock and return new lock info.
    *
    * @param token
    * @return
@@ -108,19 +114,32 @@ public abstract class BXAbstractResource extends BXResource implements
   @Override
   public LockResult refreshLock(final String token) throws NotAuthorizedException,
     PreConditionFailedException {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    return null;
   }
 
   /**
    * If the resource is currently locked, and the tokenId  matches the current
-   * one, unlock the resource
+   * one, unlock the resource.
    *
    * @param tokenId
    */
   @Override
   public void unlock(final String tokenId) throws NotAuthorizedException,
     PreConditionFailedException {
-    //To change body of implemented methods use File | Settings | File Templates.
+
+    new BXCode<Object>(this) {
+      @Override
+      public void run() throws IOException {
+        final String queryStr =
+            "import module namespace w = 'http://basex.org/webdav';" +
+            "w:delete-lock($lock-token)";
+
+        LocalQuery q = http.session().query(queryStr);
+        q.bind("lock-token", tokenId);
+
+        q.execute();
+      }
+    }.evalNoEx();
   }
 
   /**
@@ -128,7 +147,17 @@ public abstract class BXAbstractResource extends BXResource implements
    */
   @Override
   public LockToken getCurrentLock() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    return new BXCode<LockToken>(this)
+    {
+      @Override
+      public LockToken get() throws IOException {
+        try {
+          return getCurrentActiveLock();
+        } catch(SAXException e) {
+          throw new IOException(e);
+        }
+      }
+    }.evalNoEx();
   }
 
   /**
@@ -210,7 +239,7 @@ public abstract class BXAbstractResource extends BXResource implements
   protected FailureReason lock(final String tokenId, final LockTimeout timeout,
     final LockInfo lockInfo) throws IOException {
 
-
+    createLock(tokenId, timeout, lockInfo);
 
     return null;
   }
@@ -218,7 +247,7 @@ public abstract class BXAbstractResource extends BXResource implements
   protected void createLock(final String tokenId, final LockTimeout timeout,
     final LockInfo lockInfo) throws IOException {
     final String queryStr =
-      "import module namespace w = 'http://basex.org/webdav';" +
+        "import module namespace w = 'http://basex.org/webdav';" +
         "w:create-lock(" +
         "$resource," +
         "$lock-token," +
@@ -229,7 +258,7 @@ public abstract class BXAbstractResource extends BXResource implements
         "$lock-timeout)";
 
     LocalQuery q = http.session().query(queryStr);
-    q.bind("resource", path);
+    q.bind("resource", db + SEP + path);
     q.bind("lock-token", tokenId);
     q.bind("lock-scope", lockInfo.scope.name().toLowerCase());
     q.bind("lock-type", lockInfo.type.name().toLowerCase());
@@ -239,5 +268,66 @@ public abstract class BXAbstractResource extends BXResource implements
     q.bind("lock-timeout", timeoutSeconds == null ? Long.MAX_VALUE : timeoutSeconds);
 
     q.execute();
+  }
+
+  protected LockToken getCurrentActiveLock() throws IOException, SAXException {
+    final String queryStr =
+        "import module namespace w = 'http://basex.org/webdav';" +
+        "w:get-locks($resource)";
+
+    LocalQuery q = http.session().query(queryStr);
+    q.bind("resource", db + SEP + path);
+
+    LockToken result = null;
+    if(q.more()) {
+      String lockTokenStr = q.next();
+      result = parseLockInfo(lockTokenStr);
+    }
+
+    return result;
+  }
+
+  public static LockToken parseLockInfo(String lockInfo) throws SAXException, IOException {
+    XMLReader reader = XMLReaderFactory.createXMLReader();
+    LockTokenSaxHandler handler = new LockTokenSaxHandler();
+    reader.setContentHandler(handler);
+    reader.parse(new InputSource(new StringReader(lockInfo)));
+    return handler.lockToken;
+  }
+
+  public static final class LockTokenSaxHandler extends DefaultHandler {
+    public final LockToken lockToken = new LockToken(null, new LockInfo(), null);
+    private String elementName;
+
+    @Override
+    public void startElement(String uri, String localName, String name,
+        Attributes attributes) throws SAXException {
+      elementName = localName;
+      super.startElement(uri, localName, name, attributes);
+    }
+
+    @Override
+    public void endElement (String uri, String localName, String qName)
+        throws SAXException {
+      elementName = null;
+      super.endElement(uri, localName, qName);
+    }
+
+    @Override
+    public void characters(char[] ch, int start, int length) throws SAXException {
+      String value = String.valueOf(ch, start, length);
+      if("token".equals(elementName))
+        lockToken.tokenId = value;
+      else if("scope".equals(elementName))
+        lockToken.info.scope = LockInfo.LockScope.valueOf(value.toUpperCase());
+      else if("type".equals(elementName))
+        lockToken.info.type = LockInfo.LockType.valueOf(value.toUpperCase());
+      else if("depth".equals(elementName))
+        lockToken.info.depth = LockInfo.LockDepth.valueOf(value.toUpperCase());
+      else if("owner".equals(elementName))
+        lockToken.info.lockedByUser = value;
+      else if("timeout".equals(elementName))
+        lockToken.timeout = LockTimeout.parseTimeout(value);
+    }
   }
 }
