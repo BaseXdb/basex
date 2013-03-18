@@ -244,8 +244,14 @@ public final class Util {
    */
   public static Process start(final Class<?> clz, final String... args) {
     final String[] largs = { "java", "-Xmx" + Runtime.getRuntime().maxMemory(),
-        "-cp", System.getProperty("java.class.path"), clz.getName(), "-D", };
-    final StringList sl = new StringList().add(largs).add(args);
+        "-cp", System.getProperty("java.class.path") };
+    final StringList sl = new StringList().add(largs);
+
+    for(final Map.Entry<Object, Object> o : System.getProperties().entrySet()) {
+      final String k = o.getKey().toString();
+      if(k.startsWith(Prop.DBPREFIX)) sl.add("-D" + o.getValue());
+    }
+    sl.add(clz.getName()).add("-D").add(args);
 
     try {
       return new ProcessBuilder(sl.toArray()).start();

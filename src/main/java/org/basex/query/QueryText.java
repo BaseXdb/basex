@@ -65,6 +65,8 @@ public interface QueryText {
   /** Parser token. */
   String COPY_NAMESPACES = "copy-namespaces";
   /** Parser token. */
+  String COUNT = "count";
+  /** Parser token. */
   String DECIMAL_FORMAT = "decimal-format";
   /** Parser token. */
   String DECLARE = "declare";
@@ -384,8 +386,6 @@ public interface QueryText {
   String CDATA = "<![CDATA[";
   /** Parser token. */
   String COLS = "::";
-  /** Parser token. */
-  String COUNT = "count";
   /** Parser token. */
   String COMMA = ",";
   /** Parser token. */
