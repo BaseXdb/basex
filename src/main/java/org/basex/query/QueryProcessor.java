@@ -313,4 +313,9 @@ public final class QueryProcessor extends Progress {
   public String det() {
     return PLEASE_WAIT_D;
   }
+
+  @Override
+  public String toString() {
+    return query;
+  }
 }

@@ -33,7 +33,7 @@ public abstract class SandboxTest {
   /** Database context. */
   protected static Context context;
   /** Clean up files. */
-  protected static boolean cleanup = true;
+  protected static boolean cleanup;
 
   /**
    * Creates the sandbox.
@@ -45,6 +45,7 @@ public abstract class SandboxTest {
     assertTrue("Sandbox could not be created.", sb.md());
     context = new Context();
     initContext(context);
+    cleanup = true;
   }
 
   /**
@@ -55,6 +56,7 @@ public abstract class SandboxTest {
     final IOFile sb = sandbox();
     ctx.mprop.set(MainProp.DBPATH, sb.path() + "/data");
     ctx.mprop.set(MainProp.WEBPATH, sb.path() + "/webapp");
+    ctx.mprop.set(MainProp.RESTXQPATH, sb.path() + "/webapp");
     ctx.mprop.set(MainProp.REPOPATH, sb.path() + "/repo");
   }
 

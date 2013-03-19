@@ -22,9 +22,9 @@ public final class EventTest extends SandboxTest {
   /** Return value of function db:event. */
   private static final String RETURN = "ABCDEFGHIJKLMNOP";
   /** Event count. */
-  private static final int EVENT_COUNT = 1;
+  private static final int EVENT_COUNT = 10;
   /** Client count. */
-  private static final int CLIENTS = 1;
+  private static final int CLIENTS = 10;
 
   /** Server reference. */
   private static BaseXServer server;
