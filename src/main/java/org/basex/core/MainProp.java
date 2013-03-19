@@ -31,7 +31,7 @@ public final class MainProp extends AProp {
   /** Flag to include key names in the language strings. */
   public static final Object[] LANGKEYS = { "LANGKEYS", false };
   /** Applied locking algorithm: local (database) vs. global (process) locking. */
-  public static final Object[] GLOBALLOCK = { "GLOBALLOCK", true };
+  public static final Object[] GLOBALLOCK = { "GLOBALLOCK", false };
 
   /** Comment: written to property file. */
   public static final Object[] C_CLIENT = { "Client/Server Architecture" };
