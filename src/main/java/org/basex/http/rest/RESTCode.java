@@ -40,7 +40,8 @@ abstract class RESTCode {
     if(db == null) return;
     try {
       http.session().execute(new Open(db));
-      http.session().execute(new Cs(_DB_OPEN.args(db, http.dbpath())));
+      final String path = http.dbpath();
+      if(!path.isEmpty()) http.session().execute(new Cs(_DB_OPEN.args(db, path)));
     } catch(final IOException ex) {
       HTTPErr.NOT_FOUND_X.thrw(ex);
     }
