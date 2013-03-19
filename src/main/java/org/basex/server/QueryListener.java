@@ -171,8 +171,10 @@ final class QueryListener extends Progress {
       // close processor and unregisters the process
       if(qp != null) {
         qp.close();
-        ctx.unregister(qp);
-        parsed = false;
+        if(parsed) {
+          ctx.unregister(qp);
+          parsed = false;
+        }
         qp = null;
       }
     }
