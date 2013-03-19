@@ -124,7 +124,10 @@ public abstract class UserFunc extends Single implements Scope {
     }
 
     // convert all function calls in tail position to proper tail calls
-    if(tco()) expr = expr.markTailCalls();
+    if(tco()) {
+      ctx.compInfo(OPTTCE, name);
+      expr = expr.markTailCalls();
+    }
 
     if(ret == null) return;
     // adopt expected return type

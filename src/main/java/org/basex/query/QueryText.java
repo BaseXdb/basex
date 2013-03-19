@@ -728,6 +728,8 @@ public interface QueryText {
   /** Optimization info. */
   String OPTREMOVE = "%: removing %";
   /** Optimization info. */
+  String OPTTCE = "rewriting for tail calls: %";
+  /** Optimization info. */
   String OPTREMCTX = "removing context expression (.)";
   /** Optimization info. */
   String OPTFORLET = "moving for/let clauses";
