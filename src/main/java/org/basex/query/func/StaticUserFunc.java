@@ -15,6 +15,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * A static User-defined function.
@@ -27,6 +28,8 @@ public final class StaticUserFunc extends UserFunc {
   public final boolean declared;
   /** Flag that is turned on during compilation and prevents premature inlining. */
   boolean compiling;
+  /** Flag for avoiding loops in {@link #databases(org.basex.util.list.StringList)}. */
+  private boolean dontEnter;
 
   /**
    * Function constructor.
@@ -153,5 +156,14 @@ public final class StaticUserFunc extends UserFunc {
   @Override
   protected boolean tco() {
     return true;
+  }
+
+  @Override
+  public boolean databases(final StringList db) {
+    if(dontEnter) return true;
+    dontEnter = true;
+    final boolean res = expr.databases(db);
+    dontEnter = false;
+    return res;
   }
 }

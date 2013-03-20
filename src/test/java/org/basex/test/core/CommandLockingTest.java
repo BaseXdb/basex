@@ -20,7 +20,7 @@ public class CommandLockingTest extends SandboxTest {
   /** Static dummy context so we do not have to create a new one every time. */
   private static final Context DUMMY_CONTEXT = new Context();
   /** Test file name. */
-  private static final String FN = "input.xml";
+  private static final String FN = "hello.xq";
   /** Test folder. */
   private static final String FLDR = "src/test/resources";
   /** Test file. */
@@ -75,7 +75,7 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new DropEvent(NAME), false, EVENT_LIST);
     ckDBs(new DropIndex(IndexType.TEXT), true, CTX_LIST);
 //  ckDBs(new DropUser(NAME), true, ADMIN_LIST);
-    ckDBs(new Execute(FILE), true, null);
+    ckDBs(new Execute("RUN " + FILE), false, null);
     ckDBs(new Export(FILE), true, CTX_LIST);
     ckDBs(new Find("token"), false, CTX_LIST);
     ckDBs(new Flush(), true, CTX_LIST);
@@ -111,6 +111,19 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new Store(FILE), true, CTX_LIST);
   }
 
+  /** Tests locked databases in XQuery queries. */
+  @Test public void xquery() {
+    ckDBs(new XQuery("declare function local:a($a) {" +
+        "if($a = 0) then $a else local:a($a idiv 2) };" +
+        "local:a(5)"), false, NONE);
+    ckDBs(new XQuery("declare function local:a($a) {" +
+        "if($a = 0) then collection() else local:a($a idiv 2) };" +
+        "local:a(5)"), false, null);
+    ckDBs(new XQuery("declare function local:a($a) {" +
+        "if($a = 0) then doc('" + NAME + "') else local:a($a idiv 2) };" +
+        "local:a(5)"), false, NAME_LIST);
+  }
+
   /**
    * Test if the right databases are identified for locking.
    *
@@ -124,6 +137,7 @@ public class CommandLockingTest extends SandboxTest {
   private void ckDBs(final Command cmd, final boolean up, final StringList dbs) {
     ckDBs(cmd, up, dbs, dbs);
   }
+
   /**
    * Test if the right databases are identified for locking.
    *
