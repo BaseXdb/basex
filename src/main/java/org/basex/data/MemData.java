@@ -42,10 +42,10 @@ public final class MemData extends Data {
 
     meta = new MetaData(pr);
     table = new TableMemAccess(meta);
-    if(meta.updindex && (txt == null || atv == null)) {
+    if(meta.updindex) {
       idmap = new IdPreMap(meta.lastid);
-      txtindex = new UpdatableMemValues(this);
-      atvindex = new UpdatableMemValues(this);
+      txtindex = txt == null ? new UpdatableMemValues(this) : txt;
+      atvindex = atv == null ? new UpdatableMemValues(this) : atv;
     } else {
       txtindex = txt == null ? new MemValues(this) : txt;
       atvindex = atv == null ? new MemValues(this) : atv;
