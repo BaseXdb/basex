@@ -24,7 +24,7 @@ public final class UserFuncs extends ExprInfo {
   /** User-defined functions. */
   private StaticUserFunc[] funcs = { };
   /** Cached function calls. */
-  private UserFuncCall[][] calls = { };
+  private StaticFuncCall[][] calls = { };
 
   /**
    * Returns the specified function.
@@ -38,7 +38,7 @@ public final class UserFuncs extends ExprInfo {
     if(id == -1) return null;
 
     // function has already been declared
-    final UserFuncCall call = add(ii, funcs[id].name, id, args);
+    final StaticFuncCall call = add(ii, funcs[id].name, id, args);
     final FuncType type = FuncType.get(funcs[id]);
     return new TypedFunc(call, funcs[id].ann, type);
   }
@@ -59,7 +59,7 @@ public final class UserFuncs extends ExprInfo {
     final int al = args.length;
     final StaticUserFunc uf = new StaticUserFunc(ii, name, new Var[al], null, null, false,
         ctx.sc, new VarScope());
-    final UserFuncCall call = add(ii, name, add(uf, ii), args);
+    final StaticFuncCall call = add(ii, name, add(uf, ii), args);
     final FuncType type = FuncType.arity(al);
     return new TypedFunc(call, new Ann(), type);
   }
@@ -93,10 +93,10 @@ public final class UserFuncs extends ExprInfo {
    * @param arg arguments
    * @return new function call
    */
-  private UserFuncCall add(final InputInfo ii, final QNm nm, final int id,
+  private StaticFuncCall add(final InputInfo ii, final QNm nm, final int id,
       final Expr[] arg) {
 
-    final UserFuncCall call = new BaseFuncCall(ii, nm, arg);
+    final StaticFuncCall call = new BaseFuncCall(ii, nm, arg);
     // for dynamic calls
     if(funcs[id].declared) call.init(funcs[id]);
     calls[id] = Array.add(calls[id], call);
@@ -138,7 +138,7 @@ public final class UserFuncs extends ExprInfo {
     }
     // add function skeleton
     funcs = Array.add(funcs, fun);
-    calls = Array.add(calls, new UserFuncCall[0]);
+    calls = Array.add(calls, new StaticFuncCall[0]);
     return funcs.length - 1;
   }
 
@@ -152,7 +152,7 @@ public final class UserFuncs extends ExprInfo {
     // initialize function calls
     for(int i = 0; i < funcs.length; ++i) {
       qc.updating |= funcs[i].updating && calls[i].length != 0;
-      for(final UserFuncCall c : calls[i]) c.init(funcs[i]);
+      for(final StaticFuncCall c : calls[i]) c.init(funcs[i]);
     }
 
     for(final StaticUserFunc f : funcs) {

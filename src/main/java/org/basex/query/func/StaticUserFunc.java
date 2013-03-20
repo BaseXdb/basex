@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class StaticUserFunc extends UserFunc {
+public final class StaticUserFunc extends UserFunc implements XQFunction {
   /** Declaration flag. */
   public final boolean declared;
   /** Flag that is turned on during compilation and prevents premature inlining. */
@@ -59,45 +59,22 @@ public final class StaticUserFunc extends UserFunc {
   }
 
   @Override
+  @Deprecated
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-
-    // reset context and evaluate function
-    final Value cv = ctx.value;
-    final StaticContext tmp = ctx.sc;
-    ctx.sc = sc;
-    ctx.value = null;
-    try {
-      final Item it = expr.item(ctx, ii);
-      final Value v = it == null ? Empty.SEQ : it;
-      // optionally promote return value to target type
-      return cast ? ret.funcConvert(ctx, ii, v).item(ctx, ii) : it;
-    } finally {
-      ctx.value = cv;
-      ctx.sc = tmp;
-    }
+    throw Util.notexpected();
   }
 
   @Override
+  @Deprecated
   public Value value(final QueryContext ctx) throws QueryException {
-    // reset context and evaluate function
-    final Value cv = ctx.value;
-    final StaticContext tmp = ctx.sc;
-    ctx.sc = sc;
-    ctx.value = null;
-    try {
-      final Value v = ctx.value(expr);
-      // optionally promote return value to target type
-      return cast ? ret.funcConvert(ctx, info, v) : v;
-    } finally {
-      ctx.value = cv;
-      ctx.sc = tmp;
-    }
+    throw Util.notexpected();
   }
 
   @Override
+  @Deprecated
   public ValueIter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
+    throw Util.notexpected();
   }
 
   /**
@@ -142,7 +119,7 @@ public final class StaticUserFunc extends UserFunc {
   public boolean selfRecursive() {
     return !expr.accept(new ASTVisitor() {
       @Override
-      public boolean funcCall(final UserFuncCall call) {
+      public boolean funcCall(final StaticFuncCall call) {
         return call.func != StaticUserFunc.this;
       }
 
@@ -165,5 +142,79 @@ public final class StaticUserFunc extends UserFunc {
     final boolean res = expr.databases(db);
     dontEnter = false;
     return res;
+  }
+
+  @Override
+  public int arity() {
+    return args.length;
+  }
+
+  @Override
+  public QNm fName() {
+    return name;
+  }
+
+  @Override
+  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... arg)
+      throws QueryException {
+
+    // reset context and evaluate function
+    final Value cv = ctx.value;
+    final StaticContext tmp = ctx.sc;
+    ctx.sc = sc;
+    ctx.value = null;
+    final int fp = addArgs(ctx, ii, arg);
+    try {
+      final Item it = expr.item(ctx, ii);
+      final Value v = it == null ? Empty.SEQ : it;
+      // optionally promote return value to target type
+      return cast ? ret.funcConvert(ctx, ii, v).item(ctx, ii) : it;
+    } finally {
+      scope.exit(ctx, fp);
+      ctx.value = cv;
+      ctx.sc = tmp;
+    }
+  }
+
+  @Override
+  public Iter invIter(final QueryContext ctx, final InputInfo ii, final Value... arg)
+      throws QueryException {
+    return invValue(ctx, ii, arg).iter();
+  }
+
+  @Override
+  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... arg)
+      throws QueryException {
+    // reset context and evaluate function
+    final Value cv = ctx.value;
+    final StaticContext tmp = ctx.sc;
+    ctx.sc = sc;
+    ctx.value = null;
+    final int fp = addArgs(ctx, ii, arg);
+    try {
+      final Value v = ctx.value(expr);
+      // optionally promote return value to target type
+      return cast ? ret.funcConvert(ctx, info, v) : v;
+    } finally {
+      scope.exit(ctx, fp);
+      ctx.value = cv;
+      ctx.sc = tmp;
+    }
+  }
+
+  /**
+   * Adds the given arguments to the variable stack.
+   * @param ctx query context
+   * @param ii input info
+   * @param vals values to add
+   * @return old stack frame pointer
+   * @throws QueryException if the arguments can't be bound
+   */
+  private int addArgs(final QueryContext ctx, final InputInfo ii, final Value[] vals)
+      throws QueryException {
+    // move variables to stack
+    final int fp = scope.enter(ctx);
+    for(int i = 0; i < args.length; i++) ctx.set(args[i], vals[i], ii);
+    return fp;
   }
 }

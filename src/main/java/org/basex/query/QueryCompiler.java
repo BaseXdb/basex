@@ -199,7 +199,7 @@ public final class QueryCompiler {
       }
 
       @Override
-      public boolean funcCall(final UserFuncCall call) {
+      public boolean funcCall(final StaticFuncCall call) {
         return neighbor(call.func());
       }
 

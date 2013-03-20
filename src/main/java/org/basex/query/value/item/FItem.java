@@ -3,6 +3,7 @@ package org.basex.query.value.item;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -15,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public abstract class FItem extends Item {
+public abstract class FItem extends Item implements XQFunction {
   /**
    * Constructor.
    * @param t type
@@ -24,50 +25,13 @@ public abstract class FItem extends Item {
     super(t);
   }
 
-  /**
-   * Number of arguments this function item takes.
-   * @return function arity
-   */
-  public abstract int arity();
-
-  /**
-   * Name of this function, {@code null} means anonymous function.
-   * @return name or {@code null}
-   */
-  public abstract QNm fName();
-
-  /**
-   * Invokes this function item with the given arguments.
-   * @param ctx query context
-   * @param ii input info
-   * @param args arguments
-   * @return resulting iterator
-   * @throws QueryException query exception
-   */
-  public abstract Value invValue(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException;
-
-  /**
-   * Invokes this function item with the given arguments.
-   * @param ctx query context
-   * @param ii input info
-   * @param args arguments
-   * @return resulting iterator
-   * @throws QueryException query exception
-   */
+  @Override
   public Iter invIter(final QueryContext ctx, final InputInfo ii, final Value... args)
       throws QueryException {
     return invValue(ctx, ii, args).iter();
   }
 
-  /**
-   * Invokes this function item with the given arguments.
-   * @param ctx query context
-   * @param ii input info
-   * @param args arguments
-   * @return resulting item
-   * @throws QueryException query exception
-   */
+  @Override
   public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... args)
       throws QueryException {
     return invValue(ctx, ii, args).item(ctx, ii);

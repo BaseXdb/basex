@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -13,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class BaseFuncCall extends UserFuncCall {
+public final class BaseFuncCall extends StaticFuncCall {
   /**
    * Function constructor.
    * @param ii input info
@@ -27,22 +26,18 @@ public final class BaseFuncCall extends UserFuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    UserFunc fun = func;
+    StaticUserFunc fun = func;
     Value[] args = args(ctx);
 
     final int calls = ctx.tailCalls;
     try {
       do {
-        // cache arguments, evaluate function and reset variable scope
-        final int fp = addArgs(ctx, ii, fun.scope, fun.args, args);
         ctx.tailCalls = 0;
         try {
-          return fun.item(ctx, ii);
+          return fun.invItem(ctx, ii, args);
         } catch(final Continuation c) {
           fun = c.getFunc();
           args = c.getArgs();
-        } finally {
-          fun.scope.exit(ctx, fp);
         }
       } while(true);
     } catch(final QueryException ex) {
@@ -55,22 +50,18 @@ public final class BaseFuncCall extends UserFuncCall {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    UserFunc fun = func;
+    StaticUserFunc fun = func;
     Value[] args = args(ctx);
 
     final int calls = ctx.tailCalls;
     try {
       do {
-        // cache arguments, evaluate function and reset variable scope
-        final int fp = addArgs(ctx, info, fun.scope, fun.args, args);
         ctx.tailCalls = 0;
         try {
-          return ctx.value(fun);
+          return fun.invValue(ctx, info, args);
         } catch(final Continuation c) {
           fun = c.getFunc();
           args = c.getArgs();
-        } finally {
-          fun.scope.exit(ctx, fp);
         }
       } while(true);
     } catch(final QueryException ex) {
@@ -79,11 +70,6 @@ public final class BaseFuncCall extends UserFuncCall {
     } finally {
       ctx.tailCalls = calls;
     }
-  }
-
-  @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
   }
 
   @Override
