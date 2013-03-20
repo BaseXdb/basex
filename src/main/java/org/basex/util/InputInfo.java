@@ -1,9 +1,5 @@
 package org.basex.util;
 
-import static org.basex.core.Text.*;
-
-import org.basex.query.*;
-
 /**
  * This class contains the original query, its file reference, and line/column
  * information.
@@ -79,10 +75,9 @@ public final class InputInfo {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
+    tb.add(file == null ? "." : file);
     final int[] lc = lineCol();
-    tb.addExt(LINE_X, lc[0]);
-    if(lc[1] != 0) tb.add(QueryText.SEP).addExt(COLUMN_X, lc[1]);
-    if(file != null) tb.add(' ').addExt(IN_FILE_X, file);
+    tb.add(", ").addExt(lc[0]).add('/').addExt(lc[1]);
     return tb.toString();
   }
 }

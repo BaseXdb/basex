@@ -38,8 +38,7 @@ import org.basex.util.list.*;
 public final class EditorView extends View {
   /** XQuery error pattern. */
   private static final Pattern XQERROR = Pattern.compile(
-      ".*" + (LINE_X + ", " + COLUMN_X).replaceAll("%", "([0-9]+)") + ' ' +
-      IN_FILE_X.replaceAll("%", "(.*?)") + COL + "\r?\n.*", Pattern.DOTALL);
+      "(.*?), ([0-9]+)/([0-9]+)" + COL);
   /** XML error pattern. */
   private static final Pattern XMLERROR = Pattern.compile(
       LINE_X.replaceAll("%", "(.*?)") + COL + ".*");
@@ -65,15 +64,16 @@ public final class EditorView extends View {
   final BaseXTabs tabs;
   /** Execute button. */
   final BaseXButton go;
+
   /** Thread counter. */
   int threadID;
-
-  /** Last error message. */
-  String errMsg;
   /** File in which the most recent error occurred. */
   String errFile;
+
+  /** Last error message. */
+  private String errMsg;
   /** Most recent error position; used for clicking on error message. */
-  int errPos;
+  private int errPos;
 
   /** Header string. */
   private final BaseXLabel header;
@@ -476,9 +476,10 @@ public final class EditorView extends View {
       error(msg, false);
       info.setCursor(GUIConstants.CURSORHAND);
       info.setText(ERRORINFO.matcher(msg).replaceAll(""), Msg.ERROR);
-      final String tt = ERRORTT.matcher(msg).replaceAll("").replaceAll(
-          "\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
-      info.setToolTipText("<html>" + STOPPED_AT + ' ' + tt + "</html>");
+      final String tt = ERRORTT.matcher(msg).replaceAll("").
+          replace("<", "&lt;").replace(">", "&gt;").
+          replaceAll("\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
+      info.setToolTipText("<html>" + tt + "</html>");
     }
   }
 
@@ -486,19 +487,7 @@ public final class EditorView extends View {
    * Jumps to the current error.
    */
   void jumpToError() {
-    if(errMsg != null) error(errMsg, true);
-
-    /*
-    EditorArea ea = getEditor();
-    if(errFile != null) {
-      ea = find(IO.get(errFile), false);
-      if(ea == null) ea = open(new IOFile(errFile), false);
-      tabs.setSelectedComponent(ea);
-    }
-    if(errPos == -1) return;
-    ea.jumpError(errPos);
-    posCode.invokeLater();
-    */
+    if(errMsg != null) error(true);
   }
 
   /**
@@ -508,15 +497,28 @@ public final class EditorView extends View {
    */
   public void error(final String msg, final boolean open) {
     errMsg = msg;
+    for(final String s : msg.split("\r?\n")) {
+      if(XQERROR.matcher(s).matches()) {
+        errMsg = s.replace(STOPPED_AT, "");
+        break;
+      }
+    }
+    error(open);
+  }
 
-    Matcher m = XQERROR.matcher(msg);
+  /**
+   * Handles info messages resulting from a query execution.
+   * @param open open addressed file
+   */
+  private void error(final boolean open) {
+    Matcher m = XQERROR.matcher(errMsg);
     int el, ec = 2;
     if(m.matches()) {
-      el = Token.toInt(m.group(1));
-      ec = Token.toInt(m.group(2));
-      errFile = m.group(3);
+      errFile = m.group(1);
+      el = Token.toInt(m.group(2));
+      ec = Token.toInt(m.group(3));
     } else {
-      m = XMLERROR.matcher(msg);
+      m = XMLERROR.matcher(errMsg);
       if(!m.matches()) return;
       el = Token.toInt(m.group(1));
       errFile = getEditor().file.path();
