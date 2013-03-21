@@ -21,7 +21,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-abstract class RESTCode {
+public abstract class RESTCode {
   /**
    * Performs the REST operation.
    * @param http HTTP context

@@ -5,11 +5,15 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.http.rest.*;
 import org.junit.*;
 
 /**
  * This class sends parallel requests to the REST API.
- * It currently fails when more than one client is set!
+ *
+ * It currently fails when {@link #CLIENTS} is set to a value larger than 1,
+ * because {@link RESTCode#open} performs separate transactions that may be intervened
+ * by the updating transaction of another client.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
