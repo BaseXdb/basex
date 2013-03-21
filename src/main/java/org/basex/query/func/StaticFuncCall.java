@@ -27,7 +27,7 @@ public abstract class StaticFuncCall extends Arr {
   /** Function name. */
   final QNm name;
   /** Function reference. */
-  StaticUserFunc func;
+  StaticFunc func;
 
   /**
    * Function constructor.
@@ -45,7 +45,7 @@ public abstract class StaticFuncCall extends Arr {
     super.compile(ctx, scp);
 
     // compile mutually recursive functions
-    func.compile(ctx, scp);
+    func.compile(ctx);
 
     if(func.inline(ctx)) {
       // inline the function
@@ -67,7 +67,7 @@ public abstract class StaticFuncCall extends Arr {
 
       return cls == null ? rt : new GFLWOR(func.info, cls, rt).optimize(ctx, scp);
     }
-    type = func.type();
+    type = func.retType();
     return this;
   }
 
@@ -112,7 +112,7 @@ public abstract class StaticFuncCall extends Arr {
    * @param f function reference
    * @return self reference
    */
-  public StaticFuncCall init(final StaticUserFunc f) {
+  public StaticFuncCall init(final StaticFunc f) {
     func = f;
     return this;
   }
@@ -121,7 +121,7 @@ public abstract class StaticFuncCall extends Arr {
    * Getter for the called function.
    * @return user-defined function
    */
-  public final StaticUserFunc func() {
+  public final StaticFunc func() {
     return func;
   }
 
@@ -180,7 +180,7 @@ public abstract class StaticFuncCall extends Arr {
      * Getter for the continuation function.
      * @return the next function to call
      */
-    StaticUserFunc getFunc() {
+    StaticFunc getFunc() {
       return func;
     }
 

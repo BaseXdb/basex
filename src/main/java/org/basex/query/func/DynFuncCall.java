@@ -62,7 +62,7 @@ public final class DynFuncCall extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    return getFun(ctx).invIter(ctx, info, argv(ctx));
+    return value(ctx).iter();
   }
 
   @Override
@@ -93,7 +93,7 @@ public final class DynFuncCall extends Arr {
   private FItem getFun(final QueryContext ctx) throws QueryException {
     final int ar = expr.length - 1;
     final Item it = checkItem(expr[ar], ctx);
-    if(!(it instanceof FItem)) throw Err.type(this, FuncType.arity(ar), it);
+    if(!(it instanceof FItem)) throw Err.XPTYPE.thrw(info, expr[ar], "function item", it);
     final FItem fit = (FItem) it;
     if(fit.arity() != ar) throw INVARITY.thrw(info, fit, ar);
     return fit;

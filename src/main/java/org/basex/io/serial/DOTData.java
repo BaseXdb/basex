@@ -70,7 +70,7 @@ final class DOTData {
                 Pos.class, FTContains.class },
     { "FF6666", FTExpr.class, Try.class, Catch.class },
     // orange
-    { "AA9988", UserFunc.class },
+    { "AA9988", StaticFunc.class },
     { "776655", UserFuncs.class },
     { "CC6600", Path.class },
     { "FF9900", Preds.class },

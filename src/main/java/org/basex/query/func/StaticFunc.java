@@ -1,11 +1,15 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
+
+import java.util.*;
 
 import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
+import org.basex.query.expr.Expr.Use;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -14,7 +18,6 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -23,13 +26,39 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class StaticUserFunc extends UserFunc implements XQFunction {
+public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
+  /** Input info. */
+  public InputInfo info;
+  /** Function name. */
+  public final QNm name;
+  /** Arguments. */
+  public final Var[] args;
+  /** Return type. */
+  public final SeqType ret;
+  /** Annotations. */
+  public final Ann ann;
+  /** Updating flag. */
+  public final boolean updating;
   /** Declaration flag. */
   public final boolean declared;
+
+  /** Map with requested function properties. */
+  protected final EnumMap<Use, Boolean> map = new EnumMap<Expr.Use, Boolean>(Use.class);
+  /** Static context. */
+  private final StaticContext sc;
+  /** Cast flag. */
+  boolean cast;
+  /** Compilation flag. */
+  private boolean compiled;
   /** Flag that is turned on during compilation and prevents premature inlining. */
-  boolean compiling;
+  private boolean compiling;
   /** Flag for avoiding loops in {@link #databases(org.basex.util.list.StringList)}. */
   private boolean dontEnter;
+
+  /** Local variables in the scope of this function. */
+  protected final VarScope scope;
+  /** Function body. */
+  Expr expr;
 
   /**
    * Function constructor.
@@ -42,39 +71,52 @@ public final class StaticUserFunc extends UserFunc implements XQFunction {
    * @param stc static context
    * @param scp variable scope
    */
-  public StaticUserFunc(final InputInfo ii, final QNm n, final Var[] v, final SeqType r,
+  public StaticFunc(final InputInfo ii, final QNm n, final Var[] v, final SeqType r,
       final Ann a, final boolean d, final StaticContext stc, final VarScope scp) {
-    super(ii, n, v, r, a, null, stc, scp);
+    info = ii;
+    name = n;
+    args = v;
+    ret = r;
+    cast = r != null;
+    ann = a == null ? new Ann() : a;
+    updating = ann.contains(Ann.Q_UPDATING);
+    scope = scp;
+    sc = stc;
     declared = d;
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    if(!compiling) {
-      compiling = true;
-      comp(ctx, scp);
-      compiling = false;
+  public void compile(final QueryContext ctx) throws QueryException {
+    if(compiled) return;
+    compiling = compiled = true;
+    final StaticContext tmp = ctx.sc;
+    ctx.sc = sc;
+
+    final int fp = scope.enter(ctx);
+    try {
+      expr = expr.compile(ctx, scope);
+    } catch(final QueryException qe) {
+      expr = FNInfo.error(qe, info);
+    } finally {
+      scope.cleanUp(this);
+      scope.exit(ctx, fp);
+      ctx.sc = tmp;
     }
-    return this;
-  }
 
-  @Override
-  @Deprecated
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-    throw Util.notexpected();
-  }
+    // convert all function calls in tail position to proper tail calls
+    ctx.compInfo(OPTTCE, name);
+    expr = expr.markTailCalls();
 
-  @Override
-  @Deprecated
-  public Value value(final QueryContext ctx) throws QueryException {
-    throw Util.notexpected();
-  }
-
-  @Override
-  @Deprecated
-  public ValueIter iter(final QueryContext ctx) throws QueryException {
-    throw Util.notexpected();
+    if(ret != null) {
+      // remove redundant casts
+      if((ret.type == AtomType.BLN || ret.type == AtomType.FLT ||
+          ret.type == AtomType.DBL || ret.type == AtomType.QNM ||
+          ret.type == AtomType.URI) && ret.eq(expr.type())) {
+        ctx.compInfo(OPTCAST, ret);
+        cast = false;
+      }
+    }
+    compiling = false;
   }
 
   /**
@@ -107,11 +149,6 @@ public final class StaticUserFunc extends UserFunc implements XQFunction {
     return tb.toString();
   }
 
-  @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
-    throw Util.notexpected();
-  }
-
   /**
    * Checks if this function calls itself recursively.
    * @return result of check
@@ -120,7 +157,7 @@ public final class StaticUserFunc extends UserFunc implements XQFunction {
     return !expr.accept(new ASTVisitor() {
       @Override
       public boolean funcCall(final StaticFuncCall call) {
-        return call.func != StaticUserFunc.this;
+        return call.func != StaticFunc.this;
       }
 
       @Override
@@ -130,12 +167,12 @@ public final class StaticUserFunc extends UserFunc implements XQFunction {
     });
   }
 
-  @Override
-  protected boolean tco() {
-    return true;
-  }
-
-  @Override
+  /**
+   * Gathers all databases accessed by this function
+   * (see {@link Expr#databases(StringList)}).
+   * @param db database list
+   * @return {@code false} if all databases should be locked, {@code true} otherwise
+   */
   public boolean databases(final StringList db) {
     if(dontEnter) return true;
     dontEnter = true;
@@ -177,12 +214,6 @@ public final class StaticUserFunc extends UserFunc implements XQFunction {
   }
 
   @Override
-  public Iter invIter(final QueryContext ctx, final InputInfo ii, final Value... arg)
-      throws QueryException {
-    return invValue(ctx, ii, arg).iter();
-  }
-
-  @Override
   public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... arg)
       throws QueryException {
     // reset context and evaluate function
@@ -216,5 +247,75 @@ public final class StaticUserFunc extends UserFunc implements XQFunction {
     final int fp = scope.enter(ctx);
     for(int i = 0; i < args.length; i++) ctx.set(args[i], vals[i], ii);
     return fp;
+  }
+
+  /**
+   * Checks if all updating expressions in the function are correctly declared and placed.
+   * @throws QueryException query exception
+   */
+  public void checkUp() throws QueryException {
+    final boolean u = expr.uses(Use.UPD);
+    if(u) expr.checkUp();
+    if(updating) {
+      // updating function
+      if(ret != null) UPFUNCTYPE.thrw(info);
+      if(!u && !expr.isVacuous()) UPEXPECTF.thrw(info);
+    } else if(u) {
+      // uses updates, but is not declared as such
+      UPNOT.thrw(info, description());
+    }
+  }
+
+  /**
+   * Checks if this function returns vacuous results (see {@link Expr#isVacuous()}).
+   * @return result of check
+   */
+  public boolean isVacuous() {
+    return !uses(Use.UPD) && ret != null && ret.eq(SeqType.EMP);
+  }
+
+  /**
+   * Checks if the given feature is used in this function (see {@link Expr#uses(Use)}).
+   * @param u feature
+   * @return result of check
+   */
+  public boolean uses(final Use u) {
+    // handle recursive calls: set dummy value, eventually replace it with final value
+    Boolean b = map.get(u);
+    if(b == null) {
+      map.put(u, false);
+      b = expr == null || expr.uses(u);
+      map.put(u, b);
+    }
+    return b;
+  }
+
+  @Override
+  public boolean visit(final ASTVisitor visitor) {
+    for(final Var v : args) if(!visitor.declared(v)) return false;
+    return expr.accept(visitor);
+  }
+
+  @Override
+  public boolean compiled() {
+    return compiled;
+  }
+
+  /**
+   * Returns the static return type of this function.
+   * @return return type
+   */
+  public SeqType retType() {
+    return ret != null ? ret : expr.type();
+  }
+
+  /**
+   * Sets the function body of this function.
+   * @param e function body expression
+   * @return the function for convenience
+   */
+  public StaticFunc setBody(final Expr e) {
+    expr = e;
+    return this;
   }
 }

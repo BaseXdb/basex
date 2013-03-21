@@ -29,15 +29,15 @@ public final class Unit {
   private final InputInfo info;
 
   /** Tests performed before a function. */
-  private final ArrayList<StaticUserFunc> before = new ArrayList<StaticUserFunc>(1);
+  private final ArrayList<StaticFunc> before = new ArrayList<StaticFunc>(1);
   /** Tests performed after a function. */
-  private final ArrayList<StaticUserFunc> after = new ArrayList<StaticUserFunc>(1);
+  private final ArrayList<StaticFunc> after = new ArrayList<StaticFunc>(1);
   /** Tests performed before a module. */
-  private final ArrayList<StaticUserFunc> beforeModule = new ArrayList<StaticUserFunc>(1);
+  private final ArrayList<StaticFunc> beforeModule = new ArrayList<StaticFunc>(1);
   /** Tests performed after a module. */
-  private final ArrayList<StaticUserFunc> afterModule = new ArrayList<StaticUserFunc>(1);
+  private final ArrayList<StaticFunc> afterModule = new ArrayList<StaticFunc>(1);
   /** Currently processed function. */
-  private StaticUserFunc current;
+  private StaticFunc current;
 
   /**
    * Constructor.
@@ -63,7 +63,7 @@ public final class Unit {
     final Performance p = new Performance();
 
     // loop through all functions
-    for(final StaticUserFunc uf : ctx.funcs.funcs()) {
+    for(final StaticFunc uf : ctx.funcs.funcs()) {
       // consider only functions that are defined in the same file
       if(!file.eq(new IOFile(uf.info.file()))) continue;
 
@@ -88,9 +88,9 @@ public final class Unit {
 
     try {
       // call initializing functions before first test
-      for(final StaticUserFunc uf : beforeModule) eval(uf);
+      for(final StaticFunc uf : beforeModule) eval(uf);
 
-      for(final StaticUserFunc uf : ctx.funcs.funcs()) {
+      for(final StaticFunc uf : ctx.funcs.funcs()) {
         // consider only test functions that are defined in the same file
         if(!file.eq(new IOFile(uf.info.file()))) continue;
         // find test annotation
@@ -126,11 +126,11 @@ public final class Unit {
         } else {
           try {
             // call functions marked with "before"
-            for(final StaticUserFunc fn : before) eval(fn);
+            for(final StaticFunc fn : before) eval(fn);
             // call functions
             eval(uf);
             // call functions marked with "after"
-            for(final StaticUserFunc fn : after) eval(fn);
+            for(final StaticFunc fn : after) eval(fn);
 
             if(code != null) {
               f++;
@@ -159,7 +159,7 @@ public final class Unit {
       }
 
       // run finalizing tests
-      for(final StaticUserFunc uf : afterModule) eval(uf);
+      for(final StaticFunc uf : afterModule) eval(uf);
 
     } catch(final QueryException ex) {
       // handle initializers
@@ -181,9 +181,9 @@ public final class Unit {
    * @param fn function to evaluate
    * @throws QueryException query exception
    */
-  private void eval(final StaticUserFunc fn) throws QueryException {
+  private void eval(final StaticFunc fn) throws QueryException {
     current = fn;
-    final Iter ir = fn.invIter(ctx, info);
+    final Iter ir = fn.invValue(ctx, info).iter();
     for(Item it; (it = ir.next()) != null;) it.materialize(info);
   }
 
@@ -196,7 +196,7 @@ public final class Unit {
    * @return value
    * @throws QueryException query exception
    */
-  private int indexOf(final StaticUserFunc func, final byte[] name)
+  private int indexOf(final StaticFunc func, final byte[] name)
       throws QueryException {
     final Ann ann = func.ann;
     final int as = ann.size();

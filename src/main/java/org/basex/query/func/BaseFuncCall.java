@@ -26,7 +26,7 @@ public final class BaseFuncCall extends StaticFuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    StaticUserFunc fun = func;
+    StaticFunc fun = func;
     Value[] args = args(ctx);
 
     final int calls = ctx.tailCalls;
@@ -50,7 +50,7 @@ public final class BaseFuncCall extends StaticFuncCall {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    StaticUserFunc fun = func;
+    StaticFunc fun = func;
     Value[] args = args(ctx);
 
     final int calls = ctx.tailCalls;

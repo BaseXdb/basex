@@ -20,7 +20,7 @@ public final class TailFuncCall extends StaticFuncCall {
    * @param f function
    * @param a arguments
    */
-  TailFuncCall(final InputInfo ii, final QNm nm, final StaticUserFunc f, final Expr[] a) {
+  TailFuncCall(final InputInfo ii, final QNm nm, final StaticFunc f, final Expr[] a) {
     super(ii, nm, a);
     func = f;
   }

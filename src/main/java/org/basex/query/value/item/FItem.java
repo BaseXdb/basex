@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -23,12 +22,6 @@ public abstract class FItem extends Item implements XQFunction {
    */
   protected FItem(final FuncType t) {
     super(t);
-  }
-
-  @Override
-  public Iter invIter(final QueryContext ctx, final InputInfo ii, final Value... args)
-      throws QueryException {
-    return invValue(ctx, ii, args).iter();
   }
 
   @Override

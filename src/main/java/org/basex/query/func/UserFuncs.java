@@ -22,7 +22,7 @@ import org.basex.util.*;
  */
 public final class UserFuncs extends ExprInfo {
   /** User-defined functions. */
-  private StaticUserFunc[] funcs = { };
+  private StaticFunc[] funcs = { };
   /** Cached function calls. */
   private StaticFuncCall[][] calls = { };
 
@@ -39,7 +39,7 @@ public final class UserFuncs extends ExprInfo {
 
     // function has already been declared
     final StaticFuncCall call = add(ii, funcs[id].name, id, args);
-    final FuncType type = FuncType.get(funcs[id]);
+    final FuncType type = FuncType.get(funcs[id].args, funcs[id].ret);
     return new TypedFunc(call, funcs[id].ann, type);
   }
 
@@ -57,7 +57,7 @@ public final class UserFuncs extends ExprInfo {
 
     // add function call for function that has not been declared yet
     final int al = args.length;
-    final StaticUserFunc uf = new StaticUserFunc(ii, name, new Var[al], null, null, false,
+    final StaticFunc uf = new StaticFunc(ii, name, new Var[al], null, null, false,
         ctx.sc, new VarScope());
     final StaticFuncCall call = add(ii, name, add(uf, ii), args);
     final FuncType type = FuncType.arity(al);
@@ -81,7 +81,7 @@ public final class UserFuncs extends ExprInfo {
    * Returns all user-defined functions.
    * @return function array
    */
-  public StaticUserFunc[] funcs() {
+  public StaticFunc[] funcs() {
     return funcs;
   }
 
@@ -110,7 +110,7 @@ public final class UserFuncs extends ExprInfo {
    * @return function id
    * @throws QueryException query exception
    */
-  public int add(final StaticUserFunc fun, final InputInfo ii) throws QueryException {
+  public int add(final StaticFunc fun, final InputInfo ii) throws QueryException {
     final QNm name = fun.name;
     final byte[] uri = name.uri();
     if(uri.length == 0) FUNNONS.thrw(ii, name.string());
@@ -155,10 +155,10 @@ public final class UserFuncs extends ExprInfo {
       for(final StaticFuncCall c : calls[i]) c.init(funcs[i]);
     }
 
-    for(final StaticUserFunc f : funcs) {
+    for(final StaticFunc f : funcs) {
       if(!f.declared || f.expr == null) {
         // function has not been declared yet
-        for(final StaticUserFunc uf : funcs) {
+        for(final StaticFunc uf : funcs) {
           // check if another function with same name exists
           if(f != uf && f.name.eq(uf.name)) FUNCTYPE.thrw(f.info, uf.name.string());
         }
@@ -173,7 +173,7 @@ public final class UserFuncs extends ExprInfo {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    for(final UserFunc f : funcs) f.checkUp();
+    for(final StaticFunc f : funcs) f.checkUp();
   }
 
   /**
@@ -184,7 +184,7 @@ public final class UserFuncs extends ExprInfo {
   public void compile(final QueryContext ctx) throws QueryException {
     for(int i = 0; i < funcs.length; i++) {
       // only compile those functions that are used
-      if(calls[i].length != 0) funcs[i].compile(ctx, null);
+      if(calls[i].length != 0) funcs[i].compile(ctx);
     }
   }
 
@@ -201,7 +201,7 @@ public final class UserFuncs extends ExprInfo {
     // find similar local function
     final Levenshtein ls = new Levenshtein();
     final byte[] nm = lc(name.local());
-    for(final StaticUserFunc f : funcs) {
+    for(final StaticFunc f : funcs) {
       if(ls.similar(nm, lc(f.name.local()), 0)) {
         FUNSIMILAR.thrw(ii, name.string(), f.name.string());
       }
@@ -216,7 +216,7 @@ public final class UserFuncs extends ExprInfo {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final UserFunc f : funcs) sb.append(f.toString()).append(Text.NL);
+    for(final StaticFunc f : funcs) sb.append(f.toString()).append(Text.NL);
     return sb.toString();
   }
 }

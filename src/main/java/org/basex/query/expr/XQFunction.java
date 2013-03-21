@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -35,16 +34,6 @@ public interface XQFunction {
    * @throws QueryException query exception
    */
   Value invValue(QueryContext ctx, InputInfo ii, Value... args) throws QueryException;
-
-  /**
-   * Invokes this function with the given arguments.
-   * @param ctx query context
-   * @param ii input info
-   * @param args arguments
-   * @return resulting iterator
-   * @throws QueryException query exception
-   */
-  Iter invIter(QueryContext ctx, InputInfo ii, Value... args) throws QueryException;
 
   /**
    * Invokes this function with the given arguments.
