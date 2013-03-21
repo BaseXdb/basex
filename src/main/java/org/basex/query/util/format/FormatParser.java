@@ -1,5 +1,8 @@
 package org.basex.query.util.format;
 
+import static org.basex.query.util.Err.*;
+
+import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -31,5 +34,75 @@ public abstract class FormatParser extends FormatUtil {
    */
   protected FormatParser(final InputInfo ii) {
     info = ii;
+  }
+
+  /**
+   * Parses and returns the presentation modifier.
+   * @param pic picture
+   * @param def default token
+   * @param date date flag
+   * @return presentation modifier
+   * @throws QueryException query exception
+   */
+  protected byte[] presentation(final byte[] pic, final byte[] def, final boolean date)
+      throws QueryException {
+
+    // find primary format
+    final TokenParser tp = new TokenParser(pic);
+    int ch = tp.next();
+    // check single character
+    if(!tp.more()) {
+      // Latin, Greek and other alphabets
+      if(sequence(ch) != null ||
+        // Roman sequences (lower/upper case)
+        ch == 'i' || ch == 'I' ||
+        // Word output (lower/upper case)
+        ch == 'w' || ch == 'W' ||
+        // Textual output
+        date && (ch == 'n' || ch == 'N') ||
+        // circled, parenthesized or full stop digits
+        ch == '\u2460' || ch == '\u2474' || ch == '\u2488' ||
+        // Japanese numbering
+        ch == KANJI[1]) return pic;
+    } else {
+      // Word output (title case)
+      if(ch == 'W' && tp.consume('w')) return pic;
+      // Textual output (title case)
+      if(date && ch == 'N' && tp.consume('n')) return pic;
+    }
+
+    // find digit of decimal-digit-pattern
+    tp.reset();
+    digit = -1;
+    while(digit == -1 && tp.more()) digit = zeroes(tp.next());
+    // no digit found: return default primary token
+    if(digit == -1) return def;
+
+    // flags for mandatory-digit-sign and group-separator-sign
+    boolean mds = false, gss = true;
+    tp.reset();
+    while(tp.more()) {
+      ch = tp.next();
+      final int d = zeroes(ch);
+      if(d != -1) {
+        // mandatory-digit-sign
+        if(digit != d) DIFFMAND.thrw(info, pic);
+        mds = true;
+        gss = false;
+      } else if(ch == '#') {
+        // optional-digit-sign
+        if(mds) OPTAFTER.thrw(info, pic);
+        gss = false;
+      } else if(!Character.isLetter(ch)) {
+        // grouping-separator-sign
+        if(gss) INVGROUP.thrw(info, pic);
+        gss = true;
+      } else {
+        // any other letter: return default primary token
+        INVDDPATTERN.thrw(info, pic);
+      }
+    }
+    if(gss) INVGROUP.thrw(info, pic);
+    return pic;
   }
 }

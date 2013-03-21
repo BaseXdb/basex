@@ -32,12 +32,11 @@ final class DateParser extends TokenParser {
    */
   int literal() throws QueryException {
     final int ch = next();
-    if(ch == '[' || ch == ']') {
-      if(!more()) PICDATE.thrw(info, token);
-      if(!consume(ch)) {
-        if(ch == ']') PICDATE.thrw(info, token);
-        return -1;
-      }
+    if(ch == '[') { // check begin of variable marker
+      if(!more()) PICDATE.thrw(info, token); // [$
+      if(!consume(ch)) return -1; // [...
+    } else if(ch == ']') { // check end of variable marker
+      if(!consume(ch)) PICDATE.thrw(info, token); // ]$ or ]...
     }
     return ch;
   }
