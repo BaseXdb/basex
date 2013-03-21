@@ -82,7 +82,7 @@ final class RestXqResponse {
   void create() throws Exception {
 
     // wrap function with a function call
-    final StaticUserFunc uf = function.function;
+    final StaticFunc uf = function.function;
     // bind variables
     final Expr[] args = new Expr[uf.args.length];
     function.bind(http, args);
