@@ -131,7 +131,6 @@
   <servlet-mapping>
     <servlet-name>RESTXQ</servlet-name>
     <url-pattern>/restxq/*</url-pattern>
-    <load-on-startup>1</load-on-startup>
   </servlet-mapping>
 
   <!-- Direct invocation of query and script files
