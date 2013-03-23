@@ -431,7 +431,7 @@ public final class SeqType {
       return ((FItem) it).coerceTo((FuncType) type, ctx, ii);
     }
 
-    throw Err.treat(ii, type.seqType(), it);
+    throw Err.treat(ii, withOcc(Occ.ONE), it);
   }
 
   /**
