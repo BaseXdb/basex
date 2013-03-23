@@ -358,4 +358,12 @@ public final class StaticVar extends ParseExpr implements Scope {
   public boolean compiled() {
     return compiled;
   }
+
+  /**
+   * Checks if this variable has already been declared.
+   * @return result of check
+   */
+  public boolean declared() {
+    return declared;
+  }
 }

@@ -63,17 +63,19 @@ public final class VarScope {
    * @param ctx query context
    * @param ii input info
    * @param err error to be thrown if the variable doesn't exist
-   * @param fixed if the set of static variables is fixed
+   * @param mod module prefix/URI, {@code null} for main module
+   * @param xq10 XQuery 1.0 flag
    * @return variable reference
    * @throws QueryException if the variable can't be found
    */
   public Expr resolve(final QNm name, final QueryContext ctx,
-      final InputInfo ii, final Err err, final boolean fixed) throws QueryException {
+      final InputInfo ii, final Err err, final QNm mod, final boolean xq10)
+          throws QueryException {
     final Var v = current.get(name);
     if(v != null) return new VarRef(ii, v);
 
     if(parent != null) {
-      final Expr nonLocal = parent.resolve(name, ctx, ii, err, fixed);
+      final Expr nonLocal = parent.resolve(name, ctx, ii, err, mod, xq10);
       if(!(nonLocal instanceof VarRef)) return nonLocal;
 
       // a variable in the closure
@@ -85,8 +87,17 @@ public final class VarScope {
 
     // static variable
     final StaticVar global = ctx.vars.get(name);
-    if(global != null) return global;
-    if(fixed) throw err.thrw(ii, '$' + string(name.string()));
+    if(global != null) {
+      if(!global.declared() &&
+          (mod != null ? xq10 || !eq(mod.uri(), name.uri()) : name.uri().length != 0))
+        throw err.thrw(ii, '$' + string(name.string()));
+      return global;
+    }
+
+    // XQuery 1.0 only allows forward declarations
+    if(mod != null ? xq10 || !eq(mod.uri(), name.uri()) : name.uri().length != 0)
+      throw err.thrw(ii, '$' + string(name.string()));
+
     return ctx.vars.bind(name, null, ctx, ii);
   }
 
