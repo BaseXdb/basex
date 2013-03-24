@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -13,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class TailFuncCall extends UserFuncCall {
+public final class TailFuncCall extends StaticFuncCall {
   /**
    * Constructor.
    * @param ii input info
@@ -21,7 +20,7 @@ public final class TailFuncCall extends UserFuncCall {
    * @param f function
    * @param a arguments
    */
-  TailFuncCall(final InputInfo ii, final QNm nm, final StaticUserFunc f, final Expr[] a) {
+  TailFuncCall(final InputInfo ii, final QNm nm, final StaticFunc f, final Expr[] a) {
     super(ii, nm, a);
     func = f;
   }
@@ -29,38 +28,25 @@ public final class TailFuncCall extends UserFuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkHeight(ctx);
-
-    // cache arguments, evaluate function and reset variable scope
-    final int fp = addArgs(ctx, ii, func.scope, func.args, args(ctx));
+    final Value[] args = args(ctx);
     try {
-      return func.item(ctx, ii);
+      return func.invItem(ctx, ii, args);
     } catch(final QueryException ex) {
       ex.add(info);
       throw ex;
-    } finally {
-      func.scope.exit(ctx, fp);
     }
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     checkHeight(ctx);
-
-    // cache arguments, evaluate function and reset variable scope
-    final int fp = addArgs(ctx, info, func.scope, func.args, args(ctx));
+    final Value[] args = args(ctx);
     try {
-      return ctx.value(func);
+      return func.invValue(ctx, info, args);
     } catch(final QueryException ex) {
       ex.add(info);
       throw ex;
-    } finally {
-      func.scope.exit(ctx, fp);
     }
-  }
-
-  @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
   }
 
   /**

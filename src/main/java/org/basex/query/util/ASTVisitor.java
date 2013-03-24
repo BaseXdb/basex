@@ -55,7 +55,7 @@ public abstract class ASTVisitor {
    * @param call function call
    * @return if more expressions should be visited
    */
-  public boolean funcCall(final UserFuncCall call) {
+  public boolean funcCall(final StaticFuncCall call) {
     return true;
   }
 

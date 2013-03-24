@@ -6,9 +6,9 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -193,14 +193,15 @@ public class FuncType implements Type {
 
   /**
    * Getter for a function's type.
-   * @param f user-defined function
+   * @param args formal parameters
+   * @param ret return type
    * @return function type
    */
-  public static FuncType get(final UserFunc f) {
-    final SeqType[] at = new SeqType[f.args.length];
+  public static FuncType get(final Var[] args, final SeqType ret) {
+    final SeqType[] at = new SeqType[args.length];
     for(int a = 0; a < at.length; a++)
-      at[a] = f.args[a] == null ? SeqType.ITEM_ZM : f.args[a].declaredType();
-    return new FuncType(at, f.ret == null ? SeqType.ITEM_ZM : f.ret);
+      at[a] = args[a] == null ? SeqType.ITEM_ZM : args[a].declaredType();
+    return new FuncType(at, ret == null ? SeqType.ITEM_ZM : ret);
   }
 
   @Override

@@ -94,7 +94,7 @@ public final class FNFunc extends StandardFunc {
           if(it != null) return it;
           final Item x = xs.next();
           if(x == null) return null;
-          ys = f.invIter(ctx, info, x);
+          ys = f.invValue(ctx, info, x).iter();
         } while(true);
       }
     };
@@ -142,7 +142,7 @@ public final class FNFunc extends StandardFunc {
           if(it != null) return it;
           final Item x = xs.next(), y = ys.next();
           if(x == null || y == null) return null;
-          zs = zipper.invIter(ctx, info, x, y);
+          zs = zipper.invValue(ctx, info, x, y).iter();
         } while(true);
       }
     };

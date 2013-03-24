@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -124,12 +123,6 @@ public final class FuncItem extends FItem implements Scope {
       ctx.stack.exitFrame(fp);
       ctx.sc = tmp;
     }
-  }
-
-  @Override
-  public Iter invIter(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
-    return invValue(ctx, ii, args).iter();
   }
 
   @Override
