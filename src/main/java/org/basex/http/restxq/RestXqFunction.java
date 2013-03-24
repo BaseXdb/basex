@@ -44,7 +44,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Serialization parameters. */
   final SerializerProp output = new SerializerProp();
   /** Associated function. */
-  final StaticUserFunc function;
+  final StaticFunc function;
   /** Associated module. */
   final RestXqModule module;
   /** Path. */
@@ -74,7 +74,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param qc query context
    * @param m associated module
    */
-  RestXqFunction(final StaticUserFunc uf, final QueryContext qc, final RestXqModule m) {
+  RestXqFunction(final StaticFunc uf, final QueryContext qc, final RestXqModule m) {
     function = uf;
     context = qc;
     module = m;
