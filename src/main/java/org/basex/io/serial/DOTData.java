@@ -70,7 +70,7 @@ final class DOTData {
                 Pos.class, FTContains.class },
     { "FF6666", FTExpr.class, Try.class, Catch.class },
     // orange
-    { "AA9988", UserFunc.class },
+    { "AA9988", StaticFunc.class },
     { "776655", UserFuncs.class },
     { "CC6600", Path.class },
     { "FF9900", Preds.class },
@@ -81,7 +81,7 @@ final class DOTData {
                 QueryText.RET },
     { "66CC66", Var.class, Cast.class },
     // cyan
-    { "009999", UserFuncCall.class, StandardFunc.class, Root.class, VarRef.class,
+    { "009999", StaticFuncCall.class, StandardFunc.class, Root.class, VarRef.class,
                 StaticVar.class, ValueAccess.class, RangeAccess.class,
                 StringRangeAccess.class, FTIndexAccess.class },
   };

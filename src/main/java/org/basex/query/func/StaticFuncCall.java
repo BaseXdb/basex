@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.gflwor.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -22,11 +23,11 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class UserFuncCall extends Arr {
+public abstract class StaticFuncCall extends Arr {
   /** Function name. */
   final QNm name;
   /** Function reference. */
-  StaticUserFunc func;
+  StaticFunc func;
 
   /**
    * Function constructor.
@@ -34,7 +35,7 @@ public abstract class UserFuncCall extends Arr {
    * @param nm function name
    * @param arg arguments
    */
-  UserFuncCall(final InputInfo ii, final QNm nm, final Expr[] arg) {
+  StaticFuncCall(final InputInfo ii, final QNm nm, final Expr[] arg) {
     super(ii, arg);
     name = nm;
   }
@@ -44,7 +45,7 @@ public abstract class UserFuncCall extends Arr {
     super.compile(ctx, scp);
 
     // compile mutually recursive functions
-    func.compile(ctx, scp);
+    func.compile(ctx);
 
     if(func.inline(ctx)) {
       // inline the function
@@ -66,8 +67,13 @@ public abstract class UserFuncCall extends Arr {
 
       return cls == null ? rt : new GFLWOR(func.info, cls, rt).optimize(ctx, scp);
     }
-    type = func.type();
+    type = func.retType();
     return this;
+  }
+
+  @Override
+  public final Iter iter(final QueryContext ctx) throws QueryException {
+    return value(ctx).iter();
   }
 
   @Override
@@ -85,24 +91,6 @@ public abstract class UserFuncCall extends Arr {
   @Override
   public boolean databases(final StringList db) {
     return func.databases(db) && super.databases(db);
-  }
-
-  /**
-   * Adds the given arguments to the variable stack.
-   * @param ctx query context
-   * @param ii input info
-   * @param scp variable scope
-   * @param vars formal parameters
-   * @param vals values to add
-   * @return old stack frame pointer
-   * @throws QueryException if the arguments can't be bound
-   */
-  static int addArgs(final QueryContext ctx, final InputInfo ii, final VarScope scp,
-      final Var[] vars, final Value[] vals) throws QueryException {
-    // move variables to stack
-    final int fp = scp.enter(ctx);
-    for(int i = 0; i < vars.length; i++) ctx.set(vars[i], vals[i], ii);
-    return fp;
   }
 
   /**
@@ -124,7 +112,7 @@ public abstract class UserFuncCall extends Arr {
    * @param f function reference
    * @return self reference
    */
-  public UserFuncCall init(final StaticUserFunc f) {
+  public StaticFuncCall init(final StaticFunc f) {
     func = f;
     return this;
   }
@@ -133,7 +121,7 @@ public abstract class UserFuncCall extends Arr {
    * Getter for the called function.
    * @return user-defined function
    */
-  public final StaticUserFunc func() {
+  public final StaticFunc func() {
     return func;
   }
 
@@ -192,7 +180,7 @@ public abstract class UserFuncCall extends Arr {
      * Getter for the continuation function.
      * @return the next function to call
      */
-    UserFunc getFunc() {
+    StaticFunc getFunc() {
       return func;
     }
 

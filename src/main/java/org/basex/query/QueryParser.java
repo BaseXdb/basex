@@ -913,13 +913,12 @@ public class QueryParser extends InputParser {
     final Var[] args = paramList();
     wsCheck(PAR2);
 
-    final StaticUserFunc func = new StaticUserFunc(info(), name, args, optAsType(),
+    final StaticFunc func = new StaticFunc(info(), name, args, optAsType(),
         ann, true, ctx.sc, scope);
     if(func.updating) ctx.updating(false);
 
     if(!wsConsumeWs(EXTERNAL)) {
-      ctx.funcs.add(func, info());
-      func.expr = enclosed(NOFUNBODY);
+      ctx.funcs.add(func.setBody(enclosed(NOFUNBODY)), info());
     } else {
       /* try to bind external function
       if(ctx.modules.addImport(name.uri(), info(), this)) {
