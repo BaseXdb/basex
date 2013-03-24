@@ -103,9 +103,6 @@ public class QueryParser extends InputParser {
   /** Declaration flag. */
   private boolean declItem;
 
-  /** Flag that is set after the prolog was parsed. */
-  private boolean afterProlog;
-
   /** Cached QNames. */
   private final ArrayList<QNmCheck> names = new ArrayList<QNmCheck>();
   /** Current variable scope. */
@@ -317,7 +314,6 @@ public class QueryParser extends InputParser {
   private Expr mainModule() throws QueryException {
     prolog1();
     prolog2();
-    afterProlog = true;
     return expr();
   }
 
@@ -3730,7 +3726,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException if the variable isn't defined
    */
   private Expr checkVar(final QNm name, final Err err) throws QueryException {
-    return scope.resolve(name, ctx, info(), err, afterProlog || !ctx.sc.xquery3());
+    return scope.resolve(name, ctx, info(), err, module, !ctx.sc.xquery3());
   }
 
   /**
