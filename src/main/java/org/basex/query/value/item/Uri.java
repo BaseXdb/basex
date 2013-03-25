@@ -61,7 +61,7 @@ public final class Uri extends Str {
   public Uri resolve(final Uri add) {
     if(add.val.length == 0) return this;
     try {
-      final URI base = new URI(Token.string(val));
+      final URI base = new URI(Token.string(Token.uri(val, true)));
       final URI uri = base.resolve(Token.string(Token.uri(add.val, true)));
       return uri(Token.token(uri.toString()), false);
     } catch(final Exception ex) {

@@ -173,13 +173,19 @@ public final class FNQName extends StandardFunc {
    */
   private Item resolveUri(final QueryContext ctx, final Item it, final Item it2)
       throws QueryException {
+
     if(it == null) return null;
+    // check relative uri
     final Uri rel = Uri.uri(checkEStr(it));
     if(!rel.isValid()) URIINVRES.thrw(info, rel);
     if(rel.isAbsolute()) return rel;
+
+    // check base uri
     final Uri base = it2 == null ? ctx.sc.baseURI() : Uri.uri(checkEStr(it2));
-    if(!base.isValid()) URIINVRES.thrw(info, base);
     if(!base.isAbsolute()) URIABS.thrw(info, base);
+    if(!base.isValid() || contains(base.string(), '#') ||
+        !contains(base.string(), token("//"))) URIINVRES.thrw(info, base);
+
     return base.resolve(rel);
   }
 }

@@ -427,7 +427,7 @@ public enum Err {
   /** FORG0001. */
   DATEFORMAT(FORG, 1, "Wrong % format: '%' (try e.g. '%')."),
   /** FORG0002. */
-  URIINVRES(FORG, 2, "Invalid URI: %."),
+  URIINVRES(FORG, 2, "URI argument is invalid: %."),
   /** FORG0002. */
   URIABS(FORG, 2, "Base URI % is not absolute."),
 
@@ -571,6 +571,8 @@ public enum Err {
   SERMAP(SEPM, 16, "Character map '%' is not defined."),
   /** SEPM0016. */
   SERANY(SEPM, 16, "%."),
+  /** SEPM0017. */
+  SEROPT(SEPM, 17, "%."),
 
   /** XPDY0002. */
   VAREMPTY(XPDY, 2, "No value assigned to %."),
