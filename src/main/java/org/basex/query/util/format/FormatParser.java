@@ -1,6 +1,7 @@
 package org.basex.query.util.format;
 
 import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.util.*;
@@ -19,8 +20,8 @@ public abstract class FormatParser extends FormatUtil {
   Case cs;
   /** Primary format token. */
   byte[] primary;
-  /** Primary format or mandatory digit. */
-  int digit = -1;
+  /** First character of format token, or mandatory digit. */
+  int first = -1;
   /** Ordinal suffix; {@code null} if not specified. */
   byte[] ordinal;
   /** Minimum width. */
@@ -73,10 +74,9 @@ public abstract class FormatParser extends FormatUtil {
 
     // find digit of decimal-digit-pattern
     tp.reset();
-    digit = -1;
-    while(digit == -1 && tp.more()) digit = zeroes(tp.next());
+    while(first == -1 && tp.more()) first = zeroes(tp.next());
     // no digit found: return default primary token
-    if(digit == -1) return def;
+    if(first == -1) return def;
 
     // flags for mandatory-digit-sign and group-separator-sign
     boolean mds = false, gss = true;
@@ -86,7 +86,7 @@ public abstract class FormatParser extends FormatUtil {
       final int d = zeroes(ch);
       if(d != -1) {
         // mandatory-digit-sign
-        if(digit != d) DIFFMAND.thrw(info, pic);
+        if(first != d) DIFFMAND.thrw(info, pic);
         mds = true;
         gss = false;
       } else if(ch == '#') {
@@ -104,5 +104,17 @@ public abstract class FormatParser extends FormatUtil {
     }
     if(gss) INVGROUP.thrw(info, pic);
     return pic;
+  }
+
+  /**
+   * Finishes format parsing.
+   * @param pres presentation string
+   */
+  protected void finish(final byte[] pres) {
+    // skip correction of case if modifier has more than one codepoint (Ww)
+    cs = cl(pres, 0) < pres.length ? Case.STANDARD :
+      (ch(pres, 0) & ' ') == 0 ? Case.UPPER : Case.LOWER;
+    primary = lc(pres);
+    if(first == -1) first = ch(primary, 0);
   }
 }

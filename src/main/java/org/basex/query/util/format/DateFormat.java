@@ -44,11 +44,7 @@ public final class DateFormat extends FormatParser {
     }
 
     // choose first character and case
-    pres = pres.length == 0 ? df : presentation(pres, df, true);
-    cs = cl(pres, 0) < pres.length ? Case.STANDARD :
-      (ch(pres, 0) & ' ') == 0 ? Case.UPPER : Case.LOWER;
-    primary = lc(pres);
-    if(digit == -1) digit = ch(primary, 0);
+    finish(pres.length == 0 ? df : presentation(pres, df, true));
 
     // check width modifier
     final byte[] width = comma == -1 ? null : substring(pic, comma + 1);

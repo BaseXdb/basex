@@ -132,6 +132,7 @@ public abstract class Formatter extends FormatUtil {
         final int compSpec = ch(marker, 0);
         byte[] pres = ONE;
         boolean max = false;
+        BigDecimal frac = null;
         long num = 0;
 
         final boolean dat = date.type == AtomType.DAT;
@@ -157,6 +158,7 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'F':
             num = date.toJava().toGregorianCalendar().get(Calendar.DAY_OF_WEEK) - 1;
+            if(num == 0) num = 7;
             pres = new byte[] { 'n' };
             err = tim;
             break;
@@ -193,7 +195,7 @@ public abstract class Formatter extends FormatUtil {
             err = dat;
             break;
           case 'f':
-            num = date.sec().remainder(BigDecimal.ONE).movePointRight(3).intValue();
+            frac = date.sec().remainder(BigDecimal.ONE);
             err = dat;
             break;
           case 'Z':
@@ -207,6 +209,7 @@ public abstract class Formatter extends FormatUtil {
           case 'E':
             num = date.yea();
             pres = new byte[] { 'n' };
+            err = tim;
             break;
           default:
             INVCOMPSPEC.thrw(ii, marker);
@@ -223,12 +226,12 @@ public abstract class Formatter extends FormatUtil {
           if(mx > 1) fp.max = mx;
         }
 
-        if(fp.digit == 'n') {
+        if(fp.first == 'n') {
           byte[] in = EMPTY;
           if(compSpec == 'M') {
             in = month((int) num - 1, fp.min, fp.max);
           } else if(compSpec == 'F') {
-            in = day((int) num, fp.min, fp.max);
+            in = day((int) num - 1, fp.min, fp.max);
           } else if(compSpec == 'P') {
             in = ampm(num == 0);
           } else if(compSpec == 'C') {
@@ -240,11 +243,36 @@ public abstract class Formatter extends FormatUtil {
           if(fp.cs == Case.UPPER) in = uc(in);
           tb.add(in);
         } else {
+          if(frac != null && !frac.equals(BigDecimal.ZERO)) {
+            String s = frac.toString().replace("0.", "");
+            final int sl = s.length();
+            if(fp.min > sl) {
+              s = frac(frac, fp.min);
+            } else if(fp.max < sl) {
+              s = frac(frac, fp.max);
+            } else {
+              final int fl = fp.primary.length;
+              if(fl != 1 && fl != sl) s = frac(frac, fl);
+            }
+            num = Token.toLong(s);
+          }
           tb.add(formatInt(num, fp));
         }
       }
     }
     return tb.finish();
+  }
+
+  /**
+   * Returns the fractional part of a decimal number.
+   * @param num number
+   * @param len length of fractional part
+   * @return string representation
+   */
+  private String frac(final BigDecimal num, final int len) {
+    final String s = num.setScale(len, BigDecimal.ROUND_HALF_UP).toString();
+    final int d = s.indexOf('.');
+    return d == -1 ? s : s.substring(d + 1);
   }
 
   /**
@@ -260,14 +288,13 @@ public abstract class Formatter extends FormatUtil {
     if(sign) n = -n;
 
     final TokenBuilder tb = new TokenBuilder();
-    final int ch = fp.digit;
+    final int ch = fp.first;
 
     if(ch == 'w') {
       tb.add(word(n, fp.ordinal));
     } else if(ch == KANJI[1]) {
       japanese(tb, n);
-      // [CG] check if length can be different than 1
-    } else if(fp.primary.length == cl(fp.primary, 0) && ch == 'i') {
+    } else if(ch == 'i') {
       roman(tb, n);
     } else if(ch == '\u2460' || ch == '\u2474' || ch == '\u2488') {
       if(num < 1 || num > 20) tb.addLong(num);

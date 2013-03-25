@@ -44,8 +44,15 @@ final class FormatterEN extends Formatter {
       "Eightieth", "Ninetieth");
 
   /** Days. */
-  private static final byte[][] DAYS = tokens("Sunday", "Monday", "Tuesday",
-      "Wednesday", "Thursday", "Friday", "Saturday");
+  private static final byte[][][] DAYS = {
+    tokens("M", "Mon", "Monday"),
+    tokens("Tu", "Tue", "Tues", "Tuesday"),
+    tokens("W", "Wed", "Weds", "Wednesday"),
+    tokens("Th", "Thu", "Thur", "Thurs", "Thursday"),
+    tokens("F", "Fri", "Friday"),
+    tokens("Sa", "Sat", "Saturday"),
+    tokens("Su", "Sun", "Sunday")
+  };
 
   /** Months. */
   private static final byte[][] MONTHS = tokens(
@@ -81,14 +88,19 @@ final class FormatterEN extends Formatter {
 
   @Override
   public byte[] month(final int n, final int min, final int max) {
-    final TokenBuilder tb = new TokenBuilder(substring(MONTHS[n], 0, max));
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(substring(MONTHS[n], 0, Math.max(3, max)));
     while(tb.size() < min) tb.add(' ');
     return tb.finish();
   }
 
   @Override
   public byte[] day(final int n, final int min, final int max) {
-    final TokenBuilder tb = new TokenBuilder(substring(DAYS[n], 0, max));
+    final TokenBuilder tb = new TokenBuilder();
+    final byte[][] formats = DAYS[n];
+    int f = formats.length;
+    while(--f > 0 && max < formats[f].length);
+    tb.add(formats[f]);
     while(tb.size() < min) tb.add(' ');
     return tb.finish();
   }
