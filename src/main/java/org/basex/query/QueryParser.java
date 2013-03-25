@@ -28,7 +28,6 @@ import org.basex.query.path.*;
 import org.basex.query.up.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.format.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -417,9 +416,9 @@ public class QueryParser extends InputParser {
         final Ann ann = new Ann();
         while(true) {
           if(wsConsumeWs(UPDATING)) {
-            addAnnotation(ann, Ann.Q_UPDATING, Empty.SEQ, false);
+            ann.add(Ann.Q_UPDATING, Empty.SEQ);
           } else if(ctx.sc.xquery3() && consume('%')) {
-            annotation(ann, true);
+            annotation(ann);
           } else {
             break;
           }
@@ -427,8 +426,10 @@ public class QueryParser extends InputParser {
         if(wsConsumeWs(VARIABLE)) {
           // variables cannot be updating
           if(ann.contains(Ann.Q_UPDATING)) error(UPDATINGVAR);
+          checkAnnotations(ann, true);
           varDecl(ann);
         } else if(wsConsumeWs(FUNCTION)) {
+          checkAnnotations(ann, false);
           functionDecl(ann);
         } else if(!ann.isEmpty()) {
           error(VARFUNC);
@@ -449,7 +450,8 @@ public class QueryParser extends InputParser {
    */
   private Ann annotations() throws QueryException {
     final Ann ann = new Ann();
-    while(wsConsume("%")) annotation(ann, false);
+    while(wsConsume("%")) annotation(ann);
+    checkAnnotations(ann, false);
     skipWS();
     return ann;
   }
@@ -457,10 +459,9 @@ public class QueryParser extends InputParser {
   /**
    * Parses a single annotation.
    * @param ann annotations
-   * @param var variable flag
    * @throws QueryException query exception
    */
-  private void annotation(final Ann ann, final boolean var) throws QueryException {
+  private void annotation(final Ann ann) throws QueryException {
     skipWS();
     final QNm name = eQName(QNAMEINV, ANNURI);
     final ValueBuilder vb = new ValueBuilder();
@@ -473,31 +474,31 @@ public class QueryParser extends InputParser {
       wsCheck(PAR2);
     }
     skipWS();
-    addAnnotation(ann, name, vb.value(), var);
+    ann.add(name, vb.value());
   }
 
   /**
-   * Adds a single annotation.
+   * Checks all annotations.
    * @param ann annotations
-   * @param name name
-   * @param value value
    * @param var variable flag
    * @throws QueryException query exception
    */
-  private void addAnnotation(final Ann ann, final QNm name, final Value value,
-      final boolean var) throws QueryException {
-
-    if(name.eq(Ann.Q_UPDATING)) {
-      if(ann.contains(Ann.Q_UPDATING)) error(DUPLUPD);
-    } else if(name.eq(Ann.Q_PUBLIC) || name.eq(Ann.Q_PRIVATE)) {
-      // only one visibility modifier allowed
-      if(ann.contains(Ann.Q_PUBLIC) || ann.contains(Ann.Q_PRIVATE))
-        error(var ? DUPLVARVIS : DUPLVIS);
-    } else if(NSGlobal.reserved(name.uri())) {
-      // no global namespaces allowed
-      error(ANNRES, name);
+  private void checkAnnotations(final Ann ann, final boolean var) throws QueryException {
+    boolean up = false, vis = false;
+    for(int a = 0; a < ann.size(); a++) {
+      final QNm name = ann.names[a];
+      if(name.eq(Ann.Q_UPDATING)) {
+        if(up) error(DUPLUPD);
+        up = true;
+      } else if(name.eq(Ann.Q_PUBLIC) || name.eq(Ann.Q_PRIVATE)) {
+        // only one visibility modifier allowed
+        if(vis) error(var ? DUPLVARVIS : DUPLVIS);
+        vis = true;
+      } else if(NSGlobal.reserved(name.uri())) {
+        // no global namespaces allowed
+        error(ANNRES, name);
+      }
     }
-    ann.add(name, value);
   }
 
   /**
