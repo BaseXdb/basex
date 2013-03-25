@@ -176,7 +176,7 @@ public final class SerializerProp extends AProp {
    */
   public static SerializerException error(final Object key, final String found,
       final String... allowed) throws SerializerException {
-    throw SERANY.thrwSerial(allowed(key, found, allowed));
+    throw SEROPT.thrwSerial(allowed(key, found, allowed));
   }
 
   /**
