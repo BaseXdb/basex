@@ -49,7 +49,7 @@ public final class FNQName extends StandardFunc {
       case LOCAL_NAME_FROM_QNAME:    return lnFromQName(ctx, it);
       case PREFIX_FROM_QNAME:        return prefixFromQName(ctx, it);
       case NAMESPACE_URI_FOR_PREFIX: return nsUriForPrefix(it, it2);
-      case RESOLVE_URI:              return resolveURI(ctx, it, it2);
+      case RESOLVE_URI:              return resolveUri(ctx, it, it2);
       default:                       return super.item(ctx, ii);
     }
   }
@@ -171,7 +171,7 @@ public final class FNQName extends StandardFunc {
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Item resolveURI(final QueryContext ctx, final Item it, final Item it2)
+  private Item resolveUri(final QueryContext ctx, final Item it, final Item it2)
       throws QueryException {
     if(it == null) return null;
     final Uri rel = Uri.uri(checkEStr(it));
