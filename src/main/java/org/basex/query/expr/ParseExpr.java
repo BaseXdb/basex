@@ -329,6 +329,7 @@ public abstract class ParseExpr extends Expr {
     if(it == null) return EMPTY;
     final Type ip = it.type;
     if(ip.isStringOrUntyped()) return it.string(info);
+    if(it instanceof FItem) FIATOM.thrw(info, this);
     throw Err.type(this, AtomType.STR, it);
   }
 

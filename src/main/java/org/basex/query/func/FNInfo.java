@@ -123,7 +123,7 @@ public final class FNInfo extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str envVar(final QueryContext ctx) throws QueryException {
-    final String e = System.getenv(Token.string(checkEStr(expr[0], ctx)));
+    final String e = System.getenv(Token.string(checkStr(expr[0], ctx)));
     return e != null ? Str.get(e) : null;
   }
 

@@ -24,8 +24,8 @@ public final class NSGlobal {
     NS.add(XSI, XSIURI);
     NS.add(FN, FNURI);
     NS.add(MATH, MATHURI);
-    NS.add(OPT, OPTIONURI);
     NS.add(MAP, MAPURI);
+    NS.add(ANN, ANNURI);
     RESERVED = NS.size();
 
     // implementation-defined pre-declarations

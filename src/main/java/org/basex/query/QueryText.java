@@ -442,10 +442,10 @@ public interface QueryText {
   byte[] ERR = token("err");
   /** FN token. */
   byte[] FN = token("fn");
+  /** Ann token. */
+  byte[] ANN = token("ann");
   /** Math token. */
   byte[] MATH = token("math");
-  /** Option token. */
-  byte[] OPT = token("opt");
   /** Output token. */
   byte[] OUTPUT = token("output");
   /** BaseX token. */
@@ -554,8 +554,8 @@ public interface QueryText {
   byte[] ERRORURI = token(W3URI + "/2005/xqt-errors");
   /** Map URI. */
   byte[] MAPURI = token(W3URI + "/2005/xpath-functions/map");
-  /** Option URI. */
-  byte[] OPTIONURI = token(W3URI + "/2011/xquery-options");
+  /** Annotations URI. */
+  byte[] ANNURI = token(W3URI + "/2012/xquery");
 
   /** EXQuery URI. */
   String EXQUERY = "http://exquery.org/ns/";

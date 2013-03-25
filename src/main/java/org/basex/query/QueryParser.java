@@ -461,7 +461,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void annotation(final Ann ann, final boolean var) throws QueryException {
-    final QNm name = eQName(QNAMEINV, ctx.sc.nsFunc);
+    skipWS();
+    final QNm name = eQName(QNAMEINV, ANNURI);
     final ValueBuilder vb = new ValueBuilder();
     if(wsConsumeWs(PAR1)) {
       do {
