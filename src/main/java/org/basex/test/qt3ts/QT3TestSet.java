@@ -359,8 +359,15 @@ public abstract class QT3TestSet {
    */
   protected void test(final boolean success) {
     if(!success) {
-      final AssertionError err = new AssertionError(
-          Util.info("Expected one of %, found: '%'", expected, result));
+      final StringBuilder sb = new StringBuilder("\nExpected:");
+      if(expected.size() == 1) {
+        sb.append(' ' + expected.get(0));
+      } else {
+        sb.append("one of...");
+        for(final String e : expected) sb.append("\n- " + e);
+      }
+      sb.append("\nFound: ").append(result);
+      final AssertionError err = new AssertionError(sb);
       if(result.error != null) err.setStackTrace(result.error.getStackTrace());
       else if(result.exc != null)
         err.setStackTrace(result.exc.getException().getStackTrace());

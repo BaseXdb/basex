@@ -214,9 +214,7 @@ public final class XQuery implements Iterable<XdmItem> {
    * @param ctx database context
    * @return optional expected test suite result
    */
-  public static String string(final String query, final XdmValue val,
-      final Context ctx) {
-
+  public static String string(final String query, final XdmValue val, final Context ctx) {
     final XQuery qp = new XQuery(query, ctx).context(val);
     try {
       final XdmItem it = qp.next();
