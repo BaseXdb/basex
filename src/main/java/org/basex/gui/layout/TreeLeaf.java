@@ -12,19 +12,23 @@ import org.basex.data.*;
 public final class TreeLeaf extends TreeNode {
   /** Represents raw file (true) or document (false). */
   public final boolean raw;
+  /** This leaf is a dummy node displaying that node listing is abbreviated. */
+  public final boolean abbr;
 
   /**
    * Constructor.
-   * @param pth node path
    * @param nm name of content node
+   * @param pth node path
    * @param rw represented node is raw file
+   * @param ab abbreviated node listing
    * @param bxt tree reference
    * @param d data reference
    */
-  TreeLeaf(final byte[] nm, final byte[] pth, final boolean rw, final BaseXTree bxt,
-      final Data d) {
+  public TreeLeaf(final byte[] nm, final byte[] pth, final boolean rw, final boolean ab,
+      final BaseXTree bxt, final Data d) {
     super(nm, pth, bxt, d);
     raw = rw;
+    abbr = ab;
   }
 
   @Override

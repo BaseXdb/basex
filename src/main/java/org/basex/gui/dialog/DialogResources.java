@@ -163,8 +163,8 @@ public class DialogResources extends BaseXBack {
    * Searches the tree for nodes that match the given search text.
    */
   private void filter() {
-    final byte[] path = TreeNode.preparePath(token(filterText.getText()));
-    if(eq(path, SLASH)) {
+    final byte[] filterPath = TreeNode.preparePath(token(filterText.getText()));
+    if(eq(filterPath, SLASH)) {
       refreshFolder(root);
       return;
     }
@@ -173,21 +173,25 @@ public class DialogResources extends BaseXBack {
     // clear tree to append filtered nodes
     root.removeAllChildren();
 
+    int cmax = TreeFolder.MAXC;
     // check if there's a directory
     // create a folder if there's either a raw or document folder
-    if(data.resources.isDir(path)) {
-      root.add(new TreeFolder(TreeFolder.name(path), TreeFolder.path(path), tree, data));
+    if(data.resources.isDir(filterPath)) {
+      root.add(new TreeFolder(TreeFolder.name(filterPath),
+          TreeFolder.path(filterPath), tree, data));
+      cmax--;
     }
 
     // now add the actual files (if there are any)
-    final byte[] name = TreeFolder.name(path);
-    final byte[] sub = TreeFolder.path(path);
-    final TreeLeaf[] leaves = TreeFolder.leaves(
-        new TreeFolder(TreeFolder.name(sub), TreeFolder.path(sub), tree, data));
+    final byte[] name = TreeFolder.name(filterPath);
+    final byte[] sub = TreeFolder.path(filterPath);
+    final TreeFolder f = new TreeFolder(TreeFolder.name(sub), TreeFolder.path(sub),
+        tree, data);
+    cmax = f.addLeaves(name, cmax, root);
 
-    for(final TreeLeaf l : leaves) {
-      if(name.length == 0 || eq(l.name, name)) root.add(l);
-    }
+    // add dummy node if maximum number of nodes is exceeded
+    if(cmax <= 0)
+      root.add(new TreeLeaf(token("..."), sub, false, true, tree, data));
 
     ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(root);
   }
@@ -248,7 +252,10 @@ public class DialogResources extends BaseXBack {
         final boolean leaf, final int row, final boolean focus) {
 
       super.getTreeCellRendererComponent(tree, val, sel, exp, leaf, row, focus);
-      if(leaf) setIcon(((TreeLeaf) val).raw ? rawIcon : xmlIcon);
+      if(leaf) {
+        final TreeLeaf l = (TreeLeaf) val;
+        setIcon(l.raw ? rawIcon : l.abbr ? null : xmlIcon);
+      }
       return this;
     }
   }

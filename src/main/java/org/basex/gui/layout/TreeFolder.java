@@ -8,7 +8,6 @@ import javax.swing.tree.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.index.resource.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -21,6 +20,8 @@ import org.basex.util.list.*;
 public class TreeFolder extends TreeNode {
   /** Children of node have been loaded. */
   private boolean loaded;
+  /** Maximum number of displayed/processed children for a node. */
+  public static final int MAXC = 10000;
 
   /**
    * Constructor.
@@ -37,54 +38,58 @@ public class TreeFolder extends TreeNode {
   void load() {
     if(loaded) return;
 
-    // append new child nodes, folders first ...
-    for(final byte[] b : folders(this)) add(new TreeFolder(b, subfolder(), tree, data));
-    // ... then leaves.
-    for(final TreeLeaf l : leaves(this)) add(l);
+    int cmax = MAXC;
+    // add folders
+    final byte[] sub = subfolder();
+    final byte[][] folders = new TokenList(data.resources.children(subfolder(), true).
+        keys()).sort(Prop.CASE).toArray();
+    int i = 0;
+    while(i < folders.length && cmax-- > 0)
+      add(new TreeFolder(folders[i++], sub, tree, data));
+
+    // add leaves
+    cmax = addLeaves(EMPTY, cmax, this);
+    // add dummy node if not all nodes are displayed
+    if(cmax <= 0)
+      add(new TreeLeaf(token("..."), sub, false, true, tree, data));
 
     loaded = true;
     ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(this);
   }
 
   /**
-   * Finds all raw and document folders on the child axis of the given node.
-   * @param node node for which to find child folders for
-   * @return folders
+   * Filters child nodes by the given filter expression and adds the remaining children
+   * to the given node.
+   * @param filter filter expression
+   * @param cmax counter for the maximum number of children to add
+   * @param target node to append filtered nodes
+   * @return number of remaining nodes that can be added
    */
-  private static byte[][] folders(final TreeFolder node) {
-    final Resources res = node.data.resources;
-    final TokenBoolMap ts = res.children(node.subfolder(), true);
-    return new TokenList(ts.keys()).sort(Prop.CASE).toArray();
-  }
+  public int addLeaves(final byte[] filter, final int cmax, final TreeFolder target) {
+    final TokenBoolMap tbm = data.resources.children(subfolder(), false);
+    final List<byte[]> keys = new ArrayList<byte[]>();
 
-  /**
-   * Finds all leaf child nodes for the given node.
-   * @param node node for which to find leaves for
-   * @return raw file / document leaves
-   */
-  public static TreeLeaf[] leaves(final TreeFolder node) {
-    // get child resources
-    final Resources res = node.data.resources;
-    final TokenBoolMap tbm = res.children(node.subfolder(), false);
-
-    // create leaf nodes
-    final int ts = tbm.size();
-    final TreeLeaf[] leaves = new TreeLeaf[ts];
-    for(int t = 0; t < ts; t++) {
-      leaves[t] = new TreeLeaf(tbm.key(t + 1), node.subfolder(),
-          tbm.value(t + 1), node.tree, node.data);
-    }
-
-    // sort and return leaves
-    Arrays.sort(leaves, new Comparator<TreeLeaf>() {
+    // get desired leaves, depending on the given filter
+    for(final byte[] b : tbm.keys())
+      if(filter.length == 0 || eq(b, filter))
+        keys.add(b);
+    Collections.sort(keys, new Comparator<byte[]>() {
       @Override
-      public int compare(final TreeLeaf l1, final TreeLeaf l2) {
-        final byte[] n1 = l1.name;
-        final byte[] n2 = l2.name;
-        return Prop.CASE ? diff(n1, n2) : diff(lc(n1), lc(n2));
+      public int compare(final byte[] o1, final byte[] o2) {
+        return Prop.CASE ? diff(o1, o2) : diff(lc(o1), lc(o2));
       }
     });
-    return leaves;
+
+    // finally add the necessary leaves
+    final byte[] sub = subfolder();
+    int i = 0;
+    int m = cmax;
+    while(i < keys.size() && m-- > 0) {
+      final byte[] nm = keys.get(i++);
+      target.add(new TreeLeaf(nm, sub, tbm.value(tbm.id(nm)), false, tree, data));
+    }
+
+    return m;
   }
 
   /**
