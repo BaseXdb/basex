@@ -331,7 +331,7 @@ public final class FNGen extends StandardFunc {
     } catch(final IOException ex) {
       SERANY.thrw(info, ex);
     }
-    return Str.get(delete(ao.toArray(), '\r'));
+    return Str.get(ao.toArray());
   }
 
   @Override
