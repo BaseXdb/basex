@@ -85,7 +85,7 @@ public enum Err {
   /** BXDB0011. */
   BXDB_NAME(BXDB, 11, "Invalid database name: '%'."),
   /** BXDB0012. */
-  BXDB_CREATE(BXDB, 12, "Database '%' can only be create once."),
+  BXDB_CREATE(BXDB, 12, "Database '%' can only be created once."),
   /** BXDB0013. */
   BXDB_CREATEARGS(BXDB, 12, "Number of specified inputs and paths differs: % vs. %."),
 
