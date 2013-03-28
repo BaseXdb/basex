@@ -37,6 +37,8 @@ public class DialogResources extends BaseXBack {
   final BaseXButton filter;
   /** Clear button. */
   final BaseXButton clear;
+  /** Avoids superfluous filtering steps. */
+  boolean filtered;
 
   /**
    * Constructor.
@@ -71,6 +73,7 @@ public class DialogResources extends BaseXBack {
         }
         filterText.setText(filt);
         dp.add.target.setText(trgt);
+        filtered = false;
       }
     });
 
@@ -150,12 +153,14 @@ public class DialogResources extends BaseXBack {
    * @param comp the action component
    */
   void action(final Object comp) {
-    if(comp == filter) {
+    if(comp == filter && !filtered) {
       filter();
+      filtered = true;
     } else if(comp == clear) {
       filterText.setText("/");
       filterText.requestFocus();
       refreshFolder(root);
+      filtered = false;
     }
   }
 
@@ -300,7 +305,9 @@ public class DialogResources extends BaseXBack {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       final TreeNode n = selection();
-      button.setEnabled(n != null && !n.equals(root));
+      if(n instanceof TreeLeaf)
+        button.setEnabled(!((TreeLeaf) n).abbr);
+      else button.setEnabled(n != null && !n.equals(root));
     }
   }
 
@@ -332,7 +339,9 @@ public class DialogResources extends BaseXBack {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       final TreeNode n = selection();
-      button.setEnabled(n != null && !n.equals(root));
+      if(n instanceof TreeLeaf)
+        button.setEnabled(!((TreeLeaf) n).abbr);
+      else button.setEnabled(n != null && !n.equals(root));
     }
   }
 }

@@ -36,8 +36,9 @@ public class TreeFolder extends TreeNode {
 
   @Override
   void load() {
-    if(loaded) return;
+    if(loaded || updating) return;
 
+    updating = true;
     int cmax = MAXC;
     // add folders
     final byte[] sub = subfolder();
@@ -55,6 +56,7 @@ public class TreeFolder extends TreeNode {
 
     loaded = true;
     ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(this);
+    updating = false;
   }
 
   /**

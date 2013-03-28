@@ -25,6 +25,8 @@ public abstract class TreeNode extends DefaultMutableTreeNode
   final BaseXTree tree;
   /** Data reference. */
   final Data data;
+  /** Updating. */
+  boolean updating;
 
   /**
    * Constructor.
@@ -72,7 +74,8 @@ public abstract class TreeNode extends DefaultMutableTreeNode
 
   @Override
   public void treeWillExpand(final TreeExpansionEvent e) throws ExpandVetoException {
-    if(equals(e.getPath().getLastPathComponent())) load();
+    if(equals(e.getPath().getLastPathComponent()))
+      load();
   }
 
   @Override
