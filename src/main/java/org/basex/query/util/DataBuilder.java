@@ -208,15 +208,13 @@ public final class DataBuilder {
    * @return number of added nodes
    */
   private int addElem(final ANode nd, final int pre, final int par) {
-    final int ms = data.meta.size;
-    data.nspaces.open();
+    final int size = data.meta.size;
+    data.nspaces.prepare();
 
     // add new namespaces
     final Atts ns = nd.nsScope();
     final int as = ns.size();
-    final boolean ne = as > 0;
-    for(int a = 0; a < as; a++)
-      data.nspaces.add(ns.name(a), ns.string(a), ms);
+    for(int a = 0; a < as; a++) data.nspaces.add(ns.name(a), ns.string(a), size);
 
     final QNm q = nd.qname();
     final byte[] uri = q.uri();
@@ -225,8 +223,9 @@ public final class DataBuilder {
     final int s = size(nd, false);
 
     // add element node
+    final boolean ne = data.nspaces.finish();
     data.elem(pre - par, tn, size(nd, true), s, u, ne);
-    data.insert(ms);
+    data.insert(size);
 
     int p = pre + 1;
 
@@ -237,10 +236,10 @@ public final class DataBuilder {
     // add children
     ai = nd.children();
     for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, nd);
-    data.nspaces.close(ms);
+    data.nspaces.close(size);
 
     // update size if additional nodes have been added by the descendants
-    if(s != p - pre) data.size(ms, Data.ELEM, p - pre);
+    if(s != p - pre) data.size(size, Data.ELEM, p - pre);
     return p;
   }
 

@@ -684,11 +684,11 @@ public abstract class Data {
     final TokenMap nsScope = new TokenMap();
     NSNode n = nspaces.current;
     do {
-      for(int i = 0; i < n.vals.length; i += 2)
-        nsScope.add(nspaces.prefix(n.vals[i]), nspaces.uri(n.vals[i + 1]));
+      for(int i = 0; i < n.values.length; i += 2)
+        nsScope.add(nspaces.prefix(n.values[i]), nspaces.uri(n.values[i + 1]));
       final int pos = n.fnd(ipar);
       if(pos < 0) break;
-      n = n.ch[pos];
+      n = n.children[pos];
     } while(n.pre <= ipar && ipar < n.pre + size(n.pre, ELEM));
 
     // loop through all entries
@@ -721,7 +721,7 @@ public abstract class Data {
         cand.add(cn);
         for(int cI; (cI = cn.fnd(par)) > -1;) {
           // add candidate to stack
-          cn = cn.ch[cI];
+          cn = cn.children[cI];
           cand.add(0, cn);
         }
 
@@ -756,16 +756,15 @@ public abstract class Data {
       switch(dkind) {
         case DOC:
           // add document
+          nspaces.prepare();
           final int s = data.size(dpre, dkind);
           doc(pre, s, data.text(dpre, true));
           meta.ndocs++;
-          nspaces.open();
           preStack.push(pre);
           break;
         case ELEM:
           // add element
-          nspaces.open();
-          boolean ne = false;
+          nspaces.prepare();
           if(data.nsFlag(dpre)) {
             final Atts at = data.ns(dpre);
             for(int a = 0; a < at.size(); ++a) {
@@ -779,13 +778,12 @@ public abstract class Data {
                 // location pre == 3 we have to make sure N and only N gets
                 // updated.
                 newNodes.add(nspaces.add(at.name(a), at.string(a), pre));
-                ne = true;
               }
             }
           }
           byte[] nm = data.name(dpre, dkind);
           elem(dis, tagindex.index(nm, null, false), data.attSize(dpre, dkind),
-              data.size(dpre, dkind), nspaces.uri(nm, true), ne);
+              data.size(dpre, dkind), nspaces.uri(nm, true), nspaces.finish());
           preStack.push(pre);
           break;
         case TEXT:

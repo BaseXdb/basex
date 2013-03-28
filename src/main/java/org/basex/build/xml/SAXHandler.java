@@ -25,6 +25,10 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   private final boolean stripNS;
   /** Temporary attribute array. */
   private final Atts atts = new Atts();
+  /** Temporary string builder for high surrogates. */
+  private final StringBuilder sb = new StringBuilder();
+  /** Temporary namespace array. */
+  private final Atts nsp = new Atts();
   /** DTD flag. */
   private boolean dtd;
   /** Whitespace chopping. */
@@ -57,15 +61,17 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
 
     try {
       finishText();
+
       final int as = at.getLength();
-      atts.reset();
       for(int a = 0; a < as; ++a) {
         final byte[] an = token(at.getQName(a));
         final byte[] av = token(at.getValue(a));
         atts.add(stripNS ? local(an) : an, av);
       }
       final byte[] en = token(qn);
-      builder.startElem(stripNS ? local(en) : en, atts);
+      builder.openElem(stripNS ? local(en) : en, atts, nsp);
+      atts.reset();
+      nsp.reset();
       ++nodes;
     } catch(final IOException ex) {
       error(ex);
@@ -78,7 +84,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
 
     try {
       finishText();
-      builder.endElem();
+      builder.closeElem();
     } catch(final IOException ex) {
       error(ex);
     }
@@ -113,11 +119,6 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
     }
   }
 
-  /** Temporary string builder for high surrogates. */
-  private final StringBuilder sb = new StringBuilder();
-  /** Temporary namespaces. */
-  private final Atts ns = new Atts();
-
   /**
    * Checks if a text node has to be written.
    * @throws IOException I/O exception
@@ -128,12 +129,6 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
       builder.text(token(chop ? s.trim() : s));
       sb.setLength(0);
     }
-    if(!stripNS) {
-      for(int i = 0; i < ns.size(); ++i) {
-        builder.startNS(ns.name(i), ns.string(i));
-      }
-    }
-    ns.reset();
   }
 
   /**
@@ -160,7 +155,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   @Override
   public void startPrefixMapping(final String prefix, final String uri) {
-    ns.add(token(prefix), token(uri));
+    if(!stripNS) nsp.add(token(prefix), token(uri));
   }
 
   /*public void endPrefixMapping(final String prefix) { } */

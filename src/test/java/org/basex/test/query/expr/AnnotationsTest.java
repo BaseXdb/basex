@@ -16,9 +16,7 @@ public final class AnnotationsTest extends AdvancedQueryTest {
   public void functionDecl() {
     query("declare namespace a='a';declare %a:a function local:x() {1}; local:x()", "1");
     query("declare %public function local:x() { 1 }; local:x()", "1");
-    query("declare %fn:public function local:x() { 1 }; local:x()", "1");
     query("declare %private function local:x() { 1 }; local:x()", "1");
-    query("declare %fn:private function local:x() { 1 }; local:x()", "1");
     query("declare namespace a='a';declare %a:a function local:x() {1}; local:x()", "1");
   }
 
@@ -26,9 +24,7 @@ public final class AnnotationsTest extends AdvancedQueryTest {
   @Test
   public void varDecl() {
     query("declare %public variable $x := 1; $x", "1");
-    query("declare %fn:public variable $x := 1; $x", "1");
     query("declare %private variable $x := 1; $x", "1");
-    query("declare %fn:private variable $x := 1; $x", "1");
     query("declare namespace a='a';declare %a:a variable $x := 1; $x", "1");
     query("declare namespace a='a';declare %a:a(1) %a:b(2) variable $x:=1; $x", "1");
   }
@@ -38,7 +34,6 @@ public final class AnnotationsTest extends AdvancedQueryTest {
   public void conflicts() {
     error("declare namespace a='a';declare %a:a() variable $x:=1; $x", Err.ANNVALUE);
     error("declare namespace a='a';declare %a:a() variable $x:=1; $x", Err.ANNVALUE);
-    error("declare %unknown local:x() { 1 }; local:x(); $x", Err.ANNRES);
     error("declare %pfff:public variable $x := 1; $x", Err.NOURI);
     error("declare %public %public variable $x := 1; $x", Err.DUPLVARVIS);
     error("declare %public %private variable $x := 1; $x", Err.DUPLVARVIS);

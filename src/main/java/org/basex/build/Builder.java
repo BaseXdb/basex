@@ -79,18 +79,18 @@ public abstract class Builder extends Progress {
    * @param value document name
    * @throws IOException I/O exception
    */
-  public final void startDoc(final byte[] value) throws IOException {
+  public final void openDoc(final byte[] value) throws IOException {
     path.index(0, Data.DOC, level);
     pstack.set(level++, meta.size);
     addDoc(value);
-    ns.open();
+    ns.prepare();
   }
 
   /**
    * Closes a document node.
    * @throws IOException I/O exception
    */
-  public final void endDoc() throws IOException {
+  public final void closeDoc() throws IOException {
     final int pre = pstack.get(--level);
     setSize(pre, meta.size - pre);
     meta.ndocs++;
@@ -98,23 +98,17 @@ public abstract class Builder extends Progress {
   }
 
   /**
-   * Adds a new namespace; called by the building instance.
-   * @param pref the namespace prefix
-   * @param uri namespace uri
-   */
-  public final void startNS(final byte[] pref, final byte[] uri) {
-    ns.add(pref, uri, meta.size);
-  }
-
-  /**
    * Opens a new element node.
    *
    * @param nm tag name
    * @param att attributes
+   * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  public final void startElem(final byte[] nm, final Atts att) throws IOException {
-    addElem(nm, att);
+  public final void openElem(final byte[] nm, final Atts att, final Atts nsp)
+      throws IOException {
+
+    addElem(nm, att, nsp);
     ++level;
   }
 
@@ -122,10 +116,13 @@ public abstract class Builder extends Progress {
    * Stores an empty element.
    * @param nm tag name
    * @param att attributes
+   * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  public final void emptyElem(final byte[] nm, final Atts att) throws IOException {
-    addElem(nm, att);
+  public final void emptyElem(final byte[] nm, final Atts att, final Atts nsp)
+      throws IOException {
+
+    addElem(nm, att, nsp);
     final int pre = pstack.get(level);
     ns.close(pre);
     if(att.size() > IO.MAXATTS) setSize(pre, meta.size - pre);
@@ -135,7 +132,7 @@ public abstract class Builder extends Progress {
    * Closes an element.
    * @throws IOException I/O exception
    */
-  public final void endElem() throws IOException {
+  public final void closeElem() throws IOException {
     checkStop();
     --level;
     final int pre = pstack.get(level);
@@ -265,12 +262,14 @@ public abstract class Builder extends Progress {
    * Adds an element node to the storage.
    * @param nm element name
    * @param att attributes
+   * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  private void addElem(final byte[] nm, final Atts att) throws IOException {
+  private void addElem(final byte[] nm, final Atts att, final Atts nsp)
+      throws IOException {
+
     // get tag reference
     int n = tags.index(nm, null, true);
-
     path.index(n, Data.ELEM, level);
 
     // cache pre value
@@ -279,12 +278,18 @@ public abstract class Builder extends Progress {
     tstack.set(level, n);
     pstack.set(level, pre);
 
+    // parse namespaces
+    ns.prepare();
+    final int nps = nsp.size();
+    for(int nx = 0; nx < nps; nx++) {
+      ns.add(nsp.name(nx), nsp.string(nx), meta.size);
+    }
+
     // get and store element references
     final int dis = level != 0 ? pre - pstack.get(level - 1) : 1;
     final int as = att.size();
-    final boolean ne = ns.open();
     int u = ns.uri(nm, true);
-    addElem(dis, n, Math.min(IO.MAXATTS, as + 1), u, ne);
+    addElem(dis, n, Math.min(IO.MAXATTS, as + 1), u, ns.finish());
 
     // get and store attribute references
     for(int a = 0; a < as; ++a) {
