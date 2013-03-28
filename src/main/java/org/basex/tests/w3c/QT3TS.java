@@ -387,10 +387,11 @@ public final class QT3TS {
     // skip schema import, schema validation, and XML 1.1
     final XQuery q = new XQuery(
         "*:environment/*:collation | *:dependency[" +
-        "@type='feature' and " +
-        "@value=('schemaImport','schemaValidation','namespace-axis') or " +
+        "@type='feature' and" +
+        " @value=('schemaImport','schemaValidation','namespace-axis') or " +
         "@type='xml-version' and @value='1.1' or" +
-        "@type='xsd-version' and @value='1.1']", ctx).context(node);
+        "@type='xsd-version' and @value='1.1' or" +
+        "@type='spec' and contains(@value, 'XT30')]", ctx).context(node);
 
     try {
       return q.next() == null;
