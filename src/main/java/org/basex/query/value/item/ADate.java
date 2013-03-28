@@ -374,6 +374,11 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
+  public int hash(final InputInfo ii) throws QueryException {
+    return seconds().add(days().multiply(DAYSECONDS)).intValue();
+  }
+
+  @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
     final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, ii));
     final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
