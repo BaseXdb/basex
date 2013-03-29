@@ -2769,9 +2769,21 @@ public class QueryParser extends InputParser {
   private SeqType simpleType() throws QueryException {
     skipWS();
     final QNm name = eQName(TYPEINVALID, ctx.sc.nsElem);
-    final Type t = AtomType.find(name, false);
-    if(t == null) error(TYPEUNKNOWN, name);
-    if(t == AtomType.AAT || t == AtomType.NOT) error(CASTUNKNOWN, name);
+    Type t = AtomType.find(name, false);
+    if(t == null) {
+      if(wsConsume("(")) error(SIMPLETYPE, name);
+      if(ctx.sc.xquery3) {
+        if(AtomType.AST.name.eq(name)) {
+          t = AtomType.AST;
+        } else {
+          error(XQTYPEUNKNOWN, name);
+        }
+      } else {
+        error(TYPEUNKNOWN, name);
+      }
+    }
+    if(t == AtomType.AST || t == AtomType.AAT || t == AtomType.NOT)
+      error(CASTUNKNOWN, name);
     skipWS();
     return SeqType.get(t, consume('?') ? Occ.ZERO_ONE : Occ.ONE);
   }

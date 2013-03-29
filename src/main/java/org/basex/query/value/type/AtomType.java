@@ -913,7 +913,8 @@ public enum AtomType implements Type {
    */
   public static AtomType find(final QNm type, final boolean all) {
     for(final AtomType t : values()) {
-      if(t.name.eq(type) && (all || t.par != null)) return t;
+      if(!t.name.eq(type)) continue;
+      if(all || t.par != null) return t;
     }
     return null;
   }

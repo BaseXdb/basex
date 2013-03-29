@@ -737,6 +737,8 @@ public enum Err {
   UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
   /** XPST0003. */
   NSNOTALL(XPST, 3, "Namespace test is not supported in XQuery 1.0."),
+  /** XPST0003. */
+  SIMPLETYPE(XPST, 3, "Simple type expected, '%(' found."),
 
   /** XPST0005. */
   COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
@@ -894,6 +896,8 @@ public enum Err {
   MODNS(XQST, 48, "Declaration % does not match the module namespace."),
   /** XQST0049. */
   VARDEFINE(XQST, 49, "Duplicate declaration of %."),
+  /** XQST0052. */
+  XQTYPEUNKNOWN(XQST, 52, "Unknown type '%'."),
   /** XQST0054. */
   CIRCVAR(XQST, 54, "Global variable depends on itself: %"),
   /** XQST0055. */
