@@ -415,7 +415,10 @@ public final class SeqType {
       final Item atom = StandardFunc.atom(it, ii);
       if(atom != it && atom.type.instanceOf(type)) return it;
       if(atom.type == AtomType.ATM) {
-        if(type.nsSensitive()) throw Err.NSSENS.thrw(ii, it, type);
+        if(type.nsSensitive()) {
+          if(ctx.sc.xquery3()) NSSENS.thrw(ii, it, type);
+          Err.treat(ii, withOcc(Occ.ONE), it);
+        }
         return type.cast(atom, ctx, ii);
       }
 
