@@ -55,9 +55,8 @@ public final class Find extends AQuery {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add("");
-    return true;
+  public void databases(final LockResult lr) {
+    lr.read.add("");
   }
 
   /**

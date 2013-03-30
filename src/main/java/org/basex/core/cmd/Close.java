@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'close' command and closes the current database.
@@ -31,9 +30,8 @@ public final class Close extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add("");
-    return true;
+  public void databases(final LockResult lr) {
+    lr.read.add("");
   }
 
   /**

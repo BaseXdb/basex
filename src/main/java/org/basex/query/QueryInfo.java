@@ -15,8 +15,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QueryInfo {
-  /** Locked databases. */
-  public StringList locked;
+  /** Read locked databases. */
+  public StringList readLocked;
+  /** Write locked databases. */
+  public StringList writeLocked;
   /** Parsing time. */
   public long pars;
   /** Compilation time. */
@@ -52,10 +54,14 @@ public final class QueryInfo {
       tb.add(HITS_X_CC + hits).add(' ').add(hits == 1 ? ITEM : ITEMS).add(NL);
       tb.add(UPDATED_CC + up).add(' ').add(up == 1 ? ITEM : ITEMS).add(NL);
       tb.add(PRINTED_CC).add(Performance.format(out.size())).add(NL);
-      tb.add(LOCKING_CC);
-      if(locked == null) tb.add("global");
-      else if(locked.isEmpty()) tb.add("none");
-      else tb.add("local ").add(Arrays.toString(locked.toArray()));
+      tb.add(READ_LOCKING_CC);
+      if(readLocked == null) tb.add("global");
+      else if(readLocked.isEmpty()) tb.add("none");
+      else tb.add("local ").add(Arrays.toString(readLocked.toArray()));
+      tb.add(NL).add(WRITE_LOCKING_CC);
+      if(writeLocked == null) tb.add("global");
+      else if(writeLocked.isEmpty()) tb.add("none");
+      else tb.add("local ").add(Arrays.toString(writeLocked.toArray()));
       tb.add(NL);
     }
     tb.addExt(NL + QUERY_EXECUTED_X, Performance.getTime(total, runs));

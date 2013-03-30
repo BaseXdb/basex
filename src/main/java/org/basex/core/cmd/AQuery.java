@@ -15,7 +15,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract class for database queries.
@@ -99,7 +98,8 @@ public abstract class AQuery extends Command {
         // dump some query info
         out.flush();
         // remove string list if global locking is used and if query is updating
-        if(mprop.is(MainProp.GLOBALLOCK) && qp.updating) qi.locked = null;
+        if(mprop.is(MainProp.GLOBALLOCK) && qp.updating)
+          qi.readLocked = qi.writeLocked = null;
         return info(qi.toString(qp, out, hits, prop.is(Prop.QUERYINFO)));
 
       } catch(final QueryException ex) {
@@ -171,10 +171,17 @@ public abstract class AQuery extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    final boolean ok = qp != null && qp.databases(db);
-    if(ok) qi.locked = db;
-    return ok;
+  public void databases(final LockResult lr) {
+    if(null == qp)
+      lr.writeAll = true;
+    else {
+      qp.databases(lr);
+      if(qp != null) {
+        qi.readLocked = lr.readAll ? null : lr.read;
+        qi.writeLocked = lr.writeAll ? null : lr.write;
+      } else if(qp.updating) lr.writeAll = true;
+      else lr.readAll = true;
+    }
   }
 
   /**

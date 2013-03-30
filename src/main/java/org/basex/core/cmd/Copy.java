@@ -78,9 +78,9 @@ public final class Copy extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add(args);
-    return true;
+  public void databases(final LockResult lr) {
+    lr.read.add(args[0]);
+    lr.write.add(args[1]);
   }
 
   @Override

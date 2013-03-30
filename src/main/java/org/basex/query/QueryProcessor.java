@@ -15,7 +15,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.json.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
-import org.basex.util.list.*;
 
 /**
  * This class is an entry point for evaluating XQuery implementations.
@@ -236,12 +235,21 @@ public final class QueryProcessor extends Progress {
   /**
    * Returns the databases that may be touched by this query. The returned information
    * will be more accurate if the function is called after parsing the query.
-   * @see Progress#databases(StringList)
+   * @see Progress#databases(LockResult)
    */
   @Override
-  public boolean databases(final StringList db) {
-    return ctx.root != null &&
-        ctx.root.expr.databases(db.add(ctx.userReadLocks).add(ctx.userWriteLocks));
+  public void databases(final LockResult lr) {
+    lr.read.add(ctx.userReadLocks);
+    lr.write.add(ctx.userWriteLocks);
+    boolean global = false;
+    if (ctx.root == null)
+      global = true;
+    else
+      global = global | !ctx.root.expr.databases(ctx.updating ? lr.write : lr.read);
+
+    if (global)
+      if(ctx.updating) lr.writeAll = true;
+      else lr.readAll = true;
   }
 
   /**

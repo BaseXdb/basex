@@ -9,7 +9,6 @@ import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'info database' command and returns information on the
@@ -34,9 +33,8 @@ public final class InfoDB extends AInfo {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add("");
-    return true;
+  public void databases(final LockResult lr) {
+    lr.read.add("");
   }
 
   /**

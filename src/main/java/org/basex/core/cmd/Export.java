@@ -49,9 +49,8 @@ public final class Export extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add("");
-    return true;
+  public void databases(final LockResult lr) {
+    lr.read.add("");
   }
 
   /**

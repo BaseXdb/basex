@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'flush' command and flushes the database buffers.
@@ -32,8 +31,7 @@ public final class Flush extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add("");
-    return true;
+  public void databases(final LockResult lr) {
+    lr.write.add("");
   }
 }

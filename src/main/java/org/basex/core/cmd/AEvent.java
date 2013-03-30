@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import org.basex.core.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract class for database events.
@@ -19,8 +18,7 @@ abstract class AEvent extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add(DBLocking.EVENT);
-    return true;
+  public void databases(final LockResult lr) {
+    lr.write.add(DBLocking.EVENT); // Event operations are exclusive
   }
 }

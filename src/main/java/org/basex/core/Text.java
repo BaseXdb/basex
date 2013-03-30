@@ -628,8 +628,10 @@ public interface Text {
   String PRINTING_CC = lang("printing") + COLS;
   /** "Total time: ". */
   String TOTAL_TIME_CC = lang("total_time") + COLS;
-  /** "Locking: ". */
-  String LOCKING_CC = lang("locking") + COLS;
+  /** "Read locking: ". */
+  String READ_LOCKING_CC = lang("read_locking") + COLS;
+  /** "Write locking: ". */
+  String WRITE_LOCKING_CC = lang("write_locking") + COLS;
   /** "Hit(s): ". */
   String HITS_X_CC = lang("hit_s") + COLS;
   /** "Updated: ". */

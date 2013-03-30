@@ -2,6 +2,7 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 
+import org.basex.core.Progress.LockResult;
 import org.basex.data.*;
 import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
@@ -218,18 +219,16 @@ public final class Context {
     if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT) * 1000L);
 
     // get touched databases
-    StringList sl = new StringList(1);
-    if(!pr.databases(sl)) {
-      // databases cannot be determined... pass null reference
-      sl = null;
-    } else {
-      // replace empty string with currently opened database and return array
-      prepareLock(sl);
-    }
-    //assert !registered : "Already registered";
-    //registered = true;
-    locks.acquire(pr, pr.updating ? new StringList(0) : sl,
-                                  pr.updating ? sl : new StringList(0));
+    LockResult lr = new LockResult();
+    pr.databases(lr);
+    if(lr.readAll) lr.read = null;
+    else prepareLock(lr.read);
+    if(lr.writeAll) lr.write = null;
+    else prepareLock(lr.write);
+
+//    assert !registered : "Already registered";
+//    registered = true;
+    locks.acquire(pr, lr.read, lr.write);
   }
 
   /**
@@ -246,7 +245,7 @@ public final class Context {
    * Prepares the string list for locking.
    * @param sl string list
    */
-  private void prepareLock(final StringList sl) {
+  public void prepareLock(final StringList sl) {
     // replace empty string with currently opened database and return array
     for(int d = 0; d < sl.size(); d++) {
       if(sl.get(d).isEmpty())

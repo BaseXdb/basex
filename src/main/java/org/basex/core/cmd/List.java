@@ -50,8 +50,8 @@ public final class List extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return false;
+  public void databases(final LockResult lr) {
+    lr.readAll = true;
   }
 
   /**
