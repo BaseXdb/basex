@@ -72,7 +72,7 @@ public final class List extends Arr {
         }
 
         Value val = null;
-        int s = (int) size;
+        final int s = (int) size;
         if(all == AtomType.STR)      val = StrSeq.get(vs, s);
         else if(all == AtomType.BLN) val = BlnSeq.get(vs, s);
         else if(all == AtomType.FLT) val = FltSeq.get(vs, s);

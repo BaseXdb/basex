@@ -2769,21 +2769,24 @@ public class QueryParser extends InputParser {
   private SeqType simpleType() throws QueryException {
     skipWS();
     final QNm name = eQName(TYPEINVALID, ctx.sc.nsElem);
-    Type t = AtomType.find(name, false);
+    Type t = ListType.find(name);
     if(t == null) {
-      if(wsConsume("(")) error(SIMPLETYPE, name);
-      if(ctx.sc.xquery3) {
-        if(AtomType.AST.name.eq(name)) {
-          t = AtomType.AST;
+      t = AtomType.find(name, false);
+      if(t == null) {
+        if(wsConsume(PAR1)) error(SIMPLETYPE, name);
+        if(ctx.sc.xquery3) {
+          if(AtomType.AST.name.eq(name)) {
+            t = AtomType.AST;
+          } else {
+            error(XQTYPEUNKNOWN, name);
+          }
         } else {
-          error(XQTYPEUNKNOWN, name);
+          error(TYPEUNKNOWN, name);
         }
-      } else {
-        error(TYPEUNKNOWN, name);
       }
+      if(t == AtomType.AST || t == AtomType.AAT || t == AtomType.NOT)
+        error(CASTUNKNOWN, name);
     }
-    if(t == AtomType.AST || t == AtomType.AAT || t == AtomType.NOT)
-      error(CASTUNKNOWN, name);
     skipWS();
     return SeqType.get(t, consume('?') ? Occ.ZERO_ONE : Occ.ONE);
   }
@@ -2961,7 +2964,8 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(COMMA)) {
       // parse type name
       final QNm tn = eQName(QNAMEINV, ctx.sc.nsElem);
-      type = AtomType.find(tn, true);
+      type = ListType.find(tn);
+      if(type == null) type = AtomType.find(tn, true);
       if(type == null) error(TYPEUNDEF, tn);
       // parse optional question mark
       wsConsume(PLHOLDER);
@@ -2992,7 +2996,8 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(COMMA)) {
       // parse type name
       final QNm tn = eQName(QNAMEINV, ctx.sc.nsElem);
-      type = AtomType.find(tn, true);
+      type = ListType.find(tn);
+      if(type == null) type = AtomType.find(tn, true);
       if(type == null) error(TYPEUNDEF, tn);
     }
     return new ExtTest(NodeType.ATT, name, type, ctx.sc.strip);

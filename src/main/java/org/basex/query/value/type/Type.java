@@ -1,6 +1,7 @@
 package org.basex.query.value.type;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -136,7 +137,7 @@ public interface Type {
    * @return new item
    * @throws QueryException query exception
    */
-  Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
+  Value cast(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException;
 
   /**
@@ -146,7 +147,7 @@ public interface Type {
    * @return new item
    * @throws QueryException query exception
    */
-  Item cast(final Object o, final InputInfo ii) throws QueryException;
+  Value cast(final Object o, final InputInfo ii) throws QueryException;
 
   /**
    * Casts the specified string to the XQuery data type.
@@ -155,7 +156,7 @@ public interface Type {
    * @return new item
    * @throws QueryException query exception
    */
-  Item castString(final String s, final InputInfo ii) throws QueryException;
+  Value castString(final String s, final InputInfo ii) throws QueryException;
 
   /**
    * Returns the sequence type of this data type.

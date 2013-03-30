@@ -132,7 +132,8 @@ public final class Functions extends TokenSet {
     // parse data type constructors
     if(eq(name.uri(), XSURI)) {
       final byte[] ln = name.local();
-      final AtomType type = AtomType.find(name, false);
+      Type type = ListType.find(name);
+      if(type == null) type = AtomType.find(name, false);
       if(type == null) {
         final Levenshtein ls = new Levenshtein();
         for(final AtomType t : AtomType.values()) {
