@@ -376,22 +376,23 @@ public final class QT3TS {
    */
   private boolean supported(final XdmValue node) {
     /* feature: schemaImport schemaValidation staticTyping
-         schemaValidation schemaImport collection-stability
-         directory-as-collection-uri staticTyping xpath-1.0-compatibility
-         namespace-axis schema-location-hint
+         collection-stability directory-as-collection-uri
+         xpath-1.0-compatibility namespace-axis schema-location-hint
        spec: XQ10+ XP30+ XQ30+ XT30+
        xsd-version: 1.1
        language, limits, calendar, format-integer-sequence, default-language
      */
 
-    // skip schema import, schema validation, and XML 1.1
     final XQuery q = new XQuery(
-        "*:environment/*:collation | *:dependency[" +
-        "@type='feature' and" +
-        " @value=('schemaImport','schemaValidation','namespace-axis') or " +
-        "@type='xml-version' and @value='1.1' or" +
-        "@type='xsd-version' and @value='1.1' or" +
-        "@type='spec' and contains(@value, 'XT30')]", ctx).context(node);
+      "*:environment/*:collation |" + // skip collation tests
+      "*:dependency[" +
+      // skip schema imports, schema validation, namespace axis, static typing
+      "@type='feature' and" +
+      " @value=('schemaImport','schemaValidation','namespace-axis','staticTyping') or " +
+      // skip xml/xsd 1.1 tests
+      "@type=('xml-version','xsd-version') and @value='1.1' or" +
+      // skip XSLT tests
+      "@type='spec' and contains(@value, 'XT30')]", ctx).context(node);
 
     try {
       return q.next() == null;
