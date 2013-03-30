@@ -2368,6 +2368,7 @@ public class QueryParser extends InputParser {
 
     // parse attributes...
     boolean xmlDecl = false; // xml prefix explicitly declared?
+    ArrayList<QNm> atts = null;
     while(true) {
       final byte[] atn = qName(null);
       if(atn.length == 0) break;
@@ -2446,6 +2447,8 @@ public class QueryParser extends InputParser {
         }
       } else {
         final QNm attn = new QNm(atn);
+        if(atts == null) atts = new ArrayList<QNm>(1);
+        atts.add(attn);
         names.add(new QNmCheck(attn, false));
         add(cont, new CAttr(info(), false, attn, attv.finish()));
       }
@@ -2470,6 +2473,17 @@ public class QueryParser extends InputParser {
     }
 
     assignURI(npos);
+
+    // check for duplicate attribute names
+    if(atts != null) {
+      final int as = atts.size();
+      for(int a = 0; a < as - 1; a++) {
+        for(int b = a + 1; b < as; b++) {
+          if(atts.get(a).eq(atts.get(b))) ATTDUPL.thrw(info(), atts.get(a));
+        }
+      }
+    }
+
     ctx.sc.ns.size(s);
     ctx.sc.nsElem = nse;
     return new CElem(info(), tag, ns, cont.finish());

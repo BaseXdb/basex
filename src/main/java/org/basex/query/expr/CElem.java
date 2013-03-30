@@ -86,7 +86,7 @@ public final class CElem extends CName {
       final Constr constr = new Constr(ii, ctx).add(expr);
       if(constr.errAtt) NOATTALL.thrw(info);
       if(constr.errNS) NONSALL.thrw(info);
-      if(constr.duplAtt != null) (comp ? CATTDUPL : ATTDUPL).thrw(info, constr.duplAtt);
+      if(constr.duplAtt != null) CATTDUPL.thrw(info, constr.duplAtt);
       if(constr.duplNS != null) DUPLNSCONS.thrw(info, constr.duplNS);
 
       // create node
