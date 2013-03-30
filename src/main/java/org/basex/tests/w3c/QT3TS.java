@@ -221,7 +221,7 @@ public final class QT3TS {
 
     // use XQuery 1.0 if XQ10 or XP20 is specified
     final XQuery q = new XQuery("*:dependency[@type='spec']" +
-        "[matches(@value,'(XQ10|XP20)([^+]|$)')]", ctx);
+        "[matches(@value,'(XQ10)([^+]|$)')]", ctx);
     if(q.context(test).next() != null) ctx.prop.set(Prop.XQUERY3, false);
     q.close();
 
@@ -391,8 +391,8 @@ public final class QT3TS {
       " @value=('schemaImport','schemaValidation','namespace-axis','staticTyping') or " +
       // skip xml/xsd 1.1 tests
       "@type=('xml-version','xsd-version') and @value='1.1' or" +
-      // skip XSLT tests
-      "@type='spec' and contains(@value, 'XT30')]", ctx).context(node);
+      // skip non-XQuery tests
+      "@type='spec' and not(contains(@value, 'XQ'))]", ctx).context(node);
 
     try {
       return q.next() == null;
