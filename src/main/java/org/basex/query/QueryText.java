@@ -775,4 +775,11 @@ public interface QueryText {
   String OPTBIND = "binding static variable %";
   /** Optimization info. */
   String OPTCHILD = "converting % to child steps";
+
+  /** Warning. */
+  String WARNSELF = "Warning: '%' will never yield results.";
+  /** Warning. */
+  String WARNDESC = "Warning: '%' cannot have descendants.";
+  /** Warning. */
+  String WARNDOC = "Warning: '%' cannot have % nodes.";
 }

@@ -1,7 +1,6 @@
 package org.basex.query.path;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
@@ -76,6 +75,7 @@ public abstract class AxisPath extends Path {
   @Override
   protected final Expr compilePath(final QueryContext ctx, final VarScope scp)
       throws QueryException {
+
     // merge two axis paths
     if(root instanceof AxisPath) {
       Expr[] st = ((AxisPath) root).steps;
@@ -86,9 +86,7 @@ public abstract class AxisPath extends Path {
       ctx.compInfo(OPTMERGE);
       ctx.value = root(ctx);
     }
-
-    final Step s = voidStep(steps);
-    if(s != null) COMPSELF.thrw(info, s);
+    voidStep(steps, ctx);
 
     for(int i = 0; i != steps.length; ++i) {
       final Expr e = steps[i].compile(ctx, scp);

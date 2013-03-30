@@ -489,7 +489,7 @@ public abstract class Data {
   }
 
   /**
-   * Updates (replaces) the value of a single text, comment, pi or
+   * Updates (replaces) the value of a single document, text, comment, pi or
    * attribute node.
    * @param pre pre value to be replaced
    * @param kind node kind

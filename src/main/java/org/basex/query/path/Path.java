@@ -2,7 +2,6 @@ package org.basex.query.path;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.path.Axis.*;
-import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
@@ -227,10 +226,9 @@ public abstract class Path extends ParseExpr {
   /**
    * Checks if the location path contains steps that will never yield results.
    * @param stps step array
-   * @return empty step, or {@code null}
-   * @throws QueryException query exception
+   * @param ctx query context
    */
-  Step voidStep(final Expr[] stps) throws QueryException {
+  void voidStep(final Expr[] stps, final QueryContext ctx) {
     for(int l = 0; l < stps.length; ++l) {
       final Step s = axisStep(l);
       if(s == null) continue;
@@ -238,46 +236,56 @@ public abstract class Path extends ParseExpr {
       if(l == 0) {
         if(root instanceof CAttr) {
           // @.../child:: / @.../descendant::
-          if(sa == CHILD || sa == DESC) ATTDESC.thrw(info, root);
+          if(sa == CHILD || sa == DESC) {
+            ctx.compInfo(WARNDESC, root);
+            return;
+          }
         } else if(root instanceof Root || root instanceof Value &&
             ((Value) root).type == NodeType.DOC || root instanceof CDoc) {
           if(sa != CHILD && sa != DESC && sa != DESCORSELF &&
-            (sa != SELF && sa != ANCORSELF ||
-            s.test != Test.NOD && s.test != Test.DOC)) DOCAXES.thrw(info, root, sa);
+            (sa != SELF && sa != ANCORSELF || s.test != Test.NOD && s.test != Test.DOC)) {
+            ctx.compInfo(WARNDOC, root, sa);
+            return;
+          }
         }
       } else {
+        boolean warning = true;
         final Step ls = axisStep(l - 1);
         if(ls == null) continue;
         final Axis lsa = ls.axis;
         if(sa == SELF || sa == DESCORSELF) {
           // .../self:: / .../descendant-or-self::
           if(s.test == Test.NOD) continue;
-          // @.../...
-          if(lsa == ATTR && s.test.type != NodeType.ATT) return s;
-          // text()/...
-          if(ls.test == Test.TXT && s.test != Test.TXT) return s;
-          if(sa == DESCORSELF) continue;
-          // .../self::
-          final QNm n0 = ls.test.name;
-          final QNm n1 = s.test.name;
-          if(n0 == null || n1 == null || n0.local().length == 0 ||
-              n1.local().length == 0) continue;
-          // ...X/...Y
-          if(!n1.eq(n0)) return s;
+          // @.../..., text()/...
+          warning = lsa == ATTR && s.test.type != NodeType.ATT ||
+                    ls.test == Test.TXT && s.test != Test.TXT;
+          if(!warning) {
+            if(sa == DESCORSELF) continue;
+            // .../self::
+            final QNm n0 = ls.test.name;
+            final QNm n1 = s.test.name;
+            if(n0 == null || n1 == null || n0.local().length == 0 ||
+                n1.local().length == 0) continue;
+            // ...X/...Y
+            warning = !n1.eq(n0);
+          }
         } else if(sa == FOLLSIBL || sa == PRECSIBL) {
           // .../following-sibling:: / .../preceding-sibling::
-          if(lsa == ATTR) return s;
+          warning = lsa == ATTR;
         } else if(sa == DESC || sa == CHILD || sa == ATTR) {
           // .../descendant:: / .../child:: / .../attribute::
-          if(lsa == ATTR || ls.test == Test.TXT || ls.test == Test.COM ||
-              ls.test == Test.PI) return s;
+          warning = lsa == ATTR || ls.test == Test.TXT || ls.test == Test.COM ||
+              ls.test == Test.PI;
         } else if(sa == PARENT || sa == ANC) {
           // .../parent:: / .../ancestor::
-          if(ls.test == Test.DOC) return s;
+          warning = ls.test == Test.DOC;
+        }
+        if(warning) {
+          ctx.compInfo(WARNSELF, ls);
+          return;
         }
       }
     }
-    return null;
   }
 
   /**

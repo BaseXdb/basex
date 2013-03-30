@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.build.*;
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
@@ -292,18 +293,15 @@ public final class FNGen extends StandardFunc {
     if(item == null) return null;
 
     final byte[] cont = checkEStr(expr[0], ctx);
-    Uri base = ctx.sc.baseURI();
-    if(expr.length == 2) {
-      base = Uri.uri(checkEStr(expr[1], ctx));
-      if(!base.isValid()) BASEINV.thrw(info, base);
-    }
-
-    final IO io = new IOContent(cont, string(base.string()));
+    final IO io = new IOContent(cont, string(ctx.sc.baseURI().string()));
     final Prop prop = ctx.context.prop;
     final boolean chop = prop.is(Prop.CHOP);
     try {
       prop.set(Prop.CHOP, false);
-      return new DBNode(new XMLParser(io, ctx.context.prop, frag));
+
+      final Parser p = frag || prop.is(Prop.INTPARSE) ?
+        new XMLParser(io, ctx.context.prop, frag) : new SAXWrapper(io, ctx.context.prop);
+      return new DBNode(p);
     } catch(final IOException ex) {
       throw SAXERR.thrw(info, ex);
     } finally {

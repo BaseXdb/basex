@@ -187,7 +187,7 @@ public enum Function {
   UNPARSED_TEXT_AVAILABLE(FNGen.class, "unparsed-text-available(uri[,encoding])",
       BLN, 1, STR_ZO, STR),
   /** XQuery function. */
-  PARSE_XML(FNGen.class, "parse-xml(string[,base])", DOC_O, 1, STR_ZO, STR),
+  PARSE_XML(FNGen.class, "parse-xml(string)", DOC_O, STR_ZO),
   /** XQuery function. */
   PARSE_XML_FRAGMENT(FNGen.class, "parse-xml-fragment(string)", DOC_ZO, STR_ZO),
   /** XQuery function. */

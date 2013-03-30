@@ -740,13 +740,6 @@ public enum Err {
   /** XPST0003. */
   SIMPLETYPE(XPST, 3, "Simple type expected, '%(' found."),
 
-  /** XPST0005. */
-  COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
-  /** XPST0005. */
-  ATTDESC(XPST, 5, "Warning: '%' cannot have descendants."),
-  /** XPST0005. */
-  DOCAXES(XPST, 5, "Warning: '%' cannot have % nodes."),
-
   /** XPST0008. */
   VARUNDEF(XPST, 8, "Undefined variable %."),
   /** XPST0008. */
