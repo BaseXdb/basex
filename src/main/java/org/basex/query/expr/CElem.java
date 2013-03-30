@@ -64,6 +64,7 @@ public final class CElem extends CName {
       if(eq(cp, XML) ^ eq(cu, XMLURI)) CEXML.thrw(info, cu, cp);
       if(eq(cu, XMLNSURI)) CEINV.thrw(info, cu);
       if(eq(cp, XMLNS)) CEINV.thrw(info, cp);
+      if(!nm.hasURI() && nm.hasPrefix()) INVPREF.thrw(info, nm);
 
       // analyze element namespace unless it is "xml"
       if(!eq(cp, XML)) {

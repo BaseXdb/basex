@@ -87,10 +87,7 @@ public abstract class CName extends CFrag {
       (ip.isStringOrUntyped() ? INVNAME : INVQNAME).thrw(info, str);
     }
     // create and update namespace
-    final QNm nm = new QNm(str, ctx);
-    if(!nm.hasURI() && nm.hasPrefix()) INVPREF.thrw(info, nm);
-    return nm;
-
+    return new QNm(str, ctx);
   }
 
   @Override
