@@ -61,34 +61,29 @@ public final class List extends Arr {
     if(size >= 0) {
       if(size == 0 && !uses(Use.NDT) && !uses(Use.UPD)) return optPre(null, ctx);
       if(allAreValues() && size <= MAX_MAT_SIZE) {
-        // cannot be empty because values don't have effects
-        final int s = (int) size;
         Type all = null;
         final Value[] vs = new Value[expr.length];
-        int n = 0;
+        int c = 0;
         for(final Expr e : expr) {
           final Value v = e.value(ctx);
-          if(v.size() > 0) {
-            vs[n++] = v;
-            if(n == 0) all = v.type;
-            else if(v.type != all || !v.homogeneous()) all = null;
-          }
+          if(c == 0) all = v.type;
+          else if(all != v.type) all = null;
+          vs[c++] = v;
         }
 
         Value val = null;
-        if(all != null) {
-          if(all == AtomType.STR)               val = StrSeq.get(vs, n);
-          else if(all == AtomType.BLN)          val = BlnSeq.get(vs, n);
-          else if(all == AtomType.FLT)          val = FltSeq.get(vs, n);
-          else if(all == AtomType.DBL)          val = DblSeq.get(vs, n);
-          else if(all == AtomType.DEC)          val = DecSeq.get(vs, n);
-          else if(all == AtomType.BYT)          val = BytSeq.get(vs, n);
-          else if(all.instanceOf(AtomType.ITR)) val = IntSeq.get(vs, n, all);
-        }
-
-        if(val == null) {
+        int s = (int) size;
+        if(all == AtomType.STR)      val = StrSeq.get(vs, s);
+        else if(all == AtomType.BLN) val = BlnSeq.get(vs, s);
+        else if(all == AtomType.FLT) val = FltSeq.get(vs, s);
+        else if(all == AtomType.DBL) val = DblSeq.get(vs, s);
+        else if(all == AtomType.DEC) val = DecSeq.get(vs, s);
+        else if(all == AtomType.BYT) val = BytSeq.get(vs, s);
+        else if(all != null && all.instanceOf(AtomType.ITR)) {
+          val = IntSeq.get(vs, s, all);
+        } else {
           final ValueBuilder vb = new ValueBuilder(s);
-          for(int i = 0; i < n; i++) vb.add(vs[i]);
+          for(int i = 0; i < c; i++) vb.add(vs[i]);
           val = vb.value();
         }
         return optPre(val, ctx);
