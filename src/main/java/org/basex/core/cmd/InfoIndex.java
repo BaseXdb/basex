@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
@@ -57,7 +58,7 @@ public final class InfoIndex extends AInfo {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add("");
+    lr.read.add(DBLocking.CTX);
   }
 
   /**

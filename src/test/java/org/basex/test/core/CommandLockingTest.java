@@ -18,6 +18,8 @@ import org.junit.*;
  * @author Jens Erat
  */
 public class CommandLockingTest extends SandboxTest {
+  /** Static dummy context so we do not have to create a new one every time. */
+  private static final Context DUMMY_CONTEXT = new Context();
   /** Test file name. */
   private static final String FN = "hello.xq";
   /** Test folder. */
@@ -26,8 +28,6 @@ public class CommandLockingTest extends SandboxTest {
   private static final String FILE = FLDR + '/' + FN;
   /** Test name. */
   private static final String NAME2 = NAME + '2';
-  /** Context (empty string). */
-  private static final String CTX = ""; // [JE] Replace empty string
   /** Test repository. **/
   private static final String REPO = "src/test/resources/repo/";
   /** Empty StringList. */
@@ -35,9 +35,9 @@ public class CommandLockingTest extends SandboxTest {
   /** StringList containing name. */
   private static final StringList NAME_LIST = new StringList(NAME);
   /** StringList containing context. */
-  private static final StringList CTX_LIST = new StringList(CTX);
+  private static final StringList CTX_LIST = new StringList(DBLocking.CTX);
   /** StringList containing name and context. */
-  private static final StringList NAME_CTX = new StringList(NAME, CTX);
+  private static final StringList NAME_CTX = new StringList(NAME, DBLocking.CTX);
   /** StringList containing ADMIN lock string. */
   private static final StringList ADMIN_LIST = new StringList(DBLocking.ADMIN);
   /** StringList containing ADMIN lock string and name. */
@@ -106,13 +106,14 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new ShowBackups(), false, BACKUP_LIST);
     ckDBs(new ShowEvents(), false, EVENT_LIST);
     ckDBs(new ShowSessions(), false, NONE);
-    ckDBs(new ShowUsers(), false, null);
+    ckDBs(new ShowUsers(), false, ADMIN_LIST);
     ckDBs(new ShowUsers(NAME), false, ADMIN_NAME);
     ckDBs(new Store(FILE), true, CTX_LIST);
   }
 
   /** Tests locked databases in XQuery queries. */
-  @Test public void xquery() {
+  @Test
+  public void xquery() {
     ckDBs(new XQuery("declare function local:a($a) {" +
         "if($a = 0) then $a else local:a($a idiv 2) };" +
         "local:a(5)"), false, NONE);
@@ -128,7 +129,6 @@ public class CommandLockingTest extends SandboxTest {
    * Test if the right databases are identified for locking. Required databases are exact,
    * no additional ones allowed.
    *
-   * [JE] Replace empty string
    * Pass empty string for currently opened database, {@code null} for all.
    *
    * @param cmd Command to test
@@ -143,7 +143,6 @@ public class CommandLockingTest extends SandboxTest {
    * Test if the right databases are identified for locking. Required databases are exact,
    * no additional ones allowed.
    *
-   * [JE] Replace empty string
    * Pass empty string for currently opened database, {@code null} for all.
    *
    * @param cmd Command to test
@@ -157,7 +156,6 @@ public class CommandLockingTest extends SandboxTest {
   /**
    * Test if the right databases are identified for locking.
    *
-   * [JE] Replace empty string
    * Pass empty string for currently opened database, {@code null} for all.
    *
    * @param cmd Command to test
@@ -173,7 +171,6 @@ public class CommandLockingTest extends SandboxTest {
   /**
    * Test if the right databases are identified for locking.
    *
-   * [JE] Replace empty string
    * Pass empty string for currently opened database, {@code null} for all.
    *
    * @param cmd Command to test
@@ -186,6 +183,8 @@ public class CommandLockingTest extends SandboxTest {
       final StringList reqWt, final StringList allowWt) {
     // Fetch databases BaseX thinks it needs to lock
     final LockResult lr = new LockResult();
+    // [CG] cmd.updating needed because of some side-effects (instantiate QueryProcessor?)
+    cmd.updating(DUMMY_CONTEXT);
     cmd.databases(lr);
     // Need sorted lists for compareAll
     for (StringList list : new StringList[]

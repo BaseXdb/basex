@@ -68,7 +68,7 @@ public final class InfoStorage extends AQuery {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add("");
+    lr.read.add(DBLocking.CTX);
   }
 
   /**

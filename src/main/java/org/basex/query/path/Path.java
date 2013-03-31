@@ -5,6 +5,7 @@ import static org.basex.query.path.Axis.*;
 
 import java.util.*;
 
+import org.basex.core.DBLocking;
 import org.basex.data.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
@@ -458,7 +459,7 @@ public abstract class Path extends ParseExpr {
     for(final Expr s : steps) if(!s.databases(db)) return false;
     if(root != null) return root.databases(db);
     // [JE] XQuery: should only be added if placed outside a predicate
-    db.add("");
+    db.add(DBLocking.CTX);
     return true;
   }
 

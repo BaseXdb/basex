@@ -30,7 +30,7 @@ public final class Inspect extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add("");
+    lr.read.add(DBLocking.CTX);
   }
 
   /**

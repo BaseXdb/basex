@@ -79,8 +79,8 @@ public final class Check extends Command {
   }
 
   @Override
-public void databases(final LockResult lr) {
-    lr.read.add("").add(new QueryInput(args[0]).input.dbname());
+  public void databases(final LockResult lr) {
+    lr.read.add(DBLocking.CTX).add(new QueryInput(args[0]).input.dbname());
   }
 
   @Override

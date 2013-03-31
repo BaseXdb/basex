@@ -44,7 +44,7 @@ public final class Open extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add("").add(args[0]);
+    lr.read.add(DBLocking.CTX).add(args[0]);
   }
 
   @Override

@@ -248,7 +248,7 @@ public final class Context {
   public void prepareLock(final StringList sl) {
     // replace empty string with currently opened database and return array
     for(int d = 0; d < sl.size(); d++) {
-      if(sl.get(d).isEmpty())
+      if(sl.get(d).equals(DBLocking.CTX))
         if(null == data) sl.deleteAt(d);
         else sl.set(d, data.meta.name);
     }

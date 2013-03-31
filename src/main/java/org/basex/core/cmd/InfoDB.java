@@ -34,7 +34,7 @@ public final class InfoDB extends AInfo {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add("");
+    lr.read.add(DBLocking.CTX);
   }
 
   /**
