@@ -126,15 +126,17 @@ public final class FNNode extends StandardFunc {
         for(ANode fs; (fs = ai.next()) != null;) {
           if(fs.type == n.type && fs.qname().eq(qnm)) i++;
         }
-        tb.add(n.type.string()).add("(\"").add(qnm.local());
-        tb.add("\")[").add(Integer.toString(i)).add(']');
+        tb.add(n.type.string()).add('(').add(qnm.local());
+        tb.add(")[").add(Integer.toString(i)).add(']');
       }
       tl.add(tb.finish());
       n = n.parent();
     }
-    if(n.type != NodeType.DOC) IDDOC.thrw(info);
 
     final TokenBuilder tb = new TokenBuilder();
+    // add root function
+    if(n.type != NodeType.DOC) tb.add("Q{").add(QueryText.FNURI).add("}root()");
+    // add all steps in reverse order
     for(int i = tl.size() - 1; i >= 0; --i) tb.add('/').add(tl.get(i));
     return Str.get(tb.isEmpty() ? Token.SLASH : tb.finish());
   }

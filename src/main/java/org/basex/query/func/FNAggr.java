@@ -142,7 +142,7 @@ public final class FNAggr extends StandardFunc {
     for(Item it; (it = iter.next()) != null;) {
       final Type t = numType(rs, it);
       if(cmp.eval(info, rs, it) || Double.isNaN(it.dbl(info))) rs = it;
-      if(rs.type != t) rs = t.cast(rs, ctx, info);
+      if(rs.type != t) rs = (Item) t.cast(rs, ctx, info);
     }
     return rs;
   }

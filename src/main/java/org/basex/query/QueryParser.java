@@ -2368,6 +2368,7 @@ public class QueryParser extends InputParser {
 
     // parse attributes...
     boolean xmlDecl = false; // xml prefix explicitly declared?
+    ArrayList<QNm> atts = null;
     while(true) {
       final byte[] atn = qName(null);
       if(atn.length == 0) break;
@@ -2446,6 +2447,8 @@ public class QueryParser extends InputParser {
         }
       } else {
         final QNm attn = new QNm(atn);
+        if(atts == null) atts = new ArrayList<QNm>(1);
+        atts.add(attn);
         names.add(new QNmCheck(attn, false));
         add(cont, new CAttr(info(), false, attn, attv.finish()));
       }
@@ -2470,6 +2473,17 @@ public class QueryParser extends InputParser {
     }
 
     assignURI(npos);
+
+    // check for duplicate attribute names
+    if(atts != null) {
+      final int as = atts.size();
+      for(int a = 0; a < as - 1; a++) {
+        for(int b = a + 1; b < as; b++) {
+          if(atts.get(a).eq(atts.get(b))) ATTDUPL.thrw(info(), atts.get(a));
+        }
+      }
+    }
+
     ctx.sc.ns.size(s);
     ctx.sc.nsElem = nse;
     return new CElem(info(), tag, ns, cont.finish());
@@ -2769,9 +2783,24 @@ public class QueryParser extends InputParser {
   private SeqType simpleType() throws QueryException {
     skipWS();
     final QNm name = eQName(TYPEINVALID, ctx.sc.nsElem);
-    final Type t = AtomType.find(name, false);
-    if(t == null) error(TYPEUNKNOWN, name);
-    if(t == AtomType.AAT || t == AtomType.NOT) error(CASTUNKNOWN, name);
+    Type t = ListType.find(name);
+    if(t == null) {
+      t = AtomType.find(name, false);
+      if(t == null) {
+        if(wsConsume(PAR1)) error(SIMPLETYPE, name);
+        if(ctx.sc.xquery3) {
+          if(AtomType.AST.name.eq(name)) {
+            t = AtomType.AST;
+          } else {
+            error(XQTYPEUNKNOWN, name);
+          }
+        } else {
+          error(TYPEUNKNOWN, name);
+        }
+      }
+      if(t == AtomType.AST || t == AtomType.AAT || t == AtomType.NOT)
+        error(CASTUNKNOWN, name);
+    }
     skipWS();
     return SeqType.get(t, consume('?') ? Occ.ZERO_ONE : Occ.ONE);
   }
@@ -2949,7 +2978,8 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(COMMA)) {
       // parse type name
       final QNm tn = eQName(QNAMEINV, ctx.sc.nsElem);
-      type = AtomType.find(tn, true);
+      type = ListType.find(tn);
+      if(type == null) type = AtomType.find(tn, true);
       if(type == null) error(TYPEUNDEF, tn);
       // parse optional question mark
       wsConsume(PLHOLDER);
@@ -2980,7 +3010,8 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(COMMA)) {
       // parse type name
       final QNm tn = eQName(QNAMEINV, ctx.sc.nsElem);
-      type = AtomType.find(tn, true);
+      type = ListType.find(tn);
+      if(type == null) type = AtomType.find(tn, true);
       if(type == null) error(TYPEUNDEF, tn);
     }
     return new ExtTest(NodeType.ATT, name, type, ctx.sc.strip);

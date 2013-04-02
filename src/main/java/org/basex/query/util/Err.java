@@ -85,7 +85,7 @@ public enum Err {
   /** BXDB0011. */
   BXDB_NAME(BXDB, 11, "Invalid database name: '%'."),
   /** BXDB0012. */
-  BXDB_CREATE(BXDB, 12, "Database '%' can only be create once."),
+  BXDB_CREATE(BXDB, 12, "Database '%' can only be created once."),
   /** BXDB0013. */
   BXDB_CREATEARGS(BXDB, 12, "Number of specified inputs and paths differs: % vs. %."),
 
@@ -737,13 +737,8 @@ public enum Err {
   UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
   /** XPST0003. */
   NSNOTALL(XPST, 3, "Namespace test is not supported in XQuery 1.0."),
-
-  /** XPST0005. */
-  COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
-  /** XPST0005. */
-  ATTDESC(XPST, 5, "Warning: '%' cannot have descendants."),
-  /** XPST0005. */
-  DOCAXES(XPST, 5, "Warning: '%' cannot have % nodes."),
+  /** XPST0003. */
+  SIMPLETYPE(XPST, 3, "Simple type expected, '%(' found."),
 
   /** XPST0008. */
   VARUNDEF(XPST, 8, "Undefined variable %."),
@@ -894,6 +889,8 @@ public enum Err {
   MODNS(XQST, 48, "Declaration % does not match the module namespace."),
   /** XQST0049. */
   VARDEFINE(XQST, 49, "Duplicate declaration of %."),
+  /** XQST0052. */
+  XQTYPEUNKNOWN(XQST, 52, "Unknown type '%'."),
   /** XQST0054. */
   CIRCVAR(XQST, 54, "Global variable depends on itself: %"),
   /** XQST0055. */

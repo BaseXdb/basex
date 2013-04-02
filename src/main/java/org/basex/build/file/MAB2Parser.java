@@ -100,7 +100,7 @@ public final class MAB2Parser extends SingleParser {
       throw new BuildException("Invalid MAB2 input (doesn't start with ###)");
     }
 
-    builder.startElem(LIBRARY, atts.reset());
+    builder.openElem(LIBRARY, atts.reset(), nsp);
 
     // find file offsets of all titles
     final Performance p = new Performance();
@@ -143,10 +143,10 @@ public final class MAB2Parser extends SingleParser {
       for(int j = 0; j < entry.size; ++j) {
         addEntry(input, entry.children[j], 0, l);
       }
-      if(entry.size != 0 && pos != 0 && !flat) builder.endElem();
+      if(entry.size != 0 && pos != 0 && !flat) builder.closeElem();
     }
     if(Prop.debug) Util.err("\nCreate Titles: %/%\n", p, Performance.getMemory());
-    builder.endElem();
+    builder.closeElem();
 
     // write the mediovis ids back to disk
     final PrintOutput out = new PrintOutput("mvids.dat");
@@ -361,7 +361,7 @@ public final class MAB2Parser extends SingleParser {
         }
 
         // add line below to omit root nodes
-        builder.startElem(MEDIUM, atts);
+        builder.openElem(MEDIUM, atts, nsp);
         add(TYPE, type);
         add(LANGUAGE, language);
         for(int s = 0; s < nrAuth; ++s) add(AUTHOR, auth[s]);
@@ -387,7 +387,7 @@ public final class MAB2Parser extends SingleParser {
         add(GENRE, genres.get(mvID));
         add(STATUS, status.get(bibID));
         add(LENDINGS, lendings.get(bibID));
-        if(sb == 0 || flat) builder.endElem();
+        if(sb == 0 || flat) builder.closeElem();
         return title;
       }
     }
@@ -401,9 +401,9 @@ public final class MAB2Parser extends SingleParser {
    */
   private void add(final byte[] tag, final byte[] cont) throws IOException {
     if(cont == null) return;
-    builder.startElem(tag, atts.reset());
+    builder.openElem(tag, atts.reset(), nsp);
     builder.text(utf8(cont, ENCODING));
-    builder.endElem();
+    builder.closeElem();
   }
 
   /**

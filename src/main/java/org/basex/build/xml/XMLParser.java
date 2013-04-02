@@ -111,13 +111,14 @@ public class XMLParser extends SingleParser {
       final byte[] open = tags.pop();
       if(!eq(open, tag)) throw new BuildException(CLOSINGELEM, det(), tag, open);
 
-      builder.endElem();
+      builder.closeElem();
       if(tags.isEmpty()) closed = true;
       return consume(Type.R_BR);
     }
 
     consume(Type.L_BR);
     atts.reset();
+    nsp.reset();
 
     // get element name
     byte[] en = consumeToken(Type.ELEMNAME);
@@ -140,10 +141,10 @@ public class XMLParser extends SingleParser {
 
       if(startsWith(an, XMLNSC)) {
         // open namespace...
-        if(!stripNS) builder.startNS(local(an), av);
+        if(!stripNS) nsp.add(local(an), av);
       } else if(eq(an, XMLNS)) {
         // open namespace...
-        if(!stripNS) builder.startNS(EMPTY, av);
+        if(!stripNS) nsp.add(EMPTY, av);
       } else {
         // add attribute
         atts.add(stripNS ? local(an) : an, av);
@@ -156,13 +157,13 @@ public class XMLParser extends SingleParser {
 
     // send empty element to builder
     if(scanner.type == Type.CLOSE_R_BR) {
-      builder.emptyElem(en, atts);
+      builder.emptyElem(en, atts, nsp);
       if(tags.isEmpty()) closed = true;
       return scanner.more();
     }
 
     // send start element
-    builder.startElem(en, atts);
+    builder.openElem(en, atts, nsp);
     tags.add(en);
     return consume(Type.R_BR);
   }

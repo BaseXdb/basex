@@ -113,7 +113,7 @@ public final class CSVParser extends SingleParser {
 
   @Override
   public void parse() throws IOException {
-    builder.startElem(CSV, atts);
+    builder.openElem(CSV, atts, nsp);
 
     final TokenBuilder tb = new TokenBuilder();
     final NewlineInput nli = new NewlineInput(src).encoding(encoding);
@@ -151,7 +151,7 @@ public final class CSVParser extends SingleParser {
     nli.close();
 
     finish(tb, open);
-    builder.endElem();
+    builder.closeElem();
   }
 
   /**
@@ -160,9 +160,9 @@ public final class CSVParser extends SingleParser {
    */
   private void open() throws IOException {
     if(row == 0) {
-      if(simple) builder.startElem(HEADER, atts);
+      if(simple) builder.openElem(HEADER, atts, nsp);
     } else {
-      builder.startElem(RECORD, atts);
+      builder.openElem(RECORD, atts, nsp);
     }
   }
 
@@ -180,7 +180,7 @@ public final class CSVParser extends SingleParser {
     }
     add(tb);
     if(close) {
-      if(simple || row != 0) builder.endElem();
+      if(simple || row != 0) builder.closeElem();
       ++row;
     }
     col = 0;
@@ -207,9 +207,9 @@ public final class CSVParser extends SingleParser {
     }
 
     if(!tb.isEmpty() || simple) {
-      builder.startElem(t, atts);
+      builder.openElem(t, atts, nsp);
       builder.text(tb.finish());
-      builder.endElem();
+      builder.closeElem();
       tb.reset();
     }
     ++col;

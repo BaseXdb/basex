@@ -649,8 +649,8 @@ public enum AtomType implements Type {
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
 
-      // argument must be of type string and a valid QName
-      if(it.type != STR) invCast(it, ii);
+      // xquery 3.0 also allows untyped arguments
+      if(it.type != STR && !(ctx.sc.xquery3() && it.type.isUntyped())) invCast(it, ii);
       final byte[] nm = trim(it.string(ii));
       if(nm.length == 0 || !XMLToken.isQName(nm)) FUNCAST.thrw(ii, this, it);
       final QNm qn = new QNm(nm, ctx);
@@ -913,7 +913,8 @@ public enum AtomType implements Type {
    */
   public static AtomType find(final QNm type, final boolean all) {
     for(final AtomType t : values()) {
-      if(t.name.eq(type) && (all || t.par != null)) return t;
+      if(!t.name.eq(type)) continue;
+      if(all || t.par != null) return t;
     }
     return null;
   }

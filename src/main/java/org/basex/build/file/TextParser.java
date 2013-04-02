@@ -59,16 +59,16 @@ public final class TextParser extends SingleParser {
 
   @Override
   public void parse() throws IOException {
-    builder.startElem(TEXT, atts);
+    builder.openElem(TEXT, atts, nsp);
 
     final TokenBuilder tb = new TokenBuilder();
     final NewlineInput nli = new NewlineInput(src).encoding(encoding);
     try {
       for(int ch; (ch = nli.read()) != -1;) {
         if(ch == '\n' && lines) {
-          builder.startElem(LINE, atts);
+          builder.openElem(LINE, atts, nsp);
           builder.text(tb.finish());
-          builder.endElem();
+          builder.closeElem();
           tb.reset();
         } else {
           tb.add(XMLToken.valid(ch) ? ch : '?');
@@ -78,6 +78,6 @@ public final class TextParser extends SingleParser {
       nli.close();
     }
     if(!lines) builder.text(tb.finish());
-    builder.endElem();
+    builder.closeElem();
   }
 }

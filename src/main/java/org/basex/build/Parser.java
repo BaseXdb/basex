@@ -26,9 +26,10 @@ import org.basex.util.*;
 public abstract class Parser extends Progress {
   /** Source document, or {@code null}. */
   public IO src;
-  /** Temporary attribute array.
-      To speed up processing, the same instance is used over and over. */
+  /** Attributes. */
   protected final Atts atts = new Atts();
+  /** Namespaces (always empty). */
+  protected final Atts nsp = new Atts();
   /** Database properties. */
   protected final Prop prop;
   /** Target path (empty, or suffixed with a single slash). */

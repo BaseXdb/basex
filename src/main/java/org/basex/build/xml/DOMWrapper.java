@@ -46,7 +46,7 @@ public final class DOMWrapper extends Parser {
 
   @Override
   public void parse(final Builder builder) throws IOException {
-    builder.startDoc(token(filename));
+    builder.openDoc(token(filename));
 
     final Stack<NodeIterator> stack = new Stack<NodeIterator>();
     stack.push(new NodeIterator(root));
@@ -59,6 +59,7 @@ public final class DOMWrapper extends Parser {
           stack.push(new NodeIterator(n));
 
           atts.reset();
+          nsp.reset();
           final NamedNodeMap at = n.getAttributes();
           final int as = at.getLength();
           for(int a = 0; a < as; ++a) {
@@ -66,15 +67,15 @@ public final class DOMWrapper extends Parser {
             final byte[] an = token(att.getName());
             final byte[] av = token(att.getValue());
             if(eq(an, XMLNS)) {
-              if(!stripNS) builder.startNS(EMPTY, av);
+              if(!stripNS) nsp.add(EMPTY, av);
             } else if(startsWith(an, XMLNSC)) {
-              if(!stripNS) builder.startNS(local(an), av);
+              if(!stripNS) nsp.add(local(an), av);
             } else {
               atts.add(stripNS ? local(an) : an, av);
             }
           }
           final byte[] en = token(n.getNodeName());
-          builder.startElem(stripNS ? local(en) : en, atts);
+          builder.openElem(stripNS ? local(en) : en, atts, nsp);
         } else if(n instanceof Text) {
           final String s = n.getNodeValue();
           builder.text(token(chop ? s.trim() : s));
@@ -87,10 +88,10 @@ public final class DOMWrapper extends Parser {
       } else {
         stack.pop();
         if(stack.empty()) break;
-        builder.endElem();
+        builder.closeElem();
       }
     }
-    builder.endDoc();
+    builder.closeDoc();
   }
 
   @Override

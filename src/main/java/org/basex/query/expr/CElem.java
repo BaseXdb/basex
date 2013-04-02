@@ -64,6 +64,7 @@ public final class CElem extends CName {
       if(eq(cp, XML) ^ eq(cu, XMLURI)) CEXML.thrw(info, cu, cp);
       if(eq(cu, XMLNSURI)) CEINV.thrw(info, cu);
       if(eq(cp, XMLNS)) CEINV.thrw(info, cp);
+      if(!nm.hasURI() && nm.hasPrefix()) INVPREF.thrw(info, nm);
 
       // analyze element namespace unless it is "xml"
       if(!eq(cp, XML)) {
@@ -86,7 +87,7 @@ public final class CElem extends CName {
       final Constr constr = new Constr(ii, ctx).add(expr);
       if(constr.errAtt) NOATTALL.thrw(info);
       if(constr.errNS) NONSALL.thrw(info);
-      if(constr.duplAtt != null) (comp ? CATTDUPL : ATTDUPL).thrw(info, constr.duplAtt);
+      if(constr.duplAtt != null) CATTDUPL.thrw(info, constr.duplAtt);
       if(constr.duplNS != null) DUPLNSCONS.thrw(info, constr.duplNS);
 
       // create node

@@ -18,13 +18,13 @@ import org.basex.util.list.*;
  */
 final class NSNode {
   /** Children. */
-  NSNode[] ch;
+  NSNode[] children;
   /** Number of children. */
   int size;
   /** Parent node. */
-  NSNode par;
+  NSNode parent;
   /** References to Prefix/URI pairs. */
-  int[] vals;
+  int[] values;
   /** Pre value. */
   int pre;
 
@@ -33,8 +33,8 @@ final class NSNode {
    * @param p pre value
    */
   NSNode(final int p) {
-    vals = new int[0];
-    ch = new NSNode[0];
+    values = new int[0];
+    children = new NSNode[0];
     pre = p;
   }
 
@@ -45,12 +45,12 @@ final class NSNode {
    * @throws IOException I/O exception
    */
   NSNode(final DataInput in, final NSNode p) throws IOException {
-    par = p;
+    parent = p;
     pre = in.readNum();
-    vals = in.readNums();
+    values = in.readNums();
     size = in.readNum();
-    ch = new NSNode[size];
-    for(int c = 0; c < size; ++c) ch[c] = new NSNode(in, this);
+    children = new NSNode[size];
+    for(int c = 0; c < size; ++c) children[c] = new NSNode(in, this);
   }
 
   /**
@@ -60,9 +60,9 @@ final class NSNode {
    */
   void write(final DataOutput out) throws IOException {
     out.writeNum(pre);
-    out.writeNums(vals);
+    out.writeNums(values);
     out.writeNum(size);
-    for(int c = 0; c < size; ++c) ch[c].write(out);
+    for(int c = 0; c < size; ++c) children[c].write(out);
   }
 
   /**
@@ -72,15 +72,15 @@ final class NSNode {
    */
   NSNode add(final NSNode n) {
     int s = size;
-    if(s == ch.length) {
+    if(s == children.length) {
       final NSNode[] tmp = new NSNode[Math.max(s << 1, 1)];
-      System.arraycopy(ch, 0, tmp, 0, s);
-      ch = tmp;
+      System.arraycopy(children, 0, tmp, 0, s);
+      children = tmp;
     }
-    while(--s >= 0 && n.pre - ch[s].pre <= 0);
-    System.arraycopy(ch, ++s, ch, s + 1, size++ - s);
-    ch[s] = n;
-    n.par = this;
+    while(--s >= 0 && n.pre - children[s].pre <= 0);
+    System.arraycopy(children, ++s, children, s + 1, size++ - s);
+    children[s] = n;
+    n.parent = this;
     return n;
   }
 
@@ -90,10 +90,10 @@ final class NSNode {
    * @param u uri reference
    */
   void add(final int p, final int u) {
-    final int s = vals.length;
-    vals = Arrays.copyOf(vals, s + 2);
-    vals[s] = p;
-    vals[s + 1] = u;
+    final int s = values.length;
+    values = Arrays.copyOf(values, s + 2);
+    values[s] = p;
+    values[s + 1] = u;
   }
 
   /**
@@ -101,15 +101,15 @@ final class NSNode {
    * @param uri namespace URI reference
    */
   void delete(final int uri) {
-    for(int c = 0; c < size; ++c) ch[c].delete(uri);
-    final IntList il = new IntList(vals.length);
-    for(int v = 0; v < vals.length; v += 2) {
-      if(vals[v + 1] != uri) {
-        il.add(vals[v]);
-        il.add(vals[v + 1]);
+    for(int c = 0; c < size; ++c) children[c].delete(uri);
+    final IntList il = new IntList(values.length);
+    for(int v = 0; v < values.length; v += 2) {
+      if(values[v + 1] != uri) {
+        il.add(values[v]);
+        il.add(values[v + 1]);
       }
     }
-    if(il.size() != vals.length) vals = il.toArray();
+    if(il.size() != values.length) values = il.toArray();
   }
 
   // Requesting Namespaces ====================================================
@@ -121,7 +121,7 @@ final class NSNode {
    */
   NSNode find(final int p) {
     final int s = fnd(p);
-    return s == -1 ? this : ch[s].pre == p ? ch[s] : ch[s].find(p);
+    return s == -1 ? this : children[s].pre == p ? children[s] : children[s].find(p);
   }
 
   /**
@@ -130,7 +130,7 @@ final class NSNode {
    * @return u uri reference or 0
    */
   int uri(final int p) {
-    for(int v = 0; v < vals.length; v += 2) if(vals[v] == p) return vals[v + 1];
+    for(int v = 0; v < values.length; v += 2) if(values[v] == p) return values[v + 1];
     return 0;
   }
 
@@ -148,21 +148,21 @@ final class NSNode {
      * index 0 or proceed with the next node in the child array to search for
      * descendants of pre
      */
-    if(s == -1 || ch[s].pre != p) ++s;
+    if(s == -1 || children[s].pre != p) ++s;
     // first pre value which is not deleted
     final int upper = p + sz;
     // number of nodes to be deleted
     int num = 0;
     // determine number of nodes to be deleted
-    for(int i = s; i < size && ch[i].pre < upper; ++i, ++num);
+    for(int i = s; i < size && children[i].pre < upper; ++i, ++num);
     // new size of child array
     size -= num;
 
     // if all nodes are deleted, just create an empty array
-    if(size == 0) ch = new NSNode[0];
+    if(size == 0) children = new NSNode[0];
 
     // otherwise remove nodes from the child array
-    else if(num > 0) System.arraycopy(ch, s + num, ch, s, size - s);
+    else if(num > 0) System.arraycopy(children, s + num, children, s, size - s);
   }
 
   /**
@@ -175,7 +175,7 @@ final class NSNode {
     int l = 0, h = size - 1;
     while(l <= h) { // binary search
       final int m = l + h >>> 1;
-      final int v = ch[m].pre;
+      final int v = children[m].pre;
       if(v == p) return m;
       if(v < p) l = m + 1;
       else h = m - 1;
@@ -213,14 +213,14 @@ final class NSNode {
       tb.add(NL);
       for(int i = 0; i < l; ++i) tb.add("  ");
       tb.add(toString() + ' ');
-      for(int i = 0; i < vals.length; i += 2) {
+      for(int i = 0; i < values.length; i += 2) {
         tb.add("xmlns");
-        final byte[] p = ns.prefix(vals[i]);
+        final byte[] p = ns.prefix(values[i]);
         if(p.length != 0) tb.add(':');
-        tb.add(p).add("=\"").add(ns.uri(vals[i + 1])).add("\" ");
+        tb.add(p).add("=\"").add(ns.uri(values[i + 1])).add("\" ");
       }
     }
-    for(int c = 0; c < size; ++c) ch[c].print(tb, l + 1, ns, s, e);
+    for(int c = 0; c < size; ++c) children[c].print(tb, l + 1, ns, s, e);
   }
 
   @Override

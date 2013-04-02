@@ -331,7 +331,7 @@ public final class SeqType {
     // maps don't have type information attached to them, you have to look...
     return type instanceof MapType
       ? it instanceof Map && ((Map) it).hasType((MapType) type)
-      : it.type.instanceOf(type) && (!knd || checkKind(it));
+      : it.type.instanceOf(type) && (!knd || kind == null || kind.eq(it));
   }
 
   /**
@@ -343,8 +343,8 @@ public final class SeqType {
    * @return promoted item
    * @throws QueryException query exception
    */
-  public Item cast(final Item it, final QueryContext ctx,
-      final InputInfo ii, final Expr e) throws QueryException {
+  public Value cast(final Item it, final QueryContext ctx, final InputInfo ii,
+      final Expr e) throws QueryException {
 
     if(it == null) {
       if(!occ.check(0)) XPEMPTY.thrw(ii, e.description());
@@ -352,9 +352,11 @@ public final class SeqType {
     }
 
     if(!occ.check(1)) XPTYPE.thrw(ii, e.description(), this, it.type);
-    final Item i = it.type.eq(type) ? it : type.cast(it, ctx, ii);
-    if(!checkKind(i)) Err.cast(ii, type, i);
-    return i;
+    final Value v = it.type.eq(type) ? it : type.cast(it, ctx, ii);
+    if(kind != null) {
+      for(final Item i : v) if(!kind.eq(it)) Err.cast(ii, type, i);
+    }
+    return v;
   }
 
   /**
@@ -409,13 +411,16 @@ public final class SeqType {
    * @return promoted item
    * @throws QueryException query exception
    */
-  private Item funcConv(final QueryContext ctx, final InputInfo ii,
+  private Value funcConv(final QueryContext ctx, final InputInfo ii,
       final Item it) throws QueryException {
     if(type instanceof AtomType) {
       final Item atom = StandardFunc.atom(it, ii);
       if(atom != it && atom.type.instanceOf(type)) return it;
       if(atom.type == AtomType.ATM) {
-        if(type.nsSensitive()) throw Err.NSSENS.thrw(ii, it, type);
+        if(type.nsSensitive()) {
+          if(ctx.sc.xquery3()) NSSENS.thrw(ii, it, type);
+          Err.treat(ii, withOcc(Occ.ONE), it);
+        }
         return type.cast(atom, ctx, ii);
       }
 
@@ -575,22 +580,13 @@ public final class SeqType {
   }
 
   /**
-   * Checks the additional kind test.
-   * @param it item
-   * @return same item
-   */
-  private boolean checkKind(final Item it) {
-    return kind == null || kind.eq(it);
-  }
-
-  /**
    * Checks the types for equality.
    * @param t type
    * @return result of check
    */
   public boolean eq(final SeqType t) {
     return type.eq(t.type) && occ == t.occ &&
-        (kind == null ? t.kind == null : t.kind != null && kind.sameAs(t.kind));
+      (kind == null ? t.kind == null : t.kind != null && kind.sameAs(t.kind));
   }
 
   /**
@@ -600,8 +596,8 @@ public final class SeqType {
    */
   public boolean instanceOf(final SeqType t) {
     return type.instanceOf(t.type) && occ.instanceOf(t.occ)
-        // [LW] complete kind check
-        && t.kind == null || kind != null && kind.intersect(t.kind) != null;
+      // [LW] complete kind check
+      && t.kind == null || kind != null && kind.intersect(t.kind) != null;
   }
 
   @Override
@@ -609,6 +605,7 @@ public final class SeqType {
     final StringBuilder sb = new StringBuilder();
     sb.append(occ == Occ.ZERO ? EMPTY_SEQUENCE + "()" : type);
     if(kind != null) sb.deleteCharAt(sb.length() - 1).append(kind).append(')');
-    return sb.append(occ).toString();
+    if(!(type instanceof ListType)) sb.append(occ);
+    return sb.toString();
   }
 }

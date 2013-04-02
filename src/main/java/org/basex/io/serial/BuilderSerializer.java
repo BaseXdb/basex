@@ -16,7 +16,9 @@ import org.basex.util.*;
  */
 public class BuilderSerializer extends Serializer {
   /** Attribute cache. */
-  private final Atts att = new Atts();
+  private final Atts atts = new Atts();
+  /** Namespace cache. */
+  private final Atts nsp = new Atts();
   /** The builder. */
   private final Builder build;
 
@@ -49,19 +51,21 @@ public class BuilderSerializer extends Serializer {
 
   @Override
   protected final void finishOpen() throws IOException {
-    build.startElem(elem, att);
-    att.reset();
+    build.openElem(elem, atts, nsp);
+    atts.reset();
+    nsp.reset();
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    build.emptyElem(elem, att);
-    att.reset();
+    build.emptyElem(elem, atts, nsp);
+    atts.reset();
+    nsp.reset();
   }
 
   @Override
   protected void finishClose() throws IOException {
-    build.endElem();
+    build.closeElem();
   }
 
   @Override
@@ -73,24 +77,24 @@ public class BuilderSerializer extends Serializer {
   protected final void attribute(final byte[] n, final byte[] v) throws IOException {
     if(startsWith(n, XMLNS)) {
       if(n.length == 5) {
-        build.startNS(EMPTY, v);
+        nsp.add(EMPTY, v);
       } else if(n[5] == ':') {
-        build.startNS(substring(n, 6), v);
+        nsp.add(substring(n, 6), v);
       } else {
-        att.add(n, v);
+        atts.add(n, v);
       }
     } else {
-      att.add(n, v);
+      atts.add(n, v);
     }
   }
 
   @Override
   protected void openDoc(final byte[] name) throws IOException {
-    build.startDoc(name);
+    build.openDoc(name);
   }
 
   @Override
   protected final void closeDoc() throws IOException {
-    build.endDoc();
+    build.closeDoc();
   }
 }

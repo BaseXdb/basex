@@ -270,7 +270,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   }
 
   /**
-   * Detects malformed namespace hierarchy.
+   * Detects malformed namespace hierarchy inserting an element.
    * @throws BaseXException exception
    */
   @Test
@@ -287,6 +287,17 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "  Pre[1] xmlns=\"xx\" " + NL +
         "    Pre[2] xmlns=\"y\" ",
         context.data().nspaces.toString());
+  }
+
+  /**
+   * Detects malformed namespace hierarchy adding a document to an empty DB.
+   * @throws BaseXException exception
+   */
+  @Test
+  public void nsHierarchy4() throws BaseXException {
+    new CreateDB("d00x").execute(context);
+    new Add("x", "<A xmlns='A'><B/><C/></A>").execute(context);
+    query("/", "<A xmlns='A'><B/><C/></A>");
   }
 
   /** Test query. */
@@ -423,6 +434,14 @@ public final class NamespaceTest extends AdvancedQueryTest {
    */
   @Test
   public void uriStack() throws Exception {
+    /*
+     * [LK] problem:
+     * - XMLParser.java l.146 calls ns.add before ns.open
+     * - for this TC sequence of ns operations should be:
+     *  doc:open, a:open, b:open, b:add, b:close, c:open ...
+     *  BUT IS
+     *  doc:open, a:open, *b:add, b:open* ...
+     */
     create(8);
     query(
         "doc('d8')",

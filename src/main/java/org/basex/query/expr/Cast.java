@@ -3,8 +3,10 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -35,7 +37,7 @@ public final class Cast extends Single {
     if(expr.type().one()) type = SeqType.get(type.type, Occ.ONE);
 
     // pre-evaluate value
-    if(expr.isValue()) return preEval(ctx);
+    if(expr.isValue()) return optPre(value(ctx), ctx);
 
     // skip cast if specified and return types are equal
     // (the following types will always be correct)
@@ -49,8 +51,14 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return type.cast(expr.item(ctx, ii), ctx, ii, this);
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    return value(ctx).iter();
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    final Value v = type.cast(expr.item(ctx, info), ctx, info, this);
+    return v == null ? Empty.SEQ : v;
   }
 
   @Override

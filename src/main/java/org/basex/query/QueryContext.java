@@ -597,9 +597,15 @@ public final class QueryContext extends Progress {
     final QNm nm = new QNm(token(type.replaceAll("\\(.*?\\)$", "")), this);
     if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm);
 
-    final Type typ = type.endsWith(")") ? NodeType.find(nm) : AtomType.find(nm, false);
-    if(typ == null) NOTYPE.thrw(null, type);
-    return typ.cast(val, null);
+    Type t = null;
+    if(type.endsWith(")")) {
+      t = NodeType.find(nm);
+    } else {
+      t = ListType.find(nm);
+      if(t == null) AtomType.find(nm, false);
+    }
+    if(t == null) NOTYPE.thrw(null, type);
+    return t.cast(val, null);
   }
 
   /**
