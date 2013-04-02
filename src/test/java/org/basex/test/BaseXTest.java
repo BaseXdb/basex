@@ -50,7 +50,8 @@ public abstract class BaseXTest extends MainTest {
     equals("5,6;7'", "-ba=5,6;7'", "-q$a");
     // bind variables with namespaces
     equals("8", "-b{}a=8", "-q$a");
-    equals("9", "-b{URI}a=9", "-qdeclare namespace a='URI'; $a:a");
+    equals("9", "-b{URI}a=9", "-qdeclare namespace a='URI';" +
+        "declare variable $a:a external; $a:a");
     // check if parameters are evaluated in given order
     equals("12", "-ba=1", "-q$a", "-ba=2", "-q$a");
   }
