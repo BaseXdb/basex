@@ -602,7 +602,7 @@ public final class QueryContext extends Progress {
       t = NodeType.find(nm);
     } else {
       t = ListType.find(nm);
-      if(t == null) AtomType.find(nm, false);
+      if(t == null) t = AtomType.find(nm, false);
     }
     if(t == null) NOTYPE.thrw(null, type);
     return t.cast(val, null);
