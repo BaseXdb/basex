@@ -19,6 +19,8 @@ public abstract class Progress {
   /** This flag indicates that a command may perform updates. */
   public boolean updating;
 
+  /** Indicates if a process is currently registered. */
+  protected boolean registered;
   /** Stopped flag. */
   private boolean stopped;
   /** Timeout thread. */

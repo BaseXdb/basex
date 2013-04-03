@@ -58,8 +58,6 @@ public final class Context {
   private Nodes current;
   /** Process locking. */
   private final Locking locks;
-  /** Indicates if a process is currently registered.
-  private boolean registered; */
   /** Data reference. */
   private Data data;
 
@@ -226,19 +224,20 @@ public final class Context {
     if(lr.writeAll) lr.write = null;
     else prepareLock(lr.write);
 
-//    assert !registered : "Already registered";
-//    registered = true;
+    assert !pr.registered : "Already registered";
+    pr.registered = true;
     locks.acquire(pr, lr.read, lr.write);
   }
 
   /**
    * Downgrades locks.
+   * @param pr process
    * @param sl string list
    */
-  public void downgrade(final StringList sl) {
-    //if(!registered) return;
+  public void downgrade(final Progress pr, final StringList sl) {
+    if(!pr.registered) return;
     prepareLock(sl);
-    //locks.downgrade(sl);
+    locks.downgrade(sl);
   }
 
   /**
@@ -259,8 +258,8 @@ public final class Context {
    * @param pr process
    */
   public void unregister(final Progress pr) {
-    //if(!registered) return;
-    //registered = false;
+    if(!pr.registered) return;
+    pr.registered = false;
     locks.release(pr);
     pr.stopTimeout();
   }
