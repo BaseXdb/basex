@@ -53,7 +53,7 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
+  public boolean databases(final StringList db, final boolean rootContext) {
     return true;
   }
 

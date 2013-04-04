@@ -242,9 +242,8 @@ public final class InlineFunc extends Single implements Scope {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    // [LW][JE] can be done better...
-    return false;
+  public boolean databases(final StringList db, final boolean rootContext) {
+    return expr.databases(db, false);
   }
 
   @Override

@@ -81,8 +81,8 @@ public abstract class FTContains extends ParseExpr {
   }
 
   @Override
-  public final boolean databases(final StringList db) {
-    return expr.databases(db) && ftexpr.databases(db);
+  public final boolean databases(final StringList db, final boolean rootContext) {
+    return expr.databases(db, rootContext) && ftexpr.databases(db, rootContext);
   }
 
   @Override

@@ -650,9 +650,10 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final Clause clause : clauses) if(!clause.databases(db)) return false;
-    return ret.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    for(final Clause clause : clauses)
+      if(!clause.databases(db, rootContext)) return false;
+    return ret.databases(db, rootContext);
   }
 
   @Override

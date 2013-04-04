@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -9,6 +10,7 @@ import org.basex.query.util.pkg.Package;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Functions on EXPath packages.
@@ -95,5 +97,13 @@ public final class FNRepo extends StandardFunc {
   public boolean uses(final Use u) {
     // don't allow pre-evaluation
     return u == Use.CTX || super.uses(u);
+  }
+
+  @Override
+  public boolean databases(final StringList db, final boolean rootContext) {
+    db.add(DBLocking.REPO); // [JE] should be exclusive lock
+    if(expr.length > 0 && !(expr[0] instanceof Str))
+      return super.databases(db, rootContext);
+    return true;
   }
 }

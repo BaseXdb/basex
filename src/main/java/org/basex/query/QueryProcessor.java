@@ -245,7 +245,8 @@ public final class QueryProcessor extends Progress {
     if (ctx.root == null)
       global = true;
     else
-      global = global | !ctx.root.expr.databases(ctx.updating ? lr.write : lr.read);
+      global = global |
+        !ctx.root.expr.databases(ctx.updating ? lr.write : lr.read, ctx.ctxItem == null);
 
     if (global)
       if(ctx.updating) lr.writeAll = true;

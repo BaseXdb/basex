@@ -138,7 +138,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public boolean databases(final StringList db) {
+  public boolean databases(final StringList db, final boolean rootContext) {
     final Data data = data();
     if(data != null) db.add(data.meta.name);
     return true;

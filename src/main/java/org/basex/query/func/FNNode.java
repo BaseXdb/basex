@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -150,5 +151,11 @@ public final class FNNode extends StandardFunc {
   @Override
   public boolean uses(final Use u) {
     return u == Use.X30 && xquery3() || u == Use.CTX && expr.length == 0 || super.uses(u);
+  }
+
+  @Override
+  public boolean databases(final StringList db, final boolean rootContext) {
+    if (rootContext && expr.length == 0) db.add(DBLocking.CTX);
+    return super.databases(db, rootContext);
   }
 }

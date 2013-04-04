@@ -96,8 +96,8 @@ public abstract class CName extends CFrag {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return name.databases(db) && super.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    return name.databases(db, rootContext) && super.databases(db, rootContext);
   }
 
   @Override

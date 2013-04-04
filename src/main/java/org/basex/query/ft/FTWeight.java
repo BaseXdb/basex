@@ -119,8 +119,8 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return weight.databases(db) && super.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    return weight.databases(db, rootContext) && super.databases(db, rootContext);
   }
 
   @Override

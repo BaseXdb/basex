@@ -1,6 +1,8 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
@@ -16,6 +18,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.server.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Admin functions.
@@ -152,6 +155,16 @@ public final class FNAdmin extends StandardFunc {
       }
     }
     return vb;
+  }
+
+  @Override
+  public boolean databases(final StringList db, final boolean rootContext) {
+    if(oneOf(sig, _ADMIN_USERS, _ADMIN_SESSIONS)) db.add(DBLocking.ADMIN);
+    if(expr.length > 0 && expr[0] instanceof Str) {
+      db.add(string(((Str) expr[0]).string()));
+      return true;
+    }
+    return super.databases(db, rootContext);
   }
 
   /*

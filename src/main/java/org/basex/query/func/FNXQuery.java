@@ -13,6 +13,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * XQuery functions.
@@ -125,5 +126,12 @@ public final class FNXQuery extends StandardFunc {
   @Override
   public boolean uses(final Use u) {
     return u == Use.NDT && oneOf(sig, _XQUERY_EVAL, _XQUERY_INVOKE) || super.uses(u);
+  }
+
+  @Override
+  public boolean databases(final StringList db, final boolean rootContext) {
+    if (sig == _XQUERY_TYPE) return super.databases(db, rootContext);
+    // Global read lock, as updating queries are not allowed inside eval() and invoke()
+    return false;
   }
 }

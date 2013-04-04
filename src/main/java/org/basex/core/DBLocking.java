@@ -31,9 +31,9 @@ public final class DBLocking implements Locking {
 
   /** Prefix for internal special locks. */
   private static final String PREFIX = "%";
-  /** Special lock identifier for current context, will be substituated. */
+  /** Special lock identifier for current context, will be substituted. */
   public static final String CTX = PREFIX + "CTX";
-  /** Special lock identifier for admin commands. */
+  /** Special lock identifier for administrative commands. */
   public static final String ADMIN = PREFIX + "ADMIN";
   /** Special lock identifier for backup commands. */
   public static final String BACKUP = PREFIX + "BACKUP";

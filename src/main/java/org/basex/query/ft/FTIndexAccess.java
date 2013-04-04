@@ -91,9 +91,9 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public boolean databases(final StringList dbs) {
+  public boolean databases(final StringList dbs, final boolean rootContext) {
     dbs.add(db);
-    return ftexpr.databases(dbs);
+    return ftexpr.databases(dbs, rootContext);
   }
 
   @Override
