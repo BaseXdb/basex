@@ -6,6 +6,9 @@ import static org.basex.http.webdav.BXServletRequest.*;
 import javax.servlet.http.*;
 
 import org.basex.http.*;
+import org.basex.http.webdav.impl.ResourceMetaData;
+import org.basex.http.webdav.impl.ResourceMetaDataFactory;
+import org.basex.http.webdav.impl.WebDAVService;
 import org.basex.server.*;
 import org.basex.util.*;
 
@@ -19,9 +22,12 @@ import com.bradmcevoy.http.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXResourceFactory implements ResourceFactory {
+public final class BXResourceFactory implements ResourceFactory,
+  ResourceMetaDataFactory<BXAbstractResource> {
   /** HTTP Context. */
   private final HTTPContext http;
+  /** WebDAV service. */
+  private final WebDAVService<BXAbstractResource> service;
 
   /**
    * Constructor.
@@ -29,6 +35,7 @@ public final class BXResourceFactory implements ResourceFactory {
    */
   BXResourceFactory(final HTTPContext ht) {
     http = ht;
+    service = new WebDAVService<BXAbstractResource>(this, http);
   }
 
   @Override
@@ -41,17 +48,34 @@ public final class BXResourceFactory implements ResourceFactory {
       Path p = Path.path(dbpath);
       if(!r.getContextPath().isEmpty()) p = p.getStripFirst();
       if(!r.getServletPath().isEmpty()) p = p.getStripFirst();
-      if(p.isRoot()) return new BXRoot(http);
+      if(p.isRoot()) return new BXRoot(service);
 
       final String db = p.getFirst();
       return p.getLength() == 1 ?
-        dbExists(db, http) ? database(db, http) : null :
-        resource(db, p.getStripFirst().toString(), http);
+        service.dbExists(db) ?
+          new BXDatabase(new ResourceMetaData(db, service.timestamp(db)), service) :
+          null :
+        service.resource(db, p.getStripFirst().toString());
     } catch(final LoginException ex) {
       return NOAUTH;
     } catch(final Exception ex) {
       Util.errln(ex);
     }
     return null;
+  }
+
+  @Override
+  public BXFile file(WebDAVService<BXAbstractResource> s, ResourceMetaData d) {
+    return new BXFile(d, s);
+  }
+
+  @Override
+  public BXFolder folder(WebDAVService<BXAbstractResource> s, ResourceMetaData d) {
+    return new BXFolder(d, s);
+  }
+
+  @Override
+  public BXDatabase database(WebDAVService<BXAbstractResource> s, ResourceMetaData d) {
+    return new BXDatabase(d, s);
   }
 }

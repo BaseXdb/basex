@@ -1,15 +1,14 @@
 package org.basex.http.webdav;
 
+import static org.basex.http.webdav.impl.Utils.*;
+
 import static org.basex.query.func.Function.*;
 
 import java.io.*;
-import java.util.*;
 import java.util.List;
 
-import org.basex.core.cmd.*;
-import org.basex.http.*;
-import org.basex.server.*;
-import org.basex.util.*;
+import org.basex.http.webdav.impl.ResourceMetaData;
+import org.basex.http.webdav.impl.WebDAVService;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
@@ -24,10 +23,10 @@ import com.bradmcevoy.http.exceptions.*;
 public final class BXRoot extends BXFolder {
   /**
    * Constructor.
-   * @param h http context
+   * @param s service
    */
-  public BXRoot(final HTTPContext h) {
-    super(null, null, 0, h);
+  public BXRoot(final WebDAVService s) {
+    super(null, s);
   }
 
   @Override
@@ -51,36 +50,23 @@ public final class BXRoot extends BXFolder {
   }
 
   @Override
-  public BXResource child(final String name) {
-    return new BXCode<BXResource>(this) {
+  public BXAbstractResource child(final String name) {
+    return new BXCode<BXAbstractResource>(this) {
       @Override
-      public BXResource get() throws IOException {
-        return dbExists(name, http) ? database(name, http) : null;
+      public BXAbstractResource get() throws IOException {
+        return service.dbExists(name) ?
+          new BXDatabase(new ResourceMetaData(name, service.timestamp(name)), service) :
+          null;
       }
     }.evalNoEx();
   }
 
   @Override
-  public List<BXResource> getChildren() {
-    return new BXCode<List<BXResource>>(this) {
+  public List<BXAbstractResource> getChildren() {
+    return new BXCode<List<BXAbstractResource>>(this) {
       @Override
-      public List<BXResource> get() throws IOException {
-        final List<BXResource> dbs = new ArrayList<BXResource>();
-        final LocalQuery q = http.session().query(
-            "for $d in " + _DB_LIST_DETAILS.args() +
-            "return ($d/text(), $d/@modified-date/data())");
-        try {
-          while(q.more()) {
-            final String name = q.next();
-            final long mod = DateTime.parse(q.next());
-            dbs.add(new BXDatabase(name, mod, http));
-          }
-        } catch(final Exception ex) {
-          Util.errln(ex);
-        } finally {
-          q.close();
-        }
-        return dbs;
+      public List<BXAbstractResource> get() throws IOException {
+        return service.listDbs();
       }
     }.evalNoEx();
   }
@@ -90,35 +76,19 @@ public final class BXRoot extends BXFolder {
     return new BXCode<BXDatabase>(this) {
       @Override
       public BXDatabase get() throws IOException {
-        final String dbname = dbname(newName);
-        http.session().execute(new CreateDB(dbname));
-        return database(dbname, http);
+        return (BXDatabase) service.createDb(dbname(newName));
       }
     }.eval();
   }
 
   @Override
-  public BXResource createNew(final String newName, final InputStream input,
+  public BXAbstractResource createNew(final String newName, final InputStream input,
       final Long length, final String contentType) throws BadRequestException {
-
-    return new BXCode<BXDatabase>(this) {
+    return new BXCode<BXAbstractResource>(this) {
       @Override
-      public BXDatabase get() throws IOException {
-        addFile(newName, input);
-        return database(dbname(newName), http);
+      public BXAbstractResource get() throws IOException {
+        return service.createFile(newName, input);
       }
     }.eval();
-  }
-
-  @Override
-  protected void addXML(final String n, final InputStream in) throws IOException {
-    http.session().create(dbname(n), in);
-  }
-
-  @Override
-  protected void addRaw(final String n, final InputStream in) throws IOException {
-    final LocalSession session = http.session();
-    session.execute(new CreateDB(dbname(n)));
-    session.store(n, in);
   }
 }

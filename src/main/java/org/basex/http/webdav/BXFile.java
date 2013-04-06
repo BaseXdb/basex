@@ -1,13 +1,12 @@
 package org.basex.http.webdav;
 
-import static org.basex.query.func.Function.*;
+import static org.basex.http.webdav.impl.Utils.*;
 
 import java.io.*;
 import java.util.*;
 
-import org.basex.core.cmd.*;
-import org.basex.http.*;
-import org.basex.server.*;
+import org.basex.http.webdav.impl.ResourceMetaData;
+import org.basex.http.webdav.impl.WebDAVService;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
@@ -20,34 +19,18 @@ import com.bradmcevoy.http.exceptions.*;
  * @author Dimitar Popov
  */
 public final class BXFile extends BXAbstractResource implements FileResource {
-  /** Raw flag. */
-  final boolean raw;
-  /** Content type. */
-  final String ctype;
-  /** Size in bytes. */
-  final Long size;
-
   /**
    * Constructor.
-   * @param d name of database this document belongs to.
-   * @param p document path to root
-   * @param m last modified date
-   * @param r raw flag
-   * @param c content type
-   * @param s size or null
-   * @param h http context
+   * @param d resource meta data
+   * @param s service implementation
    */
-  public BXFile(final String d, final String p, final long m, final boolean r,
-      final String c, final Long s, final HTTPContext h) {
-    super(d, p, m, h);
-    raw = r;
-    ctype = c;
-    size = s;
+  public  BXFile(final ResourceMetaData d, final WebDAVService<BXAbstractResource> s) {
+    super(d, s);
   }
 
   @Override
   public Long getContentLength() {
-    return size;
+    return meta.size;
   }
 
   @Override
@@ -68,24 +51,17 @@ public final class BXFile extends BXAbstractResource implements FileResource {
 
   @Override
   public String getContentType(final String accepts) {
-    return ctype;
+    return meta.ctype;
   }
 
   @Override
   public void sendContent(final OutputStream out, final Range range,
       final Map<String, String> params, final String contentType)
       throws IOException, BadRequestException {
-
     new BXCode<Object>(this) {
       @Override
       public void run() throws IOException {
-        final LocalSession session = http.session();
-        session.setOutputStream(out);
-        final Query q = session.query(raw ? "declare option output:method 'raw'; " +
-            _DB_RETRIEVE.args("$db", "$path") : _DB_OPEN.args("$db", "$path"));
-        q.bind("db", db);
-        q.bind("path", path);
-        q.execute();
+        service.retrieve(meta.db, meta.path, meta.raw, out);
       }
     }.eval();
   }
@@ -94,34 +70,14 @@ public final class BXFile extends BXAbstractResource implements FileResource {
   protected void copyToRoot(final String n) throws IOException {
     // document is copied to the root: create new database with it
     final String nm = dbname(n);
-    http.session().execute(new CreateDB(nm));
-    add(nm, n);
+    service.createDb(nm);
+    service.copyDoc(meta.db, meta.path, nm, n);
   }
 
   @Override
   protected void copyTo(final BXFolder f, final String n) throws IOException {
     // folder is copied to a folder in a database
-    add(f.db, f.path + '/' + n);
-    f.deleteDummy(f.path);
-  }
-
-  /**
-   * Adds a document to the specified target.
-   * @param tdb target database
-   * @param tpath target path
-   * @throws IOException I/O exception
-   */
-  protected void add(final String tdb, final String tpath) throws IOException {
-    final LocalSession session = http.session();
-    final LocalQuery q = session.query(
-        "declare option db:chop 'false'; " +
-        "if(" + _DB_IS_RAW.args("$db", "$path") + ") " +
-        " then " + _DB_STORE.args("$tdb", "$tpath", _DB_RETRIEVE.args("$db", "$path")) +
-        " else " + _DB_ADD.args("$tdb", _DB_OPEN.args("$db", "$path"), "$tpath"));
-    q.bind("db", db);
-    q.bind("path", path);
-    q.bind("tdb", tdb);
-    q.bind("tpath", tpath);
-    q.execute();
+    service.copyDoc(meta.db, meta.path, f.meta.db, f.meta.path + SEP + n);
+    service.deleteDummy(f.meta.db, f.meta.path);
   }
 }

@@ -1,12 +1,13 @@
 package org.basex.http.webdav;
 
+import static org.basex.http.webdav.impl.Utils.*;
 import static com.bradmcevoy.http.LockResult.*;
 import java.io.*;
-import java.util.UUID;
+import java.util.Date;
 
-import org.basex.core.cmd.*;
-import org.basex.http.*;
-import org.basex.server.*;
+import org.basex.core.Prop;
+import org.basex.http.webdav.impl.ResourceMetaData;
+import org.basex.http.webdav.impl.WebDAVService;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
@@ -24,19 +25,66 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public abstract class BXAbstractResource extends BXResource implements
+public abstract class BXAbstractResource implements
     CopyableResource, DeletableResource, MoveableResource, LockableResource {
+  /** Resource meta data. */
+  protected final ResourceMetaData meta;
+  /** WebDAV service implementation. */
+  protected final WebDAVService<BXAbstractResource> service;
 
   /**
    * Constructor.
-   * @param d database name
-   * @param p path to folder
-   * @param m last modified date
-   * @param h http context
+   * @param m resource meta data
+   * @param s service
    */
-  protected BXAbstractResource(final String d, final String p, final long m,
-      final HTTPContext h) {
-    super(d, p, m, h);
+  protected BXAbstractResource(final ResourceMetaData m,
+      final WebDAVService<BXAbstractResource> s) {
+    meta = m;
+    service = s;
+  }
+
+  @Override
+  public Object authenticate(final String user, final String pass) {
+    if(user != null)
+      new BXCode<Object>(this) {
+        @Override
+        public void run() throws IOException {
+          service.authenticate(user, pass);
+        }
+      }.evalNoEx();
+    return user;
+  }
+
+  @Override
+  public boolean authorise(final Request request, final Request.Method method,
+      final Auth auth) {
+    return auth != null && auth.getTag() != null && service.authorise(auth.getUser(),
+      "any", meta.db, meta.path);
+  }
+
+  @Override
+  public String checkRedirect(final Request request) {
+    return null;
+  }
+
+  @Override
+  public String getRealm() {
+    return Prop.NAME;
+  }
+
+  @Override
+  public String getUniqueId() {
+    return null;
+  }
+
+  @Override
+  public String getName() {
+    return name(meta.path);
+  }
+
+  @Override
+  public Date getModifiedDate() {
+    return meta.mdate;
   }
 
   @Override
@@ -83,33 +131,26 @@ public abstract class BXAbstractResource extends BXResource implements
    * Lock this resource and return a token.
    *
    * @param timeout - in seconds, or null
-   * @param lockInfo
+   * @param lockInfo lock info
    * @return - a result containing the token representing the lock if successful,
    * otherwise a failure reason code
    */
   @Override
   public LockResult lock(final LockTimeout timeout, final LockInfo lockInfo) throws
     NotAuthorizedException, PreConditionFailedException, LockedException {
-
-    final String tokenId = UUID.randomUUID().toString();
-
-    final FailureReason failureReason = new BXCode<FailureReason>(this) {
+    return new BXCode<LockResult>(this) {
       @Override
-      public FailureReason get() throws IOException {
-        return lock(tokenId, timeout, lockInfo);
+      public LockResult get() throws IOException {
+        return lockResource(timeout, lockInfo);
       }
     }.evalNoEx();
-
-    return failureReason == null ?
-      success(new LockToken(tokenId, lockInfo, timeout)) :
-      failed(failureReason);
   }
 
   /**
    * Renew the lock and return new lock info.
    *
-   * @param token
-   * @return
+   * @param token lock token
+   * @return loc result
    */
   @Override
   public LockResult refreshLock(final String token) throws NotAuthorizedException,
@@ -121,23 +162,15 @@ public abstract class BXAbstractResource extends BXResource implements
    * If the resource is currently locked, and the tokenId  matches the current
    * one, unlock the resource.
    *
-   * @param tokenId
+   * @param tokenId lock token
    */
   @Override
   public void unlock(final String tokenId) throws NotAuthorizedException,
     PreConditionFailedException {
-
     new BXCode<Object>(this) {
       @Override
       public void run() throws IOException {
-        final String queryStr =
-            "import module namespace w = 'http://basex.org/webdav';" +
-            "w:delete-lock($lock-token)";
-
-        LocalQuery q = http.session().query(queryStr);
-        q.bind("lock-token", tokenId);
-
-        q.execute();
+        service.unlock(tokenId);
       }
     }.evalNoEx();
   }
@@ -165,13 +198,7 @@ public abstract class BXAbstractResource extends BXResource implements
    * @throws IOException I/O exception
    */
   protected void del() throws IOException {
-    final LocalSession session = http.session();
-    session.execute(new Open(db));
-    session.execute(new Delete(path));
-
-    // create dummy, if parent is an empty folder
-    final int ix = path.lastIndexOf(SEP);
-    if(ix > 0) createDummy(path.substring(0, ix));
+    service.delete(meta.db, meta.path);
   }
 
   /**
@@ -180,17 +207,7 @@ public abstract class BXAbstractResource extends BXResource implements
    * @throws IOException I/O exception
    */
   protected void rename(final String n) throws IOException {
-    final LocalSession session = http.session();
-    session.execute(new Open(db));
-    session.execute(new Rename(path, n));
-
-    // create dummy, if old parent is an empty folder
-    final int i1 = path.lastIndexOf(SEP);
-    if(i1 > 0) createDummy(path.substring(0, i1));
-
-    // delete dummy, if new parent is an empty folder
-    final int i2 = n.lastIndexOf(SEP);
-    if(i2 > 0) deleteDummy(n.substring(0, i2));
+    service.rename(meta.db, meta.path, n);
   }
 
   /**
@@ -225,10 +242,10 @@ public abstract class BXAbstractResource extends BXResource implements
    * @param n new name of the folder
    * @throws IOException I/O exception
    */
-  protected void moveTo(final BXFolder f, final String n) throws IOException {
-    if(f.db.equals(db)) {
+  void moveTo(final BXFolder f, final String n) throws IOException {
+    if(f.meta.db.equals(meta.db)) {
       // folder is moved to a folder in the same database
-      rename(f.path + SEP + n);
+      rename(f.meta.path + SEP + n);
     } else {
       // folder is moved to a folder in another database
       copyTo(f, n);
@@ -236,58 +253,27 @@ public abstract class BXAbstractResource extends BXResource implements
     }
   }
 
-  protected FailureReason lock(final String tokenId, final LockTimeout timeout,
-    final LockInfo lockInfo) throws IOException {
+  LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo) throws
+    IOException {
 
-    createLock(tokenId, timeout, lockInfo);
+    final String tokenId = service.lock(meta.db, meta.path,
+      lockInfo.scope.name().toLowerCase(),
+      lockInfo.type.name().toLowerCase(),
+      lockInfo.depth.name().toLowerCase(),
+      lockInfo.lockedByUser,
+      timeout.getSeconds());
 
-    return null;
+    // TODO failed(failureReason);
+    return success(new LockToken(tokenId, lockInfo, timeout));
   }
 
-  protected void createLock(final String tokenId, final LockTimeout timeout,
-    final LockInfo lockInfo) throws IOException {
-    final String queryStr =
-        "import module namespace w = 'http://basex.org/webdav';" +
-        "w:create-lock(" +
-        "$resource," +
-        "$lock-token," +
-        "$lock-scope," +
-        "$lock-type," +
-        "$lock-depth," +
-        "$lock-owner," +
-        "$lock-timeout)";
-
-    LocalQuery q = http.session().query(queryStr);
-    q.bind("resource", db + SEP + path);
-    q.bind("lock-token", tokenId);
-    q.bind("lock-scope", lockInfo.scope.name().toLowerCase());
-    q.bind("lock-type", lockInfo.type.name().toLowerCase());
-    q.bind("lock-depth", lockInfo.depth.name().toLowerCase());
-    q.bind("lock-owner", lockInfo.lockedByUser);
-    final Long timeoutSeconds = timeout.getSeconds();
-    q.bind("lock-timeout", timeoutSeconds == null ? Long.MAX_VALUE : timeoutSeconds);
-
-    q.execute();
+  LockToken getCurrentActiveLock() throws IOException, SAXException {
+    final String lockInfoStr = service.lock(meta.db, meta.path);
+    return lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
   }
 
-  protected LockToken getCurrentActiveLock() throws IOException, SAXException {
-    final String queryStr =
-        "import module namespace w = 'http://basex.org/webdav';" +
-        "w:get-locks($resource)";
-
-    LocalQuery q = http.session().query(queryStr);
-    q.bind("resource", db + SEP + path);
-
-    LockToken result = null;
-    if(q.more()) {
-      String lockTokenStr = q.next();
-      result = parseLockInfo(lockTokenStr);
-    }
-
-    return result;
-  }
-
-  public static LockToken parseLockInfo(String lockInfo) throws SAXException, IOException {
+  private static LockToken parseLockInfo(String lockInfo) throws SAXException,
+    IOException {
     XMLReader reader = XMLReaderFactory.createXMLReader();
     LockTokenSaxHandler handler = new LockTokenSaxHandler();
     reader.setContentHandler(handler);

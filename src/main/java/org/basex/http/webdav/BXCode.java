@@ -15,13 +15,13 @@ import com.bradmcevoy.http.exceptions.*;
  */
 public abstract class BXCode<E> {
   /** Resource. */
-  private final BXResource resource;
+  private final BXAbstractResource resource;
 
   /**
    * Constructor.
    * @param res resource
    */
-  protected BXCode(final BXResource res) {
+  protected BXCode(final BXAbstractResource res) {
     resource = res;
   }
 
