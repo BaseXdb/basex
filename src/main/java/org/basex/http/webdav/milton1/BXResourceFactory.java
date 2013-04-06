@@ -1,7 +1,6 @@
-package org.basex.http.webdav;
+package org.basex.http.webdav.milton1;
 
-import static org.basex.http.webdav.BXNotAuthorizedResource.*;
-import static org.basex.http.webdav.BXServletRequest.*;
+import static org.basex.http.webdav.milton1.BXServletRequest.*;
 
 import javax.servlet.http.*;
 
@@ -57,7 +56,7 @@ public final class BXResourceFactory implements ResourceFactory,
           null :
         service.resource(db, p.getStripFirst().toString());
     } catch(final LoginException ex) {
-      return NOAUTH;
+      return BXNotAuthorizedResource.NOAUTH;
     } catch(final Exception ex) {
       Util.errln(ex);
     }

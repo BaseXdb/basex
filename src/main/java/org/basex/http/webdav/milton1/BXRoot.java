@@ -1,8 +1,6 @@
-package org.basex.http.webdav;
+package org.basex.http.webdav.milton1;
 
 import static org.basex.http.webdav.impl.Utils.*;
-
-import static org.basex.query.func.Function.*;
 
 import java.io.*;
 import java.util.List;

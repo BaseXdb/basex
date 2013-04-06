@@ -1,18 +1,13 @@
-package org.basex.http.webdav;
+package org.basex.http.webdav.milton1;
 
 import static org.basex.http.webdav.impl.Utils.*;
-import static org.basex.query.func.Function.*;
 
 import java.io.*;
 import java.util.*;
 import java.util.List;
 
-import org.basex.core.cmd.*;
 import org.basex.http.webdav.impl.ResourceMetaData;
 import org.basex.http.webdav.impl.WebDAVService;
-import org.basex.io.in.*;
-import org.basex.server.*;
-import org.basex.util.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;

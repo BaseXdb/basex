@@ -1,4 +1,4 @@
-package org.basex.http.webdav;
+package org.basex.http.webdav.milton1;
 
 import static org.basex.http.webdav.impl.Utils.*;
 import static com.bradmcevoy.http.LockResult.*;
