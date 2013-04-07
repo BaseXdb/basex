@@ -74,6 +74,7 @@
   <servlet>
     <servlet-name>WebDAV</servlet-name>
     <servlet-class>org.basex.http.webdav.milton1.WebDAVServlet</servlet-class>
+    <!-- <servlet-class>org.basex.http.webdav.milton2.WebDAVServlet</servlet-class> -->
     <load-on-startup>1</load-on-startup>
     <!-- service-specific credentials
     <init-param>

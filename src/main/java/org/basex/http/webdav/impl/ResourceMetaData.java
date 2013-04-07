@@ -1,5 +1,6 @@
 package org.basex.http.webdav.impl;
 
+import static org.basex.http.webdav.impl.Utils.*;
 import java.util.Date;
 
 /**
@@ -24,6 +25,11 @@ public class ResourceMetaData {
   public final Long size;
   /** Folder flag. */
   public final boolean folder;
+
+  /** Default constructor. */
+  public ResourceMetaData() {
+    this(null, 0L);
+  }
 
   /**
    * Constructor.
@@ -71,7 +77,7 @@ public class ResourceMetaData {
   public ResourceMetaData(final String db, final String p, final long mod,
       final boolean raw, final String ctype, final Long size, final boolean folder) {
     this.db = db;
-    this.path = p;
+    this.path = stripLeadingSlash(p);
     this.mod = mod;
     this.raw = raw;
     this.ctype = ctype;

@@ -24,7 +24,7 @@ public final class BXRoot extends BXFolder {
    * @param s service
    */
   public BXRoot(final WebDAVService s) {
-    super(null, s);
+    super(new ResourceMetaData(), s);
   }
 
   @Override

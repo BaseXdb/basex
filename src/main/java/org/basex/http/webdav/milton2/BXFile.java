@@ -1,24 +1,30 @@
-package org.basex.http.webdav.milton1;
+package org.basex.http.webdav.milton2;
 
-import static org.basex.http.webdav.impl.Utils.*;
-
-import java.io.*;
-import java.util.*;
-
+import io.milton.http.Auth;
+import io.milton.http.FileItem;
+import io.milton.http.Range;
+import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.http.exceptions.NotFoundException;
+import io.milton.resource.FileResource;
 import org.basex.http.webdav.impl.ResourceMetaData;
 import org.basex.http.webdav.impl.WebDAVService;
+import org.basex.util.Util;
 
-import com.bradmcevoy.http.*;
-import com.bradmcevoy.http.exceptions.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Date;
+import java.util.Map;
+
+import static org.basex.http.webdav.impl.Utils.SEP;
+import static org.basex.http.webdav.impl.Utils.dbname;
 
 /**
  * WebDAV resource representing a file.
- *
  * @author BaseX Team 2005-13, BSD License
- * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXFile extends BXAbstractResource implements FileResource {
+public class BXFile extends BXAbstractResource implements FileResource {
   /**
    * Constructor.
    * @param d resource meta data
@@ -45,7 +51,7 @@ public final class BXFile extends BXAbstractResource implements FileResource {
 
   @Override
   public String processForm(final Map<String, String> parameters,
-      final Map<String, FileItem> files) throws BadRequestException {
+    final Map<String, FileItem> files) throws BadRequestException {
     return null;
   }
 
@@ -55,15 +61,15 @@ public final class BXFile extends BXAbstractResource implements FileResource {
   }
 
   @Override
-  public void sendContent(final OutputStream out, final Range range,
-      final Map<String, String> params, final String contentType)
-      throws IOException, BadRequestException {
-    new BXCode<Object>(this) {
-      @Override
-      public void run() throws IOException {
-        service.retrieve(meta.db, meta.path, meta.raw, out);
-      }
-    }.eval();
+  public void sendContent(final OutputStream out, final Range range, final Map<String,
+    String> params, final String contentType) throws IOException,
+    NotAuthorizedException, BadRequestException, NotFoundException {
+    try {
+      service.retrieve(meta.db, meta.path, meta.raw, out);
+    } catch(IOException e) {
+      Util.errln(e);
+      throw new BadRequestException(this, e.getMessage());
+    }
   }
 
   @Override
