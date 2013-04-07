@@ -23,6 +23,11 @@ import java.io.OutputStream;
 import java.util.*;
 import java.util.List;
 
+/**
+ * Service handling the various WebDAV operations.
+ * @author BaseX Team 2005-13, BSD License
+ * @author Dimitar Popov
+ */
 public class WebDAVService<T> {
   /** HTTP context. */
   private final HTTPContext http;

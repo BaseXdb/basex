@@ -7,6 +7,11 @@ import org.basex.io.in.TextInput;
 import java.io.IOException;
 import java.util.Locale;
 
+/**
+ * WebDAV utility methods.
+ * @author BaseX Team 2005-13, BSD License
+ * @author Dimitar Popov
+ */
 public final class Utils {
   /** Time string. */
   public static final String TIME = Text.TIMESTAMP.replaceAll(" |-",
