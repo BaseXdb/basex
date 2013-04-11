@@ -29,6 +29,8 @@ import java.util.List;
  * @author Dimitar Popov
  */
 public class WebDAVService<T> {
+  /** Name of the database with the WebDAV locks. */
+  private static final String WEBDAV_LOCKS_DB = "webdav-locks";
   /** HTTP context. */
   private final HTTPContext http;
   /** Resource factory. */
@@ -428,6 +430,7 @@ public class WebDAVService<T> {
     final List<T> dbs = new ArrayList<T>();
     final Query q = http.session().query(
       "for $d in " + _DB_LIST_DETAILS.args() +
+        "where not($d/text() eq '" + WEBDAV_LOCKS_DB + "') " +
         "return ($d/text(), $d/@modified-date/data())");
     try {
       while(q.more()) {
