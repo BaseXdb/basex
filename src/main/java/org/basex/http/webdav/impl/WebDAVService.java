@@ -117,34 +117,6 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Checks if any of the resources which start with the given path.
-   * @param db name of database
-   * @param p path
-   * @return {@code true} if there are resources with the given prefix
-   * @throws IOException I/O exception
-   */
-  private boolean pathExists(final String db, final String p) throws IOException {
-    final Query q = http.session().query(COUNT.args(_DB_LIST.args("$d", "$p")));
-    q.bind("d", db);
-    q.bind("p", p);
-    return !"0".equals(q.execute());
-  }
-
-  /**
-   * Checks if any resource with the specified name exists.
-   * @param db name of database
-   * @param p resource path
-   * @return {@code true} if there are resources with the name
-   * @throws IOException I/O exception
-   */
-  private boolean exists(final String db, final String p) throws IOException {
-    final Query q = http.session().query(_DB_EXISTS.args("$d", "$p"));
-    q.bind("d", db);
-    q.bind("p", p);
-    return q.execute().equals(Text.TRUE);
-  }
-
-  /**
    * Retrieve the last modified timestamp of a database.
    * @param db database
    * @return timestamp in milliseconds.
@@ -269,7 +241,7 @@ public class WebDAVService<T> {
         "for $d in " + _DB_LIST.args("$db", "$path") +
         "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) return " +
         "if(" + _DB_IS_RAW.args("$db", "$d") + ") " +
-        " then " + _DB_STORE.args("$tdb", "$t", _DB_RETRIEVE.args("$db", "$d")) +
+        "then " + _DB_STORE.args("$tdb", "$t", _DB_RETRIEVE.args("$db", "$d")) +
         " else " + _DB_ADD.args("$tdb", _DB_OPEN.args("$db", "$d"), "$t"));
     q.bind("db", sdb);
     q.bind("path", spath);
@@ -304,10 +276,9 @@ public class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public void unlock(final String token) throws IOException {
-    final String queryStr =
-        "import module namespace w = 'http://basex.org/webdav';" +
-        "w:delete-lock($lock-token)";
-    final Query q = http.session().query(queryStr);
+    final Query q = http.session().query(
+      "import module namespace w = 'http://basex.org/webdav';" +
+        "w:delete-lock($lock-token)");
     q.bind("lock-token", token);
     q.execute();
   }
@@ -327,9 +298,10 @@ public class WebDAVService<T> {
   public String lock(final String db, final String p, final String scope,
       final String type, final String depth, final String user, final Long timeout) throws
     IOException {
+    initLockDb();
     final String token = UUID.randomUUID().toString();
-    final String queryStr =
-        "import module namespace w = 'http://basex.org/webdav';" +
+    final Query q = http.session().query(
+      "import module namespace w = 'http://basex.org/webdav';" +
         "w:create-lock(" +
         "$resource," +
         "$lock-token," +
@@ -337,9 +309,7 @@ public class WebDAVService<T> {
         "$lock-type," +
         "$lock-depth," +
         "$lock-owner," +
-        "$lock-timeout)";
-
-    final Query q = http.session().query(queryStr);
+        "$lock-timeout)");
     q.bind("resource", db + SEP + p);
     q.bind("lock-token", token);
     q.bind("lock-scope", scope);
@@ -360,11 +330,9 @@ public class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public String lock(final String db, final String p) throws IOException {
-    final String queryStr =
-        "import module namespace w = 'http://basex.org/webdav';" +
-        "w:get-locks($resource)";
-
-    final Query q = http.session().query(queryStr);
+    final Query q = http.session().query(
+      "import module namespace w = 'http://basex.org/webdav';" +
+        "w:get-locks($resource)");
     q.bind("resource", db + SEP + p);
 
     return q.next();
@@ -378,18 +346,6 @@ public class WebDAVService<T> {
    */
   public T createDb(final String db) throws IOException {
     http.session().execute(new CreateDB(db));
-    return factory.database(this, new ResourceMetaData(db, timestamp(db)));
-  }
-
-  /**
-   * Create a database with the given name and add the given document.
-   * @param db database name
-   * @param in data stream
-   * @return object representing the newly created database
-   * @throws IOException I/O exception
-   */
-  private T createDb(final String db, final InputStream in) throws IOException {
-    http.session().create(db, in);
     return factory.database(this, new ResourceMetaData(db, timestamp(db)));
   }
 
@@ -420,37 +376,6 @@ public class WebDAVService<T> {
    */
   public void copyDb(final String db, final String n) throws IOException {
     http.session().execute(new Copy(db, n));
-  }
-
-  /**
-   * Add a document with the specified name to the given path.
-   * @param db database
-   * @param p path where the document will be added
-   * @param in data stream
-   * @return object representing the newly added XML
-   * @throws IOException I/O exception
-   */
-  private T addXML(final String db, final String p, final InputStream in) throws
-    IOException {
-    final Session session = http.session();
-    session.execute(new Set(Prop.CHOP, false));
-    session.add(p, in);
-    return factory.file(this, new ResourceMetaData(db, p, timestamp(db), false,
-      APP_XML, null));
-  }
-
-  /**
-   * Add a binary file with the specified name to the given path.
-   * @param db database
-   * @param p path where the file will be stored
-   * @param in data stream
-   * @return object representing the newly added file
-   * @throws IOException I/O exception
-   */
-  private T store(final String db, final String p, final InputStream in) throws
-    IOException {
-    http.session().store(p, in);
-    return factory.file(this, metaData(db, p));
   }
 
   /**
@@ -503,7 +428,7 @@ public class WebDAVService<T> {
     final List<T> dbs = new ArrayList<T>();
     final Query q = http.session().query(
       "for $d in " + _DB_LIST_DETAILS.args() +
-      "return ($d/text(), $d/@modified-date/data())");
+        "return ($d/text(), $d/@modified-date/data())");
     try {
       while(q.more()) {
         final String name = q.next();
@@ -527,7 +452,7 @@ public class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public T createFolder(final String db, final String p, final String n) throws
-      IOException {
+    IOException {
     deleteDummy(db, p);
     final String newFolder = p + SEP + n;
     createDummy(db, newFolder);
@@ -543,10 +468,10 @@ public class WebDAVService<T> {
    */
   public T resource(final String db, final String p) throws IOException {
     return exists(db, p) ?
-        factory.file(this, metaData(db, p)) :
-        pathExists(db, p) ?
-          factory.folder(this, new ResourceMetaData(db, p, timestamp(db))) :
-          null;
+      factory.file(this, metaData(db, p)) :
+      pathExists(db, p) ?
+        factory.folder(this, new ResourceMetaData(db, p, timestamp(db))) :
+        null;
   }
 
   /**
@@ -559,7 +484,7 @@ public class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public T createFile(final String db, final String p, final String n,
-      final InputStream in) throws IOException {
+    final InputStream in) throws IOException {
     final Session session = http.session();
     session.execute(new Open(db));
     final String dbp = p.isEmpty() ? n : p + SEP + n;
@@ -579,6 +504,77 @@ public class WebDAVService<T> {
    */
   public T createFile(final String n, final InputStream in) throws IOException {
     return addFile(null, n, in);
+  }
+
+  /**
+   * Checks if any of the resources which start with the given path.
+   * @param db name of database
+   * @param p path
+   * @return {@code true} if there are resources with the given prefix
+   * @throws IOException I/O exception
+   */
+  private boolean pathExists(final String db, final String p) throws IOException {
+    final Query q = http.session().query(COUNT.args(_DB_LIST.args("$d", "$p")));
+    q.bind("d", db);
+    q.bind("p", p);
+    return !"0".equals(q.execute());
+  }
+
+  /**
+   * Checks if any resource with the specified name exists.
+   * @param db name of database
+   * @param p resource path
+   * @return {@code true} if there are resources with the name
+   * @throws IOException I/O exception
+   */
+  private boolean exists(final String db, final String p) throws IOException {
+    final Query q = http.session().query(_DB_EXISTS.args("$d", "$p"));
+    q.bind("d", db);
+    q.bind("p", p);
+    return q.execute().equals(Text.TRUE);
+  }
+
+  /**
+   * Create a database with the given name and add the given document.
+   * @param db database name
+   * @param in data stream
+   * @return object representing the newly created database
+   * @throws IOException I/O exception
+   */
+  private T createDb(final String db, final InputStream in) throws IOException {
+    http.session().create(db, in);
+    return factory.database(this, new ResourceMetaData(db, timestamp(db)));
+  }
+
+  /**
+   * Add a document with the specified name to the given path.
+   * @param db database
+   * @param p path where the document will be added
+   * @param in data stream
+   * @return object representing the newly added XML
+   * @throws IOException I/O exception
+   */
+  private T addXML(final String db, final String p, final InputStream in) throws
+    IOException {
+    final Session session = http.session();
+    session.execute(new Set(Prop.CHOP, false));
+    session.add(p, in);
+    return factory.file(this, new ResourceMetaData(db, p, timestamp(db), false,
+      APP_XML, null));
+  }
+
+  /**
+   * Add a binary file with the specified name to the given path.
+   * @param db database
+   * @param p path where the file will be stored
+   * @param in data stream
+   * @return object representing the newly added file
+   * @throws IOException I/O exception
+   */
+  private T store(final String db, final String p, final InputStream in) throws
+    IOException {
+    http.session().store(p, in);
+    return factory.file(this, metaData(db, p));
   }
 
   /**
@@ -623,5 +619,15 @@ public class WebDAVService<T> {
     } finally {
       bi.close();
     }
+  }
+
+  /**
+   * Creates the lock database, if it does not exist.
+   * @throws IOException I/O exception
+   */
+  private void initLockDb() throws IOException {
+    http.session().query(
+      "import module namespace w = 'http://basex.org/webdav';" +
+        "w:init-lock-db()").execute();
   }
 }
