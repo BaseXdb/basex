@@ -35,9 +35,11 @@ public final class FNRandomTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void integer() {
-    final Integer i1 = Integer.valueOf(query(_RANDOM_INTEGER.args()));
-    final Integer i2 = Integer.valueOf(query(_RANDOM_INTEGER.args(5)));
-    assertTrue(!i1.equals(i2) && i2 >= 0 && i2 < 5);
+    final Integer i = Integer.valueOf(query(_RANDOM_INTEGER.args(5)));
+    assertTrue(i >= 0 && i < 5);
+    assertEquals("0", query(_RANDOM_INTEGER.args(0)));
+    assertEquals("0", query(_RANDOM_INTEGER.args(-1)));
+    assertEquals("0", query(_RANDOM_INTEGER.args(" 8000000000")));
   }
 
   /** Test method. */
