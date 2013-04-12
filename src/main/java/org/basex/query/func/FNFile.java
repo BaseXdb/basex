@@ -477,18 +477,19 @@ public final class FNFile extends StandardFunc {
 
   /**
    * Transfers a file path, given a source and a target.
-   * @param src source file to be copied
+   * @param source source file to be copied
    * @param ctx query context
    * @param copy copy flag (no move)
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized Item copy(final File src, final QueryContext ctx,
+  private synchronized Item copy(final File source, final QueryContext ctx,
       final boolean copy) throws QueryException, IOException {
 
-    File trg = file(1, ctx).getAbsoluteFile();
-    if(!src.getCanonicalFile().exists()) FILE_WHICH.thrw(info, src.getAbsolutePath());
+    File trg = file(1, ctx).getCanonicalFile();
+    File src = source.getCanonicalFile();
+    if(!src.exists()) FILE_WHICH.thrw(info, src.getAbsolutePath());
 
     if(trg.isDirectory()) {
       // target is a directory: attach file name
@@ -503,8 +504,8 @@ public final class FNFile extends StandardFunc {
     }
 
     // ignore operations on identical, canonical source and target path
-    final String spath = src.getCanonicalPath();
-    final String tpath = trg.getCanonicalPath();
+    final String spath = src.getPath();
+    final String tpath = trg.getPath();
     if(!spath.equals(tpath)) {
       if(copy) {
         copy(src, trg);
