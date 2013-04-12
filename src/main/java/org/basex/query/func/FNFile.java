@@ -559,8 +559,9 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    */
   private File file(final int i, final QueryContext ctx) throws QueryException {
-    return i >= expr.length ? null :
-      new IOFile(IOUrl.file(string(checkStr(expr[i], ctx)))).file();
+    if(i >= expr.length) return null;
+    final String file = string(checkStr(expr[i], ctx));
+    return (IOUrl.isFileURL(file) ? IOFile.get(file) : new IOFile(file)).file();
   }
 
   @Override
