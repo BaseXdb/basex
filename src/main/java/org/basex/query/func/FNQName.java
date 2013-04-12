@@ -182,8 +182,8 @@ public final class FNQName extends StandardFunc {
     // check base uri
     final Uri base = it2 == null ? ctx.sc.baseURI() : Uri.uri(checkEStr(it2));
     if(!base.isAbsolute()) URIABS.thrw(info, base);
-    if(!base.isValid() || contains(base.string(), '#') ||
-        !contains(base.string(), token("//"))) URIINVRES.thrw(info, base);
+    if(!base.isValid() || contains(base.string(), '#') || !contains(base.string(), '/'))
+      URIINVRES.thrw(info, base);
 
     return base.resolve(rel);
   }
