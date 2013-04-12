@@ -253,6 +253,13 @@ public interface DataText {
   /** CDATA output. */
   byte[] CDATA_C = token("]]>");
 
+  /** XML spaces: element name. */
+  byte[] XML_SPACE = token("xml:space");
+  /** XML spaces: default. */
+  byte[] DEFAULT = token("default");
+  /** XML spaces: preserve. */
+  byte[] PRESERVE = token("preserve");
+
   /** HTML: head element. */
   byte[] HEAD = token("head");
   /** HTML: meta element. */

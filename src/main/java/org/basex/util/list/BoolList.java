@@ -57,6 +57,30 @@ public final class BoolList extends ElementList {
   }
 
   /**
+   * Pops the uppermost element from the stack.
+   * @return the popped element
+   */
+  public boolean pop() {
+    return list[--size];
+  }
+
+  /**
+   * Pushes an element onto the stack.
+   * @param val element
+   */
+  public void push(final boolean val) {
+    add(val);
+  }
+
+  /**
+   * Returns the uppermost element on the stack, without removing it.
+   * @return uppermost element
+   */
+  public boolean peek() {
+    return list[size - 1];
+  }
+
+  /**
    * Finishes the int array.
    * @return int array
    */
