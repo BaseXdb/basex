@@ -115,7 +115,7 @@ public final class QueryResources {
     for(int d = 0; d < datas; ++d) {
       final Data dt = data[d];
       // database has a single document, input paths are matching
-      if(dt.resources.docs().size() == 1 && IO.get(dt.meta.original).eq(qi.io))
+      if(dt.resources.docs().size() == 1 && IO.get(dt.meta.original).eq(qi.input))
         return new DBNode(dt, 0, Data.DOC);
 
       // database instance has same name as input path
@@ -166,7 +166,7 @@ public final class QueryResources {
     for(int d = 0; d < datas; ++d) {
       // return database instance with the same name or file path
       if(qi.db != null && data[d].meta.name.equalsIgnoreCase(qi.db) ||
-          IO.get(data[d].meta.original).eq(qi.io)) {
+          IO.get(data[d].meta.original).eq(qi.input)) {
         dt = data[d];
         break;
       }
@@ -252,7 +252,7 @@ public final class QueryResources {
     Data d = null;
     try {
       // try to create database with original path
-      d = CreateDB.create(input.io, single, ctx.context);
+      d = CreateDB.create(input.input, single, ctx.context);
     } catch(final IOException ex) {
       // try to create database with path relative to base uri
       final IO base = ctx.sc.baseIO();

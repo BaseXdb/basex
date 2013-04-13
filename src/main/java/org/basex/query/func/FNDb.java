@@ -804,12 +804,12 @@ public final class FNDb extends StandardFunc {
     if(!in.type.isStringOrUntyped()) throw STRNODTYPE.thrw(info, this, in.type);
 
     final QueryInput qi = new QueryInput(Token.string(in.string(info)));
-    if(!qi.io.exists()) WHICHRES.thrw(info, qi.original);
+    if(!qi.input.exists()) WHICHRES.thrw(info, qi.original);
 
     // add slash to the target if the addressed file is an archive or directory
     String name = string(path);
     if(name.endsWith(".")) RESINV.thrw(info, path);
-    if(!name.endsWith("/") && (qi.io.isDir() || qi.io.isArchive())) name += "/";
+    if(!name.endsWith("/") && (qi.input.isDir() || qi.input.isArchive())) name += "/";
     String target = "";
     final int s = name.lastIndexOf('/');
     if(s != -1) {
@@ -818,14 +818,14 @@ public final class FNDb extends StandardFunc {
     }
 
     // set name of document
-    if(!name.isEmpty()) qi.io.name(name);
+    if(!name.isEmpty()) qi.input.name(name);
     // get name from io reference
-    else if(!(qi.io instanceof IOContent)) name = qi.io.name();
+    else if(!(qi.input instanceof IOContent)) name = qi.input.name();
 
     // ensure that the final name is not empty
     if(name.isEmpty()) RESINV.thrw(info, path);
 
-    ni.io = qi.io;
+    ni.io = qi.input;
     ni.dbname = token(name);
     ni.path = token(target);
     return ni;

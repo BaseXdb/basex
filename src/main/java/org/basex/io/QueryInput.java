@@ -12,7 +12,7 @@ public final class QueryInput {
   /** Original input string. */
   public final String original;
   /** Input reference. */
-  public final IO io;
+  public final IO input;
   /** Optional database path. */
   public String path = "";
   /** Optional database name. */
@@ -20,21 +20,21 @@ public final class QueryInput {
 
   /**
    * Constructor.
-   * @param input input path
+   * @param in input path
    */
-  public QueryInput(final String input) {
-    original = input;
-    io = IO.get(input);
+  public QueryInput(final String in) {
+    original = in;
+    input = IO.get(in);
 
     // checks if the specified input reference is a valid database name
-    if(MetaData.validName(input, false)) {
-      db = input;
+    if(MetaData.validName(in, false)) {
+      db = in;
     } else {
-      final int s = input.indexOf('/');
-      if(s > 0 && input.indexOf(':') == -1) {
-        final String n = input.substring(0, s);
+      final int s = in.indexOf('/');
+      if(s > 0 && in.indexOf(':') == -1) {
+        final String n = in.substring(0, s);
         if(MetaData.validName(n, false)) {
-          path = input.substring(s + 1);
+          path = in.substring(s + 1);
           db = n;
         }
       }
