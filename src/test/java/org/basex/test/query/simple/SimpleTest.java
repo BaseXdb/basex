@@ -101,7 +101,13 @@ public final class SimpleTest extends QueryTest {
       { "Div 1", "xs:dayTimeDuration('PT0S') div xs:dayTimeDuration('PT0S')" },
       { "Div 2", "xs:yearMonthDuration('P0M') div xs:yearMonthDuration('P0M')" },
 
-      { "Mixed 1", "(<a/>,<b/>)/(if(name() = 'a') then <a/> else 2)/." }
+      { "Mixed 1", "(<a/>,<b/>)/(if(name() = 'a') then <a/> else 2)/." },
+
+      { "Typeswitch 1", itr(1),
+        "typeswitch(<a>1</a>) case xs:string return 1 default return 1" },
+      { "Typeswitch 2", itr(1),
+        "typeswitch(<a>1</a>) case $a as xs:string return 1 default return 1" },
+
     };
   }
 }

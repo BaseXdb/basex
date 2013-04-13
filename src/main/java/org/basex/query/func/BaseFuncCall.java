@@ -24,8 +24,7 @@ public final class BaseFuncCall extends StaticFuncCall {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     StaticFunc fun = func;
     Value[] args = args(ctx);
 

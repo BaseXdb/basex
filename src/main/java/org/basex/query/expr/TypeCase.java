@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  */
 public final class TypeCase extends Single {
   /** Variable. */
-  private final Var var;
+  final Var var;
   /** Matched sequence types. */
   final SeqType[] types;
 
