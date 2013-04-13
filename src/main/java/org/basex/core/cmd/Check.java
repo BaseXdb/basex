@@ -1,13 +1,10 @@
 package org.basex.core.cmd;
 
-import static org.basex.data.DataText.*;
-
 import java.io.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.io.in.DataInput;
 import org.basex.util.list.*;
 
 /**
@@ -61,18 +58,15 @@ public final class Check extends Command {
     // database with given name does not exist
     if(!mprop.dbpath(qi.db).exists()) return false;
 
-    DataInput di = null;
+    // compare timestamp of database input and specified file
+    final MetaData meta = new MetaData(qi.db, context);
     try {
-      final MetaData meta = new MetaData(qi.db, context);
-      di = new DataInput(meta.dbfile(DATAINF));
-      meta.read(di);
+      meta.read();
       return meta.time == qi.input.timeStamp();
-    } catch(final IOException ignored) {
+    } catch(final IOException ex) {
       // rebuild database if it cannot be opened
-    } finally {
-      if(di != null) try { di.close(); } catch(final IOException ignored) { }
+      return false;
     }
-    return false;
   }
 
   @Override

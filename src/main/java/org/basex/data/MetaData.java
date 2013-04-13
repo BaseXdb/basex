@@ -274,6 +274,22 @@ public final class MetaData {
   }
 
   /**
+   * Reads in all meta data.
+   * @throws IOException exception
+   */
+  public void read() throws IOException {
+    DataInput di = null;
+    try {
+      di = new DataInput(dbfile(DATAINF));
+      read(di);
+    } catch(final IOException ex) {
+      throw ex;
+    } finally {
+      if(di != null) try { di.close(); } catch(final IOException ignored) { }
+    }
+  }
+
+  /**
    * Reads in meta data from the specified stream.
    * @param in input stream
    * @throws IOException I/O exception

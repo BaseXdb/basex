@@ -10,7 +10,6 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
-import org.basex.io.in.DataInput;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -71,21 +70,17 @@ public final class List extends Command {
     if(create) table.header.add(INPUT_PATH);
 
     for(final String name : context.databases.listDBs()) {
-      DataInput di = null;
       String file = null;
       long size = 0;
       int docs = 0;
       final MetaData meta = new MetaData(name, context);
       try {
-        di = new DataInput(meta.dbfile(DATAINF));
-        meta.read(di);
+        meta.read();
         size = meta.dbsize();
         docs = meta.ndocs;
         if(context.perm(Perm.READ, meta)) file = meta.original;
       } catch(final IOException ex) {
         file = ERROR;
-      } finally {
-        if(di != null) try { di.close(); } catch(final IOException ignored) { }
       }
 
       // count number of raw files

@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.data.DataText.*;
 import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
@@ -16,7 +15,6 @@ import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
-import org.basex.io.in.DataInput;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -342,22 +340,19 @@ public final class FNDb extends StandardFunc {
       int pos;
       @Override
       public ANode get(final long i) throws QueryException {
-        final FElem res = new FElem(Q_DATABASE);
         final String name = sl.get((int) i);
         final MetaData meta = new MetaData(name, ctx.context);
-        DataInput di = null;
         try {
-          di = new DataInput(meta.dbfile(DATAINF));
-          meta.read(di);
-          res.add(Q_RESOURCES, token(meta.ndocs));
-          res.add(Q_MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
-          if(ctx.context.perm(Perm.CREATE, meta)) res.add(Q_PATH, meta.original);
-          res.add(name);
+          meta.read();
         } catch(final IOException ex) {
           BXDB_OPEN.thrw(info, ex);
-        } finally {
-          if(di != null) try { di.close(); } catch(final IOException ignored) { }
         }
+
+        final FElem res = new FElem(Q_DATABASE);
+        res.add(Q_RESOURCES, token(meta.ndocs));
+        res.add(Q_MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
+        if(ctx.context.perm(Perm.CREATE, meta)) res.add(Q_PATH, meta.original);
+        res.add(name);
         return res;
       }
       @Override
