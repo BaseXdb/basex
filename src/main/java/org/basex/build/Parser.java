@@ -26,9 +26,9 @@ import org.basex.util.*;
 public abstract class Parser extends Progress {
   /** Source document, or {@code null}. */
   public IO src;
-  /** Attributes. */
+  /** Attributes of currently parsed element. */
   protected final Atts atts = new Atts();
-  /** Namespaces (always empty). */
+  /** Namespaces of currently parsed element. */
   protected final Atts nsp = new Atts();
   /** Database properties. */
   protected final Prop prop;
