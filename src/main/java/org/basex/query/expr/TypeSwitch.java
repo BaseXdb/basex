@@ -59,13 +59,14 @@ public final class TypeSwitch extends ParseExpr {
     for(final TypeCase tc : cases) tc.compile(ctx, scp);
 
     // return first branch if all branches are equal (e.g., empty) and use no variables
-    boolean eq = true;
-    for(int i = 1; i < cases.length; ++i) {
-      final TypeCase tc = cases[i - 1];
-      eq &= tc.expr.sameAs(cases[i].expr) && tc.var == null;
+    final TypeCase tc = cases[0];
+    boolean eq = tc.var == null;
+    for(int c = 1; eq && c < cases.length; ++c) {
+      eq = tc.expr.sameAs(cases[c].expr);
     }
-    if(eq) return optPre(cases[0].expr.item(ctx, info), ctx);
+    if(eq) return optPre(tc.expr, ctx);
 
+    // combine return types
     type = cases[0].type();
     for(int c = 1; c < cases.length; ++c) {
       type = type.union(cases[c].type());
