@@ -67,6 +67,7 @@ public class WebDAVService<T> {
    */
   public boolean authorise(final String user, final String action, final String db,
       final String p) {
+    if(WEBDAV_LOCKS_DB.equals(db)) return false;
     // TODO
     return true;
   }
@@ -338,6 +339,10 @@ public class WebDAVService<T> {
     q.bind("resource", db + SEP + p);
 
     return q.next();
+  }
+
+  public boolean hasLockedChild() {
+    return false;
   }
 
   /**
