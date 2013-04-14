@@ -75,6 +75,13 @@ public final class FNFormatDateTest extends QueryTest {
       { "formdate 230", str("12/31/2002 at 15:58:45"),
         "format-dateTime(xs:dateTime('2002-12-31T15:58:45.762+02:00'), " +
         "'[M01]/[D01]/[Y0001] at [H01]:[m01]:[s01]')" },
+
+      { "formdate 250", str("J"),
+        "format-time(xs:time('12:12:12'), '[ZZ]')" },
+      { "formdate 251", str(""),
+        "format-time(xs:time('12:12:12'), '[zZ]')" },
+      { "formdate 252", str(""),
+        "format-time(xs:time('12:12:12'), '[Zz]')" },
     };
   }
 }

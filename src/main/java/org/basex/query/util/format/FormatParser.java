@@ -24,6 +24,8 @@ public abstract class FormatParser extends FormatUtil {
   int first = -1;
   /** Ordinal suffix; {@code null} if not specified. */
   byte[] ordinal;
+  /** Traditional modifier. */
+  boolean trad;
   /** Minimum width. */
   int min;
   /** Maximum width. */
