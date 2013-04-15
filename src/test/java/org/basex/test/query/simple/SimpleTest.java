@@ -110,6 +110,8 @@ public final class SimpleTest extends QueryTest {
       { "Typeswitch 3", itr(1, 2),
         "typeswitch(<a>1</a>) case $a as xs:string return (1,2) default return (1,2)" },
 
+      { "FunctionContext 0", "declare function local:x() { /x }; local:x()" },
+
     };
   }
 }

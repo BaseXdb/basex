@@ -110,7 +110,7 @@ public final class StaticVar extends ParseExpr implements Scope {
     if(dontEnter) throw Err.circVar(ctx, this);
 
     if(!compiled) {
-      final StaticContext tmp = ctx.sc;
+      final StaticContext cs = ctx.sc;
       ctx.sc = sc;
 
       dontEnter = true;
@@ -127,7 +127,7 @@ public final class StaticVar extends ParseExpr implements Scope {
       } finally {
         scope.cleanUp(this);
         scope.exit(ctx, fp);
-        ctx.sc = tmp;
+        ctx.sc = cs;
         dontEnter = false;
       }
 
@@ -152,7 +152,7 @@ public final class StaticVar extends ParseExpr implements Scope {
     if(lazy) {
       if(!compiled) throw Util.notexpected(this + " was not compiled.");
       if(value != null) return value;
-      final StaticContext tmp = ctx.sc;
+      final StaticContext cs = ctx.sc;
       ctx.sc = sc;
       dontEnter = true;
       final int fp = scope.enter(ctx);
@@ -162,7 +162,7 @@ public final class StaticVar extends ParseExpr implements Scope {
         throw qe.notCatchable();
       } finally {
         scope.exit(ctx, fp);
-        ctx.sc = tmp;
+        ctx.sc = cs;
         dontEnter = false;
       }
     }
@@ -171,13 +171,13 @@ public final class StaticVar extends ParseExpr implements Scope {
     if(expr == null) throw VAREMPTY.thrw(info, this);
     dontEnter = true;
     final int fp = scope.enter(ctx);
-    final StaticContext tmp = ctx.sc;
+    final StaticContext cs = ctx.sc;
     ctx.sc = sc;
     try {
       return bind(expr.value(ctx));
     } finally {
       scope.exit(ctx, fp);
-      ctx.sc = tmp;
+      ctx.sc = cs;
       dontEnter = false;
     }
   }

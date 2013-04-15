@@ -109,8 +109,7 @@ public final class InlineFunc extends Single implements Scope {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     if(compiled) return this;
     compiled = true;
 
@@ -118,7 +117,7 @@ public final class InlineFunc extends Single implements Scope {
     for(final Entry<Var, Expr> e : scope.closure().entrySet())
       e.setValue(e.getValue().compile(ctx, scp));
 
-    final StaticContext tmp = ctx.sc;
+    final StaticContext cs = ctx.sc;
     ctx.sc = sc;
 
     final int fp = scope.enter(ctx);
@@ -133,7 +132,7 @@ public final class InlineFunc extends Single implements Scope {
     } finally {
       scope.cleanUp(this);
       scope.exit(ctx, fp);
-      ctx.sc = tmp;
+      ctx.sc = cs;
     }
 
     return optimize(ctx, scp);
@@ -169,7 +168,7 @@ public final class InlineFunc extends Single implements Scope {
       }
     }
 
-    final StaticContext tmp = ctx.sc;
+    final StaticContext cs = ctx.sc;
     ctx.sc = sc;
 
     if(val) {
@@ -184,7 +183,7 @@ public final class InlineFunc extends Single implements Scope {
       } finally {
         scope.cleanUp(this);
         scope.exit(ctx, fp);
-        ctx.sc = tmp;
+        ctx.sc = cs;
       }
     }
 

@@ -89,8 +89,10 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
   public void compile(final QueryContext ctx) throws QueryException {
     if(compiled) return;
     compiling = compiled = true;
-    final StaticContext tmp = ctx.sc;
+    final Value cv = ctx.value;
+    final StaticContext cs = ctx.sc;
     ctx.sc = sc;
+    ctx.value = null;
 
     final int fp = scope.enter(ctx);
     try {
@@ -100,7 +102,8 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
     } finally {
       scope.cleanUp(this);
       scope.exit(ctx, fp);
-      ctx.sc = tmp;
+      ctx.value = cv;
+      ctx.sc = cs;
     }
 
     // convert all function calls in tail position to proper tail calls
@@ -197,7 +200,7 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
 
     // reset context and evaluate function
     final Value cv = ctx.value;
-    final StaticContext tmp = ctx.sc;
+    final StaticContext cs = ctx.sc;
     ctx.sc = sc;
     ctx.value = null;
     final int fp = addArgs(ctx, ii, arg);
@@ -209,7 +212,7 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
     } finally {
       scope.exit(ctx, fp);
       ctx.value = cv;
-      ctx.sc = tmp;
+      ctx.sc = cs;
     }
   }
 
@@ -218,7 +221,7 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
       throws QueryException {
     // reset context and evaluate function
     final Value cv = ctx.value;
-    final StaticContext tmp = ctx.sc;
+    final StaticContext cs = ctx.sc;
     ctx.sc = sc;
     ctx.value = null;
     final int fp = addArgs(ctx, ii, arg);
@@ -229,7 +232,7 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
     } finally {
       scope.exit(ctx, fp);
       ctx.value = cv;
-      ctx.sc = tmp;
+      ctx.sc = cs;
     }
   }
 

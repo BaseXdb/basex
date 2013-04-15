@@ -104,11 +104,11 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
 
     // bind variables and cache context
-    final StaticContext tmp = ctx.sc;
+    final StaticContext cs = ctx.sc;
     ctx.sc = sc;
     final int fp = ctx.stack.enterFrame(stackSize);
     final Value cv = ctx.value;
@@ -121,16 +121,16 @@ public final class FuncItem extends FItem implements Scope {
     } finally {
       ctx.value = cv;
       ctx.stack.exitFrame(fp);
-      ctx.sc = tmp;
+      ctx.sc = cs;
     }
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
 
     // bind variables and cache context
-    final StaticContext tmp = ctx.sc;
+    final StaticContext cs = ctx.sc;
     ctx.sc = sc;
     final int fp = ctx.stack.enterFrame(stackSize);
     final Value cv = ctx.value;
@@ -144,7 +144,7 @@ public final class FuncItem extends FItem implements Scope {
     } finally {
       ctx.value = cv;
       ctx.stack.exitFrame(fp);
-      ctx.sc = tmp;
+      ctx.sc = cs;
     }
   }
 
