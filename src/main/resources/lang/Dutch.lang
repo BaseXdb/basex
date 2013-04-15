@@ -241,6 +241,7 @@ parameters           = Parameters
 parse_archives       = Parse bestanden in archieven
 parse_as_jsonml      = Parse input as JsonML
 parse_dtds           = Parse DTDs en entities
+parser_%             = % Parser
 parsing              = Parsing
 password             = Wachtwoord
 paste                = Plak

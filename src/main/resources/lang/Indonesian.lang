@@ -241,6 +241,7 @@ parameters           = Parameter
 parse_archives       = Uraikan berkas yang didalam arsip
 parse_as_jsonml      = Uraikan masukan sebagai JsonML
 parse_dtds           = Uraikan DTD dan entitas
+parser_%             = % Parser
 parsing              = Menguarikan
 password             = Kata kunci
 paste                = Tempel

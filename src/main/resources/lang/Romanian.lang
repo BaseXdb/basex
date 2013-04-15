@@ -241,6 +241,7 @@ parameters           = Parametri
 parse_archives       = Parsare fisiere in arhiva
 parse_as_jsonml      = Parsare intrari ca JsonML
 parse_dtds           = Parsare DTD-uri si entitati
+parser_%             = % Parser
 parsing              = Parsare
 password             = Parolă
 paste                = Lipește

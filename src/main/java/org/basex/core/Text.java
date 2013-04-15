@@ -1112,6 +1112,9 @@ public interface Text {
   /** Full-text index. */
   String FULLTEXT = lang("fulltext");
 
+  /** General info. */
+  String PARSER_X = lang("parser_%");
+
   /** Dialog asking if a new database should be be created. */
   String NEW_DB_QUESTION = lang("no_db_found") + NL + lang("new_db_question");
 

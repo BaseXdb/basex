@@ -242,6 +242,7 @@ parameters           = Parameters
 parse_archives       = Архиваар дамжуулан файлыг Parsing хийх
 parse_as_jsonml      = Parse input as JsonML
 parse_dtds           = DTD-үүд болон объектуудыг Parsing хийх
+parser_%             = % Parser
 parsing              = Parsing хийх
 password             = Нууц үг
 paste                = Хуулж тавих

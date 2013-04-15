@@ -254,7 +254,7 @@ final class DialogParsing extends BaseXBack {
    * @param type parsing type
    */
   void updateType(final String type) {
-    label.setText(type.toUpperCase(Locale.ENGLISH) + " Parser");
+    label.setText(Util.info(PARSER_X, type.toUpperCase(Locale.ENGLISH)));
 
     if(type.equals(DataText.M_XML)) {
       parseropts = xmlopts;

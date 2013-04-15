@@ -241,6 +241,7 @@ parameters           = Parameters
 parse_archives       = Analyser les fichiers dans les archives
 parse_as_jsonml      = Parse input as JsonML
 parse_dtds           = Analyser les DTD et les entités
+parser_%             = % Parser
 parsing              = Analyse
 password             = Mot de passe
 paste                = Coller

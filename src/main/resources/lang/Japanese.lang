@@ -241,6 +241,7 @@ parameters           = パラメータ
 parse_archives       = アーカイブ内のファイルを解析する
 parse_as_jsonml      = JsonMLとして解析する
 parse_dtds           = DTDとエントリーを解析する
+parser_%             = % Parser
 parsing              = パース
 password             = パスワード
 paste                = 貼り付け
