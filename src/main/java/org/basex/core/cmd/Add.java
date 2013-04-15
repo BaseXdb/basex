@@ -93,24 +93,10 @@ public final class Add extends ACreate {
     parser = new DirParser(io, prop, data.meta.path);
     parser.target(target);
 
-    // create disk instances for large documents
-    // (does not work for input streams and directories)
-    final long fl = parser.src.length();
-    boolean large = prop.is(Prop.ADDCACHE);
-    if(!large) {
-      final Runtime rt = Runtime.getRuntime();
-      final long max = rt.maxMemory();
-      if(fl > (max - rt.freeMemory()) / 2) {
-        Performance.gc(2);
-        large = fl > (max - rt.freeMemory()) / 2;
-      }
-    }
-    // in main memory mode, never write to disk
-    if(prop.is(Prop.MAINMEM)) large = false;
-
     // create random database name for disk-based creation
-    final String db = large ? context.mprop.random(data.meta.name) : name;
-    build = large ? new DiskBuilder(db, parser, context) : new MemBuilder(db, parser);
+    final boolean cache = cache(parser);
+    final String db = cache ? context.mprop.random(data.meta.name) : name;
+    build = cache ? new DiskBuilder(db, parser, context) : new MemBuilder(db, parser);
 
     Data tmp = null;
     try {
@@ -129,8 +115,38 @@ public final class Add extends ACreate {
     } finally {
       // close and drop intermediary database instance
       if(tmp != null) tmp.close();
-      if(large) DropDB.drop(db, context);
+      if(cache) DropDB.drop(db, context);
     }
+  }
+
+  /**
+   * Decides if the input should be cached before being written to the final database.
+   * @param parser parser reference
+   * @return result of check
+   */
+  private boolean cache(final Parser parser) {
+    // main memory mode: never write to disk
+    if(prop.is(Prop.MAINMEM)) return false;
+    // explicit caching
+    if(prop.is(Prop.ADDCACHE)) return true;
+
+    // create disk instances for large documents
+    // (does not work for input streams and directories)
+    long fl = parser.src.length();
+    if(parser.src instanceof IOFile) {
+      final IOFile f = (IOFile) parser.src;
+      if(f.isDir()) {
+        for(final String d : f.descendants()) fl += new IOFile(f, d).length();
+      }
+    }
+
+    // check free memory
+    final Runtime rt = Runtime.getRuntime();
+    final long max = rt.maxMemory();
+    if(fl < (max - rt.freeMemory()) / 2) return false;
+    // if caching may be necessary, run garbage collection and try again
+    Performance.gc(2);
+    return fl > (max - rt.freeMemory()) / 2;
   }
 
   @Override
