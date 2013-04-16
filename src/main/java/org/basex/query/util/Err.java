@@ -975,8 +975,24 @@ public enum Err {
   DUPLVARVIS(XQST, 116, "More than one visibility annotation declared."),
   /** XQST0118. */
   TAGWRONG(XQST, 118, "Start and end tag are different: <%>...</%>."),
+  /** XQST0120. */
+  FEATNOTSUPP(XQST, 120, "Feature '%' is not supported by the implementation."),
+  /** XQST0122. */
+  DECLQNAME(XQST, 122, "Invalid QName: '%'."),
+  /** XQST0123. */
+  DECLOPTION(XQST, 123, "Unknown option: %."),
+  /** XQST0123. */
+  DECLFEAT(XQST, 123, "Unknown feature: '%'."),
   /** XPST0125. */
   INVISIBLE(XQST, 125, "No visibility annotation allowed in inline function."),
+  /** XPST0126. */
+  FEATREQUALL(XQST, 126, "The '%' feature cannot be specified as required feature."),
+  /** XPST0127. */
+  FEATREQPRO(XQST, 127, "The '%' feature cannot be both required and prohibited."),
+  /** XPST0128. */
+  FEATPROH(XQST, 128, "The '%' feature has been disabled."),
+  /** XPST0132. */
+  FEATMODULE(XQST, 132, "The '%' feature is not allowed in a library module."),
 
   /** XQTY0024. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),

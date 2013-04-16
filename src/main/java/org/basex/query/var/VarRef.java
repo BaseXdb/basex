@@ -36,7 +36,6 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-
     type = var.type();
     size = var.size;
 
@@ -45,8 +44,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return ctx.get(var).item(ctx, ii);
   }
 

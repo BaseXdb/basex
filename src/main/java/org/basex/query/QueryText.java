@@ -358,7 +358,16 @@ public interface QueryText {
   /** Parser token. */
   String DF_ZG = "zero-digit";
 
-  // ERROR INFORMATION =======================================================
+  /** Option: prohibit-feature. */
+  String PROHIBIT_FEATURE = "prohibit-feature";
+  /** Option: require-feature. */
+  String REQUIRE_FEATURE = "require-feature";
+  /** Option: read-lock. */
+  String READ_LOCK = "read-lock";
+  /** Option: write-lock. */
+  String WRITE_LOCK = "write-lock";
+
+  // ERROR INFORMATION ========================================================
 
   /** Skip flag for the syntax highlighter (don't remove!). */
   String IGNORE = null;
@@ -415,7 +424,7 @@ public interface QueryText {
   /** Parser Token. */
   String ASTERISK = "*";
 
-  // PREFIXES =================================================================
+  // TOKENS ===================================================================
 
   /** Base token. */
   byte[] BASE = token("base");
@@ -462,10 +471,6 @@ public interface QueryText {
   byte[] DB = token("db");
   /** QUERY token. */
   byte[] QUERY = token("query");
-  /** READ_LOCK token. */
-  byte[] READ_LOCK = token("read-lock");
-  /** WRITE token. */
-  byte[] WRITE_LOCK = token("write-lock");
   /** Index token. */
   byte[] INDEX = token("index");
   /** FETCH token. */
@@ -530,6 +535,19 @@ public interface QueryText {
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
 
+  /** Feature: schema-aware. */
+  String F_SCHEMA_AWARE = "schema-aware";
+  /** Feature: static-typing. */
+  String F_STATIC_TYPING = "static-typing";
+  /** Feature: module. */
+  String F_MODULE = "module";
+  /** Feature: higher-order-function. */
+  String F_HIGHER_ORDER_FUNCTION = "higher-order-function";
+  /** Feature: all-extensions. */
+  String F_ALL_EXTENSIONS = "all-extensions";
+  /** Feature: all-optional-features. */
+  String F_ALL_OPTIONAL_FEATURES = "all-optional-features";
+
   // URIS =====================================================================
 
   /** W3 URI. */
@@ -555,7 +573,7 @@ public interface QueryText {
   /** Map URI. */
   byte[] MAPURI = token(W3URI + "/2005/xpath-functions/map");
   /** Annotations URI. */
-  byte[] ANNURI = token(W3URI + "/2012/xquery");
+  byte[] XQURI = token(W3URI + "/2012/xquery");
 
   /** EXQuery URI. */
   String EXQUERY = "http://exquery.org/ns/";

@@ -646,19 +646,19 @@ public enum AtomType implements Type {
   /** QName Type. */
   QNM("QName", AAT, XSURI, false, false, false, Type.ID.QNM) {
     @Override
-    public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
+    public QNm cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
 
       // xquery 3.0 also allows untyped arguments
       if(it.type != STR && !(ctx.sc.xquery3() && it.type.isUntyped())) invCast(it, ii);
       final byte[] nm = trim(it.string(ii));
-      if(nm.length == 0 || !XMLToken.isQName(nm)) FUNCAST.thrw(ii, this, it);
+      if(!XMLToken.isQName(nm)) FUNCAST.thrw(ii, this, it);
       final QNm qn = new QNm(nm, ctx);
       if(!qn.hasURI() && qn.hasPrefix()) NSDECL.thrw(ii, qn.prefix());
       return qn;
     }
     @Override
-    public Item cast(final Object o, final InputInfo ii) {
+    public QNm cast(final Object o, final InputInfo ii) {
       return o instanceof QName ? new QNm((QName) o) : new QNm(o.toString());
     }
   },

@@ -77,30 +77,8 @@ public class QueryParser extends InputParser {
   /** Alternative position. */
   private int ap;
 
-  /** Declared serialization options. */
-  private final StringList serial = new StringList();
-  /** Declaration flag. */
-  private boolean declElem;
-  /** Declaration flag. */
-  private boolean declFunc;
-  /** Declaration flag. */
-  private boolean declColl;
-  /** Declaration flag. */
-  private boolean declConstr;
-  /** Declaration flag. */
-  private boolean declSpaces;
-  /** Declaration flag. */
-  private boolean declOrder;
-  /** Declaration flag. */
-  private boolean declReval;
-  /** Declaration flag. */
-  private boolean declGreat;
-  /** Declaration flag. */
-  private boolean declPres;
-  /** Declaration flag. */
-  private boolean declBase;
-  /** Declaration flag. */
-  private boolean declItem;
+  /** Declared flags. */
+  private final HashSet<String> decl = new HashSet<String>();
 
   /** Cached QNames. */
   private final ArrayList<QNmCheck> names = new ArrayList<QNmCheck>();
@@ -463,7 +441,7 @@ public class QueryParser extends InputParser {
    */
   private void annotation(final Ann ann) throws QueryException {
     skipWS();
-    final QNm name = eQName(QNAMEINV, ANNURI);
+    final QNm name = eQName(QNAMEINV, XQURI);
     final ValueBuilder vb = new ValueBuilder();
     if(wsConsumeWs(PAR1)) {
       do {
@@ -518,8 +496,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void revalidationDecl() throws QueryException {
-    if(declReval) error(DUPLREVAL);
-    declReval = true;
+    if(!decl.add(REVALIDATION)) error(DUPLREVAL);
     if(wsConsumeWs(STRICT) || wsConsumeWs(LAX)) error(NOREVAL);
     wsCheck(SKIP);
   }
@@ -529,8 +506,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void boundarySpaceDecl() throws QueryException {
-    if(declSpaces) error(DUPLBOUND);
-    declSpaces = true;
+    if(!decl.add(BOUNDARY_SPACE)) error(DUPLBOUND);
     final boolean spaces = wsConsumeWs(PRESERVE);
     if(!spaces) wsCheck(STRIP);
     ctx.sc.spaces = spaces;
@@ -550,12 +526,10 @@ public class QueryParser extends InputParser {
     if(eq(XMLNSURI, uri)) error(BINDXMLURI, uri, XMLNS);
 
     if(elem) {
-      if(declElem) error(DUPLNS);
-      declElem = true;
+      if(!decl.add(ELEMENT)) error(DUPLNS);
       ctx.sc.nsElem = uri.length == 0 ? null : uri;
     } else {
-      if(declFunc) error(DUPLNS);
-      declFunc = true;
+      if(!decl.add(FUNCTION)) error(DUPLNS);
       ctx.sc.nsFunc = uri.length == 0 ? null : uri;
     }
     return true;
@@ -567,39 +541,67 @@ public class QueryParser extends InputParser {
    */
   private void optionDecl() throws QueryException {
     skipWS();
-    final QNm name = eQName(QNAMEINV, URICHECK);
+    final QNm name = eQName(QNAMEINV, ctx.sc.xquery3() ? XQURI : URICHECK);
     final byte[] val = stringLiteral();
+    final String key = string(name.local());
 
     if(ctx.sc.xquery3() && eq(name.uri(), OUTPUTURI)) {
       // output declaration
-      final String key = string(name.local());
       if(module != null) error(MODOUT);
 
       if(ctx.serProp == null) ctx.serProp = new SerializerProp();
       if(ctx.serProp.get(key) == null) error(OUTWHICH, key);
-      if(serial.contains(key)) error(OUTDUPL, key);
+      if(!decl.add("S " + key)) error(OUTDUPL, key);
 
       ctx.serProp.set(key, string(val));
-      serial.add(key);
+    } else if(ctx.sc.xquery3() && eq(name.uri(), XQURI)) {
+      // query-specific options
+      final boolean pf = key.equals(PROHIBIT_FEATURE);
+      final boolean rf = !pf && key.equals(REQUIRE_FEATURE);
+      if(!pf && !rf) error(DECLOPTION, name);
+
+      for(final byte[] vl : split(val, ' ')) {
+        if(!XMLToken.isQName(vl)) error(DECLQNAME, val);
+        final QNm qn = new QNm(vl, ctx);
+        if(!qn.hasURI()) {
+          if(qn.hasPrefix()) error(NSDECL, qn.prefix());
+          qn.uri(XQURI);
+        }
+        final String k = string(qn.local());
+        if(eq(qn.uri(), XQURI) && eq(k, F_SCHEMA_AWARE, F_STATIC_TYPING, F_MODULE,
+            F_HIGHER_ORDER_FUNCTION, F_ALL_EXTENSIONS, F_ALL_OPTIONAL_FEATURES)) {
+          if(eq(k, F_STATIC_TYPING, F_SCHEMA_AWARE, F_ALL_OPTIONAL_FEATURES))
+            error(pf ? FEATPROH : FEATNOTSUPP, k);
+          if(rf && eq(k, F_ALL_EXTENSIONS)) error(FEATREQUALL, k);
+          if(module != null && eq(k, F_MODULE)) error(FEATMODULE, k);
+          if(decl.contains(k + (pf ? 'R' : 'P'))) error(FEATREQPRO, k);
+          if(pf && eq(k, F_MODULE, F_HIGHER_ORDER_FUNCTION, F_ALL_EXTENSIONS,
+              F_ALL_OPTIONAL_FEATURES)) error(FEATPROH, k);
+          decl.add(k + (pf ? 'P' : 'R'));
+        } else {
+          error(DECLFEAT, vl);
+        }
+      }
+
     } else if(eq(name.uri(), DBURI)) {
       // project-specific declaration
-      final String key = string(uc(name.local()));
-      final Object obj = ctx.context.prop.get(key);
-      if(obj == null) error(BASX_OPTIONS, key);
+      final String ukey = key.toUpperCase(Locale.ENGLISH);
+      final Object obj = ctx.context.prop.get(ukey);
+      if(obj == null) error(BASX_OPTIONS, ukey);
       // cache old value (to be reset after query evaluation)
-      ctx.globalOpt.put(key, obj);
-      ctx.dbOptions.add(key);
+      ctx.globalOpt.put(ukey, obj);
+      ctx.dbOptions.add(ukey);
       ctx.dbOptions.add(string(val));
     } else if(eq(name.uri(), QUERYURI)) {
       // Query-specific options
-      if(eq(name.local(), READ_LOCK)) {
+      if(key.equals(READ_LOCK)) {
         for(final byte[] lock : split(val, ','))
           ctx.userReadLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
-      } else if(eq(name.local(), WRITE_LOCK)) {
+      } else if(key.equals(WRITE_LOCK)) {
         for(final byte[] lock : split(val, ','))
           ctx.userWriteLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
       } else {
-        error(BASX_OPTIONS, string(name.local()));
+        error(BASX_OPTIONS, key);
       }
     }
     // ignore unknown options
@@ -610,8 +612,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void orderingModeDecl() throws QueryException {
-    if(declOrder) error(DUPLORD);
-    declOrder = true;
+    if(!decl.add(ORDERING)) error(DUPLORD);
     ctx.sc.ordered = wsConsumeWs(ORDERED);
     if(!ctx.sc.ordered) wsCheck(UNORDERED);
   }
@@ -624,8 +625,7 @@ public class QueryParser extends InputParser {
   private boolean emptyOrderDecl() throws QueryException {
     if(!wsConsumeWs(ORDER)) return false;
     wsCheck(EMPTYORD);
-    if(declGreat) error(DUPLORDEMP);
-    declGreat = true;
+    if(!decl.add(EMPTYORD)) error(DUPLORDEMP);
     ctx.sc.orderGreatest = wsConsumeWs(GREATEST);
     if(!ctx.sc.orderGreatest) wsCheck(LEAST);
     return true;
@@ -638,8 +638,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void copyNamespacesDecl() throws QueryException {
-    if(declPres) error(DUPLCOPYNS);
-    declPres = true;
+    if(!decl.add(COPY_NAMESPACES)) error(DUPLCOPYNS);
     ctx.sc.nsPreserve = wsConsumeWs(PRESERVE);
     if(!ctx.sc.nsPreserve) wsCheck(NO_PRESERVE);
     wsCheck(COMMA);
@@ -692,8 +691,7 @@ public class QueryParser extends InputParser {
    */
   private boolean defaultCollationDecl() throws QueryException {
     if(!wsConsumeWs(COLLATION)) return false;
-    if(declColl) error(DUPLCOLL);
-    declColl = true;
+    if(!decl.add(COLLATION)) error(DUPLCOLL);
     final byte[] cl = ctx.sc.baseURI().resolve(Uri.uri(stringLiteral())).string();
     if(!eq(URLCOLL, cl)) error(COLLWHICH, cl);
     return true;
@@ -704,8 +702,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void baseURIDecl() throws QueryException {
-    if(declBase) error(DUPLBASE);
-    declBase = true;
+    if(!decl.add(BASE_URI)) error(DUPLBASE);
     final byte[] base = stringLiteral();
     if(base.length != 0) ctx.sc.baseURI(string(base));
   }
@@ -829,8 +826,7 @@ public class QueryParser extends InputParser {
    */
   private void contextItemDecl() throws QueryException {
     wsCheck(ITEMM);
-    if(declItem) error(DUPLITEM);
-    declItem = true;
+    if(!decl.add(ITEMM)) error(DUPLITEM);
 
     ctx.sc.initType = wsConsumeWs(AS) ? itemType().type : null;
     if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
@@ -890,8 +886,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void constructionDecl() throws QueryException {
-    if(declConstr) error(DUPLCONS);
-    declConstr = true;
+    if(!decl.add(CONSTRUCTION)) error(DUPLCONS);
     ctx.sc.strip = wsConsumeWs(STRIP);
     if(!ctx.sc.strip) wsCheck(PRESERVE);
   }

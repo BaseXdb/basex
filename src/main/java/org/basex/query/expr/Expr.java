@@ -60,8 +60,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr optimize(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     return this;
   };
 

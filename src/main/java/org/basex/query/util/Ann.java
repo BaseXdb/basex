@@ -18,11 +18,11 @@ import org.basex.util.list.*;
  */
 public final class Ann extends ElementList {
   /** Annotation "private". */
-  public static final QNm Q_PRIVATE = new QNm(QueryText.PRIVATE, ANNURI);
+  public static final QNm Q_PRIVATE = new QNm(QueryText.PRIVATE, XQURI);
   /** Annotation "public". */
-  public static final QNm Q_PUBLIC = new QNm(QueryText.PUBLIC, ANNURI);
+  public static final QNm Q_PUBLIC = new QNm(QueryText.PUBLIC, XQURI);
   /** Annotation "updating". */
-  public static final QNm Q_UPDATING = new QNm(QueryText.UPDATING, ANNURI);
+  public static final QNm Q_UPDATING = new QNm(QueryText.UPDATING, XQURI);
 
   /** QNames. */
   public QNm[] names = new QNm[1];

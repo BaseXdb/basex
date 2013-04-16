@@ -85,8 +85,7 @@ public final class Functions extends TokenSet {
    * @throws QueryException query exception
    */
   public static FItem get(final QNm name, final long arity, final boolean dyn,
-      final QueryContext ctx, final InputInfo ii)
-          throws QueryException {
+      final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     // use empty scope
     final VarScope scp = new VarScope();
