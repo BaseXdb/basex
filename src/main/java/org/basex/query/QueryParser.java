@@ -3538,10 +3538,10 @@ public class QueryParser extends InputParser {
 
     Let[] fl = { };
     do {
-      final Var v = addLocal(varName(), SeqType.NOD, false);
+      final QNm name = varName();
       wsCheck(ASSIGN);
       final Expr e = check(single(), INCOMPLETE);
-      fl = Array.add(fl, new Let(v, e, false, info()));
+      fl = Array.add(fl, new Let(addLocal(name, SeqType.NOD, false), e, false, info()));
     } while(wsConsumeWs(COMMA));
     wsCheck(MODIFY);
 
