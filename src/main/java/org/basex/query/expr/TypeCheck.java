@@ -50,7 +50,7 @@ public final class TypeCheck extends Single {
 
     if(argType.type.instanceOf(type.type)) {
       final SeqType.Occ occ = argType.occ.intersect(type.occ);
-      if(occ == null) throw Err.XPTYPE.thrw(info, expr, type, argType);
+      if(occ == null) throw Err.NOCAST.thrw(info, argType, type);
     }
 
     return this;
@@ -66,7 +66,7 @@ public final class TypeCheck extends Single {
     final Value val = expr.value(ctx);
     if(type.instance(val)) return val;
     if(promote) return type.funcConvert(ctx, info, val);
-    throw Err.XPTYPE.thrw(info, this, type, val.type());
+    throw Err.NOCAST.thrw(info, val.type(), type);
   }
 
   @Override

@@ -46,7 +46,7 @@ public final class FNAcc extends StandardFunc {
         return Str.get(norm(checkEStr(e, ctx)));
       case NAMESPACE_URI_FROM_QNAME:
         final Item it = e.item(ctx, info);
-        return it == null ? null : Uri.uri(((QNm) checkType(it, AtomType.QNM)).uri());
+        return it == null ? null : Uri.uri(checkQNm(it, ctx).uri());
       default:
         return super.item(ctx, ii);
     }

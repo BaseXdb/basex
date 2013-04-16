@@ -445,9 +445,9 @@ public class QueryParser extends InputParser {
     final ValueBuilder vb = new ValueBuilder();
     if(wsConsumeWs(PAR1)) {
       do {
-        final Item it = literal();
-        if(it == null) error(ANNVALUE);
-        vb.add(it);
+        final Expr ex = literal();
+        if(ex == null || !(ex instanceof Item)) error(ANNVALUE);
+        vb.add((Item) ex);
       } while(wsConsumeWs(COMMA));
       wsCheck(PAR2);
     }
@@ -910,10 +910,7 @@ public class QueryParser extends InputParser {
         ann, true, ctx.sc, scope);
     if(func.updating) ctx.updating(false);
 
-    if(!wsConsumeWs(EXTERNAL)) {
-      ctx.funcs.add(func.setBody(enclosed(NOFUNBODY)), info());
-    }
-
+    if(!wsConsumeWs(EXTERNAL)) ctx.funcs.add(func.setBody(enclosed(NOFUNBODY)), info());
     scope = scope.parent();
   }
 
@@ -2107,7 +2104,9 @@ public class QueryParser extends InputParser {
     ip = pos;
     final QNm name = eQName(null, ctx.sc.nsFunc);
     if(name != null && consume('#')) {
-      final long card = ((Int) numericLiteral(true)).itr();
+      final Expr ex = numericLiteral(true);
+      if(!(ex instanceof Int)) return ex;
+      final long card = ex instanceof Int ? ((Int) ex).itr() : -1;
       if(card < 0 || card > Integer.MAX_VALUE) error(FUNCUNKNOWN, name);
       return Functions.get(name, card, false, ctx, info());
     }
@@ -2121,7 +2120,7 @@ public class QueryParser extends InputParser {
    * @return query expression, or {@code null}
    * @throws QueryException query exception
    */
-  private Item literal() throws QueryException {
+  private Expr literal() throws QueryException {
     final char c = curr();
     // literals
     if(digit(c) || c == '.') return numericLiteral(false);
@@ -2150,7 +2149,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Item numericLiteral(final boolean itr) throws QueryException {
+  private Expr numericLiteral(final boolean itr) throws QueryException {
     tok.reset();
     while(digit(curr())) tok.add(consume());
 
@@ -2167,7 +2166,10 @@ public class QueryParser extends InputParser {
     if(dec) return new Dec(tok.finish());
 
     final long l = toLong(tok.finish());
-    if(l == Long.MIN_VALUE) error(RANGE, tok);
+    if(l == Long.MIN_VALUE) {
+      return FNInfo.error(new QueryException(null, RANGE, tok), info());
+    }
+    //error(RANGE, tok);
     return Int.get(l);
   }
 

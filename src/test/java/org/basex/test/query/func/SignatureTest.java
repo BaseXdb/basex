@@ -59,7 +59,7 @@ public class SignatureTest extends AdvancedQueryTest {
       // skip test if all types are arbitrary
       if((def.min > 0 || al != 0) && (any == 0 || any != al)) {
         final String query = qu.append(')').toString();
-        if(in) error(query, Err.XPTYPE, Err.BXDB_NODB, Err.BXDB_OPEN, Err.FUNCMP,
+        if(in) error(query, Err.NOCAST, Err.BXDB_NODB, Err.BXDB_OPEN, Err.FUNCMP,
             Err.BXDB_INDEX, Err.NODEERR);
         else error(query, Err.XPARGS);
       }

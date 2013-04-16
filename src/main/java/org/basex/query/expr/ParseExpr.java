@@ -208,7 +208,7 @@ public abstract class ParseExpr extends Expr {
     final Item it = checkNoEmpty(e.item(ctx, info), AtomType.BLN);
     final Type ip = it.type;
     if(ip == AtomType.BLN || ip.isUntyped()) return it.bool(info);
-    throw Err.type(this, AtomType.BLN, it);
+    throw Err.NOCAST.thrw(info, it.type, AtomType.BLN);
   }
 
   /**
@@ -249,7 +249,7 @@ public abstract class ParseExpr extends Expr {
   public final long checkItr(final Item it) throws QueryException {
     final Type ip = it.type;
     if(ip.instanceOf(AtomType.ITR) || ip.isUntyped()) return it.itr(info);
-    throw Err.type(this, AtomType.ITR, it);
+    throw Err.NOCAST.thrw(info, it.type, AtomType.ITR);
   }
 
   /**
@@ -261,7 +261,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final ANode checkNode(final Item it) throws QueryException {
     if(it instanceof ANode) return (ANode) it;
-    throw Err.type(this, NodeType.NOD, it);
+    throw Err.NOCAST.thrw(info, it.type, NodeType.NOD);
   }
 
   /**
@@ -315,7 +315,7 @@ public abstract class ParseExpr extends Expr {
   public final byte[] checkStr(final Item it) throws QueryException {
     final Type ip = it.type;
     if(ip.isStringOrUntyped()) return it.string(info);
-    throw Err.type(this, AtomType.STR, it);
+    throw Err.NOCAST.thrw(info, it.type, AtomType.STR);
   }
 
   /**
@@ -330,7 +330,7 @@ public abstract class ParseExpr extends Expr {
     final Type ip = it.type;
     if(ip.isStringOrUntyped()) return it.string(info);
     if(it instanceof FItem) FIATOM.thrw(info, this);
-    throw Err.type(this, AtomType.STR, it);
+    throw Err.NOCAST.thrw(info, it.type, AtomType.STR);
   }
 
   /**
@@ -398,6 +398,22 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the specified expression has the specified type; if no, throws
+   * an exception.
+   * @param it item to be checked
+   * @param ctx query context
+   * @return specified item
+   * @throws QueryException query exception
+   */
+  public final QNm checkQNm(final Item it, final QueryContext ctx)
+      throws QueryException {
+
+    if(checkNoEmpty(it).type == AtomType.QNM) return (QNm) it;
+    if(it.type.isUntyped() && ctx.sc.xquery3()) NSSENS.thrw(info, it.type, AtomType.QNM);
+    throw Err.NOCAST.thrw(info, it.type, AtomType.QNM);
+  }
+
+  /**
    * Checks if the specified expression is an empty sequence; if yes, throws
    * an exception.
    * @param it item to be checked
@@ -407,7 +423,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final Item checkType(final Item it, final Type t) throws QueryException {
     if(checkNoEmpty(it).type.instanceOf(t)) return it;
-    throw Err.type(this, t, it);
+    throw Err.NOCAST.thrw(info, it.type, t);
   }
 
   /**
@@ -500,6 +516,6 @@ public abstract class ParseExpr extends Expr {
    */
   public Map checkMap(final Item it) throws QueryException {
     if(it instanceof Map) return (Map) it;
-    throw Err.type(this, SeqType.ANY_MAP, it);
+    throw Err.NOCAST.thrw(info, it.type, SeqType.ANY_MAP);
   }
 }

@@ -102,7 +102,7 @@ public final class FNQName extends StandardFunc {
    */
   private Item lnFromQName(final QueryContext ctx, final Item it) throws QueryException {
     if(it == null) return null;
-    final QNm nm = (QNm) checkType(it, AtomType.QNM);
+    final QNm nm = checkQNm(it, ctx);
     return AtomType.NCN.cast(Str.get(nm.local()), ctx, info);
   }
 
@@ -117,7 +117,7 @@ public final class FNQName extends StandardFunc {
       throws QueryException {
 
     if(it == null) return null;
-    final QNm nm = (QNm) checkType(it, AtomType.QNM);
+    final QNm nm = checkQNm(it, ctx);
     return nm.hasPrefix() ? AtomType.NCN.cast(Str.get(nm.prefix()), ctx, info) : null;
   }
 

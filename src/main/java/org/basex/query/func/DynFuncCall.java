@@ -7,7 +7,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
@@ -93,7 +92,7 @@ public final class DynFuncCall extends Arr {
   private FItem getFun(final QueryContext ctx) throws QueryException {
     final int ar = expr.length - 1;
     final Item it = checkItem(expr[ar], ctx);
-    if(!(it instanceof FItem)) throw Err.XPTYPE.thrw(info, expr[ar], "function item", it);
+    if(!(it instanceof FItem)) NOCAST.thrw(info, it.type, "function item");
     final FItem fit = (FItem) it;
     if(fit.arity() != ar) throw INVARITY.thrw(info, fit, ar);
     return fit;

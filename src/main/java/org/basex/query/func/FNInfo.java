@@ -8,7 +8,6 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -80,7 +79,7 @@ public final class FNInfo extends StandardFunc {
     if(it == null) {
       if(al == 1) XPEMPTY.thrw(info, description());
     } else {
-      name = (QNm) checkType(it, AtomType.QNM);
+      name = checkQNm(it, ctx);
     }
     if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
     final Value val = al > 2 ? ctx.value(expr[2]) : null;

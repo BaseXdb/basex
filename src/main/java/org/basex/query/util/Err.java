@@ -780,7 +780,7 @@ public enum Err {
   /** XPTY0004. */
   XPINVTREAT(XPTY, 4, "Cannot treat % as %: %."),
   /** XPTY0004. */
-  XPTYPE(XPTY, 4, "%: % expected, % found."),
+  NOCAST(XPTY, 4, "Cannot cast from % to %."),
   /** XPTY0004. */
   CALCTYPE(XPTY, 4, "% not defined for % and %."),
 
@@ -820,7 +820,7 @@ public enum Err {
   /** XPTY0020. */
   STEPNODE(XPTY, 20, "Context node required for %; % found."),
   /** XPTY0117. */
-  NSSENS(XPTY, 117, "Cannot cast % to namespace-sensitive type %."),
+  NSSENS(XPTY, 117, "Cannot cast from % to %."),
 
   /** XQDY0025. */
   CATTDUPL(XQDY, 25, "Duplicate attribute '%'."),
@@ -1264,7 +1264,7 @@ public enum Err {
    */
   public static QueryException type(final ParseExpr e, final Type t, final Item it)
       throws QueryException {
-    throw XPTYPE.thrw(e.info, e.description(), t, it.type);
+    throw NOCAST.thrw(e.info, it.type, t);
   }
 
   /**
