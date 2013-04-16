@@ -51,7 +51,7 @@ public final class Treat extends Single {
     // input is empty
     if(it == null) {
       if(type.mayBeZero()) return Empty.ITER;
-      throw XPEMPTY.thrw(info, description());
+      NOTREAT.thrw(info, description(), Empty.SEQ, type);
     }
     // treat as empty sequence
     if(type.occ == Occ.ZERO) NOTREAT.thrw(info, description(), it.type, type);
@@ -84,7 +84,7 @@ public final class Treat extends Single {
     // input is empty
     if(len == 0) {
       if(type.mayBeZero()) return val;
-      throw XPEMPTY.thrw(info, description());
+      NOTREAT.thrw(info, description(), Empty.SEQ, type);
     }
     // treat as empty sequence
     if(type.occ == Occ.ZERO) NOTREAT.thrw(info, description(), val.type, type);
