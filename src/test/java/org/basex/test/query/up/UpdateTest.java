@@ -62,6 +62,12 @@ public final class UpdateTest extends AdvancedQueryTest {
         "<n1><n2/><n4/><n6/><n8/><n9/><n10/><n11/></n1>");
   }
 
+  /** Transform expression shadowing another variable. */
+  @Test
+  public void transform() {
+    query("let $c := <x/> return copy $c := $c modify () return $c", "<x/>");
+  }
+
   /**
    * Basic insert into.
    */
