@@ -147,7 +147,7 @@ public class WebDAVService<T> {
    */
   public ResourceMetaData metaData(final String db, final String p) throws IOException {
     final Query q = http.session().query(
-      "let $a := " + _DB_LIST_DETAILS.args("$d", "$p") +
+        "let $a := " + _DB_LIST_DETAILS.args("$d", "$p") +
         "return (" +
         "$a/@raw/data()," +
         "$a/@content-type/data()," +
@@ -218,7 +218,7 @@ public class WebDAVService<T> {
   public void copyDoc(final String sdb, final String spath, final String tdb,
       final String tpath) throws IOException {
     final Query q = http.session().query(
-      "declare option db:chop 'false'; " +
+        "declare option db:chop 'false'; " +
         "if(" + _DB_IS_RAW.args("$db", "$path") + ") " +
         " then " + _DB_STORE.args("$tdb", "$tpath", _DB_RETRIEVE.args("$db", "$path")) +
         " else " + _DB_ADD.args("$tdb", _DB_OPEN.args("$db", "$path"), "$tpath"));
@@ -240,7 +240,7 @@ public class WebDAVService<T> {
   public void copyAll(final String sdb, final String spath, final String tdb,
       final String tpath) throws IOException {
     final Query q = http.session().query(
-      "declare option db:chop 'false'; " +
+        "declare option db:chop 'false'; " +
         "for $d in " + _DB_LIST.args("$db", "$path") +
         "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) return " +
         "if(" + _DB_IS_RAW.args("$db", "$d") + ") " +
@@ -266,8 +266,8 @@ public class WebDAVService<T> {
     final Session session = http.session();
     session.setOutputStream(out);
     final Query q = session.query(raw ?
-      "declare option output:method 'raw'; " + _DB_RETRIEVE.args("$db", "$path") :
-      _DB_OPEN.args("$db", "$path"));
+        "declare option output:method 'raw'; " + _DB_RETRIEVE.args("$db", "$path") :
+        _DB_OPEN.args("$db", "$path"));
     q.bind("db", db);
     q.bind("path", p);
     q.execute();
@@ -280,7 +280,7 @@ public class WebDAVService<T> {
    */
   public void unlock(final String token) throws IOException {
     final Query q = http.session().query(
-      "import module namespace w = 'http://basex.org/webdav';" +
+        "import module namespace w = 'http://basex.org/webdav';" +
         "w:delete-lock($lock-token)");
     q.bind("lock-token", token);
     q.execute();
@@ -304,7 +304,7 @@ public class WebDAVService<T> {
     initLockDb();
     final String token = UUID.randomUUID().toString();
     final Query q = http.session().query(
-      "import module namespace w = 'http://basex.org/webdav';" +
+        "import module namespace w = 'http://basex.org/webdav';" +
         "w:create-lock(" +
         "$resource," +
         "$lock-token," +
@@ -334,15 +334,27 @@ public class WebDAVService<T> {
    */
   public String lock(final String db, final String p) throws IOException {
     final Query q = http.session().query(
-      "import module namespace w = 'http://basex.org/webdav';" +
-        "w:get-locks($resource)");
+        "import module namespace w = 'http://basex.org/webdav';" +
+        "w:get-locks-on($resource)");
     q.bind("resource", db + SEP + p);
 
     return q.next();
   }
 
-  public boolean hasLockedChild() {
-    return false;
+  /**
+   * Check if there are active conflicting locks for the given resource.
+   * @param db database
+   * @param p path
+   * @return {@code true} if there active conflicting locks
+   * @throws IOException I/O exception
+   */
+  public boolean conflictingLocks(final String db, final String p) throws IOException {
+    final Query q = http.session().query(
+        "import module namespace w = 'http://basex.org/webdav';" +
+        "w:get-conflicting-locks($resource)");
+    q.bind("resource", db + SEP + p);
+
+    return q.more();
   }
 
   /**
@@ -396,7 +408,7 @@ public class WebDAVService<T> {
     final List<T> ch = new ArrayList<T>();
     final HashSet<String> paths = new HashSet<String>();
     final Query q = http.session().query(
-      "for $a in " + _DB_LIST_DETAILS.args("$d", "$p") +
+        "for $a in " + _DB_LIST_DETAILS.args("$d", "$p") +
         "return ($a/@raw/data()," +
         "$a/@content-type/data()," +
         "$a/@modified-date/data()," +
@@ -434,7 +446,7 @@ public class WebDAVService<T> {
   public List<T> listDbs() throws IOException {
     final List<T> dbs = new ArrayList<T>();
     final Query q = http.session().query(
-      "for $d in " + _DB_LIST_DETAILS.args() +
+        "for $d in " + _DB_LIST_DETAILS.args() +
         "where not($d/text() eq '" + WEBDAV_LOCKS_DB + "') " +
         "return ($d/text(), $d/@modified-date/data())");
     try {
@@ -635,7 +647,7 @@ public class WebDAVService<T> {
    */
   private void initLockDb() throws IOException {
     http.session().query(
-      "import module namespace w = 'http://basex.org/webdav';" +
+        "import module namespace w = 'http://basex.org/webdav';" +
         "w:init-lock-db()").execute();
   }
 }
