@@ -898,7 +898,7 @@ public class QueryParser extends InputParser {
    */
   private void functionDecl(final Ann ann) throws QueryException {
     final QNm name = eQName(FUNCNAME, ctx.sc.nsFunc);
-    if(keyword(name)) error(RESERVED, name);
+    if(keyword(name)) error(RESERVED, name.local());
     if(module != null && !eq(name.uri(), module.uri())) error(MODNS, name);
 
     wsCheck(PAR1);
@@ -2104,6 +2104,7 @@ public class QueryParser extends InputParser {
     ip = pos;
     final QNm name = eQName(null, ctx.sc.nsFunc);
     if(name != null && consume('#')) {
+      if(keyword(name)) error(RESERVED, name.local());
       final Expr ex = numericLiteral(true);
       if(!(ex instanceof Int)) return ex;
       final long card = ex instanceof Int ? ((Int) ex).itr() : -1;

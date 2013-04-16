@@ -634,7 +634,7 @@ public enum Err {
   /** XPST0003. */
   FUNCNAME(XPST, 3, "Expecting function name."),
   /** XPST0003. */
-  RESERVED(XPST, 3, "% is a reserved function name."),
+  RESERVED(XPST, 3, "'%' is a reserved keyword."),
   /** XPST0003. */
   PREDMISSING(XPST, 3, "Expecting expression before predicate."),
   /** XPST0003. */
