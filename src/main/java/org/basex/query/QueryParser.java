@@ -912,12 +912,6 @@ public class QueryParser extends InputParser {
 
     if(!wsConsumeWs(EXTERNAL)) {
       ctx.funcs.add(func.setBody(enclosed(NOFUNBODY)), info());
-    } else {
-      /* try to bind external function
-      if(ctx.modules.addImport(name.uri(), info(), this)) {
-        final TypedFunc f = Functions.get(name, args, false, ctx, info());
-        if(f != null) func.expr = f.fun;
-      }*/
     }
 
     scope = scope.parent();
@@ -928,8 +922,8 @@ public class QueryParser extends InputParser {
    * @param name name to be checked
    * @return result of check
    */
-  private static boolean keyword(final QNm name) {
-    if(name.hasPrefix()) return false;
+  private boolean keyword(final QNm name) {
+    if(!ctx.sc.xquery3() || name.hasPrefix()) return false;
     final byte[] str = name.string();
     for(final byte[] key : KEYWORDS) if(eq(key, str)) return true;
     return false;
