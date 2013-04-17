@@ -179,7 +179,7 @@ public interface DataText {
   /** LessThan entity. */
   byte[] E_LT = token("&lt;");
   /** Line separator. */
-  byte[] E_2028 = token("&x2028;");
+  byte[] E_2028 = token("&#x2028;");
   /** HTML: Non-breaking space entity. */
   byte[] E_NBSP = token("&nbsp;");
 
