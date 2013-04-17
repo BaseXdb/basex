@@ -470,7 +470,7 @@ public abstract class ADate extends ADateDur {
    * @param mon month
    * @return days
    */
-  private static int dpm(final long yea, final int mon) {
+  public static int dpm(final long yea, final int mon) {
     final byte l = DAYS[mon];
     return mon == 1 && yea % 4 == 0 && (yea % 100 != 0 || yea % 400 == 0) ? l + 1 : l;
   }

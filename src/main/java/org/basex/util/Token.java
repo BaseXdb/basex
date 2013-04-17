@@ -43,11 +43,11 @@ public final class Token {
   public static final byte[] NINF = token("-INF");
   /** Space. */
   public static final byte[] SPACE = { ' ' };
-  /** Digit '0'. */
+  /** Number '0'. */
   public static final byte[] ZERO = { '0' };
-  /** Digit '-0'. */
+  /** Number '-0'. */
   private static final byte[] MZERO = { '-', '0' };
-  /** Digit '1'. */
+  /** Number '1'. */
   public static final byte[] ONE = { '1' };
   /** Slash. */
   public static final byte[] SLASH = { '/' };

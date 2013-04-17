@@ -21,13 +21,19 @@ import org.basex.util.list.*;
 public abstract class Formatter extends FormatUtil {
   /** Military timezones. */
   private static final byte[] MIL = token("YXWVUTSRQPONZABCDEFGHIKLM");
+  /** Token: Nn. */
+  private static final byte[] NN = { 'N', 'n' };
+
   /** Default language: English. */
   private static final String EN = "en";
   /** Formatter instances. */
   private static final HashMap<String, Formatter> MAP = new HashMap<String, Formatter>();
 
   // initialize hash map with English formatter as default
-  static { MAP.put(EN, new FormatterEN()); }
+  static {
+    MAP.put(EN, new FormatterEN());
+    MAP.put("de", new FormatterDE());
+  }
 
   /**
    * Returns a formatter for the specified language.
@@ -154,13 +160,15 @@ public abstract class Formatter extends FormatUtil {
             err = tim;
             break;
           case 'd':
-            num = ADate.days(0, (int) date.mon(), (int) date.day() - 1).longValue();
+            final long y = date.yea();
+            for(int m = (int) date.mon() - 1; --m >= 0;) num += ADate.dpm(y, m);
+            num += date.day();
             err = tim;
             break;
           case 'F':
             num = date.toJava().toGregorianCalendar().get(Calendar.DAY_OF_WEEK) - 1;
             if(num == 0) num = 7;
-            pres = new byte[] { 'n' };
+            pres = NN;
             err = tim;
             break;
           case 'W':
@@ -182,7 +190,7 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'P':
             num = date.hou() / 12;
-            pres = new byte[] { 'n' };
+            pres = NN;
             err = dat;
             break;
           case 'm':
@@ -203,14 +211,14 @@ public abstract class Formatter extends FormatUtil {
           case 'Z':
           case 'z':
             num = date.zon();
-            pres = token("01:01"); //num == Short.MAX_VALUE ? null : token("01:01");
+            pres = token("01:01");
             break;
           case 'C':
-            pres = new byte[] { 'n' };
+            pres = NN;
             break;
           case 'E':
             num = date.yea();
-            pres = new byte[] { 'n' };
+            pres = NN;
             err = tim;
             break;
           default:
