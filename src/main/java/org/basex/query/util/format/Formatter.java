@@ -10,6 +10,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -25,14 +26,14 @@ public abstract class Formatter extends FormatUtil {
   private static final byte[] NN = { 'N', 'n' };
 
   /** Default language: English. */
-  private static final String EN = "en";
+  private static final byte[] EN = token("en");
   /** Formatter instances. */
-  private static final HashMap<String, Formatter> MAP = new HashMap<String, Formatter>();
+  private static final TokenObjMap<Formatter> MAP = new TokenObjMap<Formatter>();
 
   // initialize hash map with English formatter as default
   static {
-    MAP.put(EN, new FormatterEN());
-    MAP.put("de", new FormatterDE());
+    MAP.add(EN, new FormatterEN());
+    MAP.add(token("de"), new FormatterDE());
   }
 
   /**
@@ -40,12 +41,11 @@ public abstract class Formatter extends FormatUtil {
    * @param ln language
    * @return formatter instance
    */
-  public static Formatter get(final String ln) {
+  public static Formatter get(final byte[] ln) {
     // check if formatter has already been created
     Formatter form = MAP.get(ln);
     if(form == null) {
-      final String clz = Util.name(Formatter.class) +
-          ln.toUpperCase(Locale.ENGLISH);
+      final String clz = Util.name(Formatter.class) + string(uc(ln));
       form = (Formatter) Reflect.get(Reflect.find(clz));
       // instantiation not successful: return default formatter
       if(form == null) form = MAP.get(EN);
@@ -110,6 +110,7 @@ public abstract class Formatter extends FormatUtil {
   /**
    * Formats the specified date.
    * @param date date to be formatted
+   * @param lng language
    * @param pic picture
    * @param cal calendar
    * @param plc place
@@ -117,13 +118,14 @@ public abstract class Formatter extends FormatUtil {
    * @return formatted string
    * @throws QueryException query exception
    */
-  public final byte[] formatDate(final ADate date, final byte[] pic, final byte[] cal,
-      final byte[] plc, final InputInfo ii) throws QueryException {
-
-    // [CG] XQuery/Formatter: currently, calendars and places are ignored
-    if(cal != null || plc != null);
+  public final byte[] formatDate(final ADate date, final byte[] lng, final byte[] pic,
+      final byte[] cal, final byte[] plc, final InputInfo ii) throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
+    if(lng.length != 0 && MAP.get(lng) == null) tb.add("[Language: en]");
+    if(cal.length != 0 && !eq(cal, token("AD"), token("ISO"))) tb.add("[Calendar: AD]");
+    if(plc.length != 0) tb.add("[Place: ]");
+
     final DateParser dp = new DateParser(ii, pic);
     while(dp.more()) {
       final int ch = dp.literal();
