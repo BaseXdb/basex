@@ -101,7 +101,9 @@ public class ',  $class-name, ' extends QT3TestSet {
    */
   @org.junit.Test
   public void ', qt3ts-java:method-name($name), '() {
-    final XQuery query = new XQuery(
+', '    xquery10();
+'[$test-case('xq10')],
+'    final XQuery query = new XQuery(
 ',  if($test-case('is_file')) then (
 '      queryFile(
         file(

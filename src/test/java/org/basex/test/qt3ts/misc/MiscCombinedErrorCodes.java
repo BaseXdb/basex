@@ -3005,6 +3005,7 @@ public class MiscCombinedErrorCodes extends QT3TestSet {
    */
   @org.junit.Test
   public void xPTY000445() {
+    xquery10();
     final XQuery query = new XQuery(
       "concat('prefix:', 'localname') cast as xs:QName",
       ctx);
@@ -3818,7 +3819,7 @@ public class MiscCombinedErrorCodes extends QT3TestSet {
       (
         error("XQST0046")
       ||
-        assertBoolean(true)
+        error("XQST0059")
       )
     );
   }
@@ -4173,6 +4174,7 @@ public class MiscCombinedErrorCodes extends QT3TestSet {
    */
   @org.junit.Test
   public void xQST0054() {
+    xquery10();
     final XQuery query = new XQuery(
       "declare namespace foo = \"http://www.example.org/\"; declare variable $a := foo:bar(); declare function foo:bar() { $a + 1 }; $a",
       ctx);
@@ -4797,6 +4799,7 @@ public class MiscCombinedErrorCodes extends QT3TestSet {
    */
   @org.junit.Test
   public void xQST0093() {
+    xquery10();
     final XQuery query = new XQuery(
       "import module namespace foo=\"http://www.example.org/foo\"; $foo:variable2",
       ctx);

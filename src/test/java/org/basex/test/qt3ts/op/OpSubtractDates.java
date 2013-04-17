@@ -220,7 +220,7 @@ public class OpSubtractDates extends QT3TestSet {
   @org.junit.Test
   public void cbclSubtractDates003() {
     final XQuery query = new XQuery(
-      "xs:date(\"2008-12-31\") - xs:date(\"2002-12-31+01:00\")",
+      "xs:date(\"2008-12-31\") - xs:date(\"2002-12-31+01:00\") + implicit-timezone()",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -240,7 +240,7 @@ public class OpSubtractDates extends QT3TestSet {
   @org.junit.Test
   public void cbclSubtractDates004() {
     final XQuery query = new XQuery(
-      "xs:date(\"2002-12-31+01:00\") - xs:date(\"2008-12-31\")",
+      "xs:date(\"2002-12-31+01:00\") - xs:date(\"2008-12-31\") - implicit-timezone()",
       ctx);
     try {
       result = new QT3Result(query.value());

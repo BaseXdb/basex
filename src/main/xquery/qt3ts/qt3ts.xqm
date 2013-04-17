@@ -121,14 +121,20 @@ declare function qt3ts:test-case(
       $test := if($is_file)
         then $file($test-case/test/@file)
         else $test-case/test/string(),
-      $result := qt3ts:result($test-case/result/*, $file, $root)
+      $result := qt3ts:result($test-case/result/*, $file, $root),
+      $xq30 :=
+        every $dep in $test-case/dependency[@type = 'spec']
+        satisfies
+          some $spec in $dep/tokenize(@value, ' ')
+          satisfies contains(trace($spec, 'spec'), '30') or contains($spec, '+')
   return map{
     'description' := $desc,
     'modules'     := $mods,
     'environment' := $map,
     'is_file'     := $is_file,
     'test'        := $test,
-    'result'      := $result
+    'result'      := $result,
+    'xq10'        := not($xq30)
   }
 };
 

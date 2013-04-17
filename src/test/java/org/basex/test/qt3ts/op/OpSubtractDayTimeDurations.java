@@ -755,7 +755,7 @@ public class OpSubtractDayTimeDurations extends QT3TestSet {
   @org.junit.Test
   public void cbclMinus023() {
     final XQuery query = new XQuery(
-      "declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"P1H\") }; local:f(false()) - xs:time(\"12:00:00\")",
+      "declare function local:f($x) { if ($x) then xs:duration(\"P1D\") else xs:dayTimeDuration(\"PT1H\") }; local:f(false()) - xs:time(\"12:00:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());

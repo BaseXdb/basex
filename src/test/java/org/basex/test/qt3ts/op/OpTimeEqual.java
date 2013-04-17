@@ -919,7 +919,9 @@ public class OpTimeEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclTimeEqual019() {
     final XQuery query = new XQuery(
-      "xs:time(\"12:00:00+01:00\") eq xs:time(\"12:00:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT1H'))\n" +
+      "            then xs:time(\"12:00:00+02:00\") eq xs:time(\"12:00:00\")\n" +
+      "            else xs:time(\"12:00:00+01:00\") eq xs:time(\"12:00:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());

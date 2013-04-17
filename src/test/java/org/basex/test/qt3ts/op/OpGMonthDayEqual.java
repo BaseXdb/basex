@@ -254,7 +254,9 @@ public class OpGMonthDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthDayEqual002() {
     final XQuery query = new XQuery(
-      "xs:gMonthDay(\"--12-30\") eq xs:gMonthDay(\"--12-31+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gMonthDay(\"--12-30\") eq xs:gMonthDay(\"--12-31+09:01\")\n" +
+      "            else xs:gMonthDay(\"--12-30\") eq xs:gMonthDay(\"--12-31+09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -274,7 +276,9 @@ public class OpGMonthDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthDayEqual003() {
     final XQuery query = new XQuery(
-      "xs:gMonthDay(\"--12-31+09:00\") eq xs:gMonthDay(\"--12-30\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gMonthDay(\"--12-31+09:01\") eq xs:gMonthDay(\"--12-30\")\n" +
+      "            else xs:gMonthDay(\"--12-31+09:00\") eq xs:gMonthDay(\"--12-30\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -294,7 +298,9 @@ public class OpGMonthDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthDayEqual004() {
     final XQuery query = new XQuery(
-      "xs:gMonthDay(\"--12-30\") eq xs:gMonthDay(\"--12-31+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gMonthDay(\"--12-30\") eq xs:gMonthDay(\"--12-31-09:01\")\n" +
+      "            else xs:gMonthDay(\"--12-30\") eq xs:gMonthDay(\"--12-31-09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -314,7 +320,9 @@ public class OpGMonthDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthDayEqual005() {
     final XQuery query = new XQuery(
-      "xs:gMonthDay(\"--12-31+09:00\") eq xs:gMonthDay(\"--12-30\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gMonthDay(\"--12-31-09:01\") eq xs:gMonthDay(\"--12-30\")\n" +
+      "            else xs:gMonthDay(\"--12-31-09:00\") eq xs:gMonthDay(\"--12-30\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -354,7 +362,9 @@ public class OpGMonthDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthDayEqual007() {
     final XQuery query = new XQuery(
-      "xs:gMonthDay(\"--12-30\") ne xs:gMonthDay(\"--12-31+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gMonthDay(\"--12-30\") ne xs:gMonthDay(\"--12-31+09:01\")\n" +
+      "            else xs:gMonthDay(\"--12-30\") ne xs:gMonthDay(\"--12-31+09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -374,7 +384,9 @@ public class OpGMonthDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthDayEqual008() {
     final XQuery query = new XQuery(
-      "xs:gMonthDay(\"--12-31+09:00\") ne xs:gMonthDay(\"--12-30\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gMonthDay(\"--12-31+09:01\") ne xs:gMonthDay(\"--12-30\")\n" +
+      "            else xs:gMonthDay(\"--12-31+09:00\") ne xs:gMonthDay(\"--12-30\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -394,7 +406,9 @@ public class OpGMonthDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthDayEqual009() {
     final XQuery query = new XQuery(
-      "xs:gMonthDay(\"--12-30\") ne xs:gMonthDay(\"--12-31+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gMonthDay(\"--12-30\") ne xs:gMonthDay(\"--12-31-09:01\")\n" +
+      "            else xs:gMonthDay(\"--12-30\") ne xs:gMonthDay(\"--12-31-09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -414,7 +428,9 @@ public class OpGMonthDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthDayEqual010() {
     final XQuery query = new XQuery(
-      "xs:gMonthDay(\"--12-31+09:00\") ne xs:gMonthDay(\"--12-30\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gMonthDay(\"--12-31-09:01\") ne xs:gMonthDay(\"--12-30\")\n" +
+      "            else xs:gMonthDay(\"--12-31-09:00\") ne xs:gMonthDay(\"--12-30\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -594,7 +610,9 @@ public class OpGMonthDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthDayEqual019() {
     final XQuery query = new XQuery(
-      "xs:gMonthDay(\"--12-31\") eq xs:gMonthDay(\"--12-31+01:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT1M'))\n" +
+      "            then xs:gMonthDay(\"--12-30\") eq xs:gMonthDay(\"--12-31+01:01\")\n" +
+      "            else xs:gMonthDay(\"--12-30\") eq xs:gMonthDay(\"--12-31+01:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -614,7 +632,9 @@ public class OpGMonthDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthDayEqual020() {
     final XQuery query = new XQuery(
-      "xs:gMonthDay(\"--12-31+01:00\") eq xs:gMonthDay(\"--12-31\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT1M'))\n" +
+      "            then xs:gMonthDay(\"--12-31+01:01\") eq xs:gMonthDay(\"--12-30\")\n" +
+      "            else xs:gMonthDay(\"--12-31+01:00\") eq xs:gMonthDay(\"--12-30\")",
       ctx);
     try {
       result = new QT3Result(query.value());

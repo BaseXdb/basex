@@ -234,7 +234,7 @@ public class OpSubtractTimes extends QT3TestSet {
   @org.junit.Test
   public void cbclSubtractTimes001() {
     final XQuery query = new XQuery(
-      "xs:time(\"12:00:00+01:00\") - xs:time(\"12:00:00\")",
+      "xs:time(\"12:00:00+01:00\") - xs:time(\"12:00:00\") - implicit-timezone()",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -254,7 +254,7 @@ public class OpSubtractTimes extends QT3TestSet {
   @org.junit.Test
   public void cbclSubtractTimes002() {
     final XQuery query = new XQuery(
-      "xs:time(\"12:00:00\") - xs:time(\"12:00:00+01:00\")",
+      "xs:time(\"12:00:00\") - xs:time(\"12:00:00+01:00\") + implicit-timezone()",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -275,7 +275,7 @@ public class OpSubtractTimes extends QT3TestSet {
   public void cbclSubtractTimes003() {
     final XQuery query = new XQuery(
       "\n" +
-      "      fn:adjust-time-to-timezone(xs:time(\"12:00:00\")) - fn:adjust-time-to-timezone(xs:time(\"08:00:00+05:00\"), xs:dayTimeDuration(\"PT1H\"))\n" +
+      "      fn:adjust-time-to-timezone(xs:time(\"12:00:00\")) - fn:adjust-time-to-timezone(xs:time(\"08:00:00+05:00\"), xs:dayTimeDuration(\"PT1H\")) + implicit-timezone()\n" +
       "   ",
       ctx);
     try {
@@ -297,7 +297,7 @@ public class OpSubtractTimes extends QT3TestSet {
   public void cbclSubtractTimes004() {
     final XQuery query = new XQuery(
       "\n" +
-      "      fn:adjust-time-to-timezone(xs:time(\"08:00:00+05:00\"), xs:dayTimeDuration(\"PT1H\")) - fn:adjust-time-to-timezone(xs:time(\"12:00:00\"))\n" +
+      "      fn:adjust-time-to-timezone(xs:time(\"08:00:00+05:00\"), xs:dayTimeDuration(\"PT1H\")) - fn:adjust-time-to-timezone(xs:time(\"12:00:00\")) - implicit-timezone()\n" +
       "   ",
       ctx);
     try {

@@ -389,6 +389,7 @@ public class FnDistinctValues extends QT3TestSet {
    */
   @org.junit.Test
   public void cbclDistinctValues002() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "      \tdeclare function local:create($arg) as xs:anyAtomicType* {\n" +
@@ -539,7 +540,9 @@ public class FnDistinctValues extends QT3TestSet {
   @org.junit.Test
   public void cbclDistinctValues003() {
     final XQuery query = new XQuery(
-      "distinct-values((xs:dateTime(\"2008-01-01T13:00:00\"),xs:dateTime(\"2008-01-01T13:00:00+00:00\")))",
+      "distinct-values(\n" +
+      "              (xs:dateTime(\"2008-01-01T13:00:00\"),\n" +
+      "               adjust-dateTime-to-timezone(xs:dateTime(\"2008-01-01T13:00:00\"))))",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -549,7 +552,7 @@ public class FnDistinctValues extends QT3TestSet {
       query.close();
     }
     test(
-      assertStringValue(false, "2008-01-01T13:00:00")
+      assertCount(1)
     );
   }
 

@@ -83,6 +83,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void kFunctionProlog12a() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "        declare function local:computeSum() { $myVariable };\n" +
@@ -2521,6 +2522,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames001() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -2569,6 +2571,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames003() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -2617,6 +2620,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames005() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -2665,6 +2669,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames007() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -2713,6 +2718,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames009() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -2761,6 +2767,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames011() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -2809,6 +2816,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames013() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -2857,6 +2865,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames015() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -2905,6 +2914,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames017() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -2953,6 +2963,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames019() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -3001,6 +3012,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames021() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -3049,6 +3061,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames023() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -3097,6 +3110,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames025() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -3145,6 +3159,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames027() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -3193,6 +3208,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames029() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +
@@ -3241,6 +3257,7 @@ public class ProdFunctionDecl extends QT3TestSet {
    */
   @org.junit.Test
   public void functionDeclReservedFunctionNames031() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "\tdeclare default function namespace \"http://www.w3.org/2005/xquery-local-functions\";\n" +

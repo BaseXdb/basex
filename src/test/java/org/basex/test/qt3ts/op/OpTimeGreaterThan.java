@@ -243,7 +243,9 @@ public class OpTimeGreaterThan extends QT3TestSet {
   @org.junit.Test
   public void cbclTimeGreaterThan004() {
     final XQuery query = new XQuery(
-      "xs:time(\"00:00:01+01:00\") gt xs:time(\"00:00:00\")",
+      "if (implicit-timezone() gt xs:dayTimeDuration('PT1H'))\n" +
+      "            then xs:time(\"00:00:00\") gt xs:time(\"00:00:00+01:00\")\n" +
+      "            else xs:time(\"00:00:00+01:01\") gt xs:time(\"00:00:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -263,7 +265,9 @@ public class OpTimeGreaterThan extends QT3TestSet {
   @org.junit.Test
   public void cbclTimeGreaterThan005() {
     final XQuery query = new XQuery(
-      "xs:time(\"00:00:00\") gt xs:time(\"00:00:01+01:00\")",
+      "if (implicit-timezone() gt xs:dayTimeDuration('PT1H'))\n" +
+      "            then xs:time(\"00:00:01+01:00\") gt xs:time(\"00:00:00\")\n" +
+      "            else xs:time(\"00:00:00\") gt xs:time(\"00:00:00+01:01\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -346,7 +350,9 @@ public class OpTimeGreaterThan extends QT3TestSet {
   @org.junit.Test
   public void cbclTimeGreaterThan009() {
     final XQuery query = new XQuery(
-      "xs:time(\"00:00:01+01:00\") le xs:time(\"00:00:00\")",
+      "if (implicit-timezone() gt xs:dayTimeDuration('PT1H'))\n" +
+      "            then xs:time(\"00:00:00\") le xs:time(\"00:00:00+01:00\")\n" +
+      "            else xs:time(\"00:00:00+01:01\") le xs:time(\"00:00:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -366,7 +372,9 @@ public class OpTimeGreaterThan extends QT3TestSet {
   @org.junit.Test
   public void cbclTimeGreaterThan010() {
     final XQuery query = new XQuery(
-      "xs:time(\"00:00:00\") le xs:time(\"00:00:01+01:00\")",
+      "if (implicit-timezone() gt xs:dayTimeDuration('PT1H'))\n" +
+      "            then xs:time(\"00:00:01+01:00\") le xs:time(\"00:00:00\")\n" +
+      "            else xs:time(\"00:00:00\") le xs:time(\"00:00:00+01:01\")",
       ctx);
     try {
       result = new QT3Result(query.value());

@@ -13529,6 +13529,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void castAs673a() {
+    xquery10();
     final XQuery query = new XQuery(
       "let $var := \"ABC\" return $var cast as xs:QName",
       ctx);
@@ -13571,6 +13572,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void castAs674() {
+    xquery10();
     final XQuery query = new XQuery(
       "let $var := <e>xml:space</e> return $var cast as xs:QName",
       ctx);
@@ -13619,6 +13621,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void castAs675() {
+    xquery10();
     final XQuery query = new XQuery(
       "\n" +
       "        declare function local:clarkname($q as xs:QName) as xs:string { \n" +
@@ -13871,6 +13874,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast10() {
+    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as item()",
       ctx);
@@ -16121,6 +16125,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast11() {
+    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as node()",
       ctx);
@@ -18371,6 +18376,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast12() {
+    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as attribute()",
       ctx);
@@ -20622,6 +20628,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast13() {
+    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as empty-sequence()",
       ctx);
@@ -28225,6 +28232,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast3() {
+    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as xs:anyType*",
       ctx);
@@ -30473,6 +30481,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast4() {
+    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as xs:anySimpleType",
       ctx);
@@ -30974,6 +30983,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast422() {
+    xquery10();
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"an arbitrary string(untypedAtomic source)\") cast as xs:QName",
       ctx);
@@ -32717,6 +32727,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast5() {
+    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as xs:untyped",
       ctx);
@@ -37199,6 +37210,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast7() {
+    xquery10();
     final XQuery query = new XQuery(
       "'string' cast as xs:anyType",
       ctx);
@@ -37639,6 +37651,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast71a() {
+    xquery10();
     final XQuery query = new XQuery(
       "xs:untypedAtomic(\"ncname\") cast as xs:QName?",
       ctx);
@@ -41683,6 +41696,7 @@ public class ProdCastExpr extends QT3TestSet {
    */
   @org.junit.Test
   public void kSeqExprCast9() {
+    xquery10();
     final XQuery query = new XQuery(
       "3 cast as xs:doesNotExist",
       ctx);

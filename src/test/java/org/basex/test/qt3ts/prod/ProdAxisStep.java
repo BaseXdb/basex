@@ -4550,6 +4550,7 @@ public class ProdAxisStep extends QT3TestSet {
    */
   @org.junit.Test
   public void axes127() {
+    xquery10();
     final XQuery query = new XQuery(
       "/*/namespace-node()",
       ctx);

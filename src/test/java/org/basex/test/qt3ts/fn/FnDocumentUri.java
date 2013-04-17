@@ -37,6 +37,7 @@ public class FnDocumentUri extends QT3TestSet {
    */
   @org.junit.Test
   public void kDocumentURIFunc2() {
+    xquery10();
     final XQuery query = new XQuery(
       "document-uri()",
       ctx);

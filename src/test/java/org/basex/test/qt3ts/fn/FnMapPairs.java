@@ -690,6 +690,138 @@ public class FnMapPairs extends QT3TestSet {
   }
 
   /**
+   * Tests the typ checking of the $f argument..
+   */
+  @org.junit.Test
+  public void fnMapPairs031() {
+    final XQuery query = new XQuery(
+      "( fn:map-pairs( if ( fn:current-dateTime() eq\n" +
+      "                                 fn:dateTime( fn:current-date(),\n" +
+      "                                              fn:current-time() ))\n" +
+      "                            then fn:concat#2 \n" +
+      "                            else (),\n" +
+      "                            (\"a\"), (\"b\") ),\n" +
+      "              fn:map-pairs( if ( fn:current-dateTime() eq\n" +
+      "                                fn:dateTime( fn:current-date(),\n" +
+      "                                             fn:current-time() ))\n" +
+      "                            then () \n" +
+      "                            else fn:concat#2,\n" +
+      "                            \"a\", \"b\" ) )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * Tests the type checking of the $f argument..
+   */
+  @org.junit.Test
+  public void fnMapPairs033() {
+    final XQuery query = new XQuery(
+      "fn:map-pairs( (fn:concat#2, fn:concat#2), \"a\", \"b\" )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * Tests the type checking of the $f argument..
+   */
+  @org.junit.Test
+  public void fnMapPairs034() {
+    final XQuery query = new XQuery(
+      "fn:map-pairs( fn:true(), \"a\", \"b\" )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * Tests the type checking of the $f argument..
+   */
+  @org.junit.Test
+  public void fnMapPairs035() {
+    final XQuery query = new XQuery(
+      " fn:map-pairs( /root, \"a\", \"b\" )",
+      ctx);
+    try {
+      query.context(node(file("fn/map-pairs/fn-map-pairs-013.xml")));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * Tests the type checking of the $f argument..
+   */
+  @org.junit.Test
+  public void fnMapPairs036() {
+    final XQuery query = new XQuery(
+      "fn:map-pairs( fn:boolean#1, \"a\", \"b\" )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
+   * Tests the type checking of the $f argument..
+   */
+  @org.junit.Test
+  public void fnMapPairs037() {
+    final XQuery query = new XQuery(
+      "fn:map-pairs( fn:concat#3, \"a\", \"b\" )",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XPTY0004")
+    );
+  }
+
+  /**
    * Apply deep-equal to corresponding pairs.
    */
   @org.junit.Test

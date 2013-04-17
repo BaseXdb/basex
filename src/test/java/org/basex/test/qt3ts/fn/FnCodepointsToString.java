@@ -1081,7 +1081,7 @@ public class FnCodepointsToString extends QT3TestSet {
   }
 
   /**
-   *  Tests invalid codepoint 0xD .
+   *  Tests invalid codepoint 0xE .
    */
   @org.junit.Test
   public void cbclCodepointsToString024() {
@@ -1101,7 +1101,7 @@ public class FnCodepointsToString extends QT3TestSet {
   }
 
   /**
-   *  Tests invalid codepoint 0xD .
+   *  Tests valid codepoints 0x9, 0xA .
    */
   @org.junit.Test
   public void cbclCodepointsToString025() {
@@ -1116,12 +1116,12 @@ public class FnCodepointsToString extends QT3TestSet {
       query.close();
     }
     test(
-      assertStringValue(false, "\t\n")
+      assertEq("'\t\n'")
     );
   }
 
   /**
-   *  Tests invalid codepoint 0xD .
+   *  Tests valid codepoint 0xD .
    */
   @org.junit.Test
   public void cbclCodepointsToString026() {

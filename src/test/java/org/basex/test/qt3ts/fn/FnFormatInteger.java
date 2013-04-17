@@ -754,7 +754,7 @@ public class FnFormatInteger extends QT3TestSet {
       query.close();
     }
     test(
-      assertStringValue(false, "1234")
+      assertStringValue(false, "1234th")
     );
   }
 
@@ -1259,6 +1259,26 @@ public class FnFormatInteger extends QT3TestSet {
     }
     test(
       assertEq("'Eleven'")
+    );
+  }
+
+  /**
+   * Error case with missing format modifier separator.
+   */
+  @org.junit.Test
+  public void formatInteger064() {
+    final XQuery query = new XQuery(
+      "format-integer(-1, '1o')",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("FODF1310")
     );
   }
 }

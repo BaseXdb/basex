@@ -887,7 +887,7 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   @org.junit.Test
   public void hof025() {
     final XQuery query = new XQuery(
-      "let $f := concat#1234, $n := function-name($f) \n" +
+      "let $f := concat#123456, $n := function-name($f) \n" +
       "        return (local-name-from-QName($n), namespace-uri-from-QName($n), function-arity($f))",
       ctx);
     try {
@@ -898,7 +898,7 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       query.close();
     }
     test(
-      assertStringValue(false, "concat http://www.w3.org/2005/xpath-functions 1234")
+      assertStringValue(false, "concat http://www.w3.org/2005/xpath-functions 123456")
     );
   }
 
@@ -1210,15 +1210,11 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
     final XQuery query = new XQuery(
       "\n" +
       "      \tdeclare function local:f($x as xs:long, $y as xs:NCName) as element(e)? { <e x=\"{$x}\" y=\"{$y}\"/> }; \n" +
-      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(), \n" +
-      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element()+, \n" +
       "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element()?, \n" +
       "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element()*, \n" +
       "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(e)*, \n" +
       "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(e, xs:anyType?)*, \n" +
       "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(*, xs:anyType?)?, \n" +
-      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(e, xs:anyType)*, \n" +
-      "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(*, xs:anyType)?, \n" +
       "      \tlocal:f#2 instance of function(xs:long, xs:NCName) as element(*, xs:untyped)?\n" +
       "      ",
       ctx);
@@ -1230,7 +1226,7 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
       query.close();
     }
     test(
-      assertStringValue(false, "false false true true true true true false false false")
+      assertStringValue(false, "true true true true true false")
     );
   }
 
@@ -2186,6 +2182,48 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   }
 
   /**
+   * It is a static error [err:XQST0039] for a function declaration to have more than one parameter with the same name..
+   */
+  @org.junit.Test
+  public void inlineFunction15() {
+    final XQuery query = new XQuery(
+      "function($Q{http://local/}foo, $Q{http://local/}bar, $Q{http://local/}foo) { \n" +
+      "              \"lala\", $Q{http://local/}foo, $Q{http://local/}bar }(\"gibbon\", \"monkey\", \"ape\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("XQST0039")
+    );
+  }
+
+  /**
+   * It is a static error [err:XQST0039] for a function declaration to have more than one parameter with the same name..
+   */
+  @org.junit.Test
+  public void inlineFunction16() {
+    final XQuery query = new XQuery(
+      "function($Q{http://local/}foo, $Q{http://local/}bar, $fn:foo) { \n" +
+      "               \"lala\", $Q{http://local/}foo, $Q{http://local/}bar }(\"gibbon\", \"monkey\", \"ape\")",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertDeepEq("\"lala\", \"gibbon\", \"monkey\"")
+    );
+  }
+
+  /**
    * that represents an anonymous function.
    */
   @org.junit.Test
@@ -2464,8 +2502,8 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void xqhof10() {
     final XQuery query = new XQuery(
       "\n" +
-      "for $f in (concat(\"one \", ?, \" three\"), substring-before(\"one two three\", ?), matches(?, \"t.*o\"), xs:NCName(?))\n" +
-      "return $f(\"two\")\n" +
+      "         for $f in (concat(\"one \", ?, \" three\"), substring-before(\"one two three\", ?), matches(?, \"t.*o\"), xs:NCName(?))\n" +
+      "         return $f(\"two\")\n" +
       "      ",
       ctx);
     try {
@@ -2527,8 +2565,8 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void xqhof13() {
     final XQuery query = new XQuery(
       "\n" +
-      "let $f := function($a) { node-name(.), $a }\n" +
-      "return <a/>/$f(5)\n" +
+      "         let $f := function($a) { node-name(.), $a }\n" +
+      "         return <a/>/$f(5)\n" +
       "      \n" +
       "      ",
       ctx);
@@ -2551,8 +2589,8 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void xqhof14() {
     final XQuery query = new XQuery(
       "\n" +
-      "let $f := name#0\n" +
-      "return <a/>/$f()\n" +
+      "         let $f := name#0\n" +
+      "         return <a/>/$f()\n" +
       "      \n" +
       "      ",
       ctx);
@@ -2575,8 +2613,8 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void xqhof15() {
     final XQuery query = new XQuery(
       "\n" +
-      "let $f := <b/>/name#0\n" +
-      "return <a/>/$f()\n" +
+      "         let $f := <b/>/name#0\n" +
+      "         return <a/>/$f()\n" +
       "      \n" +
       "      ",
       ctx);
@@ -2599,12 +2637,12 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void xqhof16() {
     final XQuery query = new XQuery(
       "\n" +
-      "declare base-uri \"main\";\n" +
-      "import module namespace lib = \"lib\";\n" +
-      "\n" +
-      "lib:getfun()(),\n" +
-      "fn:static-base-uri#0(),\n" +
-      "fn:static-base-uri()\n" +
+      "         declare base-uri \"main\";\n" +
+      "         import module namespace lib = \"lib\";\n" +
+      "         \n" +
+      "         lib:getfun()(),\n" +
+      "         fn:static-base-uri#0(),\n" +
+      "         fn:static-base-uri()\n" +
       "      ",
       ctx);
     try {
@@ -2633,11 +2671,11 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void xqhof17() {
     final XQuery query = new XQuery(
       "\n" +
-      "import module namespace lib = \"lib\";\n" +
-      "\n" +
-      "<main/>/lib:getfun2()(),\n" +
-      "<main/>/name#0(),\n" +
-      "<main/>/name()\n" +
+      "         import module namespace lib = \"lib\";\n" +
+      "         \n" +
+      "         <main/>/lib:getfun2()(),\n" +
+      "         <main/>/name#0(),\n" +
+      "         <main/>/name()\n" +
       "      ",
       ctx);
     try {
@@ -2660,12 +2698,12 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void xqhof18() {
     final XQuery query = new XQuery(
       "\n" +
-      "declare base-uri \"main\";\n" +
-      "import module namespace lib = \"lib\";\n" +
-      "\n" +
-      "lib:getfun3()(xs:QName(\"fn:static-base-uri\"),0)(),\n" +
-      "function-lookup#2(xs:QName(\"fn:static-base-uri\"),0)(),\n" +
-      "function-lookup(xs:QName(\"fn:static-base-uri\"),0)()\n" +
+      "         declare base-uri \"main\";\n" +
+      "         import module namespace lib = \"lib\";\n" +
+      "         \n" +
+      "         lib:getfun3()(xs:QName(\"fn:static-base-uri\"),0)(),\n" +
+      "         function-lookup#2(xs:QName(\"fn:static-base-uri\"),0)(),\n" +
+      "         function-lookup(xs:QName(\"fn:static-base-uri\"),0)()\n" +
       "      ",
       ctx);
     try {
@@ -2694,11 +2732,11 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void xqhof19() {
     final XQuery query = new XQuery(
       "\n" +
-      "import module namespace lib = \"lib\";\n" +
-      "\n" +
-      "<main/>/lib:getfun3()(xs:QName(\"fn:name\"),0)(),\n" +
-      "<main/>/function-lookup#2(xs:QName(\"fn:name\"),0)(),\n" +
-      "<main/>/function-lookup(xs:QName(\"fn:name\"),0)()\n" +
+      "         import module namespace lib = \"lib\";\n" +
+      "         \n" +
+      "         <main/>/lib:getfun3()(xs:QName(\"fn:name\"),0)(),\n" +
+      "         <main/>/function-lookup#2(xs:QName(\"fn:name\"),0)(),\n" +
+      "         <main/>/function-lookup(xs:QName(\"fn:name\"),0)()\n" +
       "      ",
       ctx);
     try {
@@ -2721,10 +2759,10 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void xqhof2() {
     final XQuery query = new XQuery(
       "\n" +
-      "import module namespace func = \"http://snelson.org.uk/functions/functional\";\n" +
-      "\n" +
-      "let $f := func:curry(concat#5)\n" +
-      "return $f(\"foo\")(\" bar\")(\" baz\")(\" what's\")(\" next?\")\n" +
+      "         import module namespace func = \"http://snelson.org.uk/functions/functional\";\n" +
+      "         \n" +
+      "         let $f := func:curry(concat#5)\n" +
+      "         return $f(\"foo\")(\" bar\")(\" baz\")(\" what's\")(\" next?\")\n" +
       "      ",
       ctx);
     try {
@@ -2794,11 +2832,11 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void xqhof4() {
     final XQuery query = new XQuery(
       "\n" +
-      "declare function local:hof($s, $f as function(*)) {\n" +
-      "  $f($s[1], $s[2])\n" +
-      "};\n" +
-      "\n" +
-      "local:hof(('1', '2'), concat#2)\n" +
+      "         declare function local:hof($s, $f as function(*)) {\n" +
+      "           $f($s[1], $s[2])\n" +
+      "         };\n" +
+      "         \n" +
+      "         local:hof(('1', '2'), concat#2)\n" +
       "      ",
       ctx);
     try {
@@ -2820,8 +2858,8 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void xqhof5() {
     final XQuery query = new XQuery(
       "\n" +
-      "let $a := string-join(?, \"\")\n" +
-      "return $a((\"foo\", \"bar\", \"baz\"))\n" +
+      "         let $a := string-join(?, \"\")\n" +
+      "         return $a((\"foo\", \"bar\", \"baz\"))\n" +
       "      ",
       ctx);
     try {
@@ -2843,12 +2881,12 @@ public class MiscHigherOrderFunctions extends QT3TestSet {
   public void xqhof6() {
     final XQuery query = new XQuery(
       "\n" +
-      "declare function local:curry($f as function(item()*, item()*) as item()*) as function(item()*) as function(item()*) as item()*\n" +
-      "{\n" +
-      "  function($a) { $f($a, ?) }\n" +
-      "};\n" +
-      "\n" +
-      "local:curry(substring-after#2)(\"foobar\")(\"foo\")\n" +
+      "         declare function local:curry($f as function(item()*, item()*) as item()*) as function(item()*) as function(item()*) as item()*\n" +
+      "         {\n" +
+      "           function($a) { $f($a, ?) }\n" +
+      "         };\n" +
+      "         \n" +
+      "         local:curry(substring-after#2)(\"foobar\")(\"foo\")\n" +
       "      ",
       ctx);
     try {

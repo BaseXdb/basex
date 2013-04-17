@@ -68,7 +68,11 @@ public class MiscXMLEdition extends QT3TestSet {
       query.close();
     }
     test(
-      assertSerialization("<\u037fnode/>", false)
+      (
+        assertSerialization("<\u037fnode/>", false)
+      ||
+        serializationMatches("<\u037fnode/>", "")
+      )
     );
   }
 
@@ -153,7 +157,11 @@ public class MiscXMLEdition extends QT3TestSet {
       query.close();
     }
     test(
-      assertSerialization("<eggſ/>", false)
+      (
+        assertSerialization("<eggſ/>", false)
+      ||
+        serializationMatches("<eggſ/>", "")
+      )
     );
   }
 
