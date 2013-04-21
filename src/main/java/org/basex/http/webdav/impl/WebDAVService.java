@@ -89,21 +89,6 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Checks if a folder is empty and create a dummy document.
-   * @param db database
-   * @param p path
-   * @throws IOException I/O exception
-   */
-  public void createDummy(final String db, final String p) throws IOException {
-    // check if path is a folder and is empty
-    if(p.matches("[^/]") || pathExists(db, p)) return;
-
-    final Session session = http.session();
-    session.execute(new Open(db));
-    session.store(p + SEP + DUMMY, new ArrayInput(Token.EMPTY));
-  }
-
-  /**
    * Checks if the specified database exists.
    * @param db database to be found
    * @return result of check
@@ -649,5 +634,20 @@ public class WebDAVService<T> {
     http.session().query(
         "import module namespace w = 'http://basex.org/webdav';" +
         "w:init-lock-db()").execute();
+  }
+
+  /**
+   * Checks if a folder is empty and create a dummy document.
+   * @param db database
+   * @param p path
+   * @throws IOException I/O exception
+   */
+  private void createDummy(final String db, final String p) throws IOException {
+    // check if path is a folder and is empty
+    if(p.matches("[^/]") || pathExists(db, p)) return;
+
+    final Session session = http.session();
+    session.execute(new Open(db));
+    session.store(p + SEP + DUMMY, new ArrayInput(Token.EMPTY));
   }
 }
