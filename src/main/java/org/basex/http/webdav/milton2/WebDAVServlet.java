@@ -35,7 +35,7 @@ public final class WebDAVServlet extends BaseXServlet {
       httpManagerBuilderClass = (Class<? extends HttpManagerBuilder>) config.
           getServletContext().getClassLoader().loadClass(HTTP_MANAGER_BUILDER_ENT);
       Util.debug("Using milton2 server enterprise");
-    } catch(ClassNotFoundException e) {
+    } catch(Exception e) {
       Util.debug("milton2 server enterprise is not available");
     }
   }
