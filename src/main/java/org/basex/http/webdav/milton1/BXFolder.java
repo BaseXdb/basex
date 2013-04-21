@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 
+import org.basex.util.Util;
 import org.basex.http.webdav.impl.ResourceMetaData;
 import org.basex.http.webdav.impl.WebDAVService;
 
@@ -20,7 +21,7 @@ import com.bradmcevoy.http.exceptions.*;
  * @author Dimitar Popov
  */
 public class BXFolder extends BXAbstractResource implements FolderResource,
-    DeletableCollectionResource {
+    DeletableCollectionResource, LockingCollectionResource {
   /**
    * Constructor.
    * @param d resource meta data
@@ -104,6 +105,21 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         return service.createFile(meta.db, meta.path, newName, input);
       }
     }.eval();
+  }
+
+  @Override
+  public LockToken createAndLock(String name, LockTimeout timeout, LockInfo lockInfo) throws NotAuthorizedException {
+    try {
+      final BXFile n = new BXFile(new ResourceMetaData(), service);
+      final LockResult lockResult = n.lock(timeout, lockInfo);
+      // TODO it may be needed to create the resource with no content
+      if(lockResult.isSuccessful()) return lockResult.getLockToken();
+    } catch(PreConditionFailedException e) {
+      Util.debug("Cannot lock requested resource", e);
+    } catch(LockedException e) {
+      Util.debug("Cannot lock requested resource", e);
+    }
+    return null;
   }
 
   @Override
