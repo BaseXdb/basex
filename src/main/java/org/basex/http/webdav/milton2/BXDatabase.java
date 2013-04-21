@@ -17,7 +17,7 @@ public class BXDatabase extends BXFolder {
    * @param d resource meta data
    * @param s service implementation
    */
-  public BXDatabase(ResourceMetaData d, WebDAVService s) {
+  public BXDatabase(final ResourceMetaData d, final WebDAVService<BXAbstractResource> s) {
     super(d, s);
   }
 

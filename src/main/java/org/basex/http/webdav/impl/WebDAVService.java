@@ -27,6 +27,7 @@ import java.util.List;
  * Service handling the various WebDAV operations.
  * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
+ * @param <T> the type of resource
  */
 public class WebDAVService<T> {
   /** Name of the database with the WebDAV locks. */
@@ -65,6 +66,7 @@ public class WebDAVService<T> {
    * @param p path
    * @return {@code true} if the user is authorised
    */
+  @SuppressWarnings("unused")
   public boolean authorise(final String user, final String action, final String db,
       final String p) {
     if(WEBDAV_LOCKS_DB.equals(db)) return false;
@@ -480,7 +482,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Add the given file to the specified path
+   * Add the given file to the specified path.
    * @param db database
    * @param p path
    * @param n file name
@@ -587,6 +589,7 @@ public class WebDAVService<T> {
    * @param db database
    * @param p path
    * @param in file content
+   * @return object representing the newly added file
    * @throws IOException I/O exception
    */
   private T addFile(final String db, final String p, final InputStream in) throws

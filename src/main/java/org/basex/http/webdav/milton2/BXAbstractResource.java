@@ -182,6 +182,7 @@ public abstract class BXAbstractResource implements
   }
 
   /**
+   * Get the active lock for the current resource.
    * @return - the current lock, if the resource is locked, or null
    */
   @Override
@@ -254,13 +255,26 @@ public abstract class BXAbstractResource implements
     }
   }
 
+  /**
+   * Get the active lock on the current resource.
+   * @return the token of the active lock or {@code null} if resource is not locked
+   * @throws IOException I/O exception
+   * @throws SAXException SAX exception if parsing of the lock info fails
+   */
   LockToken getCurrentActiveLock() throws IOException, SAXException {
     final String lockInfoStr = service.lock(meta.db, meta.path);
     return lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
   }
 
-  private static LockToken parseLockInfo(String lockInfo) throws SAXException,
-    IOException {
+  /**
+   * Parse the lock info.
+   * @param lockInfo lock info as a string
+   * @return parsed lock info bean
+   * @throws IOException I/O exception
+   * @throws SAXException SAX exception if parsing of the lock info fails
+   */
+  private static LockToken parseLockInfo(final String lockInfo) throws SAXException,
+      IOException {
     XMLReader reader = XMLReaderFactory.createXMLReader();
     LockTokenSaxHandler handler = new LockTokenSaxHandler();
     reader.setContentHandler(handler);
@@ -268,26 +282,30 @@ public abstract class BXAbstractResource implements
     return handler.lockToken;
   }
 
+  /** SAX handler for lock token. */
   public static final class LockTokenSaxHandler extends DefaultHandler {
+    /** Parsed lock token. */
     public final LockToken lockToken = new LockToken(null, new LockInfo(), null);
+    /** Current element name. */
     private String elementName;
 
     @Override
-    public void startElement(String uri, String localName, String name,
-        Attributes attributes) throws SAXException {
+    public void startElement(final String uri, final String localName, final String name,
+        final Attributes attributes) throws SAXException {
       elementName = localName;
       super.startElement(uri, localName, name, attributes);
     }
 
     @Override
-    public void endElement (String uri, String localName, String qName)
+    public void endElement(final String uri, final String localName, final String qName)
         throws SAXException {
       elementName = null;
       super.endElement(uri, localName, qName);
     }
 
     @Override
-    public void characters(char[] ch, int start, int length) throws SAXException {
+    public void characters(final char[] ch, final int start, final int length)
+        throws SAXException {
       String value = String.valueOf(ch, start, length);
       if("token".equals(elementName))
         lockToken.tokenId = value;

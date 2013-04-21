@@ -21,6 +21,9 @@ public final class Utils {
   /** Dummy file for empty folder.*/
   static final String DUMMY = ".empty";
 
+  /** Private constructor. */
+  private Utils() { }
+
   /**
    * Strip leading slash if available.
    * @param s string to modify
@@ -35,7 +38,7 @@ public final class Utils {
    * @param path path
    * @return name of the resource identified by the path
    */
-  public static String name(String path) {
+  public static String name(final String path) {
     final int idx = path.lastIndexOf(SEP);
     return idx < 0 ? path : path.substring(idx + 1, path.length());
   }
@@ -50,10 +53,20 @@ public final class Utils {
     return (i < 0 ? db : db.substring(0, i)).replaceAll("[^\\w-]", "");
   }
 
+  /**
+   * Return the current time in milliseconds.
+   * @return now in milliseconds
+   */
   public static long now() {
     return System.currentTimeMillis();
   }
 
+  /**
+   * Peek the next byte in the given buffer.
+   * @param bi buffer
+   * @return the next byte in the buffer
+   * @throws IOException I/O exception
+   */
   public static int peek(final BufferInput bi) throws IOException {
     final TextInput ti = new TextInput(bi);
     final int c = ti.read();

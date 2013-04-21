@@ -65,17 +65,20 @@ public final class BXResourceFactory implements ResourceFactory,
   }
 
   @Override
-  public BXFile file(WebDAVService<BXAbstractResource> s, ResourceMetaData d) {
+  public BXFile file(final WebDAVService<BXAbstractResource> s,
+      final ResourceMetaData d) {
     return new BXFile(d, s);
   }
 
   @Override
-  public BXFolder folder(WebDAVService<BXAbstractResource> s, ResourceMetaData d) {
+  public BXFolder folder(final WebDAVService<BXAbstractResource> s,
+      final ResourceMetaData d) {
     return new BXFolder(d, s);
   }
 
   @Override
-  public BXDatabase database(WebDAVService<BXAbstractResource> s, ResourceMetaData d) {
+  public BXDatabase database(final WebDAVService<BXAbstractResource> s,
+      final ResourceMetaData d) {
     return new BXDatabase(d, s);
   }
 }

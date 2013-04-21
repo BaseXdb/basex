@@ -22,16 +22,18 @@ import java.io.IOException;
  */
 public final class WebDAVServlet extends BaseXServlet {
   /** Name of the milton2 enterprise implementation of {@link HttpManagerBuilder}. */
-  private static final String HTTP_MANAGER_BUILDER_ENT = "io.milton.ent.config.HttpManagerBuilderEnt";
+  private static final String HTTP_MANAGER_BUILDER_ENT =
+      "io.milton.ent.config.HttpManagerBuilderEnt";
   /** Class implementing {@link HttpManagerBuilder}. */
-  private Class<? extends HttpManagerBuilder> httpManagerBuilderClass = null;
+  private Class<? extends HttpManagerBuilder> httpManagerBuilderClass;
 
   @Override
-  public final void init(final ServletConfig config) throws ServletException {
+  @SuppressWarnings("unchecked")
+  public void init(final ServletConfig config) throws ServletException {
     super.init(config);
     try {
-      httpManagerBuilderClass = (Class<? extends HttpManagerBuilder>) config
-        .getServletContext().getClassLoader().loadClass(HTTP_MANAGER_BUILDER_ENT);
+      httpManagerBuilderClass = (Class<? extends HttpManagerBuilder>) config.
+          getServletContext().getClassLoader().loadClass(HTTP_MANAGER_BUILDER_ENT);
       Util.debug("Using milton2 server enterprise");
     } catch(ClassNotFoundException e) {
       Util.debug("milton2 server enterprise is not available");

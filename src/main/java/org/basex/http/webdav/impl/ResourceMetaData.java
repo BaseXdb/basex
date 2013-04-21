@@ -33,56 +33,56 @@ public class ResourceMetaData {
 
   /**
    * Constructor.
-   * @param db database owning the resource
-   * @param mod resource last modification date in milliseconds
+   * @param d database owning the resource
+   * @param m resource last modification date in milliseconds
    */
-  public ResourceMetaData(final String db, final long mod) {
-    this(db, "", mod);
+  public ResourceMetaData(final String d, final long m) {
+    this(d, "", m);
   }
 
   /**
    * Constructor.
-   * @param db database owning the resource
+   * @param d database owning the resource
    * @param p resource path
-   * @param mod resource last modification date in milliseconds
+   * @param m resource last modification date in milliseconds
    */
-  public ResourceMetaData(final String db, final String p, final long mod) {
-    this(db, p, mod, false, null,  null, true);
+  public ResourceMetaData(final String d, final String p, final long m) {
+    this(d, p, m, false, null,  null, true);
   }
 
   /**
    * Constructor.
-   * @param db database owning the resource
+   * @param d database owning the resource
    * @param p resource path
-   * @param mod resource last modification date in milliseconds
-   * @param raw raw binary file flag
-   * @param ctype resource content type
-   * @param size resource size in bytes
+   * @param m resource last modification date in milliseconds
+   * @param r raw binary file flag
+   * @param c resource content type
+   * @param s resource size in bytes
    */
-  public ResourceMetaData(final String db, final String p, final long mod,
-      final boolean raw, final String ctype, final Long size) {
-    this(db, p, mod, raw, ctype,  size, false);
+  public ResourceMetaData(final String d, final String p, final long m,
+      final boolean r, final String c, final Long s) {
+    this(d, p, m, r, c,  s, false);
   }
 
   /**
    * Constructor.
-   * @param db database owning the resource
+   * @param d database owning the resource
    * @param p resource path
-   * @param mod resource last modification date in milliseconds
-   * @param raw raw binary file flag
-   * @param ctype resource content type
-   * @param size resource size in bytes
-   * @param folder folder flag
+   * @param m resource last modification date in milliseconds
+   * @param r raw binary file flag
+   * @param c resource content type
+   * @param s resource size in bytes
+   * @param f folder flag
    */
-  public ResourceMetaData(final String db, final String p, final long mod,
-      final boolean raw, final String ctype, final Long size, final boolean folder) {
-    this.db = db;
+  public ResourceMetaData(final String d, final String p, final long m,
+      final boolean r, final String c, final Long s, final boolean f) {
+    this.db = d;
     this.path = stripLeadingSlash(p);
-    this.mod = mod;
-    this.raw = raw;
-    this.ctype = ctype;
-    this.size = size;
-    this.folder = folder;
+    this.mod = m;
+    this.raw = r;
+    this.ctype = c;
+    this.size = s;
+    this.folder = f;
     this.mdate = this.mod == -1 ? null : new Date(this.mod);
   }
 }

@@ -26,7 +26,7 @@ public final class BXRoot extends BXFolder {
    * Constructor.
    * @param s service
    */
-  public BXRoot(final WebDAVService s) {
+  public BXRoot(final WebDAVService<BXAbstractResource> s) {
     super(new ResourceMetaData(), s);
   }
 

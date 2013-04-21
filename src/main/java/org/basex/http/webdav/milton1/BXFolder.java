@@ -27,7 +27,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
    * @param d resource meta data
    * @param s service implementation
    */
-  public BXFolder(final ResourceMetaData d, final WebDAVService s) {
+  public BXFolder(final ResourceMetaData d, final WebDAVService<BXAbstractResource> s) {
     super(d, s);
   }
 
@@ -108,7 +108,8 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   @Override
-  public LockToken createAndLock(String name, LockTimeout timeout, LockInfo lockInfo) throws NotAuthorizedException {
+  public LockToken createAndLock(final String name, final LockTimeout timeout,
+      final LockInfo lockInfo) throws NotAuthorizedException {
     try {
       final BXFile n = new BXFile(new ResourceMetaData(), service);
       final LockResult lockResult = n.lock(timeout, lockInfo);
