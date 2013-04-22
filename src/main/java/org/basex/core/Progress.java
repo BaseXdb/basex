@@ -19,6 +19,8 @@ public abstract class Progress {
   /** This flag indicates that a command may perform updates. */
   public boolean updating;
 
+  /** Indicates if a process is currently registered. */
+  protected boolean registered;
   /** Stopped flag. */
   private boolean stopped;
   /** Timeout thread. */
@@ -127,12 +129,10 @@ public abstract class Progress {
    * Adds the names of the databases that will be touched by the process.
    * An empty string indicates that the currently opened database will be
    * touched.
-   * @param db databases
-   * @return {@code false} if databases cannot be statically determined
+   * @param lockResult Container for lock result to pass around
    */
-  @SuppressWarnings("unused")
-  public boolean databases(final StringList db) {
-    return false;
+  public void databases(final LockResult lockResult) {
+    lockResult.writeAll = true;
   }
 
   /**
@@ -159,5 +159,20 @@ public abstract class Progress {
    */
   protected double prog() {
     return 0;
+  }
+
+  /**
+   * Result object for databases function.
+   * @see Progress#databases(LockResult)
+   */
+  public static class LockResult {
+    /** Flag if global read lock is required. */
+    public boolean readAll;
+    /** Flag if global write lock is required. */
+    public boolean writeAll;
+    /** List of databases to read lock. */
+    public StringList read = new StringList(1);
+    /** List of databases to write lock. */
+    public StringList write = new StringList(1);
   }
 }

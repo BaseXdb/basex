@@ -111,8 +111,8 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return win.databases(db) && super.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    return win.databases(db, rootContext) && super.databases(db, rootContext);
   }
 
   @Override

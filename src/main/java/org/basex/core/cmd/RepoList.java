@@ -6,14 +6,13 @@ import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.query.util.pkg.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'repo list' command.
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
-public final class RepoList extends Command {
+public final class RepoList extends ARepo {
   /**
    * Constructor.
    */
@@ -28,9 +27,8 @@ public final class RepoList extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add(DBLocking.REPO);
-    return true;
+  public void databases(final LockResult lr) {
+    lr.read.add(DBLocking.REPO);
   }
 
   @Override

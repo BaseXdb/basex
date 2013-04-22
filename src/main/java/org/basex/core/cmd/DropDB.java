@@ -90,8 +90,9 @@ public final class DropDB extends ACreate {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return databases(db, 0);
+  public void databases(final LockResult lr) {
+    if (!databases(lr.write, 0))
+      lr.writeAll = true;
   }
 
   @Override

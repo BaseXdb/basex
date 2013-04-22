@@ -82,9 +82,8 @@ abstract class AUser extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add(DBLocking.ADMIN);
-    return true;
+  public void databases(final LockResult lr) {
+    lr.write.add(DBLocking.ADMIN); // Admin operations are exclusive
   }
 
   /**

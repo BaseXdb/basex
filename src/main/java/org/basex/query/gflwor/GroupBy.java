@@ -291,8 +291,8 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final Spec spec : by) if(!spec.databases(db)) return false;
+  public boolean databases(final StringList db, final boolean rootContext) {
+    for(final Spec spec : by) if(!spec.databases(db, rootContext)) return false;
     return true;
   }
 

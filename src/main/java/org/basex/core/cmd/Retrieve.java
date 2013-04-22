@@ -45,4 +45,9 @@ public final class Retrieve extends ACreate {
       return error(FILE_NOT_STORED_X, ex);
     }
   }
+
+  @Override
+  public void databases(final LockResult lr) {
+    lr.read.add(DBLocking.CTX);
+  }
 }

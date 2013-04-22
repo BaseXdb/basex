@@ -195,7 +195,8 @@ public final class InfoView extends View implements LinkListener {
       } else if(line.startsWith(EVALUATING_C)) {
         while(i + 1 < split.length && split[++i].startsWith(LI)) eval.add(split[i]);
       } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
-          line.startsWith(PRINTED_CC) || line.startsWith(LOCKING_CC)) {
+          line.startsWith(PRINTED_CC) || line.startsWith(READ_LOCKING_CC) ||
+          line.startsWith(WRITE_LOCKING_CC)) {
         result.add(LI + line);
       } else if(line.startsWith(ERROR_C)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) {

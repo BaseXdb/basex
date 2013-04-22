@@ -8,7 +8,6 @@ import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdCreate;
 import org.basex.data.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'create user' command and creates a new user.
@@ -34,11 +33,6 @@ public final class CreateUser extends AUser {
     } catch(final BaseXException ex) {
       return error(Util.message(ex));
     }
-  }
-
-  @Override
-  public boolean databases(final StringList db) {
-    return true;
   }
 
   @Override

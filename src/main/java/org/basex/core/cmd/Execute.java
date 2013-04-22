@@ -6,7 +6,6 @@ import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.query.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'execute' command and runs a command script.
@@ -35,8 +34,8 @@ public class Execute extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return false;
+  public void databases(final LockResult lr) {
+    lr.writeAll = true;
   }
 
   @Override

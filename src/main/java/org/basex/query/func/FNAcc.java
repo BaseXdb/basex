@@ -4,12 +4,14 @@ import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Accessor functions.
@@ -91,5 +93,11 @@ public final class FNAcc extends StandardFunc {
   public boolean uses(final Use u) {
     return u == Use.POS && oneOf(sig, POSITION, LAST) ||
         u == Use.CTX && expr.length == 0 || super.uses(u);
+  }
+
+  @Override
+  public boolean databases(final StringList db, final boolean rootContext) {
+    if(rootContext && 0 == expr.length) db.add(DBLocking.CTX);
+    return super.databases(db, rootContext);
   }
 }

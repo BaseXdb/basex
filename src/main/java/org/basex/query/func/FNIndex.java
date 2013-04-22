@@ -241,7 +241,7 @@ public final class FNIndex extends StandardFunc {
   }
 
   @Override
-  public boolean databases(final StringList db) {
+  public boolean databases(final StringList db, final boolean rootContext) {
     if(!(expr[0] instanceof Str)) return false;
     db.add(string(((Str) expr[0]).string()));
     return true;

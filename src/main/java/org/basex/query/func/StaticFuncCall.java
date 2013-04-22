@@ -89,8 +89,8 @@ public abstract class StaticFuncCall extends Arr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return func.databases(db) && super.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    return func.databases(db) && super.databases(db, rootContext);
   }
 
   /**

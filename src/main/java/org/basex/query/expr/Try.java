@@ -130,9 +130,9 @@ public final class Try extends Single {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final Catch c : ctch) if(!c.databases(db)) return false;
-    return super.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    for(final Catch c : ctch) if(!c.databases(db, rootContext)) return false;
+    return super.databases(db, rootContext);
   }
 
   @Override

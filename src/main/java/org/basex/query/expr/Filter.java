@@ -179,8 +179,8 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return root.databases(db) && super.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    return root.databases(db, rootContext) && super.databases(db, rootContext);
   }
 
   @Override

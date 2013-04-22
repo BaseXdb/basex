@@ -17,4 +17,9 @@ abstract class AGet extends Command {
   AGet(final Perm p, final String... a) {
     super(p, a);
   }
+
+  @Override
+  public void databases(final LockResult lr) {
+    // No locks needed
+  }
 }

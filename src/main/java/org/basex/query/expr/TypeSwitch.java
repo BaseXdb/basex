@@ -128,9 +128,9 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final TypeCase tc : cases) if(!tc.databases(db)) return false;
-    return ts.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    for(final TypeCase tc : cases) if(!tc.databases(db, rootContext)) return false;
+    return ts.databases(db, rootContext);
   }
 
   @Override
