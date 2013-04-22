@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.Set;
@@ -25,6 +26,8 @@ import org.junit.*;
  * @author Leo Woerteler
  */
 public abstract class QT3TestSet {
+  /** EQName pattern. */
+  private static final Pattern BIND = Pattern.compile("^Q\\{(.*?)\\}(.+)$");
 
   /** Database context. */
   public Context ctx;
@@ -211,12 +214,18 @@ public abstract class QT3TestSet {
     if(result.value != null) return fail(Util.info("Error: '%'", code));
     if(code.equals("*")) return true;
 
-    final QNm err = new QNm(code, QueryText.ERRORURI);
+    String name = code, uri = string(QueryText.ERRORURI);
+    final Matcher m = BIND.matcher(code);
+    if(m.find()) {
+      uri = m.group(1);
+      name = m.group(2);
+    }
+    final QNm err = new QNm(name, uri);
 
     if(result.exc != null) {
       final QueryException qe = result.exc.getException();
-      final QNm name = qe.err() != null ? qe.err().qname() : qe.qname();
-      if(name != null) return result(err.eq(name), Util.info("% (found: %)", err, name));
+      final QNm qn = qe.err() != null ? qe.err().qname() : qe.qname();
+      if(qn != null) return result(err.eq(qn), Util.info("% (found: %)", err, qn));
       return fail(Util.info("% (found: %)", err, "?"));
     }
 

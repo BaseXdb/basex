@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -28,6 +29,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class QT3TS {
+  /** EQName pattern. */
+  private static final Pattern BIND = Pattern.compile("^Q\\{(.*?)\\}(.+)$");
+
   /** Test suite id. */
   private final String testid = "qt3ts";
   /** Path to the test suite (ignored if {@code null}). */
@@ -313,7 +317,7 @@ public final class QT3TS {
       // run query
       result.value = query.value();
     } catch(final XQueryException ex) {
-      result.exc = ex;
+      result.err = ex;
       result.value = null;
     } catch(final Throwable ex) {
       // unexpected error (potential bug)
@@ -338,8 +342,8 @@ public final class QT3TS {
     boolean err = result.value == null;
     String res;
     try {
-      res = result.error != null ? result.error.toString() : result.exc != null ?
-          result.exc.getCode() + ": " + result.exc.getLocalizedMessage() :
+      res = result.error != null ? result.error.toString() : result.err != null ?
+          result.err.getCode() + ": " + result.err.getLocalizedMessage() :
           asString("serialize(., map { 'indent' := 'no' })", result.value);
     } catch(final XQueryException ex) {
       res = ex.getCode() + ": " + ex.getLocalizedMessage();
@@ -375,20 +379,23 @@ public final class QT3TS {
    * @return result of check
    */
   private boolean supported(final XdmValue node) {
-    /* feature: schemaImport schemaValidation staticTyping
-         collection-stability directory-as-collection-uri
-         xpath-1.0-compatibility namespace-axis schema-location-hint
-       spec: XQ10+ XP30+ XQ30+ XT30+
-       xsd-version: 1.1
-       language, limits, calendar, format-integer-sequence, default-language
+    /* feature:
+       collection-stability directory-as-collection-uri higherOrderFunctions
+       moduleImport namespace-axis schema-location-hint schemaAware schemaImport
+       schemaValidation staticTyping xpath-1.0-compatibility
+       MISSING? language, limits, calendar, format-integer-sequence, default-language
      */
 
+    final String notsupp = "('schema-location-hint','schemaAware','schemaImport'," +
+        "'schemaValidation','staticTyping')";
     final XQuery q = new XQuery(
       "*:environment/*:collation |" + // skip collation tests
       "*:dependency[" +
       // skip schema imports, schema validation, namespace axis, static typing
-      "@type='feature' and" +
-      " @value=('schemaImport','schemaValidation','namespace-axis','staticTyping') or " +
+      "@type = 'feature' and (" +
+      " @value = " + notsupp + " and (@satisfied = 'true' or empty(@satisfied)) or" +
+      " @value != " + notsupp + "and @satisfied = 'false'" +
+      ") or " +
       // skip xml/xsd 1.1 tests
       "@type=('xml-version','xsd-version') and @value='1.1' or" +
       // skip non-XQuery tests
@@ -446,9 +453,11 @@ public final class QT3TS {
         } else if(type.equals("assert-permutation")) {
           msg = assertPermutation(value, expected);
         } else if(type.equals("assert-xml")) {
-          msg = assertSerialization(value, expected);
+          msg = assertXML(value, expected);
+        } else if(type.equals("serialization-matches")) {
+          msg = serializationMatches(value, expected);
         } else if(type.equals("assert-serialization-error")) {
-          msg = assertSerialError(value, expected);
+          msg = assertSerializationError(value, expected);
         } else if(type.equals("assert-string-value")) {
           msg = assertStringValue(value, expected);
         } else if(type.equals("assert-true")) {
@@ -476,9 +485,19 @@ public final class QT3TS {
    */
   private String assertError(final QT3Result result, final XdmValue expect) {
     final String exp = asString('@' + CODE, expect);
-    if(result.exc == null) return exp;
-    final String res = result.exc.getCode();
-    return !errors || exp.equals("*") || exp.equals(res) ? null : exp;
+    if(result.err == null) return exp;
+    if(!errors || exp.equals("*")) return null;
+
+    final QNm resErr = result.err.getException().qname();
+
+    String name = exp, uri = string(QueryText.ERRORURI);
+    final Matcher m = BIND.matcher(exp);
+    if(m.find()) {
+      uri = m.group(1);
+      name = m.group(2);
+    }
+    final QNm expErr = new QNm(name, uri);
+    return expErr.eq(resErr) ? null : exp;
   }
 
   /**
@@ -626,7 +645,7 @@ public final class QT3TS {
    * @param expect expected result
    * @return optional expected test suite result
    */
-  private String assertSerialization(final XdmValue value, final XdmValue expect) {
+  private String assertXML(final XdmValue value, final XdmValue expect) {
     final String file = asString("@file", expect);
     final boolean norm = asBoolean("@normalize-space=('true','1')", expect);
     final boolean pref = asBoolean("@ignore-prefixes=('true','1')", expect);
@@ -654,15 +673,39 @@ public final class QT3TS {
   }
 
   /**
+   * Tests the serialized result.
+   * @param value resulting value
+   * @param expect expected result
+   * @return optional expected test suite result
+   */
+  private String serializationMatches(final XdmValue value, final XdmValue expect) {
+    String exp = expect.getString();
+
+    final String flags = asString("@flags", expect);
+    final int flgs = flags.contains("i") ? Pattern.CASE_INSENSITIVE : 0;
+    final Pattern pat = Pattern.compile("^.*" + exp + ".*", flgs |
+        Pattern.MULTILINE | Pattern.DOTALL);
+
+    String qu = "serialize(., map{ 'indent':='no' })";
+    if(pat.matcher(asString(qu, value)).matches()) return null;
+    qu = "serialize(., map{ 'indent':='no', 'omit-xml-declaration':='no' })";
+    if(pat.matcher(asString(qu, value)).matches()) return null;
+
+    return exp;
+  }
+
+
+  /**
    * Tests a serialization error.
    * @param value resulting value
    * @param expect expected result
    * @return optional expected test suite result
    */
-  private String assertSerialError(final XdmValue value, final XdmValue expect) {
+  private String assertSerializationError(final XdmValue value, final XdmValue expect) {
     final String exp = asString('@' + CODE, expect);
     try {
-      value.toString();
+      asString("serialize(., map{ 'indent':='no' })", value);
+      //value.toString();
       return exp;
     } catch(final RuntimeException qe) {
       final String res = qe.getMessage().replaceAll("\\[|\\].*\r?\n?.*", "");
@@ -843,7 +886,7 @@ public final class QT3TS {
     /** Query result. */
     XdmValue value;
     /** Query exception. */
-    XQueryException exc;
+    XQueryException err;
     /** Query error. */
     Throwable error;
   }
