@@ -12,7 +12,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * FTContains expression with index access.
@@ -91,9 +90,8 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public boolean databases(final StringList dbs, final boolean rootContext) {
-    dbs.add(db);
-    return ftexpr.databases(dbs, rootContext);
+  public boolean accept(final ASTVisitor visitor) {
+    return visitor.lock2(db) && ftexpr.accept(visitor);
   }
 
   @Override
@@ -109,11 +107,6 @@ public final class FTIndexAccess extends Simple {
   @Override
   public String toString() {
     return Function._DB_FULLTEXT.get(info, Str.get(db), ftexpr).toString();
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return ftexpr.accept(visitor);
   }
 
   @Override

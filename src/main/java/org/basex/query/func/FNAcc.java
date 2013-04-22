@@ -8,10 +8,10 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Accessor functions.
@@ -96,8 +96,8 @@ public final class FNAcc extends StandardFunc {
   }
 
   @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    if(rootContext && 0 == expr.length) db.add(DBLocking.CTX);
-    return super.databases(db, rootContext);
+  public boolean accept(final ASTVisitor visitor) {
+    if(0 == expr.length && !visitor.lock2(DBLocking.CTX)) return false;
+    return super.accept(visitor);
   }
 }

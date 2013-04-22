@@ -20,7 +20,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract value.
@@ -138,13 +137,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    final Data data = data();
-    if(data != null) db.add(data.meta.name);
-    return true;
-  }
-
-  @Override
   public String description() {
     return type + " " + SEQUENCE;
   }
@@ -212,7 +204,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return true;
+    final Data data = data();
+    return data == null || visitor.lock2(data.meta.name);
   }
 
   @Override

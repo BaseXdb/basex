@@ -11,7 +11,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Switch expression.
@@ -127,12 +126,6 @@ public final class Switch extends ParseExpr {
       cond = cn;
     }
     return change ? optimize(ctx, scp) : null;
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    for(final SwitchCase sc : cases) if(!sc.databases(db, rootContext)) return false;
-    return cond.databases(db, rootContext);
   }
 
   /**

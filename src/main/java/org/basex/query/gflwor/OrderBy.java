@@ -1,13 +1,14 @@
 package org.basex.query.gflwor;
 
-import static org.basex.util.Array.*;
 import static org.basex.query.QueryText.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import static org.basex.util.Array.*;
+
+import java.util.*;
 import java.util.List;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.gflwor.GFLWOR.*;
+import org.basex.query.gflwor.GFLWOR.Eval;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -15,7 +16,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 
 /**
@@ -292,12 +292,6 @@ public final class OrderBy extends GFLWOR.Clause {
   @Override
   public void checkUp() throws QueryException {
     checkNoneUp(keys);
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    for(final Key key : keys) if(!key.databases(db, rootContext)) return false;
-    return true;
   }
 
   @Override

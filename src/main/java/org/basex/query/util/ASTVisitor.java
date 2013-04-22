@@ -67,4 +67,23 @@ public abstract class ASTVisitor {
   public boolean funcItem(final FuncItem func) {
     return true;
   }
+
+  /**
+   * Notifies the visitor of a database lock.
+   * @param db database to be locked
+   * @return if more expressions should be visited
+   */
+  public boolean lock2(final String db) {
+    return true;
+  }
+
+  /**
+   * Notifies the visitor of an expression entering a focus.
+   */
+  public void enterFocus() { }
+
+  /**
+   * Notifies the visitor of an expression leaving a focus.
+   */
+  public void exitFocus() { }
 }

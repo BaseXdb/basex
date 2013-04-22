@@ -15,7 +15,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * This index class retrieves texts and attribute values from the index.
@@ -133,11 +132,6 @@ public final class ValueAccess extends IndexAccess {
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
     return new ValueAccess(info, expr.copy(ctx, scp, vs), itype, data, iterable);
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    return expr.databases(db, rootContext);
   }
 
   @Override

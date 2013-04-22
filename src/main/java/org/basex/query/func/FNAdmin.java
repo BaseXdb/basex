@@ -14,11 +14,11 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.server.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Admin functions.
@@ -158,13 +158,12 @@ public final class FNAdmin extends StandardFunc {
   }
 
   @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    if(oneOf(sig, _ADMIN_USERS, _ADMIN_SESSIONS)) db.add(DBLocking.ADMIN);
-    if(expr.length > 0 && expr[0] instanceof Str) {
-      db.add(string(((Str) expr[0]).string()));
-      return true;
-    }
-    return super.databases(db, rootContext);
+  public boolean accept(final ASTVisitor visitor) {
+    if(oneOf(sig, _ADMIN_USERS, _ADMIN_SESSIONS) &&
+        !visitor.lock2(DBLocking.ADMIN)) return false;
+    if(expr.length > 0 && expr[0] instanceof Str &&
+        !visitor.lock2(string(((Str) expr[0]).string()))) return false;
+    return super.accept(visitor);
   }
 
   /*

@@ -6,13 +6,13 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Context item.
@@ -71,9 +71,8 @@ public final class Context extends Simple {
   }
 
   @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    if (rootContext) db.add(DBLocking.CTX);
-    return true;
+  public boolean accept(final ASTVisitor visitor) {
+    return visitor.lock2(DBLocking.CTX) && super.accept(visitor);
   }
 
   @Override

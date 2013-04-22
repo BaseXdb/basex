@@ -17,7 +17,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Inline function.
@@ -239,11 +238,6 @@ public final class InlineFunc extends Single implements Scope {
   public boolean removable(final Var v) {
     // [LW] Variables are removable from the closure.
     return false;
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    return expr.databases(db, false);
   }
 
   @Override

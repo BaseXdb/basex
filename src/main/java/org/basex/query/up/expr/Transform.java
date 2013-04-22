@@ -15,7 +15,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Transform expression.
@@ -113,12 +112,6 @@ public final class Transform extends Arr {
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
     return new Transform(info, copyAll(ctx, scp, vs, copies), expr[0].copy(ctx, scp, vs),
         expr[1].copy(ctx, scp, vs));
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    for(final Let c : copies) if(!c.databases(db, rootContext)) return false;
-    return super.databases(db, rootContext);
   }
 
   @Override

@@ -1,13 +1,18 @@
 package org.basex.query;
 
+import java.util.*;
+
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
+import org.basex.util.list.*;
 
 /**
  * An XQuery main module.
@@ -107,6 +112,82 @@ public class MainModule extends ExprInfo implements Scope {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
+    return expr.accept(visitor);
+  }
+
+  /**
+   * Returns the databases that may be touched by this query. The returned information
+   * will be more accurate if the function is called after parsing the query.
+   * @param lr lock result
+   * @see Progress#databases(LockResult)
+   * @param ctx query context
+   * @return {@code true} if query can be locally locked
+   */
+  public boolean databases(final LockResult lr, final QueryContext ctx) {
+    final StringList sl = ctx.updating ? lr.write : lr.read;
+
+    final ASTVisitor visitor = new ASTVisitor() {
+      /** Already visited scopes. */
+      final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<Scope, Object>();
+      /** Focus level. */
+      int level = ctx.ctxItem == null ? 0 : 1;
+
+      @Override
+      public boolean lock2(final String db) {
+        if(db == null) return false;
+        if(level == 0 || db != DBLocking.CTX) sl.add(db);
+        return true;
+      }
+
+      @Override
+      public void enterFocus() {
+        level++;
+      }
+
+      @Override
+      public void exitFocus() {
+        level--;
+      }
+
+      @Override
+      public boolean staticVar(final StaticVar var) {
+        if(funcs.containsKey(var)) return true;
+        funcs.put(var, null);
+        return var.visit(this);
+      }
+
+      @Override
+      public boolean funcCall(final StaticFuncCall call) {
+        return func(call.func());
+      }
+
+      @Override
+      public boolean inlineFunc(final Scope sub) {
+        enterFocus();
+        final boolean ac = sub.visit(this);
+        exitFocus();
+        return ac;
+      }
+
+      @Override
+      public boolean funcItem(final FuncItem func) {
+        return func(func);
+      }
+
+      /**
+       * Visits a scope.
+       * @param scp scope
+       * @return if more expressions should be visited
+       */
+      private boolean func(final Scope scp) {
+        if(funcs.containsKey(scp)) return true;
+        funcs.put(scp, null);
+        enterFocus();
+        final boolean ac = scp.visit(this);
+        exitFocus();
+        return ac;
+      }
+    };
     return expr.accept(visitor);
   }
 

@@ -176,11 +176,8 @@ public abstract class AQuery extends Command {
       lr.writeAll = true;
     else {
       qp.databases(lr);
-      if(qp != null) {
-        qi.readLocked = lr.readAll ? null : lr.read;
-        qi.writeLocked = lr.writeAll ? null : lr.write;
-      } else if(qp.updating) lr.writeAll = true;
-      else lr.readAll = true;
+      qi.readLocked = lr.readAll ? null : lr.read;
+      qi.writeLocked = lr.writeAll ? null : lr.write;
     }
   }
 

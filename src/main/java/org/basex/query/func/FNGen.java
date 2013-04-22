@@ -24,7 +24,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Generating functions.
@@ -348,19 +347,21 @@ public final class FNGen extends StandardFunc {
   }
 
   @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    if(0 == expr.length && oneOf(sig, DATA, COLLECTION, URI_COLLECTION)) {
-      if(sig == COLLECTION || rootContext) db.add(DBLocking.CTX);
-      return true;
+  public boolean accept(final ASTVisitor visitor) {
+    if(0 == expr.length && oneOf(sig, COLLECTION, URI_COLLECTION)) {
+      if(!visitor.lock2(DBLocking.COLL)) return false;
+    } else if(0 == expr.length && oneOf(sig, DATA)) {
+      if(!visitor.lock2(DBLocking.CTX)) return false;
+    } else if(oneOf(sig, DOC_AVAILABLE, DOC, COLLECTION, URI_COLLECTION)) {
+      if(0 == expr.length || !(expr[0] instanceof Str)) {
+        if(!visitor.lock2(null)) return false;
+      } else {
+        final QueryInput qi = new QueryInput(string(((Str) expr[0]).string()));
+        if(qi.db == null && !visitor.lock2(null)) return false;
+        if(!visitor.lock2(qi.db)) return false;
+      }
     }
-    if(oneOf(sig, DOC_AVAILABLE, DOC, COLLECTION, URI_COLLECTION)) {
-      if(0 == expr.length || !(expr[0] instanceof Str)) return false;
-      final QueryInput qi = new QueryInput(string(((Str) expr[0]).string()));
-      if(qi.db == null) return false;
-      db.add(qi.db);
-      return true;
-    }
-    return super.databases(db, rootContext);
+    return super.accept(visitor);
   }
 
   @Override

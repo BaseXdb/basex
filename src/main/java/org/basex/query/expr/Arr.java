@@ -8,7 +8,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract array expression.
@@ -79,12 +78,6 @@ public abstract class Arr extends ParseExpr {
     final T[] copy = arr.clone();
     for(int i = 0; i < copy.length; i++) copy[i] = (T) copy[i].copy(ctx, scp, vs);
     return copy;
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    for(final Expr e : expr) if(!e.databases(db, rootContext)) return false;
-    return true;
   }
 
   @Override

@@ -3,7 +3,6 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This class is implemented by all kinds of processes.
@@ -159,20 +158,5 @@ public abstract class Progress {
    */
   protected double prog() {
     return 0;
-  }
-
-  /**
-   * Result object for databases function.
-   * @see Progress#databases(LockResult)
-   */
-  public static class LockResult {
-    /** Flag if global read lock is required. */
-    public boolean readAll;
-    /** Flag if global write lock is required. */
-    public boolean writeAll;
-    /** List of databases to read lock. */
-    public StringList read = new StringList(1);
-    /** List of databases to write lock. */
-    public StringList write = new StringList(1);
   }
 }
