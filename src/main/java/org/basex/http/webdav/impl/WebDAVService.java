@@ -274,6 +274,19 @@ public class WebDAVService<T> {
   }
 
   /**
+   * Renew the lock with the given token.
+   * @param token lock token
+   * @throws IOException I/O exception
+   */
+  public void refreshLock(final String token) throws IOException {
+    final Query q = http.session().query(
+        "import module namespace w = 'http://basex.org/webdav';" +
+        "w:refresh-lock($lock-token)");
+    q.bind("lock-token", token);
+    q.execute();
+  }
+
+  /**
    * Create a new lock for the specified resource.
    * @param db database
    * @param p path
@@ -313,6 +326,21 @@ public class WebDAVService<T> {
   }
 
   /**
+   * Get lock with given token.
+   * @param token lock token
+   * @return lock
+   * @throws IOException I/O exception
+   */
+  public String lock(final String token) throws IOException {
+    final Query q = http.session().query(
+        "import module namespace w = 'http://basex.org/webdav';" +
+        "w:get-lock($lock-token)");
+    q.bind("$lock-token", token);
+
+    return q.next();
+  }
+
+  /**
    * Get active locks for the given resource.
    * @param db database
    * @param p path
@@ -338,8 +366,15 @@ public class WebDAVService<T> {
   public boolean conflictingLocks(final String db, final String p) throws IOException {
     final Query q = http.session().query(
         "import module namespace w = 'http://basex.org/webdav';" +
-        "w:get-conflicting-locks($resource)");
+        "w:get-conflicting-locks(" +
+          "<w:lockinfo>" +
+            "<w:path>{ $resource }</w:path>" +
+            "<w:scope>exclusive</w:scope>" +
+            "<w:depth>infinite</w:depth>" +
+            "<w:owner>{ $lock-owner }</w:owner>" +
+          "</w:lockinfo>)");
     q.bind("resource", db + SEP + p);
+    q.bind("lock-owner", http.user);
 
     return q.more();
   }

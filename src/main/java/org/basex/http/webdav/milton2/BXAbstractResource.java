@@ -162,7 +162,12 @@ public abstract class BXAbstractResource implements
   @Override
   public LockResult refreshLock(final String token) throws NotAuthorizedException,
     PreConditionFailedException {
-    return null;
+    try {
+      return refresh(token);
+    } catch(IOException e) {
+      Util.errln(e);
+      return failed(FailureReason.PRECONDITION_FAILED);
+    }
   }
 
   /**
@@ -189,7 +194,7 @@ public abstract class BXAbstractResource implements
   public LockToken getCurrentLock() {
     try {
       return getCurrentActiveLock();
-    } catch(Exception e) {
+    } catch(IOException e) {
       Util.errln(e);
       return null;
     }
@@ -259,27 +264,43 @@ public abstract class BXAbstractResource implements
    * Get the active lock on the current resource.
    * @return the token of the active lock or {@code null} if resource is not locked
    * @throws IOException I/O exception
-   * @throws SAXException SAX exception if parsing of the lock info fails
    */
-  LockToken getCurrentActiveLock() throws IOException, SAXException {
+  LockToken getCurrentActiveLock() throws IOException {
     final String lockInfoStr = service.lock(meta.db, meta.path);
     return lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
   }
 
   /**
+   * Renew a lock with the given token.
+   * @param token lock token
+   * @return lock result
+   * @throws IOException I/O exception
+   */
+  LockResult refresh(final String token) throws IOException {
+    service.refreshLock(token);
+    final String lockInfoStr = service.lock(token);
+    LockToken lockToken = lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
+    // TODO failed(failureReason);
+    return success(lockToken);
+  }
+
+/**
    * Parse the lock info.
    * @param lockInfo lock info as a string
    * @return parsed lock info bean
    * @throws IOException I/O exception
-   * @throws SAXException SAX exception if parsing of the lock info fails
    */
-  private static LockToken parseLockInfo(final String lockInfo) throws SAXException,
-      IOException {
-    XMLReader reader = XMLReaderFactory.createXMLReader();
-    LockTokenSaxHandler handler = new LockTokenSaxHandler();
-    reader.setContentHandler(handler);
-    reader.parse(new InputSource(new StringReader(lockInfo)));
-    return handler.lockToken;
+  private static LockToken parseLockInfo(final String lockInfo) throws IOException {
+    try {
+      XMLReader reader = XMLReaderFactory.createXMLReader();
+      LockTokenSaxHandler handler = new LockTokenSaxHandler();
+      reader.setContentHandler(handler);
+      reader.parse(new InputSource(new StringReader(lockInfo)));
+      return handler.lockToken;
+    } catch(SAXException e) {
+      Util.err("Error while parsing lock info", e);
+      return null;
+    }
   }
 
   /** SAX handler for lock token. */
