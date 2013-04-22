@@ -5,7 +5,6 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'check' command: opens an existing database or
@@ -80,9 +79,8 @@ public final class Check extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add("").add(new QueryInput(args[0]).input.dbname());
-    return true;
+  public void databases(final LockResult lr) {
+    lr.read.add(DBLocking.CTX).add(new QueryInput(args[0]).input.dbname());
   }
 
   @Override

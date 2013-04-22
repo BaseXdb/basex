@@ -112,8 +112,8 @@ public final class Where extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return pred.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    return pred.databases(db, rootContext);
   }
 
   @Override

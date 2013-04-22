@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.util.Err.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -72,9 +73,8 @@ public final class Root extends Simple {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    // [JE] XQuery: should only be added if placed outside a predicate
-    db.add("");
+  public boolean databases(final StringList db, final boolean rootContext) {
+    if (rootContext) db.add(DBLocking.CTX);
     return true;
   }
 

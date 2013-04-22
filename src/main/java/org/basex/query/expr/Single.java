@@ -63,8 +63,8 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return expr.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    return expr.databases(db, rootContext);
   }
 
   @Override

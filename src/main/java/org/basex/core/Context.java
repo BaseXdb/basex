@@ -2,6 +2,7 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 
+import org.basex.core.Progress.LockResult;
 import org.basex.data.*;
 import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
@@ -57,8 +58,6 @@ public final class Context {
   private Nodes current;
   /** Process locking. */
   private final Locking locks;
-  /** Indicates if a process is currently registered.
-  private boolean registered; */
   /** Data reference. */
   private Data data;
 
@@ -218,38 +217,37 @@ public final class Context {
     if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT) * 1000L);
 
     // get touched databases
-    StringList sl = new StringList(1);
-    if(!pr.databases(sl)) {
-      // databases cannot be determined... pass null reference
-      sl = null;
-    } else {
-      // replace empty string with currently opened database and return array
-      prepareLock(sl);
-    }
-    //assert !registered : "Already registered";
-    //registered = true;
-    locks.acquire(pr, pr.updating ? new StringList(0) : sl,
-                                  pr.updating ? sl : new StringList(0));
+    LockResult lr = new LockResult();
+    pr.databases(lr);
+    if(lr.readAll) lr.read = null;
+    else prepareLock(lr.read);
+    if(lr.writeAll) lr.write = null;
+    else prepareLock(lr.write);
+
+    assert !pr.registered : "Already registered";
+    pr.registered = true;
+    locks.acquire(pr, lr.read, lr.write);
   }
 
   /**
    * Downgrades locks.
+   * @param pr process
    * @param sl string list
    */
-  public void downgrade(final StringList sl) {
-    //if(!registered) return;
+  public void downgrade(final Progress pr, final StringList sl) {
+    if(!pr.registered) return;
     prepareLock(sl);
-    //locks.downgrade(sl);
+    locks.downgrade(sl);
   }
 
   /**
    * Prepares the string list for locking.
    * @param sl string list
    */
-  private void prepareLock(final StringList sl) {
+  public void prepareLock(final StringList sl) {
     // replace empty string with currently opened database and return array
     for(int d = 0; d < sl.size(); d++) {
-      if(sl.get(d).isEmpty())
+      if(sl.get(d).equals(DBLocking.CTX))
         if(null == data) sl.deleteAt(d);
         else sl.set(d, data.meta.name);
     }
@@ -260,8 +258,8 @@ public final class Context {
    * @param pr process
    */
   public void unregister(final Progress pr) {
-    //if(!registered) return;
-    //registered = false;
+    if(!pr.registered) return;
+    pr.registered = false;
     locks.release(pr);
     pr.stopTimeout();
   }

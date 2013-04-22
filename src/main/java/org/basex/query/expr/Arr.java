@@ -82,8 +82,8 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final Expr e : expr) if(!e.databases(db)) return false;
+  public boolean databases(final StringList db, final boolean rootContext) {
+    for(final Expr e : expr) if(!e.databases(db, rootContext)) return false;
     return true;
   }
 

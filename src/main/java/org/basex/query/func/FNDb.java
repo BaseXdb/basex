@@ -839,13 +839,14 @@ public final class FNDb extends StandardFunc {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    if(!oneOf(_DB_SYSTEM, _DB_NODE_ID, _DB_NODE_PRE, _DB_EVENT, _DB_OUTPUT)) {
+  public boolean databases(final StringList db, final boolean rootContext) {
+    if(sig == _DB_SYSTEM) return true;
+    if(!oneOf(sig, _DB_NODE_ID, _DB_NODE_PRE, _DB_EVENT, _DB_OUTPUT)) {
       if(expr.length == 0 || !(expr[0] instanceof Str)) return false;
       db.add(string(((Str) expr[0]).string()));
       return true;
     }
-    return super.databases(db);
+    return super.databases(db, rootContext);
   }
 
   @Override

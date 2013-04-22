@@ -342,9 +342,10 @@ public final class Window extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return expr.databases(db) && (start == null || start.databases(db))
-        && (end == null || end.databases(db));
+  public boolean databases(final StringList db, final boolean rootContext) {
+    return expr.databases(db, rootContext)
+        && (start == null || start.databases(db, rootContext))
+        && (end == null || end.databases(db, rootContext));
   }
 
   @Override

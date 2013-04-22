@@ -439,9 +439,10 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    if(occ != null) for(final Expr o : occ) if(!o.databases(db)) return false;
-    return query.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    if(occ != null) for(final Expr o : occ)
+      if(!o.databases(db, rootContext)) return false;
+    return query.databases(db, rootContext);
   }
 
   @Override

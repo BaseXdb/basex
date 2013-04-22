@@ -334,8 +334,8 @@ public final class StaticVar extends ParseExpr implements Scope {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return expr != null && expr.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    return expr != null && expr.databases(db, rootContext);
   }
 
   @Override

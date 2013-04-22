@@ -157,8 +157,8 @@ public final class If extends Arr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return cond.databases(db) && super.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    return cond.databases(db, rootContext) && super.databases(db, rootContext);
   }
 
   @Override

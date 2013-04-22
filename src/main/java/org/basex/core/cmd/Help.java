@@ -6,7 +6,6 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.Commands.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'help' command and returns help on the database commands.
@@ -38,7 +37,7 @@ public final class Help extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return true;
+  public void databases(final LockResult lr) {
+    // No locks needed
   }
 }

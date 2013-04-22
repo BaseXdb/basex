@@ -116,9 +116,9 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final Let c : copies) if(!c.databases(db)) return false;
-    return super.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    for(final Let c : copies) if(!c.databases(db, rootContext)) return false;
+    return super.databases(db, rootContext);
   }
 
   @Override

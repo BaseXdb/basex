@@ -111,9 +111,9 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final Expr d : dist) if(!d.databases(db)) return false;
-    return super.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    for(final Expr d : dist) if(!d.databases(db, rootContext)) return false;
+    return super.databases(db, rootContext);
   }
 
   @Override

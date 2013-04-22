@@ -167,8 +167,8 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final Expr p : preds) if(!p.databases(db)) return false;
+  public boolean databases(final StringList db, final boolean rootContext) {
+    for(final Expr p : preds) if(!p.databases(db, false)) return false;
     return true;
   }
 

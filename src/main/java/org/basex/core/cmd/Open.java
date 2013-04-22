@@ -7,7 +7,6 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'open' command and opens a database.
@@ -44,9 +43,8 @@ public final class Open extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add("").add(args[0]);
-    return true;
+  public void databases(final LockResult lr) {
+    lr.read.add(DBLocking.CTX).add(args[0]);
   }
 
   @Override

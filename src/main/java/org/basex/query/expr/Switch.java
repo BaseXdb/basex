@@ -130,9 +130,9 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final SwitchCase sc : cases) if(!sc.databases(db)) return false;
-    return cond.databases(db);
+  public boolean databases(final StringList db, final boolean rootContext) {
+    for(final SwitchCase sc : cases) if(!sc.databases(db, rootContext)) return false;
+    return cond.databases(db, rootContext);
   }
 
   /**

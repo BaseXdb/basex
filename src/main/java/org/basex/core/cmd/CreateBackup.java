@@ -73,8 +73,9 @@ public final class CreateBackup extends ABackup {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return super.databases(db) && databases(db, 0);
+  public void databases(final LockResult lr) {
+    super.databases(lr);
+    databases(lr.read, 0);
   }
 
   @Override

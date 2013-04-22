@@ -295,8 +295,8 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final Key key : keys) if(!key.databases(db)) return false;
+  public boolean databases(final StringList db, final boolean rootContext) {
+    for(final Key key : keys) if(!key.databases(db, rootContext)) return false;
     return true;
   }
 

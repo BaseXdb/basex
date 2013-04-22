@@ -117,7 +117,7 @@ public final class Count extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean databases(final StringList db) {
+  public boolean databases(final StringList db, final boolean rootContext) {
     return true;
   }
 

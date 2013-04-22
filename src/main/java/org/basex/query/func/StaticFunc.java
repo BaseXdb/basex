@@ -172,14 +172,14 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
 
   /**
    * Gathers all databases accessed by this function
-   * (see {@link Expr#databases(StringList)}).
+   * (see {@link Expr#databases(StringList, boolean)}).
    * @param db database list
    * @return {@code false} if all databases should be locked, {@code true} otherwise
    */
   public boolean databases(final StringList db) {
     if(dontEnter) return true;
     dontEnter = true;
-    final boolean res = expr.databases(db);
+    final boolean res = expr.databases(db, false);
     dontEnter = false;
     return res;
   }
