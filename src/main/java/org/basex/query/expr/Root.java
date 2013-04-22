@@ -74,7 +74,7 @@ public final class Root extends Simple {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock2(DBLocking.CTX);
+    return visitor.lock(DBLocking.CTX);
   }
 
   @Override

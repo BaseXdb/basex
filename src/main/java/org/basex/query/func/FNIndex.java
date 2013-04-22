@@ -243,9 +243,9 @@ public final class FNIndex extends StandardFunc {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     if(!(expr[0] instanceof Str)) {
-      if(!visitor.lock2(null)) return false;
+      if(!visitor.lock(null)) return false;
     } else {
-      if(!visitor.lock2(string(((Str) expr[0]).string()))) return false;
+      if(!visitor.lock(string(((Str) expr[0]).string()))) return false;
     }
     return super.accept(visitor);
   }

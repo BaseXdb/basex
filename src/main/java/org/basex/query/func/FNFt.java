@@ -274,8 +274,8 @@ public final class FNFt extends StandardFunc {
   public boolean accept(final ASTVisitor visitor) {
     if(oneOf(sig, _FT_SEARCH, _FT_TOKENS)) {
       if(!(expr[0] instanceof Str)) {
-        if(!visitor.lock2(null)) return false;
-      } else if(!visitor.lock2(string(((Str) expr[0]).string()))) {
+        if(!visitor.lock(null)) return false;
+      } else if(!visitor.lock(string(((Str) expr[0]).string()))) {
         return false;
       }
     }

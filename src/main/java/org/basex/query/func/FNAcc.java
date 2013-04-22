@@ -97,7 +97,7 @@ public final class FNAcc extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    if(0 == expr.length && !visitor.lock2(DBLocking.CTX)) return false;
+    if(0 == expr.length && !visitor.lock(DBLocking.CTX)) return false;
     return super.accept(visitor);
   }
 }

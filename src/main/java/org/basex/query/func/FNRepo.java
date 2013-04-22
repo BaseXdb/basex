@@ -102,6 +102,6 @@ public final class FNRepo extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock2(DBLocking.REPO) && super.accept(visitor);
+    return visitor.lock(DBLocking.REPO) && super.accept(visitor);
   }
 }

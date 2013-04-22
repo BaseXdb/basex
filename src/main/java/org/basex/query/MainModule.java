@@ -133,7 +133,7 @@ public class MainModule extends ExprInfo implements Scope {
       int level = ctx.ctxItem == null ? 0 : 1;
 
       @Override
-      public boolean lock2(final String db) {
+      public boolean lock(final String db) {
         if(db == null) return false;
         if(level == 0 || db != DBLocking.CTX) sl.add(db);
         return true;

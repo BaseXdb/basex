@@ -73,7 +73,7 @@ public abstract class ASTVisitor {
    * @param db database to be locked
    * @return if more expressions should be visited
    */
-  public boolean lock2(final String db) {
+  public boolean lock(final String db) {
     return true;
   }
 

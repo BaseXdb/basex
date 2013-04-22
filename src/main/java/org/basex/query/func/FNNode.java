@@ -156,6 +156,6 @@ public final class FNNode extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return (expr.length != 0 || visitor.lock2(DBLocking.CTX)) && super.accept(visitor);
+    return (expr.length != 0 || visitor.lock(DBLocking.CTX)) && super.accept(visitor);
   }
 }

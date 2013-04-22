@@ -349,16 +349,16 @@ public final class FNGen extends StandardFunc {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     if(0 == expr.length && oneOf(sig, COLLECTION, URI_COLLECTION)) {
-      if(!visitor.lock2(DBLocking.COLL)) return false;
+      if(!visitor.lock(DBLocking.COLL)) return false;
     } else if(0 == expr.length && oneOf(sig, DATA)) {
-      if(!visitor.lock2(DBLocking.CTX)) return false;
+      if(!visitor.lock(DBLocking.CTX)) return false;
     } else if(oneOf(sig, DOC_AVAILABLE, DOC, COLLECTION, URI_COLLECTION)) {
       if(0 == expr.length || !(expr[0] instanceof Str)) {
-        if(!visitor.lock2(null)) return false;
+        if(!visitor.lock(null)) return false;
       } else {
         final QueryInput qi = new QueryInput(string(((Str) expr[0]).string()));
-        if(qi.db == null && !visitor.lock2(null)) return false;
-        if(!visitor.lock2(qi.db)) return false;
+        if(qi.db == null && !visitor.lock(null)) return false;
+        if(!visitor.lock(qi.db)) return false;
       }
     }
     return super.accept(visitor);

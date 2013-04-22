@@ -843,8 +843,8 @@ public final class FNDb extends StandardFunc {
   public boolean accept(final ASTVisitor visitor) {
     if(!oneOf(sig, _DB_NODE_ID, _DB_NODE_PRE, _DB_EVENT, _DB_OUTPUT, _DB_SYSTEM)) {
       if(expr.length == 0 || !(expr[0] instanceof Str)) {
-        if(!visitor.lock2(null)) return false;
-      } else if(!visitor.lock2(string(((Str) expr[0]).string()))) {
+        if(!visitor.lock(null)) return false;
+      } else if(!visitor.lock(string(((Str) expr[0]).string()))) {
         return false;
       }
     }

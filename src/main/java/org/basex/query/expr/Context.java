@@ -72,7 +72,7 @@ public final class Context extends Simple {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock2(DBLocking.CTX) && super.accept(visitor);
+    return visitor.lock(DBLocking.CTX) && super.accept(visitor);
   }
 
   @Override

@@ -91,7 +91,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock2(db) && ftexpr.accept(visitor);
+    return visitor.lock(db) && ftexpr.accept(visitor);
   }
 
   @Override
