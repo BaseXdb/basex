@@ -7,7 +7,8 @@ import io.milton.resource.FolderResource;
 import io.milton.resource.LockingCollectionResource;
 import org.basex.http.webdav.impl.ResourceMetaData;
 import org.basex.http.webdav.impl.WebDAVService;
-import org.basex.util.Util;
+import org.basex.io.in.*;
+import org.basex.util.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,12 +22,11 @@ import static org.basex.http.webdav.impl.Utils.dbname;
 
 /**
  * WebDAV resource representing a folder within a collection database.
- *
  * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
 public class BXFolder extends BXAbstractResource implements FolderResource,
-  DeletableCollectionResource, LockingCollectionResource {
+    DeletableCollectionResource, LockingCollectionResource {
 
   /**
    * Constructor.
@@ -60,8 +60,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   @Override
   public void sendContent(final OutputStream out, final Range range,
       final Map<String, String> params, final String contentType) throws IOException,
-    NotAuthorizedException, BadRequestException, NotFoundException {
-  }
+      NotAuthorizedException, BadRequestException, NotFoundException { }
 
   @Override
   public boolean isLockedOutRecursive(final Request request) {
@@ -75,9 +74,9 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
   @Override
   public BXFolder createCollection(final String folder) throws NotAuthorizedException,
-    ConflictException, BadRequestException {
+      ConflictException, BadRequestException {
     try {
-      return (BXFolder) service.createFolder(meta.db, meta.path,  folder);
+      return (BXFolder) service.createFolder(meta.db, meta.path, folder);
     } catch(IOException e) {
       Util.errln(e);
       throw new BadRequestException(this, e.getMessage());
@@ -86,7 +85,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
   @Override
   public BXAbstractResource child(final String childName) throws NotAuthorizedException,
-    BadRequestException {
+      BadRequestException {
     try {
       return service.resource(meta.db, meta.path + SEP + childName);
     } catch(IOException e) {
@@ -97,7 +96,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
   @Override
   public List<BXAbstractResource> getChildren() throws NotAuthorizedException,
-    BadRequestException {
+      BadRequestException {
     try {
       return service.list(meta.db, meta.path);
     } catch(IOException e) {
@@ -109,7 +108,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   @Override
   public BXAbstractResource createNew(final String newName, final InputStream input,
       final Long length, final String contentType) throws IOException, ConflictException,
-    NotAuthorizedException, BadRequestException {
+      NotAuthorizedException, BadRequestException {
     try {
       return service.createFile(meta.db, meta.path, newName, input);
     } catch(IOException e) {
@@ -122,14 +121,12 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   public LockToken createAndLock(final String name, final LockTimeout timeout,
       final LockInfo lockInfo) throws NotAuthorizedException {
     try {
-      final BXFile n = new BXFile(new ResourceMetaData(), service);
-      final LockResult lockResult = n.lock(timeout, lockInfo);
-      // TODO it may be needed to create the resource with no content
+      final BXAbstractResource r = createNew(name, new ArrayInput(Token.EMPTY),
+          Long.valueOf(0L), null);
+      final LockResult lockResult = r.lock(timeout, lockInfo);
       if(lockResult.isSuccessful()) return lockResult.getLockToken();
-    } catch(PreConditionFailedException e) {
-      Util.debug("Cannot lock requested resource", e);
-    } catch(LockedException e) {
-      Util.debug("Cannot lock requested resource", e);
+    } catch(Exception e) {
+      Util.debug("Cannot lock and create requested resource", e);
     }
     return null;
   }

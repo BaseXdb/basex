@@ -4,11 +4,11 @@ import static org.basex.http.webdav.impl.Utils.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.List;
 
-import org.basex.util.Util;
+import org.basex.util.*;
 import org.basex.http.webdav.impl.ResourceMetaData;
 import org.basex.http.webdav.impl.WebDAVService;
+import org.basex.io.in.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.*;
@@ -111,14 +111,12 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   public LockToken createAndLock(final String name, final LockTimeout timeout,
       final LockInfo lockInfo) throws NotAuthorizedException {
     try {
-      final BXFile n = new BXFile(new ResourceMetaData(), service);
-      final LockResult lockResult = n.lock(timeout, lockInfo);
-      // TODO it may be needed to create the resource with no content
+      final BXAbstractResource r = createNew(name, new ArrayInput(Token.EMPTY),
+          Long.valueOf(0L), null);
+      final LockResult lockResult = r.lock(timeout, lockInfo);
       if(lockResult.isSuccessful()) return lockResult.getLockToken();
-    } catch(PreConditionFailedException e) {
-      Util.debug("Cannot lock requested resource", e);
-    } catch(LockedException e) {
-      Util.debug("Cannot lock requested resource", e);
+    } catch(Exception e) {
+      Util.debug("Cannot lock and create requested resource", e);
     }
     return null;
   }
