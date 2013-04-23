@@ -203,11 +203,13 @@ public final class BaseXHTTP {
           res.write(in.read());
         }
       }
-    } else {
+    } else if(create) {
       // try to locate file from resource path
       final InputStream is = BaseXHTTP.class.getResourceAsStream('/' + file);
-      if(is == null && create) throw new BaseXException(in + " not found.");
+      if(is == null) throw new BaseXException(in + " not found.");
       data = new IOStream(is).read();
+    } else {
+      return trg;
     }
 
     if(create) {
