@@ -71,7 +71,7 @@ final class DOTData {
     { "FF6666", FTExpr.class, Try.class, Catch.class },
     // orange
     { "AA9988", StaticFunc.class },
-    { "776655", UserFuncs.class },
+    { "776655", StaticFuncs.class },
     { "CC6600", Path.class },
     { "FF9900", Preds.class },
     // green

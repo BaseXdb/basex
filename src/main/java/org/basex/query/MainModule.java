@@ -3,7 +3,6 @@ package org.basex.query;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -20,22 +19,15 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class MainModule extends ExprInfo implements Scope {
-  /** Variable scope of this module. */
-  final VarScope scope;
-  /** Root expression of this module. */
-  public Expr expr;
-  /** Compilation flag. */
-  private boolean compiled;
-
+public class MainModule extends StaticScope {
   /**
    * Constructor.
    * @param rt root expression
    * @param scp variable scope
    */
   public MainModule(final Expr rt, final VarScope scp) {
+    super(scp, null);
     expr = rt;
-    scope = scp;
   }
 
   @Override
@@ -193,10 +185,5 @@ public class MainModule extends ExprInfo implements Scope {
     if (!expr.accept(visitor))
       if(ctx.updating) lr.writeAll = true;
       else lr.readAll = true;
-  }
-
-  @Override
-  public boolean compiled() {
-    return compiled;
   }
 }

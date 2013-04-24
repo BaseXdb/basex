@@ -17,12 +17,14 @@ public final class TailFuncCall extends StaticFuncCall {
    * Constructor.
    * @param ii input info
    * @param nm name of the function to call
-   * @param f function
    * @param a arguments
+   * @param fn referenced function
+   * @param sctx static context
    */
-  TailFuncCall(final InputInfo ii, final QNm nm, final StaticFunc f, final Expr[] a) {
-    super(ii, nm, a);
-    func = f;
+  TailFuncCall(final QNm nm, final Expr[] a, final StaticFunc fn,
+      final StaticContext sctx, final InputInfo ii) {
+    super(nm, a, sctx, ii);
+    func = fn;
   }
 
   @Override

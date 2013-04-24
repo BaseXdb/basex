@@ -6,7 +6,6 @@ import static org.basex.query.util.Err.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Use;
@@ -25,62 +24,37 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
-  /** Input info. */
-  public InputInfo info;
-  /** Function name. */
-  public final QNm name;
+public final class StaticFunc extends StaticDecl implements XQFunction {
   /** Arguments. */
   public final Var[] args;
-  /** Return type. */
-  public final SeqType ret;
-  /** Annotations. */
-  public final Ann ann;
   /** Updating flag. */
   public final boolean updating;
-  /** Declaration flag. */
-  public final boolean declared;
 
   /** Map with requested function properties. */
   protected final EnumMap<Use, Boolean> map = new EnumMap<Expr.Use, Boolean>(Use.class);
-  /** Local variables in the scope of this function. */
-  protected final VarScope scope;
-
-  /** Static context. */
-  final StaticContext sc;
   /** Cast flag. */
   boolean cast;
-  /** Function body. */
-  Expr expr;
-
-  /** Compilation flag. */
-  private boolean compiled;
   /** Flag that is turned on during compilation and prevents premature inlining. */
   private boolean compiling;
 
   /**
    * Function constructor.
-   * @param ii input info
+   * @param a annotations
    * @param n function name
    * @param v arguments
    * @param r return type
-   * @param a annotations
-   * @param d declaration flag
+   * @param e function body
    * @param stc static context
    * @param scp variable scope
+   * @param ii input info
    */
-  public StaticFunc(final InputInfo ii, final QNm n, final Var[] v, final SeqType r,
-      final Ann a, final boolean d, final StaticContext stc, final VarScope scp) {
-    info = ii;
-    name = n;
+  public StaticFunc(final Ann a, final QNm n, final Var[] v, final SeqType r,
+      final Expr e, final StaticContext stc, final VarScope scp, final InputInfo ii) {
+    super(stc, a, n, r, scp, ii);
     args = v;
-    ret = r;
+    expr = e;
     cast = r != null;
-    ann = a == null ? new Ann() : a;
     updating = ann.contains(Ann.Q_UPDATING);
-    scope = scp;
-    sc = stc;
-    declared = d;
   }
 
   @Override
@@ -109,12 +83,12 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
     ctx.compInfo(OPTTCE, name);
     expr = expr.markTailCalls();
 
-    if(ret != null) {
+    if(declType != null) {
       // remove redundant casts
-      if((ret.type == AtomType.BLN || ret.type == AtomType.FLT ||
-          ret.type == AtomType.DBL || ret.type == AtomType.QNM ||
-          ret.type == AtomType.URI) && ret.eq(expr.type())) {
-        ctx.compInfo(OPTCAST, ret);
+      if((declType.type == AtomType.BLN || declType.type == AtomType.FLT ||
+          declType.type == AtomType.DBL || declType.type == AtomType.QNM ||
+              declType.type == AtomType.URI) && declType.eq(expr.type())) {
+        ctx.compInfo(OPTCAST, declType);
         cast = false;
       }
     }
@@ -146,7 +120,7 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
     if(updating) tb.add(UPDATING).add(' ');
     tb.add(FUNCTION).add(' ').add(name.string());
     tb.add(PAR1).addSep(args, SEP).add(PAR2);
-    if(ret != null) tb.add(' ' + AS + ' ' + ret);
+    if(declType != null) tb.add(' ' + AS + ' ' + declType);
     if(expr != null) tb.add(" { " + expr + " }; ");
     return tb.toString();
   }
@@ -193,7 +167,7 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
       final Item it = expr.item(ctx, ii);
       final Value v = it == null ? Empty.SEQ : it;
       // optionally promote return value to target type
-      return cast ? ret.funcConvert(ctx, ii, v).item(ctx, ii) : it;
+      return cast ? declType.funcConvert(ctx, ii, v).item(ctx, ii) : it;
     } finally {
       scope.exit(ctx, fp);
       ctx.value = cv;
@@ -213,7 +187,7 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
     try {
       final Value v = ctx.value(expr);
       // optionally promote return value to target type
-      return cast ? ret.funcConvert(ctx, info, v) : v;
+      return cast ? declType.funcConvert(ctx, info, v) : v;
     } finally {
       scope.exit(ctx, fp);
       ctx.value = cv;
@@ -246,7 +220,7 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
     if(u) expr.checkUp();
     if(updating) {
       // updating function
-      if(ret != null) UPFUNCTYPE.thrw(info);
+      if(declType != null) UPFUNCTYPE.thrw(info);
       if(!u && !expr.isVacuous()) UPEXPECTF.thrw(info);
     } else if(u) {
       // uses updates, but is not declared as such
@@ -259,7 +233,7 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
    * @return result of check
    */
   public boolean isVacuous() {
-    return !uses(Use.UPD) && ret != null && ret.eq(SeqType.EMP);
+    return !uses(Use.UPD) && declType != null && declType.eq(SeqType.EMP);
   }
 
   /**
@@ -284,26 +258,16 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
     return expr.accept(visitor);
   }
 
-  @Override
-  public boolean compiled() {
-    return compiled;
-  }
-
   /**
    * Returns the static return type of this function.
    * @return return type
    */
   public SeqType retType() {
-    return ret != null ? ret : expr.type();
+    return declType != null ? declType : expr.type();
   }
 
-  /**
-   * Sets the function body of this function.
-   * @param e function body expression
-   * @return the function for convenience
-   */
-  public StaticFunc setBody(final Expr e) {
-    expr = e;
-    return this;
+  @Override
+  public byte[] id() {
+    return StaticFuncs.sig(name, args.length);
   }
 }

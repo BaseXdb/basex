@@ -106,7 +106,7 @@ public final class Functions extends TokenSet {
     // compile the function if it hasn't been done statically
     if(dyn && f.fun instanceof StaticFuncCall) {
       final StaticFunc usf = ((StaticFuncCall) f.fun).func();
-      if(usf != null && usf.declared) usf.compile(ctx);
+      if(usf != null) usf.compile(ctx);
     }
 
     final FuncType ft = f.type;
@@ -166,7 +166,7 @@ public final class Functions extends TokenSet {
     }
 
     // user-defined function
-    final TypedFunc tf = ctx.funcs.get(name, args, ii);
+    final TypedFunc tf = ctx.funcs.getRef(name, args, ctx.sc, ii);
     if(tf != null) return tf;
 
     // Java function (only allowed with administrator permissions)
@@ -174,7 +174,9 @@ public final class Functions extends TokenSet {
     if(jf != null) return TypedFunc.java(jf);
 
     // add user-defined function that has not been declared yet
-    if(!dyn && FuncType.find(name) == null) return ctx.funcs.add(name, args, ii, ctx);
+    if(!dyn && FuncType.find(name) == null) {
+      return ctx.funcs.getFuncRef(name, args, ctx.sc, ii);
+    }
 
     // no function found
     return null;

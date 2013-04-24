@@ -9,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -749,6 +750,8 @@ public enum Err {
   /** XPST0008. */
   VARUNDEF(XPST, 8, "Undefined variable %."),
   /** XPST0008. */
+  VARPRIVATE(XPST, 8, "Private variable % is not visible from this module."),
+  /** XPST0008. */
   TYPEUNDEF(XPST, 8, "Undefined type '%'."),
   /** XPST0008. */
   SCHEMAINV(XPST, 8, "Undefined schema name '%'."),
@@ -1310,7 +1313,7 @@ public enum Err {
    * @return never
    * @throws QueryException query exception
    */
-  public static QueryException circVar(final QueryContext ctx, final ParseExpr var)
+  public static QueryException circVar(final QueryContext ctx, final StaticVar var)
       throws QueryException {
     throw (ctx.sc.xquery3() ? CIRCVAR30 : CIRCVAR).thrw(var.info, var);
   }
