@@ -250,6 +250,7 @@ public final class Context {
       if(sl.get(d).equals(DBLocking.CTX))
         if(null == data) sl.deleteAt(d);
         else sl.set(d, data.meta.name);
+      if(!Prop.CASE) sl.set(d, sl.get(d).toLowerCase());
     }
   }
 
