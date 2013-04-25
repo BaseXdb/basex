@@ -121,9 +121,11 @@ public class MainModule extends ExprInfo implements Scope {
    * @param lr lock result
    * @see Progress#databases(LockResult)
    * @param ctx query context
-   * @return {@code true} if query can be locally locked
    */
-  public boolean databases(final LockResult lr, final QueryContext ctx) {
+  public void databases(final LockResult lr, final QueryContext ctx) {
+    lr.read.add(ctx.userReadLocks);
+    lr.write.add(ctx.userWriteLocks);
+
     final StringList sl = ctx.updating ? lr.write : lr.read;
 
     final ASTVisitor visitor = new ASTVisitor() {
@@ -188,7 +190,9 @@ public class MainModule extends ExprInfo implements Scope {
         return ac;
       }
     };
-    return expr.accept(visitor);
+    if (!expr.accept(visitor))
+      if(ctx.updating) lr.writeAll = true;
+      else lr.readAll = true;
   }
 
   @Override
