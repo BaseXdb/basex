@@ -11,7 +11,6 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * FTDistance expression.
@@ -108,12 +107,6 @@ public final class FTDistance extends FTFilter {
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
     return new FTDistance(info, expr[0].copy(ctx, scp, vs),
         Arr.copyAll(ctx, scp, vs, dist), unit);
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    for(final Expr d : dist) if(!d.databases(db, rootContext)) return false;
-    return super.databases(db, rootContext);
   }
 
   @Override

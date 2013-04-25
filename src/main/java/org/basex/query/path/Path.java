@@ -5,11 +5,12 @@ import static org.basex.query.path.Axis.*;
 
 import java.util.*;
 
-import org.basex.core.DBLocking;
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.Context;
 import org.basex.query.path.Test.Mode;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -19,7 +20,6 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Path expression.
@@ -455,15 +455,6 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    for(final Expr s : steps) if(!s.databases(db, false)) return false;
-    if(root != null) return root.databases(db, rootContext);
-
-    if (rootContext) db.add(DBLocking.CTX);
-    return true;
-  }
-
-  @Override
   public final void plan(final FElem plan) {
     addPlan(plan, planElem(), root, steps);
   }
@@ -482,7 +473,15 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return (root == null || root.accept(visitor)) && visitAll(visitor, steps);
+    if(root == null) {
+      if(!visitor.lock(DBLocking.CTX)) return false;
+    } else if(!root.accept(visitor)) {
+      return false;
+    }
+    visitor.enterFocus();
+    for(final Expr e : steps) if(!e.accept(visitor)) return false;
+    visitor.exitFocus();
+    return true;
   }
 
   @Override

@@ -1,22 +1,23 @@
 package org.basex.query.gflwor;
 
 import static org.basex.query.QueryText.*;
+
 import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.gflwor.GFLWOR.*;
+import org.basex.query.gflwor.GFLWOR.Eval;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
-import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * The GFLWOR {@code group by} expression.
@@ -288,12 +289,6 @@ public final class GroupBy extends GFLWOR.Clause {
   public void checkUp() throws QueryException {
     checkNoneUp(preExpr);
     checkNoneUp(by);
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    for(final Spec spec : by) if(!spec.databases(db, rootContext)) return false;
-    return true;
   }
 
   @Override

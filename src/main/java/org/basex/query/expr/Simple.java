@@ -5,7 +5,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Simple expression without arguments.
@@ -50,11 +49,6 @@ public abstract class Simple extends ParseExpr {
   public Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
     return null;
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    return true;
   }
 
   @Override

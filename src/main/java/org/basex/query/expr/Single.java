@@ -5,7 +5,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract single expression.
@@ -60,11 +59,6 @@ public abstract class Single extends ParseExpr {
     if(sub == null) return null;
     expr = sub;
     return optimize(ctx, scp);
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    return expr.databases(db, rootContext);
   }
 
   @Override

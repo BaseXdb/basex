@@ -7,6 +7,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -154,8 +155,7 @@ public final class FNNode extends StandardFunc {
   }
 
   @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    if (rootContext && expr.length == 0) db.add(DBLocking.CTX);
-    return super.databases(db, rootContext);
+  public boolean accept(final ASTVisitor visitor) {
+    return (expr.length != 0 || visitor.lock(DBLocking.CTX)) && super.accept(visitor);
   }
 }

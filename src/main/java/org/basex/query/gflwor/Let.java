@@ -1,11 +1,12 @@
 package org.basex.query.gflwor;
 
 import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.gflwor.GFLWOR.*;
-import org.basex.query.iter.Iter;
+import org.basex.query.gflwor.GFLWOR.Eval;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -13,9 +14,8 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.ft.Scoring;
+import org.basex.util.ft.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * FLWOR {@code let} clause, binding an expression to a variable.
@@ -182,11 +182,6 @@ public final class Let extends GFLWOR.Clause {
   @Override
   public void checkUp() throws QueryException {
     checkNoUp(expr);
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    return expr.databases(db, rootContext);
   }
 
   @Override

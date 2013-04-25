@@ -22,6 +22,7 @@ import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -839,14 +840,15 @@ public final class FNDb extends StandardFunc {
   }
 
   @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    if(sig == _DB_SYSTEM) return true;
-    if(!oneOf(sig, _DB_NODE_ID, _DB_NODE_PRE, _DB_EVENT, _DB_OUTPUT)) {
-      if(expr.length == 0 || !(expr[0] instanceof Str)) return false;
-      db.add(string(((Str) expr[0]).string()));
-      return true;
+  public boolean accept(final ASTVisitor visitor) {
+    if(!oneOf(sig, _DB_NODE_ID, _DB_NODE_PRE, _DB_EVENT, _DB_OUTPUT, _DB_SYSTEM)) {
+      if(expr.length == 0 || !(expr[0] instanceof Str)) {
+        if(!visitor.lock(null)) return false;
+      } else if(!visitor.lock(string(((Str) expr[0]).string()))) {
+        return false;
+      }
     }
-    return super.databases(db, rootContext);
+    return super.accept(visitor);
   }
 
   @Override

@@ -1,5 +1,8 @@
 package org.basex.query.gflwor;
 
+import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
+
 import java.util.*;
 
 import org.basex.query.*;
@@ -16,10 +19,6 @@ import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
-
-import static org.basex.util.Token.token;
-import static org.basex.query.QueryText.*;
 
 /**
  * the GFLWOR {@code window} clause.
@@ -339,13 +338,6 @@ public final class Window extends GFLWOR.Clause {
   @Override
   public void checkUp() throws QueryException {
     checkNoneUp(expr, start, end);
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    return expr.databases(db, rootContext)
-        && (start == null || start.databases(db, rootContext))
-        && (end == null || end.databases(db, rootContext));
   }
 
   @Override

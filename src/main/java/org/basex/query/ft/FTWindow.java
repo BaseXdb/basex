@@ -9,7 +9,6 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * FTWindow expression.
@@ -108,11 +107,6 @@ public final class FTWindow extends FTFilter {
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
     return new FTWindow(info, expr[0].copy(ctx, scp, vs), win.copy(ctx, scp, vs), unit);
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    return win.databases(db, rootContext) && super.databases(db, rootContext);
   }
 
   @Override
