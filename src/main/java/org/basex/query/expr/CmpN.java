@@ -6,7 +6,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.SeqType.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -44,6 +44,8 @@ public final class CmpN extends Cmp {
       }
     };
 
+    /** Cached enums (faster). */
+    public static final OpN[] VALUES = values();
     /** String representation. */
     public final String name;
 

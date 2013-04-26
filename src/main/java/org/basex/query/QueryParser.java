@@ -1451,11 +1451,11 @@ public class QueryParser extends InputParser {
   private Expr comparison() throws QueryException {
     final Expr e = ftContains();
     if(e != null) {
-      for(final OpV c : OpV.values()) if(wsConsumeWs(c.name))
+      for(final OpV c : OpV.VALUES) if(wsConsumeWs(c.name))
         return new CmpV(e, check(ftContains(), CMPEXPR), c, info());
-      for(final OpN c : OpN.values()) if(wsConsumeWs(c.name))
+      for(final OpN c : OpN.VALUES) if(wsConsumeWs(c.name))
         return new CmpN(e, check(ftContains(), CMPEXPR), c, info());
-      for(final OpG c : OpG.values()) if(wsConsumeWs(c.name))
+      for(final OpG c : OpG.VALUES) if(wsConsumeWs(c.name))
         return new CmpG(e, check(ftContains(), CMPEXPR), c, info());
     }
     return e;
@@ -1888,7 +1888,7 @@ public class QueryParser extends InputParser {
         error(NOATTNAME);
       }
     } else {
-      for(final Axis a : Axis.values()) {
+      for(final Axis a : Axis.VALUES) {
         final int i = ip;
         if(!wsConsumeWs(a.name)) continue;
         alter = NOLOCSTEP;

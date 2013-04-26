@@ -681,6 +681,8 @@ public enum AtomType implements Type {
   /** Language pattern. */
   static final Pattern LANGPATTERN = Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*");
 
+  /** Cached enums (faster). */
+  public static final AtomType[] VALUES = values();
   /** Name. */
   public final QNm name;
   /** Parent type. */
@@ -912,7 +914,7 @@ public enum AtomType implements Type {
    * @return type or {@code null}
    */
   public static AtomType find(final QNm type, final boolean all) {
-    for(final AtomType t : values()) {
+    for(final AtomType t : VALUES) {
       if(!t.name.eq(type)) continue;
       if(all || t.par != null) return t;
     }
@@ -930,7 +932,7 @@ public enum AtomType implements Type {
    * @return corresponding type if found, {@code null} otherwise
    */
   static Type getType(final Type.ID id) {
-    for(final AtomType t : values()) if(t.id == id) return t;
+    for(final AtomType t : VALUES) if(t.id == id) return t;
     return null;
   }
 }

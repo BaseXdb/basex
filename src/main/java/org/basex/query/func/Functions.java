@@ -40,7 +40,7 @@ public final class Functions extends TokenSet {
    * Constructor, registering statically available XQuery functions.
    */
   private Functions() {
-    for(final Function def : Function.values()) {
+    for(final Function def : Function.VALUES) {
       final String dsc = def.desc;
       final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
       final int i = add(new QNm(ln, def.uri()).id());

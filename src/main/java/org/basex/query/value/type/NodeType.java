@@ -135,6 +135,8 @@ public enum NodeType implements Type {
   /** Schema-attribute. */
   SCA("schema-attribute", NOD, ID.SCA);
 
+  /** Cached enums (faster). */
+  public static final NodeType[] VALUES = values();
   /** String representation. */
   private final byte[] string;
   /** Parent type. */
@@ -261,7 +263,7 @@ public enum NodeType implements Type {
   public static NodeType find(final QNm type) {
     if(type.uri().length == 0) {
       final byte[] ln = type.local();
-      for(final NodeType t : values()) {
+      for(final NodeType t : VALUES) {
         if(Token.eq(ln, t.string)) return t;
       }
     }
@@ -279,7 +281,7 @@ public enum NodeType implements Type {
    * @return corresponding type if found, {@code null} otherwise
    */
   static Type getType(final Type.ID id) {
-    for(final NodeType t : values()) if(t.id == id) return t;
+    for(final NodeType t : VALUES) if(t.id == id) return t;
     return null;
   }
 }

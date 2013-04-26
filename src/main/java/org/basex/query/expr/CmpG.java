@@ -77,6 +77,8 @@ public final class CmpG extends Cmp {
       public OpG invert() { return OpG.EQ; }
     };
 
+    /** Cached enums (faster). */
+    public static final OpG[] VALUES = values();
     /** String representation. */
     public final String name;
     /** Comparator. */

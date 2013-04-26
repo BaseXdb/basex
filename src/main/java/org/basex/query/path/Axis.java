@@ -109,6 +109,8 @@ public enum Axis {
     }
   };
 
+  /** Cached enums (faster). */
+  public static final Axis[] VALUES = values();
   /** Axis string. */
   public final String name;
   /** Descendant axis flag. */

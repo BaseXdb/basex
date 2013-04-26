@@ -974,6 +974,8 @@ public enum Function {
     URIS.put(FNXQUnit.class,   XQUNITURI);
   }
 
+  /** Cached enums (faster). */
+  public static final Function[] VALUES = values();
   /** Minimum number of arguments. */
   public final int min;
   /** Maximum number of arguments. */
@@ -1111,7 +1113,7 @@ public enum Function {
    * @param args ignored
   public static void main(final String... args) {
     final StringList sl = new StringList();
-    for(Function f : Function.values()) {
+    for(Function f : VALUES) {
       sl.add(f.toString().replaceAll("^fn:|\\(.*", ""));
     }
     for(final String s : sl.sort(false, false)) {
