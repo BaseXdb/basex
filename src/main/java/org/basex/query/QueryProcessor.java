@@ -239,11 +239,7 @@ public final class QueryProcessor extends Progress {
    */
   @Override
   public void databases(final LockResult lr) {
-    lr.read.add(ctx.userReadLocks);
-    lr.write.add(ctx.userWriteLocks);
-    if(ctx.root == null || !ctx.root.databases(lr, ctx))
-      if(ctx.updating) lr.writeAll = true;
-      else lr.readAll = true;
+    ctx.databases(lr);
   }
 
   /**

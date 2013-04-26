@@ -316,6 +316,18 @@ public final class QueryContext extends Progress {
   }
 
   /**
+   * Returns the databases that may be touched by this query. The returned information
+   * will be more accurate if the function is called after parsing the query.
+   * @see Progress#databases(LockResult)
+   */
+  @Override
+  public void databases(final LockResult lr) {
+    if(null != root)
+      root.databases(lr, this);
+    else lr.writeAll = true;
+  }
+
+  /**
    * Binds a value to the context item, using the same rules as for
    * {@link #bind binding variables}.
    * @param val value to be bound
@@ -329,6 +341,14 @@ public final class QueryContext extends Progress {
     } else {
       ctxItem = cast(val, type);
     }
+  }
+
+  /**
+   * Set root expression.
+   * @param rt Main Module
+   */
+  public void setRoot(final MainModule rt) {
+    root = rt;
   }
 
   /**
