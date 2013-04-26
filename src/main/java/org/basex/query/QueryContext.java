@@ -15,6 +15,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.Expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
@@ -186,6 +187,16 @@ public final class QueryContext extends Progress {
   }
 
   /**
+   * Sets the main module (root expression).
+   * @param rt main module
+   */
+  public void mainModule(final MainModule rt) {
+    root = rt;
+    updating = root.expr.uses(Use.UPD);
+
+  }
+
+  /**
    * Compiles and optimizes the expression.
    * @throws QueryException query exception
    */
@@ -341,14 +352,6 @@ public final class QueryContext extends Progress {
     } else {
       ctxItem = cast(val, type);
     }
-  }
-
-  /**
-   * Set root expression.
-   * @param rt Main Module
-   */
-  public void setRoot(final MainModule rt) {
-    root = rt;
   }
 
   /**
