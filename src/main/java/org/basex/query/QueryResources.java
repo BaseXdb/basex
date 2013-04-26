@@ -89,7 +89,8 @@ public final class QueryResources {
   public Data data(final String name, final InputInfo info) throws QueryException {
     // check if a database with the same name has already been opened
     for(int d = 0; d < datas; ++d) {
-      if(data[d].meta.name.equalsIgnoreCase(name)) return data[d];
+      final String n = data[d].meta.name;
+      if(Prop.CASE ? n.equals(name) : n.equalsIgnoreCase(name)) return data[d];
     }
 
     try {
@@ -119,7 +120,8 @@ public final class QueryResources {
         return new DBNode(dt, 0, Data.DOC);
 
       // database instance has same name as input path
-      if(dt.meta.name.equalsIgnoreCase(qi.db)) return doc(dt, qi, info);
+      final String n = dt.meta.name;
+      if(Prop.CASE ? n.equals(n) : n.equalsIgnoreCase(qi.db)) return doc(dt, qi, info);
     }
 
     // open new database, or create new instance
@@ -155,19 +157,24 @@ public final class QueryResources {
     final String in = base != null ? base.merge(input).path() : null;
 
     // check currently opened collections
-    for(int c = 0; c < colls; c++) {
-      if(in != null && collName[c].equalsIgnoreCase(in) ||
-          collName[c].equalsIgnoreCase(input)) return coll[c];
+    if(in != null) {
+      final String[] names = { in, input };
+      for(int c = 0; c < colls; c++) {
+        final String n = collName[c];
+        if(Prop.CASE ? Token.eq(n, names) : Token.eqic(n, names)) return coll[c];
+      }
     }
 
     // check currently opened databases
     final QueryInput qi = new QueryInput(input);
     Data dt = null;
-    for(int d = 0; d < datas; ++d) {
+    for(int i = 0; i < datas; ++i) {
       // return database instance with the same name or file path
-      if(qi.db != null && data[d].meta.name.equalsIgnoreCase(qi.db) ||
-          IO.get(data[d].meta.original).eq(qi.input)) {
-        dt = data[d];
+      final Data d = data[i];
+      final String n = d.meta.name;
+      if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db) ||
+          IO.get(d.meta.original).eq(qi.input)) {
+        dt = d;
         break;
       }
     }

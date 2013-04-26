@@ -693,8 +693,7 @@ public final class Token {
    */
   public static boolean eqic(final String str, final String... strings) {
     for(final String s : strings) {
-      if(str == null ? s == null : str.equalsIgnoreCase(s))
-        return true;
+      if(str == null ? s == null : str.equalsIgnoreCase(s)) return true;
     }
     return false;
   }
