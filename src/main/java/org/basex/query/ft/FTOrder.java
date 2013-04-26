@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -28,9 +27,7 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final FTLexer lex) {
-
+  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex) {
     int p = 0, s = 0;
     boolean f = true;
     for(final FTStringMatch sm : mtc) {
@@ -58,10 +55,5 @@ public final class FTOrder extends FTFilter {
   @Override
   public String toString() {
     return super.toString() + QueryText.ORDERED;
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return expr[0].accept(visitor);
   }
 }

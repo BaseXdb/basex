@@ -155,9 +155,4 @@ public final class FTAnd extends FTExpr {
   public String toString() {
     return PAR1 + toString(' ' + FTAND + ' ') + PAR2;
   }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, expr);
-  }
 }

@@ -474,8 +474,8 @@ public final class FTWords extends FTExpr {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, expr) && query.accept(visitor)
-        && (occ == null || visitAll(visitor, occ));
+    return super.accept(visitor) && query.accept(visitor) &&
+        (occ == null || visitAll(visitor, occ));
   }
 
   @Override

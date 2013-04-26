@@ -172,7 +172,7 @@ public final class FNFt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter search(final QueryContext ctx) throws QueryException {
-    final Data data = data(0, ctx);
+    final Data data = data(ctx);
     final Value terms = ctx.value(expr[1]);
     final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
     final TokenMap tm = new FuncParams(Q_FTOPTIONS, info).parse(opt);
@@ -231,7 +231,7 @@ public final class FNFt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter tokens(final QueryContext ctx) throws QueryException {
-    final Data data = data(0, ctx);
+    final Data data = data(ctx);
     byte[] entry = expr.length < 2 ? Token.EMPTY : checkStr(expr[1], ctx);
     if(entry.length != 0) {
       final FTLexer ftl = new FTLexer(new FTOpt().copy(data.meta));
@@ -272,13 +272,7 @@ public final class FNFt extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    if(oneOf(sig, _FT_SEARCH, _FT_TOKENS)) {
-      if(!(expr[0] instanceof Str)) {
-        if(!visitor.lock(null)) return false;
-      } else if(!visitor.lock(string(((Str) expr[0]).string()))) {
-        return false;
-      }
-    }
+    if(oneOf(sig, _FT_SEARCH, _FT_TOKENS) && !dataLock(visitor)) return false;
     return super.accept(visitor);
   }
 }

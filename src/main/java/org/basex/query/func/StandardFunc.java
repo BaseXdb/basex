@@ -128,14 +128,14 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns a data instance for the specified argument.
-   * @param i index of argument
+   * Returns a data instance for the first argument of the function.
+   * This method assumes that the function has at least one argument.
    * @param ctx query context
    * @return data instance
    * @throws QueryException query exception
    */
-  Data data(final int i, final QueryContext ctx) throws QueryException {
-    final Item it = checkNoEmpty(expr[i].item(ctx, info));
+  Data data(final QueryContext ctx) throws QueryException {
+    final Item it = checkNoEmpty(expr[0].item(ctx, info));
     final Type ip = it.type;
     if(it instanceof ANode) return checkDBNode(it).data;
     if(it instanceof AStr)  {
@@ -144,6 +144,17 @@ public abstract class StandardFunc extends Arr {
       return ctx.resource.data(name, info);
     }
     throw STRNODTYPE.thrw(info, this, ip);
+  }
+
+  /**
+   * Checks if the specified database can be detected for locking, i.e., if the
+   * first argument of the tested function is a static string.
+   * This method assumes that the function has at least one argument.
+   * @param visitor visitor
+   * @return result of check
+   */
+  protected boolean dataLock(final ASTVisitor visitor) {
+    return visitor.lock(expr[0] instanceof Str ? string(((Str) expr[0]).string()) : null);
   }
 
   /**

@@ -479,7 +479,7 @@ public abstract class Path extends ParseExpr {
       return false;
     }
     visitor.enterFocus();
-    for(final Expr e : steps) if(!e.accept(visitor)) return false;
+    if(!visitAll(visitor, steps)) return false;
     visitor.exitFocus();
     return true;
   }

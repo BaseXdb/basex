@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
@@ -130,7 +129,7 @@ public final class FNAdmin extends StandardFunc {
   private Iter users(final QueryContext ctx) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     for(final User u : expr.length == 0 ? ctx.context.users.users(null) :
-      data(0, ctx).meta.users.users(ctx.context.users)) {
+      data(ctx).meta.users.users(ctx.context.users)) {
       vb.add(new FElem(Q_USER).add(u.name).add(Q_PERMISSION,
           u.perm.toString().toLowerCase(Locale.ENGLISH)));
     }
@@ -159,36 +158,9 @@ public final class FNAdmin extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    if(oneOf(sig, _ADMIN_USERS, _ADMIN_SESSIONS) &&
-        !visitor.lock(DBLocking.ADMIN)) return false;
-    if(expr.length > 0 && expr[0] instanceof Str &&
-        !visitor.lock(string(((Str) expr[0]).string()))) return false;
+    if(oneOf(sig, _ADMIN_USERS, _ADMIN_SESSIONS) && !visitor.lock(DBLocking.ADMIN))
+      return false;
+    if(sig == _ADMIN_USERS && expr.length > 0 && !dataLock(visitor)) return false;
     return super.accept(visitor);
   }
-
-  /*
-   * Creates a new user. Needs to be implemented as updating function.
-   * @param ctx query context
-   * @return {@code null}
-   * @throws QueryException query exception
-  private Item createUser(final QueryContext ctx) throws QueryException {
-    final String user = Token.string(checkStr(expr[0], ctx));
-    final Item pw = checkItem(expr[1], ctx);
-    final byte[] pass;
-    if(pw instanceof AStr) {
-      pass = pw.string(info);
-    } else if(pw instanceof Bin) {
-      pass = new Hex((Bin) pw, info).string(info);
-    } else {
-      throw STRBINTYPE.thrw(info, pw.type);
-    }
-
-    try {
-      CreateUser.create(user, Token.string(pass), ctx.context);
-    } catch(final BaseXException ex) {
-      BXAD_USER.thrw(info, ex);
-    }
-    return null;
-  }
-   */
 }

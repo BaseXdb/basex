@@ -309,8 +309,8 @@ public final class Window extends GFLWOR.Clause {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return expr.accept(visitor) && start.accept(visitor)
-        && (end == null || end.accept(visitor)) && visitor.declared(var);
+    return expr.accept(visitor) && start.accept(visitor) &&
+        (end == null || end.accept(visitor)) && visitor.declared(var);
   }
 
   @Override
