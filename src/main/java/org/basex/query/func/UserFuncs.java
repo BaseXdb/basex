@@ -3,6 +3,8 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
@@ -22,9 +24,10 @@ import org.basex.util.*;
  */
 public final class UserFuncs extends ExprInfo {
   /** User-defined functions. */
-  private StaticFunc[] funcs = { };
+  private ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>(1);
   /** Cached function calls. */
-  private StaticFuncCall[][] calls = { };
+  private ArrayList<ArrayList<StaticFuncCall>> calls =
+      new ArrayList<ArrayList<StaticFuncCall>>(1);
 
   /**
    * Returns the specified function.
@@ -38,9 +41,10 @@ public final class UserFuncs extends ExprInfo {
     if(id == -1) return null;
 
     // function has already been declared
-    final StaticFuncCall call = add(ii, funcs[id].name, id, args);
-    final FuncType type = FuncType.get(funcs[id].args, funcs[id].ret);
-    return new TypedFunc(call, funcs[id].ann, type);
+    final StaticFunc sf = funcs.get(id);
+    final StaticFuncCall call = add(ii, sf.name, id, args);
+    final FuncType type = FuncType.get(sf.args, sf.ret);
+    return new TypedFunc(call, sf.ann, type);
   }
 
   /**
@@ -71,8 +75,9 @@ public final class UserFuncs extends ExprInfo {
    * @return function instance
    */
   private int indexOf(final QNm name, final Expr[] args) {
-    for(int id = 0; id < funcs.length; ++id) {
-      if(name.eq(funcs[id].name) && args.length == funcs[id].args.length) return id;
+    for(int id = 0; id < funcs.size(); ++id) {
+      final StaticFunc sf = funcs.get(id);
+      if(args.length == sf.args.length && name.eq(sf.name)) return id;
     }
     return -1;
   }
@@ -81,7 +86,7 @@ public final class UserFuncs extends ExprInfo {
    * Returns all user-defined functions.
    * @return function array
    */
-  public StaticFunc[] funcs() {
+  public ArrayList<StaticFunc> funcs() {
     return funcs;
   }
 
@@ -98,8 +103,9 @@ public final class UserFuncs extends ExprInfo {
 
     final StaticFuncCall call = new BaseFuncCall(ii, nm, arg);
     // for dynamic calls
-    if(funcs[id].declared) call.init(funcs[id]);
-    calls[id] = Array.add(calls[id], call);
+    final StaticFunc sf = funcs.get(id);
+    if(sf.declared) call.init(sf);
+    calls.get(id).add(call);
     return call;
   }
 
@@ -120,16 +126,12 @@ public final class UserFuncs extends ExprInfo {
       funError(name, ii);
     }
 
-    final byte[] ln = name.local();
-    for(int l = 0; l < funcs.length; ++l) {
-      final QNm qn = funcs[l].name;
-      final byte[] u = qn.uri();
-      final byte[] nm = qn.local();
-
-      if(eq(ln, nm) && eq(uri, u) && fun.args.length == funcs[l].args.length) {
+    for(int l = 0; l < funcs.size(); ++l) {
+      final StaticFunc sf = funcs.get(l);
+      if(fun.args.length == sf.args.length && name.eq(sf.name)) {
         // declare function that has been called before
-        if(!funcs[l].declared) {
-          funcs[l] = fun;
+        if(!sf.declared) {
+          funcs.set(l, fun);
           return l;
         }
         // duplicate declaration
@@ -137,9 +139,9 @@ public final class UserFuncs extends ExprInfo {
       }
     }
     // add function skeleton
-    funcs = Array.add(funcs, fun);
-    calls = Array.add(calls, new StaticFuncCall[0]);
-    return funcs.length - 1;
+    funcs.add(fun);
+    calls.add(new ArrayList<StaticFuncCall>(1));
+    return funcs.size() - 1;
   }
 
   /**
@@ -150,9 +152,11 @@ public final class UserFuncs extends ExprInfo {
    */
   public void check(final QueryContext qc) throws QueryException {
     // initialize function calls
-    for(int i = 0; i < funcs.length; ++i) {
-      qc.updating |= funcs[i].updating && calls[i].length != 0;
-      for(final StaticFuncCall c : calls[i]) c.init(funcs[i]);
+    for(int i = 0; i < funcs.size(); ++i) {
+      final StaticFunc sf = funcs.get(i);
+      final ArrayList<StaticFuncCall> sfc = calls.get(i);
+      qc.updating |= sf.updating && !sfc.isEmpty();
+      for(final StaticFuncCall c : sfc) c.init(sf);
     }
 
     for(final StaticFunc f : funcs) {
@@ -182,9 +186,9 @@ public final class UserFuncs extends ExprInfo {
    * @throws QueryException query exception
    */
   public void compile(final QueryContext ctx) throws QueryException {
-    for(int i = 0; i < funcs.length; i++) {
-      // only compile those functions that are used
-      if(calls[i].length != 0) funcs[i].compile(ctx);
+    // only compile those functions that are used
+    for(int i = 0; i < funcs.size(); i++) {
+      if(!calls.get(i).isEmpty()) funcs.get(i).compile(ctx);
     }
   }
 
@@ -210,7 +214,7 @@ public final class UserFuncs extends ExprInfo {
 
   @Override
   public void plan(final FElem plan) {
-    if(funcs.length != 0) addPlan(plan, planElem(), funcs);
+    if(!funcs.isEmpty()) addPlan(plan, planElem(), funcs);
   }
 
   @Override

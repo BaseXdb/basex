@@ -933,8 +933,8 @@ public class QueryParser extends InputParser {
    */
   private Var[] paramList() throws QueryException {
     Var[] args = { };
-    skipWS();
     while(true) {
+      skipWS();
       if(curr() != '$') {
         if(args.length == 0) break;
         check('$');
@@ -945,7 +945,6 @@ public class QueryParser extends InputParser {
 
       args = Array.add(args, var);
       if(!consume(',')) break;
-      skipWS();
     }
     return args;
   }
