@@ -8,7 +8,6 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Use;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
@@ -94,8 +93,7 @@ final class RestXqResponse {
     String forward = null;
     try {
       // assign local updating flag
-      qc.updating = mod.expr.uses(Use.UPD);
-      qc.setRoot(mod);
+      qc.mainModule(mod);
       qc.context(http, null);
       qc.context.register(qc);
 
