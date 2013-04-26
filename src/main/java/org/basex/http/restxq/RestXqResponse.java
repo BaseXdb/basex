@@ -95,6 +95,7 @@ final class RestXqResponse {
     try {
       // assign local updating flag
       qc.updating = mod.expr.uses(Use.UPD);
+      qc.setRoot(mod);
       qc.context(http, null);
       qc.context.register(qc);
 
@@ -102,8 +103,8 @@ final class RestXqResponse {
       final StringList o = qc.dbOptions;
       for(int s = 0; s < o.size(); s += 2) qc.context.prop.set(o.get(s), o.get(s + 1));
 
-      mod.compile(qc);
-      Value result = mod.value(qc);
+      qc.compile();
+      Value result = qc.value();
       final Value update = qc.update();
       if(update != null) result = update;
 
