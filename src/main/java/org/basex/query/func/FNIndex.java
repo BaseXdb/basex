@@ -15,11 +15,11 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Index functions.
@@ -241,9 +241,12 @@ public final class FNIndex extends StandardFunc {
   }
 
   @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    if(!(expr[0] instanceof Str)) return false;
-    db.add(string(((Str) expr[0]).string()));
-    return true;
+  public boolean accept(final ASTVisitor visitor) {
+    if(!(expr[0] instanceof Str)) {
+      if(!visitor.lock(null)) return false;
+    } else {
+      if(!visitor.lock(string(((Str) expr[0]).string()))) return false;
+    }
+    return super.accept(visitor);
   }
 }

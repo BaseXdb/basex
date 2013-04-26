@@ -241,14 +241,7 @@ public final class QueryProcessor extends Progress {
   public void databases(final LockResult lr) {
     lr.read.add(ctx.userReadLocks);
     lr.write.add(ctx.userWriteLocks);
-    boolean global = false;
-    if (ctx.root == null)
-      global = true;
-    else
-      global = global |
-        !ctx.root.expr.databases(ctx.updating ? lr.write : lr.read, ctx.ctxItem == null);
-
-    if (global)
+    if(ctx.root == null || !ctx.root.databases(lr, ctx))
       if(ctx.updating) lr.writeAll = true;
       else lr.readAll = true;
   }

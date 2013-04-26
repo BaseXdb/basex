@@ -2,11 +2,11 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.Progress.LockResult;
 import org.basex.data.*;
 import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
 import org.basex.server.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -247,7 +247,7 @@ public final class Context {
   public void prepareLock(final StringList sl) {
     // replace empty string with currently opened database and return array
     for(int d = 0; d < sl.size(); d++) {
-      if(sl.get(d).equals(DBLocking.CTX))
+      if(Token.eq(sl.get(d), DBLocking.CTX, DBLocking.COLL))
         if(null == data) sl.deleteAt(d);
         else sl.set(d, data.meta.name);
     }

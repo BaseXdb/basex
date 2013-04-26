@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import org.basex.index.*;
 
 import org.basex.core.*;
-import org.basex.core.Progress.LockResult;
+import org.basex.core.LockResult;
 import org.basex.core.cmd.*;
 import org.basex.test.*;
 import org.basex.util.list.*;
@@ -36,6 +36,8 @@ public class CommandLockingTest extends SandboxTest {
   private static final StringList NAME_LIST = new StringList(NAME);
   /** StringList containing context. */
   private static final StringList CTX_LIST = new StringList(DBLocking.CTX);
+  /** StringList containing collection. */
+  private static final StringList COLL_LIST = new StringList(DBLocking.COLL);
   /** StringList containing name and context. */
   private static final StringList NAME_CTX = new StringList(NAME, DBLocking.CTX);
   /** StringList containing ADMIN lock string. */
@@ -116,9 +118,9 @@ public class CommandLockingTest extends SandboxTest {
   public void xquery() {
     // Basic document access
     ckDBs(new XQuery("collection('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("collection()"), false, CTX_LIST);
+    ckDBs(new XQuery("collection()"), false, COLL_LIST);
     // fn:collection() always accesses the global context, no matter what local context is
-    ckDBs(new XQuery("<a/>/count(collection())"), false, CTX_LIST);
+    ckDBs(new XQuery("<a/>/count(collection())"), false, COLL_LIST);
     ckDBs(new XQuery("doc('" + NAME + "')"), false, NAME_LIST);
     ckDBs(new XQuery("doc-available('" + NAME + "/foo.xml')"), false, NAME_LIST, null);
     ckDBs(new XQuery("parse-xml('<foo/>')"), true, NONE);
@@ -133,7 +135,7 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery("unparsed-text-available('" + FILE + "')"), false, NONE);
     ckDBs(new XQuery("unparsed-text-lines('" + FILE + "')"), false, NONE);
     ckDBs(new XQuery("uri-collection('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("uri-collection()"), false, CTX_LIST);
+    ckDBs(new XQuery("uri-collection()"), false, COLL_LIST);
 
     // Accessor and node functions
     for(String fn : new String[] { "data", "position", "last", "string", "number",
@@ -145,8 +147,9 @@ public class CommandLockingTest extends SandboxTest {
     }
     for(String fn : new String[] { "data", "string", "number", "string-length",
         "normalize-space", "document-uri", "nilled", "node-name", "local-name", "name",
-        "namespace-uri", "root", "base-uri", "generate-id", "has-children", "path"})
+        "namespace-uri", "root", "base-uri", "generate-id", "has-children", "path"}) {
       ckDBs(new XQuery(fn + "(doc('" + NAME + "'))"), false, NAME_LIST);
+    }
 
     // Others
     ckDBs(new XQuery("."), false, CTX_LIST);
@@ -162,7 +165,7 @@ public class CommandLockingTest extends SandboxTest {
         "local:a(5)"), false, NONE);
     ckDBs(new XQuery("declare function local:a($a) {" +
         "if($a = 0) then collection() else local:a($a idiv 2) };" +
-        "local:a(5)"), false, CTX_LIST);
+        "local:a(5)"), false, COLL_LIST);
     ckDBs(new XQuery("declare function local:a($a) {" +
         "if($a = 0) then doc('" + NAME + "') else local:a($a idiv 2) };" +
         "local:a(5)"), false, NAME_LIST);
@@ -354,9 +357,8 @@ public class CommandLockingTest extends SandboxTest {
     if(null == reqWt && !lr.writeAll) fail("Should write lock all databases, didn't.");
     if(null != reqWt && null != allowWt && !lr.write.containsAll(reqWt))
       fail("Didn't write lock all necessary databases.");
-    if(null != allowWt && lr.writeAll) fail("write locked all databases, may not.");
+    if(null != allowWt && lr.writeAll) fail("Write locked all databases, may not.");
     if(null != allowWt && !allowWt.containsAll(lr.write))
-      fail("write locked more databases than I should.");
+      fail("Write locked more databases than I should.");
   }
-
 }

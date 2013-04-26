@@ -9,7 +9,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract filter expression.
@@ -179,11 +178,6 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    return root.databases(db, rootContext) && super.databases(db, rootContext);
-  }
-
-  @Override
   public final void plan(final FElem plan) {
     final FElem el = planElem();
     addPlan(plan, el, root);
@@ -197,7 +191,12 @@ public abstract class Filter extends Preds {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return root.accept(visitor) && visitAll(visitor, preds);
+    for(final Expr e : preds) {
+      visitor.enterFocus();
+      if(!e.accept(visitor)) return false;
+      visitor.exitFocus();
+    }
+    return root.accept(visitor);
   }
 
   @Override

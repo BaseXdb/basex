@@ -253,7 +253,12 @@ public abstract class Step extends Preds {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, preds);
+    for(final Expr e : preds) {
+      visitor.enterFocus();
+      if(!e.accept(visitor)) return false;
+      visitor.exitFocus();
+    }
+    return true;
   }
 
   @Override

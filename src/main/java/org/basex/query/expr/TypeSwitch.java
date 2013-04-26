@@ -10,7 +10,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Typeswitch expression.
@@ -125,12 +124,6 @@ public final class TypeSwitch extends ParseExpr {
     final TypeCase[] cs = new TypeCase[cases.length];
     for(int i = 0; i < cs.length; i++) cs[i] = cases[i].copy(ctx, scp, vs);
     return new TypeSwitch(info, ts.copy(ctx, scp, vs), cs);
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    for(final TypeCase tc : cases) if(!tc.databases(db, rootContext)) return false;
-    return ts.databases(db, rootContext);
   }
 
   @Override

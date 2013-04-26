@@ -2,6 +2,7 @@ package org.basex.query.var;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -13,7 +14,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Static variable which can be assigned an expression.
@@ -331,11 +331,6 @@ public final class StaticVar extends ParseExpr implements Scope {
     if(expr != null) sb.append(ASSIGN).append(' ').append(expr);
     else sb.append(EXTERNAL);
     return sb.append(';');
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    return expr != null && expr.databases(db, rootContext);
   }
 
   @Override

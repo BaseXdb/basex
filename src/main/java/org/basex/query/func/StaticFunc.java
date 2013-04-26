@@ -18,7 +18,6 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * A static User-defined function.
@@ -52,8 +51,6 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
   private boolean compiled;
   /** Flag that is turned on during compilation and prevents premature inlining. */
   private boolean compiling;
-  /** Flag for avoiding loops in {@link #databases(org.basex.util.list.StringList)}. */
-  private boolean dontEnter;
 
   /** Local variables in the scope of this function. */
   protected final VarScope scope;
@@ -168,20 +165,6 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
         return sub.visit(this);
       }
     });
-  }
-
-  /**
-   * Gathers all databases accessed by this function
-   * (see {@link Expr#databases(StringList, boolean)}).
-   * @param db database list
-   * @return {@code false} if all databases should be locked, {@code true} otherwise
-   */
-  public boolean databases(final StringList db) {
-    if(dontEnter) return true;
-    dontEnter = true;
-    final boolean res = expr.databases(db, false);
-    dontEnter = false;
-    return res;
   }
 
   @Override

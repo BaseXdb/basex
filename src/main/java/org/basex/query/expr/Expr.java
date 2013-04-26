@@ -16,7 +16,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract class for representing XQuery expressions.
@@ -265,8 +264,8 @@ public abstract class Expr extends ExprInfo {
    * @param db set
    * @param rootContext is in root context
    * @return {@code false} if databases cannot be statically determined
-   */
   public abstract boolean databases(final StringList db, final boolean rootContext);
+   */
 
   /**
    * <p>This method is overwritten by {@link CmpG}, {@link CmpV} and {@link FNSimple}.

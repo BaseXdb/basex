@@ -271,12 +271,14 @@ public final class FNFt extends StandardFunc {
   }
 
   @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
+  public boolean accept(final ASTVisitor visitor) {
     if(oneOf(sig, _FT_SEARCH, _FT_TOKENS)) {
-      if(!(expr[0] instanceof Str)) return false;
-      db.add(string(((Str) expr[0]).string()));
-      return true;
+      if(!(expr[0] instanceof Str)) {
+        if(!visitor.lock(null)) return false;
+      } else if(!visitor.lock(string(((Str) expr[0]).string()))) {
+        return false;
+      }
     }
-    return super.databases(db, rootContext);
+    return super.accept(visitor);
   }
 }

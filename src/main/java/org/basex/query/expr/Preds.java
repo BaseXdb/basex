@@ -15,7 +15,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract predicate expression, implemented by {@link Filter} and
@@ -164,12 +163,6 @@ public abstract class Preds extends ParseExpr {
   public Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
     return inlineAll(ctx, scp, preds, v, e) ? optimize(ctx, scp) : null;
-  }
-
-  @Override
-  public boolean databases(final StringList db, final boolean rootContext) {
-    for(final Expr p : preds) if(!p.databases(db, false)) return false;
-    return true;
   }
 
   @Override
