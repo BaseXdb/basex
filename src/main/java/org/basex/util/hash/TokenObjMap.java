@@ -46,6 +46,15 @@ public final class TokenObjMap<E> extends TokenSet {
     return (E) values[p];
   }
 
+  /**
+   * Sets the specified value.
+   * @param p value index
+   * @param v value to be set
+   */
+  public void value(final int p, final E v) {
+    values[p] = v;
+  }
+
   @Override
   public int delete(final byte[] key) {
     final int i = super.delete(key);
