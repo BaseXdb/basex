@@ -576,7 +576,7 @@ public final class QueryContext extends Progress {
    * @return the variable if it could be bound, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private StaticVar bind(final String name, final Value val) throws QueryException {
+  private StaticVar bind(final String name, final Expr val) throws QueryException {
     // remove optional $ prefix
     String nm = name.indexOf('$') == 0 ? name.substring(1) : name;
     byte[] uri = EMPTY;
@@ -605,10 +605,10 @@ public final class QueryContext extends Progress {
    * @return cast value
    * @throws QueryException query exception
    */
-  private Value cast(final Object val, final String type) throws QueryException {
+  private Expr cast(final Object val, final String type) throws QueryException {
     // return original value
     if(type == null || type.isEmpty()) {
-      return val instanceof Value ? (Value) val : JavaMapping.toValue(val);
+      return val instanceof Expr ? (Expr) val : JavaMapping.toValue(val);
     }
 
     // convert to json
