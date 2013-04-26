@@ -565,7 +565,7 @@ public final class QueryContext extends Progress {
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Binds an value to a global variable. If the value is an {@link Expr}
+   * Binds a value to a global variable. If the value is an {@link Expr}
    * instance, it is directly assigned. Otherwise, it is first cast to the
    * appropriate XQuery type.
    * @param name name of variable
@@ -573,7 +573,7 @@ public final class QueryContext extends Progress {
    * @return the variable if it could be bound, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private StaticVar bind(final String name, final Expr val) throws QueryException {
+  private StaticVar bind(final String name, final Value val) throws QueryException {
     // remove optional $ prefix
     String nm = name.indexOf('$') == 0 ? name.substring(1) : name;
     byte[] uri = EMPTY;
@@ -602,10 +602,10 @@ public final class QueryContext extends Progress {
    * @return cast value
    * @throws QueryException query exception
    */
-  private Expr cast(final Object val, final String type) throws QueryException {
+  private Value cast(final Object val, final String type) throws QueryException {
     // return original value
     if(type == null || type.isEmpty()) {
-      return val instanceof Expr ? (Expr) val : JavaMapping.toValue(val);
+      return val instanceof Value ? (Value) val : JavaMapping.toValue(val);
     }
 
     // convert to json

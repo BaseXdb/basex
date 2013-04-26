@@ -117,9 +117,4 @@ public final class FTNot extends FTExpr {
   public String toString() {
     return FTNOT + ' ' + expr[0];
   }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return expr[0].accept(visitor);
-  }
 }

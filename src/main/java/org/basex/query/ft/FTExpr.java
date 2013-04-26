@@ -114,6 +114,11 @@ public abstract class FTExpr extends ParseExpr {
     addPlan(plan, planElem(), expr);
   }
 
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr);
+  }
+
   /**
    * Prints the array with the specified separator.
    * @param sep separator

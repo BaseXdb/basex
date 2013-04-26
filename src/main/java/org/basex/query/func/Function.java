@@ -453,7 +453,7 @@ public enum Function {
   /** XQuery function. */
   _ADMIN_SESSIONS(FNAdmin.class, "sessions()", ELM_ZM),
   /** XQuery function. */
-  _ADMIN_LOGS(FNAdmin.class, "logs([name])", ELM_ZM, 0, STR),
+  _ADMIN_LOGS(FNAdmin.class, "logs([date])", ELM_ZM, 0, STR),
 
   /* FNArchive functions. */
 

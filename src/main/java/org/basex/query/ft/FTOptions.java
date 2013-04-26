@@ -2,7 +2,6 @@ package org.basex.query.ft;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -67,10 +66,5 @@ public final class FTOptions extends FTExpr {
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
     return new FTOptions(info, expr[0].copy(ctx, scp, vs), new FTOpt().copy(opt));
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return expr[0].accept(visitor);
   }
 }

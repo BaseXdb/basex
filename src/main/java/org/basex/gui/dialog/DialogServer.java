@@ -308,7 +308,7 @@ public final class DialogServer extends BaseXDialog {
         gui.gprop.set(GUIProp.S_PORT, pc);
         gui.gprop.set(GUIProp.S_USER, us);
         gui.gprop.set(GUIProp.S_PASSWORD, pw);
-        cs = new ClientSession(ctx, us, pw);
+        cs = new ClientSession(hs, pc, us, pw);
         user.setSess(cs);
         dbsP.setSess(cs);
         connected = true;

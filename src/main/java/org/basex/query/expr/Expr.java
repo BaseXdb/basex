@@ -384,9 +384,9 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Traverses this expression, notifying the visitor of all declared and used variables.
-   * Variable declarations have to be reported before all uses of the variable.
-   * @param visitor variable visitor
+   * Traverses this expression, notifying the visitor of declared and used variables,
+   * and checking the tree for other recursive properties.
+   * @param visitor visitor
    * @return if the walk should be continued
    */
   public abstract boolean accept(final ASTVisitor visitor);

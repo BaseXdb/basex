@@ -138,10 +138,9 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery("uri-collection()"), false, COLL_LIST);
 
     // Accessor and node functions
-    for(String fn : new String[] { "data", "position", "last", "string", "number",
-        "string-length", "normalize-space", "document-uri", "nilled", "node-name",
-        "local-name", "name", "namespace-uri", "root", "base-uri", "generate-id",
-        "has-children", "path"}) {
+    for(String fn : new String[] { "data", "string", "number", "string-length",
+        "normalize-space", "document-uri", "nilled", "node-name", "local-name", "name",
+        "namespace-uri", "root", "base-uri", "generate-id", "has-children", "path"}) {
       ckDBs(new XQuery(fn + "()"), false, CTX_LIST);
       ckDBs(new XQuery("doc('" + NAME + "')/" + fn + "()"), false, NAME_LIST, NAME_CTX);
     }
@@ -184,8 +183,6 @@ public class CommandLockingTest extends SandboxTest {
   @Test
   public void db() {
     // General Functions
-    ckDBs(new XQuery("db:backups('" + NAME + "')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:backups()"), false, null);
     ckDBs(new XQuery("db:info('" + NAME + "')"), false, NAME_LIST);
     ckDBs(new XQuery("db:list('" + NAME + "')"), false, NAME_LIST);
     ckDBs(new XQuery("db:list()"), false, null);

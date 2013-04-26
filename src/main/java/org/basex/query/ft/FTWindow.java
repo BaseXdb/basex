@@ -121,7 +121,7 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, expr) && win.accept(visitor);
+    return super.accept(visitor) && win.accept(visitor);
   }
 
   @Override

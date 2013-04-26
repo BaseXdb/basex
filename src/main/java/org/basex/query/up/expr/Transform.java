@@ -122,15 +122,13 @@ public final class Transform extends Arr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(COPY + ' ');
-    for(final Let t : copies)
-      sb.append(t.var + " " + ASSIGN + ' ' + t.expr + ' ');
-    return sb.append(MODIFY + ' ' + expr[0] + ' ' + RETURN + ' ' +
-        expr[1]).toString();
+    for(final Let t : copies) sb.append(t.var + " " + ASSIGN + ' ' + t.expr + ' ');
+    return sb.append(MODIFY + ' ' + expr[0] + ' ' + RETURN + ' ' + expr[1]).toString();
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, copies) && visitAll(visitor, expr);
+    return visitAll(visitor, copies) && super.accept(visitor);
   }
 
   @Override

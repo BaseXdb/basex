@@ -45,7 +45,7 @@ public final class FNGen extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case DATA:                return data(ctx);
+      case DATA:                return dataa(ctx);
       case COLLECTION:          return collection(ctx).iter();
       case URI_COLLECTION:      return uriCollection(ctx);
       case UNPARSED_TEXT_LINES: return unparsedTextLines(ctx);
@@ -91,7 +91,7 @@ public final class FNGen extends StandardFunc {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private Iter data(final QueryContext ctx) throws QueryException {
+  private Iter dataa(final QueryContext ctx) throws QueryException {
     final Iter ir = ctx.iter(expr.length != 0 ? expr[0] : checkCtx(ctx));
 
     return new Iter() {
@@ -348,12 +348,13 @@ public final class FNGen extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    if(0 == expr.length && oneOf(sig, COLLECTION, URI_COLLECTION)) {
-      if(!visitor.lock(DBLocking.COLL)) return false;
-    } else if(0 == expr.length && oneOf(sig, DATA)) {
+    if(oneOf(sig, DATA) && expr.length == 0) {
       if(!visitor.lock(DBLocking.CTX)) return false;
     } else if(oneOf(sig, DOC_AVAILABLE, DOC, COLLECTION, URI_COLLECTION)) {
-      if(0 == expr.length || !(expr[0] instanceof Str)) {
+      if(expr.length == 0) {
+        if(oneOf(sig, COLLECTION, URI_COLLECTION) && !visitor.lock(DBLocking.COLL))
+          return false;
+      } else if(!(expr[0] instanceof Str)) {
         if(!visitor.lock(null)) return false;
       } else {
         final QueryInput qi = new QueryInput(string(((Str) expr[0]).string()));

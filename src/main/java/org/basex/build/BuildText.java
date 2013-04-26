@@ -63,8 +63,6 @@ public interface BuildText {
   /** Scanner error. */
   String TEXTENC = "Encoding expected in text declaration.";
   /** Scanner error. */
-  String DECLWRONG = "Invalid document declaration.";
-  /** Scanner error. */
   String DECLENCODE = "Invalid encoding.";
   /** Scanner error. */
   String DECLSTANDALONE = "Invalid standalone attribute in declaration.";
