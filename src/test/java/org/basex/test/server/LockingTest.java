@@ -194,6 +194,23 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
+   * Capitalization test.
+   *
+   * Runs two queries on similar database names only differing on capitalization. If
+   * {@code Prop.CASE} is set, should run in parallel, otherwise not.
+   *
+   * @throws Exception None expected
+   */
+  @Ignore // [CG] Enable when database name capitalization bug #685 is resolved
+  @Test
+  public void capsTest() throws Exception {
+    testQueries(
+        new XQuery("insert node <foo/> into doc('" + NAME.toUpperCase() + "')"),
+        new XQuery("insert node <foo/> into doc('" + NAME.toLowerCase() + "')"),
+        Prop.CASE);
+  }
+
+  /**
    * Load test.
    * @throws Exception None expected
    */

@@ -29,15 +29,6 @@ public final class Prop extends AProp {
   /** System's temporary directory. */
   public static final String TMP = System.getProperty("java.io.tmpdir") + '/';
 
-  /** OS flag (source: {@code http://lopica.sourceforge.net/os.html}). */
-  private static final String OS = System.getProperty("os.name");
-  /** Flag denoting if OS belongs to Mac family. */
-  public static final boolean MAC = OS.startsWith("Mac");
-  /** Flag denoting if OS belongs to Windows family. */
-  public static final boolean WIN = OS.startsWith("Windows");
-  /** Respect lower/upper case when doing file comparisons. */
-  public static final boolean CASE = !(MAC || WIN);
-
   /** Prefix for project specific properties. */
   public static final String DBPREFIX = "org.basex.";
   /** System property for specifying database home directory. */
@@ -46,6 +37,34 @@ public final class Prop extends AProp {
   public static final String USERHOME = System.getProperty("user.home") + File.separator;
   /** Directory for storing the property files, database directory, etc. */
   public static final String HOME = homePath();
+
+  /** OS flag (source: {@code http://lopica.sourceforge.net/os.html}). */
+  private static final String OS = System.getProperty("os.name");
+  /** Flag denoting if OS belongs to Mac family. */
+  public static final boolean MAC = OS.startsWith("Mac");
+  /** Flag denoting if OS belongs to Windows family. */
+  public static final boolean WIN = OS.startsWith("Windows");
+  /** Respect lower/upper case when doing file comparisons. */
+  public static final boolean CASE;
+  /** Test user home directory for capitalization behavior. */
+  static {
+    final String home = Prop.HOME;
+    final File lower = new File(home + "/.basexcasetest");
+    final File caps = new File(home + "/.BASEXCASETEST");
+    lower.delete();
+    caps.delete();
+    boolean result = false;
+    try {
+      lower.createNewFile();
+      // if capitalized version exists, filesystem doesn't distinguish capitalization
+      result = !caps.exists();
+    } catch(IOException e) {
+      throw new Error("IO error while testing case sensitivity!", e);
+    } finally {
+      lower.delete();
+    }
+    CASE = result;
+  }
 
   /** Comment in configuration file. */
   static final String PROPHEADER = "# " + NAME + " Property File." + NL;
