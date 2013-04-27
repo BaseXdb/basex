@@ -555,6 +555,8 @@ public enum Err {
   /** FTST0019. */
   FTDUP(FTST, 19, "Match option '%' was declared twice."),
 
+  /** SENR0001. */
+  SERATTR(SENR, 1, "Attributes and namespaces cannot be serialized:%."),
   /** SESU0007. */
   SERENCODING(SESU, 7, "Encoding not supported: '%'."),
   /** SEPM0009. */
@@ -1161,6 +1163,7 @@ public enum Err {
     /** FOFD Error type. */ FOUT,
     /** FTDY Error type. */ FTDY,
     /** FTST Error type. */ FTST,
+    /** SENR Error type. */ SENR,
     /** SEPM Error type. */ SEPM,
     /** SERE Error type. */ SERE,
     /** SEPM Error type. */ SESU,
