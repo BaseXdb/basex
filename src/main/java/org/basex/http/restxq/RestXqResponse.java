@@ -204,7 +204,7 @@ final class RestXqResponse {
           }
         } else if(OUTPUT_SERIAL.eq(n)) {
           // process output:serialization-parameters
-          sp = FuncParams.serializerProp(n);
+          sp = FuncParams.serializerProp(n, null);
         } else {
           function.error(UNEXP_NODE, n);
         }
