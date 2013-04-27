@@ -54,7 +54,7 @@ public final class FTTest extends QueryTest {
       { "Simple 3", bool(false), "'abc' contains text 'b'" },
       { "Simple 4", node(22), "//b['true' contains text 'true']" },
       { "Simple 5", bool(true), "//@key contains text 'value'" },
-      { "Simple 6", node(36), "//@key[. contains text 'value']" },
+      { "Simple 6", str("value"), "//@key[. contains text 'value']/string()" },
       { "Simple 7", bool(false), "//@key contains text 'values'" },
       { "Simple 8", bool(true), "number('100') + 23 contains text '123'" },
       { "Simple 9", bool(true), "true() contains text 'true'" },
@@ -544,7 +544,8 @@ public final class FTTest extends QueryTest {
     final Prop prop = context.prop;
     if(ALL) {
       // testing all kinds of combinations
-      for(int a = 0; a < 2; ++a) { prop.set(Prop.FTINDEX, a == 0);
+      for(int a = 0; a < 2; ++a) {
+        prop.set(Prop.FTINDEX, a == 0);
         super.test();
       }
     } else {

@@ -557,6 +557,8 @@ public enum Err {
 
   /** SENR0001. */
   SERATTR(SENR, 1, "Attributes and namespaces cannot be serialized:%."),
+  /** SENR0001. */
+  SERFUNC(SENR, 1, "Functions cannot be serialized: %."),
   /** SESU0007. */
   SERENCODING(SESU, 7, "Encoding not supported: '%'."),
   /** SEPM0009. */
@@ -575,6 +577,8 @@ public enum Err {
   SERANY(SEPM, 16, "%."),
   /** SEPM0017. */
   SEROPT(SEPM, 17, "%."),
+  /** SEPM0017. */
+  SERWHICH(SEPM, 17, "Unknown serialization parameter: '%'."),
 
   /** XPDY0002. */
   VAREMPTY(XPDY, 2, "No value assigned to %."),
@@ -977,6 +981,8 @@ public enum Err {
   DUPLVARVIS(XQST, 116, "More than one visibility annotation declared."),
   /** XQST0118. */
   TAGWRONG(XQST, 118, "Start and end tag are different: <%>...</%>."),
+  /** XQST0119. */
+  OUTDOC(XQST, 119, "Serialization document '%' cannot be parsed."),
   /** XQST0120. */
   FEATNOTSUPP(XQST, 120, "Feature '%' is not supported by the implementation."),
   /** XQST0122. */

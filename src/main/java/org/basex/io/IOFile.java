@@ -300,6 +300,7 @@ public final class IOFile extends IO {
       if(ch == ' ') tb.add("%20");
       else tb.add(ch);
     }
+    if(isDir()) tb.add('/');
     return tb.toString();
   }
 

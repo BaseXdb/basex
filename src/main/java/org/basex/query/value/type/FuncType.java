@@ -72,7 +72,7 @@ public class FuncType implements Type {
 
   @Override
   public byte[] string() {
-    return Token.token(FUNCTION);
+    return token(FUNCTION);
   }
 
   @Override

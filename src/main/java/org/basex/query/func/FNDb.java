@@ -270,8 +270,7 @@ public final class FNDb extends StandardFunc {
    */
   private Iter backups(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    final String prefix = expr.length == 0 ? null :
-      Token.string(checkStr(expr[0], ctx)) + '-';
+    final String prefix = expr.length == 0 ? null : string(checkStr(expr[0], ctx)) + '-';
 
     final StringList list = ctx.context.databases.backups(prefix);
     final IOFile dbpath = ctx.context.mprop.dbpath();
@@ -283,7 +282,7 @@ public final class FNDb extends StandardFunc {
         if(++up >= list.size()) return null;
         final String name = list.get(up);
         final long length = new IOFile(dbpath, name).length();
-        return new FElem(Q_BACKUP).add(name).add(Q_SIZE, Token.token(length));
+        return new FElem(Q_BACKUP).add(name).add(Q_SIZE, token(length));
       }
     };
   }
@@ -799,7 +798,7 @@ public final class FNDb extends StandardFunc {
 
     if(!in.type.isStringOrUntyped()) throw STRNODTYPE.thrw(info, this, in.type);
 
-    final QueryInput qi = new QueryInput(Token.string(in.string(info)));
+    final QueryInput qi = new QueryInput(string(in.string(info)));
     if(!qi.input.exists()) WHICHRES.thrw(info, qi.original);
 
     // add slash to the target if the addressed file is an archive or directory

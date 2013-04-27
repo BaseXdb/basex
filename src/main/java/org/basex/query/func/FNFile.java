@@ -30,7 +30,7 @@ import org.basex.util.list.*;
  */
 public final class FNFile extends StandardFunc {
   /** Line separator. */
-  private static final byte[] NL = Token.token(Prop.NL);
+  private static final byte[] NL = token(Prop.NL);
 
   /**
    * Constructor.
@@ -360,7 +360,7 @@ public final class FNFile extends StandardFunc {
     check(path);
     final Iter ir = expr[1].iter(ctx);
     final SerializerProp sp = FuncParams.serializerProp(
-        expr.length > 2 ? expr[2].item(ctx, info) : null);
+        expr.length > 2 ? expr[2].item(ctx, info) : null, info);
 
     final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
     try {
@@ -394,7 +394,7 @@ public final class FNFile extends StandardFunc {
 
     final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
     try {
-      out.write(cs == null ? s : Token.string(s).getBytes(cs));
+      out.write(cs == null ? s : string(s).getBytes(cs));
     } finally {
       out.close();
     }
@@ -423,7 +423,7 @@ public final class FNFile extends StandardFunc {
       for(Item it; (it = ir.next()) != null;) {
         if(!it.type.isStringOrUntyped()) Err.type(this, AtomType.STR, it);
         final byte[] s = it.string(info);
-        out.write(cs == null ? s : Token.string(s).getBytes(cs));
+        out.write(cs == null ? s : string(s).getBytes(cs));
         out.write(cs == null ? NL : Prop.NL.getBytes(cs));
       }
     } finally {

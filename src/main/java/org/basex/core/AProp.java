@@ -41,12 +41,14 @@ public abstract class AProp implements Iterable<String> {
   public AProp(final String suffix) {
     try {
       for(final Field f : getClass().getFields()) {
+        if(!Modifier.isStatic(f.getModifiers())) continue;
         final Object obj = f.get(null);
         if(!(obj instanceof Object[])) continue;
         final Object[] arr = (Object[]) obj;
         if(arr.length > 1) props.put(arr[0].toString(), arr[1]);
       }
     } catch(final Exception ex) {
+      ex.printStackTrace();
       Util.notexpected(ex);
     }
     if(suffix != null) read(suffix);

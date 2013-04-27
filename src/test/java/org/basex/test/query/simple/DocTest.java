@@ -79,10 +79,10 @@ public final class DocTest extends QueryTest {
 
       { "PredIndex 1", node(21), "//text()[. = 'Exercise 1']" },
       { "PredIndex 2", node(20), "//text()[. = 'Exercise 1']/.." },
-      { "PredIndex 3", node(9), "//@*[. = '1']" },
-      { "PredIndex 4", node(9), "//@id[. = '1']" },
+      { "PredIndex 3", str("1"), "//@*[. = '1']/string()" },
+      { "PredIndex 4", str("1"), "//@id[. = '1']/string()" },
       { "PredIndex 5", node(8), "//@id[. = '1']/.." },
-      { "PredIndex 6", node(11), "//@*[. = '#000000']" },
+      { "PredIndex 6", str("#000000"), "//@*[. = '#000000']/string()" },
       { "PredIndex 7", empty(), "//@id[. = '#000000']" },
 
       { "Pred Error 1", "/[/]" },
@@ -124,7 +124,7 @@ public final class DocTest extends QueryTest {
 
       { "RangeIndex 1", node(8), "//*[@id = 1]" },
       { "RangeIndex 2", node(3, 8), "//*[@id >= 0 and @id <= 1]" },
-      { "RangeIndex 3", node(9), "//@id[. = 1]" },
+      { "RangeIndex 3", str("1"), "//@id[. = 1]/string()" },
     };
   }
 

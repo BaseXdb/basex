@@ -29,6 +29,7 @@ import org.basex.query.up.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
@@ -552,6 +553,19 @@ public class QueryParser extends InputParser {
       if(ctx.serProp == null) ctx.serProp = new SerializerProp();
       if(ctx.serProp.get(key) == null) error(OUTWHICH, key);
       if(!decl.add("S " + key)) error(OUTDUPL, key);
+      if(key.equals(SerializerProp.S_PARAMETER_DOCUMENT[0].toString())) {
+        final IO io = IO.get(string(ctx.sc.baseURI().resolve(Uri.uri(val)).string()));
+        try {
+          final ANode node = new DBNode(io, ctx.context.prop).children().next();
+          // check parameters and add values to properties
+          final InputInfo info = info();
+          final TokenMap tm = FuncParams.serializerMap(node, info);
+          FuncParams.serializerProp(tm, info);
+          for(final byte[] sk : tm) ctx.serProp.set(string(sk), string(tm.get(sk)));
+        } catch(final IOException ex) {
+          OUTDOC.thrw(info(), val);
+        }
+      }
 
       ctx.serProp.set(key, string(val));
     } else if(ctx.sc.xquery3() && eq(name.uri(), XQURI)) {

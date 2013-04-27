@@ -149,15 +149,15 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
  @Test
  public void noMultipleRenamesOrUpdatesOnSameTarget() {
    final AtomicUpdateList l = atomics("<a><b/></a>");
-   l.addRename(2, Data.ELEM, Token.token("foo"), Token.EMPTY);
-   l.addRename(2, Data.ELEM, Token.token("foo2"), Token.EMPTY);
+   l.addRename(2, Data.ELEM, token("foo"), EMPTY);
+   l.addRename(2, Data.ELEM, token("foo2"), EMPTY);
    thrown.expect(RuntimeException.class);
    thrown.expectMessage("Multiple renames on node");
    optimize(l, -1);
 
    l.clear();
-   l.addUpdateValue(2, Data.ELEM, Token.token("foo"));
-   l.addUpdateValue(2, Data.ELEM, Token.token("foo"));
+   l.addUpdateValue(2, Data.ELEM, token("foo"));
+   l.addUpdateValue(2, Data.ELEM, token("foo"));
    thrown.expect(RuntimeException.class);
    thrown.expectMessage("Multiple updates on node");
    optimize(l, -1);

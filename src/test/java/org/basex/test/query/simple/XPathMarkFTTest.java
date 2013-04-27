@@ -60,7 +60,7 @@ public final class XPathMarkFTTest extends QueryTest {
         "//L/following::*" },
       { "A10", node(6, 10, 15, 24, 28, 33, 39, 43, 48), "//L/preceding::*" },
       { "A11", node(53), "//L/self::*" },
-      { "A12", node(54), "//L/@id" },
+      { "A12", str("n12"), "//L/@id/string()" },
       { "F01", node(1, 20, 53, 64, 73), "//*[contains(., 'plentiful')]" },
       { "F02", node(73), "//*[starts-with(., 'plentiful')]" },
       { "F03", node(73), "//*[substring(., 1, 9) = 'plentiful']" },

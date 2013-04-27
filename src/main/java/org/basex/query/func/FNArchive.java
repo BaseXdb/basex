@@ -56,15 +56,15 @@ public final class FNArchive extends StandardFunc {
   private static final QNm Q_VALUE = new QNm("value");
 
   /** Option: format. */
-  private static final byte[] FORMAT = Token.token("format");
+  private static final byte[] FORMAT = token("format");
   /** Option: algorithm. */
-  private static final byte[] ALGORITHM = Token.token("algorithm");
+  private static final byte[] ALGORITHM = token("algorithm");
   /** Option: algorithm: deflate. */
-  private static final byte[] DEFLATE = Token.token("deflate");
+  private static final byte[] DEFLATE = token("deflate");
   /** Option: algorithm: stored. */
-  private static final byte[] STORED = Token.token("stored");
+  private static final byte[] STORED = token("stored");
   /** Option: algorithm: unknown. */
-  private static final byte[] UNKNOWN = Token.token("unknown");
+  private static final byte[] UNKNOWN = token("unknown");
 
   /**
    * Constructor.
@@ -406,7 +406,7 @@ public final class FNArchive extends StandardFunc {
 
     // data to be compressed
     byte[] val = checkStrBin(con);
-    if(con instanceof AStr && en != null && en != Token.UTF8) val = encode(val, en);
+    if(con instanceof AStr && en != null && en != UTF8) val = encode(val, en);
 
     try {
       out.level(lvl == null ? level : toInt(lvl));

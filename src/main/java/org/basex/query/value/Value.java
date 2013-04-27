@@ -97,17 +97,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
    */
   public abstract Object toJava() throws QueryException;
 
-  /**
-   * Materializes streamable values, or returns a self reference.
-   * @param ii input info
-   * @return materialized item
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
-  public Value materialize(final InputInfo ii) throws QueryException {
-    return this;
-  }
-
   @Override
   public boolean uses(final Use u) {
     return false;

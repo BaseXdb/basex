@@ -102,7 +102,8 @@ public abstract class IO {
     path = p;
     final String n = p.substring(p.lastIndexOf('/') + 1);
     // use current time if no name is given
-    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + XMLSUFFIX : n;
+    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + IO.BASEXSUFFIX +
+                       IO.XMLSUFFIX : n;
   }
 
   /**

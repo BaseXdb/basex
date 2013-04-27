@@ -52,6 +52,17 @@ public final class FuncParams {
    * @throws QueryException query exception
    */
   public TokenMap parse(final Item it) throws QueryException {
+    return parse(it, false);
+  }
+
+  /**
+   * Converts the parameters of the argument to a token map.
+   * @param it item to be converted
+   * @param ignore ignore unknown parameters
+   * @return map
+   * @throws QueryException query exception
+   */
+  public TokenMap parse(final Item it, final boolean ignore) throws QueryException {
     // XQuery map: convert to internal map
     if(it instanceof Map) return ((Map) it).tokenJavaMap(info);
 
@@ -65,7 +76,10 @@ public final class FuncParams {
     for(ANode n; (n = ai.next()) != null;) {
       if(n.type != NodeType.ELM) continue;
       final QNm qn = n.qname();
-      if(!eq(qn.uri(), root.uri())) ELMOPTION.thrw(info, n);
+      if(!eq(qn.uri(), root.uri())) {
+        if(ignore) continue;
+        ELMOPTION.thrw(info, n);
+      }
       // retrieve key from element name and value from "value" attribute or text node
       final byte[] key = qn.local();
       byte[] val = n.attribute(A_VALUE);
@@ -81,15 +95,44 @@ public final class FuncParams {
   /**
    * Converts the specified parameters to serialization properties.
    * @param it input item
+   * @param info input info
    * @return serialization string
    * @throws QueryException query exception
    */
-  public static SerializerProp serializerProp(final Item it) throws QueryException {
+  public static SerializerProp serializerProp(final Item it, final InputInfo info)
+      throws QueryException {
+    return serializerProp(serializerMap(it, info), info);
+  }
+
+  /**
+   * Converts the specified parameter item to a map.
+   * @param it input item
+   * @param info input info
+   * @return serialization string
+   * @throws QueryException query exception
+   */
+  public static TokenMap serializerMap(final Item it, final InputInfo info)
+      throws QueryException {
+    return it == null ? new TokenMap() : new FuncParams(Q_SPARAM, info).parse(it, true);
+  }
+
+  /**
+   * Converts the specified parameters to serialization properties.
+   * @param map map with serialization parameters
+   * @param info input info
+   * @return serialization string
+   * @throws QueryException query exception
+   */
+  public static SerializerProp serializerProp(final TokenMap map, final InputInfo info)
+      throws QueryException {
+
     final TokenBuilder tb = new TokenBuilder();
-    if(it != null) {
-      final TokenMap map = new FuncParams(Q_SPARAM, null).parse(it);
-      for(final byte[] key : map) tb.add(key).add('=').add(map.get(key)).add(',');
-    }
-    return new SerializerProp(tb.toString());
+    for(final byte[] key : map) tb.add(key).add('=').add(map.get(key)).add(',');
+
+    final SerializerProp sp = new SerializerProp(tb.toString());
+    if(!sp.unknown.isEmpty()) SERWHICH.thrw(info, sp.unknown.get(0));
+    final Object[] cm = SerializerProp.S_USE_CHARACTER_MAPS;
+    if(!sp.get(cm).isEmpty()) SERWHICH.thrw(info, cm[0].toString());
+    return sp;
   }
 }

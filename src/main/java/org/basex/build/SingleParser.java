@@ -39,4 +39,14 @@ public abstract class SingleParser extends Parser {
    * @throws IOException I/O exception
    */
   public abstract void parse() throws IOException;
+
+  /**
+   * Sets the database builder.
+   * @param b builder instance
+   * @return self reference
+   */
+  public SingleParser builder(final Builder b) {
+    builder = b;
+    return this;
+  }
 }

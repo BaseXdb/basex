@@ -84,6 +84,8 @@ public abstract class Serializer {
     if(item instanceof ANode) {
       if(item.type == NodeType.ATT || item.type == NodeType.NSP) SERATTR.thrwSerial(item);
       serialize((ANode) item);
+    } else if(item instanceof FItem) {
+      SERFUNC.thrwSerial(item.description());
     } else {
       finishElement();
       atomic(item);

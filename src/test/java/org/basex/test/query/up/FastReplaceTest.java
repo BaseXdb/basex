@@ -127,7 +127,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
   public void replaceAttribute() {
     query("replace node (//item)[1]/attribute() with " +
       "(attribute att1 {'0'}, attribute att2 {'1'})");
-    query("(//item)[1]/attribute()", " att1=\"0\" att2=\"1\"");
+    query("(//item)[1]/attribute()/string()", "0 1");
   }
 
   /**
@@ -137,7 +137,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
   @Test
   public void replaceAttribute2() {
     query("for $i in //item return replace node $i/attribute() with " +
-    "(attribute att1 {'0'}, attribute att2 {'1'})");
-    query("//item/attribute()");
+        "(attribute att1 {'0'}, attribute att2 {'1'})");
+    query("//item/attribute()/string()");
   }
 }
