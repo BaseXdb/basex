@@ -754,6 +754,8 @@ public enum Err {
   SCHEMAINV(XPST, 8, "Undefined schema name '%'."),
 
   /** XPST0017. */
+  FUNCPRIV(XPST, 17, "Function is private: %(...)."),
+  /** XPST0017. */
   XPARGS(XPST, 17, "%: wrong number of arguments."),
   /** XPST0017. */
   FUNSIMILAR(XPST, 17, "Unknown function '%'; similar: '%'."),
@@ -894,7 +896,7 @@ public enum Err {
   /** XQST0047. */
   MODNS(XQST, 48, "Declaration % does not match the module namespace."),
   /** XQST0049. */
-  VARDEFINE(XQST, 49, "Duplicate declaration of %."),
+  VARDUPL(XQST, 49, "Duplicate declaration of %."),
   /** XQST0052. */
   XQTYPEUNKNOWN(XQST, 52, "Unknown type '%'."),
   /** XQST0054. */
@@ -966,7 +968,7 @@ public enum Err {
   /** XQST0106. */
   DUPLVIS(XQST, 106, "More than one visibility annotation declared."),
   /** XQST0108. */
-  MODOUT(XQST, 108, "No output declarations allowed in modules."),
+  MODOUT(XQST, 108, "No output declarations allowed in library modules."),
   /** XPST0109. */
   OUTWHICH(XQST, 109, "Unknown serialization parameter: '%'."),
   /** XPST0110. */

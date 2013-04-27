@@ -68,9 +68,9 @@ public final class VarScope {
    * @return variable reference
    * @throws QueryException if the variable can't be found
    */
-  public Expr resolve(final QNm name, final QueryContext ctx,
-      final InputInfo ii, final Err err, final QNm mod, final boolean xq10)
-          throws QueryException {
+  public Expr resolve(final QNm name, final QueryContext ctx, final InputInfo ii,
+      final Err err, final QNm mod, final boolean xq10) throws QueryException {
+
     final Var v = current.get(name);
     if(v != null) return new VarRef(ii, v);
 
@@ -87,18 +87,14 @@ public final class VarScope {
 
     // static variable
     final StaticVar global = ctx.vars.get(name);
-    if(global != null) {
-      if(!global.declared() &&
-          (mod != null ? xq10 || !eq(mod.uri(), name.uri()) : name.uri().length != 0))
-        throw err.thrw(ii, '$' + string(name.string()));
-      return global;
-    }
 
     // XQuery 1.0 only allows forward declarations
-    if(mod != null ? xq10 || !eq(mod.uri(), name.uri()) : name.uri().length != 0)
+    final boolean unknown = mod != null ? xq10 || !eq(mod.uri(), name.uri()) :
+      name.uri().length != 0;
+    if(unknown && (global == null || !global.declared()))
       throw err.thrw(ii, '$' + string(name.string()));
 
-    return ctx.vars.bind(name, null, ctx, ii);
+    return global != null ? global : ctx.vars.bind(name, null, ctx, ii);
   }
 
   /**

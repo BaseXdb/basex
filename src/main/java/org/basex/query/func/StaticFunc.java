@@ -43,19 +43,20 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
 
   /** Map with requested function properties. */
   protected final EnumMap<Use, Boolean> map = new EnumMap<Expr.Use, Boolean>(Use.class);
+  /** Local variables in the scope of this function. */
+  protected final VarScope scope;
+
   /** Static context. */
-  private final StaticContext sc;
+  final StaticContext sc;
   /** Cast flag. */
   boolean cast;
+  /** Function body. */
+  Expr expr;
+
   /** Compilation flag. */
   private boolean compiled;
   /** Flag that is turned on during compilation and prevents premature inlining. */
   private boolean compiling;
-
-  /** Local variables in the scope of this function. */
-  protected final VarScope scope;
-  /** Function body. */
-  Expr expr;
 
   /**
    * Function constructor.
@@ -86,6 +87,7 @@ public final class StaticFunc extends ExprInfo implements Scope, XQFunction {
   public void compile(final QueryContext ctx) throws QueryException {
     if(compiled) return;
     compiling = compiled = true;
+
     final Value cv = ctx.value;
     final StaticContext cs = ctx.sc;
     ctx.sc = sc;

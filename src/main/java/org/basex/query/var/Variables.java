@@ -41,6 +41,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    */
   public StaticVar bind(final QNm nm, final Expr e, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
+
     final StaticVar var = vars.get(nm);
     if(var != null) return var.bind(e, ctx, ii);
 

@@ -39,7 +39,8 @@ public final class VarRef extends ParseExpr {
     size = var.size;
 
     // constant propagation
-    return ctx.isBound(var) ? ctx.get(var) : this;
+    final Value v = ctx.get(var);
+    return v != null ? v : this;
   }
 
   @Override

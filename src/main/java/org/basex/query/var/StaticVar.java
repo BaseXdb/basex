@@ -16,7 +16,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Static variable which can be assigned an expression.
+ * Static variable to which an expression can be assigned.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
@@ -107,7 +107,7 @@ public final class StaticVar extends ParseExpr implements Scope {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope o) throws QueryException {
     if(expr == null) throw (declared ? VAREMPTY : VARUNDEF).thrw(info, this);
-    if(dontEnter) throw Err.circVar(ctx, this);
+    if(dontEnter) circVar(ctx, this);
 
     if(!compiled) {
       final StaticContext cs = ctx.sc;
@@ -148,7 +148,7 @@ public final class StaticVar extends ParseExpr implements Scope {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    if(dontEnter) throw Err.circVar(ctx, this);
+    if(dontEnter) circVar(ctx, this);
     if(lazy) {
       if(!compiled) throw Util.notexpected(this + " was not compiled.");
       if(value != null) return value;
@@ -206,8 +206,8 @@ public final class StaticVar extends ParseExpr implements Scope {
    */
   private StaticVar bind(final Expr e, final boolean ext, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
-    if(!bindable || compiled) return null;
 
+    if(!bindable || compiled) return null;
     if(e instanceof Value) {
       Value v = (Value) e;
       if(ext && check != null && !check.instance(v)) v = check.cast(v, ctx, ii, this);
@@ -231,7 +231,8 @@ public final class StaticVar extends ParseExpr implements Scope {
    */
   public void declare(final SeqType t, final Ann a, final Expr e, final boolean ext,
       final QueryContext ctx, final InputInfo ii) throws QueryException {
-    if(declared) throw Err.VARDEFINE.thrw(ii, this);
+
+    if(declared) VARDUPL.thrw(ii, this);
     declared = true;
     check = t;
     info = ii;
@@ -256,7 +257,7 @@ public final class StaticVar extends ParseExpr implements Scope {
   private Expr checkType(final Expr e, final InputInfo ii) throws QueryException {
     if(check != null) {
       if(e instanceof Value) check.treat((Value) e, ii);
-      else if(e.type().intersect(check) == null) throw Err.treat(ii, check, e);
+      else if(e.type().intersect(check) == null) treat(ii, check, e);
     }
     return e;
   }

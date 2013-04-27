@@ -637,9 +637,7 @@ public final class QueryContext extends Progress {
    * @return bound value
    */
   public Value get(final Var var) {
-    final Value val = stack.get(var);
-    if(val == null) throw Util.notexpected(var);
-    return val;
+    return stack.get(var);
   }
 
   /**
@@ -652,14 +650,5 @@ public final class QueryContext extends Progress {
   public void set(final Var vr, final Value vl, final InputInfo ii)
       throws QueryException {
     stack.set(vr, vl, this, ii);
-  }
-
-  /**
-   * Checks if there's a value bound to the given variable.
-   * @param vr variable
-   * @return {@code true} is a value is bound, {@code false} otherwise
-   */
-  public boolean isBound(final Var vr) {
-    return stack.get(vr) != null;
   }
 }

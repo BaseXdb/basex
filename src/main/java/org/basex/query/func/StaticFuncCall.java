@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
@@ -42,6 +43,10 @@ public abstract class StaticFuncCall extends Arr {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
+
+    // disallow call of private functions from module with different uri
+    if(func.ann.contains(Ann.Q_PRIVATE) && !func.sc.baseURI().eq(info, ctx.sc.baseURI()))
+        FUNCPRIV.thrw(info, name);
 
     // compile mutually recursive functions
     func.compile(ctx);
