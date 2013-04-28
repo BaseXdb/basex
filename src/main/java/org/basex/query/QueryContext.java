@@ -192,7 +192,7 @@ public final class QueryContext extends Progress {
    */
   public void mainModule(final MainModule rt) {
     root = rt;
-    updating = root.expr.uses(Use.UPD);
+    updating = rt.expr.uses(Use.UPD);
 
   }
 

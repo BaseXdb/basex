@@ -83,6 +83,8 @@ public final class FNQName extends StandardFunc {
    */
   private Item qName(final Item it, final Item it2) throws QueryException {
     final byte[] uri = checkEStr(it);
+    if(it2 == null) XPEMPTY.thrw(info, description());
+
     final byte[] name = checkEStr(it2);
     final byte[] str = !contains(name, ':') && eq(uri, XMLURI) ?
         concat(XMLC, name) : name;
@@ -185,6 +187,6 @@ public final class FNQName extends StandardFunc {
     if(!base.isValid() || contains(base.string(), '#') || !contains(base.string(), '/'))
       URIINVRES.thrw(info, base);
 
-    return base.resolve(rel);
+    return base.resolve(rel, info);
   }
 }

@@ -890,7 +890,7 @@ public enum Err {
   /** XQST0045. */
   ANNRES(XQST, 45, "Annotation % uses reserved namespace."),
   /** XQST0046. */
-  INVURI(XQST, 46, "URI \"%\" is invalid."),
+  INVURI(XQST, 46, "URI '%' is invalid."),
   /** XQST0047. */
   DUPLMODULE(XQST, 47, "Module namespace is declared twice: '%'."),
   /** XQST0047. */

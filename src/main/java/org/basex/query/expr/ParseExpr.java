@@ -288,7 +288,7 @@ public abstract class ParseExpr extends Expr {
     final byte[] u = checkStr(e, ctx);
     if(eq(URLCOLL, u)) return;
     final Uri uri = Uri.uri(u);
-    if(uri.isAbsolute() || !eq(ctx.sc.baseURI().resolve(uri).string(), URLCOLL))
+    if(uri.isAbsolute() || !eq(ctx.sc.baseURI().resolve(uri, info).string(), URLCOLL))
       IMPLCOL.thrw(info, e);
   }
 

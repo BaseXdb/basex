@@ -2,6 +2,8 @@ package org.basex.query.value.item;
 
 import java.net.*;
 
+import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -56,17 +58,19 @@ public final class Uri extends Str {
    * Appends the specified address. If one of the URIs is invalid,
    * the original uri is returned.
    * @param add address to be appended
+   * @param info input info
    * @return new uri
+   * @throws QueryException query exception
    */
-  public Uri resolve(final Uri add) {
+  public Uri resolve(final Uri add, final InputInfo info) throws QueryException {
     if(add.val.length == 0) return this;
     try {
-      final URI base = new URI(Token.string(Token.uri(val, true)));
-      final URI uri = base.resolve(Token.string(Token.uri(add.val, true)));
+      final URI base = new URI(Token.string(val));
+      final URI res = new URI(Token.string(add.val));
+      final URI uri = base.resolve(res);
       return uri(Token.token(uri.toString()), false);
-    } catch(final Exception ex) {
-      Util.debug(ex);
-      return this;
+    } catch(final URISyntaxException ex) {
+      throw Err.URIINVRES.thrw(info, ex.getMessage());
     }
   }
 

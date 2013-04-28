@@ -554,7 +554,7 @@ public class QueryParser extends InputParser {
       if(ctx.serProp.get(key) == null) error(OUTWHICH, key);
       if(!decl.add("S " + key)) error(OUTDUPL, key);
       if(key.equals(SerializerProp.S_PARAMETER_DOCUMENT[0].toString())) {
-        final IO io = IO.get(string(ctx.sc.baseURI().resolve(Uri.uri(val)).string()));
+        final IO io = IO.get(string(resolvedUri(val).string()));
         try {
           final ANode node = new DBNode(io, ctx.context.prop).children().next();
           // check parameters and add values to properties
@@ -706,8 +706,8 @@ public class QueryParser extends InputParser {
   private boolean defaultCollationDecl() throws QueryException {
     if(!wsConsumeWs(COLLATION)) return false;
     if(!decl.add(COLLATION)) error(DUPLCOLL);
-    final byte[] cl = ctx.sc.baseURI().resolve(Uri.uri(stringLiteral())).string();
-    if(!eq(URLCOLL, cl)) error(COLLWHICH, cl);
+    final byte[] coll = resolvedUri(stringLiteral()).string();
+    if(!eq(URLCOLL, coll)) error(COLLWHICH, coll);
     return true;
   }
 
@@ -1259,8 +1259,9 @@ public class QueryParser extends InputParser {
       if(least) wsCheck(LEAST);
     }
     if(wsConsumeWs(COLLATION)) {
-      final Uri coll = uriLiteral();
-      if(!eq(URLCOLL, coll.string())) error(coll.isValid() ? WHICHCOLL : INVURI, coll);
+      final Uri uri = resolvedUri(stringLiteral());
+      if(!eq(URLCOLL, uri.string()))
+        error(uri.isValid() ? WHICHCOLL : INVURI, uri.string());
     }
     final OrderBy.Key ord = new OrderBy.Key(info(), e, desc, least);
     return order == null ? new OrderBy.Key[] { ord } : Array.add(order, ord);
@@ -2229,14 +2230,15 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Reads and potentially resolves a URI literal.
+   * Potentially resolves a URI literal.
+   * @param string uri string
    * @return resolved URI
    * @throws QueryException query exception
    */
-  private Uri uriLiteral() throws QueryException {
-    final Uri uri = Uri.uri(stringLiteral());
-    if(!uri.isValid()) error(INVURI, uri);
-    return uri.isAbsolute() ? uri : ctx.sc.baseURI().resolve(uri);
+  private Uri resolvedUri(final byte[] string) throws QueryException {
+    final Uri uri = Uri.uri(string);
+    if(!uri.isValid()) error(INVURI, string);
+    return uri.isAbsolute() ? uri : ctx.sc.baseURI().resolve(uri, info());
   }
 
   /**
