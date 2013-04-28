@@ -50,6 +50,7 @@ public abstract class QT3TestSet {
     ctx = new Context();
     new Set(Prop.CHOP, false).execute(ctx);
     new Set(Prop.INTPARSE, false).execute(ctx);
+    new Set(Prop.XQUERY3, true).execute(ctx);
     result = null;
   }
 
@@ -59,6 +60,11 @@ public abstract class QT3TestSet {
     ctx.close();
     ctx = null;
     result = null;
+  }
+
+  /** Sets the XQuery version to 1.0. */
+  protected void xquery10() {
+    ctx.prop.set(Prop.XQUERY3, false);
   }
 
   /**

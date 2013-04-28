@@ -290,6 +290,7 @@ public class FnNamespaceUriFromQName extends QT3TestSet {
    */
   @org.junit.Test
   public void namespaceURIFromQNameFunc015() {
+    xquery10();
     final XQuery query = new XQuery(
       "fn:namespace-uri-from-QName((//Folder)[1])",
       ctx);

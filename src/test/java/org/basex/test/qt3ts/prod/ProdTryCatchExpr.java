@@ -376,6 +376,106 @@ public class ProdTryCatchExpr extends QT3TestSet {
   }
 
   /**
+   * Integer literal out of range is a dynamic error.
+   */
+  @org.junit.Test
+  public void try014() {
+    final XQuery query = new XQuery(
+      "try { 9999999999999999999999999999999999999999999999999999999999999999999999\n" +
+      "                idiv\n" +
+      "                9999999999999999999999999999999999999999999999999999999999999999999999 }\n" +
+      "        catch err:FOAR0002 {1}\n" +
+      "    ",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("1")
+    );
+  }
+
+  /**
+   * Bad date is a dynamic error.
+   */
+  @org.junit.Test
+  public void try015() {
+    final XQuery query = new XQuery(
+      "try { xs:date('2013-02-29') }\n" +
+      "          catch err:FORG0001 {true()}\n" +
+      "    ",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * No context item is a dynamic error.
+   */
+  @org.junit.Test
+  public void try016() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:f() { .+3 };\n" +
+      "      try {local:f()} catch err:XPDY0002 {true()}\n" +
+      "    ",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertBoolean(true)
+    );
+  }
+
+  /**
+   * No context item is a dynamic error (but no context node is a type error...).
+   */
+  @org.junit.Test
+  public void try017() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare function local:f() { a };\n" +
+      "      try {local:f()} catch err:XPDY0002 {true()}\n" +
+      "    ",
+      ctx);
+    try {
+      query.namespace("err", "http://www.w3.org/2005/xqt-errors");
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertBoolean(true)
+      ||
+        error("XPTY0004")
+      )
+    );
+  }
+
+  /**
    * XPDY0002 must be caught..
    */
   @org.junit.Test

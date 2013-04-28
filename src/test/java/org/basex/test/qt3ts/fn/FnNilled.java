@@ -17,6 +17,7 @@ public class FnNilled extends QT3TestSet {
    */
   @org.junit.Test
   public void kNilledFunc1() {
+    xquery10();
     final XQuery query = new XQuery(
       "nilled()",
       ctx);

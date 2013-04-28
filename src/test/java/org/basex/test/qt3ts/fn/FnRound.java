@@ -37,6 +37,7 @@ public class FnRound extends QT3TestSet {
    */
   @org.junit.Test
   public void kRoundFunc2() {
+    xquery10();
     final XQuery query = new XQuery(
       "round(1, 2)",
       ctx);

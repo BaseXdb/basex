@@ -40,6 +40,60 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
   }
 
   /**
+   * The require-feature and prohibit-feature options may be lists of QNames..
+   */
+  @org.junit.Test
+  public void prohibitFeatureList1() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare option prohibit-feature \"all-extensions static-typing\";\n" +
+      "      ()\n" +
+      "    ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertEmpty()
+      ||
+        error("XQST0128")
+      )
+    );
+  }
+
+  /**
+   * The require-feature and prohibit-feature options may be lists of QNames..
+   */
+  @org.junit.Test
+  public void prohibitFeatureList2() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare option prohibit-feature \"static-typing all-extensions\";\n" +
+      "      ()\n" +
+      "    ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertEmpty()
+      ||
+        error("XQST0128")
+      )
+    );
+  }
+
+  /**
    * An error must be thrown if the feature is prohibited and used. .
    */
   @org.junit.Test
@@ -386,7 +440,13 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0120")
+      (
+        error("XQST0129")
+      ||
+        error("XQST0128")
+      ||
+        error("XQST0120")
+      )
     );
   }
 
@@ -410,7 +470,13 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0120")
+      (
+        error("XQST0129")
+      ||
+        error("XQST0128")
+      ||
+        error("XQST0120")
+      )
     );
   }
 
@@ -434,7 +500,11 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0120")
+      (
+        assertBoolean(false)
+      ||
+        error("XQST0120")
+      )
     );
   }
 
@@ -458,7 +528,11 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      assertBoolean(false)
+      (
+        assertBoolean(false)
+      ||
+        error("XQST0128")
+      )
     );
   }
 
@@ -483,6 +557,8 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
     }
     test(
       (
+        error("XQST0129")
+      ||
         error("XQST0120")
       ||
         error("XQST0128")
@@ -519,6 +595,190 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
   }
 
   /**
+   * The require-feature and prohibit-feature options may be lists of QNames..
+   */
+  @org.junit.Test
+  public void requireFeatureList1Ns1() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      import module namespace module = \"http://www.w3.org/XQueryTest/RequireProhibitFeature\";\n" +
+      "      declare option require-feature \"module higher-order-function\";\n" +
+      "      let $f := function() { () } return $f()\n" +
+      "    ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertEmpty()
+      ||
+        error("XQST0120")
+      )
+    );
+  }
+
+  /**
+   * The require-feature and prohibit-feature options may be lists of QNames..
+   */
+  @org.junit.Test
+  public void requireFeatureList1Ns2() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      import module namespace module = \"http://www.w3.org/XQueryTest/RequireProhibitFeature\";\n" +
+      "      declare option require-feature \"module higher-order-function\";\n" +
+      "      let $f := function() { () } return $f()\n" +
+      "    ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertEmpty()
+      ||
+        error("XQST0120")
+      )
+    );
+  }
+
+  /**
+   * The require-feature and prohibit-feature options may be lists of QNames..
+   */
+  @org.junit.Test
+  public void requireFeatureList1S() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      import module namespace module = \"http://www.w3.org/XQueryTest/RequireProhibitFeature\";\n" +
+      "      declare option require-feature \"module higher-order-function\";\n" +
+      "      let $f := function() { () } return $f()\n" +
+      "    ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertEmpty()
+      )
+    );
+  }
+
+  /**
+   * The require-feature and prohibit-feature options may be lists of QNames..
+   */
+  @org.junit.Test
+  public void requireFeatureList2Ns() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare option require-feature \"unknown higher-order-function\";\n" +
+      "      let $f := function() { () } return $f()\n" +
+      "    ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XQST0123")
+      ||
+        error("XQST0120")
+      )
+    );
+  }
+
+  /**
+   * The require-feature and prohibit-feature options may be lists of QNames..
+   */
+  @org.junit.Test
+  public void requireFeatureList2S() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare option require-feature \"unknown higher-order-function\";\n" +
+      "      let $f := function() { () } return $f()\n" +
+      "    ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XQST0123")
+      )
+    );
+  }
+
+  /**
+   * The require-feature and prohibit-feature options may be lists of QNames..
+   */
+  @org.junit.Test
+  public void requireFeatureList3Ns() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare option require-feature \"higher-order-function unknown\";\n" +
+      "      let $f := function() { () } return $f()\n" +
+      "    ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XQST0123")
+      )
+    );
+  }
+
+  /**
+   * The require-feature and prohibit-feature options may be lists of QNames..
+   */
+  @org.junit.Test
+  public void requireFeatureList3S() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      declare option require-feature \"unknown higher-order-function\";\n" +
+      "      let $f := function() { () } return $f()\n" +
+      "    ",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        error("XQST0123")
+      )
+    );
+  }
+
+  /**
    * An error must be thrown if the feature is not supported..
    */
   @org.junit.Test
@@ -537,7 +797,11 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0120")
+      (
+        assertBoolean(false)
+      ||
+        error("XQST0120")
+      )
     );
   }
 
@@ -627,7 +891,11 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0120")
+      (
+        assertEmpty()
+      ||
+        error("XQST0120")
+      )
     );
   }
 
@@ -673,7 +941,11 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0120")
+      (
+        assertEmpty()
+      ||
+        error("XQST0120")
+      )
     );
   }
 
@@ -719,7 +991,11 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0120")
+      (
+        assertEq("0")
+      ||
+        error("XQST0120")
+      )
     );
   }
 
@@ -765,7 +1041,11 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0120")
+      (
+        assertEmpty()
+      ||
+        error("XQST0120")
+      )
     );
   }
 
@@ -810,7 +1090,11 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0129")
+      (
+        assertBoolean(false)
+      ||
+        error("XQST0129")
+      )
     );
   }
 
@@ -854,7 +1138,11 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0129")
+      (
+        assertEmpty()
+      ||
+        error("XQST0129")
+      )
     );
   }
 
@@ -898,7 +1186,11 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0129")
+      (
+        assertEq("0")
+      ||
+        error("XQST0129")
+      )
     );
   }
 
@@ -989,7 +1281,11 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0120")
+      (
+        assertEmpty()
+      ||
+        error("XQST0120")
+      )
     );
   }
 
@@ -1038,7 +1334,7 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XPST0016")
+      error("XQST0016")
     );
   }
 
@@ -1099,30 +1395,6 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       "\n" +
       "      declare option require-feature \"module\";\n" +
       "      declare option prohibit-feature \"module\";\n" +
-      "      ()\n" +
-      "    ",
-      ctx);
-    try {
-      result = new QT3Result(query.value());
-    } catch(final Throwable trw) {
-      result = new QT3Result(trw);
-    } finally {
-      query.close();
-    }
-    test(
-      error("XQST0127")
-    );
-  }
-
-  /**
-   * A feature cannot be both required and prohibited..
-   */
-  @org.junit.Test
-  public void requireProhibit3() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "      declare option require-feature \"serialization\";\n" +
-      "      declare option prohibit-feature \"serialization\";\n" +
       "      ()\n" +
       "    ",
       ctx);
@@ -1324,6 +1596,8 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
     }
     test(
       (
+        assertEq("1")
+      ||
         error("XQST0120")
       ||
         error("XQST0128")
@@ -1380,7 +1654,11 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      error("XQST0120")
+      (
+        error("XQST0120")
+      ||
+        error("XQST0129")
+      )
     );
   }
 
@@ -1586,7 +1864,7 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
     final XQuery query = new XQuery(
       "\n" +
       "      import module namespace module = \"http://www.w3.org/XQueryTest/RequireProhibitFeature\";\n" +
-      "      let $f := () return $f()\n" +
+      "      let $f := function() { () } return $f()\n" +
       "    ",
       ctx);
     try {
@@ -1598,7 +1876,7 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       query.close();
     }
     test(
-      assertEmpty()
+      error("XQST0129")
     );
   }
 
@@ -1610,7 +1888,7 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
     final XQuery query = new XQuery(
       "\n" +
       "      import module namespace module = \"http://www.w3.org/XQueryTest/RequireProhibitFeature\";\n" +
-      "      let $f := () return $f()\n" +
+      "      let $f := function() { () } return $f()\n" +
       "    ",
       ctx);
     try {
@@ -1639,32 +1917,7 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
       "\n" +
       "      import module namespace module = \"http://www.w3.org/XQueryTest/RequireProhibitFeature\";\n" +
       "      declare option require-feature \"higher-order-function\";\n" +
-      "      let $f := () return $f()\n" +
-      "    ",
-      ctx);
-    try {
-      query.addModule("http://www.w3.org/XQueryTest/RequireProhibitFeature", file("prod/RequireProhibitFeature/prohibits.xquery"));
-      result = new QT3Result(query.value());
-    } catch(final Throwable trw) {
-      result = new QT3Result(trw);
-    } finally {
-      query.close();
-    }
-    test(
-      error("XQST0120")
-    );
-  }
-
-  /**
-   * Prohibiting or requiring a feature only affects the module..
-   */
-  @org.junit.Test
-  public void separateModules9S() {
-    final XQuery query = new XQuery(
-      "\n" +
-      "      import module namespace module = \"http://www.w3.org/XQueryTest/RequireProhibitFeature\";\n" +
-      "      declare option require-feature \"higher-order-function\";\n" +
-      "      let $f := () return $f()\n" +
+      "      let $f := function() { () } return $f()\n" +
       "    ",
       ctx);
     try {
@@ -1677,7 +1930,38 @@ public class ProdRequireProhibitFeature extends QT3TestSet {
     }
     test(
       (
-        assertEq("1")
+        assertEmpty()
+      ||
+        error("XQST0120")
+      ||
+        error("XQST0128")
+      )
+    );
+  }
+
+  /**
+   * Prohibiting or requiring a feature only affects the module..
+   */
+  @org.junit.Test
+  public void separateModules9S() {
+    final XQuery query = new XQuery(
+      "\n" +
+      "      import module namespace module = \"http://www.w3.org/XQueryTest/RequireProhibitFeature\";\n" +
+      "      declare option require-feature \"higher-order-function\";\n" +
+      "      let $f := function() { () } return $f()\n" +
+      "    ",
+      ctx);
+    try {
+      query.addModule("http://www.w3.org/XQueryTest/RequireProhibitFeature", file("prod/RequireProhibitFeature/prohibits.xquery"));
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      (
+        assertEmpty()
       ||
         error("XQST0128")
       )

@@ -243,7 +243,9 @@ public class OpTimeLessThan extends QT3TestSet {
   @org.junit.Test
   public void cbclTimeLessThan004() {
     final XQuery query = new XQuery(
-      "xs:time(\"00:00:01+01:00\") lt xs:time(\"00:00:00\")",
+      "if (implicit-timezone() gt xs:dayTimeDuration('PT1H'))\n" +
+      "            then xs:time(\"00:00:00\") lt xs:time(\"00:00:00+01:00\")\n" +
+      "            else xs:time(\"00:00:00+01:01\") lt xs:time(\"00:00:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -263,7 +265,9 @@ public class OpTimeLessThan extends QT3TestSet {
   @org.junit.Test
   public void cbclTimeLessThan005() {
     final XQuery query = new XQuery(
-      "xs:time(\"00:00:00\") lt xs:time(\"00:00:01+01:00\")",
+      "if (implicit-timezone() gt xs:dayTimeDuration('PT1H'))\n" +
+      "            then xs:time(\"00:00:00+01:00\") lt xs:time(\"00:00:00\")\n" +
+      "            else xs:time(\"00:00:00\") lt xs:time(\"00:00:00+01:01\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -346,7 +350,9 @@ public class OpTimeLessThan extends QT3TestSet {
   @org.junit.Test
   public void cbclTimeLessThan009() {
     final XQuery query = new XQuery(
-      "xs:time(\"00:00:01+01:00\") ge xs:time(\"00:00:00\")",
+      "if (implicit-timezone() gt xs:dayTimeDuration('PT1H'))\n" +
+      "            then xs:time(\"00:00:00\") ge xs:time(\"00:00:01+01:00\")  \n" +
+      "            else xs:time(\"00:00:00+01:01\") ge xs:time(\"00:00:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -366,7 +372,9 @@ public class OpTimeLessThan extends QT3TestSet {
   @org.junit.Test
   public void cbclTimeLessThan010() {
     final XQuery query = new XQuery(
-      "xs:time(\"00:00:00\") ge xs:time(\"00:00:01+01:00\")",
+      "if (implicit-timezone() gt xs:dayTimeDuration('PT1H'))\n" +
+      "            then xs:time(\"00:00:01+01:00\") ge xs:time(\"00:00:00\")\n" +
+      "            else xs:time(\"00:00:00\") ge xs:time(\"00:00:00+01:01\")",
       ctx);
     try {
       result = new QT3Result(query.value());

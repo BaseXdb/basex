@@ -254,7 +254,9 @@ public class OpGYearEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearEqual002() {
     final XQuery query = new XQuery(
-      "xs:gYear(\"2008\") eq xs:gYear(\"2008+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gYear(\"2008\") eq xs:gYear(\"2008+09:01\")\n" +
+      "            else xs:gYear(\"2008\") eq xs:gYear(\"2008+09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -274,7 +276,9 @@ public class OpGYearEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearEqual003() {
     final XQuery query = new XQuery(
-      "xs:gYear(\"2008+09:00\") eq xs:gYear(\"2008\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gYear(\"2008+09:01\") eq xs:gYear(\"2008\")\n" +
+      "            else xs:gYear(\"2008+09:00\") eq xs:gYear(\"2008\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -294,7 +298,9 @@ public class OpGYearEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearEqual004() {
     final XQuery query = new XQuery(
-      "xs:gYear(\"2008\") eq xs:gYear(\"2008+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gYear(\"2008\") eq xs:gYear(\"2008-09:01\")\n" +
+      "            else xs:gYear(\"2008\") eq xs:gYear(\"2008-09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -314,7 +320,9 @@ public class OpGYearEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearEqual005() {
     final XQuery query = new XQuery(
-      "xs:gYear(\"2008+09:00\") eq xs:gYear(\"2008\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gYear(\"2008-09:01\") eq xs:gYear(\"2008\")\n" +
+      "            else xs:gYear(\"2008-09:00\") eq xs:gYear(\"2008\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -354,7 +362,9 @@ public class OpGYearEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearEqual007() {
     final XQuery query = new XQuery(
-      "xs:gYear(\"2008\") ne xs:gYear(\"2008+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gYear(\"2008\") ne xs:gYear(\"2008+09:01\")\n" +
+      "            else xs:gYear(\"2008\") ne xs:gYear(\"2008+09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -374,7 +384,9 @@ public class OpGYearEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearEqual008() {
     final XQuery query = new XQuery(
-      "xs:gYear(\"2008+09:00\") ne xs:gYear(\"2008\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gYear(\"2008+09:01\") ne xs:gYear(\"2008\")\n" +
+      "            else xs:gYear(\"2008+09:00\") ne xs:gYear(\"2008\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -394,7 +406,9 @@ public class OpGYearEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearEqual009() {
     final XQuery query = new XQuery(
-      "xs:gYear(\"2008\") ne xs:gYear(\"2008+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gYear(\"2008\") ne xs:gYear(\"2008-09:01\")\n" +
+      "            else xs:gYear(\"2008\") ne xs:gYear(\"2008-09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -414,7 +428,9 @@ public class OpGYearEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearEqual010() {
     final XQuery query = new XQuery(
-      "xs:gYear(\"2008+09:00\") ne xs:gYear(\"2008\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gYear(\"2008-09:01\") ne xs:gYear(\"2008\")\n" +
+      "            else xs:gYear(\"2008-09:00\") ne xs:gYear(\"2008\")",
       ctx);
     try {
       result = new QT3Result(query.value());

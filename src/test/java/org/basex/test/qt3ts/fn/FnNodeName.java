@@ -17,6 +17,7 @@ public class FnNodeName extends QT3TestSet {
    */
   @org.junit.Test
   public void kNodeNameFunc1() {
+    xquery10();
     final XQuery query = new XQuery(
       "node-name()",
       ctx);

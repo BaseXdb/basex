@@ -254,7 +254,9 @@ public class OpGDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGDayEqual002() {
     final XQuery query = new XQuery(
-      "xs:gDay(\"---30\") eq xs:gDay(\"---31+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gDay(\"---30\") eq xs:gDay(\"---31+09:01\")\n" +
+      "            else xs:gDay(\"---30\") eq xs:gDay(\"---31+09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -274,7 +276,9 @@ public class OpGDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGDayEqual003() {
     final XQuery query = new XQuery(
-      "xs:gDay(\"---31+09:00\") eq xs:gDay(\"---30\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gDay(\"---31+09:01\") eq xs:gDay(\"---30\")\n" +
+      "            else xs:gDay(\"---31+09:00\") eq xs:gDay(\"---30\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -294,7 +298,9 @@ public class OpGDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGDayEqual004() {
     final XQuery query = new XQuery(
-      "xs:gDay(\"---30\") eq xs:gDay(\"---31+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gDay(\"---30\") eq xs:gDay(\"---31-09:01\")\n" +
+      "            else xs:gDay(\"---30\") eq xs:gDay(\"---31-09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -314,7 +320,9 @@ public class OpGDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGDayEqual005() {
     final XQuery query = new XQuery(
-      "xs:gDay(\"---31+09:00\") eq xs:gDay(\"---30\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gDay(\"---31-09:01\") eq xs:gDay(\"---30\")\n" +
+      "            else xs:gDay(\"---31-09:00\") eq xs:gDay(\"---30\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -354,7 +362,9 @@ public class OpGDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGDayEqual007() {
     final XQuery query = new XQuery(
-      "xs:gDay(\"---30\") ne xs:gDay(\"---31+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gDay(\"---30\") ne xs:gDay(\"---31+09:01\")\n" +
+      "            else xs:gDay(\"---30\") ne xs:gDay(\"---31+09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -374,7 +384,9 @@ public class OpGDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGDayEqual008() {
     final XQuery query = new XQuery(
-      "xs:gDay(\"---31+09:00\") ne xs:gDay(\"---30\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gDay(\"---31+09:01\") ne xs:gDay(\"---30\")\n" +
+      "            else xs:gDay(\"---31+09:00\") ne xs:gDay(\"---30\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -394,7 +406,9 @@ public class OpGDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGDayEqual009() {
     final XQuery query = new XQuery(
-      "xs:gDay(\"---30\") ne xs:gDay(\"---31+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gDay(\"---30\") ne xs:gDay(\"---31-09:01\")\n" +
+      "            else xs:gDay(\"---30\") ne xs:gDay(\"---31-09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -414,7 +428,9 @@ public class OpGDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGDayEqual010() {
     final XQuery query = new XQuery(
-      "xs:gDay(\"---31+09:00\") ne xs:gDay(\"---30\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gDay(\"---31-09:01\") ne xs:gDay(\"---30\")\n" +
+      "            else xs:gDay(\"---31-09:00\") ne xs:gDay(\"---30\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -594,7 +610,9 @@ public class OpGDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGDayEqual019() {
     final XQuery query = new XQuery(
-      "xs:gDay(\"---31+01:00\") eq xs:gDay(\"---31\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT1H'))\n" +
+      "            then xs:gDay(\"---31+01:01\") eq xs:gDay(\"---31\")\n" +
+      "            else xs:gDay(\"---31+01:00\") eq xs:gDay(\"---31\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -614,7 +632,9 @@ public class OpGDayEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGDayEqual020() {
     final XQuery query = new XQuery(
-      "xs:gDay(\"---31\") eq xs:gDay(\"---31+01:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT1H'))\n" +
+      "            then xs:gDay(\"---31\") eq xs:gDay(\"---31+01:01\")\n" +
+      "            else xs:gDay(\"---31\") eq xs:gDay(\"---31+01:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());

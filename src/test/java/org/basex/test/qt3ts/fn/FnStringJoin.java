@@ -17,6 +17,7 @@ public class FnStringJoin extends QT3TestSet {
    */
   @org.junit.Test
   public void kStringJoinFunc1() {
+    xquery10();
     final XQuery query = new XQuery(
       "string-join(\"a string\")",
       ctx);

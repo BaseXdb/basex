@@ -47,4 +47,24 @@ public class FnSerialize extends QT3TestSet {
       )
     );
   }
+
+  /**
+   * Serialize a function item.
+   */
+  @org.junit.Test
+  public void serializeXml010() {
+    final XQuery query = new XQuery(
+      "serialize(name#1)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      error("SENR0001")
+    );
+  }
 }

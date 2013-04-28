@@ -698,6 +698,106 @@ public class FnSubstring extends QT3TestSet {
   }
 
   /**
+   * substring() of a string containing non-BMP characters.
+   */
+  @org.junit.Test
+  public void fnSubstring25() {
+    final XQuery query = new XQuery(
+      "substring(\"𐀁\", 1, 2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("\"𐀁\"")
+    );
+  }
+
+  /**
+   * substring() of a string containing non-BMP characters.
+   */
+  @org.junit.Test
+  public void fnSubstring26() {
+    final XQuery query = new XQuery(
+      "substring(\"𐀁\", 2, 1)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("\"\"")
+    );
+  }
+
+  /**
+   * substring() of a string containing non-BMP characters.
+   */
+  @org.junit.Test
+  public void fnSubstring27() {
+    final XQuery query = new XQuery(
+      "substring(\"𐀁\", 0, 2)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("\"𐀁\"")
+    );
+  }
+
+  /**
+   * substring() of a string containing non-BMP characters.
+   */
+  @org.junit.Test
+  public void fnSubstring28() {
+    final XQuery query = new XQuery(
+      "substring(\"𐀁\", 0, 3)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("\"𐀁\"")
+    );
+  }
+
+  /**
+   * substring() of a string containing non-BMP characters.
+   */
+  @org.junit.Test
+  public void fnSubstring29() {
+    final XQuery query = new XQuery(
+      "substring(\"𐀁𐀁\", 3)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("\"\"")
+    );
+  }
+
+  /**
    * Evaluation of substring function as per example 3 (for this function) from the F&O specs. .
    */
   @org.junit.Test
@@ -714,6 +814,26 @@ public class FnSubstring extends QT3TestSet {
     }
     test(
       assertStringValue(false, "234")
+    );
+  }
+
+  /**
+   * substring() of a string containing non-BMP characters.
+   */
+  @org.junit.Test
+  public void fnSubstring30() {
+    final XQuery query = new XQuery(
+      "substring(\"𐀁𐀁\", 0)",
+      ctx);
+    try {
+      result = new QT3Result(query.value());
+    } catch(final Throwable trw) {
+      result = new QT3Result(trw);
+    } finally {
+      query.close();
+    }
+    test(
+      assertEq("\"𐀁𐀁\"")
     );
   }
 

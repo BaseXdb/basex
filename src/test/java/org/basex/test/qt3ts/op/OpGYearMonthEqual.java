@@ -254,7 +254,9 @@ public class OpGYearMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearMonthEqual002() {
     final XQuery query = new XQuery(
-      "xs:gYearMonth(\"2008-01\") eq xs:gYearMonth(\"2008-01+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gYearMonth(\"2008-01\") eq xs:gYearMonth(\"2008-01+09:01\")\n" +
+      "            else xs:gYearMonth(\"2008-01\") eq xs:gYearMonth(\"2008-01+09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -274,7 +276,9 @@ public class OpGYearMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearMonthEqual003() {
     final XQuery query = new XQuery(
-      "xs:gYearMonth(\"2008-01+09:00\") eq xs:gYearMonth(\"2008-01\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gYearMonth(\"2008-01+09:01\") eq xs:gYearMonth(\"2008-01\")\n" +
+      "            else xs:gYearMonth(\"2008-01+09:00\") eq xs:gYearMonth(\"2008-01\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -294,7 +298,9 @@ public class OpGYearMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearMonthEqual004() {
     final XQuery query = new XQuery(
-      "xs:gYearMonth(\"2008-01\") eq xs:gYearMonth(\"2008-01+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gYearMonth(\"2008-01\") eq xs:gYearMonth(\"2008-01-09:01\")\n" +
+      "            else xs:gYearMonth(\"2008-01\") eq xs:gYearMonth(\"2008-01-09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -314,7 +320,9 @@ public class OpGYearMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearMonthEqual005() {
     final XQuery query = new XQuery(
-      "xs:gYearMonth(\"2008-01+09:00\") eq xs:gYearMonth(\"2008-01\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gYearMonth(\"2008-01-09:01\") eq xs:gYearMonth(\"2008-01\")\n" +
+      "            else xs:gYearMonth(\"2008-01-09:00\") eq xs:gYearMonth(\"2008-01\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -354,7 +362,9 @@ public class OpGYearMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearMonthEqual007() {
     final XQuery query = new XQuery(
-      "xs:gYearMonth(\"2008-01\") ne xs:gYearMonth(\"2008-01+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gYearMonth(\"2008-01\") ne xs:gYearMonth(\"2008-01+09:01\")\n" +
+      "            else xs:gYearMonth(\"2008-01\") ne xs:gYearMonth(\"2008-01+09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -374,7 +384,9 @@ public class OpGYearMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearMonthEqual008() {
     final XQuery query = new XQuery(
-      "xs:gYearMonth(\"2008-01+09:00\") ne xs:gYearMonth(\"2008-01\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gYearMonth(\"2008-01+09:01\") ne xs:gYearMonth(\"2008-01\")\n" +
+      "            else xs:gYearMonth(\"2008-01+09:00\") ne xs:gYearMonth(\"2008-01\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -394,7 +406,9 @@ public class OpGYearMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearMonthEqual009() {
     final XQuery query = new XQuery(
-      "xs:gYearMonth(\"2008-01\") ne xs:gYearMonth(\"2008-01+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gYearMonth(\"2008-01\") ne xs:gYearMonth(\"2008-01-09:01\")\n" +
+      "            else xs:gYearMonth(\"2008-01\") ne xs:gYearMonth(\"2008-01-09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -414,7 +428,9 @@ public class OpGYearMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGYearMonthEqual010() {
     final XQuery query = new XQuery(
-      "xs:gYearMonth(\"2008-01+09:00\") ne xs:gYearMonth(\"2008-01\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gYearMonth(\"2008-01-09:01\") ne xs:gYearMonth(\"2008-01\")\n" +
+      "            else xs:gYearMonth(\"2008-01-09:00\") ne xs:gYearMonth(\"2008-01\")",
       ctx);
     try {
       result = new QT3Result(query.value());

@@ -254,7 +254,9 @@ public class OpGMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthEqual002() {
     final XQuery query = new XQuery(
-      "xs:gMonth(\"--06\") eq xs:gMonth(\"--06+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gMonth(\"--06\") eq xs:gMonth(\"--06+09:01\")\n" +
+      "            else xs:gMonth(\"--06\") eq xs:gMonth(\"--06+09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -274,7 +276,9 @@ public class OpGMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthEqual003() {
     final XQuery query = new XQuery(
-      "xs:gMonth(\"--06+09:00\") eq xs:gMonth(\"--06\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gMonth(\"--06+09:01\") eq xs:gMonth(\"--06\")\n" +
+      "            else xs:gMonth(\"--06+09:00\") eq xs:gMonth(\"--06\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -294,7 +298,9 @@ public class OpGMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthEqual004() {
     final XQuery query = new XQuery(
-      "xs:gMonth(\"--06\") eq xs:gMonth(\"--06+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gMonth(\"--06\") eq xs:gMonth(\"--06-09:01\")\n" +
+      "            else xs:gMonth(\"--06\") eq xs:gMonth(\"--06-09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -314,7 +320,9 @@ public class OpGMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthEqual005() {
     final XQuery query = new XQuery(
-      "xs:gMonth(\"--06+09:00\") eq xs:gMonth(\"--06\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gMonth(\"--06-09:01\") eq xs:gMonth(\"--06\")\n" +
+      "            else xs:gMonth(\"--06-09:00\") eq xs:gMonth(\"--06\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -354,7 +362,9 @@ public class OpGMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthEqual007() {
     final XQuery query = new XQuery(
-      "xs:gMonth(\"--06\") ne xs:gMonth(\"--06+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gMonth(\"--06\") ne xs:gMonth(\"--06+09:01\")\n" +
+      "            else xs:gMonth(\"--06\") ne xs:gMonth(\"--06+09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -374,7 +384,9 @@ public class OpGMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthEqual008() {
     final XQuery query = new XQuery(
-      "xs:gMonth(\"--06+09:00\") ne xs:gMonth(\"--06\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('PT9M'))\n" +
+      "            then xs:gMonth(\"--06+09:01\") ne xs:gMonth(\"--06\")\n" +
+      "            else xs:gMonth(\"--06+09:00\") ne xs:gMonth(\"--06\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -394,7 +406,9 @@ public class OpGMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthEqual009() {
     final XQuery query = new XQuery(
-      "xs:gMonth(\"--06\") ne xs:gMonth(\"--06+09:00\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gMonth(\"--06\") ne xs:gMonth(\"--06-09:01\")\n" +
+      "            else xs:gMonth(\"--06\") ne xs:gMonth(\"--06-09:00\")",
       ctx);
     try {
       result = new QT3Result(query.value());
@@ -414,7 +428,9 @@ public class OpGMonthEqual extends QT3TestSet {
   @org.junit.Test
   public void cbclGMonthEqual010() {
     final XQuery query = new XQuery(
-      "xs:gMonth(\"--06+09:00\") ne xs:gMonth(\"--06\")",
+      "if (implicit-timezone() eq xs:dayTimeDuration('-PT9M'))\n" +
+      "            then xs:gMonth(\"--06-09:01\") ne xs:gMonth(\"--06\")\n" +
+      "            else xs:gMonth(\"--06-09:00\") ne xs:gMonth(\"--06\")",
       ctx);
     try {
       result = new QT3Result(query.value());
