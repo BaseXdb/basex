@@ -321,16 +321,12 @@ public final class QueryContext extends Progress {
     return value != null ? value.data() : null;
   }
 
-  /**
-   * Returns the databases that may be touched by this query. The returned information
-   * will be more accurate if the function is called after parsing the query.
-   * @see Progress#databases(LockResult)
-   */
   @Override
   public void databases(final LockResult lr) {
-    if(null != root)
-      root.databases(lr, this);
-    else lr.writeAll = true;
+    super.databases(lr);
+    /* [JE] RESTXQ: causes deadlock (?) when writeAll is followed by local downgrades
+    if(null != root) root.databases(lr, this);
+    else lr.writeAll = true; */
   }
 
   /**

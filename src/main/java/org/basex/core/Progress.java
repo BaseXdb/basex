@@ -125,9 +125,7 @@ public abstract class Progress {
   }
 
   /**
-   * Adds the names of the databases that will be touched by the process.
-   * An empty string indicates that the currently opened database will be
-   * touched.
+   * Adds the names of the databases that may be touched by the process.
    * @param lockResult Container for lock result to pass around
    */
   public void databases(final LockResult lockResult) {

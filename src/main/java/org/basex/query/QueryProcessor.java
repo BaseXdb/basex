@@ -232,14 +232,12 @@ public final class QueryProcessor extends Progress {
     ctx.close();
   }
 
-  /**
-   * Returns the databases that may be touched by this query. The returned information
-   * will be more accurate if the function is called after parsing the query.
-   * @see Progress#databases(LockResult)
-   */
   @Override
   public void databases(final LockResult lr) {
-    ctx.databases(lr);
+    // [JE] see comment in QueryContext#databases
+    //ctx.databases(lr);
+    if(null != ctx.root) ctx.root.databases(lr, ctx);
+    else lr.writeAll = true;
   }
 
   /**

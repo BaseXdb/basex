@@ -111,79 +111,95 @@ public class MainModule extends StaticScope {
    * Returns the databases that may be touched by this query. The returned information
    * will be more accurate if the function is called after parsing the query.
    * @param lr lock result
-   * @see Progress#databases(LockResult)
    * @param ctx query context
+   * @see Progress#databases(LockResult)
    */
   public void databases(final LockResult lr, final QueryContext ctx) {
     lr.read.add(ctx.userReadLocks);
     lr.write.add(ctx.userWriteLocks);
-
-    final StringList sl = ctx.updating ? lr.write : lr.read;
-
-    final ASTVisitor visitor = new ASTVisitor() {
-      /** Already visited scopes. */
-      final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<Scope, Object>();
-      /** Focus level. */
-      int level = ctx.ctxItem == null ? 0 : 1;
-
-      @Override
-      public boolean lock(final String db) {
-        if(db == null) return false;
-        if(level == 0 || db != DBLocking.CTX) sl.add(db);
-        return true;
-      }
-
-      @Override
-      public void enterFocus() {
-        level++;
-      }
-
-      @Override
-      public void exitFocus() {
-        level--;
-      }
-
-      @Override
-      public boolean staticVar(final StaticVar var) {
-        if(funcs.containsKey(var)) return true;
-        funcs.put(var, null);
-        return var.visit(this);
-      }
-
-      @Override
-      public boolean funcCall(final StaticFuncCall call) {
-        return func(call.func());
-      }
-
-      @Override
-      public boolean inlineFunc(final Scope sub) {
-        enterFocus();
-        final boolean ac = sub.visit(this);
-        exitFocus();
-        return ac;
-      }
-
-      @Override
-      public boolean funcItem(final FuncItem func) {
-        return func(func);
-      }
-
-      /**
-       * Visits a scope.
-       * @param scp scope
-       * @return if more expressions should be visited
-       */
-      private boolean func(final Scope scp) {
-        if(funcs.containsKey(scp)) return true;
-        funcs.put(scp, null);
-        enterFocus();
-        final boolean ac = scp.visit(this);
-        exitFocus();
-        return ac;
-      }
-    };
-    if (!expr.accept(visitor))
+    if(!expr.accept(new LockVisitor(lr, ctx)))
       if(ctx.updating) lr.writeAll = true;
       else lr.readAll = true;
   }
+
+  /**
+   * Lock visitor.
+   * @author Leo Woerteler
+   */
+  static class LockVisitor extends ASTVisitor {
+    /** Already visited scopes. */
+    private final IdentityHashMap<Scope, Object> funcs =
+        new IdentityHashMap<Scope, Object>();
+    /** List of databases to be locked. */
+    private final StringList sl;
+    /** Focus level. */
+    private int level;
+
+    /**
+     * Constructor.
+     * @param lr lock result
+     * @param ctx query context
+     */
+    LockVisitor(final LockResult lr, final QueryContext ctx) {
+      sl = ctx.updating ? lr.write : lr.read;
+      level = ctx.ctxItem == null ? 0 : 1;
+    }
+
+    @Override
+    public boolean lock(final String db) {
+      if(db == null) return false;
+      if(level == 0 || db != DBLocking.CTX) sl.add(db);
+      return true;
+    }
+
+    @Override
+    public void enterFocus() {
+      level++;
+    }
+
+    @Override
+    public void exitFocus() {
+      level--;
+    }
+
+    @Override
+    public boolean staticVar(final StaticVar var) {
+      if(funcs.containsKey(var)) return true;
+      funcs.put(var, null);
+      return var.visit(this);
+    }
+
+    @Override
+    public boolean funcCall(final StaticFuncCall call) {
+      return func(call.func());
+    }
+
+    @Override
+    public boolean inlineFunc(final Scope sub) {
+      enterFocus();
+      final boolean ac = sub.visit(this);
+      exitFocus();
+      return ac;
+    }
+
+    @Override
+    public boolean funcItem(final FuncItem func) {
+      return func(func);
+    }
+
+    /**
+     * Visits a scope.
+     * @param scp scope
+     * @return if more expressions should be visited
+     */
+    private boolean func(final Scope scp) {
+      if(funcs.containsKey(scp)) return true;
+      funcs.put(scp, null);
+      enterFocus();
+      final boolean ac = scp.visit(this);
+      exitFocus();
+      return ac;
+    }
+  };
+
 }

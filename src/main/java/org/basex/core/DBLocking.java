@@ -214,7 +214,7 @@ public final class DBLocking implements Locking {
 
     if(null != writeObjects) {
       if(!writeObjects.containsAll(downgrade)) throw new IllegalMonitorStateException(
-          "Cannot downgrade write lock not acquired.");
+          "Cannot downgrade write lock that has not been acquired.");
 
       // Perform downgrades
       for(final String object : writeObjects) {
