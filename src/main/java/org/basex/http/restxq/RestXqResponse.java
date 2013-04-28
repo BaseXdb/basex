@@ -11,7 +11,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -79,7 +78,6 @@ final class RestXqResponse {
    * @throws Exception exception
    */
   void create() throws Exception {
-
     // wrap function with a function call
     final StaticFunc uf = function.function;
     // bind variables
@@ -101,29 +99,27 @@ final class RestXqResponse {
       final StringList o = qc.dbOptions;
       for(int s = 0; s < o.size(); s += 2) qc.context.prop.set(o.get(s), o.get(s + 1));
 
+      // compile and evaluate query
       qc.compile();
-      Value result = qc.value();
-      final Value update = qc.update();
-      if(update != null) result = update;
-
-      // handle response element
-      final ValueIter iter = result.iter();
+      final Iter iter = qc.iter();
       Item item = iter.next();
       ANode resp = null;
+
+      // handle response element
       if(item != null && item.type.isNode()) {
         final ANode node = (ANode) item;
         // send redirect to browser
         if(RESTXQ_REDIRECT.eq(node)) {
           final ANode ch = node.children().next();
           if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
-          redirect = string(trim(ch.string()));
+          redirect = string(ch.string()).trim();
           return;
         }
         // server-side forwarding
         if(RESTXQ_FORWARD.eq(node)) {
           final ANode ch = node.children().next();
           if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
-          forward = string(trim(ch.string()));
+          forward = string(ch.string()).trim();
           return;
         }
         if(RESTXQ_RESPONSE.eq(node)) {
