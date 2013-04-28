@@ -15,12 +15,14 @@ import org.basex.util.*;
 public final class BaseFuncCall extends StaticFuncCall {
   /**
    * Function constructor.
-   * @param ii input info
    * @param nm function name
-   * @param arg arguments
+   * @param a arguments
+   * @param sctx static context
+   * @param ii input info
    */
-  public BaseFuncCall(final InputInfo ii, final QNm nm, final Expr[] arg) {
-    super(ii, nm, arg);
+  public BaseFuncCall(final QNm nm, final Expr[] a, final StaticContext sctx,
+      final InputInfo ii) {
+    super(nm, a, sctx, ii);
   }
 
   @Override
@@ -73,6 +75,6 @@ public final class BaseFuncCall extends StaticFuncCall {
 
   @Override
   public Expr markTailCalls() {
-    return new TailFuncCall(info, name, func, expr);
+    return new TailFuncCall(name, expr, func, sc, info);
   }
 }

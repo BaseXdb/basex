@@ -89,11 +89,12 @@ public abstract class QueryTest extends SandboxTest {
         }
       } catch(final Exception ex) {
         final String msg = ex.getMessage();
-        if(correct || msg.contains("mailman")) {
+        if(correct || msg == null || msg.contains("mailman")) {
           final String cp = correct && (!(cmp instanceof Nodes) ||
               ((Nodes) cmp).data != null) ? cmp.toString() : "()";
           sb.append("[" + qu[0] + "] " + query + "\n[E] " +
-              cp + "\n[F] " + msg.replaceAll("\r\n?|\n", " ") + ' ' +
+              cp + "\n[F] " +
+              (msg == null ? Util.name(ex) : msg.replaceAll("\r\n?|\n", " ")) + ' ' +
               details() + '\n');
           ++fail;
         }

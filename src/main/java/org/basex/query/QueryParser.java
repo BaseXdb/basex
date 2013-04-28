@@ -84,7 +84,7 @@ public class QueryParser extends InputParser {
   /** Cached QNames. */
   private final ArrayList<QNmCheck> names = new ArrayList<QNmCheck>();
   /** Current variable scope. */
-  VarScope scope = new VarScope();
+  private VarScope scope;
 
   /**
    * Constructor.
@@ -152,34 +152,85 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses a main module.
+   * Parses the "MainModule" rule.
+   * Parses the "Setter" rule.
+   * Parses the "QueryBody (= Expr)" rule.
    * @return resulting root expression
    * @throws QueryException query exception
    */
   public final MainModule parseMain() throws QueryException {
-    return new MainModule(parse(null), scope);
+    file(ctx.sc.baseIO(), ctx.context);
+    checkValidChars();
+
+    try {
+      versionDecl();
+
+      final int i = ip;
+      if(wsConsumeWs(MODULE, NSPACE, null)) error(MAINMOD);
+      ip = i;
+
+      prolog1();
+      prolog2();
+
+      scope = new VarScope();
+      final Expr e = expr();
+      if(e == null) {
+        if(alter != null) error();
+        else error(EXPREMPTY);
+      }
+
+      final MainModule mm = new MainModule(e, scope);
+      scope = null;
+      finish(mm, true);
+      return mm;
+    } catch(final QueryException ex) {
+      mark();
+      ex.pos(this);
+      throw ex;
+    }
   }
 
   /**
    * Parses a library module.
-   * @param uri expected namespace URI
+   * Parses the "ModuleDecl" rule.
+   * @param check if functions and variables should be checked
    * @return name of the module
    * @throws QueryException query exception
    */
-  public final QNm parseModule(final byte[] uri) throws QueryException {
-    if(uri == null) throw new NullPointerException();
-    return (QNm) parse(uri);
+  protected final QNm parseModule(final boolean check) throws QueryException {
+    file(ctx.sc.baseIO(), ctx.context);
+    checkValidChars();
+
+    try {
+      versionDecl();
+      wsCheck(MODULE);
+      wsCheck(NSPACE);
+      skipWS();
+      final byte[] name = ncName(XPNAME);
+      wsCheck(IS);
+      final byte[] uri = stringLiteral();
+      if(uri.length == 0) error(NSMODURI);
+      module = new QNm(name, uri);
+
+      ctx.sc.ns.add(name, uri, info());
+      skipWS();
+      check(';');
+      prolog1();
+      prolog2();
+      finish(null, check);
+      return module;
+    } catch(final QueryException ex) {
+      mark();
+      ex.pos(this);
+      throw ex;
+    }
   }
 
   /**
-   * Parses the specified query or module.
-   * If the specified uri is {@code null}, the query is parsed as main module.
-   * @param uri module uri.
-   * @return resulting expression, or the name of the module
+   * Checks the input string for illegal characters.
    * @throws QueryException query exception
    */
-  private Expr parse(final byte[] uri) throws QueryException {
-    file(ctx.sc.baseIO(), ctx.context);
-
+  private void checkValidChars() throws QueryException {
     if(!more()) error(QUERYEMPTY);
 
     // checks if the query string contains invalid characters
@@ -194,13 +245,20 @@ public class QueryParser extends InputParser {
       }
       i += hs ? Character.charCount(cp) : 1;
     }
+  }
 
-    final Expr expr = module(uri);
+  /**
+   * Finishes the parsing step.
+   * @param mm main module, {@code null} for library modules
+   * @param check if functions and variables should be checked
+   * @throws QueryException query exception
+   */
+  private void finish(final MainModule mm, final boolean check) throws QueryException {
     if(more()) {
       if(alter != null) error();
       final String rest = rest();
       ip++;
-      if(uri != null) error(MODEXPR, rest);
+      if(mm == null) error(MODEXPR, rest);
       error(QUERYEND, rest);
     }
 
@@ -214,44 +272,17 @@ public class QueryParser extends InputParser {
       ctx.sc.decFormats.add(empty, new DecFormatter());
     }
 
-    // check function calls
-    ctx.funcs.check(ctx);
+    if(check) {
+      // check function calls and variable references
+      ctx.funcs.check(ctx);
+      ctx.vars.check(ctx);
 
-    // check placement of updating expressions if any updating expressions have been found
-    if(ctx.updates != null) {
-      ctx.funcs.checkUp();
-      ctx.vars.checkUp();
-      expr.checkUp();
-    }
-    return expr;
-  }
-
-  /**
-   * Parses the specified query and starts with the "Module" rule.
-   * If the specified uri is {@code null}, the query is parsed as main module.
-   * @param u module uri
-   * @return resulting expression
-   * @throws QueryException query exception
-   */
-  private Expr module(final byte[] u) throws QueryException {
-    try {
-      versionDecl();
-      if(u != null) return moduleDecl(u);
-
-      final int i = ip;
-      if(wsConsumeWs(MODULE, NSPACE, null)) error(MAINMOD);
-      ip = i;
-
-      final Expr expr = mainModule();
-      if(expr == null) {
-        if(alter != null) error();
-        else error(EXPREMPTY);
+      // check placement of updating expressions if any have been found
+      if(ctx.updates != null) {
+        ctx.funcs.checkUp();
+        ctx.vars.checkUp();
+        if(mm != null) mm.expr.checkUp();
       }
-      return expr;
-    } catch(final QueryException ex) {
-      mark();
-      ex.pos(this);
-      throw ex;
     }
   }
 
@@ -280,46 +311,6 @@ public class QueryParser extends InputParser {
       return;
     }
     wsCheck(";");
-  }
-
-  /**
-   * Parses the "MainModule" rule.
-   * Parses the "Setter" rule.
-   * Parses the "QueryBody (= Expr)" rule.
-   * @return query expression
-   * @throws QueryException query exception
-   */
-  private Expr mainModule() throws QueryException {
-    prolog1();
-    prolog2();
-    return expr();
-  }
-
-  /**
-   * Parses the "ModuleDecl" rule.
-   * @param u module uri (may be empty)
-   * @return name of module
-   * @throws QueryException query exception
-   */
-  private QNm moduleDecl(final byte[] u) throws QueryException {
-    wsCheck(MODULE);
-    wsCheck(NSPACE);
-    skipWS();
-    final byte[] name = ncName(XPNAME);
-    wsCheck(IS);
-    final byte[] uri = stringLiteral();
-    if(uri.length == 0) error(NSMODURI);
-    module = new QNm(name, uri);
-
-    ctx.sc.ns.add(name, uri, info());
-    skipWS();
-    check(';');
-    prolog1();
-    prolog2();
-    // check if import and declaration uri match
-    // skip test if module has not been imported (in this case, URI is empty)
-    if(u.length != 0 && !eq(u, uri)) error(WRONGMODULE, module.uri(), file);
-    return module;
   }
 
   /**
@@ -770,34 +761,28 @@ public class QueryParser extends InputParser {
       ctx.sc.ns.add(ns, uri, info());
     }
 
-    try {
-      // check modules at specified locations
-      if(wsConsumeWs(AT)) {
-        do {
-          module(stringLiteral(), uri);
-        } while(wsConsumeWs(COMMA));
-        return;
-      }
-
-      // check pre-declared module files
-      final byte[] path = ctx.modDeclared.get(uri);
-      if(path != null) {
-        module(path, uri);
-        return;
-      }
-
-      // check built-in modules
-      for(final byte[] u : Function.URIS.values()) if(eq(uri, u)) return;
-
-      // resolve module uri
-      if(ctx.modules.addImport(uri, info(), this)) return;
-
-      error(NOMODULE, uri);
-
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      error(CIRCMODULE);
+    // check modules at specified locations
+    if(wsConsumeWs(AT)) {
+      do {
+        module(stringLiteral(), uri, true);
+      } while(wsConsumeWs(COMMA));
+      return;
     }
+
+    // check pre-declared module files
+    final byte[] path = ctx.modDeclared.get(uri);
+    if(path != null) {
+      module(path, uri, true);
+      return;
+    }
+
+    // check built-in modules
+    for(final byte[] u : Function.URIS.values()) if(eq(uri, u)) return;
+
+    // resolve module uri
+    if(ctx.modules.addImport(uri, info(), this)) return;
+
+    error(NOMODULE, uri);
   }
 
   /**
@@ -807,6 +792,18 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   public void module(final byte[] path, final byte[] uri) throws QueryException {
+    module(path, uri, false);
+  }
+
+  /**
+   * Parses the specified module, checking function and variable references at the end.
+   * @param path file path
+   * @param uri module uri
+   * @param imprt if this is an imported module
+   * @throws QueryException query exception
+   */
+  private void module(final byte[] path, final byte[] uri, final boolean imprt)
+      throws QueryException {
     // get absolute path
     final IO io = ctx.sc.io(string(path));
     final byte[] p = token(io.path());
@@ -816,6 +813,7 @@ public class QueryParser extends InputParser {
     if(u != null) {
       if(!eq(uri, u)) error(WRONGMODULE, uri,
           ctx.context.user.has(Perm.ADMIN) ? io.path() : io.name());
+      if(!ctx.sc.xquery3() && ctx.modStack.contains(p)) error(CIRCMODULE);
       return;
     }
     ctx.modParsed.add(p, uri);
@@ -828,10 +826,14 @@ public class QueryParser extends InputParser {
       error(NOMODULEFILE, ctx.context.user.has(Perm.ADMIN) ? io.path() : io.name());
     }
 
+    ctx.modStack.push(p);
     final StaticContext sc = ctx.sc;
     ctx.sc = new StaticContext(sc.xquery3());
-    new QueryParser(qu, io.path(), ctx).parse(uri);
+    final byte[] muri = new QueryParser(qu, io.path(), ctx).parseModule(!imprt).uri();
+    // check if import and declaration uri match
+    if(!eq(uri, muri)) error(WRONGMODULE, muri, file);
     ctx.sc = sc;
+    ctx.modStack.pop();
   }
 
   /**
@@ -842,12 +844,16 @@ public class QueryParser extends InputParser {
     wsCheck(ITEMM);
     if(!decl.add(ITEMM)) error(DUPLITEM);
 
-    ctx.sc.initType = wsConsumeWs(AS) ? itemType().type : null;
+    ctx.sc.initType = wsConsumeWs(AS) ? itemType() : null;
+
     if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
     else if(!wsConsumeWs(ASSIGN)) return;
-    ctx.ctxItem = check(single(), NOVARDECL);
+    scope = new VarScope();
+    final Expr e = check(single(), NOVARDECL);
+    ctx.ctxItem = new MainModule(e, scope);
+    scope = null;
     if(module != null) error(DECITEM);
-    if(ctx.ctxItem.uses(Use.UPD)) error(UPCTX, ctx.ctxItem);
+    if(e.uses(Use.UPD)) error(UPCTX, e);
   }
 
   /**
@@ -861,7 +867,7 @@ public class QueryParser extends InputParser {
     if(module != null && !eq(vn.uri(), module.uri())) error(MODNS, vn);
 
     final Expr bind;
-    final VarScope scp = scope = scope.child();
+    scope = new VarScope();
     final boolean external = wsConsumeWs(EXTERNAL);
     if(external) {
       bind = ctx.sc.xquery3() && wsConsumeWs(ASSIGN) ? check(single(), NOVARDECL) : null;
@@ -869,10 +875,9 @@ public class QueryParser extends InputParser {
       wsCheck(ASSIGN);
       bind = check(single(), NOVARDECL);
     }
-    scope = scope.parent();
 
-    // bind variable if not done yet
-    ctx.vars.declare(vn, tp, ann, bind, external, ctx, scp, info());
+    ctx.vars.declare(vn, tp, ann, bind, external, ctx.sc, scope, info());
+    scope = null;
   }
 
   /**
@@ -911,21 +916,23 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void functionDecl(final Ann ann) throws QueryException {
+    final InputInfo ii = info();
     final QNm name = eQName(FUNCNAME, ctx.sc.nsFunc);
     if(keyword(name)) error(RESERVED, name.local());
     if(module != null && !eq(name.uri(), module.uri())) error(MODNS, name);
 
     wsCheck(PAR1);
-    scope = scope.child();
+    scope = new VarScope();
     final Var[] args = paramList();
     wsCheck(PAR2);
+    final SeqType tp = optAsType();
+    if(ann.contains(Ann.Q_UPDATING)) ctx.updating(false);
 
-    final StaticFunc func = new StaticFunc(info(), name, args, optAsType(),
-        ann, true, ctx.sc, scope);
-    if(func.updating) ctx.updating(false);
-
-    if(!wsConsumeWs(EXTERNAL)) ctx.funcs.add(func.setBody(enclosed(NOFUNBODY)), info());
-    scope = scope.parent();
+    if(!wsConsumeWs(EXTERNAL)) {
+      final Expr body = enclosed(NOFUNBODY);
+      ctx.funcs.declare(ann, name, args, tp, body, ctx.sc, ii, scope);
+    }
+    scope = null;
   }
 
   /**
@@ -1286,19 +1293,18 @@ public class QueryParser extends InputParser {
       if(type != null) wsCheck(ASSIGN);
       by = check(single(), NOVARDECL);
     } else {
-      final Expr vr = checkVar(name, GVARNOTDEFINED);
+      final VarRef vr = scope.resolve(name, ctx, ii);
       // the grouping variable has to be declared by the same FLWOR expression
       boolean dec = false;
-      if(vr instanceof VarRef) {
-        final Var v = ((VarRef) vr).var;
+      if(vr != null) {
         for(final Clause f : cl) {
-          if(f.declares(v)) {
+          if(f.declares(vr.var)) {
             dec = true;
             break;
           }
         }
       }
-      if(!dec) error(GVARNOTDEFINED, vr);
+      if(!dec) error(GVARNOTDEFINED, '$' + string(name.string()));
       by = vr;
     }
 
@@ -2034,7 +2040,7 @@ public class QueryParser extends InputParser {
     skipWS();
     final char c = curr();
     // variables
-    if(c == '$') return checkVar(varName(), VARUNDEF);
+    if(c == '$') return checkVar(info(), varName());
     // parentheses
     if(c == '(' && next() != '#') return parenthesized();
     // direct constructor
@@ -2828,12 +2834,12 @@ public class QueryParser extends InputParser {
     }
 
     // parse item type and occurrence indicator
-    final TypeWrapper tw = itemType();
+    final SeqType tw = itemType();
     skipWS();
     final Occ occ = consume('?') ? Occ.ZERO_ONE : consume('+') ? Occ.ONE_MORE :
       consume('*') ? Occ.ZERO_MORE : Occ.ONE;
     skipWS();
-    return SeqType.get(tw.type, occ, tw.test);
+    return tw.withOcc(occ);
   }
 
   /**
@@ -2842,12 +2848,12 @@ public class QueryParser extends InputParser {
    * @return item type
    * @throws QueryException query exception
    */
-  private TypeWrapper itemType() throws QueryException {
+  private SeqType itemType() throws QueryException {
     skipWS();
 
     // parenthesized item type
     if(consume(PAR1)) {
-      final TypeWrapper ret = itemType();
+      final SeqType ret = itemType();
       wsCheck(PAR2);
       return ret;
     }
@@ -2871,7 +2877,7 @@ public class QueryParser extends InputParser {
       if(t == null) {
         t = FuncType.find(name);
         // [LW] XQuery, function test: add annotation support
-        if(t != null) return new TypeWrapper(functionTest(t));
+        if(t != null) return functionTest(t).seqType();
       }
       // no type found
       if(t == null) error(NOTYPE, name.string());
@@ -2888,13 +2894,13 @@ public class QueryParser extends InputParser {
     if(ann != null) error(NOANN);
 
     // atomic value, or closing parenthesis
-    if(!func || wsConsume(PAR2)) return new TypeWrapper(t);
+    if(!func || wsConsume(PAR2)) return t.seqType();
 
     // raise error if type different to node is not finalized by a parenthesis
     if(!(t instanceof NodeType)) wsCheck(PAR2);
 
     // return type with an optional kind test for node types
-    return new TypeWrapper(t, kindTest((NodeType) t));
+    return SeqType.get(t, SeqType.Occ.ONE, kindTest((NodeType) t));
   }
 
   /**
@@ -3758,15 +3764,31 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Checks if a referenced variable is defined and throws the specified error
-   * if not.
+   * Checks if a referenced variable is defined and throws the specified error if not.
+   * @param ii input info
    * @param name variable name
-   * @param err error to throw
    * @return referenced variable
    * @throws QueryException if the variable isn't defined
    */
-  private Expr checkVar(final QNm name, final Err err) throws QueryException {
-    return scope.resolve(name, ctx, info(), err, module, !ctx.sc.xquery3());
+  private Expr checkVar(final InputInfo ii, final QNm name) throws QueryException {
+    // local variable
+    final VarRef local = scope.resolve(name, ctx, ii);
+    if(local != null) return local;
+
+    // static variable
+    final byte[] uri = name.uri();
+
+    // in XQuery 1.0 only forward declarations are allowed (except for implicit variables)
+    final boolean main = module == null, implicit = main && uri.length == 0;
+    if(!(ctx.sc.xquery3() || ctx.vars.declared(name) || implicit)) {
+      throw error(VARUNDEF, '$' + string(name.string()));
+    }
+
+    // variable has to be declared by the same or a directly imported module
+    if(!(main || eq(module.uri(), uri) || modules.contains(uri)))
+      throw error(VARUNDEF, '$' + string(name.string()));
+
+    return ctx.vars.newRef(name, ctx.sc, ii);
   }
 
   /**
@@ -3922,32 +3944,6 @@ public class QueryParser extends InputParser {
   private void assignURI(final int npos) throws QueryException {
     for(int i = npos; i < names.size(); i++) {
       if(names.get(i).assign(npos == 0)) names.remove(i--);
-    }
-  }
-
-  /** Type wrapper. */
-  private static class TypeWrapper {
-    /** Type. */
-    final Type type;
-    /** Kind test. */
-    final Test test;
-
-    /**
-     * Constructor.
-     * @param t type
-     */
-    TypeWrapper(final Type t) {
-      this(t, null);
-    }
-
-    /**
-     * Constructor.
-     * @param t type
-     * @param k kind test
-     */
-    TypeWrapper(final Type t, final Test k) {
-      type = t;
-      test = k;
     }
   }
 
