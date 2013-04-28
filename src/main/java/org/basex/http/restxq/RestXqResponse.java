@@ -78,20 +78,20 @@ final class RestXqResponse {
    * @throws Exception exception
    */
   void create() throws Exception {
-    // wrap function with a function call
-    final StaticFunc uf = function.function;
-    // bind variables
-    final Expr[] args = new Expr[uf.args.length];
-    function.bind(http, args);
-    final StaticFuncCall call = new BaseFuncCall(uf.name, args, uf.sc, uf.info);
-    call.init(uf);
-    final MainModule mod = new MainModule(call, new VarScope());
+    String redirect = null, forward = null;
 
-    // compile and evaluate function
-    String redirect = null;
-    String forward = null;
     try {
-      // assign local updating flag
+      // bind variables
+      final StaticFunc uf = function.function;
+      final Expr[] args = new Expr[uf.args.length];
+      function.bind(http, args);
+
+      // wrap function with a function call
+      final StaticFuncCall call = new BaseFuncCall(uf.name, args, uf.sc, uf.info);
+      call.init(uf);
+      final MainModule mod = new MainModule(call, new VarScope());
+
+      // assign main module and http context and register process
       qc.mainModule(mod);
       qc.context(http, null);
       qc.context.register(qc);
