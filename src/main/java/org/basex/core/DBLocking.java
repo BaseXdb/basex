@@ -196,14 +196,14 @@ public final class DBLocking implements Locking {
 
   /**
    * Only keeps given write locks, downgrades the others to read locks.
-   * @param downgrade Write locks to keep
+   * @param write write locks to keep
    */
   @Override
-  public void downgrade(final StringList downgrade) {
+  public void downgrade(final StringList write) {
     final Long thread = Thread.currentThread().getId();
-    if(null == downgrade)
+    if(null == write)
       throw new IllegalMonitorStateException("Cannot downgrade to global write lock.");
-    downgrade.sort(true, true).unique();
+    write.sort(true, true).unique();
 
     // Fetch current locking status
     final StringList writeObjects = writeLocked.remove(thread);
@@ -213,12 +213,12 @@ public final class DBLocking implements Locking {
     if(null != readObjects) newReadObjects.add(readObjects);
 
     if(null != writeObjects) {
-      if(!writeObjects.containsAll(downgrade)) throw new IllegalMonitorStateException(
+      if(!writeObjects.containsAll(write)) throw new IllegalMonitorStateException(
           "Cannot downgrade write lock that has not been acquired.");
 
       // Perform downgrades
       for(final String object : writeObjects) {
-        if(downgrade.contains(object)) {
+        if(write.contains(object)) {
           newWriteObjects.add(object);
         } else {
           final ReentrantReadWriteLock lock = getOrCreateLock(object);
@@ -241,7 +241,7 @@ public final class DBLocking implements Locking {
       writeAll.writeLock().unlock();
 
       synchronized(globalLock) {
-        if(!downgrade.isEmpty())
+        if(!write.isEmpty())
           localWriters++;
         globalReaders++;
         globalLock.notifyAll();

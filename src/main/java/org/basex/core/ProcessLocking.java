@@ -78,7 +78,7 @@ final class ProcessLocking implements Locking {
   }
 
   @Override
-  public void downgrade(final StringList db) {
+  public void downgrade(final StringList write) {
   }
 
   @Override
