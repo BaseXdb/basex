@@ -196,7 +196,7 @@ public final class ClientListener extends Thread {
         // send {OK}
         send(true);
         context.blocker.remove(address);
-        context.add(this);
+        context.sessions.add(this);
       } else {
         if(!us.isEmpty()) log(ACCESS_DENIED, false);
         // delay users with wrong passwords
@@ -239,7 +239,7 @@ public final class ClientListener extends Thread {
       command.stop();
       do Performance.sleep(50); while(command != null);
     }
-    context.delete(this);
+    context.sessions.remove(this);
 
     try {
       new Close().run(context);

@@ -31,7 +31,7 @@ public final class StaticVar extends StaticDecl {
   /** Bound value. */
   Value value;
   /** Inferred type. */
-  private SeqType type;
+  private final SeqType type;
   /** Flag for lazy evaluation. */
   private final boolean lazy;
 

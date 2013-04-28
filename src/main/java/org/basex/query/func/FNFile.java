@@ -488,7 +488,7 @@ public final class FNFile extends StandardFunc {
       final boolean copy) throws QueryException, IOException {
 
     File trg = file(1, ctx).getCanonicalFile();
-    File src = source.getCanonicalFile();
+    final File src = source.getCanonicalFile();
     if(!src.exists()) FILE_WHICH.thrw(info, src.getAbsolutePath());
 
     if(trg.isDirectory()) {

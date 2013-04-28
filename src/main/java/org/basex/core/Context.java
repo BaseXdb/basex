@@ -209,6 +209,18 @@ public final class Context {
   }
 
   /**
+   * Checks if the current user has the specified permission.
+   * @param p requested permission
+   * @param md optional meta data reference
+   * @return result of check
+   */
+  public boolean perm(final Perm p, final MetaData md) {
+    final User us = md == null || p == Perm.CREATE || p == Perm.ADMIN ? null :
+      md.users.get(user.name);
+    return (us == null ? user : us).has(p);
+  }
+
+  /**
    * Locks the specified process and starts a timeout thread.
    * @param pr process
    */
@@ -217,7 +229,7 @@ public final class Context {
     if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT) * 1000L);
 
     // get touched databases
-    LockResult lr = new LockResult();
+    final LockResult lr = new LockResult();
     pr.databases(lr);
     if(lr.readAll) lr.read = null;
     else prepareLock(lr.read);
@@ -232,26 +244,12 @@ public final class Context {
   /**
    * Downgrades locks.
    * @param pr process
-   * @param sl string list
+   * @param write write locks to keep
    */
-  public void downgrade(final Progress pr, final StringList sl) {
+  public void downgrade(final Progress pr, final StringList write) {
     if(!pr.registered) return;
-    prepareLock(sl);
-    locks.downgrade(sl);
-  }
-
-  /**
-   * Prepares the string list for locking.
-   * @param sl string list
-   */
-  public void prepareLock(final StringList sl) {
-    // replace empty string with currently opened database and return array
-    for(int d = 0; d < sl.size(); d++) {
-      if(Token.eq(sl.get(d), DBLocking.CTX, DBLocking.COLL)) {
-        if(null == data) sl.deleteAt(d);
-        else sl.set(d, data.meta.name);
-      }
-    }
+    prepareLock(write);
+    locks.downgrade(write);
   }
 
   /**
@@ -266,30 +264,16 @@ public final class Context {
   }
 
   /**
-   * Adds the specified client session.
-   * @param s session to be added
+   * Prepares the string list for locking.
+   * @param sl string list
    */
-  public void add(final ClientListener s) {
-    sessions.add(s);
-  }
-
-  /**
-   * Removes the specified client session.
-   * @param s session to be removed
-   */
-  public void delete(final ClientListener s) {
-    sessions.remove(s);
-  }
-
-  /**
-   * Checks if the current user has the specified permission.
-   * @param p requested permission
-   * @param md optional meta data reference
-   * @return result of check
-   */
-  public boolean perm(final Perm p, final MetaData md) {
-    final User us = md == null || p == Perm.CREATE || p == Perm.ADMIN ? null :
-      md.users.get(user.name);
-    return (us == null ? user : us).has(p);
+  private void prepareLock(final StringList sl) {
+    // replace empty string with currently opened database and return array
+    for(int d = 0; d < sl.size(); d++) {
+      if(Token.eq(sl.get(d), DBLocking.CTX, DBLocking.COLL)) {
+        if(null == data) sl.deleteAt(d);
+        else sl.set(d, data.meta.name);
+      }
+    }
   }
 }

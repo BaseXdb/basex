@@ -138,13 +138,13 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery("uri-collection()"), false, COLL_LIST);
 
     // Accessor and node functions
-    for(String fn : new String[] { "data", "string", "number", "string-length",
+    for(final String fn : new String[] { "data", "string", "number", "string-length",
         "normalize-space", "document-uri", "nilled", "node-name", "local-name", "name",
         "namespace-uri", "root", "base-uri", "generate-id", "has-children", "path"}) {
       ckDBs(new XQuery(fn + "()"), false, CTX_LIST);
       ckDBs(new XQuery("doc('" + NAME + "')/" + fn + "()"), false, NAME_LIST, NAME_CTX);
     }
-    for(String fn : new String[] { "data", "string", "number", "string-length",
+    for(final String fn : new String[] { "data", "string", "number", "string-length",
         "normalize-space", "document-uri", "nilled", "node-name", "local-name", "name",
         "namespace-uri", "root", "base-uri", "generate-id", "has-children", "path"}) {
       ckDBs(new XQuery(fn + "(doc('" + NAME + "'))"), false, NAME_LIST);
@@ -339,7 +339,7 @@ public class CommandLockingTest extends SandboxTest {
     cmd.updating(DUMMY_CONTEXT);
     cmd.databases(lr);
     // Need sorted lists for compareAll
-    for (StringList list : new StringList[]
+    for (final StringList list : new StringList[]
         {reqRd, allowRd, reqWt, allowWt, lr.read, lr.write})
       if (null != list) list.sort(false, true).unique();
 

@@ -23,9 +23,9 @@ public interface Locking {
 
   /**
    * Unlock all string locked by a transaction.
-   * @param db databases
+   * @param write write locks to keep
    */
-  void downgrade(final StringList db);
+  void downgrade(final StringList write);
 
   /**
    * Unlock all string locked by a transaction.
