@@ -273,27 +273,17 @@ public final class QueryContext extends Progress {
   public Value value() throws QueryException {
     try {
       final Value v = root.value(this);
-      final Value u = update();
-      return u != null ? u : v;
+      if(updating) {
+        context.downgrade(this, updates.databases());
+        updates.apply();
+        if(updates.size() != 0 && context.data() != null) context.update();
+        if(output.size() != 0) return output.value();
+      }
+      return v;
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw BASX_STACKOVERFLOW.thrw(null);
     }
-  }
-
-  /**
-   * Performs updates.
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  public Value update() throws QueryException {
-    if(updating) {
-      context.downgrade(this, updates.databases());
-      updates.apply();
-      if(updates.size() != 0 && context.data() != null) context.update();
-      if(output.size() != 0) return output.value();
-    }
-    return null;
   }
 
   /**
