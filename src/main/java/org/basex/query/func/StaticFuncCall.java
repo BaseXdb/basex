@@ -24,6 +24,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public abstract class StaticFuncCall extends Arr {
+  /** Static context of this function call. */
+  protected final StaticContext sc;
   /** Function name. */
   final QNm name;
   /** Function reference. */
@@ -34,9 +36,12 @@ public abstract class StaticFuncCall extends Arr {
    * @param ii input info
    * @param nm function name
    * @param arg arguments
+   * @param sctx static context
    */
-  StaticFuncCall(final InputInfo ii, final QNm nm, final Expr[] arg) {
+  StaticFuncCall(final QNm nm, final Expr[] arg, final StaticContext sctx,
+      final InputInfo ii) {
     super(ii, arg);
+    sc = sctx;
     name = nm;
   }
 
@@ -67,7 +72,7 @@ public abstract class StaticFuncCall extends Arr {
 
       // copy the function body
       final Expr cpy = func.expr.copy(ctx, scp, vs), rt = !func.cast ? cpy :
-            new TypeCheck(func.info, cpy, func.ret, true).optimize(ctx, scp);
+            new TypeCheck(func.info, cpy, func.declType, true).optimize(ctx, scp);
 
       return cls == null ? rt : new GFLWOR(func.info, cls, rt).optimize(ctx, scp);
     }
@@ -85,7 +90,7 @@ public abstract class StaticFuncCall extends Arr {
       final IntMap<Var> vs) {
     final Expr[] arg = new Expr[expr.length];
     for(int i = 0; i < arg.length; i++) arg[i] = expr[i].copy(ctx, scp, vs);
-    final BaseFuncCall call = new BaseFuncCall(info, name, arg);
+    final BaseFuncCall call = new BaseFuncCall(name, arg, sc, info);
     call.func = func;
     call.type = type;
     call.size = size;
@@ -107,13 +112,14 @@ public abstract class StaticFuncCall extends Arr {
   }
 
   /**
-   * Initializes the function call after all functions have been declared.
+   * Initializes the function and checks for visibility.
    * @param f function reference
-   * @return self reference
+   * @throws QueryException query exception
    */
-  public StaticFuncCall init(final StaticFunc f) {
+  public void init(final StaticFunc f) throws QueryException {
     func = f;
-    return this;
+    if(f.ann.contains(Ann.Q_PRIVATE) && !sc.baseURI().eq(info, f.sc.baseURI()))
+      throw Err.FUNCPRIV.thrw(info, f.name.string());
   }
 
   /**

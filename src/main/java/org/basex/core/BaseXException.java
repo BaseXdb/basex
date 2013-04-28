@@ -49,7 +49,7 @@ public final class BaseXException extends IOException {
       } else if(ext[e] instanceof Throwable) {
         ext[e] = Util.message((Throwable) ext[e]);
       } else if(!(ext[e] instanceof String)) {
-        ext[e] = ext[e].toString();
+        ext[e] = String.valueOf(ext[e]);
       }
     }
     return Util.info(text, ext);

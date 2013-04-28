@@ -302,7 +302,7 @@ public final class SeqType {
    * @return sequence type
    */
   public SeqType withOcc(final Occ o) {
-    return get(type, o, kind);
+    return o == occ ? this : get(type, o, kind);
   }
 
   /**
