@@ -85,8 +85,9 @@ final class RestXqResponse {
     // bind variables
     final Expr[] args = new Expr[uf.args.length];
     function.bind(http, args);
-    final MainModule mod = new MainModule(new BaseFuncCall(null, uf.name, args).init(uf),
-        new VarScope());
+    final StaticFuncCall call = new BaseFuncCall(uf.name, args, uf.sc, uf.info);
+    call.init(uf);
+    final MainModule mod = new MainModule(call, new VarScope());
 
     // compile and evaluate function
     String redirect = null;
