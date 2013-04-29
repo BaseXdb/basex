@@ -121,7 +121,8 @@ public final class QueryResources {
 
       // database instance has same name as input path
       final String n = dt.meta.name;
-      if(Prop.CASE ? n.equals(n) : n.equalsIgnoreCase(qi.db)) return doc(dt, qi, info);
+      if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db))
+        return doc(dt, qi, info);
     }
 
     // open new database, or create new instance
