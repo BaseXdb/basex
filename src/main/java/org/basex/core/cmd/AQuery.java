@@ -255,4 +255,16 @@ public abstract class AQuery extends Command {
   public boolean stoppable() {
     return true;
   }
+
+  @Override
+  public boolean registered() {
+    if(qp == null) Util.notexpected("No query processor available.");
+    return qp.ctx.registered();
+  }
+
+  @Override
+  public void registered(final boolean reg) {
+    if(qp == null) Util.notexpected("No query processor available.");
+    qp.ctx.registered(reg);
+  }
 }

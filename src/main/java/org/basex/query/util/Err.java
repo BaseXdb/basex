@@ -390,11 +390,6 @@ public enum Err {
   /** FODF1310. */
   INVDDPATTERN(FODF, 1310, "Invalid decimal-digit-pattern: '%'."),
 
-  // [CG] obsolete error codes?
-
-  /** FODF1310. */
-  NOMAND(FODF, 1310, "No mandatory digit specified: '%'."),
-
   /** FODT0001. */
   DATERANGE(FODT, 1, "%: '%' out of range."),
   /** FODT0001. */

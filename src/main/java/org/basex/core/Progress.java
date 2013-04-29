@@ -19,7 +19,7 @@ public abstract class Progress {
   public boolean updating;
 
   /** Indicates if a process is currently registered. */
-  protected boolean registered;
+  private boolean registered;
   /** Stopped flag. */
   private boolean stopped;
   /** Timeout thread. */
@@ -130,6 +130,22 @@ public abstract class Progress {
    */
   public void databases(final LockResult lockResult) {
     lockResult.writeAll = true;
+  }
+
+  /**
+   * Checks if the progress is registered.
+   * @return result of check
+   */
+  public boolean registered() {
+    return registered;
+  }
+
+  /**
+   * Sets the registered state.
+   * @param reg registered flag
+   */
+  public void registered(final boolean reg) {
+    registered = reg;
   }
 
   /**

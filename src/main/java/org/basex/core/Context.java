@@ -225,8 +225,8 @@ public final class Context {
    * @param pr process
    */
   public void register(final Progress pr) {
-    assert !pr.registered : "Already registered";
-    pr.registered = true;
+    assert !pr.registered() : "Already registered";
+    pr.registered(true);
 
     // administrators will not be affected by the timeout
     if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT) * 1000L);
@@ -245,7 +245,7 @@ public final class Context {
    * @param write write locks to keep
    */
   public void downgrade(final Progress pr, final StringList write) {
-    if(pr.registered) locks.downgrade(prepareLock(write, false));
+    if(pr.registered()) locks.downgrade(prepareLock(write, false));
   }
 
   /**
@@ -253,8 +253,8 @@ public final class Context {
    * @param pr process
    */
   public void unregister(final Progress pr) {
-    if(!pr.registered) return;
-    pr.registered = false;
+    if(!pr.registered()) return;
+    pr.registered(false);
     locks.release(pr);
     pr.stopTimeout();
   }

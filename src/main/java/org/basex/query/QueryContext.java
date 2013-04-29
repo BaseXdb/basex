@@ -293,11 +293,6 @@ public final class QueryContext extends Progress {
    */
   public Value update() throws QueryException {
     if(updating) {
-      /* [JE] leads to deadlock with RESTXQ:
-       * - db:create(<x>DB</x>/string())
-       * - db:open(<x>DB</x>/string())
-       * second issue: this Progress instance is not equal to AQuery instance!
-       */
       //context.downgrade(this, updates.databases());
       updates.apply();
       if(updates.size() != 0 && context.data() != null) context.update();
