@@ -1026,4 +1026,13 @@ public final class UpdateTest extends AdvancedQueryTest {
        Err.BASX_DBTRANSFORM);
    error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", Err.BASX_DBTRANSFORM);
  }
+
+ /**
+  * Tests the combination of transform expressions and xquery:eval().
+  */
+ @Test
+ public void evalFItem() {
+   query("declare function local:c() { copy $a := <a/> modify () return $a };" +
+     "xquery:eval('$c()', map { 'c' := local:c#0 })", "<a/>");
+ }
 }
