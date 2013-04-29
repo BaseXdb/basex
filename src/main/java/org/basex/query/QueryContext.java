@@ -100,9 +100,9 @@ public final class QueryContext extends Progress {
   public byte ftoknum;
 
   /** Strings to lock defined by lock:read option. */
-  public StringList userReadLocks = new StringList(0);
+  public StringList readLocks = new StringList(0);
   /** Strings to lock defined by lock:write option. */
-  public StringList userWriteLocks = new StringList(0);
+  public StringList writeLocks = new StringList(0);
 
   /** Pending updates. */
   public Updates updates;
@@ -278,17 +278,32 @@ public final class QueryContext extends Progress {
   public Value value() throws QueryException {
     try {
       final Value v = root.value(this);
-      if(updating) {
-        context.downgrade(this, updates.databases());
-        updates.apply();
-        if(updates.size() != 0 && context.data() != null) context.update();
-        if(output.size() != 0) return output.value();
-      }
-      return v;
+      final Value u = update();
+      return u != null ? u : v;
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw BASX_STACKOVERFLOW.thrw(null);
     }
+  }
+
+  /**
+   * Performs updates.
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  public Value update() throws QueryException {
+    if(updating) {
+      /* [JE] leads to deadlock with RESTXQ:
+       * - db:create(<x>DB</x>/string())
+       * - db:open(<x>DB</x>/string())
+       * second issue: this Progress instance is not equal to AQuery instance!
+       */
+      //context.downgrade(this, updates.databases());
+      updates.apply();
+      if(updates.size() != 0 && context.data() != null) context.update();
+      if(output.size() != 0) return output.value();
+    }
+    return null;
   }
 
   /**
@@ -323,10 +338,12 @@ public final class QueryContext extends Progress {
 
   @Override
   public void databases(final LockResult lr) {
-    super.databases(lr);
-    /* [JE] RESTXQ: causes deadlock (?) when writeAll is followed by local downgrades
-    if(null != root) root.databases(lr, this);
-    else lr.writeAll = true; */
+    lr.read.add(readLocks);
+    lr.write.add(writeLocks);
+    if(root == null || !root.databases(lr, this)) {
+      if(updating) lr.writeAll = true;
+      else lr.readAll = true;
+    }
   }
 
   /**

@@ -225,20 +225,18 @@ public final class Context {
    * @param pr process
    */
   public void register(final Progress pr) {
+    assert !pr.registered : "Already registered";
+    pr.registered = true;
+
     // administrators will not be affected by the timeout
     if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT) * 1000L);
 
     // get touched databases
     final LockResult lr = new LockResult();
     pr.databases(lr);
-    if(lr.readAll) lr.read = null;
-    else prepareLock(lr.read);
-    if(lr.writeAll) lr.write = null;
-    else prepareLock(lr.write);
-
-    assert !pr.registered : "Already registered";
-    pr.registered = true;
-    locks.acquire(pr, lr.read, lr.write);
+    final StringList read = prepareLock(lr.read, lr.readAll);
+    final StringList write = prepareLock(lr.write, lr.writeAll);
+    locks.acquire(pr, read, write);
   }
 
   /**
@@ -247,9 +245,7 @@ public final class Context {
    * @param write write locks to keep
    */
   public void downgrade(final Progress pr, final StringList write) {
-    if(!pr.registered) return;
-    prepareLock(write);
-    locks.downgrade(write);
+    if(pr.registered) locks.downgrade(prepareLock(write, false));
   }
 
   /**
@@ -266,8 +262,12 @@ public final class Context {
   /**
    * Prepares the string list for locking.
    * @param sl string list
+   * @param all lock all databases
+   * @return string list, or {@code null}
    */
-  private void prepareLock(final StringList sl) {
+  private StringList prepareLock(final StringList sl, final boolean all) {
+    if(all) return null;
+
     // replace empty string with currently opened database and return array
     for(int d = 0; d < sl.size(); d++) {
       if(Token.eq(sl.get(d), DBLocking.CTX, DBLocking.COLL)) {
@@ -275,5 +275,6 @@ public final class Context {
         else sl.set(d, data.meta.name);
       }
     }
+    return sl;
   }
 }

@@ -108,18 +108,14 @@ public class MainModule extends StaticScope {
   }
 
   /**
-   * Returns the databases that may be touched by this query. The returned information
-   * will be more accurate if the function is called after parsing the query.
+   * Adds the names of the databases that may be touched by the module.
    * @param lr lock result
    * @param ctx query context
+   * @return result of check
    * @see Progress#databases(LockResult)
    */
-  public void databases(final LockResult lr, final QueryContext ctx) {
-    lr.read.add(ctx.userReadLocks);
-    lr.write.add(ctx.userWriteLocks);
-    if(!expr.accept(new LockVisitor(lr, ctx)))
-      if(ctx.updating) lr.writeAll = true;
-      else lr.readAll = true;
+  public boolean databases(final LockResult lr, final QueryContext ctx) {
+    return expr.accept(new LockVisitor(lr, ctx));
   }
 
   /**

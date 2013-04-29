@@ -369,8 +369,7 @@ public abstract class AProp implements Iterable<String> {
     for(final Field f : clz.getFields()) {
       if(!Modifier.isStatic(f.getModifiers())) continue;
       final Object obj = f.get(null);
-      if(!(obj instanceof Object[])) continue;
-      props.add((Object[]) obj);
+      if(obj instanceof Object[]) props.add((Object[]) obj);
     }
     return props.toArray(new Object[props.size()][]);
   };

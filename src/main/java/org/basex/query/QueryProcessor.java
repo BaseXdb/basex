@@ -234,10 +234,7 @@ public final class QueryProcessor extends Progress {
 
   @Override
   public void databases(final LockResult lr) {
-    // [JE] see comment in QueryContext#databases
-    //ctx.databases(lr);
-    if(null != ctx.root) ctx.root.databases(lr, ctx);
-    else lr.writeAll = true;
+    ctx.databases(lr);
   }
 
   /**

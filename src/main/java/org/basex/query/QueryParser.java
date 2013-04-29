@@ -601,10 +601,10 @@ public class QueryParser extends InputParser {
       // Query-specific options
       if(key.equals(READ_LOCK)) {
         for(final byte[] lock : split(val, ','))
-          ctx.userReadLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
+          ctx.readLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
       } else if(key.equals(WRITE_LOCK)) {
         for(final byte[] lock : split(val, ','))
-          ctx.userWriteLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
+          ctx.writeLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
       } else {
         error(BASX_OPTIONS, key);
       }
