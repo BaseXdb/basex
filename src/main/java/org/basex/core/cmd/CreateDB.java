@@ -83,14 +83,14 @@ public final class CreateDB extends ACreate {
     try {
       if(prop.is(Prop.MAINMEM)) {
         // create main memory instance
-        final Data data = progress(new MemBuilder(name, parser)).build();
+        final Data data = proc(new MemBuilder(name, parser)).build();
         context.openDB(data);
         context.dbs.add(data);
       } else {
         if(context.pinned(name)) return error(DB_PINNED_X, name);
 
         // create disk-based instance
-        progress(new DiskBuilder(name, parser, context)).build().close();
+        proc(new DiskBuilder(name, parser, context)).build().close();
 
         // second step: open database and create index structures
         final Open open = new Open(name);
@@ -107,7 +107,7 @@ public final class CreateDB extends ACreate {
       if(prop.is(Prop.CREATEONLY)) new Close().run(context);
 
       return info(parser.info() + DB_CREATED_X_X, name, perf);
-    } catch(final ProgressException ex) {
+    } catch(final ProcException ex) {
       throw ex;
     } catch(final IOException ex) {
       abort();

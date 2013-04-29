@@ -21,7 +21,7 @@ import org.xml.sax.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class Command extends Progress {
+public abstract class Command extends Proc {
   /** Command arguments. */
   public final String[] args;
 
@@ -340,7 +340,7 @@ public abstract class Command extends Progress {
 
     try {
       return run();
-    } catch(final ProgressException ex) {
+    } catch(final ProcException ex) {
       // process was interrupted by the user or server
       abort();
       return error(INTERRUPTED);

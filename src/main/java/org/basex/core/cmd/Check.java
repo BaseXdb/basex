@@ -38,7 +38,7 @@ public final class Check extends Command {
     } else {
       cmd = new CreateDB(qi.db, qi.input.exists() ? qi.original : null);
     }
-    progress(cmd);
+    proc(cmd);
 
     // execute command
     final boolean ok = cmd.run(context);

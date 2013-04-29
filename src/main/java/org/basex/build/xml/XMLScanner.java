@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  * @author Andreas Weiler
  */
-final class XMLScanner extends Progress {
+final class XMLScanner extends Proc {
   /** Entities. */
   private static final String[] ENTITIES =
     { "amp", "&", "apos", "'", "quot", "\"", "lt", "<", "gt", ">" };

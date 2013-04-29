@@ -12,7 +12,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Zip extends Progress {
+public final class Zip extends Proc {
   /** Archive. */
   private final IO archive;
   /** Total files in a zip operation. */

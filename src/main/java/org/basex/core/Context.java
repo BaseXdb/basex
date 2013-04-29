@@ -108,7 +108,7 @@ public final class Context {
     blocker = new ClientBlocker();
     databases = new Databases(this);
     locks = mp.is(MainProp.GLOBALLOCK) || Prop.gui ?
-      new ProcessLocking(this) : new DBLocking(mp);
+      new ProcLocking(this) : new DBLocking(mp);
     users = new Users(this);
     repo = new Repo(this);
     log = new Log(this);
@@ -224,7 +224,7 @@ public final class Context {
    * Locks the specified process and starts a timeout thread.
    * @param pr process
    */
-  public void register(final Progress pr) {
+  public void register(final Proc pr) {
     assert !pr.registered() : "Already registered";
     pr.registered(true);
 
@@ -244,7 +244,7 @@ public final class Context {
    * @param pr process
    * @param write write locks to keep
    */
-  public void downgrade(final Progress pr, final StringList write) {
+  public void downgrade(final Proc pr, final StringList write) {
     if(pr.registered()) locks.downgrade(prepareLock(write, false));
   }
 
@@ -252,7 +252,7 @@ public final class Context {
    * Unlocks the process and stops the timeout.
    * @param pr process
    */
-  public void unregister(final Progress pr) {
+  public void unregister(final Proc pr) {
     if(!pr.registered()) return;
     pr.registered(false);
     locks.release(pr);

@@ -119,7 +119,7 @@ public abstract class ACreate extends Command {
       default:        throw Util.notexpected();
     }
     data.closeIndex(index);
-    data.setIndex(index, (cmd == null ? ib : cmd.progress(ib)).build());
+    data.setIndex(index, (cmd == null ? ib : cmd.proc(ib)).build());
   }
 
   /**

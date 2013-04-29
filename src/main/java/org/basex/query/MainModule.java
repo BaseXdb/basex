@@ -112,7 +112,7 @@ public class MainModule extends StaticScope {
    * @param lr lock result
    * @param ctx query context
    * @return result of check
-   * @see Progress#databases(LockResult)
+   * @see Proc#databases(LockResult)
    */
   public boolean databases(final LockResult lr, final QueryContext ctx) {
     return expr.accept(new LockVisitor(lr, ctx));

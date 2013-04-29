@@ -12,8 +12,8 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class Progress {
-  /** Listener, reacting on progress information. */
+public abstract class Proc {
+  /** Listener, reacting on process information. */
   public InfoListener listen;
   /** This flag indicates that a command may perform updates. */
   public boolean updating;
@@ -24,8 +24,8 @@ public abstract class Progress {
   private boolean stopped;
   /** Timeout thread. */
   private Thread timeout;
-  /** Sub progress. */
-  private Progress sub;
+  /** Sub process. */
+  private Proc sub;
 
   /**
    * Returns short information on the current process or sub process.
@@ -62,16 +62,16 @@ public abstract class Progress {
   }
 
   /**
-   * Sets a new sub progress.
-   * @param <P> progress type
-   * @param prog progress
-   * @return passed on progress reference
+   * Sets a new sub process.
+   * @param <P> process type
+   * @param proc process
+   * @return passed on process reference
    */
-  protected final <P extends Progress> P progress(final P prog) {
-    sub = prog;
+  protected final <P extends Proc> P proc(final P proc) {
+    sub = proc;
     sub.listen = listen;
     if(stopped) sub.stop();
-    return prog;
+    return proc;
   }
 
   /**
@@ -84,14 +84,14 @@ public abstract class Progress {
   }
 
   /**
-   * Checks if the progress was interrupted; if yes, sends a runtime exception.
+   * Checks if the process was interrupted; if yes, sends a runtime exception.
    */
   public final void checkStop() {
-    if(stopped) throw new ProgressException();
+    if(stopped) throw new ProcException();
   }
 
   /**
-   * Aborts a failed or interrupted progress.
+   * Aborts a failed or interrupted process.
    */
   protected void abort() {
     if(sub != null) sub.abort();
@@ -108,7 +108,7 @@ public abstract class Progress {
       @Override
       public void run() {
         Performance.sleep(ms);
-        Progress.this.stop();
+        Proc.this.stop();
       }
     };
     timeout.start();
@@ -133,7 +133,7 @@ public abstract class Progress {
   }
 
   /**
-   * Checks if the progress is registered.
+   * Checks if the process is registered.
    * @return result of check
    */
   public boolean registered() {
