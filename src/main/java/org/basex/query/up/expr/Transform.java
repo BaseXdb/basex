@@ -60,6 +60,7 @@ public final class Transform extends Arr {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     final int o = (int) ctx.output.size();
+    if(ctx.updates == null) ctx.updates = new Updates();
     final ContextModifier tmp = ctx.updates.mod;
     final TransformModifier pu = new TransformModifier();
     ctx.updates.mod = pu;
