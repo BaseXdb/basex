@@ -74,7 +74,9 @@ public enum Err {
   /** BXDB0005. */
   BXDB_DBRETURN(BXDB, 5, "Query must yield database nodes."),
   /** BXDB0006. */
-  BXDB_SINGLE(BXDB, 6, "Database path '%' must point to a single document."),
+  BXDB_NODOC(BXDB, 6, "Database path '%' yields no documents."),
+  /** BXDB0006. */
+  BXDB_SINGLE(BXDB, 6, "Database path '%' points to more than one document."),
   /** BXDB0007. */
   BXDB_OPENED(BXDB, 7, "Database '%' is opened by another process."),
   /** BXDB0008. */
@@ -88,7 +90,9 @@ public enum Err {
   /** BXDB0012. */
   BXDB_CREATE(BXDB, 12, "Database '%' can only be created once."),
   /** BXDB0013. */
-  BXDB_CREATEARGS(BXDB, 12, "Number of specified inputs and paths differs: % vs. %."),
+  BXDB_CREATEARGS(BXDB, 13, "Number of specified inputs and paths differs: % vs. %."),
+  /** BXDB0014. */
+  BXDB_DIR(BXDB, 14, "Database path '%' points to a directory."),
 
   // Fetch module
 

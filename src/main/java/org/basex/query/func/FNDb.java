@@ -534,7 +534,7 @@ public final class FNDb extends StandardFunc {
     final IOFile bin = data.inMemory() ? null : data.meta.binary(path);
     if(bin != null) {
       if(bin.exists()) {
-        if(bin.isDir()) BXDB_SINGLE.thrw(info);
+        if(bin.isDir()) BXDB_DIR.thrw(info, path);
         ctx.updates.add(new DBStore(data, path, input, info), ctx);
       } else {
         ctx.updates.add(new DBAdd(data, input, ctx, info), ctx);
