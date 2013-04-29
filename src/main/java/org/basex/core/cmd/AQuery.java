@@ -106,7 +106,7 @@ public abstract class AQuery extends Command {
         err = Util.message(ex);
       } catch(final IOException ex) {
         err = Util.message(ex);
-      } catch(final ProgressException ex) {
+      } catch(final ProcException ex) {
         err = INTERRUPTED;
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
@@ -200,7 +200,7 @@ public abstract class AQuery extends Command {
    * @return query processor
    */
   private QueryProcessor queryProcessor(final String query, final Context ctx) {
-    if(qp == null) qp = progress(new QueryProcessor(query, ctx));
+    if(qp == null) qp = proc(new QueryProcessor(query, ctx));
     return qp;
   }
 
@@ -254,17 +254,5 @@ public abstract class AQuery extends Command {
   @Override
   public boolean stoppable() {
     return true;
-  }
-
-  @Override
-  public boolean registered() {
-    if(qp == null) Util.notexpected("No query processor available.");
-    return qp.ctx.registered();
-  }
-
-  @Override
-  public void registered(final boolean reg) {
-    if(qp == null) Util.notexpected("No query processor available.");
-    qp.ctx.registered(reg);
   }
 }

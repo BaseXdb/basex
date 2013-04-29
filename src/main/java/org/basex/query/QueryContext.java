@@ -40,7 +40,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class QueryContext extends Progress {
+public final class QueryContext extends Proc {
   /** URL pattern (matching Clark and EQName notation). */
   private static final Pattern BIND =
       Pattern.compile("^((\"|')(.*?)\\2:|(\\{(.*?)\\}))(.+)$");

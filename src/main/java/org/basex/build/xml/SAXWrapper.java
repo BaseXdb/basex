@@ -84,7 +84,7 @@ public final class SAXWrapper extends SingleParser {
       final String msg = Util.info(SCANPOS_X_X, in, ex.getLineNumber(),
           ex.getColumnNumber()) + COLS + Util.message(ex);
       throw new IOException(msg, ex);
-    } catch(final ProgressException ex) {
+    } catch(final ProcException ex) {
       throw ex;
     } catch(final Exception ex) {
       // occurs, e.g. if document encoding is invalid:

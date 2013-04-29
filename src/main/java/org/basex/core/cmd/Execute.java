@@ -44,7 +44,7 @@ public class Execute extends Command {
 
     final StringBuilder sb = new StringBuilder();
     for(final Command c : list) {
-      progress(c);
+      proc(c);
       final boolean ok = c.run(context, out);
       sb.append(c.info());
       if(!ok) return error(sb.toString());

@@ -4,7 +4,7 @@ import org.basex.util.list.*;
 
 /**
  * Result object for databases function.
- * @see Progress#databases(LockResult)
+ * @see Proc#databases(LockResult)
  */
 public class LockResult {
   /** Flag if global read lock is required. */

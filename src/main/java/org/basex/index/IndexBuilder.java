@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class IndexBuilder extends Progress {
+public abstract class IndexBuilder extends Proc {
   /** Data reference. */
   protected final Data data;
   /** Total parsing value. */

@@ -23,7 +23,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class Parser extends Progress {
+public abstract class Parser extends Proc {
   /** Source document, or {@code null}. */
   public IO src;
   /** Attributes of currently parsed element. */

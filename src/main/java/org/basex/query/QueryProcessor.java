@@ -22,7 +22,7 @@ import org.basex.query.value.node.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class QueryProcessor extends Progress {
+public final class QueryProcessor extends Proc {
   /** Expression context. */
   public final QueryContext ctx;
   /** Query. */
@@ -40,7 +40,7 @@ public final class QueryProcessor extends Progress {
   public QueryProcessor(final String qu, final Context cx) {
     query = qu;
     ctx = new QueryContext(cx);
-    progress(ctx);
+    proc(ctx);
   }
 
   /**
