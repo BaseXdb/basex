@@ -63,8 +63,9 @@ public abstract class BaseXServlet extends HttpServlet {
     } catch(final QueryException ex) {
       http.status(SC_BAD_REQUEST, Util.message(ex));
     } catch(final Exception ex) {
-      Util.errln(Util.bug(ex));
-      http.status(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED, ex));
+      final String msg = Util.bug(ex);
+      Util.errln(msg);
+      http.status(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED, msg));
     } finally {
       if(Prop.debug) {
         Util.outln("_ REQUEST _________________________________" + Prop.NL + req);
