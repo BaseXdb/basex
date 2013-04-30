@@ -387,33 +387,29 @@ public final class QT3TS {
     return QueryProcessor.removeComments(in, maxout);
   }
 
+  /** Flags for dependencies that are not supported. */
+  private static final String NOSUPPORT =
+    "('schema-location-hint','schemaAware','schemaImport'," +
+    "'schemaValidation','staticTyping')";
+
   /**
-   * Checks if the current query is supported.
-   * @param node query context
+   * Checks if the current test case is supported.
+   * @param test test case
    * @return result of check
    */
-  private boolean supported(final XdmValue node) {
-    /* feature:
-       collection-stability directory-as-collection-uri higherOrderFunctions
-       moduleImport namespace-axis schema-location-hint schemaAware schemaImport
-       schemaValidation staticTyping xpath-1.0-compatibility
-       MISSING? language, limits, calendar, format-integer-sequence, default-language
-     */
-
-    final String notsupp = "('schema-location-hint','schemaAware','schemaImport'," +
-        "'schemaValidation','staticTyping')";
+  private boolean supported(final XdmValue test) {
+    // the following query generates a result if the specified test is not supported
     final XQuery q = new XQuery(
       "*:environment/*:collation |" + // skip collation tests
       "*:dependency[" +
       // skip schema imports, schema validation, namespace axis, static typing
       "@type = 'feature' and (" +
-      " @value = " + notsupp + " and (@satisfied = 'true' or empty(@satisfied)) or" +
-      " @value != " + notsupp + "and @satisfied = 'false'" +
-      ") or " +
+      " @value = " + NOSUPPORT + " and (@satisfied = 'true' or empty(@satisfied)) or" +
+      " @value != " + NOSUPPORT + "and @satisfied = 'false') or " +
       // skip xml/xsd 1.1 tests
-      "@type=('xml-version','xsd-version') and @value='1.1' or" +
+      "@type=('xml-version','xsd-version') and @value=('1.1','1.0:4-') or" +
       // skip non-XQuery tests
-      "@type='spec' and not(contains(@value, 'XQ'))]", ctx).context(node);
+      "@type='spec' and not(contains(@value, 'XQ'))]", ctx).context(test);
 
     try {
       return q.next() == null;
