@@ -59,7 +59,9 @@ public final class QT3TS {
   private int ignored;
 
   /** Current base uri. */
-  private String base;
+  private String baseURI;
+  /** Current base directory. */
+  private String baseDir;
 
   /** Slow queries flag. */
   private TreeMap<Long, String> slow;
@@ -106,7 +108,7 @@ public final class QT3TS {
     ctx.prop.set(Prop.CHOP, false);
     ctx.prop.set(Prop.INTPARSE, false);
 
-    final XQuery qdoc = new XQuery("doc('" + file(null, CATALOG) + "')", ctx);
+    final XQuery qdoc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx);
     final XdmValue doc = qdoc.value();
     final String version = asString("*:catalog/@version", doc);
     Util.outln(NL + "QT3 Test Suite " + version);
@@ -175,11 +177,13 @@ public final class QT3TS {
    * @throws Exception exception
    */
   private void testSet(final String name) throws Exception {
-    final XQuery qdoc = new XQuery("doc(' " + file(null, name) + "')", ctx);
+    final XQuery qdoc = new XQuery("doc(' " + file(false, name) + "')", ctx);
     final XdmValue doc = qdoc.value();
     final XQuery qset = new XQuery("*:test-set", ctx).context(doc);
     final XdmValue set = qset.value();
-    base = IO.get(doc.getBaseURI()).dirPath();
+    final IO base = IO.get(doc.getBaseURI());
+    baseURI = base.path();
+    baseDir = base.dirPath();
     qdoc.close();
 
     if(supported(set)) {
@@ -249,8 +253,8 @@ public final class QT3TS {
     if(ienv != null) e = new QT3Env(ctx, ienv);
     qenv.close();
 
-    // set base uri
-    String b = base;
+    // parse local environment
+    boolean base = true;
     if(e == null) {
       final String env = asString("*:environment/@ref", test);
       if(!env.isEmpty()) {
@@ -259,7 +263,7 @@ public final class QT3TS {
         // check if environment is defined in catalog
         if(e == null) {
           e = envs(genvs, env);
-          b = null;
+          base = false;
         }
         if(e == null) Util.errln("%: environment '%' not found.", name, env);
       }
@@ -274,12 +278,12 @@ public final class QT3TS {
       string = asString("*:test", test);
     } else {
       // get query from file
-      string = string(new IOFile(base, qfile).read());
+      string = string(new IOFile(baseDir, qfile).read());
     }
 
     if(verbose) Util.outln(name);
     final XQuery query = new XQuery(string, ctx);
-    if(b != null) query.baseURI(b);
+    if(base) query.baseURI(baseURI);
 
     // add modules
     final String qm = "for $m in *:module return ($m/@uri, $m/@file)";
@@ -289,7 +293,7 @@ public final class QT3TS {
       if(uri == null) break;
       final XdmItem file = qmod.next();
       if(file == null) break;
-      query.addModule(uri.getString(), base + file.getString());
+      query.addModule(uri.getString(), baseDir + file.getString());
     }
 
     final QT3Result result = new QT3Result();
@@ -306,7 +310,7 @@ public final class QT3TS {
         // bind documents
         for(final HashMap<String, String> src : e.sources) {
           // add document reference
-          final String file = file(b, src.get(FILE));
+          final String file = file(base, src.get(FILE));
           query.addDocument(src.get(URI), file);
           final String role = src.get(ROLE);
           if(role == null) continue;
@@ -316,7 +320,7 @@ public final class QT3TS {
         }
         // bind resources
         for(final HashMap<String, String> src : e.resources) {
-          query.addResource(src.get(URI), file(b, src.get(FILE)), src.get(ENCODING));
+          query.addResource(src.get(URI), file(base, src.get(FILE)), src.get(ENCODING));
         }
         // bind collections
         query.addCollection(e.collURI, e.collSources.toArray());
@@ -664,8 +668,8 @@ public final class QT3TS {
     final boolean pref = asBoolean("@ignore-prefixes=('true','1')", expect);
 
     try {
-      String exp = normNL(file.isEmpty() ?
-          expect.getString() : string(new IOFile(base, file).read()));
+      String exp = normNL(file.isEmpty() ? expect.getString() :
+        string(new IOFile(baseDir, file).read()));
       if(norm) exp = string(norm(token(exp)));
 
       final String res = normNL(asString("serialize(., map{ 'indent':='no' })", value));
@@ -820,12 +824,12 @@ public final class QT3TS {
 
   /**
    * Returns the path to a given file.
-   * @param b base path, possibly {@code null}
+   * @param base base flag.
    * @param file file name
    * @return path to the file
    */
-  private String file(final String b, final String file) {
-    final String dir = b != null ? b : basePath;
+  private String file(final boolean base, final String file) {
+    final String dir = base ? baseDir : basePath;
     return dir == null ? file : new File(dir, file).getAbsolutePath();
   }
 
