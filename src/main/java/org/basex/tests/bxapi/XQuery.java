@@ -165,7 +165,7 @@ public final class XQuery implements Iterable<XdmItem> {
    */
   public XdmValue value() {
     try {
-      return XdmValue.get(qp.value().materialize(null));
+      return XdmValue.get(qp.value());
     } catch(final QueryException ex) {
       Util.debug(ex);
       throw new XQueryException(ex);

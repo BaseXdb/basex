@@ -122,9 +122,9 @@ public final class QT3TS {
 
     final StringBuilder result = new StringBuilder();
     result.append(" Rate    : ").append(pc(correct, tested)).append(NL);
-    result.append(" Correct : ").append(correct).append(NL);
-    result.append(" Tested  : ").append(tested).append(NL);
     result.append(" Total   : ").append(total).append(NL);
+    result.append(" Tested  : ").append(tested).append(NL);
+    result.append(" Wrong   : ").append(tested - correct).append(NL);
     result.append(" Ignored : ").append(ignored).append(NL);
 
     final String path = new File(testid + ".log").getCanonicalPath();
@@ -705,12 +705,14 @@ public final class QT3TS {
     final String exp = asString('@' + CODE, expect);
     try {
       asString("serialize(., map{ 'indent':='no' })", value);
-      //value.toString();
       return exp;
-    } catch(final RuntimeException qe) {
-      final String res = qe.getMessage().replaceAll("\\[|\\].*\r?\n?.*", "");
-      return !errors || exp.equals("*") || exp.equals(res) ? null :
-        Util.info("% (found: %)", exp, res);
+    } catch(final XQueryException qe) {
+      if(!errors || exp.equals("*")) return null;
+      for(final String s : qe.getMessage().split("\r\n?|\n")) {
+        if(s.matches(".*\\[.+\\].*") && exp.matches(s.replaceAll(".*\\[|\\].*", "")))
+          return null;
+      }
+      return Util.info("% (found: %)", exp, qe.getMessage());
     }
   }
 
