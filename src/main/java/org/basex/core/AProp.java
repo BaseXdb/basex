@@ -311,6 +311,8 @@ public abstract class AProp implements Iterable<String> {
     return tb.toString();
   }
 
+  // STATIC METHODS =====================================================================
+
   /**
    * Returns a system property.
    * @param key {@link Prop} key
@@ -319,8 +321,6 @@ public abstract class AProp implements Iterable<String> {
   public static String getSystem(final Object[] key) {
     return key.length > 0 ? getSystem(key[0].toString()) : "";
   }
-
-  // STATIC METHODS =====================================================================
 
   /**
    * Returns a system property. If necessary, the key will

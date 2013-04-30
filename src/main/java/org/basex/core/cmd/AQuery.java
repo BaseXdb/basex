@@ -23,11 +23,11 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class AQuery extends Command {
+  /** Query result. */
+  protected Result result;
+
   /** Query info. */
   private final QueryInfo qi = new QueryInfo();
-  /** Query result. */
-  Result result;
-
   /** Query processor. */
   private QueryProcessor qp;
   /** Query exception. */
@@ -39,7 +39,7 @@ public abstract class AQuery extends Command {
    * @param d requires opened database
    * @param arg arguments
    */
-  AQuery(final Perm p, final boolean d, final String... arg) {
+  protected AQuery(final Perm p, final boolean d, final String... arg) {
     super(p, d, arg);
   }
 
@@ -48,7 +48,7 @@ public abstract class AQuery extends Command {
    * @param query query
    * @return success flag
    */
-  final boolean query(final String query) {
+  protected final boolean query(final String query) {
     final Performance p = new Performance();
     String err;
     if(qe != null) {
@@ -124,27 +124,12 @@ public abstract class AQuery extends Command {
   }
 
   /**
-   * Returns an extended error message.
-   * @param err error message
-   * @return result of check
-   */
-  final boolean extError(final String err) {
-    // will only be evaluated when an error has occurred
-    final StringBuilder sb = new StringBuilder();
-    if(prop.is(Prop.QUERYINFO)) {
-      sb.append(info()).append(qp.info()).append(NL).append(ERROR_C).append(NL);
-    }
-    sb.append(err);
-    return error(sb.toString());
-  }
-
-  /**
    * Checks if the query might perform updates.
    * @param ctx database context
    * @param qu query
    * @return result of check
    */
-  final boolean updating(final Context ctx, final String qu) {
+  protected final boolean updating(final Context ctx, final String qu) {
     // keyword found; parse query to get sure
     try {
       final Performance p = new Performance();
@@ -160,31 +145,10 @@ public abstract class AQuery extends Command {
     }
   }
 
-  @Override
-  public boolean updating(final Context ctx) {
-    return args[0] != null && updating(ctx, args[0]);
-  }
-
-  @Override
-  public boolean updated(final Context ctx) {
-    return qp != null && qp.updates() != 0;
-  }
-
-  @Override
-  public void databases(final LockResult lr) {
-    if(null == qp)
-      lr.writeAll = true;
-    else {
-      qp.databases(lr);
-      qi.readLocked = lr.readAll ? null : lr.read;
-      qi.writeLocked = lr.writeAll ? null : lr.write;
-    }
-  }
-
   /**
    * Performs the first argument as XQuery and returns a node set.
    */
-  final void queryNodes() {
+  protected final void queryNodes() {
     try {
       result = queryProcessor(args[0], context).queryNodes();
     } catch(final QueryException ex) {
@@ -204,11 +168,19 @@ public abstract class AQuery extends Command {
     return qp;
   }
 
-  @Override
-  public final Result result() {
-    final Result r = result;
-    result = null;
-    return r;
+  /**
+   * Returns an extended error message.
+   * @param err error message
+   * @return result of check
+   */
+  private boolean extError(final String err) {
+    // will only be evaluated when an error has occurred
+    final StringBuilder sb = new StringBuilder();
+    if(prop.is(Prop.QUERYINFO)) {
+      sb.append(info()).append(qp.info()).append(NL).append(ERROR_C).append(NL);
+    }
+    sb.append(err);
+    return error(sb.toString());
   }
 
   /**
@@ -247,6 +219,27 @@ public abstract class AQuery extends Command {
   }
 
   @Override
+  public boolean updating(final Context ctx) {
+    return args[0] != null && updating(ctx, args[0]);
+  }
+
+  @Override
+  public boolean updated(final Context ctx) {
+    return qp != null && qp.updates() != 0;
+  }
+
+  @Override
+  public void databases(final LockResult lr) {
+    if(null == qp)
+      lr.writeAll = true;
+    else {
+      qp.databases(lr);
+      qi.readLocked = lr.readAll ? null : lr.read;
+      qi.writeLocked = lr.writeAll ? null : lr.write;
+    }
+  }
+
+  @Override
   public void build(final CmdBuilder cb) {
     cb.init().xquery(0);
   }
@@ -264,5 +257,12 @@ public abstract class AQuery extends Command {
   @Override
   public void registered(final boolean reg) {
     qp.registered(reg);
+  }
+
+  @Override
+  public final Result result() {
+    final Result r = result;
+    result = null;
+    return r;
   }
 }

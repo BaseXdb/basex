@@ -27,7 +27,7 @@ public abstract class ACreate extends Command {
    * Protected constructor, specifying command arguments.
    * @param arg arguments
    */
-  ACreate(final String... arg) {
+  protected ACreate(final String... arg) {
     this(Perm.CREATE, false, arg);
     newData = true;
   }
@@ -38,30 +38,8 @@ public abstract class ACreate extends Command {
    * @param d requires opened database
    * @param arg arguments
    */
-  ACreate(final Perm p, final boolean d, final String... arg) {
+  protected ACreate(final Perm p, final boolean d, final String... arg) {
     super(p, d, arg);
-  }
-
-  @Override
-  public boolean newData(final Context ctx) {
-    if(newData) new Close().run(ctx);
-    return newData;
-  }
-
-  @Override
-  public void databases(final LockResult lr) {
-    // default implementation for commands accessing (exclusively) the opened database
-    lr.write.add(DBLocking.CTX);
-  }
-
-  @Override
-  public final boolean supportsProg() {
-    return true;
-  }
-
-  @Override
-  public boolean stoppable() {
-    return true;
   }
 
   /**
@@ -148,5 +126,27 @@ public abstract class ACreate extends Command {
     data.closeIndex(index);
     data.meta.dirty = true;
     return pat == null || data.meta.drop(pat + '.');
+  }
+
+  @Override
+  public boolean newData(final Context ctx) {
+    if(newData) new Close().run(ctx);
+    return newData;
+  }
+
+  @Override
+  public void databases(final LockResult lr) {
+    // default implementation for commands accessing (exclusively) the opened database
+    lr.write.add(DBLocking.CTX);
+  }
+
+  @Override
+  public final boolean supportsProg() {
+    return true;
+  }
+
+  @Override
+  public boolean stoppable() {
+    return true;
   }
 }

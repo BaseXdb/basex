@@ -479,7 +479,8 @@ public enum Function {
   /* FNClient functions. */
 
   /** XQuery function. */
-  _CLIENT_CONNECT(FNClient.class, "connect(url,port,user,pass)", URI, STR, ITR, STR, STR),
+  _CLIENT_CONNECT(FNClient.class, "connect(url,port,user,password)",
+      URI, STR, ITR, STR, STR),
   /** XQuery function. */
   _CLIENT_EXECUTE(FNClient.class, "execute(id,command)", STR, URI, STR),
   /** XQuery function. */

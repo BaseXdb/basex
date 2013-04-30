@@ -308,11 +308,6 @@ public final class QueryProcessor extends Proc {
   }
 
   @Override
-  public String toString() {
-    return query;
-  }
-
-  @Override
   public boolean registered() {
     return ctx.registered();
   }
@@ -320,5 +315,10 @@ public final class QueryProcessor extends Proc {
   @Override
   public void registered(final boolean reg) {
     ctx.registered(reg);
+  }
+
+  @Override
+  public String toString() {
+    return query;
   }
 }
