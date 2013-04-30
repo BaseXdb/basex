@@ -115,11 +115,11 @@ public final class XQuery implements Iterable<XdmItem> {
   /**
    * Adds a resource.
    * @param name name of the collection
-   * @param path document path
+   * @param strings document path, encoding
    * @throws XQueryException exception
    */
-  public void addResource(final String name, final String path) {
-    qp.ctx.resource.addResource(name, path);
+  public void addResource(final String name, final String... strings) {
+    qp.ctx.resource.addResource(name, strings);
   }
 
   /**

@@ -44,7 +44,7 @@ public final class QT3TSReport {
     { "language", "de", "true" },
     { "language", "xib", "true" },
     { "limits", "year_lt_0", "true" },
-    { "unicode-normalization-form", "FULLY-NORMALIZED", "true" },
+    { "unicode-normalization-form", "FULLY-NORMALIZED", "false" },
     { "unicode-normalization-form", "NFD", "true" },
     { "unicode-normalization-form", "NFKC", "true" },
     { "unicode-normalization-form", "NFKD", "true" },

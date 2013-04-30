@@ -1,6 +1,6 @@
 package org.basex.tests.w3c;
 
-import static org.basex.core.Prop.*;
+import static org.basex.core.Prop.NL;
 import static org.basex.tests.w3c.QT3Constants.*;
 import static org.basex.util.Token.*;
 
@@ -316,7 +316,7 @@ public final class QT3TS {
         }
         // bind resources
         for(final HashMap<String, String> src : e.resources) {
-          query.addResource(src.get(URI), file(b, src.get(FILE)));
+          query.addResource(src.get(URI), file(b, src.get(FILE)), src.get(ENCODING));
         }
         // bind collections
         query.addCollection(e.collURI, e.collSources.toArray());
@@ -406,10 +406,13 @@ public final class QT3TS {
       "@type = 'feature' and (" +
       " @value = " + NOSUPPORT + " and (@satisfied = 'true' or empty(@satisfied)) or" +
       " @value != " + NOSUPPORT + "and @satisfied = 'false') or " +
+      // skip fully-normalized unicode tests
+      "@type='unicode-normalization-form' and @value != 'FULLY-NORMALIZED' or " +
       // skip xml/xsd 1.1 tests
-      "@type=('xml-version','xsd-version') and @value=('1.1','1.0:4-') or" +
+      "@type=('xml-version','xsd-version') and @value=('1.1','1.0:4-') or " +
       // skip non-XQuery tests
-      "@type='spec' and not(contains(@value, 'XQ'))]", ctx).context(test);
+      "@type='spec' and not(contains(@value, 'XQ'))" +
+      "]", ctx).context(test);
 
     try {
       return q.next() == null;

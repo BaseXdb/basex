@@ -40,6 +40,8 @@ interface QT3Constants {
   String SELECT = "select";
   /** QT3TS String. */
   String PREFIX = "prefix";
+  /** QT3TS String. */
+  String ENCODING = "encoding";
 
   /** QT3TS String. */
   String SCHEMA_IMPORT = "schemaImport";
