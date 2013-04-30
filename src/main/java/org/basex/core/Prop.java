@@ -20,6 +20,14 @@ public final class Prop extends AProp {
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
   public static final String VERSION = "7.7 beta";
+  /** Main author. */
+  public static final String AUTHOR = "Christian Gr\u00FCn";
+  /** Co-authors (1). */
+  public static final String TEAM1 = "Alexander Holupirek, Michael Seiferle";
+  /** Co-authors (2). */
+  public static final String TEAM2 = "Lukas Kircher, Leo W\u00F6rteler";
+  /** Entity. */
+  public static final String ENTITY = Prop.NAME + " Team";
 
   /** New line string. */
   public static final String NL = System.getProperty("line.separator");

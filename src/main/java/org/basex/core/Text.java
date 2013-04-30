@@ -45,8 +45,6 @@ public interface Text {
   String VERSION_URL = "http://files." + NAMELC + ".org/version.txt";
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
-  /** Company info. */
-  String COMPANY = Prop.NAME + " Team";
   /** Title and version. */
   String TITLE = Prop.NAME + ' ' + Prop.VERSION;
 
@@ -1266,15 +1264,15 @@ public interface Text {
   String MEMUSED_C = USED_MEM + COLS;
 
   /** Copyright info. */
-  String COPYRIGHT = "\u00A9 2005-12 " + COMPANY;
+  String COPYRIGHT = "\u00A9 2005-12 " + Prop.ENTITY;
   /** License info. */
   String LICENSE = lang("license");
   /** Developer info. */
-  String CHIEF_ARCHITECT = lang("chief_architect") + ": Christian Gr\u00FCn";
+  String CHIEF_ARCHITECT = lang("chief_architect") + ": " + Prop.AUTHOR;
   /** Contributors info. */
-  String TEAM1 = lang("team") + ": Alexander Holupirek, Michael Seiferle,";
+  String TEAM1 = lang("team") + ": " + Prop.TEAM1 + ',';
   /** Developer names. */
-  String TEAM2 = "Lukas Kircher, Leo W\u00F6rteler";
+  String TEAM2 = Prop.TEAM2;
   /** Developer names. */
   String AND_OTHERS = lang("and_others");
   /** Translation. */
