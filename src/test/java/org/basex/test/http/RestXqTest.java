@@ -91,6 +91,18 @@ public final class RestXqTest extends HTTPTest {
     getE(f, "2/x");
   }
 
+  /** Checks if undeclared functions are reported. */
+  @Test public void unknownFunction() {
+    try {
+      get("declare function m:foo($x) { $x };" +
+          "declare %R:path('') function m:f() { m:foo() };", "", "");
+      fail("Unknown function 'm:foo()' should not be found.");
+    } catch(IOException e) {
+      System.out.println(e.getMessage());
+      assertTrue(e.getMessage().contains("XPST0017"));
+    }
+  }
+
   /** Retrieve path with typed variable.
    * @throws Exception exception */
   @Test public void post() throws Exception {
