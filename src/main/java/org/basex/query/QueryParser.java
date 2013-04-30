@@ -718,8 +718,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void schemaImport() throws QueryException {
+    byte[] pref = null;
     if(wsConsumeWs(NSPACE)) {
-      final byte[] pref = ncName(XPNAME);
+      pref = ncName(XPNAME);
       if(eq(pref, XML, XMLNS)) error(BINDXML, pref);
       wsCheck(IS);
     } else if(wsConsumeWs(DEFAULT)) {
@@ -727,7 +728,7 @@ public class QueryParser extends InputParser {
       wsCheck(NSPACE);
     }
     byte[] ns = stringLiteral();
-    if(ns.length == 0) error(NSEMPTY);
+    if(pref != null && ns.length == 0) error(NSEMPTY);
     if(!Uri.uri(ns).isValid()) error(INVURI, ns);
     if(wsConsumeWs(AT)) {
       do {
