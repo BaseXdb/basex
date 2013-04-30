@@ -218,14 +218,16 @@ public final class FNGen extends StandardFunc {
       if(!Uri.uri(p).isValid()) INVURL.thrw(info, p);
 
       IO io = base.merge(p);
-      final String rp = ctx.resource.resources.get(io.path());
-      if(rp != null) io = IO.get(rp);
-      if(!io.exists()) throw RESNF.thrw(info, p);
+      final String[] rp = ctx.resource.resources.get(io.path());
+      if(rp != null && rp.length > 0) {
+        io = IO.get(rp[0]);
+        if(rp.length > 1) enc = rp[1];
+      }
+      if(!io.exists()) RESNF.thrw(info, p);
 
       final InputStream is = io.inputStream();
       try {
-        final TextInput ti = new TextInput(io).valid(true);
-        if(enc != null) ti.encoding(enc);
+        final TextInput ti = new TextInput(io).encoding(enc).validate(true);
         if(!check) return Str.get(ti.content());
         while(ti.read() != -1);
         return Bln.TRUE;
@@ -237,8 +239,10 @@ public final class FNGen extends StandardFunc {
       throw ex;
     } catch(final IOException ex) {
       if(check) return Bln.FALSE;
-      if(ex instanceof EncodingException) INVCHARS.thrw(info, ex);
-      if(ex instanceof InputException && enc == null) WHICHCHARS.thrw(info);
+      if(ex instanceof InputException) {
+        if(ex instanceof EncodingException || enc != null) INVCHARS.thrw(info, ex);
+        else WHICHCHARS.thrw(info, ex);
+      }
       throw RESNF.thrw(info, path);
     }
   }

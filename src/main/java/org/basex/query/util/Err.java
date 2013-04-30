@@ -533,7 +533,7 @@ public enum Err {
   /** FOUT1190. */
   INVCHARS(FOUT, 1190, "%."),
   /** FOUT1200. */
-  WHICHCHARS(FOUT, 1200, "Resource contains invalid input."),
+  WHICHCHARS(FOUT, 1200, "Resource contains invalid input: %."),
 
   /** FTDY0016. */
   FTWEIGHT(FTDY, 16, "Weight value out of range: %."),

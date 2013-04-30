@@ -7,7 +7,6 @@ import java.nio.*;
 import java.nio.charset.*;
 
 import org.basex.io.serial.*;
-import org.basex.util.*;
 
 /**
  * This abstract class specifies a single method for decoding input to UTF-8.
@@ -68,11 +67,12 @@ abstract class TextDecoder {
     int read(final TextInput ti) throws IOException {
       int ch = ti.next();
       if(ch < 0x80) return ch;
+      if(ch < 0xC0) return invalid();
       cache[0] = (byte) ch;
       final int cl = cl((byte) ch);
       for(int c = 1; c < cl; ++c) {
         ch = ti.next();
-        if(ch < 0) return invalid();
+        if(ch < 0x80) return invalid();
         cache[c] = (byte) ch;
       }
       return cp(cache, 0);
@@ -139,7 +139,7 @@ abstract class TextDecoder {
       try {
         csd = Charset.forName(enc).newDecoder();
       } catch(final Exception ex) {
-        throw new IOException(Util.message(ex));
+        throw new EncodingException(ex);
       }
     }
 

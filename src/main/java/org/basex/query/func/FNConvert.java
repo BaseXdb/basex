@@ -251,7 +251,7 @@ public final class FNConvert extends StandardFunc {
       throws IOException {
 
     try {
-      return new NewlineInput(is).encoding(enc).valid(true).content();
+      return new NewlineInput(is).encoding(enc).validate(true).content();
     } finally {
       is.close();
     }

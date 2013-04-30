@@ -54,7 +54,7 @@ public final class StrStream extends AStr {
     TextInput nli = null;
     try {
       nli = new TextInput(input);
-      nli.encoding(encoding).valid(true);
+      nli.encoding(encoding).validate(true);
       return nli;
     } catch(final IOException ex) {
       if(nli != null) try { nli.close(); } catch(final IOException ignored) { }

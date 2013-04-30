@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  */
 public final class QueryResources {
   /** Resources. */
-  public final HashMap<String, String> resources = new HashMap<String, String>();
+  public final HashMap<String, String[]> resources = new HashMap<String, String[]>();
 
   /** Database context. */
   private final QueryContext ctx;
@@ -201,10 +201,10 @@ public final class QueryResources {
   /**
    * Adds a resource with the specified path. Only called from the test APIs.
    * @param uri resource uri
-   * @param path resource path
+   * @param strings resource strings (path, encoding)
    */
-  public void addResource(final String uri, final String path) {
-    resources.put(uri, path);
+  public void addResource(final String uri, final String... strings) {
+    resources.put(uri, strings);
   }
 
   /**
