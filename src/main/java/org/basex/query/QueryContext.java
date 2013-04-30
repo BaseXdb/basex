@@ -184,7 +184,7 @@ public final class QueryContext extends Proc {
    * @throws QueryException query exception
    */
   public QNm module(final String qu, final String path) throws QueryException {
-    return new QueryParser(qu, path, this).parseModule(false);
+    return new QueryParser(qu, path, this).parseModule(true);
   }
 
   /**
@@ -194,7 +194,6 @@ public final class QueryContext extends Proc {
   public void mainModule(final MainModule rt) {
     root = rt;
     updating = rt.expr.uses(Use.UPD);
-
   }
 
   /**
