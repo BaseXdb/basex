@@ -46,6 +46,8 @@ public final class QT3TS {
   private final TokenBuilder wrong = new TokenBuilder();
   /** Ignored tests. */
   private final TokenBuilder ignore = new TokenBuilder();
+  /** Report builder. */
+  private QT3TSReport report;
 
   /** Number of total queries. */
   private int total;
@@ -108,6 +110,7 @@ public final class QT3TS {
     final XdmValue doc = qdoc.value();
     final String version = asString("*:catalog/@version", doc);
     Util.outln(NL + "QT3 Test Suite " + version);
+    Util.outln("Test directory: " + new File(".").getCanonicalPath());
     Util.out("Parsing queries");
 
     final XQuery qenv = new XQuery("*:catalog/*:environment", ctx).context(doc);
@@ -127,9 +130,9 @@ public final class QT3TS {
     result.append(" Wrong   : ").append(tested - correct).append(NL);
     result.append(" Ignored : ").append(ignored).append(NL);
 
-    final String path = new File(testid + ".log").getCanonicalPath();
-    Util.outln(NL + "Writing log file '" + path + "'..." + NL);
-    final PrintOutput po = new PrintOutput(path);
+    // save log data
+    Util.outln(NL + "Writing log file '" + testid + ".log'...");
+    final PrintOutput po = new PrintOutput(testid + ".log");
     po.println("QT3TS RESULTS __________________________" + NL);
     po.println(result.toString());
     po.println("WRONG __________________________________" + NL);
@@ -144,7 +147,15 @@ public final class QT3TS {
     }
     po.close();
 
-    Util.out(result);
+    // save report
+    if(report != null) {
+      final String file = "ReportingResults/results_" +
+          Prop.NAME + "_" + Prop.VERSION + IO.XMLSUFFIX;
+      new IOFile(file).write(report.create(ctx).toArray());
+      Util.outln("Creating report '" + file + "'...");
+    }
+
+    Util.out(NL + result);
     Util.outln(" Time    : " + perf);
 
     if(slow != null && !slow.isEmpty()) {
@@ -177,6 +188,8 @@ public final class QT3TS {
       final ArrayList<QT3Env> envs = new ArrayList<QT3Env>();
       for(final XdmItem ienv : qenv) envs.add(new QT3Env(ctx, ienv));
       qenv.close();
+
+      if(report != null) report.addSet(asString("@name", set));
 
       // run all test cases
       final XQuery qts = new XQuery("*:test-case", ctx).context(set);
@@ -334,7 +347,7 @@ public final class QT3TS {
     // revert to XQuery as default
     ctx.prop.set(Prop.XQUERY3, true);
 
-    final String msg = test(result, expected);
+    final String exp = test(result, expected);
     final TokenBuilder tmp = new TokenBuilder();
     tmp.add(name).add(NL);
     tmp.add(noComments(string)).add(NL);
@@ -351,14 +364,15 @@ public final class QT3TS {
     }
 
     tmp.add(err ? "Error : " : "Result: ").add(noComments(res)).add(NL);
-    if(msg == null) {
+    if(exp == null) {
       tmp.add(NL);
       right.add(tmp.finish());
       correct++;
     } else {
-      tmp.add("Expect: " + noComments(msg)).add(NL).add(NL);
+      tmp.add("Expect: " + noComments(exp)).add(NL).add(NL);
       wrong.add(tmp.finish());
     }
+    if(report != null) report.addTest(name, exp == null);
 
     query.close();
     qexp.close();
@@ -423,7 +437,7 @@ public final class QT3TS {
    * Tests the result of a test case.
    * @param result resulting value
    * @param expected expected result
-   * @return optional expected test suite result
+   * @return {@code null} if test was successful; otherwise, expected test suite result
    */
   private String test(final QT3Result result, final XdmValue expected) {
     final String type = expected.getName();
@@ -848,6 +862,7 @@ public final class QT3TS {
         " -e  ignore error codes" + NL +
         " -i  also save ignored files" + NL +
         " -p  path to the test suite" + NL +
+        " -r  generate report file" + NL +
         " -s  print slow queries" + NL +
         " -v  verbose output",
         Util.info(Text.CONSOLE, Util.name(this)));
@@ -865,6 +880,8 @@ public final class QT3TS {
           ignoring = true;
         } else if(c == 'e') {
           errors = false;
+        } else if(c == 'r') {
+          report = new QT3TSReport();
         } else if(c == 's') {
           slow = new TreeMap<Long, String>();
         } else if(c == 'p') {
