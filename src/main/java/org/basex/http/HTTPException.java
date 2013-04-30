@@ -1,5 +1,7 @@
 package org.basex.http;
 
+import java.io.*;
+
 import org.basex.util.*;
 
 /**
@@ -8,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class HTTPException extends Exception {
+public final class HTTPException extends IOException {
   /** Status code. */
   private final int status;
 

@@ -18,6 +18,8 @@ public enum HTTPErr {
   ONEOP(SC_BAD_REQUEST, "Only one operation can be specified."),
   /** Error 400, "Unknown parameter: '%'". */
   UNKNOWN_PARAM_X(SC_BAD_REQUEST, "Unknown parameter: '%'."),
+  /** Error 400, "Invalid parameters: '%'". */
+  INVALID_PARAM_X(SC_BAD_REQUEST, "Parameters cannot be decoded: %."),
   /** Error 400, "Multiple context items specified.". */
   MULTIPLE_CONTEXT_X(SC_BAD_REQUEST, "Multiple context items specified."),
 
