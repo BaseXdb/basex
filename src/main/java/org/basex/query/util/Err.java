@@ -1002,7 +1002,7 @@ public enum Err {
   /** XPST0127. */
   FEATREQPRO(XQST, 127, "The '%' feature cannot be both required and prohibited."),
   /** XPST0128. */
-  FEATPROH(XQST, 128, "The '%' feature has been disabled."),
+  FEATPROH(XQST, 128, "The '%' feature cannot be deactivated."),
   /** XPST0132. */
   FEATMODULE(XQST, 132, "The '%' feature is not allowed in a library module."),
 

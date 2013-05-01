@@ -374,7 +374,7 @@ public class QueryParser extends InputParser {
   private void prolog2() throws QueryException {
     while(true) {
       final int i = ip;
-      if(!wsConsumeWs(DECLARE)) return;
+      if(!wsConsumeWs(DECLARE)) break;
 
       if(ctx.sc.xquery3() && wsConsumeWs(CONTEXT)) {
         contextItemDecl();
@@ -405,11 +405,21 @@ public class QueryParser extends InputParser {
           error(VARFUNC);
         } else {
           ip = i;
-          return;
+          break;
         }
       }
       skipWS();
       check(';');
+    }
+
+    for(final String d : decl) {
+      if(!d.endsWith("_R") && !d.endsWith("_P")) continue;
+      final boolean pf = d.charAt(d.length() - 1) == 'P';
+      final String k = d.substring(0, d.length() - 2);
+      if(eq(k, F_STATIC_TYPING, F_SCHEMA_AWARE, F_ALL_OPTIONAL_FEATURES))
+        error(pf ? FEATPROH : FEATNOTSUPP, k);
+      if(pf && eq(k, F_MODULE, F_HIGHER_ORDER_FUNCTION, F_ALL_EXTENSIONS,
+          F_ALL_OPTIONAL_FEATURES)) error(FEATPROH, k);
     }
   }
 
@@ -569,20 +579,17 @@ public class QueryParser extends InputParser {
         if(!XMLToken.isQName(vl)) error(DECLQNAME, val);
         final QNm qn = new QNm(vl, ctx);
         if(!qn.hasURI()) {
-          if(qn.hasPrefix()) error(NSDECL, qn.prefix());
+          if(qn.hasPrefix()) error(NOURI, qn.prefix());
           qn.uri(XQURI);
         }
         final String k = string(qn.local());
         if(eq(qn.uri(), XQURI) && eq(k, F_SCHEMA_AWARE, F_STATIC_TYPING, F_MODULE,
             F_HIGHER_ORDER_FUNCTION, F_ALL_EXTENSIONS, F_ALL_OPTIONAL_FEATURES)) {
-          if(eq(k, F_STATIC_TYPING, F_SCHEMA_AWARE, F_ALL_OPTIONAL_FEATURES))
-            error(pf ? FEATPROH : FEATNOTSUPP, k);
-          if(rf && eq(k, F_ALL_EXTENSIONS)) error(FEATREQUALL, k);
+
           if(module != null && eq(k, F_MODULE)) error(FEATMODULE, k);
-          if(decl.contains(k + (pf ? 'R' : 'P'))) error(FEATREQPRO, k);
-          if(pf && eq(k, F_MODULE, F_HIGHER_ORDER_FUNCTION, F_ALL_EXTENSIONS,
-              F_ALL_OPTIONAL_FEATURES)) error(FEATPROH, k);
-          decl.add(k + (pf ? 'P' : 'R'));
+          if(rf && eq(k, F_ALL_EXTENSIONS)) error(FEATREQUALL, k);
+          if(decl.contains(k + (pf ? "_R" : "_P"))) error(FEATREQPRO, k);
+          decl.add(k + (pf ? "_P" : "_R"));
         } else {
           error(DECLFEAT, vl);
         }
@@ -2191,7 +2198,6 @@ public class QueryParser extends InputParser {
     if(l == Long.MIN_VALUE) {
       return FNInfo.error(new QueryException(null, RANGE, tok), info());
     }
-    //error(RANGE, tok);
     return Int.get(l);
   }
 
