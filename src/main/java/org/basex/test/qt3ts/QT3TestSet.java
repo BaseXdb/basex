@@ -114,7 +114,7 @@ public abstract class QT3TestSet {
       final XdmItem res = value instanceof XdmItem ? (XdmItem) value : null;
       return result(exp.equal(res), exp.toString());
     } catch(final XQueryException err) {
-      return fail(err.getException().getMessage());
+      return result(expect.equals(value.getString()), err.getException().getMessage());
     } finally {
       query.close();
     }

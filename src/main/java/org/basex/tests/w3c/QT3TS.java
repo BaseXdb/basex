@@ -604,7 +604,9 @@ public final class QT3TS {
       final XdmItem res = value instanceof XdmItem ? (XdmItem) value : null;
       return exp.equal(res) ? null : exp.toString();
     } catch(final XQueryException err) {
-      return err.getException().getMessage();
+      // try simple string comparison
+      return expect.getString().equals(value.getString()) ? null :
+        err.getException().getMessage();
     } finally {
       query.close();
     }
