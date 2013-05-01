@@ -5,6 +5,7 @@ import static org.basex.tests.w3c.QT3Constants.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -103,6 +104,7 @@ public final class QT3TS {
   private void run(final String[] args) throws Exception {
     ctx.mprop.set(MainProp.DBPATH, sandbox().path() + "/data");
     parseArguments(args);
+    init();
 
     final Performance perf = new Performance();
     ctx.prop.set(Prop.CHOP, false);
@@ -696,7 +698,7 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String serializationMatches(final XdmValue value, final XdmValue expect) {
-    String exp = expect.getString();
+    final String exp = expect.getString();
 
     final String flags = asString("@flags", expect);
     final int flgs = flags.contains("i") ? Pattern.CASE_INSENSITIVE : 0;
@@ -898,6 +900,41 @@ public final class QT3TS {
         single = arg.string();
         maxout = Integer.MAX_VALUE;
       }
+    }
+  }
+
+  /**
+   * Adds an environment variable required for function tests. Reference:
+   *http://stackoverflow.com/questions/318239/how-do-i-set-environment-variables-from-java
+   */
+  @SuppressWarnings("unchecked")
+  private static void init() {
+    final Map<String, String> ne = new HashMap<String, String>();
+    ne.put("QTTEST", "42");
+    ne.put("QTTEST2", "other");
+    ne.put("QTTESTEMPTY", "");
+    try {
+      final Class<?> pe = Class.forName("java.lang.ProcessEnvironment");
+      final Field f = pe.getDeclaredField("theEnvironment");
+      f.setAccessible(true);
+      ((Map<String, String>) f.get(null)).putAll(ne);
+      final Field f2 = pe.getDeclaredField("theCaseInsensitiveEnvironment");
+      f2.setAccessible(true);
+      ((Map<String, String>) f2.get(null)).putAll(ne);
+    } catch(final NoSuchFieldException ex) {
+      try {
+        for(final Class<?> cl : Collections.class.getDeclaredClasses()) {
+          if("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
+            final Field f = cl.getDeclaredField("m");
+            f.setAccessible(true);
+            ((Map<String, String>) f.get(System.getenv())).putAll(ne);
+          }
+        }
+      } catch(final Exception e2) {
+        Util.errln("Test environment variable could not be set:" + e2);
+      }
+    } catch(final Exception e1) {
+      Util.errln("Test environment variable could not be set: " + e1);
     }
   }
 
