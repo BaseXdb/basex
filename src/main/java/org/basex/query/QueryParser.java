@@ -3672,19 +3672,20 @@ public class QueryParser extends InputParser {
     final boolean ent = consume('&');
     if(ent) {
       if(consume('#')) {
-        final int b = consume('x') ? 16 : 10;
+        final int b = consume('x') ? 0x10 : 10;
+        boolean ok = true;
         int n = 0;
         do {
           final char c = curr();
           final boolean m = digit(c);
-          final boolean h = b == 16
-              && (c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F');
+          final boolean h = b == 0x10 && (c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F');
           if(!m && !h) entityError(i, INVENTITY);
           final long nn = n;
-          n = n * b + (consume() & 15);
-          if(n < nn) entityError(i, INVCHARREF);
+          n = n * b + (consume() & 0xF);
+          if(n < nn) ok = false;
           if(!m) n += 9;
         } while(!consume(';'));
+        if(!ok) entityError(i, INVCHARREF);
         if(!XMLToken.valid(n)) entityError(i, INVCHARREF);
         tb.add(n);
       } else {
@@ -3728,7 +3729,7 @@ public class QueryParser extends InputParser {
   private void entityError(final int p, final Err c) throws QueryException {
     final String sub = input.substring(p, Math.min(p + 20, il));
     final int sc = sub.indexOf(';');
-    final String ent = sc != -1 ? sub.substring(0, sc + 1) : sub;
+    final String ent = sc != -1 ? sub.substring(0, sc + 1) : sub + "...";
     error(c, ent);
   }
 
