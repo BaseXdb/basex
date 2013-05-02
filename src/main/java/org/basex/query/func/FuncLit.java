@@ -1,0 +1,120 @@
+package org.basex.query.func;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.util.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
+import org.basex.query.var.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+
+/**
+ * A named function literal.
+ *
+ * @author BaseX Team 2005-12, BSD License
+ * @author Leo Woerteler
+ */
+public class FuncLit extends Single {
+  /** Variable scope. */
+  private final VarScope scope;
+  /** Static context. */
+  private final StaticContext sc;
+  /** Function name. */
+  private final QNm name;
+  /** Formal parameters. */
+  private final Var[] args;
+  /** If the function's type should be checked at compile time. */
+  private final boolean check;
+
+  /**
+   * Constructor.
+   * @param nm function name
+   * @param arg formal parameters
+   * @param fn function body
+   * @param ft function type
+   * @param scp variable scope
+   * @param sctx static context
+   * @param ii input info
+   */
+  public FuncLit(final QNm nm, final Var[] arg, final Expr fn, final FuncType ft,
+      final VarScope scp, final StaticContext sctx, final InputInfo ii) {
+    super(ii, fn);
+    name = nm;
+    args = arg;
+    check = ft == null;
+    type = (ft == null ? FuncType.arity(args.length) : ft).seqType();
+    scope = scp;
+    sc = sctx;
+  }
+
+  @Override
+  public Expr compile(final QueryContext ctx, final VarScope o) throws QueryException {
+    if(check) {
+      final StaticFunc sf = ctx.funcs.get(name, args.length, info);
+      if(sf == null) throw Err.FUNCUNKNOWN.thrw(info, name.string());
+      type = sf.funcType().seqType();
+    }
+
+    final int fp = scope.enter(ctx);
+    try {
+      expr = expr.compile(ctx, scope);
+    } finally {
+      scope.exit(ctx, fp);
+    }
+
+    return expr.isValue() ? preEval(ctx) : this;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    for(final Var v : args) if(!visitor.declared(v)) return false;
+    return expr.accept(visitor);
+  }
+
+  @Override
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    return new FuncItem(name, args, expr, (FuncType) type.type, false, ctx.value, ctx.pos,
+        ctx.size, null, scope, sc);
+  }
+
+  @Override
+  public Expr copy(final QueryContext ctx, final VarScope o, final IntMap<Var> vs) {
+    final VarScope scp = new VarScope();
+    final Var[] arg = new Var[args.length];
+    for(int i = 0; i < arg.length; i++)
+      vs.add(args[i].id, arg[i] = scp.newCopyOf(ctx, args[i]));
+    final Expr call = expr.copy(ctx, scp, vs);
+    return new FuncLit(name, arg, call, (FuncType) type.type, scp, sc, info);
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.X30 || u == Use.CTX || u == Use.POS;
+  }
+
+  @Override
+  public String toString() {
+    return new TokenBuilder(name.string()).add('#').add(
+        Token.token(args.length)).toString();
+  }
+
+  /**
+   * Creates a function literal for a function that was not yet encountered while parsing.
+   * @param nm function name
+   * @param ar function arity
+   * @param ctx query context
+   * @param ii input info
+   * @return function literal
+   * @throws QueryException query exception
+   */
+  public static FuncLit unknown(final QNm nm, final long ar, final QueryContext ctx,
+      final InputInfo ii) throws QueryException {
+    final VarScope scp = new VarScope();
+    final FuncType temp = FuncType.arity((int) ar);
+    final Var[] arg = new Var[(int) ar];
+    final Expr[] refs = temp.args(arg, ctx, scp, ii);
+    final TypedFunc call = ctx.funcs.getFuncRef(nm, refs, ctx.sc, ii);
+    return new FuncLit(nm, arg, call.fun, null, scp, ctx.sc, ii);
+  }
+}

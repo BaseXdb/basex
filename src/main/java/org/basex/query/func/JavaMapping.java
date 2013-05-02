@@ -147,24 +147,53 @@ public abstract class JavaMapping extends Arr {
   }
 
   /**
-   * Returns a new Java function instance.
-   * @param qname function name
-   * @param args arguments
+   * Gets the specified method from a query module.
+   * @param mod query module object
+   * @param path path of the module
+   * @param name method name
+   * @param arity number of arguments
    * @param ctx query context
    * @param ii input info
-   * @return Java function, or {@code null}
+   * @return method if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  static JavaMapping get(final QNm qname, final Expr[] args, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
+  private static Method getModMethod(final Object mod, final String path,
+      final String name, final long arity, final QueryContext ctx, final InputInfo ii)
+          throws QueryException {
+    // find method with identical name and arity
+    Method meth = null;
+    for(final Method m : mod.getClass().getMethods()) {
+      if(m.getName().equals(name) && m.getParameterTypes().length == arity) {
+        if(meth != null) throw JAVAAMB.thrw(ii, path + ':' + name);
+        meth = m;
+      }
+    }
+    if(meth == null) throw WHICHJAVA.thrw(ii, path + ':' + name);
 
-    final byte[] uri = qname.uri();
-    final byte[] ln = qname.local();
-    // check if URI starts with "java:" prefix (if yes, module must be Java code)
-    final boolean java = startsWith(uri, JAVAPREF);
-    final QNm nm = new QNm(ln, java ? substring(uri, JAVAPREF.length) : uri);
+    // check if user has sufficient permissions to call the function
+    Perm perm = Perm.ADMIN;
+    final QueryModule.Requires req = meth.getAnnotation(QueryModule.Requires.class);
+    if(req != null) perm = Perm.get(req.value().name());
+    if(!ctx.context.user.has(perm)) return null;
+    return meth;
+  }
 
-    // rewrite function name: convert dashes to upper-case initials
+  /**
+   * Converts a module URI to a path.
+   * @param uri module URI
+   * @return module path
+   */
+  private static String toPath(final byte[] uri) {
+    final String path = string(uri), p = ModuleLoader.uri2path(path);
+    return p == null ? path : ModuleLoader.capitalize(p).replace("/", ".").substring(1);
+  }
+
+  /**
+   * Converts the given name to camel case.
+   * @param ln name to convert
+   * @return resulting name
+   */
+  private static String camelCase(final byte[] ln) {
     final TokenBuilder tb = new TokenBuilder();
     boolean dash = false;
     for(int p = 0; p < ln.length; p += cl(ln, p)) {
@@ -177,34 +206,35 @@ public abstract class JavaMapping extends Arr {
         if(!dash) tb.add(ch);
       }
     }
-    final String name = tb.toString();
+    return tb.toString();
+  }
+
+  /**
+   * Returns a new Java function instance.
+   * @param qname function name
+   * @param args arguments
+   * @param ctx query context
+   * @param ii input info
+   * @return Java function, or {@code null}
+   * @throws QueryException query exception
+   */
+  static JavaMapping get(final QNm qname, final Expr[] args, final QueryContext ctx,
+      final InputInfo ii) throws QueryException {
+
+    final byte[] uri = qname.uri();
+    // check if URI starts with "java:" prefix (if yes, module must be Java code)
+    final boolean java = startsWith(uri, JAVAPREF);
+
+    // rewrite function name: convert dashes to upper-case initials
+    final String name = camelCase(qname.local());
 
     // check imported Java modules
-    String path = string(nm.uri());
-    final String p = ModuleLoader.uri2path(path);
-    if(p != null) path = p;
-    path = ModuleLoader.capitalize(path).replace("/", ".").substring(1);
+    final String path = toPath(java ? substring(uri, JAVAPREF.length) : uri);
 
     final Object jm  = ctx.modules.findImport(path);
     if(jm != null) {
-      // find method with identical name and arity
-      Method meth = null;
-      for(final Method m : jm.getClass().getMethods()) {
-        if(m.getName().equals(name) && m.getParameterTypes().length == args.length) {
-          if(meth != null) JAVAAMB.thrw(ii, path + ':' + name);
-          meth = m;
-        }
-      }
-
-      if(meth != null) {
-        // check if user has sufficient permissions to call the function
-        Perm perm = Perm.ADMIN;
-        final QueryModule.Requires req = meth.getAnnotation(QueryModule.Requires.class);
-        if(req != null) perm = Perm.get(req.value().name());
-        if(!ctx.context.user.has(perm)) return null;
-        return new JavaModuleFunc(ii, jm, meth, args);
-      }
-      WHICHJAVA.thrw(ii, path + ':' + name);
+      final Method meth = getModMethod(jm, path, name, args.length, ctx, ii);
+      if(meth != null) return new JavaModuleFunc(ii, jm, meth, args);
     }
 
     // only allowed with administrator permissions
@@ -212,7 +242,8 @@ public abstract class JavaMapping extends Arr {
 
     // check addressed class
     try {
-      return new JavaFunc(ii, ctx.modules.findClass(path), name, args);
+      final Class<?> clz = ctx.modules.findClass(path);
+      return new JavaFunc(ii, clz, name, args);
     } catch(final ClassNotFoundException ex) {
       // only throw exception if "java:" prefix was explicitly specified
       if(java) throw WHICHJAVA.thrw(ii, uri);

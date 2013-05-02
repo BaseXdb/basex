@@ -139,7 +139,7 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    type = FuncType.get(args, ret).seqType();
+    type = FuncType.get(ann, args, ret).seqType();
     size = 1;
     // only evaluate if the closure is empty, so we don't lose variables
     return scope.closure().isEmpty() ? preEval(ctx) : this;
@@ -199,7 +199,7 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public FuncItem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final FuncType ft = FuncType.get(args, ret);
+    final FuncType ft = FuncType.get(ann, args, ret);
     final boolean c = ft.ret != null && !expr.type().instanceOf(ft.ret);
 
     // collect closure

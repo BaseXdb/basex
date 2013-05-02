@@ -54,6 +54,11 @@ public final class Map extends FItem {
   }
 
   @Override
+  public FuncType funcType() {
+    return MapType.get(AtomType.AAT, SeqType.ITEM_ZM);
+  }
+
+  @Override
   public Value invValue(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
     return get(args[0].item(ctx, ii), ii);

@@ -33,7 +33,7 @@ public final class StaticFuncs extends ExprInfo {
    * @param arity function arity
    * @return the function's signature
    */
-  protected static byte[] sig(final QNm name, final int arity) {
+  protected static byte[] sig(final QNm name, final long arity) {
     return new TokenBuilder(name.id()).add('#').add(Token.token(arity)).finish();
   }
 
@@ -146,6 +146,21 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
+   * Returns the function with the given name and arity.
+   * @param name function name
+   * @param arity function arity
+   * @param ii input info
+   * @return function if found, {@code null} otherwise
+   * @throws QueryException query exception
+   */
+  public StaticFunc get(final QNm name, final long arity, final InputInfo ii)
+      throws QueryException {
+    if(NSGlobal.reserved(name.uri())) funError(name, ii);
+    final FuncCache fc = funcs.get(sig(name, arity));
+    return fc == null ? null : fc.func;
+  }
+
+  /**
    * Finds similar function names and throws an error message.
    * @param name function name
    * @param ii input info
@@ -240,7 +255,7 @@ public final class StaticFuncs extends ExprInfo {
         return new TypedFunc(call, new Ann(), FuncType.arity(args.length));
       }
       call.init(func);
-      return new TypedFunc(call, func.ann, FuncType.get(func.args, func.declType));
+      return new TypedFunc(call, func.ann, func.funcType());
     }
 
     /**

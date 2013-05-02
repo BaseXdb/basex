@@ -34,6 +34,13 @@ public final class FuncItem extends FItem implements Scope {
   /** Optional type to cast to. */
   private final SeqType cast;
 
+  /** Context value. */
+  private final Value ctxVal;
+  /** Context position. */
+  private final long pos;
+  /** Context length. */
+  private final long size;
+
   /** The closure of this function item. */
   private final Map<Var, Value> closure;
   /** Size of the stack frame needed for this function. */
@@ -46,13 +53,16 @@ public final class FuncItem extends FItem implements Scope {
    * @param body function body
    * @param t function type
    * @param cst cast flag
+   * @param vl context value
+   * @param ps context position
+   * @param sz context size
    * @param cls closure
    * @param scp variable scope
    * @param sctx static context
    */
   public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
-      final boolean cst, final Map<Var, Value> cls, final VarScope scp,
-      final StaticContext sctx) {
+      final boolean cst, final Value vl, final long ps, final long sz,
+      final Map<Var, Value> cls, final VarScope scp, final StaticContext sctx) {
     super(t);
     name = n;
     vars = arg;
@@ -61,6 +71,10 @@ public final class FuncItem extends FItem implements Scope {
     closure = cls != null ? cls : Collections.<Var, Value>emptyMap();
     stackSize = scp.stackSize();
     sc = sctx;
+
+    ctxVal = vl;
+    pos = ps;
+    size = sz;
   }
 
   /**
@@ -76,7 +90,7 @@ public final class FuncItem extends FItem implements Scope {
   public FuncItem(final Var[] arg, final Expr body, final FuncType t,
       final Map<Var, Value> cl, final boolean cst, final VarScope scp,
       final StaticContext sctx) {
-    this(null, arg, body, t, cst, cl, scp, sctx);
+    this(null, arg, body, t, cst, null, 0, 0, cl, scp, sctx);
   }
 
   @Override
@@ -87,6 +101,11 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public QNm fName() {
     return name;
+  }
+
+  @Override
+  public FuncType funcType() {
+    return (FuncType) type;
   }
 
   /**
@@ -112,14 +131,19 @@ public final class FuncItem extends FItem implements Scope {
     ctx.sc = sc;
     final int fp = ctx.stack.enterFrame(stackSize);
     final Value cv = ctx.value;
+    final long ps = ctx.pos, sz = ctx.size;
     try {
       bindVars(ctx, ii, args);
-      ctx.value = null;
+      ctx.value = ctxVal;
+      ctx.pos = pos;
+      ctx.size = size;
       final Value v = ctx.value(expr);
       // optionally cast return value to target type
       return cast != null ? cast.funcConvert(ctx, ii, v) : v;
     } finally {
       ctx.value = cv;
+      ctx.pos = ps;
+      ctx.size = sz;
       ctx.stack.exitFrame(fp);
       ctx.sc = cs;
     }
@@ -134,15 +158,20 @@ public final class FuncItem extends FItem implements Scope {
     ctx.sc = sc;
     final int fp = ctx.stack.enterFrame(stackSize);
     final Value cv = ctx.value;
+    final long ps = ctx.pos, sz = ctx.size;
     try {
       bindVars(ctx, ii, args);
-      ctx.value = null;
+      ctx.value = ctxVal;
+      ctx.pos = pos;
+      ctx.size = size;
       final Item it = expr.item(ctx, ii);
       final Value v = it == null ? Empty.SEQ : it;
       // optionally cast return value to target type
       return cast != null ? cast.funcConvert(ctx, ii, v).item(ctx, ii) : it;
     } finally {
       ctx.value = cv;
+      ctx.pos = ps;
+      ctx.size = sz;
       ctx.stack.exitFrame(fp);
       ctx.sc = cs;
     }
@@ -181,7 +210,7 @@ public final class FuncItem extends FItem implements Scope {
       refs[i] = new VarRef(ii, vars[i]);
     }
     return new FuncItem(fun.name, vars, new DynFuncCall(ii, fun, refs), t,
-        fun.cast != null, null, sc, ctx.sc);
+        fun.cast != null, null, 0, 0, null, sc, ctx.sc);
   }
 
   @Override

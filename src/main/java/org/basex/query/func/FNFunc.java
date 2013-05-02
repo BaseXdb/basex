@@ -66,7 +66,8 @@ public final class FNFunc extends StandardFunc {
     final QNm name = checkQNm(expr[0].item(ctx, ii), ctx);
     final long arity = checkItr(expr[1], ctx);
     try {
-      return Functions.get(name, arity, true, ctx, ii);
+      final Expr lit = Functions.getLiteral(name, arity, ctx, ii);
+      return lit == null ? null : lit.item(ctx, ii);
     } catch(final QueryException e) {
       // function not found
       if(e.err() == Err.FUNCUNKNOWN) return null;
@@ -225,6 +226,7 @@ public final class FNFunc extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && oneOf(sig, FUNCTION_LOOKUP) || u == Use.X30 || super.uses(u);
+    return (u == Use.CTX || u == Use.POS) && oneOf(sig, FUNCTION_LOOKUP)
+        || u == Use.X30 || super.uses(u);
   }
 }

@@ -2138,7 +2138,8 @@ public class QueryParser extends InputParser {
       if(!(ex instanceof Int)) return ex;
       final long card = ex instanceof Int ? ((Int) ex).itr() : -1;
       if(card < 0 || card > Integer.MAX_VALUE) error(FUNCUNKNOWN, name);
-      return Functions.get(name, card, false, ctx, info());
+      final Expr lit = Functions.getLiteral(name, card, ctx, info());
+      return lit != null ? lit : FuncLit.unknown(name, card, ctx, info());
     }
 
     ip = pos;
@@ -2312,8 +2313,10 @@ public class QueryParser extends InputParser {
 
         final Expr ret;
         if(holes != null) {
-          final FItem f = Functions.get(name, args.length + holes.length, false, ctx, ii);
-          ret = f == null ? null : new PartFunc(ii, f, args, holes);
+          final int card = args.length + holes.length;
+          final Expr lit = Functions.getLiteral(name, card, ctx, ii),
+              f = lit != null ? lit : FuncLit.unknown(name, card, ctx, ii);
+          ret = new PartFunc(ii, f, args, holes);
         } else {
           final TypedFunc f = Functions.get(name, args, false, ctx, ii);
           ret = f == null ? null : f.fun;
@@ -2884,8 +2887,7 @@ public class QueryParser extends InputParser {
       // function types
       if(t == null) {
         t = FuncType.find(name);
-        // [LW] XQuery, function test: add annotation support
-        if(t != null) return functionTest(t).seqType();
+        if(t != null) return functionTest(ann, t).seqType();
       }
       // no type found
       if(t == null) error(NOTYPE, name.string());
@@ -2913,11 +2915,12 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FunctionTest" rule.
+   * @param ann annotations
    * @param t function type
    * @return resulting type
    * @throws QueryException query exception
    */
-  private Type functionTest(final Type t) throws QueryException {
+  private Type functionTest(final Ann ann, final Type t) throws QueryException {
     // wildcard
     if(wsConsume(ASTERISK)) {
       wsCheck(PAR2);
@@ -2944,7 +2947,7 @@ public class QueryParser extends InputParser {
     }
     wsCheck(AS);
     final SeqType st = sequenceType();
-    return FuncType.get(st, args);
+    return FuncType.get(ann, st, args);
   }
 
   /**

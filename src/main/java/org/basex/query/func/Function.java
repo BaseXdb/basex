@@ -9,6 +9,7 @@ import java.util.regex.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -131,7 +132,7 @@ public enum Function {
       STR, 2, ITR_ZO, STR, STR),
   /** XQuery function. */
   FORMAT_NUMBER(FNFormat.class, "format-number(number,picture[,format])",
-      STR, 2, ITR_ZO, STR, STR),
+      STR, 2, ITR_ZO, STR, STR_ZO),
   /** XQuery function. */
   FORMAT_DATETIME(FNFormat.class, "format-dateTime(number,picture,[lang,cal,place])",
       STR_ZO, 2, DTM_ZO, STR, STR_ZO, STR_ZO, STR_ZO),
@@ -193,7 +194,7 @@ public enum Function {
   /** XQuery function. */
   URI_COLLECTION(FNGen.class, "uri-collection([uri])", URI_ZM, 0, STR_ZO),
   /** XQuery function. */
-  SERIALIZE(FNGen.class, "serialize(items[,params])", STR, 1, ITEM_ZM, ITEM),
+  SERIALIZE(FNGen.class, "serialize(items[,params])", STR, 1, ITEM_ZM, NOD_ZO),
 
   /* FNId functions. */
 
@@ -1059,6 +1060,9 @@ public enum Function {
    * @return function type
    */
   final FuncType type(final int arity) {
+    final Ann ann = new Ann();
+    for(final Function up : UPDATING)
+      if(this == up) ann.add(Ann.Q_UPDATING, Empty.SEQ);
     final SeqType[] arg = new SeqType[arity];
     if(arity != 0 && max == Integer.MAX_VALUE) {
       System.arraycopy(args, 0, arg, 0, args.length);
@@ -1067,7 +1071,7 @@ public enum Function {
     } else {
       System.arraycopy(args, 0, arg, 0, arity);
     }
-    return FuncType.get(ret, arg);
+    return FuncType.get(ann, ret, arg);
   }
 
   /** Argument pattern. */

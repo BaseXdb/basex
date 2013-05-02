@@ -154,6 +154,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
+  public FuncType funcType() {
+    return FuncType.get(ann, args, declType);
+  }
+
+  @Override
   public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... arg)
       throws QueryException {
 
