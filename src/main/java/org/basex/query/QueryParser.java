@@ -412,6 +412,7 @@ public class QueryParser extends InputParser {
       check(';');
     }
 
+    // check if specified features are supported or can be prohibited
     for(final String d : decl) {
       if(!d.endsWith("_R") && !d.endsWith("_P")) continue;
       final boolean pf = d.charAt(d.length() - 1) == 'P';
