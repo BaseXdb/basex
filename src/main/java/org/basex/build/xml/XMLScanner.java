@@ -175,7 +175,7 @@ final class XMLScanner extends Proc {
 
     // parse comments etc...
     if(c == '!') {
-      if(consume(DOCTYPE)) {
+      if(!fragment && consume(DOCTYPE)) {
         type = Type.DTD;
         dtd();
       } else {
