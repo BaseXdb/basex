@@ -176,6 +176,8 @@ public final class OrderBy extends GFLWOR.Clause {
           final Key or = keys[k];
           final Item m = a[k] == Dbl.NAN || a[k] == Flt.NAN ? null : a[k],
               n = b[k] == Dbl.NAN || b[k] == Flt.NAN ? null : b[k];
+
+          if(m != null && n != null && !m.comparable(n)) Err.cast(or.info, m.type, n);
           final int c = m == null ? n == null ? 0 : or.least ? -1 : 1 :
             n == null ? or.least ? 1 : -1 : m.diff(or.info, n);
           if(c != 0) return or.desc ? -c : c;
