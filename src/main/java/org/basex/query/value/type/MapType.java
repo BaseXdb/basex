@@ -24,7 +24,7 @@ public final class MapType extends FuncType {
    * @param rt return type
    */
   MapType(final AtomType arg, final SeqType rt) {
-    super(new SeqType[]{ arg.seqType() }, rt);
+    super(new Ann(), new SeqType[]{ arg.seqType() }, rt);
     keyType = arg;
   }
 

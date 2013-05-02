@@ -87,7 +87,7 @@ public final class FNFormat extends StandardFunc {
     else if(!it.type.isNumberOrUntyped()) number(this, it);
 
     final String pic = string(checkStr(expr[1], ctx));
-    final QNm frm = new QNm(expr.length == 3 ? checkStr(expr[2], ctx) : EMPTY, ctx);
+    final QNm frm = new QNm(expr.length == 3 ? checkEStr(expr[2], ctx) : EMPTY, ctx);
 
     final DecFormatter df = ctx.sc.decFormats.get(frm.id());
     if(df == null) throw FORMNUM.thrw(info, frm);
