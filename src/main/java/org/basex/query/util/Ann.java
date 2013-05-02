@@ -56,6 +56,24 @@ public final class Ann extends ElementList {
     return false;
   }
 
+  /**
+   * Checks if the specified key/value pair is found in the list.
+   * @param k name of the entry
+   * @param v value of the entry
+   * @return result of check
+   */
+  public boolean contains(final QNm k, final Value v) {
+    try {
+      for(int i = 0; i < size; ++i) {
+        if(names[i].eq(k) && Compare.deep(v, values[i], null)) return true;
+      }
+      return false;
+    } catch(final QueryException e) {
+      // should never happen because annotations can only contain simple literals
+      throw Util.notexpected(e);
+    }
+  }
+
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
@@ -73,5 +91,59 @@ public final class Ann extends ElementList {
       tb.add(' ');
     }
     return tb.toString();
+  }
+
+  /**
+   * Returns the union of these annotations and the given ones.
+   * @param ann other annotations
+   * @return a n {@link Ann} instance containing all annotations
+   */
+  public Ann union(final Ann ann) {
+    final Ann o = new Ann();
+    boolean pub = false, priv = false, up = false;
+    for(int i = 0; i < size; i++) {
+      if(names[i].eq(Ann.Q_PUBLIC)) pub = true;
+      else if(names[i].eq(Ann.Q_PRIVATE)) priv = true;
+      else if(names[i].eq(Ann.Q_UPDATING)) up = true;
+      o.add(names[i], values[i]);
+    }
+
+    for(int i = 0; i < ann.size; i++) {
+      final QNm name = ann.names[i];
+      if(name.eq(Ann.Q_PUBLIC)) {
+        if(pub) continue;
+        if(priv) return null;
+      } else if(name.eq(Ann.Q_PRIVATE)) {
+        if(pub) return null;
+        if(priv) continue;
+      } else if(name.eq(Ann.Q_UPDATING) && up) {
+        continue;
+      }
+      o.add(ann.names[i], ann.values[i]);
+    }
+    return o;
+  }
+
+  /**
+   * Returns the intersection of these annotations and the given ones.
+   * @param ann annotations
+   * @return those annotations that are present in both collections
+   */
+  public Ann intersect(final Ann ann) {
+    final Ann o = new Ann();
+    for(int i = 0; i < size; i++) {
+      final QNm name = names[i];
+      final Value val = values[i];
+      try {
+        for(int j = 0; j < ann.size; j++) {
+          if(name.eq(ann.names[j]) && Compare.deep(val, ann.values[j], null))
+            o.add(name, val);
+        }
+      } catch(QueryException e) {
+        // should never happen because annotations can only contain simple literals
+        Util.notexpected(e);
+      }
+    }
+    return o;
   }
 }

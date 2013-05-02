@@ -205,7 +205,7 @@ public abstract class StandardFunc extends Arr {
     if(i < expr.length) {
       final Map map = checkMap(expr[i].item(ctx, info));
       for(final Item it : map.keys()) {
-        byte[] key;
+        final byte[] key;
         if(it instanceof Str) {
           key = it.string(null);
         } else {
