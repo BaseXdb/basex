@@ -413,11 +413,11 @@ public final class QT3TS {
       " @value = " + NOSUPPORT + " and (@satisfied = 'true' or empty(@satisfied)) or" +
       " @value != " + NOSUPPORT + "and @satisfied = 'false') or " +
       // skip fully-normalized unicode tests
-      "@type='unicode-normalization-form' and @value != 'FULLY-NORMALIZED' or " +
+      "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' or " +
       // skip xml/xsd 1.1 tests
-      "@type=('xml-version','xsd-version') and @value=('1.1','1.0:4-') or " +
+      "@type = ('xml-version', 'xsd-version') and @value = ('1.1', '1.0:4-') or " +
       // skip non-XQuery tests
-      "@type='spec' and not(contains(@value, 'XQ'))" +
+      "@type = 'spec' and not(contains(@value, 'XQ'))" +
       "]", ctx).context(test);
 
     try {
