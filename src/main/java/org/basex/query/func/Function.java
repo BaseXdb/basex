@@ -154,11 +154,17 @@ public enum Function {
   FUNCTION_ARITY(FNFunc.class, "function-arity(function)", ITR, FUN_O),
   /** XQuery function. */
   FUNCTION_LOOKUP(FNFunc.class, "function-lookup(name,arity)", FUN_OZ, QNM, ITR),
-  /** XQuery function. */
+  /** XQuery function (obsolete). */
   MAP(FNFunc.class, "map(function,seq)", ITEM_ZM,
       FuncType.get(ITEM_ZM, ITEM).seqType(), ITEM_ZM),
-  /** XQuery function. */
+  /** XQuery function (obsolete). */
   MAP_PAIRS(FNFunc.class, "map-pairs(function,seq1,seq2)", ITEM_ZM,
+      FuncType.get(ITEM_ZM, ITEM, ITEM).seqType(), ITEM_ZM, ITEM_ZM),
+  /** XQuery function. */
+  FOR_EACH(FNFunc.class, "for-each(function,seq)", ITEM_ZM,
+      FuncType.get(ITEM_ZM, ITEM).seqType(), ITEM_ZM),
+  /** XQuery function. */
+  FOR_EACH_PAIR(FNFunc.class, "for-each-pair(function,seq1,seq2)", ITEM_ZM,
       FuncType.get(ITEM_ZM, ITEM, ITEM).seqType(), ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   FOLD_LEFT(FNFunc.class, "fold-left(function,zero,seq)", ITEM_ZM,
