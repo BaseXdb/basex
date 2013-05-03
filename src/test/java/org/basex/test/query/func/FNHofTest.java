@@ -34,14 +34,14 @@ public final class FNHofTest extends AdvancedQueryTest {
   public void sortWithTest() {
     query("hof:sort-with(function($a, $b) { $a < $b }, ())", "");
     query("hof:sort-with(function($a, $b) { $a > $b }, 1 to 5)", "5 4 3 2 1");
-    error("hof:sort-with(<x/>, 1 to 5)", Err.XPTYPE);
+    error("hof:sort-with(<x/>, 1 to 5)", Err.NOCAST);
   }
 
   /** Test method. */
   @Test
   public void foldLeft1Test() {
     query("hof:fold-left1(function($x, $y) { $x + $y }, 1 to 10)", "55");
-    error("hof:fold-left1(function($x, $y) { $x + $y }, ())", Err.XPTYPE);
+    error("hof:fold-left1(function($x, $y) { $x + $y }, ())", Err.NOCAST);
   }
 
   /** Test method. */

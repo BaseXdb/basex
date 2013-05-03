@@ -1,13 +1,14 @@
 package org.basex.query.gflwor;
 
-import static org.basex.util.Array.*;
 import static org.basex.query.QueryText.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import static org.basex.util.Array.*;
+
+import java.util.*;
 import java.util.List;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.gflwor.GFLWOR.*;
+import org.basex.query.gflwor.GFLWOR.Eval;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -15,7 +16,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 
 /**
@@ -176,6 +176,8 @@ public final class OrderBy extends GFLWOR.Clause {
           final Key or = keys[k];
           final Item m = a[k] == Dbl.NAN || a[k] == Flt.NAN ? null : a[k],
               n = b[k] == Dbl.NAN || b[k] == Flt.NAN ? null : b[k];
+
+          if(m != null && n != null && !m.comparable(n)) Err.cast(or.info, m.type, n);
           final int c = m == null ? n == null ? 0 : or.least ? -1 : 1 :
             n == null ? or.least ? 1 : -1 : m.diff(or.info, n);
           if(c != 0) return or.desc ? -c : c;
@@ -292,12 +294,6 @@ public final class OrderBy extends GFLWOR.Clause {
   @Override
   public void checkUp() throws QueryException {
     checkNoneUp(keys);
-  }
-
-  @Override
-  public boolean databases(final StringList db) {
-    for(final Key key : keys) if(!key.databases(db)) return false;
-    return true;
   }
 
   @Override

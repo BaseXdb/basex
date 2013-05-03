@@ -4,9 +4,11 @@ import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -46,7 +48,7 @@ public final class FNAcc extends StandardFunc {
         return Str.get(norm(checkEStr(e, ctx)));
       case NAMESPACE_URI_FROM_QNAME:
         final Item it = e.item(ctx, info);
-        return it == null ? null : Uri.uri(((QNm) checkType(it, AtomType.QNM)).uri());
+        return it == null ? null : Uri.uri(checkQNm(it, ctx).uri());
       default:
         return super.item(ctx, ii);
     }
@@ -91,5 +93,12 @@ public final class FNAcc extends StandardFunc {
   public boolean uses(final Use u) {
     return u == Use.POS && oneOf(sig, POSITION, LAST) ||
         u == Use.CTX && expr.length == 0 || super.uses(u);
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    if(!oneOf(sig, POSITION, LAST) && 0 == expr.length && !visitor.lock(DBLocking.CTX))
+      return false;
+    return super.accept(visitor);
   }
 }

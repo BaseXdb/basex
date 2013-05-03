@@ -40,6 +40,7 @@ public final class DateFormat extends FormatParser {
       if(p == 'a' || p == 'c' || p == 'o' || p == 't') {
         pres = substring(pres, 0, pl - 1);
         if(p == 'o') ordinal = EMPTY;
+        if(p == 't') trad = true;
       }
     }
 

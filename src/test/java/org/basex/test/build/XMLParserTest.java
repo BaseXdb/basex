@@ -15,11 +15,30 @@ import org.junit.*;
  */
 public final class XMLParserTest extends SandboxTest {
   /**
+   * Prepares the tests.
+   */
+  @Before
+  public void before() {
+    context.prop.set(Prop.MAINMEM, true);
+  }
+
+  /**
+   * Finishes the tests.
+   */
+  @Before
+  public void after() {
+    context.prop.set(Prop.MAINMEM, false);
+    context.prop.set(Prop.CHOP, true);
+    context.prop.set(Prop.STRIPNS, false);
+    context.prop.set(Prop.SERIALIZER, "");
+    context.prop.set(Prop.INTPARSE, true);
+  }
+
+  /**
    * Tests the internal parser (Option {@link Prop#INTPARSE}).
    */
   @Test
   public void intParse() {
-    context.prop.set(Prop.MAINMEM, true);
     context.prop.set(Prop.CHOP, false);
 
     final StringBuilder sb = new StringBuilder();
@@ -55,6 +74,8 @@ public final class XMLParserTest extends SandboxTest {
 
     // list all errors
     if(sb.length() != 0) fail(sb.toString());
+
+    context.prop.set(Prop.MAINMEM, false);
   }
 
   /**
@@ -64,14 +85,37 @@ public final class XMLParserTest extends SandboxTest {
   @Test
   public void parse() throws Exception {
     context.prop.set(Prop.STRIPNS, true);
+    context.prop.set(Prop.SERIALIZER, "indent=no");
+
     final String doc = "<e xmlns='A'><b:f xmlns:b='B'/></e>";
     for(final boolean b : new boolean[] { false, true }) {
       context.prop.set(Prop.INTPARSE, b);
       new CreateDB(NAME, doc).execute(context);
-      String result = new XQuery(".").execute(context).replaceAll("[\\r\\n]+ *", "");
+      String result = new XQuery(".").execute(context);
       assertEquals("<e><f/></e>", result);
-      result = new XQuery("e/f").execute(context).replaceAll("[\\r\\n]+ *", "");
+      result = new XQuery("e/f").execute(context);
       assertEquals("<f/>", result);
+    }
+  }
+
+  /**
+   * Tests the xml:space attribute.
+   * @throws Exception exceptions
+   */
+  @Test
+  public void xmlSpace() throws Exception {
+    context.prop.set(Prop.SERIALIZER, "indent=no");
+
+    final String in = "<x><a xml:space='default'> </a><a> </a>" +
+        "<a xml:space='preserve'> </a></x>";
+    final String out = "<x><a xml:space=\"default\"/><a/>" +
+        "<a xml:space=\"preserve\"> </a></x>";
+
+    for(final boolean b : new boolean[] { true, false }) {
+      context.prop.set(Prop.INTPARSE, b);
+      new CreateDB(NAME, in).execute(context);
+      final String result = new XQuery(".").execute(context);
+      assertEquals("Internal parser: " + b, out, result);
     }
   }
 }

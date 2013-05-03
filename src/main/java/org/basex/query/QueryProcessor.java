@@ -15,7 +15,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.json.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
-import org.basex.util.list.*;
 
 /**
  * This class is an entry point for evaluating XQuery implementations.
@@ -23,7 +22,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class QueryProcessor extends Progress {
+public final class QueryProcessor extends Proc {
   /** Expression context. */
   public final QueryContext ctx;
   /** Query. */
@@ -41,7 +40,7 @@ public final class QueryProcessor extends Progress {
   public QueryProcessor(final String qu, final Context cx) {
     query = qu;
     ctx = new QueryContext(cx);
-    progress(ctx);
+    proc(ctx);
   }
 
   /**
@@ -233,15 +232,9 @@ public final class QueryProcessor extends Progress {
     ctx.close();
   }
 
-  /**
-   * Returns the databases that may be touched by this query. The returned information
-   * will be more accurate if the function is called after parsing the query.
-   * @see Progress#databases(StringList)
-   */
   @Override
-  public boolean databases(final StringList db) {
-    return ctx.root != null &&
-        ctx.root.expr.databases(db.add(ctx.userReadLocks).add(ctx.userWriteLocks));
+  public void databases(final LockResult lr) {
+    ctx.databases(lr);
   }
 
   /**
@@ -312,6 +305,16 @@ public final class QueryProcessor extends Progress {
   @Override
   public String det() {
     return PLEASE_WAIT_D;
+  }
+
+  @Override
+  public boolean registered() {
+    return ctx.registered();
+  }
+
+  @Override
+  public void registered(final boolean reg) {
+    ctx.registered(reg);
   }
 
   @Override

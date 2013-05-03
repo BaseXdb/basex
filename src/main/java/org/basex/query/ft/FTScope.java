@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -29,8 +28,7 @@ public final class FTScope extends FTFilter {
    * @param u unit
    * @param s same flag
    */
-  public FTScope(final InputInfo ii, final FTExpr e, final FTUnit u,
-      final boolean s) {
+  public FTScope(final InputInfo ii, final FTExpr e, final FTUnit u, final boolean s) {
     super(ii, e);
     unit = u;
     same = s;
@@ -76,10 +74,5 @@ public final class FTScope extends FTFilter {
   @Override
   public String toString() {
     return super.toString() + (same ? SAME : DIFFERENT) + ' ' + unit;
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, expr);
   }
 }

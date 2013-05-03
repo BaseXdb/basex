@@ -1,7 +1,6 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-import static org.basex.data.DataText.*;
 
 import java.awt.*;
 import java.io.*;
@@ -14,7 +13,6 @@ import org.basex.gui.*;
 import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.io.*;
-import org.basex.io.in.DataInput;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -192,22 +190,20 @@ public final class DialogManage extends BaseXDialog {
       doc2.setText(BACKUPS + COLS + title);
 
       boolean active = ctx.mprop.dbexists(db);
+      String info = "";
       if(active) {
         // refresh info view
-        DataInput in = null;
         final MetaData meta = new MetaData(db, ctx);
         try {
-          in = new DataInput(meta.dbfile(DATAINF));
-          meta.read(in);
-          detail.setText(Token.token(InfoDB.db(meta, true, true, true)));
+          meta.read();
+          info = InfoDB.db(meta, true, true, true);
         } catch(final IOException ex) {
-          detail.setText(Token.token(Util.message(ex)));
-        } finally {
-          if(in != null) try { in.close(); } catch(final IOException ignored) { }
+          info = Util.message(ex);
         }
-      } else {
-        detail.setText(dbs.size() == 1 ? Token.token(ONLY_BACKUP) : Token.EMPTY);
+      } else if(dbs.size() == 1) {
+        info = ONLY_BACKUP;
       }
+      detail.setText(Token.token(info));
 
       // enable or disable buttons
       rename.setEnabled(active);

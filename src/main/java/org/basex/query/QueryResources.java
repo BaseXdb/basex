@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  */
 public final class QueryResources {
   /** Resources. */
-  public final HashMap<String, String> resources = new HashMap<String, String>();
+  public final HashMap<String, String[]> resources = new HashMap<String, String[]>();
 
   /** Database context. */
   private final QueryContext ctx;
@@ -89,7 +89,8 @@ public final class QueryResources {
   public Data data(final String name, final InputInfo info) throws QueryException {
     // check if a database with the same name has already been opened
     for(int d = 0; d < datas; ++d) {
-      if(data[d].meta.name.equalsIgnoreCase(name)) return data[d];
+      final String n = data[d].meta.name;
+      if(Prop.CASE ? n.equals(name) : n.equalsIgnoreCase(name)) return data[d];
     }
 
     try {
@@ -115,11 +116,13 @@ public final class QueryResources {
     for(int d = 0; d < datas; ++d) {
       final Data dt = data[d];
       // database has a single document, input paths are matching
-      if(dt.resources.docs().size() == 1 && IO.get(dt.meta.original).eq(qi.io))
+      if(dt.resources.docs().size() == 1 && IO.get(dt.meta.original).eq(qi.input))
         return new DBNode(dt, 0, Data.DOC);
 
       // database instance has same name as input path
-      if(dt.meta.name.equalsIgnoreCase(qi.db)) return doc(dt, qi, info);
+      final String n = dt.meta.name;
+      if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db))
+        return doc(dt, qi, info);
     }
 
     // open new database, or create new instance
@@ -155,19 +158,24 @@ public final class QueryResources {
     final String in = base != null ? base.merge(input).path() : null;
 
     // check currently opened collections
-    for(int c = 0; c < colls; c++) {
-      if(in != null && collName[c].equalsIgnoreCase(in) ||
-          collName[c].equalsIgnoreCase(input)) return coll[c];
+    if(in != null) {
+      final String[] names = { in, input };
+      for(int c = 0; c < colls; c++) {
+        final String n = collName[c];
+        if(Prop.CASE ? Token.eq(n, names) : Token.eqic(n, names)) return coll[c];
+      }
     }
 
     // check currently opened databases
     final QueryInput qi = new QueryInput(input);
     Data dt = null;
-    for(int d = 0; d < datas; ++d) {
+    for(int i = 0; i < datas; ++i) {
       // return database instance with the same name or file path
-      if(qi.db != null && data[d].meta.name.equalsIgnoreCase(qi.db) ||
-          IO.get(data[d].meta.original).eq(qi.io)) {
-        dt = data[d];
+      final Data d = data[i];
+      final String n = d.meta.name;
+      if(Prop.CASE ? n.equals(qi.db) : n.equalsIgnoreCase(qi.db) ||
+          IO.get(d.meta.original).eq(qi.input)) {
+        dt = d;
         break;
       }
     }
@@ -193,10 +201,10 @@ public final class QueryResources {
   /**
    * Adds a resource with the specified path. Only called from the test APIs.
    * @param uri resource uri
-   * @param path resource path
+   * @param strings resource strings (path, encoding)
    */
-  public void addResource(final String uri, final String path) {
-    resources.put(uri, path);
+  public void addResource(final String uri, final String... strings) {
+    resources.put(uri, strings);
   }
 
   /**
@@ -252,7 +260,7 @@ public final class QueryResources {
     Data d = null;
     try {
       // try to create database with original path
-      d = CreateDB.create(input.io, single, ctx.context);
+      d = CreateDB.create(input.input, single, ctx.context);
     } catch(final IOException ex) {
       // try to create database with path relative to base uri
       final IO base = ctx.sc.baseIO();
@@ -289,7 +297,8 @@ public final class QueryResources {
     // get all document nodes of the specified database
     final IntList docs = dt.resources.docs(qi.path);
     // ensure that a single document was filtered
-    if(docs.size() != 1) BXDB_SINGLE.thrw(info, qi.original);
+    if(docs.size() != 1)
+      (docs.isEmpty() ? BXDB_NODOC : BXDB_SINGLE).thrw(info, qi.original);
     return new DBNode(dt, docs.get(0), Data.DOC);
   }
 

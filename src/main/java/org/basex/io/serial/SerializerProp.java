@@ -6,6 +6,7 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.core.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class defines all available serialization parameters.
@@ -74,6 +75,9 @@ public final class SerializerProp extends AProp {
   /** Serialization parameter: 4.0/4.01/5.0. */
   public static final Object[] S_HTML_VERSION = {
     "html-version", "" };
+  /** Parameter document. */
+  public static final Object[] S_PARAMETER_DOCUMENT = {
+    "parameter-document", "" };
 
   /** Specific serialization parameter: newline. */
   public static final Object[] S_NEWLINE = {
@@ -97,6 +101,9 @@ public final class SerializerProp extends AProp {
   public static final Object[] S_WRAP_URI = {
     "wrap-uri", "" };
 
+  /** Unknown properties. */
+  public final StringList unknown = new StringList(0);
+
   /**
    * Constructor.
    */
@@ -113,7 +120,9 @@ public final class SerializerProp extends AProp {
     for(final String ser : s.trim().split(",")) {
       if(ser.isEmpty()) continue;
       final String[] sprop = ser.split("=", 2);
-      set(sprop[0].trim(), sprop.length < 2 ? "" : sprop[1].trim());
+      final String key = sprop[0].trim();
+      final String value = set(key, sprop.length < 2 ? "" : sprop[1].trim());
+      if(value == null) unknown.add(key);
     }
   }
 

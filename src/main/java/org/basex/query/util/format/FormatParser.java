@@ -24,6 +24,8 @@ public abstract class FormatParser extends FormatUtil {
   int first = -1;
   /** Ordinal suffix; {@code null} if not specified. */
   byte[] ordinal;
+  /** Traditional modifier. */
+  boolean trad;
   /** Minimum width. */
   int min;
   /** Maximum width. */
@@ -112,8 +114,9 @@ public abstract class FormatParser extends FormatUtil {
    */
   protected void finish(final byte[] pres) {
     // skip correction of case if modifier has more than one codepoint (Ww)
-    cs = cl(pres, 0) < pres.length ? Case.STANDARD :
-      (ch(pres, 0) & ' ') == 0 ? Case.UPPER : Case.LOWER;
+    final int cp = ch(pres, 0);
+    cs = cl(pres, 0) < pres.length || digit(cp) ? Case.STANDARD :
+      (cp & ' ') == 0 ? Case.UPPER : Case.LOWER;
     primary = lc(pres);
     if(first == -1) first = ch(primary, 0);
   }

@@ -90,7 +90,7 @@ public class TextInput extends BufferInput {
    * @param v flag to be set
    * @return self reference
    */
-  public final TextInput valid(final boolean v) {
+  public final TextInput validate(final boolean v) {
     valid = v;
     decoder.valid = v;
     return this;
@@ -103,8 +103,10 @@ public class TextInput extends BufferInput {
    * @throws IOException I/O Exception
    */
   public TextInput encoding(final String enc) throws IOException {
-    final String e = normEncoding(enc, decoder.encoding);
-    if(e != UTF8) decoder = TextDecoder.get(e);
+    if(enc != null) {
+      decoder = TextDecoder.get(normEncoding(enc, decoder.encoding));
+      decoder.valid = valid;
+    }
     return this;
   }
 

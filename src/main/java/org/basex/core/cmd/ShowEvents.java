@@ -2,6 +2,7 @@ package org.basex.core.cmd;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 
@@ -29,5 +30,10 @@ public final class ShowEvents extends AEvent {
   @Override
   public void build(final CmdBuilder cb) {
     cb.init(Cmd.SHOW + " " + CmdShow.EVENTS).args();
+  }
+
+  @Override
+  public void databases(final LockResult lr) {
+    lr.read.add(DBLocking.EVENT);
   }
 }

@@ -9,7 +9,6 @@ import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'show users' command and shows existing users.
@@ -55,8 +54,10 @@ public final class ShowUsers extends Command {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return null == args[0] || super.databases(db.add(DBLocking.ADMIN), 0);
+  public void databases(final LockResult lr) {
+    lr.read.add(DBLocking.ADMIN);
+    if (null != args[0])
+      databases(lr.read, 0);
   }
 
   @Override

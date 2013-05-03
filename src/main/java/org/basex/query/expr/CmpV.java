@@ -104,6 +104,8 @@ public final class CmpV extends Cmp {
       public OpV invert() { return EQ; }
     };
 
+    /** Cached enums (faster). */
+    public static final OpV[] VALUES = values();
     /** String representation. */
     public final String name;
 

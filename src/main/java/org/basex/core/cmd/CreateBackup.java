@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
@@ -60,7 +61,7 @@ public final class CreateBackup extends ABackup {
     final String backup = db + '-' + DateTime.format(new Date(), DateTime.DATETIME) +
         IO.ZIPSUFFIX;
     final IOFile zf = mprop.dbpath(backup);
-    final Zip zip = progress(new Zip(zf));
+    final Zip zip = proc(new Zip(zf));
 
     try {
       final IOFile path = mprop.dbpath(db);
@@ -73,8 +74,9 @@ public final class CreateBackup extends ABackup {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return super.databases(db) && databases(db, 0);
+  public void databases(final LockResult lr) {
+    super.databases(lr);
+    databases(lr.read, 0);
   }
 
   @Override

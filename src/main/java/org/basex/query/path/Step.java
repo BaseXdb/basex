@@ -244,7 +244,7 @@ public abstract class Step extends Preds {
       if(axis == Axis.SELF) sb.append('.');
     }
     if(sb.length() == 0) {
-      if(axis == Axis.ATTR && test != Test.NOD) sb.append('@');
+      if(axis == Axis.ATTR && test instanceof NameTest) sb.append('@');
       else if(axis != Axis.CHILD) sb.append(axis).append("::");
       sb.append(test);
     }
@@ -253,7 +253,12 @@ public abstract class Step extends Preds {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, preds);
+    for(final Expr e : preds) {
+      visitor.enterFocus();
+      if(!e.accept(visitor)) return false;
+      visitor.exitFocus();
+    }
+    return true;
   }
 
   @Override

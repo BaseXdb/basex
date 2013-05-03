@@ -11,6 +11,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.util.*;
 
@@ -125,5 +126,11 @@ public final class FNXQuery extends StandardFunc {
   @Override
   public boolean uses(final Use u) {
     return u == Use.NDT && oneOf(sig, _XQUERY_EVAL, _XQUERY_INVOKE) || super.uses(u);
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    if(oneOf(sig, _XQUERY_EVAL, _XQUERY_INVOKE) && !visitor.lock(null)) return false;
+    return super.accept(visitor);
   }
 }

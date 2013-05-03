@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.Expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -40,13 +41,62 @@ public final class Functions extends TokenSet {
    * Constructor, registering statically available XQuery functions.
    */
   private Functions() {
-    for(final Function def : Function.values()) {
+    for(final Function def : Function.VALUES) {
       final String dsc = def.desc;
       final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
       final int i = add(new QNm(ln, def.uri()).id());
       if(i < 0) Util.notexpected("Function defined twice:" + def);
       funcs[i] = def;
     }
+  }
+
+  /**
+   * Tries to resolve the specified function as a cast.
+   * @param name function name
+   * @param arity number of arguments
+   * @param ii input info
+   * @return cast type if found, {@code null} otherwise
+   * @throws QueryException query exception
+   */
+  private static Type getCast(final QNm name, final long arity, final InputInfo ii)
+      throws QueryException {
+    if(!eq(name.uri(), XSURI)) return null;
+    final byte[] ln = name.local();
+    Type type = ListType.find(name);
+    if(type == null) type = AtomType.find(name, false);
+    if(type == null) {
+      final Levenshtein ls = new Levenshtein();
+      for(final AtomType t : AtomType.values()) {
+        if(t.par != null && t != AtomType.NOT && t != AtomType.AAT &&
+            t != AtomType.BIN && ls.similar(lc(ln), lc(t.string()), 0))
+          throw FUNSIMILAR.thrw(ii, name.string(), t.string());
+      }
+    }
+    // no constructor function found, or abstract type specified
+    if(type == null || type == AtomType.NOT || type == AtomType.AAT)
+      throw FUNCUNKNOWN.thrw(ii, name.string());
+
+    if(arity != 1) throw FUNCTYPE.thrw(ii, name.string());
+    return type;
+  }
+
+  /**
+   * Tries to resolve the specified function as a built-in one.
+   * @param name function name
+   * @param arity number of arguments
+   * @param ii input info
+   * @return function spec if found, {@code null} otherwise
+   * @throws QueryException query exception
+   */
+  private Function getBuiltIn(final QNm name, final long arity, final InputInfo ii)
+      throws QueryException {
+    final int id = id(name.id());
+    if(id == 0) return null;
+    final Function fl = funcs[id];
+    if(!eq(fl.uri(), name.uri())) return null;
+    // check number of arguments
+    if(arity < fl.min || arity > fl.max) throw XPARGS.thrw(ii, fl);
+    return fl;
   }
 
   /**
@@ -59,59 +109,69 @@ public final class Functions extends TokenSet {
    */
   public StandardFunc get(final QNm name, final Expr[] args, final InputInfo ii)
       throws QueryException {
-
-    final int id = id(name.id());
-    if(id == 0) return null;
-
-    // create function
-    final Function fl = funcs[id];
-    if(!eq(fl.uri(), name.uri())) return null;
-
-    final StandardFunc f = fl.get(ii, args);
-    // check number of arguments
-    if(args.length < fl.min || args.length > fl.max)
-      XPARGS.thrw(ii, fl);
-    return f;
+    final Function fl = getBuiltIn(name, args.length, ii);
+    return fl == null ? null : fl.get(ii, args);
   }
 
   /**
-   * Returns the specified function literal.
+   * Gets a function literal for a known function.
    * @param name function name
    * @param arity number of arguments
-   * @param dyn dynamic invocation flag
    * @param ctx query context
    * @param ii input info
-   * @return literal function expression
+   * @return function literal if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public static FItem get(final QNm name, final long arity, final boolean dyn,
-      final QueryContext ctx, final InputInfo ii)
-          throws QueryException {
+  public static Expr getLiteral(final QNm name, final long arity,
+      final QueryContext ctx, final InputInfo ii) throws QueryException {
+    final int ar = (int) arity;
 
-    // use empty scope
+    // parse data type constructors
+    final Type cst = getCast(name, arity, ii);
+    if(cst != null) {
+      final VarScope scp = new VarScope();
+      final Var arg = scp.uniqueVar(ctx, SeqType.AAT_ZO, true);
+      final Expr e = new Cast(ii, new VarRef(ii, arg), cst.seqType());
+      final FuncType tp = FuncType.get(e.type(), SeqType.AAT_ZO);
+      return new FuncItem(name, new Var[] { arg }, e, tp, false, null, 0, 0, null,
+          scp, ctx.sc);
+    }
+
+    // pre-defined functions
+    final Function fn = get().getBuiltIn(name, arity, ii);
+    if(fn != null) {
+      final VarScope scp = new VarScope();
+      final FuncType ft = fn.type(ar);
+      final Var[] args = new Var[ar];
+      final Expr[] calls = ft.args(args, ctx, scp, ii);
+
+      final StandardFunc f = fn.get(calls);
+      if(!f.uses(Use.CTX) && !f.uses(Use.POS))
+        return new FuncItem(name, args, f, ft, false, null, 0, 0, null, scp, ctx.sc);
+
+      return new FuncLit(name, args, f, ft, scp, ctx.sc, ii);
+    }
+
+    // user-defined function
+    final StaticFunc sf = ctx.funcs.get(name, arity, ii);
+    if(sf != null) {
+      final FuncType ft = sf.funcType();
+      final VarScope scp = new VarScope();
+      final Var[] args = new Var[ar];
+      final Expr[] calls = ft.args(args, ctx, scp, ii);
+      final TypedFunc tf = ctx.funcs.getFuncRef(name, calls, ctx.sc, ii);
+      return new FuncItem(name, args, tf.fun, ft, false, null, 0, 0, null, scp, ctx.sc);
+    }
+
+    // Java function (only allowed with administrator permissions)
     final VarScope scp = new VarScope();
+    final FuncType jt = FuncType.arity(ar);
+    final Var[] vs = new Var[ar];
+    final Expr[] refs = jt.args(vs, ctx, scp, ii);
+    final Expr jm = JavaMapping.get(name, refs, ctx, ii);
+    if(jm != null) return new FuncLit(name, vs, jm, jt, scp, ctx.sc, ii);
 
-    final Expr[] args = new Expr[(int) arity];
-    final Var[] vars = new Var[args.length];
-    for(int i = 0; i < args.length; i++) {
-      vars[i] = scp.uniqueVar(ctx, null, true);
-      args[i] = new VarRef(ii, vars[i]);
-    }
-
-    final TypedFunc f = get(name, args, dyn, ctx, ii);
-    if(f == null) {
-      if(!dyn) FUNCUNKNOWN.thrw(ii, name + "#" + arity);
-      return null;
-    }
-
-    // compile the function if it hasn't been done statically
-    if(dyn && f.fun instanceof StaticFuncCall) {
-      final StaticFunc usf = ((StaticFuncCall) f.fun).func();
-      if(usf != null && usf.declared) usf.compile(ctx);
-    }
-
-    final FuncType ft = f.type;
-    return new FuncItem(name, vars, f.fun, ft, false, null, scp, ctx.sc);
+    return null;
   }
 
   /**
@@ -167,7 +227,7 @@ public final class Functions extends TokenSet {
     }
 
     // user-defined function
-    final TypedFunc tf = ctx.funcs.get(name, args, ii);
+    final TypedFunc tf = ctx.funcs.getRef(name, args, ctx.sc, ii);
     if(tf != null) return tf;
 
     // Java function (only allowed with administrator permissions)
@@ -175,7 +235,9 @@ public final class Functions extends TokenSet {
     if(jf != null) return TypedFunc.java(jf);
 
     // add user-defined function that has not been declared yet
-    if(!dyn && FuncType.find(name) == null) return ctx.funcs.add(name, args, ii, ctx);
+    if(!dyn && FuncType.find(name) == null) {
+      return ctx.funcs.getFuncRef(name, args, ctx.sc, ii);
+    }
 
     // no function found
     return null;

@@ -646,19 +646,19 @@ public enum AtomType implements Type {
   /** QName Type. */
   QNM("QName", AAT, XSURI, false, false, false, Type.ID.QNM) {
     @Override
-    public Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
+    public QNm cast(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
 
       // xquery 3.0 also allows untyped arguments
       if(it.type != STR && !(ctx.sc.xquery3() && it.type.isUntyped())) invCast(it, ii);
       final byte[] nm = trim(it.string(ii));
-      if(nm.length == 0 || !XMLToken.isQName(nm)) FUNCAST.thrw(ii, this, it);
+      if(!XMLToken.isQName(nm)) FUNCAST.thrw(ii, this, it);
       final QNm qn = new QNm(nm, ctx);
       if(!qn.hasURI() && qn.hasPrefix()) NSDECL.thrw(ii, qn.prefix());
       return qn;
     }
     @Override
-    public Item cast(final Object o, final InputInfo ii) {
+    public QNm cast(final Object o, final InputInfo ii) {
       return o instanceof QName ? new QNm((QName) o) : new QNm(o.toString());
     }
   },
@@ -681,6 +681,8 @@ public enum AtomType implements Type {
   /** Language pattern. */
   static final Pattern LANGPATTERN = Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*");
 
+  /** Cached enums (faster). */
+  public static final AtomType[] VALUES = values();
   /** Name. */
   public final QNm name;
   /** Parent type. */
@@ -912,7 +914,7 @@ public enum AtomType implements Type {
    * @return type or {@code null}
    */
   public static AtomType find(final QNm type, final boolean all) {
-    for(final AtomType t : values()) {
+    for(final AtomType t : VALUES) {
       if(!t.name.eq(type)) continue;
       if(all || t.par != null) return t;
     }
@@ -930,7 +932,7 @@ public enum AtomType implements Type {
    * @return corresponding type if found, {@code null} otherwise
    */
   static Type getType(final Type.ID id) {
-    for(final AtomType t : values()) if(t.id == id) return t;
+    for(final AtomType t : VALUES) if(t.id == id) return t;
     return null;
   }
 }

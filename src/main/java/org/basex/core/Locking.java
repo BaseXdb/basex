@@ -13,23 +13,23 @@ public interface Locking {
    * Puts read and write locks the specified databases.
    * Store and return the {@code token} for unlocking these objects again.
    *
-   * @param pr progress
+   * @param pr process
    * @param read names of databases to put read locks on.
    *   Global locking is performed if the passed on reference is {@code null}
    * @param write names of databases to put write locks on.
    *   Global locking is performed if the passed on reference is {@code null}
    */
-  void acquire(final Progress pr, final StringList read, final StringList write);
+  void acquire(final Proc pr, final StringList read, final StringList write);
 
   /**
    * Unlock all string locked by a transaction.
-   * @param db databases
+   * @param write write locks to keep
    */
-  void downgrade(final StringList db);
+  void downgrade(final StringList write);
 
   /**
    * Unlock all string locked by a transaction.
-   * @param pr progress
+   * @param pr process
    */
-  void release(final Progress pr);
+  void release(final Proc pr);
 }

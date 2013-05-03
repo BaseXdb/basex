@@ -10,7 +10,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * FTOptions expression.
@@ -119,11 +118,6 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return weight.databases(db) && super.databases(db);
-  }
-
-  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), weight, expr[0]);
   }
@@ -135,7 +129,7 @@ public final class FTWeight extends FTExpr {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, expr) && weight.accept(visitor);
+    return super.accept(visitor) && weight.accept(visitor);
   }
 
   @Override

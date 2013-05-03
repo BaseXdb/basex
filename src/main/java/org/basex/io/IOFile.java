@@ -1,6 +1,7 @@
 package org.basex.io;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -299,6 +300,7 @@ public final class IOFile extends IO {
       if(ch == ' ') tb.add("%20");
       else tb.add(ch);
     }
+    if(isDir()) tb.add('/');
     return tb.toString();
   }
 
@@ -363,6 +365,45 @@ public final class IOFile extends IO {
       if(!suf && sub) sb.append(".*");
     }
     return Prop.CASE ? sb.toString() : sb.toString().toLowerCase(Locale.ENGLISH);
+  }
+
+  /**
+   * Normalizes the specified URL and creates a new {@link IOFile} instance.
+   * @param url url to be converted
+   * @return file path
+   */
+  public static IOFile get(final String url) {
+    String file = url;
+    try {
+      if(file.indexOf('%') != -1) file = URLDecoder.decode(file, Prop.ENCODING);
+    } catch(final Exception ex) { /* ignored. */ }
+    // remove file scheme
+    if(file.startsWith(FILEPREF)) file = file.substring(FILEPREF.length());
+    // remove duplicate slashes
+    file = normSlashes(file);
+    // remove leading slash from Windows paths
+    if(file.length() > 2 && file.charAt(0) == '/' && file.charAt(2) == ':' &&
+        Token.letter(file.charAt(1))) file = file.substring(1);
+
+    return new IOFile(file);
+  }
+
+  /**
+   * Normalize slashes in the specified path.
+   * @param path path to be normalized
+   * @return normalized path
+   */
+  private static String normSlashes(final String path) {
+    boolean a = true;
+    final StringBuilder sb = new StringBuilder(path.length());
+    final int pl = path.length();
+    for(int p = 0; p < pl; p++) {
+      final char c = path.charAt(p);
+      final boolean b = c != '/';
+      if(a || b) sb.append(c);
+      a = b;
+    }
+    return sb.toString();
   }
 
   /**

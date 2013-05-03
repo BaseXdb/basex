@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  * @author Andreas Weiler
  */
-final class XMLScanner extends Progress {
+final class XMLScanner extends Proc {
   /** Entities. */
   private static final String[] ENTITIES =
     { "amp", "&", "apos", "'", "quot", "\"", "lt", "<", "gt", ">" };
@@ -55,8 +55,6 @@ final class XMLScanner extends Progress {
   private final TokenMap pents = new TokenMap();
   /** DTD flag. */
   private final boolean dtd;
-  /** Chop whitespaces. */
-  private final boolean chop;
   /** Allow document fragment as input. */
   private final boolean fragment;
 
@@ -89,7 +87,6 @@ final class XMLScanner extends Progress {
         ents.add(token(ENTITIES[e]), token(ENTITIES[e + 1]));
       }
       dtd = pr.is(Prop.DTD);
-      chop = pr.is(Prop.CHOP);
 
       String enc = null;
       // process document declaration...
@@ -178,7 +175,7 @@ final class XMLScanner extends Progress {
 
     // parse comments etc...
     if(c == '!') {
-      if(consume(DOCTYPE)) {
+      if(!fragment && consume(DOCTYPE)) {
         type = Type.DTD;
         dtd();
       } else {
@@ -323,7 +320,6 @@ final class XMLScanner extends Progress {
         if(!f && !isCDATA()) {
           text = false;
           prev(1);
-          if(chop) token.trim();
           return;
         }
         cDATA();

@@ -186,14 +186,23 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_SIZE.args(PATH1), "1");
     query(_FILE_DELETE.args(PATH1));
 
-    query(_FILE_WRITE.args(PATH1, "a\u00e4",
-        serialParams("<encoding value='CP1252'/>")));
+    query(_FILE_WRITE.args(PATH1, "a\u00e4", serialParams("<encoding value='CP1252'/>")));
     query(_FILE_READ_TEXT.args(PATH1, "CP1252"), "a\u00e4");
 
-    query(_FILE_WRITE.args(PATH1, "\"<a/>\"",
-        serialParams("<method value='text'/>")));
+    query(_FILE_WRITE.args(PATH1, "\"<a/>\"", serialParams("<method value='text'/>")));
     query(_FILE_READ_TEXT.args(PATH1), "&lt;a/&gt;");
     query(_FILE_DELETE.args(PATH1));
+
+    // test spaces in filename
+    query(_FILE_WRITE.args(PATH1 + "%20X", ""));
+    query(_FILE_EXISTS.args(PATH1 + "%20X"), "true");
+    query(_FILE_DELETE.args(PATH1 + "%20X"));
+    query(_FILE_EXISTS.args(PATH1 + "%20X"), "false");
+
+    query(_FILE_WRITE.args(PATH1 + " X", ""));
+    query(_FILE_EXISTS.args(PATH1 + " X"), "true");
+    query(_FILE_DELETE.args(PATH1 + " X"));
+    query(_FILE_EXISTS.args(PATH1 + " X"), "false");
   }
 
   /** Test method. */
@@ -213,8 +222,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_READ_TEXT.args(PATH1, "CP1252"), "a\u00e4");
     query(_FILE_DELETE.args(PATH1));
 
-    query(_FILE_APPEND.args(PATH1, "\"<a/>\"",
-        serialParams("<method value='text'/>")));
+    query(_FILE_APPEND.args(PATH1, "\"<a/>\"", serialParams("<method value='text'/>")));
     query(_FILE_READ_TEXT.args(PATH1), "&lt;a/&gt;");
     query(_FILE_DELETE.args(PATH1));
   }
@@ -223,7 +231,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void writeText() {
     error(_FILE_WRITE_TEXT.args(PATH, "x"), Err.FILE_DIR);
-    error(_FILE_WRITE_TEXT.args(PATH1, " 123"), Err.XPTYPE);
+    error(_FILE_WRITE_TEXT.args(PATH1, " 123"), Err.NOCAST);
 
     query(_FILE_WRITE_TEXT.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), "1");
@@ -236,7 +244,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void writeTextLines() {
     error(_FILE_WRITE_TEXT_LINES.args(PATH, "x"), Err.FILE_DIR);
-    error(_FILE_WRITE_TEXT_LINES.args(PATH1, " 123"), Err.XPTYPE);
+    error(_FILE_WRITE_TEXT_LINES.args(PATH1, " 123"), Err.NOCAST);
 
     query(_FILE_WRITE_TEXT_LINES.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());
@@ -277,7 +285,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void appendText() {
     error(_FILE_APPEND_TEXT.args(PATH, "x"), Err.FILE_DIR);
-    error(_FILE_APPEND_TEXT.args(PATH1, " 123"), Err.XPTYPE);
+    error(_FILE_APPEND_TEXT.args(PATH1, " 123"), Err.NOCAST);
 
     query(_FILE_APPEND_TEXT.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), "1");
@@ -290,7 +298,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void appendTextLines() {
     error(_FILE_APPEND_TEXT_LINES.args(PATH, "x"), Err.FILE_DIR);
-    error(_FILE_APPEND_TEXT_LINES.args(PATH1, " 123"), Err.XPTYPE);
+    error(_FILE_APPEND_TEXT_LINES.args(PATH1, " 123"), Err.NOCAST);
 
     query(_FILE_APPEND_TEXT_LINES.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());

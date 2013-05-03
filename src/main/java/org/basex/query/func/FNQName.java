@@ -83,6 +83,8 @@ public final class FNQName extends StandardFunc {
    */
   private Item qName(final Item it, final Item it2) throws QueryException {
     final byte[] uri = checkEStr(it);
+    if(it2 == null) XPEMPTY.thrw(info, description());
+
     final byte[] name = checkEStr(it2);
     final byte[] str = !contains(name, ':') && eq(uri, XMLURI) ?
         concat(XMLC, name) : name;
@@ -102,7 +104,7 @@ public final class FNQName extends StandardFunc {
    */
   private Item lnFromQName(final QueryContext ctx, final Item it) throws QueryException {
     if(it == null) return null;
-    final QNm nm = (QNm) checkType(it, AtomType.QNM);
+    final QNm nm = checkQNm(it, ctx);
     return AtomType.NCN.cast(Str.get(nm.local()), ctx, info);
   }
 
@@ -117,7 +119,7 @@ public final class FNQName extends StandardFunc {
       throws QueryException {
 
     if(it == null) return null;
-    final QNm nm = (QNm) checkType(it, AtomType.QNM);
+    final QNm nm = checkQNm(it, ctx);
     return nm.hasPrefix() ? AtomType.NCN.cast(Str.get(nm.prefix()), ctx, info) : null;
   }
 
@@ -182,9 +184,9 @@ public final class FNQName extends StandardFunc {
     // check base uri
     final Uri base = it2 == null ? ctx.sc.baseURI() : Uri.uri(checkEStr(it2));
     if(!base.isAbsolute()) URIABS.thrw(info, base);
-    if(!base.isValid() || contains(base.string(), '#') ||
-        !contains(base.string(), token("//"))) URIINVRES.thrw(info, base);
+    if(!base.isValid() || contains(base.string(), '#') || !contains(base.string(), '/'))
+      URIINVRES.thrw(info, base);
 
-    return base.resolve(rel);
+    return base.resolve(rel, info);
   }
 }

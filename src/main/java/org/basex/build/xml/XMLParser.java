@@ -8,6 +8,7 @@ import java.io.*;
 import org.basex.build.*;
 import org.basex.build.BuildText.Type;
 import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.list.*;
 
@@ -27,6 +28,10 @@ public class XMLParser extends SingleParser {
   private final XMLScanner scanner;
   /** Names of opened elements. */
   private final TokenList tags = new TokenList();
+  /** Whitespace handling. */
+  private final BoolList chops = new BoolList();
+  /** Chop whitespaces. */
+  private final boolean chop;
   /** Allow document fragment as input. */
   private final boolean fragment;
   /** Closed root tag. */
@@ -55,6 +60,8 @@ public class XMLParser extends SingleParser {
     super(source, pr);
     scanner = new XMLScanner(source, pr, frag);
     stripNS = pr.is(Prop.STRIPNS);
+    chop = pr.is(Prop.CHOP);
+    chops.push(chop);
     fragment = frag;
   }
 
@@ -65,8 +72,10 @@ public class XMLParser extends SingleParser {
     while(true) {
       if(scanner.type == Type.TEXT) {
         final byte[] text = scanner.token.finish();
-        if(!tags.isEmpty() || fragment || !ws(text))
+        if(!tags.isEmpty() || fragment || !ws(text)) {
+          if(chops.peek()) scanner.token.trim();
           builder.text(scanner.token.finish());
+        }
       } else if(scanner.type == Type.COMMENT) {
         builder.comment(scanner.token.finish());
       } else if(scanner.type == Type.PI) {
@@ -110,6 +119,7 @@ public class XMLParser extends SingleParser {
       if(tags.isEmpty()) throw new BuildException(OPEN, det(), tag);
       final byte[] open = tags.pop();
       if(!eq(open, tag)) throw new BuildException(CLOSINGELEM, det(), tag, open);
+      chops.pop();
 
       builder.closeElem();
       if(tags.isEmpty()) closed = true;
@@ -164,7 +174,17 @@ public class XMLParser extends SingleParser {
 
     // send start element
     builder.openElem(en, atts, nsp);
-    tags.add(en);
+    tags.push(en);
+    boolean c = chops.peek();
+    if(chop) {
+      final int a = atts.get(DataText.XML_SPACE);
+      if(a != -1) {
+        final byte[] s = atts.string(a);
+        if(eq(s, DataText.DEFAULT)) c = true;
+        else if(eq(s, DataText.PRESERVE)) c = false;
+      }
+    }
+    chops.push(c);
     return consume(Type.R_BR);
   }
 

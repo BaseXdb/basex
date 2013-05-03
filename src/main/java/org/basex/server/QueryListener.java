@@ -21,7 +21,7 @@ import org.basex.util.*;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-final class QueryListener extends Progress {
+final class QueryListener extends Proc {
   /** Performance. */
   final Performance perf = new Performance();
   /** Query info. */
@@ -164,7 +164,7 @@ final class QueryListener extends Progress {
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
         throw new BaseXException(BASX_STACKOVERFLOW.desc);
-      } catch(final ProgressException ex) {
+      } catch(final ProcException ex) {
         throw new BaseXException(TIMEOUT_EXCEEDED);
       }
     } finally {

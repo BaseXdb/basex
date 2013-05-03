@@ -1,5 +1,7 @@
 package org.basex.build.file;
 
+import static org.basex.util.Token.*;
+
 import java.io.*;
 
 import org.basex.build.xml.*;
@@ -11,9 +13,6 @@ import org.basex.query.util.*;
 import org.basex.query.util.json.*;
 import org.basex.query.util.json.JsonParser.Spec;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
-
-import static org.basex.util.Token.*;
 
 /**
  * This class parses files in the JSON format
@@ -79,7 +78,7 @@ public final class JSONParser extends XMLParser {
 
     Spec sp = Spec.RFC4627;
     for(final Spec s : Spec.values())
-      if(Token.string(s.desc).equalsIgnoreCase(spec)) sp = s;
+      if(string(s.desc).equalsIgnoreCase(spec)) sp = s;
 
     // parse input, using specified encoding
     final byte[] content = new NewlineInput(io).encoding(encoding).content();

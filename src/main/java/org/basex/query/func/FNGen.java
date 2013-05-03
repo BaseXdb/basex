@@ -24,7 +24,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Generating functions.
@@ -46,7 +45,7 @@ public final class FNGen extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case DATA:                return data(ctx);
+      case DATA:                return dataa(ctx);
       case COLLECTION:          return collection(ctx).iter();
       case URI_COLLECTION:      return uriCollection(ctx);
       case UNPARSED_TEXT_LINES: return unparsedTextLines(ctx);
@@ -92,7 +91,7 @@ public final class FNGen extends StandardFunc {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private Iter data(final QueryContext ctx) throws QueryException {
+  private Iter dataa(final QueryContext ctx) throws QueryException {
     final Iter ir = ctx.iter(expr.length != 0 ? expr[0] : checkCtx(ctx));
 
     return new Iter() {
@@ -219,14 +218,16 @@ public final class FNGen extends StandardFunc {
       if(!Uri.uri(p).isValid()) INVURL.thrw(info, p);
 
       IO io = base.merge(p);
-      final String rp = ctx.resource.resources.get(io.path());
-      if(rp != null) io = IO.get(rp);
-      if(!io.exists()) throw RESNF.thrw(info, p);
+      final String[] rp = ctx.resource.resources.get(io.path());
+      if(rp != null && rp.length > 0) {
+        io = IO.get(rp[0]);
+        if(rp.length > 1) enc = rp[1];
+      }
+      if(!io.exists()) RESNF.thrw(info, p);
 
       final InputStream is = io.inputStream();
       try {
-        final TextInput ti = new TextInput(io).valid(true);
-        if(enc != null) ti.encoding(enc);
+        final TextInput ti = new TextInput(io).encoding(enc).validate(true);
         if(!check) return Str.get(ti.content());
         while(ti.read() != -1);
         return Bln.TRUE;
@@ -238,8 +239,10 @@ public final class FNGen extends StandardFunc {
       throw ex;
     } catch(final IOException ex) {
       if(check) return Bln.FALSE;
-      if(ex instanceof EncodingException) INVCHARS.thrw(info, ex);
-      if(ex instanceof InputException && enc == null) WHICHCHARS.thrw(info);
+      if(ex instanceof InputException) {
+        if(ex instanceof EncodingException || enc != null) INVCHARS.thrw(info, ex);
+        else WHICHCHARS.thrw(info, ex);
+      }
       throw RESNF.thrw(info, path);
     }
   }
@@ -320,7 +323,7 @@ public final class FNGen extends StandardFunc {
     try {
       // run serialization
       Item it = expr.length > 1 ? expr[1].item(ctx, info) : null;
-      final Serializer ser = Serializer.get(ao, FuncParams.serializerProp(it));
+      final Serializer ser = Serializer.get(ao, FuncParams.serializerProp(it, info));
       final Iter ir = expr[0].iter(ctx);
       while((it = ir.next()) != null) ser.serialize(it);
       ser.close();
@@ -348,16 +351,22 @@ public final class FNGen extends StandardFunc {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    if(oneOf(sig, DOC, COLLECTION)) {
-      // [JE] XQuery: check how to handle default collection()
-      if(expr.length == 0 || !(expr[0] instanceof Str)) return false;
-      final QueryInput qi = new QueryInput(string(((Str) expr[0]).string()));
-      if(qi.db == null) return false;
-      db.add(qi.db);
-      return true;
+  public boolean accept(final ASTVisitor visitor) {
+    if(oneOf(sig, DATA) && expr.length == 0) {
+      if(!visitor.lock(DBLocking.CTX)) return false;
+    } else if(oneOf(sig, DOC_AVAILABLE, DOC, COLLECTION, URI_COLLECTION)) {
+      if(expr.length == 0) {
+        if(oneOf(sig, COLLECTION, URI_COLLECTION) && !visitor.lock(DBLocking.COLL))
+          return false;
+      } else if(!(expr[0] instanceof Str)) {
+        if(!visitor.lock(null)) return false;
+      } else {
+        final QueryInput qi = new QueryInput(string(((Str) expr[0]).string()));
+        if(qi.db == null && !visitor.lock(null)) return false;
+        if(!visitor.lock(qi.db)) return false;
+      }
     }
-    return super.databases(db);
+    return super.accept(visitor);
   }
 
   @Override

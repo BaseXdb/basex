@@ -20,7 +20,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract value.
@@ -98,17 +97,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
    */
   public abstract Object toJava() throws QueryException;
 
-  /**
-   * Materializes streamable values, or returns a self reference.
-   * @param ii input info
-   * @return materialized item
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
-  public Value materialize(final InputInfo ii) throws QueryException {
-    return this;
-  }
-
   @Override
   public boolean uses(final Use u) {
     return false;
@@ -135,13 +123,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public Value copy(final QueryContext ctx, final VarScope scp,
       final IntMap<Var> vs) {
     return this;
-  }
-
-  @Override
-  public boolean databases(final StringList db) {
-    final Data data = data();
-    if(data != null) db.add(data.meta.name);
-    return true;
   }
 
   @Override
@@ -212,7 +193,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return true;
+    final Data data = data();
+    return data == null || visitor.lock(data.meta.name);
   }
 
   @Override

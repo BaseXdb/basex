@@ -196,8 +196,7 @@ public final class Unit {
    * @return value
    * @throws QueryException query exception
    */
-  private int indexOf(final StaticFunc func, final byte[] name)
-      throws QueryException {
+  private int indexOf(final StaticFunc func, final byte[] name) throws QueryException {
     final Ann ann = func.ann;
     final int as = ann.size();
     int pos = -1;

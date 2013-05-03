@@ -11,7 +11,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract FTContains expression.
@@ -78,11 +77,6 @@ public abstract class FTContains extends ParseExpr {
     if(fte != null) ftexpr = fte;
 
     return ex != null || fte != null ? optimize(ctx, scp) : null;
-  }
-
-  @Override
-  public final boolean databases(final StringList db) {
-    return expr.databases(db) && ftexpr.databases(db);
   }
 
   @Override

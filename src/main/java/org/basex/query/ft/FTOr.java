@@ -125,9 +125,4 @@ public final class FTOr extends FTExpr {
   public String toString() {
     return PAR1 + toString(' ' + FTOR + ' ') + PAR2;
   }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, expr);
-  }
 }

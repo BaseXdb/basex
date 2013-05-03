@@ -25,8 +25,7 @@ public abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
     throw CONDTYPE.thrw(ii, this);
   }
 

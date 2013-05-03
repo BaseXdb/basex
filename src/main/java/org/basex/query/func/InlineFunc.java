@@ -17,7 +17,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Inline function.
@@ -109,8 +108,7 @@ public final class InlineFunc extends Single implements Scope {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     if(compiled) return this;
     compiled = true;
 
@@ -118,7 +116,7 @@ public final class InlineFunc extends Single implements Scope {
     for(final Entry<Var, Expr> e : scope.closure().entrySet())
       e.setValue(e.getValue().compile(ctx, scp));
 
-    final StaticContext tmp = ctx.sc;
+    final StaticContext cs = ctx.sc;
     ctx.sc = sc;
 
     final int fp = scope.enter(ctx);
@@ -133,7 +131,7 @@ public final class InlineFunc extends Single implements Scope {
     } finally {
       scope.cleanUp(this);
       scope.exit(ctx, fp);
-      ctx.sc = tmp;
+      ctx.sc = cs;
     }
 
     return optimize(ctx, scp);
@@ -141,7 +139,7 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
-    type = FuncType.get(args, ret).seqType();
+    type = FuncType.get(ann, args, ret).seqType();
     size = 1;
     // only evaluate if the closure is empty, so we don't lose variables
     return scope.closure().isEmpty() ? preEval(ctx) : this;
@@ -169,7 +167,7 @@ public final class InlineFunc extends Single implements Scope {
       }
     }
 
-    final StaticContext tmp = ctx.sc;
+    final StaticContext cs = ctx.sc;
     ctx.sc = sc;
 
     if(val) {
@@ -184,7 +182,7 @@ public final class InlineFunc extends Single implements Scope {
       } finally {
         scope.cleanUp(this);
         scope.exit(ctx, fp);
-        ctx.sc = tmp;
+        ctx.sc = cs;
       }
     }
 
@@ -201,7 +199,7 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public FuncItem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final FuncType ft = FuncType.get(args, ret);
+    final FuncType ft = FuncType.get(ann, args, ret);
     final boolean c = ft.ret != null && !expr.type().instanceOf(ft.ret);
 
     // collect closure
@@ -239,12 +237,6 @@ public final class InlineFunc extends Single implements Scope {
   @Override
   public boolean removable(final Var v) {
     // [LW] Variables are removable from the closure.
-    return false;
-  }
-
-  @Override
-  public boolean databases(final StringList db) {
-    // [LW][JE] can be done better...
     return false;
   }
 

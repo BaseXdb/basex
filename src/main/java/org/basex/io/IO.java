@@ -102,7 +102,8 @@ public abstract class IO {
     path = p;
     final String n = p.substring(p.lastIndexOf('/') + 1);
     // use current time if no name is given
-    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + XMLSUFFIX : n;
+    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + IO.BASEXSUFFIX +
+                       IO.XMLSUFFIX : n;
   }
 
   /**
@@ -126,7 +127,7 @@ public abstract class IO {
     if(source == null) return new IOContent("");
     final String s = source.trim();
     return s.indexOf('<') == 0 ? new IOContent(s) :
-           IOUrl.isFileURL(s)  ? new IOFile(IOUrl.file(s)) :
+           IOUrl.isFileURL(s)  ? IOFile.get(s) :
            IOFile.isValid(s)   ? new IOFile(s) :
            IOUrl.isValid(s)    ? new IOUrl(s) :
            new IOContent(s);

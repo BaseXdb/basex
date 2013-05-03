@@ -3,7 +3,6 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This class is implemented by all kinds of processes.
@@ -13,18 +12,20 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class Progress {
-  /** Listener, reacting on progress information. */
+public abstract class Proc {
+  /** Listener, reacting on process information. */
   public InfoListener listen;
   /** This flag indicates that a command may perform updates. */
   public boolean updating;
 
+  /** Indicates if a process is currently registered. */
+  private boolean registered;
   /** Stopped flag. */
   private boolean stopped;
   /** Timeout thread. */
   private Thread timeout;
-  /** Sub progress. */
-  private Progress sub;
+  /** Sub process. */
+  private Proc sub;
 
   /**
    * Returns short information on the current process or sub process.
@@ -61,16 +62,16 @@ public abstract class Progress {
   }
 
   /**
-   * Sets a new sub progress.
-   * @param <P> progress type
-   * @param prog progress
-   * @return passed on progress reference
+   * Sets a new sub process.
+   * @param <P> process type
+   * @param proc process
+   * @return passed on process reference
    */
-  protected final <P extends Progress> P progress(final P prog) {
-    sub = prog;
+  protected final <P extends Proc> P proc(final P proc) {
+    sub = proc;
     sub.listen = listen;
     if(stopped) sub.stop();
-    return prog;
+    return proc;
   }
 
   /**
@@ -83,14 +84,14 @@ public abstract class Progress {
   }
 
   /**
-   * Checks if the progress was interrupted; if yes, sends a runtime exception.
+   * Checks if the process was interrupted; if yes, sends a runtime exception.
    */
   public final void checkStop() {
-    if(stopped) throw new ProgressException();
+    if(stopped) throw new ProcException();
   }
 
   /**
-   * Aborts a failed or interrupted progress.
+   * Aborts a failed or interrupted process.
    */
   protected void abort() {
     if(sub != null) sub.abort();
@@ -107,7 +108,7 @@ public abstract class Progress {
       @Override
       public void run() {
         Performance.sleep(ms);
-        Progress.this.stop();
+        Proc.this.stop();
       }
     };
     timeout.start();
@@ -124,15 +125,27 @@ public abstract class Progress {
   }
 
   /**
-   * Adds the names of the databases that will be touched by the process.
-   * An empty string indicates that the currently opened database will be
-   * touched.
-   * @param db databases
-   * @return {@code false} if databases cannot be statically determined
+   * Adds the names of the databases that may be touched by the process.
+   * @param lockResult Container for lock result to pass around
    */
-  @SuppressWarnings("unused")
-  public boolean databases(final StringList db) {
-    return false;
+  public void databases(final LockResult lockResult) {
+    lockResult.writeAll = true;
+  }
+
+  /**
+   * Checks if the process is registered.
+   * @return result of check
+   */
+  public boolean registered() {
+    return registered;
+  }
+
+  /**
+   * Sets the registered state.
+   * @param reg registered flag
+   */
+  public void registered(final boolean reg) {
+    registered = reg;
   }
 
   /**

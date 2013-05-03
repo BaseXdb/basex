@@ -9,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -73,7 +74,9 @@ public enum Err {
   /** BXDB0005. */
   BXDB_DBRETURN(BXDB, 5, "Query must yield database nodes."),
   /** BXDB0006. */
-  BXDB_SINGLE(BXDB, 6, "Database path '%' must point to a single document."),
+  BXDB_NODOC(BXDB, 6, "Database path '%' yields no documents."),
+  /** BXDB0006. */
+  BXDB_SINGLE(BXDB, 6, "Database path '%' points to more than one document."),
   /** BXDB0007. */
   BXDB_OPENED(BXDB, 7, "Database '%' is opened by another process."),
   /** BXDB0008. */
@@ -87,7 +90,9 @@ public enum Err {
   /** BXDB0012. */
   BXDB_CREATE(BXDB, 12, "Database '%' can only be created once."),
   /** BXDB0013. */
-  BXDB_CREATEARGS(BXDB, 12, "Number of specified inputs and paths differs: % vs. %."),
+  BXDB_CREATEARGS(BXDB, 13, "Number of specified inputs and paths differs: % vs. %."),
+  /** BXDB0014. */
+  BXDB_DIR(BXDB, 14, "Database path '%' points to a directory."),
 
   // Fetch module
 
@@ -385,11 +390,6 @@ public enum Err {
   /** FODF1310. */
   INVDDPATTERN(FODF, 1310, "Invalid decimal-digit-pattern: '%'."),
 
-  // [CG] obsolete error codes?
-
-  /** FODF1310. */
-  NOMAND(FODF, 1310, "No mandatory digit specified: '%'."),
-
   /** FODT0001. */
   DATERANGE(FODT, 1, "%: '%' out of range."),
   /** FODT0001. */
@@ -533,7 +533,7 @@ public enum Err {
   /** FOUT1190. */
   INVCHARS(FOUT, 1190, "%."),
   /** FOUT1200. */
-  WHICHCHARS(FOUT, 1200, "Resource contains invalid input."),
+  WHICHCHARS(FOUT, 1200, "Resource contains invalid input: %."),
 
   /** FTDY0016. */
   FTWEIGHT(FTDY, 16, "Weight value out of range: %."),
@@ -555,6 +555,10 @@ public enum Err {
   /** FTST0019. */
   FTDUP(FTST, 19, "Match option '%' was declared twice."),
 
+  /** SENR0001. */
+  SERATTR(SENR, 1, "Attributes and namespaces cannot be serialized:%."),
+  /** SENR0001. */
+  SERFUNC(SENR, 1, "Functions cannot be serialized: %."),
   /** SESU0007. */
   SERENCODING(SESU, 7, "Encoding not supported: '%'."),
   /** SEPM0009. */
@@ -573,6 +577,8 @@ public enum Err {
   SERANY(SEPM, 16, "%."),
   /** SEPM0017. */
   SEROPT(SEPM, 17, "%."),
+  /** SEPM0017. */
+  SERWHICH(SEPM, 17, "Unknown serialization parameter: '%'."),
 
   /** XPDY0002. */
   VAREMPTY(XPDY, 2, "No value assigned to %."),
@@ -634,7 +640,7 @@ public enum Err {
   /** XPST0003. */
   FUNCNAME(XPST, 3, "Expecting function name."),
   /** XPST0003. */
-  RESERVED(XPST, 3, "% is a reserved function name."),
+  RESERVED(XPST, 3, "'%' is a reserved keyword."),
   /** XPST0003. */
   PREDMISSING(XPST, 3, "Expecting expression before predicate."),
   /** XPST0003. */
@@ -743,10 +749,14 @@ public enum Err {
   /** XPST0008. */
   VARUNDEF(XPST, 8, "Undefined variable %."),
   /** XPST0008. */
+  VARPRIVATE(XPST, 8, "Private variable % is not visible from this module."),
+  /** XPST0008. */
   TYPEUNDEF(XPST, 8, "Undefined type '%'."),
   /** XPST0008. */
   SCHEMAINV(XPST, 8, "Undefined schema name '%'."),
 
+  /** XPST0017. */
+  FUNCPRIV(XPST, 17, "Function is private: %(...)."),
   /** XPST0017. */
   XPARGS(XPST, 17, "%: wrong number of arguments."),
   /** XPST0017. */
@@ -780,7 +790,7 @@ public enum Err {
   /** XPTY0004. */
   XPINVTREAT(XPTY, 4, "Cannot treat % as %: %."),
   /** XPTY0004. */
-  XPTYPE(XPTY, 4, "%: % expected, % found."),
+  NOCAST(XPTY, 4, "Cannot cast from % to %."),
   /** XPTY0004. */
   CALCTYPE(XPTY, 4, "% not defined for % and %."),
 
@@ -820,7 +830,7 @@ public enum Err {
   /** XPTY0020. */
   STEPNODE(XPTY, 20, "Context node required for %; % found."),
   /** XPTY0117. */
-  NSSENS(XPTY, 117, "Cannot cast % to namespace-sensitive type %."),
+  NSSENS(XPTY, 117, "Cannot cast from % to %."),
 
   /** XQDY0025. */
   CATTDUPL(XQDY, 25, "Duplicate attribute '%'."),
@@ -882,13 +892,13 @@ public enum Err {
   /** XQST0045. */
   ANNRES(XQST, 45, "Annotation % uses reserved namespace."),
   /** XQST0046. */
-  INVURI(XQST, 46, "URI \"%\" is invalid."),
+  INVURI(XQST, 46, "URI '%' is invalid."),
   /** XQST0047. */
   DUPLMODULE(XQST, 47, "Module namespace is declared twice: '%'."),
   /** XQST0047. */
   MODNS(XQST, 48, "Declaration % does not match the module namespace."),
   /** XQST0049. */
-  VARDEFINE(XQST, 49, "Duplicate declaration of %."),
+  VARDUPL(XQST, 49, "Duplicate declaration of %."),
   /** XQST0052. */
   XQTYPEUNKNOWN(XQST, 52, "Unknown type '%'."),
   /** XQST0054. */
@@ -960,7 +970,7 @@ public enum Err {
   /** XQST0106. */
   DUPLVIS(XQST, 106, "More than one visibility annotation declared."),
   /** XQST0108. */
-  MODOUT(XQST, 108, "No output declarations allowed in modules."),
+  MODOUT(XQST, 108, "No output declarations allowed in library modules."),
   /** XPST0109. */
   OUTWHICH(XQST, 109, "Unknown serialization parameter: '%'."),
   /** XPST0110. */
@@ -975,8 +985,26 @@ public enum Err {
   DUPLVARVIS(XQST, 116, "More than one visibility annotation declared."),
   /** XQST0118. */
   TAGWRONG(XQST, 118, "Start and end tag are different: <%>...</%>."),
+  /** XQST0119. */
+  OUTDOC(XQST, 119, "Serialization document '%' cannot be parsed."),
+  /** XQST0120. */
+  FEATNOTSUPP(XQST, 120, "Feature '%' is not supported by the implementation."),
+  /** XQST0122. */
+  DECLQNAME(XQST, 122, "Invalid QName: '%'."),
+  /** XQST0123. */
+  DECLOPTION(XQST, 123, "Unknown option: %."),
+  /** XQST0123. */
+  DECLFEAT(XQST, 123, "Unknown feature: '%'."),
   /** XPST0125. */
   INVISIBLE(XQST, 125, "No visibility annotation allowed in inline function."),
+  /** XPST0126. */
+  FEATREQUALL(XQST, 126, "The '%' feature cannot be specified as required feature."),
+  /** XPST0127. */
+  FEATREQPRO(XQST, 127, "The '%' feature cannot be both required and prohibited."),
+  /** XPST0128. */
+  FEATPROH(XQST, 128, "The '%' feature cannot be deactivated."),
+  /** XPST0132. */
+  FEATMODULE(XQST, 132, "The '%' feature is not allowed in a library module."),
 
   /** XQTY0024. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),
@@ -1145,6 +1173,7 @@ public enum Err {
     /** FOFD Error type. */ FOUT,
     /** FTDY Error type. */ FTDY,
     /** FTST Error type. */ FTST,
+    /** SENR Error type. */ SENR,
     /** SEPM Error type. */ SEPM,
     /** SERE Error type. */ SERE,
     /** SEPM Error type. */ SESU,
@@ -1248,7 +1277,7 @@ public enum Err {
    */
   public static QueryException type(final ParseExpr e, final Type t, final Item it)
       throws QueryException {
-    throw XPTYPE.thrw(e.info, e.description(), t, it.type);
+    throw NOCAST.thrw(e.info, it.type, t);
   }
 
   /**
@@ -1283,7 +1312,7 @@ public enum Err {
    * @return never
    * @throws QueryException query exception
    */
-  public static QueryException circVar(final QueryContext ctx, final ParseExpr var)
+  public static QueryException circVar(final QueryContext ctx, final StaticVar var)
       throws QueryException {
     throw (ctx.sc.xquery3() ? CIRCVAR30 : CIRCVAR).thrw(var.info, var);
   }

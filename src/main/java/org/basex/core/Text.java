@@ -45,8 +45,6 @@ public interface Text {
   String VERSION_URL = "http://files." + NAMELC + ".org/version.txt";
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
-  /** Company info. */
-  String COMPANY = Prop.NAME + " Team";
   /** Title and version. */
   String TITLE = Prop.NAME + ' ' + Prop.VERSION;
 
@@ -628,8 +626,10 @@ public interface Text {
   String PRINTING_CC = lang("printing") + COLS;
   /** "Total time: ". */
   String TOTAL_TIME_CC = lang("total_time") + COLS;
-  /** "Locking: ". */
-  String LOCKING_CC = lang("locking") + COLS;
+  /** "Read locking: ". */
+  String READ_LOCKING_CC = lang("read_locking") + COLS;
+  /** "Write locking: ". */
+  String WRITE_LOCKING_CC = lang("write_locking") + COLS;
   /** "Hit(s): ". */
   String HITS_X_CC = lang("hit_s") + COLS;
   /** "Updated: ". */
@@ -1112,6 +1112,9 @@ public interface Text {
   /** Full-text index. */
   String FULLTEXT = lang("fulltext");
 
+  /** General info. */
+  String PARSER_X = lang("parser_%");
+
   /** Dialog asking if a new database should be be created. */
   String NEW_DB_QUESTION = lang("no_db_found") + NL + lang("new_db_question");
 
@@ -1261,15 +1264,15 @@ public interface Text {
   String MEMUSED_C = USED_MEM + COLS;
 
   /** Copyright info. */
-  String COPYRIGHT = "\u00A9 2005-12 " + COMPANY;
+  String COPYRIGHT = "\u00A9 2005-12 " + Prop.ENTITY;
   /** License info. */
   String LICENSE = lang("license");
   /** Developer info. */
-  String CHIEF_ARCHITECT = lang("chief_architect") + ": Christian Gr\u00FCn";
+  String CHIEF_ARCHITECT = lang("chief_architect") + ": " + Prop.AUTHOR;
   /** Contributors info. */
-  String TEAM1 = lang("team") + ": Alexander Holupirek, Michael Seiferle,";
+  String TEAM1 = lang("team") + ": " + Prop.TEAM1 + ',';
   /** Developer names. */
-  String TEAM2 = "Lukas Kircher, Leo W\u00F6rteler";
+  String TEAM2 = Prop.TEAM2;
   /** Developer names. */
   String AND_OTHERS = lang("and_others");
   /** Translation. */

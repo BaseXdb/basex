@@ -10,6 +10,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -19,26 +20,32 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Formatter extends FormatUtil {
+  /** Military timezones. */
+  private static final byte[] MIL = token("YXWVUTSRQPONZABCDEFGHIKLM");
+  /** Token: Nn. */
+  private static final byte[] NN = { 'N', 'n' };
+
   /** Default language: English. */
-  private static final String EN = "en";
+  private static final byte[] EN = token("en");
   /** Formatter instances. */
-  private static final HashMap<String, Formatter> MAP =
-    new HashMap<String, Formatter>();
+  private static final TokenObjMap<Formatter> MAP = new TokenObjMap<Formatter>();
 
   // initialize hash map with English formatter as default
-  static { MAP.put(EN, new FormatterEN()); }
+  static {
+    MAP.add(EN, new FormatterEN());
+    MAP.add(token("de"), new FormatterDE());
+  }
 
   /**
    * Returns a formatter for the specified language.
    * @param ln language
    * @return formatter instance
    */
-  public static Formatter get(final String ln) {
+  public static Formatter get(final byte[] ln) {
     // check if formatter has already been created
     Formatter form = MAP.get(ln);
     if(form == null) {
-      final String clz = Util.name(Formatter.class) +
-          ln.toUpperCase(Locale.ENGLISH);
+      final String clz = Util.name(Formatter.class) + string(uc(ln));
       form = (Formatter) Reflect.get(Reflect.find(clz));
       // instantiation not successful: return default formatter
       if(form == null) form = MAP.get(EN);
@@ -103,6 +110,7 @@ public abstract class Formatter extends FormatUtil {
   /**
    * Formats the specified date.
    * @param date date to be formatted
+   * @param lng language
    * @param pic picture
    * @param cal calendar
    * @param plc place
@@ -110,13 +118,14 @@ public abstract class Formatter extends FormatUtil {
    * @return formatted string
    * @throws QueryException query exception
    */
-  public final byte[] formatDate(final ADate date, final byte[] pic, final byte[] cal,
-      final byte[] plc, final InputInfo ii) throws QueryException {
-
-    // [CG] XQuery/Formatter: currently, calendars and places are ignored
-    if(cal != null || plc != null);
+  public final byte[] formatDate(final ADate date, final byte[] lng, final byte[] pic,
+      final byte[] cal, final byte[] plc, final InputInfo ii) throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
+    if(lng.length != 0 && MAP.get(lng) == null) tb.add("[Language: en]");
+    if(cal.length != 0 && !eq(cal, token("AD"), token("ISO"))) tb.add("[Calendar: AD]");
+    if(plc.length != 0) tb.add("[Place: ]");
+
     final DateParser dp = new DateParser(ii, pic);
     while(dp.more()) {
       final int ch = dp.literal();
@@ -153,13 +162,15 @@ public abstract class Formatter extends FormatUtil {
             err = tim;
             break;
           case 'd':
-            num = ADate.days(0, (int) date.mon(), (int) date.day() - 1).longValue();
+            final long y = date.yea();
+            for(int m = (int) date.mon() - 1; --m >= 0;) num += ADate.dpm(y, m);
+            num += date.day();
             err = tim;
             break;
           case 'F':
             num = date.toJava().toGregorianCalendar().get(Calendar.DAY_OF_WEEK) - 1;
             if(num == 0) num = 7;
-            pres = new byte[] { 'n' };
+            pres = NN;
             err = tim;
             break;
           case 'W':
@@ -181,7 +192,7 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'P':
             num = date.hou() / 12;
-            pres = new byte[] { 'n' };
+            pres = NN;
             err = dat;
             break;
           case 'm':
@@ -196,19 +207,20 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'f':
             frac = date.sec().remainder(BigDecimal.ONE);
+            num = frac.movePointRight(3).intValue();
             err = dat;
             break;
           case 'Z':
           case 'z':
             num = date.zon();
-            pres = num == Short.MAX_VALUE ? null : token("01:01");
+            pres = token("01:01");
             break;
           case 'C':
-            pres = new byte[] { 'n' };
+            pres = NN;
             break;
           case 'E':
             num = date.yea();
-            pres = new byte[] { 'n' };
+            pres = NN;
             err = tim;
             break;
           default:
@@ -226,8 +238,12 @@ public abstract class Formatter extends FormatUtil {
           if(mx > 1) fp.max = mx;
         }
 
-        if(fp.first == 'n') {
-          byte[] in = EMPTY;
+        if(compSpec == 'z' || compSpec == 'Z') {
+          // output timezone
+          tb.add(formatTZ((int) num, fp, marker));
+        } else if(fp.first == 'n') {
+          // output name representation
+          byte[] in = null;
           if(compSpec == 'M') {
             in = month((int) num - 1, fp.min, fp.max);
           } else if(compSpec == 'F') {
@@ -239,10 +255,18 @@ public abstract class Formatter extends FormatUtil {
           } else if(compSpec == 'E') {
             in = era((int) num);
           }
-          if(fp.cs == Case.LOWER) in = lc(in);
-          if(fp.cs == Case.UPPER) in = uc(in);
-          tb.add(in);
+          if(in != null) {
+            if(fp.cs == Case.LOWER) in = lc(in);
+            if(fp.cs == Case.UPPER) in = uc(in);
+            tb.add(in);
+          } else {
+            // fallback representation
+            fp.first = '0';
+            fp.primary = ONE;
+            tb.add(formatInt(num, fp));
+          }
         } else {
+          // output fractional component
           if(frac != null && !frac.equals(BigDecimal.ZERO)) {
             String s = frac.toString().replace("0.", "");
             final int sl = s.length();
@@ -310,6 +334,99 @@ public abstract class Formatter extends FormatUtil {
     if(fp.cs == Case.LOWER) in = lc(in);
     if(fp.cs == Case.UPPER) in = uc(in);
     return sign ? concat(new byte[] { '-' }, in) : in;
+  }
+
+  /**
+   * Returns a formatted timezone.
+   * @param num integer to be formatted
+   * @param fp format parser
+   * @param marker marker
+   * @return string representation
+   * @throws QueryException query exception
+   */
+  public final byte[] formatTZ(final int num, final FormatParser fp,
+      final byte[] marker) throws QueryException {
+
+    final boolean uc = ch(marker, 0) == 'Z';
+    final boolean mil = uc && ch(marker, 1) == 'Z';
+
+    // ignore values without timezone. exception: military timezone
+    if(num == Short.MAX_VALUE) return mil ? new byte[] { 'J' } : EMPTY;
+
+    final TokenBuilder tb = new TokenBuilder();
+    if(!mil || !addMilTZ(num, tb)) {
+      if(!uc) tb.add("GMT");
+
+      final boolean minus = num < 0;
+      if(fp.trad && num == 0) {
+        tb.add('Z');
+      } else {
+        tb.add(minus ? '-' : '+');
+
+        final TokenParser tp = new TokenParser(fp.primary);
+        final int c1 = tp.next(), c2 = tp.next(), c3 = tp.next(), c4 = tp.next();
+        final int z1 = zeroes(c1), z2 = zeroes(c2), z3 = zeroes(c3), z4 = zeroes(c4);
+        if(z1 == -1) {
+          tb.add(addTZ(num, 0, new TokenBuilder("00"))).add(':');
+          tb.add(addTZ(num, 1, new TokenBuilder("00")));
+        } else if(z2 == -1) {
+          tb.add(addTZ(num, 0, new TokenBuilder().add(c1)));
+          if(c2 == -1) {
+            if(num % 60 != 0) tb.add(':').add(addTZ(num, 1, new TokenBuilder("00")));
+          } else {
+            final TokenBuilder t = new TokenBuilder().add(z3 == -1 ? '0' : z3);
+            if(z3 != -1 && z4 != -1) t.add(z4);
+            tb.add(c2).add(addTZ(num, 1, t));
+          }
+        } else if(z3 == -1) {
+          tb.add(addTZ(num, 0, new TokenBuilder().add(c1).add(c2)));
+          if(c3 == -1) {
+            if(num % 60 != 0) tb.add(':').add(addTZ(num, 1, new TokenBuilder("00")));
+          } else {
+            final int c5 = tp.next(), z5 = zeroes(c5);
+            final TokenBuilder t = new TokenBuilder().add(z4 == -1 ? '0' : z4);
+            if(z4 != -1 && z5 != -1) t.add(z5);
+            tb.add(c3).add(addTZ(num % 60, 1, t));
+          }
+        } else if (z4 == -1) {
+          tb.add(addTZ(num, 0, new TokenBuilder().add(c1)));
+          tb.add(addTZ(num, 1, new TokenBuilder().add(c2).add(c3)));
+        } else {
+          tb.add(addTZ(num, 0, new TokenBuilder().add(c1).add(c2)));
+          tb.add(addTZ(num, 1, new TokenBuilder().add(c3).add(c4)));
+        }
+      }
+    }
+    return tb.finish();
+  }
+
+  /**
+   * Returns a timezone component.
+   * @param num number to be formatted
+   * @param c counter
+   * @param format presentation format
+   * @return timezone component
+   * @throws QueryException query exception
+   */
+  private byte[] addTZ(final int num, final int c, final TokenBuilder format)
+      throws QueryException {
+
+    int n = c == 0 ? num / 60 : num % 60;
+    if(num < 0) n = -n;
+    return number(n, new IntFormat(format.finish(), null), zeroes(format.cp(0)));
+  }
+
+  /**
+   * Adds a military timezone component to the specified token builder.
+   * @param num number to be formatted
+   * @param tb token builder
+   * @return {@code true} if timezone was added
+   */
+  private boolean addMilTZ(final int num, final TokenBuilder tb) {
+    final int n = num / 60;
+    if(num % 60 != 0 || n < -12 || n > 12) return false;
+    tb.add(MIL[n + 12]);
+    return true;
   }
 
   /**

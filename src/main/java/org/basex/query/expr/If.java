@@ -13,7 +13,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * If expression.
@@ -154,11 +153,6 @@ public final class If extends Arr {
   public If copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
     return copyType(new If(info, cond.copy(ctx, scp, vs),
         expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs)));
-  }
-
-  @Override
-  public boolean databases(final StringList db) {
-    return cond.databases(db) && super.databases(db);
   }
 
   @Override

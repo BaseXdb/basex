@@ -10,7 +10,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Typeswitch expression.
@@ -58,13 +57,15 @@ public final class TypeSwitch extends ParseExpr {
     // compile branches
     for(final TypeCase tc : cases) tc.compile(ctx, scp);
 
-    // return result if all branches are equal (e.g., empty)
-    boolean eq = true;
-    for(int i = 1; i < cases.length; ++i) {
-      eq &= cases[i - 1].expr.sameAs(cases[i].expr);
+    // return first branch if all branches are equal (e.g., empty) and use no variables
+    final TypeCase tc = cases[0];
+    boolean eq = tc.var == null;
+    for(int c = 1; eq && c < cases.length; ++c) {
+      eq = tc.expr.sameAs(cases[c].expr);
     }
-    if(eq) return preEval(ctx);
+    if(eq) return optPre(tc.expr, ctx);
 
+    // combine return types
     type = cases[0].type();
     for(int c = 1; c < cases.length; ++c) {
       type = type.union(cases[c].type());
@@ -123,12 +124,6 @@ public final class TypeSwitch extends ParseExpr {
     final TypeCase[] cs = new TypeCase[cases.length];
     for(int i = 0; i < cs.length; i++) cs[i] = cases[i].copy(ctx, scp, vs);
     return new TypeSwitch(info, ts.copy(ctx, scp, vs), cs);
-  }
-
-  @Override
-  public boolean databases(final StringList db) {
-    for(final TypeCase tc : cases) if(!tc.databases(db)) return false;
-    return ts.databases(db);
   }
 
   @Override

@@ -61,13 +61,10 @@ public final class SyntaxXQuery extends Syntax {
    * @param props property class
    * @throws Exception exception
    */
-  private static void addProps(final Class<?> props) throws Exception {
-    for(final Field f : props.getFields()) {
-      final Object obj = f.get(null);
-      if(!(obj instanceof Object[])) continue;
-      final Object[] o = (Object[]) obj;
-      if(o.length == 2) Collections.addAll(FUNC,
-          o[0].toString().toLowerCase().split("-"));
+  private static void addProps(final Class<? extends AProp> props) throws Exception {
+    for(final Object[] arr : AProp.props(props)) {
+      if(arr.length > 1)
+        Collections.addAll(FUNC, arr[0].toString().toLowerCase().split("-"));
     }
   }
 

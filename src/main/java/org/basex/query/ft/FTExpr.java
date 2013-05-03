@@ -9,7 +9,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * This class defines is an abstract class for full-text expressions.
@@ -96,12 +95,6 @@ public abstract class FTExpr extends ParseExpr {
   public abstract FTExpr copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final Expr e : expr) if(!e.databases(db)) return false;
-    return true;
-  }
-
-  @Override
   public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
     for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].indexEquivalent(ic);
     return this;
@@ -119,6 +112,11 @@ public abstract class FTExpr extends ParseExpr {
   @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), expr);
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, expr);
   }
 
   /**

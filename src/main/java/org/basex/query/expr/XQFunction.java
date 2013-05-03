@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -24,6 +25,12 @@ public interface XQFunction {
    * @return name or {@code null}
    */
   QNm fName();
+
+  /**
+   * Type of this function.
+   * @return this function's type
+   */
+  FuncType funcType();
 
   /**
    * Invokes this function with the given arguments.

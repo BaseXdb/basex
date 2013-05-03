@@ -30,7 +30,7 @@ import org.basex.util.list.*;
  */
 public final class FNFile extends StandardFunc {
   /** Line separator. */
-  private static final byte[] NL = Token.token(Prop.NL);
+  private static final byte[] NL = token(Prop.NL);
 
   /**
    * Constructor.
@@ -360,7 +360,7 @@ public final class FNFile extends StandardFunc {
     check(path);
     final Iter ir = expr[1].iter(ctx);
     final SerializerProp sp = FuncParams.serializerProp(
-        expr.length > 2 ? expr[2].item(ctx, info) : null);
+        expr.length > 2 ? expr[2].item(ctx, info) : null, info);
 
     final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
     try {
@@ -394,7 +394,7 @@ public final class FNFile extends StandardFunc {
 
     final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));
     try {
-      out.write(cs == null ? s : Token.string(s).getBytes(cs));
+      out.write(cs == null ? s : string(s).getBytes(cs));
     } finally {
       out.close();
     }
@@ -423,7 +423,7 @@ public final class FNFile extends StandardFunc {
       for(Item it; (it = ir.next()) != null;) {
         if(!it.type.isStringOrUntyped()) Err.type(this, AtomType.STR, it);
         final byte[] s = it.string(info);
-        out.write(cs == null ? s : Token.string(s).getBytes(cs));
+        out.write(cs == null ? s : string(s).getBytes(cs));
         out.write(cs == null ? NL : Prop.NL.getBytes(cs));
       }
     } finally {
@@ -477,17 +477,18 @@ public final class FNFile extends StandardFunc {
 
   /**
    * Transfers a file path, given a source and a target.
-   * @param src source file to be copied
+   * @param source source file to be copied
    * @param ctx query context
    * @param copy copy flag (no move)
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized Item copy(final File src, final QueryContext ctx,
+  private synchronized Item copy(final File source, final QueryContext ctx,
       final boolean copy) throws QueryException, IOException {
 
-    File trg = file(1, ctx).getAbsoluteFile();
+    File trg = file(1, ctx).getCanonicalFile();
+    final File src = source.getCanonicalFile();
     if(!src.exists()) FILE_WHICH.thrw(info, src.getAbsolutePath());
 
     if(trg.isDirectory()) {
@@ -503,8 +504,8 @@ public final class FNFile extends StandardFunc {
     }
 
     // ignore operations on identical, canonical source and target path
-    final String spath = src.getCanonicalPath();
-    final String tpath = trg.getCanonicalPath();
+    final String spath = src.getPath();
+    final String tpath = trg.getPath();
     if(!spath.equals(tpath)) {
       if(copy) {
         copy(src, trg);
@@ -558,8 +559,9 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    */
   private File file(final int i, final QueryContext ctx) throws QueryException {
-    return i >= expr.length ? null :
-      new IOFile(IOUrl.file(string(checkStr(expr[i], ctx)))).file();
+    if(i >= expr.length) return null;
+    final String file = string(checkStr(expr[i], ctx));
+    return (IOUrl.isFileURL(file) ? IOFile.get(file) : new IOFile(file)).file();
   }
 
   @Override

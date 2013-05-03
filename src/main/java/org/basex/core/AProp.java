@@ -40,13 +40,11 @@ public abstract class AProp implements Iterable<String> {
    */
   public AProp(final String suffix) {
     try {
-      for(final Field f : getClass().getFields()) {
-        final Object obj = f.get(null);
-        if(!(obj instanceof Object[])) continue;
-        final Object[] arr = (Object[]) obj;
+      for(final Object[] arr : props(getClass())) {
         if(arr.length > 1) props.put(arr[0].toString(), arr[1]);
       }
     } catch(final Exception ex) {
+      ex.printStackTrace();
       Util.notexpected(ex);
     }
     if(suffix != null) read(suffix);
@@ -63,13 +61,9 @@ public abstract class AProp implements Iterable<String> {
       bw = new BufferedWriter(new FileWriter(file.file()));
       bw.write(PROPHEADER);
 
-      for(final Field f : getClass().getFields()) {
-        final Object obj = f.get(null);
-        if(!(obj instanceof Object[])) continue;
-
-        final Object[] o = (Object[]) obj;
-        final String key = o[0].toString();
-        if(o.length == 1) {
+      for(final Object[] arr : props(getClass())) {
+        final String key = arr[0].toString();
+        if(arr.length == 1) {
           bw.write(NL + "# " + key + NL);
           continue;
         }
@@ -317,6 +311,8 @@ public abstract class AProp implements Iterable<String> {
     return tb.toString();
   }
 
+  // STATIC METHODS =====================================================================
+
   /**
    * Returns a system property.
    * @param key {@link Prop} key
@@ -325,8 +321,6 @@ public abstract class AProp implements Iterable<String> {
   public static String getSystem(final Object[] key) {
     return key.length > 0 ? getSystem(key[0].toString()) : "";
   }
-
-  // STATIC METHODS =====================================================================
 
   /**
    * Returns a system property. If necessary, the key will
@@ -361,6 +355,24 @@ public abstract class AProp implements Iterable<String> {
       DBPREFIX + key.toLowerCase(Locale.ENGLISH);
     if(System.getProperty(k) == null) System.setProperty(k, val.toString());
   }
+
+  /**
+   * Returns all property objects from the specified property class.
+   * @param clz property class
+   * @return property objects
+   * @throws IllegalAccessException exception
+   */
+  public static final Object[][] props(final Class<? extends AProp> clz)
+      throws IllegalAccessException {
+
+    final ArrayList<Object[]> props = new ArrayList<Object[]>();
+    for(final Field f : clz.getFields()) {
+      if(!Modifier.isStatic(f.getModifiers())) continue;
+      final Object obj = f.get(null);
+      if(obj instanceof Object[]) props.add((Object[]) obj);
+    }
+    return props.toArray(new Object[props.size()][]);
+  };
 
   // PROTECTED METHODS ==================================================================
 
@@ -473,13 +485,8 @@ public abstract class AProp implements Iterable<String> {
     try {
       if(err.isEmpty()) {
         boolean ok = true;
-        for(final Field f : getClass().getFields()) {
-          final Object obj = f.get(null);
-          if(!(obj instanceof Object[])) continue;
-          final Object[] arr = (Object[]) obj;
-          if(arr.length < 2) continue;
-          final String key = arr[0].toString();
-          ok &= read.contains(key);
+        for(final Object[] arr : props(getClass())) {
+          if(arr.length > 1) ok &= read.contains(arr[0].toString());
         }
         if(!ok) err.addExt("Saving properties in \"%\"..." + NL, file);
       }

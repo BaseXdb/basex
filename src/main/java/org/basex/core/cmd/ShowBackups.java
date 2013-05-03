@@ -52,4 +52,9 @@ public final class ShowBackups extends ABackup {
   public void build(final CmdBuilder cb) {
     cb.init(Cmd.SHOW + " " + CmdShow.BACKUPS);
   }
+
+  @Override
+  public void databases(final LockResult lr) {
+    lr.read.add(DBLocking.BACKUP);
+  }
 }

@@ -6,7 +6,9 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
 import org.xml.sax.helpers.*;
@@ -31,6 +33,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   private final Atts nsp = new Atts();
   /** DTD flag. */
   private boolean dtd;
+  /** Whitespace handling. */
+  private final BoolList chops = new BoolList();
   /** Whitespace chopping. */
   private final boolean chop;
   /** Element counter. */
@@ -51,8 +55,9 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
    */
   public SAXHandler(final Builder build, final boolean ch, final boolean sn) {
     builder = build;
-    chop = ch;
     stripNS = sn;
+    chop = ch;
+    chops.push(ch);
   }
 
   @Override
@@ -70,6 +75,18 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
       }
       final byte[] en = token(qn);
       builder.openElem(stripNS ? local(en) : en, atts, nsp);
+
+      boolean c = chops.peek();
+      if(chop) {
+        final int a = atts.get(DataText.XML_SPACE);
+        if(a != -1) {
+          final byte[] s = atts.string(a);
+          if(eq(s, DataText.DEFAULT)) c = true;
+          else if(eq(s, DataText.PRESERVE)) c = false;
+        }
+      }
+      chops.push(c);
+
       atts.reset();
       nsp.reset();
       ++nodes;
@@ -85,6 +102,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
     try {
       finishText();
       builder.closeElem();
+      chops.pop();
     } catch(final IOException ex) {
       error(ex);
     }
@@ -126,7 +144,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   private void finishText() throws IOException {
     if(sb.length() != 0) {
       final String s = sb.toString();
-      builder.text(token(chop ? s.trim() : s));
+      builder.text(token(chops.peek() ? s.trim() : s));
       sb.setLength(0);
     }
   }

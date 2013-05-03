@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class ProcessLocking implements Locking {
+final class ProcLocking implements Locking {
   /** Queue for all waiting processes. */
   private final LinkedList<Object> queue = new LinkedList<Object>();
   /** Mutex object. */
@@ -33,12 +33,12 @@ final class ProcessLocking implements Locking {
    * Default constructor.
    * @param c context
    */
-  ProcessLocking(final Context c) {
+  ProcLocking(final Context c) {
     ctx = c;
   }
 
   @Override
-  public void acquire(final Progress pr, final StringList read, final StringList write) {
+  public void acquire(final Proc pr, final StringList read, final StringList write) {
     final Object o = new Object();
 
     synchronized(mutex) {
@@ -78,11 +78,11 @@ final class ProcessLocking implements Locking {
   }
 
   @Override
-  public void downgrade(final StringList db) {
+  public void downgrade(final StringList write) {
   }
 
   @Override
-  public void release(final Progress pr) {
+  public void release(final Proc pr) {
     synchronized(mutex) {
       if(pr.updating) {
         writer = false;

@@ -5,18 +5,17 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
+import org.basex.query.path.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.iter.Iter;
-import org.basex.query.path.*;
-import org.basex.query.util.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * General FLWOR expression.
@@ -647,12 +646,6 @@ public final class GFLWOR extends ParseExpr {
   public void checkUp() throws QueryException {
     for(final Clause cl : clauses) cl.checkUp();
     ret.checkUp();
-  }
-
-  @Override
-  public boolean databases(final StringList db) {
-    for(final Clause clause : clauses) if(!clause.databases(db)) return false;
-    return ret.databases(db);
   }
 
   @Override

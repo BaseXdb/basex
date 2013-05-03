@@ -25,7 +25,6 @@ public final class Var extends ExprInfo {
 
   /** Stack slot number. */
   public int slot = -1;
-
   /** Expected result size. */
   public long size = -1;
 
@@ -104,10 +103,10 @@ public final class Var extends ExprInfo {
    */
   public void refineType(final SeqType t, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     if(t == null) return;
     if(declared != null) {
-      if(declared.occ.intersect(t.occ) == null)
-        throw Err.XPTYPE.thrw(ii, this, declared, t);
+      if(declared.occ.intersect(t.occ) == null) Err.NOCAST.thrw(ii, t, declared);
       if(!t.convertibleTo(declared)) return;
     }
 
@@ -158,7 +157,7 @@ public final class Var extends ExprInfo {
       throws QueryException {
     if(!checksType() || declared.instance(val)) return val;
     if(promote) return declared.funcConvert(ctx, ii, val);
-    throw Err.XPTYPE.thrw(ii, this, declared, val.type());
+    throw Err.NOCAST.thrw(ii, val.type(), declared);
   }
 
   /**

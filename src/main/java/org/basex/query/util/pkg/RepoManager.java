@@ -137,7 +137,7 @@ public final class RepoManager {
     final StringList sl = new StringList();
     // traverse EXPath packages
     for(final byte[] p : repo.pkgDict()) {
-      if(p != null) sl.add(Token.string(p));
+      if(p != null) sl.add(string(p));
     }
 
     // traverse all directories, ignore root entries with dashes

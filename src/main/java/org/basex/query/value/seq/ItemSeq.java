@@ -89,18 +89,6 @@ public final class ItemSeq extends Seq {
     return item[(int) pos];
   }
 
-  /**
-   * Materializes streamable values, or returns a self reference.
-   * @param ii input info
-   * @return materialized item
-   * @throws QueryException query exception
-   */
-  @Override
-  public Value materialize(final InputInfo ii) throws QueryException {
-    for(int i = 0; i < size; ++i) item[i] = item[i].materialize(ii);
-    return this;
-  }
-
   @Override
   public boolean homogeneous() {
     return ret != null && ret != AtomType.ITEM;

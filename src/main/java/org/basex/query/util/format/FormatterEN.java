@@ -60,14 +60,11 @@ final class FormatterEN extends Formatter {
       "August", "September", "October", "November", "December");
 
   /** AM/PM Markers. */
-  private static final byte[][] AMPM = tokens("AM", "PM");
-
+  private static final byte[][] AMPM = tokens("am", "pm");
   /** And. */
   private static final byte[] AND = token("and");
-
   /** Ordinal suffixes (st, nr, rd, th). */
   private static final byte[][] ORDSUFFIX = tokens("st", "nd", "rd", "th");
-
   /** Eras: BC, AD. */
   private static final byte[][] ERAS = tokens("BC", "AD");
 
@@ -130,7 +127,6 @@ final class FormatterEN extends Formatter {
    */
   private static void word(final TokenBuilder tb, final long n, final byte[] ord) {
     if(n == 0) {
-      //tb.add(ZERO);
     } else if(n < 20) {
       tb.add((ord != null ? ORDINALS : WORDS)[(int) n]);
     } else if(n < 100) {

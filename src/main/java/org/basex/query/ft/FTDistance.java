@@ -11,7 +11,6 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * FTDistance expression.
@@ -111,12 +110,6 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final Expr d : dist) if(!d.databases(db)) return false;
-    return super.databases(db);
-  }
-
-  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(DISTANCE, dist[0] + "-" + dist[1] + ' ' + unit), expr);
   }
@@ -129,7 +122,7 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, expr) && visitAll(visitor, dist);
+    return super.accept(visitor) && visitAll(visitor, dist);
   }
 
   @Override

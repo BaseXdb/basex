@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class Builder extends Progress {
+public abstract class Builder extends Proc {
   /** Tree structure. */
   final PathSummary path = new PathSummary();
   /** Namespace index. */

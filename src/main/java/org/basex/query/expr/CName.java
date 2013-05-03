@@ -10,7 +10,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract fragment constructor with a QName argument.
@@ -93,11 +92,6 @@ public abstract class CName extends CFrag {
   @Override
   public boolean removable(final Var v) {
     return name.removable(v) && super.removable(v);
-  }
-
-  @Override
-  public boolean databases(final StringList db) {
-    return name.databases(db) && super.databases(db);
   }
 
   @Override

@@ -15,7 +15,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Transform expression.
@@ -61,6 +60,7 @@ public final class Transform extends Arr {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     final int o = (int) ctx.output.size();
+    if(ctx.updates == null) ctx.updates = new Updates();
     final ContextModifier tmp = ctx.updates.mod;
     final TransformModifier pu = new TransformModifier();
     ctx.updates.mod = pu;
@@ -116,12 +116,6 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final Let c : copies) if(!c.databases(db)) return false;
-    return super.databases(db);
-  }
-
-  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), copies, expr);
   }
@@ -129,15 +123,13 @@ public final class Transform extends Arr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(COPY + ' ');
-    for(final Let t : copies)
-      sb.append(t.var + " " + ASSIGN + ' ' + t.expr + ' ');
-    return sb.append(MODIFY + ' ' + expr[0] + ' ' + RETURN + ' ' +
-        expr[1]).toString();
+    for(final Let t : copies) sb.append(t.var + " " + ASSIGN + ' ' + t.expr + ' ');
+    return sb.append(MODIFY + ' ' + expr[0] + ' ' + RETURN + ' ' + expr[1]).toString();
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, copies) && visitAll(visitor, expr);
+    return visitAll(visitor, copies) && super.accept(visitor);
   }
 
   @Override

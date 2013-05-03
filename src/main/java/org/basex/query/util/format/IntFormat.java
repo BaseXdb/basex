@@ -38,7 +38,8 @@ public final class IntFormat extends FormatParser {
       if(tp.consume('(')) {
         while(!tp.consume(')')) {
           if(!tp.more()) INVORDINAL.thrw(info, mod);
-          ord.add(tp.next());
+          final int cp = tp.next();
+          if(cp != '-') ord.add(cp);
         };
       }
       ordinal = ord.finish();

@@ -179,7 +179,7 @@ public interface DataText {
   /** LessThan entity. */
   byte[] E_LT = token("&lt;");
   /** Line separator. */
-  byte[] E_2028 = token("&x2028;");
+  byte[] E_2028 = token("&#x2028;");
   /** HTML: Non-breaking space entity. */
   byte[] E_NBSP = token("&nbsp;");
 
@@ -252,6 +252,13 @@ public interface DataText {
   byte[] CDATA_O = token("<![CDATA[");
   /** CDATA output. */
   byte[] CDATA_C = token("]]>");
+
+  /** XML spaces: element name. */
+  byte[] XML_SPACE = token("xml:space");
+  /** XML spaces: default. */
+  byte[] DEFAULT = token("default");
+  /** XML spaces: preserve. */
+  byte[] PRESERVE = token("preserve");
 
   /** HTML: head element. */
   byte[] HEAD = token("head");

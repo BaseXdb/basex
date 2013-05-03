@@ -31,7 +31,11 @@ public final class DBLocking implements Locking {
 
   /** Prefix for internal special locks. */
   private static final String PREFIX = "%";
-  /** Special lock identifier for admin commands. */
+  /** Special lock identifier for current document, will be substituted. */
+  public static final String COLL = PREFIX + "DOC";
+  /** Special lock identifier for current context, will be substituted. */
+  public static final String CTX = PREFIX + "CTX";
+  /** Special lock identifier for administrative commands. */
   public static final String ADMIN = PREFIX + "ADMIN";
   /** Special lock identifier for backup commands. */
   public static final String BACKUP = PREFIX + "BACKUP";
@@ -55,9 +59,12 @@ public final class DBLocking implements Locking {
    * Shared lock    - else
    */
   private final ReentrantReadWriteLock writeAll = new ReentrantReadWriteLock();
-  /** Stores one lock for each object ever used for locking. */
+  /** Stores one lock for each object used for locking. */
   private final Map<String, ReentrantReadWriteLock> locks =
       new HashMap<String, ReentrantReadWriteLock>();
+  /** Stores lock usage counters for each object used for locking. */
+  private final Map<String, Integer> lockUsage =
+      new HashMap<String, Integer>();
   /**
    * Currently running transactions.
    * Used as monitor for atomizing access to {@link #queue}.
@@ -93,7 +100,7 @@ public final class DBLocking implements Locking {
   }
 
   @Override
-  public void acquire(final Progress pr, final StringList read, final StringList write) {
+  public void acquire(final Proc pr, final StringList read, final StringList write) {
     final Long thread = Thread.currentThread().getId();
     if(writeLocked.containsKey(thread) || readLocked.containsKey(thread))
       throw new IllegalMonitorStateException("Thread already holds one or more locks.");
@@ -164,25 +171,39 @@ public final class DBLocking implements Locking {
     while(r < readObjects.size() || w < writeObjects.size()) {
       // Look what token comes earlier in alphabet, prefer writing against reading
       if(w < writeObjects.size() && (r >= readObjects.size()
-          || writeObjects.get(w).compareTo(readObjects.get(r)) <= 0))
-        getOrCreateLock(writeObjects.get(w++)).writeLock().lock();
-      else
-        // Read lock only if not global write locking; otherwise no lock downgrading from
-        // global write lock is possible
-        if(null != write) getOrCreateLock(readObjects.get(r++)).readLock().lock();
+          || writeObjects.get(w).compareTo(readObjects.get(r)) <= 0)) {
+        final String writeObject = writeObjects.get(w++);
+        synchronized(lockUsage) {
+          Integer usage = lockUsage.get(writeObject);
+          if(null == usage) usage = 0;
+          lockUsage.put(writeObject, ++usage);
+        }
+        getOrCreateLock(writeObject).writeLock().lock();
+      } else
+      // Read lock only if not global write locking; otherwise no lock downgrading from
+      // global write lock is possible
+      if(null != write) {
+        final String readObject = readObjects.get(r++);
+        synchronized(lockUsage) {
+          Integer usage = lockUsage.get(readObject);
+          if(null == usage) usage = 0;
+          lockUsage.put(readObject, ++usage);
+        }
+        getOrCreateLock(readObject).readLock().lock();
+      }
     }
   }
 
   /**
    * Only keeps given write locks, downgrades the others to read locks.
-   * @param downgrade Write locks to keep
+   * @param write write locks to keep
    */
   @Override
-  public void downgrade(final StringList downgrade) {
+  public void downgrade(final StringList write) {
     final Long thread = Thread.currentThread().getId();
-    if(null == downgrade)
+    if(null == write)
       throw new IllegalMonitorStateException("Cannot downgrade to global write lock.");
-    downgrade.sort(true, true).unique();
+    write.sort(true, true).unique();
 
     // Fetch current locking status
     final StringList writeObjects = writeLocked.remove(thread);
@@ -192,12 +213,12 @@ public final class DBLocking implements Locking {
     if(null != readObjects) newReadObjects.add(readObjects);
 
     if(null != writeObjects) {
-      if(!writeObjects.containsAll(downgrade)) throw new IllegalMonitorStateException(
-          "Cannot downgrade write lock not acquired.");
+      if(!writeObjects.containsAll(write)) throw new IllegalMonitorStateException(
+          "Cannot downgrade write lock that has not been acquired.");
 
       // Perform downgrades
       for(final String object : writeObjects) {
-        if(downgrade.contains(object)) {
+        if(write.contains(object)) {
           newWriteObjects.add(object);
         } else {
           final ReentrantReadWriteLock lock = getOrCreateLock(object);
@@ -220,7 +241,7 @@ public final class DBLocking implements Locking {
       writeAll.writeLock().unlock();
 
       synchronized(globalLock) {
-        if(!downgrade.isEmpty())
+        if(!write.isEmpty())
           localWriters++;
         globalReaders++;
         globalLock.notifyAll();
@@ -250,7 +271,7 @@ public final class DBLocking implements Locking {
   }
 
   @Override
-  public void release(final Progress pr) {
+  public void release(final Proc pr) {
     // Release all write locks
     final Long thread = Thread.currentThread().getId();
     final StringList writeObjects = writeLocked.remove(thread);
@@ -259,6 +280,7 @@ public final class DBLocking implements Locking {
       assert 1 == lock.getWriteHoldCount() : "Unexpected write lock count: "
           + lock.getWriteHoldCount();
       lock.writeLock().unlock();
+      unsetLockIfUnused(object);
     }
 
     // Release all read locks
@@ -266,6 +288,7 @@ public final class DBLocking implements Locking {
     if(!writeAll.isWriteLocked() && null != readObjects)
       for(final String object : readObjects) {
         getOrCreateLock(object).readLock().unlock();
+        unsetLockIfUnused(object);
       }
 
     // Release global locks
@@ -283,6 +306,22 @@ public final class DBLocking implements Locking {
     synchronized(queue) {
       transactions--;
       queue.notifyAll();
+    }
+  }
+
+  /**
+   * Unsets lock if unused.
+   * @param object Object to test
+   */
+  private void unsetLockIfUnused(final String object) {
+    synchronized(lockUsage) {
+      Integer usage = lockUsage.get(object);
+      assert null != usage;
+      if (0 == --usage) {
+        locks.remove(object);
+        lockUsage.remove(object);
+      } else
+        lockUsage.put(object, usage);
     }
   }
 

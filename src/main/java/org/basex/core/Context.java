@@ -6,6 +6,7 @@ import org.basex.data.*;
 import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
 import org.basex.server.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -57,8 +58,6 @@ public final class Context {
   private Nodes current;
   /** Process locking. */
   private final Locking locks;
-  /** Indicates if a process is currently registered.
-  private boolean registered; */
   /** Data reference. */
   private Data data;
 
@@ -109,7 +108,7 @@ public final class Context {
     blocker = new ClientBlocker();
     databases = new Databases(this);
     locks = mp.is(MainProp.GLOBALLOCK) || Prop.gui ?
-      new ProcessLocking(this) : new DBLocking(mp);
+      new ProcLocking(this) : new DBLocking(mp);
     users = new Users(this);
     repo = new Repo(this);
     log = new Log(this);
@@ -210,79 +209,6 @@ public final class Context {
   }
 
   /**
-   * Locks the specified process and starts a timeout thread.
-   * @param pr process
-   */
-  public void register(final Progress pr) {
-    // administrators will not be affected by the timeout
-    if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT) * 1000L);
-
-    // get touched databases
-    StringList sl = new StringList(1);
-    if(!pr.databases(sl)) {
-      // databases cannot be determined... pass null reference
-      sl = null;
-    } else {
-      // replace empty string with currently opened database and return array
-      prepareLock(sl);
-    }
-    //assert !registered : "Already registered";
-    //registered = true;
-    locks.acquire(pr, pr.updating ? new StringList(0) : sl,
-                                  pr.updating ? sl : new StringList(0));
-  }
-
-  /**
-   * Downgrades locks.
-   * @param sl string list
-   */
-  public void downgrade(final StringList sl) {
-    //if(!registered) return;
-    prepareLock(sl);
-    //locks.downgrade(sl);
-  }
-
-  /**
-   * Prepares the string list for locking.
-   * @param sl string list
-   */
-  private void prepareLock(final StringList sl) {
-    // replace empty string with currently opened database and return array
-    for(int d = 0; d < sl.size(); d++) {
-      if(sl.get(d).isEmpty())
-        if(null == data) sl.deleteAt(d);
-        else sl.set(d, data.meta.name);
-    }
-  }
-
-  /**
-   * Unlocks the process and stops the timeout.
-   * @param pr process
-   */
-  public void unregister(final Progress pr) {
-    //if(!registered) return;
-    //registered = false;
-    locks.release(pr);
-    pr.stopTimeout();
-  }
-
-  /**
-   * Adds the specified client session.
-   * @param s session to be added
-   */
-  public void add(final ClientListener s) {
-    sessions.add(s);
-  }
-
-  /**
-   * Removes the specified client session.
-   * @param s session to be removed
-   */
-  public void delete(final ClientListener s) {
-    sessions.remove(s);
-  }
-
-  /**
    * Checks if the current user has the specified permission.
    * @param p requested permission
    * @param md optional meta data reference
@@ -292,5 +218,63 @@ public final class Context {
     final User us = md == null || p == Perm.CREATE || p == Perm.ADMIN ? null :
       md.users.get(user.name);
     return (us == null ? user : us).has(p);
+  }
+
+  /**
+   * Locks the specified process and starts a timeout thread.
+   * @param pr process
+   */
+  public void register(final Proc pr) {
+    assert !pr.registered() : "Already registered";
+    pr.registered(true);
+
+    // administrators will not be affected by the timeout
+    if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT) * 1000L);
+
+    // get touched databases
+    final LockResult lr = new LockResult();
+    pr.databases(lr);
+    final StringList read = prepareLock(lr.read, lr.readAll);
+    final StringList write = prepareLock(lr.write, lr.writeAll);
+    locks.acquire(pr, read, write);
+  }
+
+  /**
+   * Downgrades locks.
+   * @param pr process
+   * @param write write locks to keep
+   */
+  public void downgrade(final Proc pr, final StringList write) {
+    if(pr.registered()) locks.downgrade(prepareLock(write, false));
+  }
+
+  /**
+   * Unlocks the process and stops the timeout.
+   * @param pr process
+   */
+  public void unregister(final Proc pr) {
+    if(!pr.registered()) return;
+    pr.registered(false);
+    locks.release(pr);
+    pr.stopTimeout();
+  }
+
+  /**
+   * Prepares the string list for locking.
+   * @param sl string list
+   * @param all lock all databases
+   * @return string list, or {@code null}
+   */
+  private StringList prepareLock(final StringList sl, final boolean all) {
+    if(all) return null;
+
+    // replace empty string with currently opened database and return array
+    for(int d = 0; d < sl.size(); d++) {
+      if(Token.eq(sl.get(d), DBLocking.CTX, DBLocking.COLL)) {
+        if(null == data) sl.deleteAt(d);
+        else sl.set(d, data.meta.name);
+      }
+    }
+    return sl;
   }
 }

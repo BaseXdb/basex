@@ -15,11 +15,11 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Index functions.
@@ -84,7 +84,7 @@ public final class FNIndex extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item facets(final QueryContext ctx) throws QueryException {
-    final Data data = data(0, ctx);
+    final Data data = data(ctx);
     final boolean flat = expr.length == 2 && eq(checkStr(expr[1], ctx), FLAT);
     return new FDoc().add(flat ? flat(data) : tree(data, data.paths.root().get(0)));
   }
@@ -97,7 +97,7 @@ public final class FNIndex extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter values(final QueryContext ctx, final IndexType it) throws QueryException {
-    final Data data = data(0, ctx);
+    final Data data = data(ctx);
     final byte[] entry = expr.length < 2 ? Token.EMPTY : checkStr(expr[1], ctx);
     if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
 
@@ -143,7 +143,7 @@ public final class FNIndex extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter names(final QueryContext ctx, final IndexType it) throws QueryException {
-    final Data data = data(0, ctx);
+    final Data data = data(ctx);
     return entries(it == IndexType.TAG ? data.tagindex : data.atnindex,
       new IndexEntries(Token.EMPTY, it));
   }
@@ -241,9 +241,7 @@ public final class FNIndex extends StandardFunc {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    if(!(expr[0] instanceof Str)) return false;
-    db.add(string(((Str) expr[0]).string()));
-    return true;
+  public boolean accept(final ASTVisitor visitor) {
+    return dataLock(visitor) && super.accept(visitor);
   }
 }

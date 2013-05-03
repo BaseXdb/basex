@@ -4,14 +4,13 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.Iter;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Local Variable Reference expression.
@@ -36,17 +35,16 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-
     type = var.type();
     size = var.size;
 
     // constant propagation
-    return ctx.isBound(var) ? ctx.get(var) : this;
+    final Value v = ctx.get(var);
+    return v != null ? v : this;
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return ctx.get(var).item(ctx, ii);
   }
 
@@ -108,11 +106,6 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public void checkUp() throws QueryException {
-  }
-
-  @Override
-  public boolean databases(final StringList db) {
-    return true;
   }
 
   @Override

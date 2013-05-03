@@ -9,7 +9,6 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * FTWindow expression.
@@ -111,11 +110,6 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return win.databases(db) && super.databases(db);
-  }
-
-  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(QueryText.WINDOW, unit), win, expr);
   }
@@ -127,7 +121,7 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, expr) && win.accept(visitor);
+    return super.accept(visitor) && win.accept(visitor);
   }
 
   @Override

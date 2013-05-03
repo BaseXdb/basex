@@ -16,7 +16,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract class for representing XQuery expressions.
@@ -60,8 +59,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr optimize(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     return this;
   };
 
@@ -264,9 +262,10 @@ public abstract class Expr extends ExprInfo {
   /**
    * Adds the names of the databases that will be touched by the query.
    * @param db set
+   * @param rootContext is in root context
    * @return {@code false} if databases cannot be statically determined
+  public abstract boolean databases(final StringList db, final boolean rootContext);
    */
-  public abstract boolean databases(final StringList db);
 
   /**
    * <p>This method is overwritten by {@link CmpG}, {@link CmpV} and {@link FNSimple}.
@@ -385,9 +384,9 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Traverses this expression, notifying the visitor of all declared and used variables.
-   * Variable declarations have to be reported before all uses of the variable.
-   * @param visitor variable visitor
+   * Traverses this expression, notifying the visitor of declared and used variables,
+   * and checking the tree for other recursive properties.
+   * @param visitor visitor
    * @return if the walk should be continued
    */
   public abstract boolean accept(final ASTVisitor visitor);

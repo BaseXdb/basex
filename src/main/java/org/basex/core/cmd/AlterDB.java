@@ -6,7 +6,6 @@ import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'alter database' command and renames a database.
@@ -51,9 +50,8 @@ public final class AlterDB extends ACreate {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    db.add(args);
-    return true;
+  public void databases(final LockResult lr) {
+    lr.write.add(args);
   }
 
   /**

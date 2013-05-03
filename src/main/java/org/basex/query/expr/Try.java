@@ -9,7 +9,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Project specific try/catch expression.
@@ -130,12 +129,6 @@ public final class Try extends Single {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    for(final Catch c : ctch) if(!c.databases(db)) return false;
-    return super.databases(db);
-  }
-
-  @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), expr, ctch);
   }
@@ -149,7 +142,7 @@ public final class Try extends Single {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return expr.accept(visitor) && visitAll(visitor, ctch);
+    return super.accept(visitor) && visitAll(visitor, ctch);
   }
 
   @Override

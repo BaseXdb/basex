@@ -1,9 +1,11 @@
 package org.basex.query.func;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.util.pkg.Package;
 import org.basex.query.value.item.*;
@@ -12,6 +14,7 @@ import org.basex.util.*;
 
 /**
  * Functions on EXPath packages.
+ * [JE] install() and delete() should be updating functions
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
@@ -95,5 +98,10 @@ public final class FNRepo extends StandardFunc {
   public boolean uses(final Use u) {
     // don't allow pre-evaluation
     return u == Use.CTX || super.uses(u);
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitor.lock(DBLocking.REPO) && super.accept(visitor);
   }
 }

@@ -4,14 +4,13 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.gflwor.GFLWOR.Clause;
 import org.basex.query.gflwor.GFLWOR.Eval;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.query.util.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 
 /**
@@ -114,11 +113,6 @@ public final class Count extends GFLWOR.Clause {
   @Override
   public void checkUp() throws QueryException {
     // never
-  }
-
-  @Override
-  public boolean databases(final StringList db) {
-    return true;
   }
 
   @Override

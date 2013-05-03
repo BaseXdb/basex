@@ -3,9 +3,11 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -55,10 +57,10 @@ public final class FNNode extends StandardFunc {
 
         Uri base = Uri.EMPTY;
         do {
-          if(n == null) return ctx.sc.baseURI().resolve(base);
+          if(n == null) return ctx.sc.baseURI().resolve(base, info);
           final Uri bu = Uri.uri(n.baseURI(), false);
           if(!bu.isValid()) FUNCAST.thrw(ii, bu.type, bu);
-          base = bu.resolve(base);
+          base = bu.resolve(base, info);
           if(n.type == NodeType.DOC && n instanceof DBNode) break;
           n = n.parent();
         } while(!base.isAbsolute());
@@ -150,5 +152,10 @@ public final class FNNode extends StandardFunc {
   @Override
   public boolean uses(final Use u) {
     return u == Use.X30 && xquery3() || u == Use.CTX && expr.length == 0 || super.uses(u);
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return (expr.length != 0 || visitor.lock(DBLocking.CTX)) && super.accept(visitor);
   }
 }

@@ -55,7 +55,9 @@ public final class FNRandom extends StandardFunc {
    * @throws QueryException query exception
    */
   private int randomInt(final QueryContext ctx) throws QueryException {
-    return expr.length == 1 ? RND.nextInt((int) checkItr(expr[0], ctx)) : RND.nextInt();
+    if(expr.length == 0) return RND.nextInt();
+    final long s = checkItr(expr[0], ctx);
+    return s < 1 || s > Integer.MAX_VALUE ? 0 : RND.nextInt((int) s);
   }
 
   /**

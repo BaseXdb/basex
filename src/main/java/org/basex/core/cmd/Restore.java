@@ -56,11 +56,12 @@ public class Restore extends ABackup {
   }
 
   @Override
-  public boolean databases(final StringList db) {
+  public void databases(final LockResult lr) {
+    super.databases(lr);
     final String name = args[0];
     // Not sure whether database or backup name is provided, lock both
     final String dbName = Pattern.compile(DateTime.PATTERN + '$').split(name)[0];
-    return super.databases(db.add(name).add(dbName));
+    lr.write.add(name).add(dbName);
   }
 
   /**
@@ -70,7 +71,7 @@ public class Restore extends ABackup {
    */
   private boolean restore(final IOFile file) {
     try {
-      progress(new Zip(file)).unzip(mprop.dbpath());
+      proc(new Zip(file)).unzip(mprop.dbpath());
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);

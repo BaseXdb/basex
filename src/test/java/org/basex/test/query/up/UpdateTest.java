@@ -62,6 +62,12 @@ public final class UpdateTest extends AdvancedQueryTest {
         "<n1><n2/><n4/><n6/><n8/><n9/><n10/><n11/></n1>");
   }
 
+  /** Transform expression shadowing another variable. */
+  @Test
+  public void transform() {
+    query("let $c := <x/> return copy $c := $c modify () return $c", "<x/>");
+  }
+
   /**
    * Basic insert into.
    */
@@ -1019,5 +1025,14 @@ public final class UpdateTest extends AdvancedQueryTest {
    error("copy $c := <a/> modify db:add('" + NAME + "','<x/>','x.xml') return $c",
        Err.BASX_DBTRANSFORM);
    error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", Err.BASX_DBTRANSFORM);
+ }
+
+ /**
+  * Tests the combination of transform expressions and xquery:eval().
+  */
+ @Test
+ public void evalFItem() {
+   query("declare function local:c() { copy $a := <a/> modify () return $a };" +
+     "xquery:eval('$c()', map { 'c' := local:c#0 })", "<a/>");
  }
 }

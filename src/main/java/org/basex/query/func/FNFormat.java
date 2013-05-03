@@ -71,7 +71,7 @@ public final class FNFormat extends StandardFunc {
       fp = new IntFormat(pic, info);
       formats.add(pic, fp);
     }
-    return Str.get(Formatter.get(string(lng)).formatInt(num, fp));
+    return Str.get(Formatter.get(lng).formatInt(num, fp));
   }
 
   /**
@@ -87,7 +87,7 @@ public final class FNFormat extends StandardFunc {
     else if(!it.type.isNumberOrUntyped()) number(this, it);
 
     final String pic = string(checkStr(expr[1], ctx));
-    final QNm frm = new QNm(expr.length == 3 ? checkStr(expr[2], ctx) : EMPTY, ctx);
+    final QNm frm = new QNm(expr.length == 3 ? checkEStr(expr[2], ctx) : EMPTY, ctx);
 
     final DecFormatter df = ctx.sc.decFormats.get(frm.id());
     if(df == null) throw FORMNUM.thrw(info, frm);
@@ -110,7 +110,7 @@ public final class FNFormat extends StandardFunc {
     if(it == null) return null;
     final ADate date = (ADate) checkType(it, tp);
 
-    final Formatter form = Formatter.get(string(lng));
-    return Str.get(form.formatDate(date, pic, cal, plc, info));
+    final Formatter form = Formatter.get(lng);
+    return Str.get(form.formatDate(date, lng, pic, cal, plc, info));
   }
 }

@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
@@ -12,6 +13,7 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.server.*;
@@ -127,7 +129,7 @@ public final class FNAdmin extends StandardFunc {
   private Iter users(final QueryContext ctx) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     for(final User u : expr.length == 0 ? ctx.context.users.users(null) :
-      data(0, ctx).meta.users.users(ctx.context.users)) {
+      data(ctx).meta.users.users(ctx.context.users)) {
       vb.add(new FElem(Q_USER).add(u.name).add(Q_PERMISSION,
           u.perm.toString().toLowerCase(Locale.ENGLISH)));
     }
@@ -154,29 +156,11 @@ public final class FNAdmin extends StandardFunc {
     return vb;
   }
 
-  /*
-   * Creates a new user. Needs to be implemented as updating function.
-   * @param ctx query context
-   * @return {@code null}
-   * @throws QueryException query exception
-  private Item createUser(final QueryContext ctx) throws QueryException {
-    final String user = Token.string(checkStr(expr[0], ctx));
-    final Item pw = checkItem(expr[1], ctx);
-    final byte[] pass;
-    if(pw instanceof AStr) {
-      pass = pw.string(info);
-    } else if(pw instanceof Bin) {
-      pass = new Hex((Bin) pw, info).string(info);
-    } else {
-      throw STRBINTYPE.thrw(info, pw.type);
-    }
-
-    try {
-      CreateUser.create(user, Token.string(pass), ctx.context);
-    } catch(final BaseXException ex) {
-      BXAD_USER.thrw(info, ex);
-    }
-    return null;
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    if(oneOf(sig, _ADMIN_USERS, _ADMIN_SESSIONS) && !visitor.lock(DBLocking.ADMIN))
+      return false;
+    if(sig == _ADMIN_USERS && expr.length > 0 && !dataLock(visitor)) return false;
+    return super.accept(visitor);
   }
-   */
 }

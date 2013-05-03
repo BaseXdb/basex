@@ -130,7 +130,7 @@ public final class Lang {
           creds.add(credits(cont));
         }
       } else {
-        for(final IO f : new IOFile(IOUrl.file(url.toString())).children()) {
+        for(final IO f : IOFile.get(url.toString()).children()) {
           langs.add(f.name().replaceAll('.' + SUFFIX, ""));
           creds.add(credits(f.read()));
         }

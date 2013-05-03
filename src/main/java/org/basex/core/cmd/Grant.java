@@ -9,7 +9,6 @@ import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Evaluates the 'grant' command and grants permissions to users.
@@ -97,8 +96,10 @@ public final class Grant extends AUser {
   }
 
   @Override
-  public boolean databases(final StringList db) {
-    return super.databases(db) && databases(db, 2);
+  public void databases(final LockResult lr) {
+    super.databases(lr);
+    if (!databases(lr.write, 2))
+      lr.writeAll = true;
   }
 
   @Override

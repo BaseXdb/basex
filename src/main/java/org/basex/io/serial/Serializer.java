@@ -3,6 +3,7 @@ package org.basex.io.serial;
 import static org.basex.data.DataText.*;
 import static org.basex.io.serial.SerializerProp.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -81,7 +82,10 @@ public abstract class Serializer {
   public final void serialize(final Item item) throws IOException {
     openResult();
     if(item instanceof ANode) {
+      if(item.type == NodeType.ATT || item.type == NodeType.NSP) SERATTR.thrwSerial(item);
       serialize((ANode) item);
+    } else if(item instanceof FItem) {
+      SERFUNC.thrwSerial(item.description());
     } else {
       finishElement();
       atomic(item);
@@ -314,17 +318,19 @@ public abstract class Serializer {
   private void node(final DBNode node) throws IOException {
     final FTPosData ft = node instanceof FTPosNode ? ((FTPosNode) node).ft : null;
     final Data data = node.data;
+    int p = node.pre;
+    int k = data.kind(p);
+    if(k == Data.ATTR) SERATTR.thrwSerial(node);
 
     boolean doc = false;
     final TokenList nsp = data.nspaces.size() != 0 ? new TokenList() : null;
     final IntList pars = new IntList();
     int l = 0;
-    int p = node.pre;
 
     // loop through all table entries
-    final int s = p + data.size(p, data.kind(p));
+    final int s = p + data.size(p, k);
     while(p < s && !finished()) {
-      final int k = data.kind(p);
+      k = data.kind(p);
       final int r = data.parent(p, k);
 
       // close opened elements...
