@@ -123,7 +123,11 @@ public abstract class Formatter extends FormatUtil {
 
     final TokenBuilder tb = new TokenBuilder();
     if(lng.length != 0 && MAP.get(lng) == null) tb.add("[Language: en]");
-    if(cal.length != 0 && !eq(cal, token("AD"), token("ISO"))) tb.add("[Calendar: AD]");
+    boolean iso = false;
+    if(cal.length != 0) {
+      iso = eq(cal, token("ISO"));
+      if(!iso && !eq(cal, token("ISO"))) tb.add("[Calendar: AD]");
+    }
     if(plc.length != 0) tb.add("[Place: ]");
 
     final DateParser dp = new DateParser(ii, pic);
@@ -179,6 +183,7 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'w':
             num = date.toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
+            if(iso && num == 0) num = 5;
             err = tim;
             break;
           case 'H':
