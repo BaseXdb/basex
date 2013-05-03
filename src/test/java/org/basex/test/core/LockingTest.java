@@ -406,6 +406,30 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
+   * Downgrade from global write lock, other fetches local writes locks.
+   * @throws InterruptedException Got interrupted.
+   */
+  @Test
+  public void downgradeGlobalWriteLockTest() throws InterruptedException {
+    final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
+
+    final LockTester th1 = new LockTester(null, NONE, null, sync);
+    final LockTester th2 = new LockTester(sync, NONE, objects, test);
+
+    th1.start();
+    th2.start();
+    assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th1.downgrade(objects);
+    assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th1.release();
+    assertTrue("Thread 2 should be able to acquire lock now.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th2.release();
+  }
+
+  /**
    * Lock downgrading holding read locks.
    * @throws InterruptedException Got interrupted.
    */
