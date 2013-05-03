@@ -2,9 +2,13 @@ package org.basex.tests.bxapi;
 
 import java.util.*;
 
+import javax.xml.namespace.*;
+
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.format.*;
+import org.basex.query.value.item.*;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -73,6 +77,22 @@ public final class XQuery implements Iterable<XdmItem> {
   public XQuery namespace(final String prefix, final String uri) {
     try {
       qp.namespace(prefix, uri);
+      return this;
+    } catch(final QueryException ex) {
+      Util.debug(ex);
+      throw new XQueryException(ex);
+    }
+  }
+
+  /**
+   * Declares a decimal format.
+   * @param name qname
+   * @param map format
+   * @return self reference
+   */
+  public XQuery decimalFormat(final QName name, final HashMap<String, String> map) {
+    try {
+      qp.ctx.sc.decFormats.add(new QNm(name).id(), new DecFormatter(null, map));
       return this;
     } catch(final QueryException ex) {
       Util.debug(ex);

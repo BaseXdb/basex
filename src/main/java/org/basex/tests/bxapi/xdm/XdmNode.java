@@ -1,5 +1,7 @@
 package org.basex.tests.bxapi.xdm;
 
+import javax.xml.namespace.*;
+
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -26,8 +28,8 @@ final class XdmNode extends XdmItem {
   }
 
   @Override
-  public String getName() {
-    return Token.string(node.name());
+  public QName getName() {
+    return node.qname().toJava();
   }
 
   @Override

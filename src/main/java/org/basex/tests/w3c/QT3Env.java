@@ -4,9 +4,13 @@ import static org.basex.tests.w3c.QT3Constants.*;
 
 import java.util.*;
 
+import javax.xml.namespace.*;
+
 import org.basex.core.*;
+import org.basex.query.value.item.*;
 import org.basex.tests.bxapi.*;
 import org.basex.tests.bxapi.xdm.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -24,14 +28,14 @@ final class QT3Env {
   final ArrayList<HashMap<String, String>> resources;
   /** Parameters: name, as, select, declared. */
   final ArrayList<HashMap<String, String>> params;
-  /** Decimal Formats: decimal-separator, grouping-separator,
-      digit, pattern-separator, infinity, NaN, per-mille,
-      minus-sign, name, percent, zero-digit. */
-  final ArrayList<HashMap<String, String>> formats;
   /** Schemas: uri, file, xml:id. */
   final HashMap<String, String> schemas;
   /** Collations: uri, default. */
   final HashMap<String, String> collations;
+  /** Decimal Formats: decimal-separator, grouping-separator,
+  digit, pattern-separator, infinity, NaN, per-mille,
+  minus-sign, name, percent, zero-digit. */
+  final HashMap<QName, HashMap<String, String>> decFormats;
   /** Static Base URI: uri. */
   final String baseURI;
   /** Name. */
@@ -55,7 +59,6 @@ final class QT3Env {
     resources = list(ctx, env, RESOURCE);
     params = list(ctx, env, PARAM);
     namespaces = list(ctx, env, NAMESPACE);
-    formats = list(ctx, env, DECIMAL_FORMAT);
     ArrayList<HashMap<String, String>> al = list(ctx, env, SCHEMA);
     schemas = al.isEmpty() ? null : al.get(0);
     al = list(ctx, env, COLLATION);
@@ -66,16 +69,31 @@ final class QT3Env {
     // collections
     collURI = XQuery.string("*:collection/@uri", env, ctx);
 
-    final XQuery cc = new XQuery("*:collection/*:source/@role = '.'", ctx).
-        context(env);
-    collContext = cc.next().getBoolean();
-    cc.close();
+    XQuery xq = new XQuery("*:collection/*:source/@role = '.'", ctx).context(env);
+    collContext = xq.next().getBoolean();
+    xq.close();
 
     collSources = new StringList();
-    final XQuery qsrc = new XQuery("*:collection/*:source/@file", ctx).
-        context(env);
-    for(final XdmItem iatt : qsrc) collSources.add(iatt.getString());
-    qsrc.close();
+    xq = new XQuery("*:collection/*:source/@file", ctx).context(env);
+    for(final XdmItem iatt : xq) collSources.add(iatt.getString());
+    xq.close();
+
+    decFormats = new HashMap<QName, HashMap<String, String>>();
+    xq = new XQuery("*:decimal-format", ctx).context(env);
+    for(final XdmItem it : xq) {
+      final XdmItem xq2 = new XQuery(
+        "for $n in @name " +
+        "let $b := substring-before($n, ':') " +
+        "return QName(if($b) then namespace-uri-for-prefix($b, .) else '', $n)",
+        ctx).context(it).next();
+      final HashMap<String, String> hm = new HashMap<String, String>();
+      final QNm qnm = xq2 != null ? (QNm) xq2.internal() : new QNm(Token.EMPTY);
+      decFormats.put(qnm.toJava(), hm);
+      for(final XdmItem it2 : new XQuery("@*[name() != 'name']", ctx).context(it)) {
+        hm.put(it2.getName().getLocalPart(), it2.getString());
+      }
+    }
+    xq.close();
   }
 
   /**
@@ -105,7 +123,7 @@ final class QT3Env {
   static HashMap<String, String> map(final Context ctx, final XdmValue env) {
     final HashMap<String, String> map = new HashMap<String, String>();
     final XQuery query = new XQuery("@*", ctx).context(env);
-    for(final XdmItem it : query) map.put(it.getName(), it.getString());
+    for(final XdmItem it : query) map.put(it.getName().getLocalPart(), it.getString());
     query.close();
     return map;
   }

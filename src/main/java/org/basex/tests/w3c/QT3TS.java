@@ -9,6 +9,8 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.regex.*;
 
+import javax.xml.namespace.*;
+
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -331,6 +333,12 @@ public final class QT3TS {
         }
         // set base uri
         if(e.baseURI != null) query.baseURI(e.baseURI);
+        // bind decimal formats
+        for(final Map.Entry<QName, HashMap<String, String>> df :
+          e.decFormats.entrySet()) {
+          query.decimalFormat(df.getKey(), df.getValue());
+          System.out.println("-> " + df.getKey());
+        }
       }
 
       // run query
@@ -445,7 +453,7 @@ public final class QT3TS {
    * @return {@code null} if test was successful; otherwise, expected test suite result
    */
   private String test(final QT3Result result, final XdmValue expected) {
-    final String type = expected.getName();
+    final String type = expected.getName().getLocalPart();
     final XdmValue value = result.value;
 
     try {

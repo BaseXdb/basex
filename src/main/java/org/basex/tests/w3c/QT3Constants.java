@@ -18,8 +18,6 @@ interface QT3Constants {
   /** QT3TS String. */
   String NAMESPACE = "namespace";
   /** QT3TS String. */
-  String DECIMAL_FORMAT = "decimal-format";
-  /** QT3TS String. */
   String SCHEMA = "schema";
   /** QT3TS String. */
   String COLLECTION = "collection";

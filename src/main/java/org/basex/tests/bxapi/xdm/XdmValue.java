@@ -1,5 +1,7 @@
 package org.basex.tests.bxapi.xdm;
 
+import javax.xml.namespace.*;
+
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -36,7 +38,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * Returns the name of a node.
    * @return node name
    */
-  public String getName() {
+  public QName getName() {
     throw Util.notexpected("Item must be a node.");
   }
 
