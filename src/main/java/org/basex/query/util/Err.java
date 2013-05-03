@@ -412,6 +412,10 @@ public enum Err {
   INVCOMPSPEC(FOFD, 1340, "Invalid variable marker: '[%]'."),
   /** FOFD1340. */
   PICDATE(FOFD, 1340, "Invalid picture string: '%'."),
+  /** FOFD1340. */
+  CALQNAME(FOFD, 1340, "Invalid EQName: '%'."),
+  /** FOFD1340. */
+  CALWHICH(FOFD, 1340, "Unknown calendar: '%'."),
   /** FOFD1350. */
   PICINVCOMP(FOFD, 1350, "Component '[%]' not applicable to % values."),
 

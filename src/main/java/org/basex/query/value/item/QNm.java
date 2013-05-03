@@ -76,7 +76,7 @@ public final class QNm extends Item {
    * @param u namespace URI
    */
   public QNm(final String n, final String u) {
-    this(token(n), token(u));
+    this(token(n), u == null ? null : token(u));
   }
 
   /**
