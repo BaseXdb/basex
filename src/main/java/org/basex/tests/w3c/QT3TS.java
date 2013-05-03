@@ -337,7 +337,6 @@ public final class QT3TS {
         for(final Map.Entry<QName, HashMap<String, String>> df :
           e.decFormats.entrySet()) {
           query.decimalFormat(df.getKey(), df.getValue());
-          System.out.println("-> " + df.getKey());
         }
       }
 
