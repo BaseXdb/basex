@@ -17,6 +17,8 @@ public interface BuildText {
   String LIMITELEMS = "%: Too many different element names (limit: %).";
   /** Builder error. */
   String LIMITATTS = "%: Too many different attribute names (limit: %).";
+  /** Builder error. */
+  String WHICHNS = "%: Undeclared namespace prefix '%'.";
 
   /** Parser error. */
   String PARSEINV = "%: % expected, % found.";
