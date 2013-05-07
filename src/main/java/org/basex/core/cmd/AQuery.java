@@ -251,12 +251,13 @@ public abstract class AQuery extends Command {
 
   @Override
   public boolean registered() {
-    return qp.registered();
+    return qp == null ? super.registered() : qp.registered();
   }
 
   @Override
   public void registered(final boolean reg) {
-    qp.registered(reg);
+    if(qp != null) qp.registered(reg);
+    else super.registered(reg);
   }
 
   @Override
