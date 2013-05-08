@@ -144,6 +144,7 @@ fulltext             = Plein texte
 fulltext_index       = Index plein texte
 general              = Général
 general_info         = Informations Générales
+global_option_%      = L'option globale '%' ne peut être modifié.
 go_back              = En arrière
 go_forward           = En avant
 go_home              = Aller à l'accueil

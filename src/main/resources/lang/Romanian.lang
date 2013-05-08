@@ -144,6 +144,7 @@ fulltext             = Full-text
 fulltext_index       = Full-text Index
 general              = General
 general_info         = Informatii generale
+global_option_%      = Global option '%' cannot be set.
 go_back              = Mergi inapoi
 go_forward           = Mergi inainte
 go_home              = Home

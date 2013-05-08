@@ -144,6 +144,7 @@ fulltext             = 全文
 fulltext_index       = 全文インデックス
 general              = 一般
 general_info         = 一般事項
+global_option_%      = Global option '%' cannot be set.
 go_back              = 戻る
 go_forward           = 進む
 go_home              = ホームへ

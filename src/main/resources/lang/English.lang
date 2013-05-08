@@ -144,6 +144,7 @@ fulltext             = Full-Text
 fulltext_index       = Full-Text Index
 general              = General
 general_info         = General Information
+global_option_%      = Global option '%' cannot be set.
 go_back              = Go Back
 go_forward           = Go Forward
 go_home              = Go Home

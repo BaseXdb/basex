@@ -718,6 +718,8 @@ public interface Text {
 
   // GENERAL COMMANDS =========================================================
 
+  /** "Global option '%' cannot be set". */
+  String GLOBAL_OPTION_X = lang("global_option_%");
   /** "Unknown option '%'". */
   String UNKNOWN_OPTION_X = lang("unknown_option_%");
   /** Unknown command error. */
