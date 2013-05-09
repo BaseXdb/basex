@@ -710,7 +710,9 @@ public class Geo extends QueryModule {
   private DBNode gmlWriter(final Geometry geometry) throws QueryException {
     String geo;
     try {
-      geo = new GMLWriter().write(geometry);
+      // write geometry and add namespace declaration
+      geo = new GMLWriter().write(geometry).replaceAll(
+          "^<gml:(.*?)>", "<gml:$1 xmlns:gml='" + string(GMLURI) + "'>");
     } catch(final Exception ex) {
       throw GeoErrors.gmlWriterErr(ex);
     }

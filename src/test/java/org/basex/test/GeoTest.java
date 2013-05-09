@@ -62,7 +62,8 @@ public final class GeoTest extends AdvancedQueryTest {
   public void envelope() {
     runQuery("geo:envelope(<gml:LinearRing><gml:coordinates>1,1 20,1 50,30 1,1" +
             "</gml:coordinates></gml:LinearRing>)",
-            "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
+            "<gml:Polygon xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:outerBoundaryIs><gml:LinearRing>" +
             "<gml:coordinates>1.0,1.0 1.0,30.0 50.0,30.0 50.0,1.0 1.0,1.0" +
             "</gml:coordinates></gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>");
 
@@ -115,11 +116,13 @@ public final class GeoTest extends AdvancedQueryTest {
     runQuery("geo:boundary(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
         "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
         "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>)",
-        "<gml:LineString><gml:coordinates>11.0,11.0 18.0,11.0 18.0,18.0 11.0,18.0 " +
+        "<gml:LineString xmlns:gml=\"http://www.opengis.net/gml\">" +
+        "<gml:coordinates>11.0,11.0 18.0,11.0 18.0,18.0 11.0,18.0 " +
         "11.0,11.0</gml:coordinates></gml:LineString>");
 
-    runQuery("geo:boundary(<gml:Point><gml:coordinates>2,3</gml:coordinates>" +
-        "</gml:Point>)", "<gml:MultiGeometry/>");
+    runQuery("geo:boundary(" +
+        "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
+        "<gml:MultiGeometry xmlns:gml=\"http://www.opengis.net/gml\"/>");
     runError("geo:boundary(text {'a'})", FUNCMP.qname());
     runError("geo:boundary(a)", XPNOCTX.qname());
     runError("geo:boundary(<gml:geo/>)", GeoErrors.qname(1));
@@ -318,16 +321,17 @@ public final class GeoTest extends AdvancedQueryTest {
   public void buffer() {
     runQuery("geo:buffer(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
         "<gml:coordinates>10,10 20,10 30,40 20,40 10,10</gml:coordinates>" +
-        "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>," +
-        "xs:double(0))",
-        "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
+        "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>,xs:double(0))",
+        "<gml:Polygon xmlns:gml=\"http://www.opengis.net/gml\">" +
+        "<gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
         "10.0,10.0 20.0,40.0 30.0,40.0 20.0,10.0 10.0,10.0</gml:coordinates>" +
         "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>");
 
     runQuery("geo:buffer(<gml:LineString><gml:coordinates>1,1 5,9 2,1" +
-              "</gml:coordinates></gml:LineString>, xs:double(0))",
-              "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates/>" +
-              "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>");
+        "</gml:coordinates></gml:LineString>, xs:double(0))",
+        "<gml:Polygon xmlns:gml=\"http://www.opengis.net/gml\">" +
+        "<gml:outerBoundaryIs><gml:LinearRing><gml:coordinates/>" +
+        "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>");
     runError("geo:buffer(" +
             "<gml:LinearRing><gml:coordinates>1,1 55,99 2,1</gml:coordinates>" +
             "</gml:LinearRing>, xs:double(1))", GeoErrors.qname(2));
@@ -341,7 +345,8 @@ public final class GeoTest extends AdvancedQueryTest {
   public void convexHull() {
     runQuery("geo:convexHull(<gml:LinearRing><gml:coordinates>1,1 55,99 2,2 1,1" +
             "</gml:coordinates></gml:LinearRing>)",
-            "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
+            "<gml:Polygon xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
             "1.0,1.0 55.0,99.0 2.0,2.0 1.0,1.0</gml:coordinates></gml:LinearRing>" +
             "</gml:outerBoundaryIs></gml:Polygon>");
 
@@ -359,12 +364,14 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>" +
             "10,10 20,10 30,40 10,10</gml:coordinates></gml:LinearRing>" +
             "</gml:outerBoundaryIs></gml:Polygon>)",
-            "<gml:LineString><gml:coordinates/></gml:LineString>");
+            "<gml:LineString xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates/></gml:LineString>");
 
     runQuery("geo:intersection(<gml:LinearRing><gml:coordinates>1,1 55,99 2,3 1,1" +
             "</gml:coordinates></gml:LinearRing>," +
             "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
-            "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>");
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>");
 
     runError("geo:intersection(<gml:LinearRing><gml:coordinates></gml:coordinates>" +
             "</gml:LinearRing>)", XPARGS.qname());
@@ -379,14 +386,16 @@ public final class GeoTest extends AdvancedQueryTest {
   public void union() {
     runQuery("geo:union(<gml:Point><gml:coordinates>2</gml:coordinates></gml:Point>," +
             "<gml:Point><gml:coordinates>2,3</gml:coordinates></gml:Point>)",
-            "<gml:MultiPoint><gml:pointMember><gml:Point><gml:coordinates>2.0,0.0" +
+            "<gml:MultiPoint xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:pointMember><gml:Point><gml:coordinates>2.0,0.0" +
             "</gml:coordinates></gml:Point></gml:pointMember><gml:pointMember>" +
             "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>" +
             "</gml:pointMember></gml:MultiPoint>");
 
     runQuery("geo:union(<gml:Point><gml:coordinates>2</gml:coordinates></gml:Point>," +
             "<gml:Point><gml:coordinates>3</gml:coordinates></gml:Point>)",
-            "<gml:MultiPoint><gml:pointMember><gml:Point>" +
+            "<gml:MultiPoint xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:pointMember><gml:Point>" +
             "<gml:coordinates>2.0,0.0</gml:coordinates></gml:Point></gml:pointMember>" +
             "<gml:pointMember><gml:Point><gml:coordinates>3.0,0.0</gml:coordinates>" +
             "</gml:Point></gml:pointMember></gml:MultiPoint>");
@@ -402,10 +411,11 @@ public final class GeoTest extends AdvancedQueryTest {
   @Test
   public void difference() {
     runQuery("geo:difference(" +
-            "<gml:Point><gml:coordinates>20,1</gml:coordinates></gml:Point>," +
-            "<gml:LinearRing><gml:coordinates>0,0 20,20 20,30 0,20 0,0" +
-            "</gml:coordinates></gml:LinearRing>)",
-            "<gml:Point><gml:coordinates>20.0,1.0</gml:coordinates></gml:Point>");
+        "<gml:Point><gml:coordinates>20,1</gml:coordinates></gml:Point>," +
+        "<gml:LinearRing><gml:coordinates>0,0 20,20 20,30 0,20 0,0" +
+        "</gml:coordinates></gml:LinearRing>)",
+        "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+        "<gml:coordinates>20.0,1.0</gml:coordinates></gml:Point>");
 
     runError("geo:difference(" +
             "<gml:Point><gml:coordinates></gml:coordinates></gml:Point>," +
@@ -422,7 +432,8 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:Point><gml:coordinates>20,1</gml:coordinates></gml:Point>," +
             "<gml:LinearRing><gml:coordinates>0,0 20,20 20,30 0,20 0,0" +
             "</gml:coordinates></gml:LinearRing>)",
-             "<gml:MultiGeometry><gml:geometryMember><gml:Point><gml:coordinates>" +
+             "<gml:MultiGeometry xmlns:gml=\"http://www.opengis.net/gml\">" +
+             "<gml:geometryMember><gml:Point><gml:coordinates>" +
              "20.0,1.0</gml:coordinates></gml:Point></gml:geometryMember>" +
              "<gml:geometryMember><gml:LineString><gml:coordinates>0.0,0.0 20.0,20.0" +
              " 20.0,30.0 0.0,20.0 0.0,0.0</gml:coordinates></gml:LineString>" +
@@ -442,7 +453,8 @@ public final class GeoTest extends AdvancedQueryTest {
   public void geometryN() {
     runQuery("geo:geometryN(" +
             "<gml:Point><gml:coordinates>2,1</gml:coordinates></gml:Point>, 1)",
-            "<gml:Point><gml:coordinates>2.0,1.0</gml:coordinates></gml:Point>");
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>2.0,1.0</gml:coordinates></gml:Point>");
 
     runError("geo:geometryN(" +
             "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>,1)",
@@ -545,11 +557,13 @@ public final class GeoTest extends AdvancedQueryTest {
   public void startPoint() {
     runQuery("geo:startPoint(<gml:LinearRing><gml:coordinates>1,1 20,1 20,20 1,1" +
             "</gml:coordinates></gml:LinearRing>)",
-            "<gml:Point><gml:coordinates>1.0,1.0</gml:coordinates></gml:Point>");
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>1.0,1.0</gml:coordinates></gml:Point>");
 
     runQuery("geo:startPoint(<gml:LineString><gml:coordinates>1,1 20,1 20,20 1,1" +
             "</gml:coordinates></gml:LineString>)",
-            "<gml:Point><gml:coordinates>1.0,1.0</gml:coordinates></gml:Point>");
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>1.0,1.0</gml:coordinates></gml:Point>");
 
     runError("geo:startPoint(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
             "1,1 0,0 2,1</gml:coordinates></gml:LineString><gml:LineString>" +
@@ -570,11 +584,13 @@ public final class GeoTest extends AdvancedQueryTest {
   public void endPoint() {
     runQuery("geo:endPoint(<gml:LinearRing><gml:coordinates>2,3 20,1 20,20 2,3" +
             "</gml:coordinates></gml:LinearRing>)",
-            "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>");
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>");
 
     runQuery("geo:endPoint(<gml:LineString><gml:coordinates>11,10 20,1 20,20 12,13" +
             "</gml:coordinates></gml:LineString>)",
-            "<gml:Point><gml:coordinates>12.0,13.0</gml:coordinates></gml:Point>");
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>12.0,13.0</gml:coordinates></gml:Point>");
 
     runError("geo:endPoint(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
             "1,1 0,0 2,1</gml:coordinates></gml:LineString><gml:LineString>" +
@@ -667,11 +683,13 @@ public final class GeoTest extends AdvancedQueryTest {
   public void pointN() {
     runQuery("geo:pointN(<gml:LinearRing><gml:coordinates>2,3 20,1 20,20 2,3" +
             "</gml:coordinates></gml:LinearRing>, 1)",
-            "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>");
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>");
 
     runQuery("geo:pointN(<gml:LineString><gml:coordinates>11,10 20,1 20,20 12,13" +
             "</gml:coordinates></gml:LineString>, 4)",
-            "<gml:Point><gml:coordinates>12.0,13.0</gml:coordinates></gml:Point>");
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>12.0,13.0</gml:coordinates></gml:Point>");
 
     runError("geo:pointN(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
             "1,1 0,0 2,1</gml:coordinates></gml:LineString><gml:LineString>" +
@@ -715,17 +733,20 @@ public final class GeoTest extends AdvancedQueryTest {
     runQuery("geo:centroid(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
             "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
             "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>)",
-            "<gml:Point><gml:coordinates>14.5,14.5</gml:coordinates></gml:Point>");
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>14.5,14.5</gml:coordinates></gml:Point>");
 
     runQuery("geo:centroid(" +
             "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>)",
-            "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>");
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>");
 
     runQuery("geo:centroid(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
             "1,1 0,0 2,1</gml:coordinates></gml:LineString><gml:LineString>" +
             "<gml:coordinates>2,1 3,3 4,4</gml:coordinates></gml:LineString>" +
             "</gml:MultiLineString>)",
-            "<gml:Point><gml:coordinates>1.8468564716806986,1.540569415042095" +
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>1.8468564716806986,1.540569415042095" +
             "</gml:coordinates></gml:Point>");
 
     runError("geo:centroid(" +
@@ -741,17 +762,20 @@ public final class GeoTest extends AdvancedQueryTest {
     runQuery("geo:pointOnSurface(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
             "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
             "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>)",
-            "<gml:Point><gml:coordinates>14.5,14.5</gml:coordinates></gml:Point>");
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>14.5,14.5</gml:coordinates></gml:Point>");
 
     runQuery("geo:pointOnSurface(" +
             "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>)",
-            "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>");
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>");
 
     runQuery("geo:pointOnSurface(<gml:MultiLineString><gml:LineString><gml:coordinates>" +
             "1,1 0,0 2,1</gml:coordinates></gml:LineString><gml:LineString>" +
             "<gml:coordinates>2,1 3,3 4,4</gml:coordinates></gml:LineString>" +
-            "</gml:MultiLineString>)", "<gml:Point><gml:coordinates>3.0,3.0" +
-            "</gml:coordinates></gml:Point>");
+            "</gml:MultiLineString>)",
+            "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>3.0,3.0</gml:coordinates></gml:Point>");
 
     runError("geo:pointOnSurface(" +
             "<gml:unknown><gml:coordinates>1,1</gml:coordinates></gml:unknown>)",
@@ -767,8 +791,9 @@ public final class GeoTest extends AdvancedQueryTest {
     runQuery("geo:exteriorRing(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
             "<gml:coordinates>11,11 18,11 18,18 11,18 11,11</gml:coordinates>" +
             "</gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>)",
-            "<gml:LineString><gml:coordinates>11.0,11.0 18.0,11.0 18.0,18.0 11.0,18.0 " +
-            "11.0,11.0</gml:coordinates></gml:LineString>");
+            "<gml:LineString xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>11.0,11.0 18.0,11.0 18.0,18.0 11.0,18.0 11.0,11.0" +
+            "</gml:coordinates></gml:LineString>");
 
     runError("geo:exteriorRing(" +
             "<gml:Point><gml:coordinates>2.0,3.0</gml:coordinates></gml:Point>)",
@@ -811,7 +836,8 @@ public final class GeoTest extends AdvancedQueryTest {
             "<gml:innerBoundaryIs><gml:LinearRing><gml:coordinates>" +
             "10,10 20,10 20,20 10,20 10,10</gml:coordinates></gml:LinearRing>" +
             "</gml:innerBoundaryIs></gml:Polygon>, 1)",
-            "<gml:LineString><gml:coordinates>2.0,2.0 3.0,2.0 3.0,3.0 2.0,3.0 2.0,2.0" +
+            "<gml:LineString xmlns:gml=\"http://www.opengis.net/gml\">" +
+            "<gml:coordinates>2.0,2.0 3.0,2.0 3.0,3.0 2.0,3.0 2.0,2.0" +
             "</gml:coordinates></gml:LineString>");
 
     runError("geo:interiorRingN(<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing>" +
