@@ -257,30 +257,38 @@ public final class QueryResources {
   private Data create(final QueryInput input, final boolean single, final InputInfo info)
       throws QueryException {
 
-    Data d = null;
     try {
-      // try to create database with original path
-      d = CreateDB.create(input.input, single, ctx.context);
+      final Data d = createDB(input, single, info);
+      input.path = "";
+      addData(d);
+      return d;
     } catch(final IOException ex) {
-      // try to create database with path relative to base uri
-      final IO base = ctx.sc.baseIO();
-      if(base != null) {
-        try {
-          final String in = base.merge(input.original).path();
-          if(!in.equals(input.original))
-            d = CreateDB.create(IO.get(in), single, ctx.context);
-        } catch(final IOException exc) {
-          // raise error
-          IOERR.thrw(info, exc);
-        }
-      }
-      // no base URI: raise error
-      if(d == null) IOERR.thrw(info, ex);
+      throw IOERR.thrw(info, ex);
     }
+  }
 
-    input.path = "";
-    addData(d);
-    return d;
+  /**
+   * Creates a new database instance.
+   * @param input query input
+   * @param single expect single document
+   * @param info input info
+   * @return data reference
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private Data createDB(final QueryInput input, final boolean single,
+      final InputInfo info) throws QueryException, IOException {
+
+    if(input.input.exists()) return CreateDB.create(input.input, single, ctx.context);
+
+    // try to create database with path relative to base uri
+    final IO base = ctx.sc.baseIO();
+    if(base != null) {
+      final String in = base.merge(input.original).path();
+      if(!in.equals(input.original))
+        return CreateDB.create(IO.get(in), single, ctx.context);
+    }
+    throw WHICHRES.thrw(info, input.input);
   }
 
   /**
