@@ -56,6 +56,8 @@ public final class Check extends Command {
     if(!context.user.has(Perm.CREATE)) return true;
     // database with given name does not exist
     if(!mprop.dbpath(qi.db).exists()) return false;
+    // open database if addressed file does not exist
+    if(!qi.input.exists()) return true;
 
     // compare timestamp of database input and specified file
     final MetaData meta = new MetaData(qi.db, context);
