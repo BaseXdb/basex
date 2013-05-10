@@ -2042,9 +2042,9 @@ public class QueryParser extends InputParser {
         if(!wsConsume(PAR1)) break;
 
         final InputInfo ii = info();
-        final ArrayList<Expr> argList = new ArrayList<Expr>();
+        final ExprList argList = new ExprList();
         final int[] holes = argumentList(argList, e);
-        final Expr[] args = argList.toArray(new Expr[argList.size()]);
+        final Expr[] args = argList.finish();
 
         e = holes == null ? new DynFuncCall(ii, e, args) :
           new PartFunc(ii, e, args, holes);
@@ -2320,9 +2320,9 @@ public class QueryParser extends InputParser {
     if(name != null && !keyword(name)) {
       if(wsConsume(PAR1)) {
         final InputInfo ii = info();
-        final ArrayList<Expr> argList = new ArrayList<Expr>();
+        final ExprList argList = new ExprList();
         final int[] holes = argumentList(argList, name.string());
-        final Expr[] args = argList.toArray(new Expr[argList.size()]);
+        final Expr[] args = argList.finish();
         alter = FUNCUNKNOWN;
         alterFunc = name;
         ap = ip;
@@ -2356,8 +2356,9 @@ public class QueryParser extends InputParser {
    * @return array of arguments, place-holders '?' are represented as {@code null} entries
    * @throws QueryException query exception
    */
-  private int[] argumentList(final ArrayList<Expr> args, final Object name)
+  private int[] argumentList(final ExprList args, final Object name)
       throws QueryException {
+
     int[] holes = null;
     if(!wsConsume(PAR2)) {
       int i = 0;
