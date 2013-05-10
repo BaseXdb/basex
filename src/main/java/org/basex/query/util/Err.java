@@ -412,6 +412,10 @@ public enum Err {
   INVCOMPSPEC(FOFD, 1340, "Invalid variable marker: '[%]'."),
   /** FOFD1340. */
   PICDATE(FOFD, 1340, "Invalid picture string: '%'."),
+  /** FOFD1340. */
+  CALQNAME(FOFD, 1340, "Invalid EQName: '%'."),
+  /** FOFD1340. */
+  CALWHICH(FOFD, 1340, "Unknown calendar: '%'."),
   /** FOFD1350. */
   PICINVCOMP(FOFD, 1350, "Component '[%]' not applicable to % values."),
 
@@ -822,6 +826,8 @@ public enum Err {
   INVNCNAME(XPTY, 4, "Invalid NCName: '%'."),
   /** XPTY0004. */
   INVPOS(XPTY, 4, "Illegal argument position for %: %."),
+  /** XPTY0004. */
+  CITYPES(XPTY, 4, "Incompatible types in context item declarations: % vs. %."),
 
   /** XPTY0018. */
   EVALNODESVALS(XPTY, 18, "Path yields both nodes and atomic values."),
@@ -978,7 +984,7 @@ public enum Err {
   /** XPST0111. */
   DECDUPL(XQST, 111, "Duplicate decimal-format declaration."),
   /** XQST0113. */
-  DECITEM(XQST, 113, "No value can be assigned to context item in library module."),
+  DECITEM(XQST, 113, "Context item cannot be bound in library module."),
   /** XPST0111. */
   DECDUPLPROP(XQST, 114, "Duplicate decimal-format property '%'."),
   /** XQST0116. */

@@ -32,12 +32,14 @@ public final class FNFunc extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case MAP:        return map(ctx);
-      case FILTER:     return filter(ctx);
-      case MAP_PAIRS:  return zip(ctx);
-      case FOLD_LEFT:  return foldLeft(ctx);
-      case FOLD_RIGHT: return foldRight(ctx);
-      default:         return super.iter(ctx);
+      case MAP:           return forEach(ctx);
+      case FOR_EACH:      return forEach(ctx);
+      case FILTER:        return filter(ctx);
+      case MAP_PAIRS:     return forEachPair(ctx);
+      case FOR_EACH_PAIR: return forEachPair(ctx);
+      case FOLD_LEFT:     return foldLeft(ctx);
+      case FOLD_RIGHT:    return foldRight(ctx);
+      default:            return super.iter(ctx);
     }
   }
 
@@ -81,7 +83,7 @@ public final class FNFunc extends StandardFunc {
    * @return sequence of results
    * @throws QueryException exception
    */
-  private Iter map(final QueryContext ctx) throws QueryException {
+  private Iter forEach(final QueryContext ctx) throws QueryException {
     final FItem f = withArity(0, 1, ctx);
     final Iter xs = expr[1].iter(ctx);
     return new Iter() {
@@ -128,7 +130,7 @@ public final class FNFunc extends StandardFunc {
    * @return sequence of results
    * @throws QueryException query exception
    */
-  private Iter zip(final QueryContext ctx) throws QueryException {
+  private Iter forEachPair(final QueryContext ctx) throws QueryException {
     final FItem zipper = withArity(0, 2, ctx);
     final Iter xs = expr[1].iter(ctx);
     final Iter ys = expr[2].iter(ctx);

@@ -145,6 +145,7 @@ fulltext             = Бүтэн-текст
 fulltext_index       = Бүтэн текст индекс
 general              = Ерөнхий
 general_info         = Ерөнхий мэдээлэл
+global_option_%      = Global option '%' cannot be set.
 go_back              = Буцах
 go_forward           = Урагшлуулах
 go_home              = Эхлэл рүү буцах

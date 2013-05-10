@@ -841,6 +841,15 @@ public class QueryParser extends InputParser {
     final byte[] muri = new QueryParser(qu, io.path(), ctx).parseModule(!imprt).uri();
     // check if import and declaration uri match
     if(!eq(uri, muri)) error(WRONGMODULE, muri, file);
+    // check if context item declaration types are compatible to each other
+
+    if(ctx.sc.initType != null) {
+      if(sc.initType == null) {
+        sc.initType = ctx.sc.initType;
+      } else if(!ctx.sc.initType.eq(sc.initType)) {
+        error(CITYPES, ctx.sc.initType, sc.initType);
+      }
+    }
     ctx.sc = sc;
     ctx.modStack.pop();
   }
@@ -853,7 +862,14 @@ public class QueryParser extends InputParser {
     wsCheck(ITEMM);
     if(!decl.add(ITEMM)) error(DUPLITEM);
 
-    ctx.sc.initType = wsConsumeWs(AS) ? itemType() : null;
+    if(wsConsumeWs(AS)) {
+      final SeqType type = itemType();
+      if(ctx.sc.initType == null) {
+        ctx.sc.initType = type;
+      } else if(!ctx.sc.initType.eq(type)) {
+        error(CITYPES, ctx.sc.initType, type);
+      }
+    }
 
     if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
     else if(!wsConsumeWs(ASSIGN)) return;

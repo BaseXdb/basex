@@ -76,17 +76,17 @@ public enum Function {
   /** XQuery function. */
   DAY_FROM_DATETIME(FNDate.class, "day-from-dateTime(datetime)", ITR_ZO, DTM_ZO),
   /** XQuery function. */
-  DAYS_FROM_DURATION(FNDate.class, "days-from-duration(dur)", ITR_ZO, DUR_ZO),
+  DAYS_FROM_DURATION(FNDate.class, "days-from-duration(duration)", ITR_ZO, DUR_ZO),
   /** XQuery function. */
   HOURS_FROM_DATETIME(FNDate.class, "hours-from-dateTime(datetime)", ITR_ZO, DTM_ZO),
   /** XQuery function. */
-  HOURS_FROM_DURATION(FNDate.class, "hours-from-duration(dur)", ITR_ZO, DUR_ZO),
+  HOURS_FROM_DURATION(FNDate.class, "hours-from-duration(duration)", ITR_ZO, DUR_ZO),
   /** XQuery function. */
   HOURS_FROM_TIME(FNDate.class, "hours-from-time(item)", ITR_ZO, TIM_ZO),
   /** XQuery function. */
   MINUTES_FROM_DATETIME(FNDate.class, "minutes-from-dateTime(datetime)", ITR_ZO, DTM_ZO),
   /** XQuery function. */
-  MINUTES_FROM_DURATION(FNDate.class, "minutes-from-duration(dur)", ITR_ZO, DUR_ZO),
+  MINUTES_FROM_DURATION(FNDate.class, "minutes-from-duration(duration)", ITR_ZO, DUR_ZO),
   /** XQuery function. */
   MINUTES_FROM_TIME(FNDate.class, "minutes-from-time(item)", ITR_ZO, TIM_ZO),
   /** XQuery function. */
@@ -94,11 +94,11 @@ public enum Function {
   /** XQuery function. */
   MONTH_FROM_DATETIME(FNDate.class, "month-from-dateTime(datetime)", ITR_ZO, DTM_ZO),
   /** XQuery function. */
-  MONTHS_FROM_DURATION(FNDate.class, "months-from-duration(dur)", ITR_ZO, DUR_ZO),
+  MONTHS_FROM_DURATION(FNDate.class, "months-from-duration(duration)", ITR_ZO, DUR_ZO),
   /** XQuery function. */
   SECONDS_FROM_DATETIME(FNDate.class, "seconds-from-dateTime(datetime)", DEC_ZO, DTM_ZO),
   /** XQuery function. */
-  SECONDS_FROM_DURATION(FNDate.class, "seconds-from-duration(dur)", DEC_ZO, DUR_ZO),
+  SECONDS_FROM_DURATION(FNDate.class, "seconds-from-duration(duration)", DEC_ZO, DUR_ZO),
   /** XQuery function. */
   SECONDS_FROM_TIME(FNDate.class, "seconds-from-time(item)", DEC_ZO, TIM_ZO),
   /** XQuery function. */
@@ -112,13 +112,13 @@ public enum Function {
   /** XQuery function. */
   YEAR_FROM_DATETIME(FNDate.class, "year-from-dateTime(datetime)", ITR_ZO, DTM_ZO),
   /** XQuery function. */
-  YEARS_FROM_DURATION(FNDate.class, "years-from-duration(dur)", ITR_ZO, DUR_ZO),
+  YEARS_FROM_DURATION(FNDate.class, "years-from-duration(duration)", ITR_ZO, DUR_ZO),
   /** XQuery function. */
   ADJUST_DATE_TO_TIMEZONE(FNDate.class, "adjust-date-to-timezone(date[,zone])",
       DAT_ZO, 1, DAT_ZO, DTD_ZO),
   /** XQuery function. */
   ADJUST_DATETIME_TO_TIMEZONE(FNDate.class, "adjust-dateTime-to-timezone(date[,zone])",
-      DTM, 1, DTM_ZO, DTD_ZO),
+      DTM_ZO, 1, DTM_ZO, DTD_ZO),
   /** XQuery function. */
   ADJUST_TIME_TO_TIMEZONE(FNDate.class, "adjust-time-to-timezone(date[,zone])",
       TIM_ZO, 1, TIM_ZO, DTD_ZO),
@@ -128,19 +128,20 @@ public enum Function {
   /* FNFormat functions. */
 
   /** XQuery function. */
-  FORMAT_INTEGER(FNFormat.class, "format-integer(number,picture[,lang])",
+  FORMAT_INTEGER(FNFormat.class, "format-integer(number,picture[,language])",
       STR, 2, ITR_ZO, STR, STR),
   /** XQuery function. */
   FORMAT_NUMBER(FNFormat.class, "format-number(number,picture[,format])",
       STR, 2, ITR_ZO, STR, STR_ZO),
   /** XQuery function. */
-  FORMAT_DATETIME(FNFormat.class, "format-dateTime(number,picture,[lang,cal,place])",
+  FORMAT_DATETIME(FNFormat.class,
+      "format-dateTime(number,picture,[language,calendar,place])",
       STR_ZO, 2, DTM_ZO, STR, STR_ZO, STR_ZO, STR_ZO),
   /** XQuery function. */
-  FORMAT_DATE(FNFormat.class, "format-date(date,picture,[lang,cal,place])",
+  FORMAT_DATE(FNFormat.class, "format-date(date,picture,[language,calendar,place])",
       STR_ZO, 2, DAT_ZO, STR, STR_ZO, STR_ZO, STR_ZO),
   /** XQuery function. */
-  FORMAT_TIME(FNFormat.class, "format-time(number,picture,[lang,cal,place])",
+  FORMAT_TIME(FNFormat.class, "format-time(number,picture,[language,calendar,place])",
       STR_ZO, 2, TIM_ZO, STR, STR_ZO, STR_ZO, STR_ZO),
 
   /* FNFunc functions. */
@@ -154,11 +155,17 @@ public enum Function {
   FUNCTION_ARITY(FNFunc.class, "function-arity(function)", ITR, FUN_O),
   /** XQuery function. */
   FUNCTION_LOOKUP(FNFunc.class, "function-lookup(name,arity)", FUN_OZ, QNM, ITR),
-  /** XQuery function. */
+  /** XQuery function (obsolete). */
   MAP(FNFunc.class, "map(function,seq)", ITEM_ZM,
       FuncType.get(ITEM_ZM, ITEM).seqType(), ITEM_ZM),
-  /** XQuery function. */
+  /** XQuery function (obsolete). */
   MAP_PAIRS(FNFunc.class, "map-pairs(function,seq1,seq2)", ITEM_ZM,
+      FuncType.get(ITEM_ZM, ITEM, ITEM).seqType(), ITEM_ZM, ITEM_ZM),
+  /** XQuery function. */
+  FOR_EACH(FNFunc.class, "for-each(function,seq)", ITEM_ZM,
+      FuncType.get(ITEM_ZM, ITEM).seqType(), ITEM_ZM),
+  /** XQuery function. */
+  FOR_EACH_PAIR(FNFunc.class, "for-each-pair(function,seq1,seq2)", ITEM_ZM,
       FuncType.get(ITEM_ZM, ITEM, ITEM).seqType(), ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   FOLD_LEFT(FNFunc.class, "fold-left(function,zero,seq)", ITEM_ZM,

@@ -30,7 +30,13 @@ public final class Set extends AGet {
     final String val = args[1];
     try {
       final String v = prop.set(key, val);
-      return v == null ? error(prop.unknown(key)) : info(key + COLS + v);
+      if(v != null) return info(key + COLS + v);
+
+      // retrieve values of all options
+      if(context.user.has(Perm.ADMIN) && mprop.get(key) != null) {
+        return error(Text.GLOBAL_OPTION_X, key);
+      }
+      return error(prop.unknown(key));
     } catch(final Exception ex) {
       Util.debug(ex);
       return error(INVALID_VALUE_X_X, key, val);

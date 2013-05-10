@@ -146,7 +146,7 @@ public final class FNNode extends StandardFunc {
   @Override
   public boolean xquery3() {
     return oneOf(sig, GENERATE_ID, PATH, HAS_CHILDREN) ||
-        expr.length == 0 && oneOf(sig, DOCUMENT_URI, NODE_NAME);
+        expr.length == 0 && oneOf(sig, DOCUMENT_URI, NODE_NAME, NILLED);
   }
 
   @Override

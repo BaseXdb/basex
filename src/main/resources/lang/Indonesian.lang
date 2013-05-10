@@ -144,6 +144,7 @@ fulltext             = Teks-Penuh
 fulltext_index       = Indeks Teks-Penuh
 general              = Umum
 general_info         = Informasi umum
+global_option_%      = Global option '%' cannot be set.
 go_back              = Kembali
 go_forward           = Maju
 go_home              = Pulang

@@ -144,6 +144,7 @@ fulltext             = Volltext
 fulltext_index       = Volltext-Index
 general              = Allgemein
 general_info         = Allgemeines
+global_option_%      = Die globale Option '%' kann nicht verändert werden.
 go_back              = Zurück
 go_forward           = Weiter
 go_home              = Wurzelknoten

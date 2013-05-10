@@ -281,14 +281,14 @@ public abstract class Builder extends Proc {
     // parse namespaces
     ns.prepare();
     final int nps = nsp.size();
-    for(int nx = 0; nx < nps; nx++) {
-      ns.add(nsp.name(nx), nsp.string(nx), meta.size);
-    }
+    for(int nx = 0; nx < nps; nx++) ns.add(nsp.name(nx), nsp.string(nx), meta.size);
 
     // get and store element references
     final int dis = level != 0 ? pre - pstack.get(level - 1) : 1;
     final int as = att.size();
     int u = ns.uri(nm, true);
+    if(u == 0 && indexOf(nm, ':') != -1 && !eq(prefix(nm), XML))
+      throw new BuildException(WHICHNS, parser.detail(), prefix(nm));
     addElem(dis, n, Math.min(IO.MAXATTS, as + 1), u, ns.finish());
 
     // get and store attribute references
@@ -297,6 +297,9 @@ public abstract class Builder extends Proc {
       final byte[] an = att.name(a);
       n = atts.index(an, av, true);
       u = ns.uri(an, false);
+      if(u == 0 && indexOf(an, ':') != -1 && !eq(prefix(an), XML))
+        throw new BuildException(WHICHNS, parser.detail(), an);
+
       path.index(n, Data.ATTR, level + 1, av, meta);
       addAttr(n, av, Math.min(IO.MAXATTS, a + 1), u);
     }

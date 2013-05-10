@@ -126,7 +126,7 @@ public final class DBLocking implements Locking {
     else writeAll.readLock().lock();
 
     synchronized(globalLock) {
-      // global write locking
+      // local write locking
       if(null != write && !write.isEmpty()) {
         while(globalReaders > 0) {
           try {
@@ -173,22 +173,14 @@ public final class DBLocking implements Locking {
       if(w < writeObjects.size() && (r >= readObjects.size()
           || writeObjects.get(w).compareTo(readObjects.get(r)) <= 0)) {
         final String writeObject = writeObjects.get(w++);
-        synchronized(lockUsage) {
-          Integer usage = lockUsage.get(writeObject);
-          if(null == usage) usage = 0;
-          lockUsage.put(writeObject, ++usage);
-        }
+        setLockUsed(writeObject);
         getOrCreateLock(writeObject).writeLock().lock();
       } else
       // Read lock only if not global write locking; otherwise no lock downgrading from
       // global write lock is possible
       if(null != write) {
         final String readObject = readObjects.get(r++);
-        synchronized(lockUsage) {
-          Integer usage = lockUsage.get(readObject);
-          if(null == usage) usage = 0;
-          lockUsage.put(readObject, ++usage);
-        }
+        setLockUsed(readObject);
         getOrCreateLock(readObject).readLock().lock();
       }
     }
@@ -209,7 +201,7 @@ public final class DBLocking implements Locking {
     final StringList writeObjects = writeLocked.remove(thread);
     final StringList readObjects = readLocked.remove(thread);
     final StringList newWriteObjects = new StringList();
-    final StringList newReadObjects = new StringList();
+    StringList newReadObjects = new StringList();
     if(null != readObjects) newReadObjects.add(readObjects);
 
     if(null != writeObjects) {
@@ -232,11 +224,19 @@ public final class DBLocking implements Locking {
     }
 
     // Downgrade from global write lock to global read lock
-    if(writeAll.isWriteLocked()) {
-      // Fetch not yet claimed read locks before releasing global write lock
-      for(final String object : readObjects) {
-        getOrCreateLock(object).readLock().lock();
+    if(writeAll.writeLock().isHeldByCurrentThread()) {
+      for (final String object : write) {
+        getOrCreateLock(object).writeLock().lock();
+        setLockUsed(object);
       }
+      newWriteObjects.add(write);
+      // Release all local read locks as we're fetching a global one
+      for(final String object : readObjects) {
+        getOrCreateLock(object).readLock().unlock();
+        unsetLockIfUnused(object);
+      }
+      newReadObjects = null;
+      readLocked.remove(thread);
       writeAll.readLock().lock();
       writeAll.writeLock().unlock();
 
@@ -250,7 +250,8 @@ public final class DBLocking implements Locking {
 
     // Write back new locking lists
     writeLocked.put(thread, newWriteObjects);
-    readLocked.put(thread, newReadObjects);
+    if (null != newReadObjects)
+      readLocked.put(thread, newReadObjects);
   }
 
   /**
@@ -306,6 +307,18 @@ public final class DBLocking implements Locking {
     synchronized(queue) {
       transactions--;
       queue.notifyAll();
+    }
+  }
+
+  /**
+   * Marks a lock as used.
+   * @param lock Lock to set used
+   */
+  private void setLockUsed(final String lock) {
+    synchronized(lockUsage) {
+      Integer usage = lockUsage.get(lock);
+      if(null == usage) usage = 0;
+      lockUsage.put(lock, ++usage);
     }
   }
 

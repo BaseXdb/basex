@@ -330,6 +330,7 @@ public class CommandTest extends SandboxTest {
   public final void infoTable() {
     no(new InfoStorage("1", "2"));
     ok(new CreateDB(NAME, FILE));
+    ok(new InfoStorage());
     ok(new InfoStorage("1", "2"));
     ok(new InfoStorage("1", null));
     ok(new InfoStorage("// li", null));
