@@ -642,7 +642,7 @@ public interface Text {
   String QUERY_EXECUTED_X = lang("query_executed_%");
 
   /** Stopped info. */
-  String STOPPED_AT = lang("stopped_at");
+  String STOPPED_AT = lang("stopped_at") + ' ';
   /** Line info. */
   String LINE_X = lang("line_%");
   /** Column info. */

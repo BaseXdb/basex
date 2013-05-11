@@ -210,7 +210,7 @@ public final class QueryException extends Exception {
   @Override
   public String getMessage() {
     final TokenBuilder tb = new TokenBuilder();
-    if(info != null) tb.add(STOPPED_AT).add(' ').add(info.toString()).add(COL).add(NL);
+    if(info != null) tb.add(STOPPED_AT).add(info.toString()).add(COL).add(NL);
     final byte[] code = name.local();
     if(code.length != 0) tb.add('[').add(code).add("] ");
     tb.add(getLocalizedMessage());

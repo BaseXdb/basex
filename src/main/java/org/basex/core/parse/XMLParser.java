@@ -52,7 +52,7 @@ final class XMLParser extends CmdParser {
       final QueryProcessor qa = new QueryProcessor(query, ctx).context(node);
       for(final Item ia : qa.value()) cmds.add(command(ia));
     } catch(final IOException ex) {
-      throw error(Text.STOPPED_AT + " %", ex);
+      throw error(Text.STOPPED_AT + '%', ex);
     }
   }
 
