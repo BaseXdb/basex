@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 final class RESTGet extends RESTCode {
   @Override
-  void run(final HTTPContext http) throws HTTPException, IOException {
+  void run(final HTTPContext http) throws IOException {
     final Map<String, String[]> vars = new HashMap<String, String[]>();
 
     // handle query parameters

@@ -26,7 +26,7 @@ public class RESTCommand extends RESTCode {
   }
 
   @Override
-  void run(final HTTPContext http) throws HTTPException, IOException {
+  void run(final HTTPContext http) throws IOException {
     // open addressed database
     open(http);
     // set default content type to raw

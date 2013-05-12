@@ -28,7 +28,7 @@ import org.basex.util.*;
  */
 public class RESTPost extends RESTCode {
   @Override
-  void run(final HTTPContext http) throws HTTPException, IOException {
+  void run(final HTTPContext http) throws IOException {
     parseOptions(http);
 
     String enc = http.req.getCharacterEncoding();

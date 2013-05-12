@@ -25,10 +25,9 @@ public abstract class RESTCode {
   /**
    * Performs the REST operation.
    * @param http HTTP context
-   * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  abstract void run(final HTTPContext http) throws HTTPException, IOException;
+  abstract void run(final HTTPContext http) throws IOException;
 
   /**
    * Opens the addressed database.

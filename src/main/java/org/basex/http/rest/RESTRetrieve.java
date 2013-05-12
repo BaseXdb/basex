@@ -36,7 +36,7 @@ final class RESTRetrieve extends RESTQuery {
   }
 
   @Override
-  void run(final HTTPContext http) throws HTTPException, IOException {
+  void run(final HTTPContext http) throws IOException {
     // open addressed database
     open(http);
 

@@ -16,7 +16,7 @@ import org.basex.server.*;
  */
 public class RESTDelete extends RESTCode {
   @Override
-  void run(final HTTPContext http) throws HTTPException, IOException {
+  void run(final HTTPContext http) throws IOException {
     // parse database options
     parseOptions(http);
     // open addressed database

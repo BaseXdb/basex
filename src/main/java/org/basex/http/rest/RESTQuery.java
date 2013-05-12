@@ -43,7 +43,7 @@ class RESTQuery extends RESTCode {
   }
 
   @Override
-  void run(final HTTPContext http) throws HTTPException, IOException {
+  void run(final HTTPContext http) throws IOException {
     query(input, http, http.context().mprop.get(MainProp.WEBPATH));
   }
 
@@ -56,7 +56,7 @@ class RESTQuery extends RESTCode {
    * @throws IOException I/O exception
    */
   protected void query(final String in, final HTTPContext http, final String path)
-      throws HTTPException, IOException {
+      throws IOException {
 
     final LocalSession session = http.session();
     if(item != null) {
