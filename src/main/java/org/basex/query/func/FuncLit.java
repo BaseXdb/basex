@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class FuncLit extends Single {
+public class FuncLit extends Single implements Scope {
   /** Variable scope. */
   private final VarScope scope;
   /** Static context. */
@@ -26,6 +26,8 @@ public class FuncLit extends Single {
   private final Var[] args;
   /** If the function's type should be checked at compile time. */
   private final boolean check;
+  /** Compilation flag. */
+  private boolean compiled;
 
   /**
    * Constructor.
@@ -49,7 +51,10 @@ public class FuncLit extends Single {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope o) throws QueryException {
+  public void compile(QueryContext ctx) throws QueryException {
+    if(compiled) return;
+    compiled = true;
+
     if(check) {
       final StaticFunc sf = ctx.funcs.get(name, args.length, info);
       if(sf == null) throw Err.FUNCUNKNOWN.thrw(info, name.string());
@@ -60,16 +65,15 @@ public class FuncLit extends Single {
     try {
       expr = expr.compile(ctx, scope);
     } finally {
+      scope.cleanUp(this);
       scope.exit(ctx, fp);
     }
-
-    return expr.isValue() ? preEval(ctx) : this;
   }
 
   @Override
-  public boolean accept(final ASTVisitor visitor) {
-    for(final Var v : args) if(!visitor.declared(v)) return false;
-    return expr.accept(visitor);
+  public Expr compile(final QueryContext ctx, final VarScope o) throws QueryException {
+    compile(ctx);
+    return expr.isValue() ? preEval(ctx) : this;
   }
 
   @Override
@@ -116,5 +120,21 @@ public class FuncLit extends Single {
     final Expr[] refs = temp.args(arg, ctx, scp, ii);
     final TypedFunc call = ctx.funcs.getFuncRef(nm, refs, ctx.sc, ii);
     return new FuncLit(nm, arg, call.fun, null, scp, ctx.sc, ii);
+  }
+
+  @Override
+  public boolean visit(ASTVisitor visitor) {
+    for(final Var v : args) if(!visitor.declared(v)) return false;
+    return expr.accept(visitor);
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitor.inlineFunc(this);
+  }
+
+  @Override
+  public boolean compiled() {
+    return compiled;
   }
 }
