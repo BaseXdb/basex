@@ -50,15 +50,26 @@ public class QueryParser extends InputParser {
   private static final byte[] URICHECK = {};
   /** QName check: skip namespace check. */
   private static final byte[] SKIPCHECK = {};
-  /** Reserved function names (sorted). */
-  private static final byte[][] KEYWORDS = {
-    NodeType.ATT.string(), NodeType.COM.string(), NodeType.DOC.string(),
-    NodeType.ELM.string(), token(EMPTY_SEQUENCE), FuncType.ANY_FUN.string(),
-    token(IF), AtomType.ITEM.string(),
-    NodeType.NSP.string(), NodeType.NOD.string(), NodeType.PI.string(),
-    token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT), token(SWITCH),
-    NodeType.TXT.string(), token(TYPESWITCH)
-  };
+  /** Reserved function names (XQuery 1.0). */
+  private static final TokenSet KEYWORDS10 = new TokenSet();
+  /** Reserved function names (XQuery 3.0). */
+  private static final TokenSet KEYWORDS30 = new TokenSet();
+
+  static {
+    final byte[][] keys = {
+      NodeType.ATT.string(), NodeType.COM.string(), NodeType.DOC.string(),
+      NodeType.ELM.string(), token(EMPTY_SEQUENCE), token(IF), AtomType.ITEM.string(),
+      NodeType.NOD.string(), NodeType.PI.string(), token(SCHEMA_ATTRIBUTE),
+      token(SCHEMA_ELEMENT), NodeType.TXT.string(), token(TYPESWITCH)
+    };
+    for(final byte[] key : keys) {
+      KEYWORDS10.add(key);
+      KEYWORDS30.add(key);
+    }
+    KEYWORDS30.add(FuncType.ANY_FUN.string());
+    KEYWORDS30.add(NodeType.NSP.string());
+    KEYWORDS30.add(SWITCH);
+  }
 
   /** Query context. */
   final QueryContext ctx;
@@ -946,7 +957,7 @@ public class QueryParser extends InputParser {
   private void functionDecl(final Ann ann) throws QueryException {
     final InputInfo ii = info();
     final QNm name = eQName(FUNCNAME, ctx.sc.nsFunc);
-    if(keyword(name)) error(RESERVED, name.local());
+    if(ctx.sc.xquery3() && keyword(name)) error(RESERVED, name.local());
     if(module != null && !eq(name.uri(), module.uri())) error(MODNS, name);
 
     wsCheck(PAR1);
@@ -969,10 +980,8 @@ public class QueryParser extends InputParser {
    * @return result of check
    */
   private boolean keyword(final QNm name) {
-    if(!ctx.sc.xquery3() || name.hasPrefix()) return false;
-    final byte[] str = name.string();
-    for(final byte[] key : KEYWORDS) if(eq(key, str)) return true;
-    return false;
+    return !name.hasPrefix() &&
+        (ctx.sc.xquery3() ? KEYWORDS30 : KEYWORDS10).contains(name.string());
   }
 
   /**
@@ -2131,8 +2140,8 @@ public class QueryParser extends InputParser {
     skipWS();
     final int pos = ip;
 
-    // parse annotations
-    final Ann ann = ctx.sc.xquery3() && curr('%') ? annotations() : null;
+    // parse annotations; will only be visited for XQuery 3.0 expressions
+    final Ann ann = curr('%') ? annotations() : null;
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
       final VarScope inner = scope = scope.child();

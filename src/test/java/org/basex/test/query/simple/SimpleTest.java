@@ -112,6 +112,9 @@ public final class SimpleTest extends QueryTest {
 
       { "FunctionContext 0", "declare function local:x() { /x }; local:x()" },
 
+      { "XQuery 3.0", empty(), "xquery version '3.0'; <a/>/node()" },
+      { "XQuery 1.0", empty(), "xquery version '1.0'; <a/>/node()" },
+
     };
   }
 }
