@@ -105,4 +105,11 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   public void ctxItemTest() {
     query("declare context item := contains(?, \"a\"); .(\"abc\")", "true");
   }
+
+  /** Tests using a function literal that is used before the function (see GH-698). */
+  @Test
+  public void funcLitForward() {
+    query("declare function local:a($a) { local:b#1($a) };" +
+        "declare function local:b($b) { $b }; local:a(1)", "1");
+  }
 }
