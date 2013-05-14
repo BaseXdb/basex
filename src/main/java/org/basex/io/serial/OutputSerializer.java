@@ -26,52 +26,54 @@ import org.basex.util.hash.*;
  */
 public abstract class OutputSerializer extends Serializer {
   /** System document type. */
-  private String docsys;
+  protected String docsys;
   /** Public document type. */
   private String docpub;
   /** Flag for printing content type. */
-  int ct;
+  protected int ct;
   /** Separator flag (used for formatting). */
-  boolean sep;
-  /** Item flag (used for formatting). */
-  private boolean item;
+  protected boolean sep;
   /** Item separator flag (used for formatting). */
-  boolean isep;
+  protected boolean isep;
   /** Script flag. */
-  boolean script;
+  protected boolean script;
 
   /** HTML5 flag. */
-  final boolean html5;
+  protected final boolean html5;
   /** URI escape flag. */
-  final boolean escape;
+  protected final boolean escape;
+  /** Standalone 'omit' flag. */
+  protected final boolean saomit;
+  /** Indentation flag. */
+  protected final boolean indent;
+  /** Include content type flag. */
+  protected final boolean content;
+  /** New line. */
+  protected final byte[] nl;
+  /** Output stream. */
+  protected final PrintOutput out;
+
+  /** Item flag (used for formatting). */
+  private boolean item;
+  /** UTF8 flag. */
+  private final boolean utf8;
   /** CData elements. */
   private final TokenSet cdata = new TokenSet();
   /** Suppress indentation elements. */
   private final TokenSet suppress = new TokenSet();
-  /** Indentation flag. */
-  final boolean indent;
-  /** Include content type flag. */
-  final boolean content;
   /** Media type. */
   private final String media;
   /** Charset. */
   private final Charset encoding;
   /** Item separator. */
   private final byte[] itemsep;
-  /** New line. */
-  final byte[] nl;
-  /** Output stream. */
-  final PrintOutput out;
-
-  /** UTF8 flag. */
-  private final boolean utf8;
 
   // project specific properties
 
   /** Number of spaces to indent. */
-  final int indents;
+  protected final int indents;
   /** Tabular character. */
-  final char tab;
+  protected final char tab;
 
   /** Format items. */
   private final boolean format;
@@ -98,6 +100,7 @@ public abstract class OutputSerializer extends Serializer {
     final boolean decl = !p.yes(S_OMIT_XML_DECLARATION);
     final boolean bom  = p.yes(S_BYTE_ORDER_MARK);
     final String sa = p.check(S_STANDALONE, YES, NO, OMIT);
+    saomit = sa.equals(OMIT);
     p.check(S_NORMALIZATION_FORM, NFC, DataText.NONE);
 
     final String maps = p.get(S_USE_CHARACTER_MAPS);
@@ -175,14 +178,14 @@ public abstract class OutputSerializer extends Serializer {
         print(ver);
         print(DOCDECL2);
         print(p.get(S_ENCODING));
-        if(!sa.equals(OMIT)) {
+        if(!saomit) {
           print(DOCDECL3);
           print(sa);
         }
         print(ATT2);
         print(PI_C);
         sep = true;
-      } else if(!sa.equals(OMIT) || !ver.equals(V10) && docsys != null) {
+      } else if(!saomit || !ver.equals(V10) && docsys != null) {
         SERSTAND.thrwSerial();
       }
     }
@@ -413,7 +416,6 @@ public abstract class OutputSerializer extends Serializer {
     }
     print(" \"" + docsys + '"');
     print(ELEM_C);
-    docsys = null;
     sep = true;
     return true;
   }

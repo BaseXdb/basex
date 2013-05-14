@@ -139,9 +139,9 @@ public final class Ann extends ElementList {
           if(name.eq(ann.names[j]) && Compare.deep(val, ann.values[j], null))
             o.add(name, val);
         }
-      } catch(QueryException e) {
+      } catch(final QueryException ex) {
         // should never happen because annotations can only contain simple literals
-        Util.notexpected(e);
+        Util.notexpected(ex);
       }
     }
     return o;

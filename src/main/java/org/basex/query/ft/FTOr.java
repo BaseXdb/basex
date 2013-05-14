@@ -38,7 +38,8 @@ public final class FTOr extends FTExpr {
     for(final FTExpr e : expr) not &= e instanceof FTNot;
     if(not) {
       // convert (!A or !B or ...) to !(A and B and ...)
-      for(int e = 0; e < expr.length; ++e) expr[e] = expr[e].expr[0];
+      final int es = expr.length;
+      for(int e = 0; e < es; e++) expr[e] = expr[e].expr[0];
       return new FTNot(info, new FTAnd(info, expr));
     }
     return this;
@@ -47,7 +48,8 @@ public final class FTOr extends FTExpr {
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final FTNode item = expr[0].item(ctx, info);
-    for(int e = 1; e < expr.length; ++e) {
+    final int es = expr.length;
+    for(int e = 1; e < es; e++) {
       or(item, expr[e].item(ctx, info));
     }
     return item;
@@ -56,9 +58,10 @@ public final class FTOr extends FTExpr {
   @Override
   public FTIter iter(final QueryContext ctx) throws QueryException {
     // initialize iterators
-    final FTIter[] ir = new FTIter[expr.length];
-    final FTNode[] it = new FTNode[expr.length];
-    for(int e = 0; e < expr.length; ++e) {
+    final int es = expr.length;
+    final FTIter[] ir = new FTIter[es];
+    final FTNode[] it = new FTNode[es];
+    for(int e = 0; e < es; e++) {
       ir[e] = expr[e].iter(ctx);
       it[e] = ir[e].next();
     }
@@ -68,7 +71,7 @@ public final class FTOr extends FTExpr {
       public FTNode next() throws QueryException {
         // find item with smallest pre value
         int p = -1;
-        for(int i = 0; i < it.length; ++i) {
+        for(int i = 0; i < es; ++i) {
           if(it[i] != null && (p == -1 || it[p].pre > it[i].pre)) p = i;
         }
         // no items left - leave
@@ -76,7 +79,7 @@ public final class FTOr extends FTExpr {
 
         // merge all matches
         final FTNode item = it[p];
-        for(int i = 0; i < it.length; ++i) {
+        for(int i = 0; i < es; ++i) {
           if(it[i] != null && p != i && item.pre == it[i].pre) {
             or(item, it[i]);
             it[i] = ir[i].next();

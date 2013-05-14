@@ -48,8 +48,9 @@ public final class FNOut extends StandardFunc {
    */
   private Str format(final QueryContext ctx) throws QueryException {
     final String form = string(checkStr(expr[0], ctx));
-    final Object[] args = new Object[expr.length - 1];
-    for(int e = 1; e < expr.length; e++) {
+    final int es = expr.length;
+    final Object[] args = new Object[es - 1];
+    for(int e = 1; e < es; e++) {
       final Item it = expr[e].item(ctx, info);
       args[e - 1] = it.type.isUntyped() ? string(it.string(info)) : it.toJava();
     }

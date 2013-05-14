@@ -100,14 +100,15 @@ public final class PartFunc extends Arr {
   @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
-    expr[expr.length - 1].plan(e);
+    final int es = expr.length, hs = holes.length;
+    expr[es - 1].plan(e);
     int p = -1;
-    for(int i = 0; i < holes.length; i++) {
+    for(int i = 0; i < hs; i++) {
       while(++p < holes[i]) expr[p - i].plan(e);
       final FElem a = new FElem(Token.token(QueryText.ARG));
       e.add(a.add(planAttr(QueryText.POS, Token.token(i))));
     }
-    while(++p < expr.length + holes.length - 1) expr[p - holes.length].plan(e);
+    while(++p < es + hs - 1) expr[p - hs].plan(e);
     plan.add(e);
   }
 
@@ -115,13 +116,13 @@ public final class PartFunc extends Arr {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(expr[expr.length - 1].toString()).add('(');
     int p = -1;
-    for(int i = 0; i < holes.length; i++) {
+    final int es = expr.length, hs = holes.length;
+    for(int i = 0; i < hs; i++) {
       while(++p < holes[i])
         tb.add(p > 0 ? QueryText.SEP : "").add(expr[p - i].toString());
       tb.add(p > 0 ? QueryText.SEP : "").add('?');
     }
-    while(++p < expr.length + holes.length - 1)
-      tb.add(QueryText.SEP).add(expr[p - holes.length].toString());
+    while(++p < es + hs - 1) tb.add(QueryText.SEP).add(expr[p - hs].toString());
     return tb.add(')').toString();
   }
 }

@@ -563,6 +563,10 @@ public enum Err {
   SERATTR(SENR, 1, "Attributes and namespaces cannot be serialized:%."),
   /** SENR0001. */
   SERFUNC(SENR, 1, "Functions cannot be serialized: %."),
+  /** SEPM0004. */
+  SERSA(SEPM, 4, "If 'standalone' is specified, the root must be a single element."),
+  /** SEPM0004. */
+  SERDT(SEPM, 4, "If 'doctype-system' is specified, the root must be a single element."),
   /** SESU0007. */
   SERENCODING(SESU, 7, "Encoding not supported: '%'."),
   /** SEPM0009. */

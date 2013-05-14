@@ -36,7 +36,8 @@ public abstract class Arr extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx, scp);
+    final int es = expr.length;
+    for(int e = 0; e < es; e++) expr[e] = expr[e].compile(ctx, scp);
     return this;
   }
 
@@ -82,7 +83,8 @@ public abstract class Arr extends ParseExpr {
 
   @Override
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
-    for(int e = 0; e < expr.length; ++e) expr[e] = expr[e].indexEquivalent(ic);
+    final int es = expr.length;
+    for(int e = 0; e < es; ++e) expr[e] = expr[e].indexEquivalent(ic);
     return this;
   }
 

@@ -101,8 +101,9 @@ public final class DynFuncCall extends Arr {
   @Override
   public void plan(final FElem plan) {
     final FElem el = planElem();
-    addPlan(plan, el, expr[expr.length - 1]);
-    for(int i = 0; i < expr.length - 1; i++) expr[i].plan(el);
+    final int es = expr.length;
+    addPlan(plan, el, expr[es - 1]);
+    for(int e = 0; e < es - 1; e++) expr[e].plan(el);
   }
 
   @Override
@@ -112,10 +113,11 @@ public final class DynFuncCall extends Arr {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(expr[expr.length - 1].toString()).add('(');
-    for(int i = 0; i < expr.length - 1; i++) {
-      tb.add(expr[i].toString());
-      if(i < expr.length - 2) tb.add(", ");
+    final int es = expr.length;
+    final TokenBuilder tb = new TokenBuilder(expr[es - 1].toString()).add('(');
+    for(int e = 0; e < es - 1; e++) {
+      tb.add(expr[e].toString());
+      if(e < es - 2) tb.add(", ");
     }
     return tb.add(')').toString();
   }

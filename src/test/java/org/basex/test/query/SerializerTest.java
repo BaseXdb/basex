@@ -22,8 +22,8 @@ public final class SerializerTest extends AdvancedQueryTest {
   public void xhtml() {
     final String option = "declare option output:method 'xhtml';";
     query(option + "<html/>", "<html></html>");
-    final String[] empties = { "area", "base", "br", "col", "hr", "img", "input", "link",
-        "meta", "basefont", "frame", "isindex", "param" };
+    final String[] empties = { "area", "base", "br", "col", "embed", "hr", "img", "input",
+        "link", "meta", "basefont", "frame", "isindex", "param" };
     for(final String e : empties) query(option + "<" + e + "/>", "<" + e + " />");
   }
 
@@ -32,8 +32,8 @@ public final class SerializerTest extends AdvancedQueryTest {
   public void html() {
     final String option = "declare option output:method 'html';";
     query(option + "<html/>", "<html></html>");
-    final String[] empties = { "area", "base", "br", "col", "hr", "img", "input", "link",
-        "meta", "basefont", "frame", "isindex", "param" };
+    final String[] empties = { "area", "base", "br", "col", "embed", "hr", "img", "input",
+        "link", "meta", "basefont", "frame", "isindex", "param" };
     for(final String e : empties) query(option + "<" + e + "/>", "<" + e + ">");
 
     query(option + "<html><script>&lt;</script></html>",

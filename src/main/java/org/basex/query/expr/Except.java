@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
@@ -29,16 +30,23 @@ public final class Except extends Set {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
-    if(expr[0].isEmpty()) return optPre(null, ctx);
 
-    for(int e = 1; e < expr.length; ++e) {
-      if(expr[e].isEmpty()) {
-        ctx.compInfo(OPTREMOVE, this, expr[e]);
-        expr = Array.delete(expr, e--);
+    final int es = expr.length;
+    final ExprList el = new ExprList(es);
+    for(final Expr ex : expr) {
+      if(ex.isEmpty()) {
+        // remove empty operands (return empty sequence if first value is empty)
+        if(el.isEmpty()) return optPre(null, ctx);
+        ctx.compInfo(OPTREMOVE, this, ex);
+      } else {
+        el.add(ex);
       }
     }
-    // results must always be sorted
-    return expr.length == 1 && iterable ? expr[0] : this;
+    // ensure that results are always sorted
+    if(el.size() == 1 && iterable) return el.get(0);
+    // replace expressions with optimized list
+    if(el.size() != es) expr = el.finish();
+    return this;
   }
 
   @Override

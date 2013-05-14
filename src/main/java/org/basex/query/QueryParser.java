@@ -552,7 +552,10 @@ public class QueryParser extends InputParser {
       // output declaration
       if(module != null) error(MODOUT);
 
-      if(ctx.serProp == null) ctx.serProp = new SerializerProp();
+      if(ctx.serProp == null) {
+        final Prop prop = ctx.context.prop;
+        ctx.serProp = new SerializerProp(prop.get(Prop.SERIALIZER));
+      }
       if(ctx.serProp.get(key) == null) error(OUTWHICH, key);
       if(!decl.add("S " + key)) error(OUTDUPL, key);
       if(key.equals(SerializerProp.S_PARAMETER_DOCUMENT[0].toString())) {

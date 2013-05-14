@@ -34,7 +34,7 @@ public final class Or extends Logical {
 
     // merge predicates if possible
     CmpG cmpg = null;
-    Expr[] ex = {};
+    final ExprList el = new ExprList(expr.length);
     for(final Expr e : expr) {
       Expr tmp = null;
       if(e instanceof CmpG) {
@@ -44,10 +44,12 @@ public final class Or extends Logical {
         else if(cmpg.union(g, ctx, scp)) tmp = g;
       }
       // no optimization found; add original expression
-      if(tmp == null) ex = Array.add(ex, e);
+      if(tmp == null) el.add(e);
     }
-    if(ex.length != expr.length) ctx.compInfo(OPTWRITE, this);
-    expr = ex;
+    if(expr.length != el.size()) {
+      ctx.compInfo(OPTWRITE, this);
+      expr = el.finish();
+    }
     compFlatten(ctx);
 
     // return single expression if it yields a boolean

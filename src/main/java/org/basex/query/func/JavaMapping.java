@@ -69,8 +69,9 @@ public abstract class JavaMapping extends Arr {
 
   @Override
   public final Value value(final QueryContext ctx) throws QueryException {
-    final Value[] args = new Value[expr.length];
-    for(int a = 0; a < expr.length; ++a) args[a] = ctx.value(expr[a]);
+    final int es = expr.length;
+    final Value[] args = new Value[es];
+    for(int e = 0; e < es; ++e) args[e] = ctx.value(expr[e]);
     return toValue(eval(args, ctx));
   }
 
