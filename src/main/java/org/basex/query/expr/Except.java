@@ -33,7 +33,7 @@ public final class Except extends Set {
 
     for(int e = 1; e < expr.length; ++e) {
       if(expr[e].isEmpty()) {
-        ctx.compInfo(OPTREMOVE, description(), expr[e]);
+        ctx.compInfo(OPTREMOVE, this, expr[e]);
         expr = Array.delete(expr, e--);
       }
     }

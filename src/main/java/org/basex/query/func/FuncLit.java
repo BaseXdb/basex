@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class FuncLit extends Single implements Scope {
+public final class FuncLit extends Single implements Scope {
   /** Variable scope. */
   private final VarScope scope;
   /** Static context. */
@@ -51,7 +51,7 @@ public class FuncLit extends Single implements Scope {
   }
 
   @Override
-  public void compile(QueryContext ctx) throws QueryException {
+  public void compile(final QueryContext ctx) throws QueryException {
     if(compiled) return;
     compiled = true;
 
@@ -123,7 +123,7 @@ public class FuncLit extends Single implements Scope {
   }
 
   @Override
-  public boolean visit(ASTVisitor visitor) {
+  public boolean visit(final ASTVisitor visitor) {
     for(final Var v : args) if(!visitor.declared(v)) return false;
     return expr.accept(visitor);
   }
