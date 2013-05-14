@@ -14,6 +14,7 @@ import javax.xml.namespace.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.Compare.Flag;
@@ -28,7 +29,7 @@ import org.basex.util.*;
  * {@code http://dev.w3.org/2011/QT3-test-suite/}. The driver needs to be
  * executed from the test suite directory.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class QT3TS {
@@ -111,6 +112,7 @@ public final class QT3TS {
     final Performance perf = new Performance();
     ctx.prop.set(Prop.CHOP, false);
     ctx.prop.set(Prop.INTPARSE, false);
+    ctx.prop.set(Prop.SERIALIZER, "omit-xml-declaration=no,indent=no");
 
     final XQuery qdoc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx);
     final XdmValue doc = qdoc.value();
@@ -342,6 +344,7 @@ public final class QT3TS {
 
       // run query
       result.value = query.value();
+      result.sprop = query.serializer();
     } catch(final XQueryException ex) {
       result.err = ex;
       result.value = null;
@@ -368,11 +371,19 @@ public final class QT3TS {
     boolean err = result.value == null;
     String res;
     try {
-      res = result.error != null ? result.error.toString() : result.err != null ?
-          result.err.getCode() + ": " + result.err.getLocalizedMessage() :
-          asString("serialize(., map { 'indent' := 'no' })", result.value);
+      if(result.error != null) {
+        res = result.error.toString();
+      } else if(result.err != null) {
+        res = result.err.getCode() + ": " + result.err.getLocalizedMessage();
+      } else {
+        result.sprop.set(SerializerProp.S_OMIT_XML_DECLARATION, "yes");
+        res = serialize(result.value, result.sprop);
+      }
     } catch(final XQueryException ex) {
       res = ex.getCode() + ": " + ex.getLocalizedMessage();
+      err = true;
+    } catch(final Throwable ex) {
+      res = "Unexpected: " + ex.toString();
       err = true;
     }
 
@@ -481,9 +492,9 @@ public final class QT3TS {
         } else if(type.equals("assert-xml")) {
           msg = assertXML(value, expected);
         } else if(type.equals("serialization-matches")) {
-          msg = serializationMatches(value, expected);
+          msg = serializationMatches(value, expected, result.sprop);
         } else if(type.equals("assert-serialization-error")) {
-          msg = assertSerializationError(value, expected);
+          msg = assertSerializationError(value, expected, result.sprop);
         } else if(type.equals("assert-string-value")) {
           msg = assertStringValue(value, expected);
         } else if(type.equals("assert-true")) {
@@ -678,9 +689,10 @@ public final class QT3TS {
     final boolean norm = asBoolean("@normalize-space=('true','1')", expect);
     final boolean pref = asBoolean("@ignore-prefixes=('true','1')", expect);
 
+    String exp = expect.getString();
     try {
-      String exp = normNL(file.isEmpty() ? expect.getString() :
-        string(new IOFile(baseDir, file).read()));
+      if(!file.isEmpty()) exp = string(new IOFile(baseDir, file).read());
+      exp = normNL(exp);
       if(norm) exp = string(norm(token(exp)));
 
       final String res = normNL(asString("serialize(., map{ 'indent':='no' })", value));
@@ -696,7 +708,7 @@ public final class QT3TS {
           "<X>" + res + "</X>" , "(" + flags + ")");
       return asBoolean(query, expect) ? null : exp;
     } catch(final IOException ex) {
-      return Util.message(ex);
+      return Util.info("% (found: %)", exp, ex);
     }
   }
 
@@ -704,22 +716,23 @@ public final class QT3TS {
    * Tests the serialized result.
    * @param value resulting value
    * @param expect expected result
+   * @param sprop serialization properties
    * @return optional expected test suite result
    */
-  private String serializationMatches(final XdmValue value, final XdmValue expect) {
-    final String exp = expect.getString();
+  private String serializationMatches(final XdmValue value, final XdmValue expect,
+      final SerializerProp sprop) {
 
+    final String exp = expect.getString();
     final String flags = asString("@flags", expect);
     final int flgs = flags.contains("i") ? Pattern.CASE_INSENSITIVE : 0;
     final Pattern pat = Pattern.compile("^.*" + exp + ".*", flgs |
         Pattern.MULTILINE | Pattern.DOTALL);
 
-    String qu = "serialize(., map{ 'indent':='no' })";
-    if(pat.matcher(asString(qu, value)).matches()) return null;
-    qu = "serialize(., map{ 'indent':='no', 'omit-xml-declaration':='no' })";
-    if(pat.matcher(asString(qu, value)).matches()) return null;
-
-    return exp;
+    try {
+      return pat.matcher(".*" + serialize(value, sprop) + ".*").matches() ? null : exp;
+    } catch(final IOException ex) {
+      return Util.info("% (found: %)", exp, ex);
+    }
   }
 
 
@@ -727,21 +740,42 @@ public final class QT3TS {
    * Tests a serialization error.
    * @param value resulting value
    * @param expect expected result
+   * @param sprop serialization properties
    * @return optional expected test suite result
    */
-  private String assertSerializationError(final XdmValue value, final XdmValue expect) {
+  private String assertSerializationError(final XdmValue value, final XdmValue expect,
+      final SerializerProp sprop) {
+
     final String exp = asString('@' + CODE, expect);
     try {
-      asString("serialize(., map{ 'indent':='no' })", value);
+      serialize(value, sprop);
       return exp;
-    } catch(final XQueryException qe) {
+    } catch(final SerializerException ex) {
       if(!errors || exp.equals("*")) return null;
-      for(final String s : qe.getMessage().split("\r\n?|\n")) {
-        if(s.matches(".*\\[.+\\].*") && exp.matches(s.replaceAll(".*\\[|\\].*", "")))
-          return null;
-      }
-      return Util.info("% (found: %)", exp, qe.getMessage());
+      final QueryException qe = ex.getCause();
+      final String code = string(qe.qname().local());
+      if(code.equals(exp)) return null;
+      return Util.info("% (found: %)", exp, ex);
+    } catch(final IOException ex) {
+      return Util.info("% (found: %)", exp, ex);
     }
+  }
+
+  /**
+   * Serializes values.
+   * @param value resulting value
+   * @param sprop serialization properties
+   * @return optional expected test suite result
+   * @throws IOException I/O exception
+   */
+  private String serialize(final XdmValue value, final SerializerProp sprop)
+      throws IOException {
+
+    final ArrayOutput ao = new ArrayOutput();
+    final Serializer ser = Serializer.get(ao, sprop);
+    for(final Item it : value.internal()) ser.serialize(it);
+    ser.close();
+    return ao.toString();
   }
 
   /**
@@ -951,6 +985,8 @@ public final class QT3TS {
    * Structure for storing XQuery results.
    */
   static class QT3Result {
+    /** Serialization parameters. */
+    SerializerProp sprop;
     /** Query result. */
     XdmValue value;
     /** Query exception. */

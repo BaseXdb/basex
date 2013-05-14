@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * QT3TS Report builder.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class QT3TSReport {

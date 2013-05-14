@@ -2,6 +2,9 @@ package org.basex.tests.w3c;
 
 /**
  * Strings.
+ *
+ * @author BaseX Team 2005-13, BSD License
+ * @author Christian Gruen
  */
 interface QT3Constants {
   /** QT3TS String. */

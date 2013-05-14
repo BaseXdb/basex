@@ -13,6 +13,9 @@ import org.basex.util.*;
 
 /**
  * Wrapper for representing XQuery values.
+ *
+ * @author BaseX Team 2005-13, BSD License
+ * @author Christian Gruen
  */
 public abstract class XdmValue implements Iterable<XdmItem> {
   /**

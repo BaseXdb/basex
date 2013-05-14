@@ -9,6 +9,9 @@ import org.basex.util.*;
 
 /**
  * Wrapper for representing an empty sequence.
+ *
+ * @author BaseX Team 2005-13, BSD License
+ * @author Christian Gruen
  */
 public final class XdmEmpty extends XdmValue {
   /** Empty sequence. */

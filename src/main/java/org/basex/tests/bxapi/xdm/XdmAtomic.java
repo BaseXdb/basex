@@ -8,6 +8,9 @@ import org.basex.util.*;
 
 /**
  * Wrapper for representing XQuery items.
+ *
+ * @author BaseX Team 2005-13, BSD License
+ * @author Christian Gruen
  */
 final class XdmAtomic extends XdmItem {
   /** Wrapped item. */

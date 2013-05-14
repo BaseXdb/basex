@@ -5,6 +5,7 @@ import java.util.*;
 import javax.xml.namespace.*;
 
 import org.basex.core.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.format.*;
@@ -15,6 +16,9 @@ import org.basex.util.list.*;
 
 /**
  * Wrapper for evaluating XQuery expressions.
+ *
+ * @author BaseX Team 2005-13, BSD License
+ * @author Christian Gruen
  */
 public final class XQuery implements Iterable<XdmItem> {
   /** Query processor. */
@@ -190,6 +194,15 @@ public final class XQuery implements Iterable<XdmItem> {
       Util.debug(ex);
       throw new XQueryException(ex);
     }
+  }
+
+  /**
+   * Returns serialization properties.
+   * @return serialization properties
+   * @throws XQueryException exception
+   */
+  public SerializerProp serializer() {
+    return qp.ctx.serParams(false);
   }
 
   /**

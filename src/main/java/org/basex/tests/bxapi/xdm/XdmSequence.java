@@ -9,6 +9,9 @@ import org.basex.util.*;
 
 /**
  * Wrapper for representing XQuery values.
+ *
+ * @author BaseX Team 2005-13, BSD License
+ * @author Christian Gruen
  */
 final class XdmSequence extends XdmValue {
   /** Wrapped sequence. */

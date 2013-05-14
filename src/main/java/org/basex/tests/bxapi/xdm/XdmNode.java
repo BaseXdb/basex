@@ -9,6 +9,9 @@ import org.basex.util.*;
 
 /**
  * Wrapper for representing an XQuery node.
+ *
+ * @author BaseX Team 2005-13, BSD License
+ * @author Christian Gruen
  */
 final class XdmNode extends XdmItem {
   /** Wrapped node. */
