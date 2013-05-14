@@ -78,6 +78,10 @@ public final class NSTest extends QueryTest {
 
       /* Buggy queries:
 
+      // expected error: XQDY0102
+      { "NSCon 1", "<e xmlns='x'>{ namespace {''} { 'y' } }</e>" },
+      { "NSCon 2", "<e xmlns:p='x'>{ namespace {'p'} { 'y' } }</e>" },
+
       // function prefix is declared by element constructor
       { "FuncX 1", dbl(1),
         "number(<b a='{ p:count(5) }' " +
