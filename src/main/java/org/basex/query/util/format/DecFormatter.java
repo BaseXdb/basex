@@ -302,12 +302,12 @@ public final class DecFormatter extends FormatUtil {
     if(str.startsWith("-")) str = (char) minus + str.substring(1);
 
     // integer/fractional separator
-    final int sp = str.indexOf(decimal);
+    final int sep = str.indexOf('.');
 
     // create integer part
     final TokenBuilder pre = new TokenBuilder();
     final int sl = str.length();
-    final int il = sp == -1 ? sl : sp;
+    final int il = sep == -1 ? sl : sep;
     for(int i = il; i < pic.min[0]; ++i) pre.add(zero);
     for(int i = 0; i < il; i++) pre.add(zero + str.charAt(i) - '0');
 
@@ -328,8 +328,8 @@ public final class DecFormatter extends FormatUtil {
 
     // create fractional part
     final TokenBuilder suf = new TokenBuilder();
-    final int fl = sp == -1 ? 0 : sl - il - 1;
-    if(fl != 0) for(int i = sp + 1; i < sl; i++) suf.add(zero + str.charAt(i) - '0');
+    final int fl = sep == -1 ? 0 : sl - il - 1;
+    if(fl != 0) for(int i = sep + 1; i < sl; i++) suf.add(zero + str.charAt(i) - '0');
     for(int i = fl; i < pic.min[1]; ++i) suf.add(zero);
 
     // squeeze in grouping separators in a reverse manner
