@@ -969,6 +969,10 @@ public enum Err {
   GVARNOTDEFINED(XQST, 94, "Undeclared grouping variable '%'."),
   /** XPST0097. */
   INVDECFORM(XQST, 97, "Invalid decimal-format property: %='%'."),
+  /** XPST0097. */
+  INVDECSINGLE(XQST, 97, "Decimal-format property must be a single character: %='%'."),
+  /** XPST0097. */
+  INVDECZERO(XQST, 97, "Zero-digit property must be Unicode digit with value zero: '%'."),
   /** XPST0098. */
   DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format '%'."),
   /** XQST0099. */

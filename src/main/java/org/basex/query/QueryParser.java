@@ -689,18 +689,18 @@ public class QueryParser extends InputParser {
     if(ctx.sc.decFormats.get(name.id()) != null) error(DECDUPL);
 
     // create new format
-    final HashMap<String, String> map = new HashMap<String, String>();
+    final TokenMap map = new TokenMap();
     // collect all property declarations
     int n;
     do {
       n = map.size();
       skipWS();
-      final String prop = string(ncName(null));
-      for(final String s : DECFORMATS) {
-        if(!prop.equals(s)) continue;
+      final byte[] prop = ncName(null);
+      for(final byte[] s : DECFORMATS) {
+        if(!eq(prop, s)) continue;
         if(map.get(s) != null) error(DECDUPLPROP, s);
         wsCheck(IS);
-        map.put(s, string(stringLiteral()));
+        map.add(s, stringLiteral());
         break;
       }
       if(map.isEmpty()) error(NODECLFORM, prop);

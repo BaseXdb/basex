@@ -760,11 +760,15 @@ public final class Token {
    * Returns the position of the specified character or -1.
    * @param token token
    * @param c character to be found
-   * @return result of test
+   * @return position or {@code -1}
    */
   public static int indexOf(final byte[] token, final int c) {
     final int tl = token.length;
-    for(int t = 0; t < tl; ++t) if(token[t] == c) return t;
+    if(c < 128) {
+      for(int t = 0; t < tl; t++) if(token[t] == c) return t;
+    } else {
+      for(int t = 0; t < tl; t += cl(token, t)) if(cp(token, t) == c) return t;
+    }
     return -1;
   }
 
@@ -772,18 +776,24 @@ public final class Token {
    * Returns the last position of the specified character or -1.
    * @param token token
    * @param c character to be found
-   * @return result of test
+   * @return position or {@code -1}
    */
   public static int lastIndexOf(final byte[] token, final int c) {
-    for(int t = token.length - 1; t >= 0; --t) if(token[t] == c) return t;
-    return -1;
+    final int tl = token.length;
+    int p = -1;
+    if(c < 128) {
+      for(int t = tl - 1; t >= 0; --t) if(token[t] == c) return t;
+    } else {
+      for(int t = 0; t < tl; t += cl(token, t)) if(cp(token, t) == c) p = t;
+    }
+    return p;
   }
 
   /**
    * Returns the position of the specified token or -1.
    * @param token token
    * @param sub token to be found
-   * @return result of test
+   * @return position or {@code -1}
    */
   public static int indexOf(final byte[] token, final byte[] sub) {
     return indexOf(token, sub, 0);
