@@ -124,7 +124,7 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
-   * Checks if the function performs updates.
+   * Checks if the functions perform updates.
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
