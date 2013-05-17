@@ -46,7 +46,7 @@ final class XMLParser extends CmdParser {
       if(!execute(COMMANDS, node).isEmpty()) {
         query = COMMANDS + query;
         // ensure that the root contains no text nodes as children
-        if(!execute(COMMANDS + "/text()", node).trim().isEmpty())
+        if(!execute(COMMANDS + "/text()/string()", node).trim().isEmpty())
           throw error(Text.SYNTAX_X, '<' + COMMANDS + "><...></" + COMMANDS + '>');
       }
       final QueryProcessor qa = new QueryProcessor(query, ctx).context(node);
