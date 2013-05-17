@@ -90,6 +90,7 @@ public final class StaticFuncs extends ExprInfo {
    */
   public TypedFunc getFuncRef(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo ii) throws QueryException {
+
     if(NSGlobal.reserved(name.uri())) funError(name, ii);
     final byte[] sig = sig(name, args.length);
     if(!funcs.contains(sig)) funcs.add(sig, new FuncCache(null));
@@ -176,7 +177,7 @@ public final class StaticFuncs extends ExprInfo {
     final int fs = funcs.size();
     for(int id = 1; id <= fs; ++id) {
       final StaticFunc sf = funcs.value(id).func;
-      if(ls.similar(nm, lc(sf.name.local()), 0)) {
+      if(sf != null && ls.similar(nm, lc(sf.name.local()), 0)) {
         FUNSIMILAR.thrw(ii, name.string(), sf.name.string());
       }
     }
