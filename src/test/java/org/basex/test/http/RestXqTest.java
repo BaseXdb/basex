@@ -97,9 +97,8 @@ public final class RestXqTest extends HTTPTest {
       get("declare function m:foo($x) { $x };" +
           "declare %R:path('') function m:f() { m:foo() };", "", "");
       fail("Unknown function 'm:foo()' should not be found.");
-    } catch(IOException e) {
-      System.out.println(e.getMessage());
-      assertTrue(e.getMessage().contains("XPST0017"));
+    } catch(IOException ex) {
+      assertTrue(ex.getMessage().contains("XPST0017"));
     }
   }
 
