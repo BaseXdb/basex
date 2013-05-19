@@ -146,20 +146,23 @@ public interface Type {
   /**
    * Casts the specified Java object to the XQuery data type.
    * @param o Java object
+   * @param ctx TODO
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value cast(final Object o, final InputInfo ii) throws QueryException;
+  Value cast(final Object o, QueryContext ctx, final InputInfo ii) throws QueryException;
 
   /**
    * Casts the specified string to the XQuery data type.
    * @param s string object
+   * @param ctx TODO
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value castString(final String s, final InputInfo ii) throws QueryException;
+  Value castString(final String s, QueryContext ctx, final InputInfo ii)
+      throws QueryException;
 
   /**
    * Returns the sequence type of this data type.

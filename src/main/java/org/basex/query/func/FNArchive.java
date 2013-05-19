@@ -230,7 +230,7 @@ public final class FNArchive extends StandardFunc {
   private ValueBuilder extractText(final QueryContext ctx) throws QueryException {
     final String enc = encoding(2, ARCH_ENCODING, ctx);
     final ValueBuilder vb = new ValueBuilder();
-    for(final byte[] b : extract(ctx)) vb.add(Str.get(encode(b, enc)));
+    for(final byte[] b : extract(ctx)) vb.add(Str.get(encode(b, enc, ctx)));
     return vb;
   }
 
@@ -406,7 +406,7 @@ public final class FNArchive extends StandardFunc {
 
     // data to be compressed
     byte[] val = checkStrBin(con);
-    if(con instanceof AStr && en != null && en != UTF8) val = encode(val, en);
+    if(con instanceof AStr && en != null && en != UTF8) val = encode(val, en, ctx);
 
     try {
       out.level(lvl == null ? level : toInt(lvl));
@@ -420,12 +420,15 @@ public final class FNArchive extends StandardFunc {
    * Encodes the specified string to another encoding.
    * @param val value to be encoded
    * @param en encoding
+   * @param ctx query context
    * @return encoded string
    * @throws QueryException query exception
    */
-  private byte[] encode(final byte[] val, final String en) throws QueryException {
+  private byte[] encode(final byte[] val, final String en, final QueryContext ctx)
+      throws QueryException {
+
     try {
-      return FNConvert.toString(new ArrayInput(val), en);
+      return FNConvert.toString(new ArrayInput(val), en, ctx);
     } catch(final IOException ex) {
       throw ARCH_ENCODE.thrw(info, ex);
     }

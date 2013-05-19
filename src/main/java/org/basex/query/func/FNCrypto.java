@@ -57,8 +57,8 @@ public final class FNCrypto extends StandardFunc {
             checkStr(expr[4], ctx), checkStr(expr[5], ctx),
             arg6Str ? arg6.string(ii) : Token.token(""),
             expr.length > 7 ? checkNode(expr[7].item(ctx, ii)) :
-              expr.length == 7 && !arg6Str ? checkNode(expr[6].item(ctx, ii)) :
-                null, info);
+              expr.length == 7 && !arg6Str ? checkNode(expr[6].item(ctx, ii)) : null,
+            ctx, info);
       case _CRYPTO_VALIDATE_SIGNATURE:
         return new DigitalSignature(ii).
             validateSignature(checkNode(expr[0].item(ctx, ii)));

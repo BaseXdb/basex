@@ -72,7 +72,7 @@ public abstract class JavaMapping extends Arr {
     final int es = expr.length;
     final Value[] args = new Value[es];
     for(int e = 0; e < es; ++e) args[e] = ctx.value(expr[e]);
-    return toValue(eval(args, ctx));
+    return toValue(eval(args, ctx), ctx);
   }
 
   /**
@@ -87,63 +87,66 @@ public abstract class JavaMapping extends Arr {
 
   /**
    * Converts the specified result to an XQuery value.
-   * @param res result object
+   * @param obj result object
+   * @param ctx query context
    * @return value
    * @throws QueryException query exception
    */
-  public static Value toValue(final Object res) throws QueryException {
-    if(res == null) return Empty.SEQ;
-    if(res instanceof Value) return (Value) res;
-    if(res instanceof Iter) return ((Iter) res).value();
+  public static Value toValue(final Object obj, final QueryContext ctx)
+      throws QueryException {
+
+    if(obj == null) return Empty.SEQ;
+    if(obj instanceof Value) return (Value) obj;
+    if(obj instanceof Iter) return ((Iter) obj).value();
     // find XQuery mapping for specified type
-    final Type type = type(res);
-    if(type != null) return type.cast(res, null);
+    final Type type = type(obj);
+    if(type != null) return type.cast(obj, ctx, null);
 
     // primitive arrays
-    if(res instanceof byte[])    return BytSeq.get((byte[]) res);
-    if(res instanceof long[])    return IntSeq.get((long[]) res, AtomType.ITR);
-    if(res instanceof char[])    return Str.get(new String((char[]) res));
-    if(res instanceof boolean[]) return BlnSeq.get((boolean[]) res);
-    if(res instanceof double[])  return DblSeq.get((double[]) res);
-    if(res instanceof float[])   return FltSeq.get((float[]) res);
+    if(obj instanceof byte[])    return BytSeq.get((byte[]) obj);
+    if(obj instanceof long[])    return IntSeq.get((long[]) obj, AtomType.ITR);
+    if(obj instanceof char[])    return Str.get(new String((char[]) obj));
+    if(obj instanceof boolean[]) return BlnSeq.get((boolean[]) obj);
+    if(obj instanceof double[])  return DblSeq.get((double[]) obj);
+    if(obj instanceof float[])   return FltSeq.get((float[]) obj);
 
     // no array: return Java type
-    if(!res.getClass().isArray()) return new Jav(res);
-    final int s = Array.getLength(res);
+    if(!obj.getClass().isArray()) return new Jav(obj, ctx);
+    final int s = Array.getLength(obj);
     // empty array
     if(s == 0) return Empty.SEQ;
     // string array
-    if(res instanceof String[]) {
-      final String[] r = (String[]) res;
+    if(obj instanceof String[]) {
+      final String[] r = (String[]) obj;
       final byte[][] b = new byte[r.length][];
       for(int v = 0; v < s; v++) b[v] = Token.token(r[v]);
       return StrSeq.get(b);
     }
     // character array
-    if(res instanceof char[][]) {
-      final char[][] r = (char[][]) res;
+    if(obj instanceof char[][]) {
+      final char[][] r = (char[][]) obj;
       final byte[][] b = new byte[r.length][];
       for(int v = 0; v < s; v++) b[v] = Token.token(new String(r[v]));
       return StrSeq.get(b);
     }
     // short array
-    if(res instanceof short[]) {
-      final short[] r = (short[]) res;
+    if(obj instanceof short[]) {
+      final short[] r = (short[]) obj;
       final long[] b = new long[r.length];
       for(int v = 0; v < s; v++) b[v] = r[v];
       return IntSeq.get(b, AtomType.SHR);
     }
     // integer array
-    if(res instanceof int[]) {
-      final int[] r = (int[]) res;
+    if(obj instanceof int[]) {
+      final int[] r = (int[]) obj;
       final long[] b = new long[r.length];
       for(int v = 0; v < s; v++) b[v] = r[v];
       return IntSeq.get(b, AtomType.INT);
     }
     // any other array (also nested ones)
-    final Object[] obj = (Object[]) res;
-    final ValueBuilder vb = new ValueBuilder(obj.length);
-    for(final Object o : obj) vb.add(toValue(o));
+    final Object[] objs = (Object[]) obj;
+    final ValueBuilder vb = new ValueBuilder(objs.length);
+    for(final Object o : objs) vb.add(toValue(o, ctx));
     return vb.value();
   }
 

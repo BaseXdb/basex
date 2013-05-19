@@ -144,7 +144,7 @@ public final class FNClient extends StandardFunc {
       // evaluate query
       while(cq.more()) {
         final String result = cq.next();
-        vb.add(cq.type().castString(result, info));
+        vb.add(cq.type().castString(result, ctx, info));
       }
       return vb.value();
     } catch(final BaseXException ex) {

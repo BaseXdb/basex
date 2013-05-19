@@ -2,6 +2,7 @@ package org.basex.query.value.item;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -22,17 +23,21 @@ public final class StrStream extends AStr {
   private final String encoding;
   /** Error message. */
   private final Err error;
+  /** Validation flag. */
+  private final boolean validate;
 
   /**
    * Constructor.
    * @param io input
    * @param enc encoding (may be null)
+   * @param ctx query context
    * @param err error message to be thrown
    */
-  public StrStream(final IO io, final String enc, final Err err) {
+  public StrStream(final IO io, final String enc, final Err err, final QueryContext ctx) {
     input = io;
     encoding = enc;
     error = err;
+    validate = ctx.context.prop.is(Prop.CHECKSTRINGS);
   }
 
   @Override
@@ -54,7 +59,7 @@ public final class StrStream extends AStr {
     TextInput nli = null;
     try {
       nli = new TextInput(input);
-      nli.encoding(encoding).validate(true);
+      nli.encoding(encoding).validate(validate);
       return nli;
     } catch(final IOException ex) {
       if(nli != null) try { nli.close(); } catch(final IOException ignored) { }

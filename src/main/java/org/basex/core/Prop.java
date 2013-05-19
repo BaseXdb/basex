@@ -168,6 +168,8 @@ public final class Prop extends AProp {
   public static final Object[] CACHEQUERY = { "CACHEQUERY", false };
   /** Forces database creation for unknown documents. */
   public static final Object[] FORCECREATE = { "FORCECREATE", false };
+  /** Validate string inputs. */
+  public static final Object[] CHECKSTRINGS = { "CHECKSTRINGS", true };
   /** Levenshtein default error. */
   public static final Object[] LSERROR = { "LSERROR", 0 };
   /** Number of query executions. */

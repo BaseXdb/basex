@@ -607,7 +607,7 @@ public final class QueryContext extends Proc {
   private Expr cast(final Object val, final String type) throws QueryException {
     // return original value
     if(type == null || type.isEmpty()) {
-      return val instanceof Expr ? (Expr) val : JavaMapping.toValue(val);
+      return val instanceof Expr ? (Expr) val : JavaMapping.toValue(val, this);
     }
 
     // convert to json
@@ -627,7 +627,7 @@ public final class QueryContext extends Proc {
       if(t == null) t = AtomType.find(nm, false);
     }
     if(t == null) NOTYPE.thrw(null, type);
-    return t.cast(val, null);
+    return t.cast(val, this, null);
   }
 
   /**

@@ -121,13 +121,15 @@ public enum ListType implements Type {
       throws QueryException;
 
   @Override
-  public Value cast(final Object o, final InputInfo ii) throws QueryException {
-    return cast(Str.get(ii, o), null, ii);
+  public Value cast(final Object o, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return cast(Str.get(o, ctx, ii), null, ii);
   }
 
   @Override
-  public Value castString(final String o, final InputInfo ii) throws QueryException {
-    return cast(o, ii);
+  public Value castString(final String o, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return cast(o, ctx, ii);
   }
 
   @Override
