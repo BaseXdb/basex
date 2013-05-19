@@ -173,8 +173,8 @@ declare function qt3ts:result(
           'flags' := ($assert/@flags/string(), '')[1],
           'regex' := $assert/text()/string()
         }
-      case 'all-of' return map(qt3ts:result(?, $file, $root), $assert/*)
-      case 'any-of' return map(qt3ts:result(?, $file, $root), $assert/*)
+      case 'all-of' return map($assert/*, qt3ts:result(?, $file, $root))
+      case 'any-of' return map($assert/*, qt3ts:result(?, $file, $root))
       default return qt3ts:debug('Unknown assertion', $name)
   )
 };
