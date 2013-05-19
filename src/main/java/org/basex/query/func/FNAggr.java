@@ -9,6 +9,7 @@ import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -59,12 +60,13 @@ public final class FNAggr extends StandardFunc {
 
   @Override
   Expr opt(final QueryContext ctx) throws QueryException {
+    // skip non-deterministic and variable expressions
     final Expr e = expr[0];
-    final long c = e.size();
-    if(c < 0 || e.uses(Use.NDT)) return this;
+    if(e.uses(Use.NDT) || e instanceof VarRef) return this;
 
+    final long c = e.size();
     switch(sig) {
-      case COUNT: return Int.get(c);
+      case COUNT: return c >= 0 ? Int.get(c) : this;
       case SUM:   return c == 0 ? expr.length == 2 ? expr[1] : Int.get(0) : this;
       default:    return this;
     }

@@ -32,16 +32,16 @@ public final class FNHofTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void sortWithTest() {
-    query("hof:sort-with(function($a, $b) { $a < $b }, ())", "");
-    query("hof:sort-with(function($a, $b) { $a > $b }, 1 to 5)", "5 4 3 2 1");
-    error("hof:sort-with(<x/>, 1 to 5)", Err.INVCAST);
+    query("hof:sort-with((), function($a, $b) { $a < $b })", "");
+    query("hof:sort-with(1 to 5, function($a, $b) { $a > $b })", "5 4 3 2 1");
+    error("hof:sort-with(1 to 5, <x/>)", Err.INVCAST);
   }
 
   /** Test method. */
   @Test
   public void foldLeft1Test() {
-    query("hof:fold-left1(function($x, $y) { $x + $y }, 1 to 10)", "55");
-    error("hof:fold-left1(function($x, $y) { $x + $y }, ())", Err.INVEMPTY);
+    query("hof:fold-left1(1 to 10, function($x, $y) { $x + $y })", "55");
+    error("hof:fold-left1((), function($x, $y) { $x + $y })", Err.INVEMPTY);
   }
 
   /** Test method. */

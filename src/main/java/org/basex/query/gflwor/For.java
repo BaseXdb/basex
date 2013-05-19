@@ -76,17 +76,17 @@ public final class For extends GFLWOR.Clause {
             if(pos != null) ctx.set(pos, Int.get(p), info);
             if(score != null) ctx.set(score, Dbl.get(it.score()), info);
             return true;
-          } else if(empty && iter != null && p == 0) {
+          }
+          if(empty && iter != null && p == 0) {
             // expression yields no items, bind the empty sequence instead
             ctx.set(var, Empty.SEQ, info);
             if(pos != null) ctx.set(pos, Int.get(p), info);
             if(score != null) ctx.set(score, Dbl.get(0), info);
             iter = null;
             return true;
-          } else if(!sub.next(ctx)) {
-            // no more iterations from above, we're done here
-            return false;
           }
+          // no more iterations from above, we're done here
+          if(!sub.next(ctx)) return false;
 
           // next iteration, reset iterator and counter
           iter = expr.iter(ctx);

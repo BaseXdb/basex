@@ -81,8 +81,8 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value foldLeft1(final QueryContext ctx) throws QueryException {
-    final FItem f = withArity(0, 2, ctx);
-    final Iter xs = expr[1].iter(ctx);
+    final FItem f = withArity(1, 2, ctx);
+    final Iter xs = expr[0].iter(ctx);
 
     Value sum = checkNoEmpty(xs.next());
     for(Item x; (x = xs.next()) != null;) sum = f.invValue(ctx, info, sum, x);
@@ -96,8 +96,8 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value sortWith(final QueryContext ctx) throws QueryException {
-    final Value v = expr[1].value(ctx);
-    final Comparator<Item> cmp = getComp(0, ctx);
+    final Value v = expr[0].value(ctx);
+    final Comparator<Item> cmp = getComp(1, ctx);
     if(v.size() < 2) return v;
     final ValueBuilder vb = v.cache();
     try {

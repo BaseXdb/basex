@@ -33,10 +33,8 @@ public final class FNFunc extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case MAP:           return forEach(ctx);
       case FOR_EACH:      return forEach(ctx);
       case FILTER:        return filter(ctx);
-      case MAP_PAIRS:     return forEachPair(ctx);
       case FOR_EACH_PAIR: return forEachPair(ctx);
       case FOLD_LEFT:     return foldLeft(ctx);
       case FOLD_RIGHT:    return foldRight(ctx);
@@ -87,8 +85,8 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException exception
    */
   private Iter forEach(final QueryContext ctx) throws QueryException {
-    final FItem f = withArity(0, 1, ctx);
-    final Iter xs = expr[1].iter(ctx);
+    final FItem f = withArity(1, 1, ctx);
+    final Iter xs = expr[0].iter(ctx);
     return new Iter() {
       /** Results. */
       Iter ys = Empty.ITER;
@@ -113,8 +111,8 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter filter(final QueryContext ctx) throws QueryException {
-    final FItem f = withArity(0, 1, ctx);
-    final Iter xs = expr[1].iter(ctx);
+    final FItem f = withArity(1, 1, ctx);
+    final Iter xs = expr[0].iter(ctx);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
@@ -134,9 +132,9 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter forEachPair(final QueryContext ctx) throws QueryException {
-    final FItem zipper = withArity(0, 2, ctx);
-    final Iter xs = expr[1].iter(ctx);
-    final Iter ys = expr[2].iter(ctx);
+    final FItem zipper = withArity(2, 2, ctx);
+    final Iter xs = expr[0].iter(ctx);
+    final Iter ys = expr[1].iter(ctx);
     return new Iter() {
       /** Results. */
       Iter zs = Empty.ITER;
@@ -161,8 +159,8 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter foldLeft(final QueryContext ctx) throws QueryException {
-    final FItem f = withArity(0, 2, ctx);
-    final Iter xs = expr[2].iter(ctx);
+    final FItem f = withArity(2, 2, ctx);
+    final Iter xs = expr[0].iter(ctx);
     Item x = xs.next();
 
     // don't convert to a value if not necessary
@@ -171,7 +169,6 @@ public final class FNFunc extends StandardFunc {
     Value sum = ctx.value(expr[1]);
     do sum = f.invValue(ctx, info, sum, x);
     while((x = xs.next()) != null);
-
     return sum.iter();
   }
 
@@ -182,15 +179,13 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter foldRight(final QueryContext ctx) throws QueryException {
-    final FItem f = withArity(0, 2, ctx);
-    final Value xs = ctx.value(expr[2]);
+    final FItem f = withArity(2, 2, ctx);
+    final Value xs = ctx.value(expr[0]);
     // evaluate start value lazily if it's passed straight through
     if(xs.isEmpty()) return expr[1].iter(ctx);
 
     Value res = ctx.value(expr[1]);
-    for(long i = xs.size(); --i >= 0;)
-      res = f.invValue(ctx, info, xs.itemAt(i), res);
-
+    for(long i = xs.size(); --i >= 0;) res = f.invValue(ctx, info, xs.itemAt(i), res);
     return res.iter();
   }
 
@@ -217,11 +212,13 @@ public final class FNFunc extends StandardFunc {
    */
   private FItem withArity(final int p, final int a, final QueryContext ctx)
       throws QueryException {
-    final Item f = checkItem(expr[p], ctx);
-    if(!(f instanceof FItem) || ((FItem) f).arity() != a)
-      Err.type(this, FuncType.arity(a), f);
 
-    return (FItem) f;
+    final Item it = checkItem(expr[p], ctx);
+    if(it instanceof FItem) {
+      final FItem fi = (FItem) it;
+      if(fi.arity() == a) return fi;
+    }
+    throw Err.type(this, FuncType.arity(a), it);
   }
 
   @Override
@@ -231,7 +228,7 @@ public final class FNFunc extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return (u == Use.CTX || u == Use.POS) && oneOf(sig, FUNCTION_LOOKUP)
-        || u == Use.X30 || super.uses(u);
+    return (u == Use.CTX || u == Use.POS) && oneOf(sig, FUNCTION_LOOKUP) ||
+        u == Use.X30 || super.uses(u);
   }
 }
