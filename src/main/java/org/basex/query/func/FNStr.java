@@ -131,18 +131,19 @@ public final class FNStr extends StandardFunc {
 
   /**
    * Converts codepoints to a string.
-   * @param iter iterator
+   * @param ir iterator
    * @return iterator
    * @throws QueryException query exception
    */
-  private Str cp2str(final Iter iter) throws QueryException {
-    final TokenBuilder tb = new TokenBuilder();
-    for(Item i; (i = iter.next()) != null;) {
-      final long n = checkItr(i);
+  private Str cp2str(final Iter ir) throws QueryException {
+    final TokenBuilder tb = new TokenBuilder(Math.max(8, (int) ir.size()));
+    for(Item it; (it = ir.next()) != null;) {
+      final long n = checkItr(it);
+      final int i = (int) n;
       // check int boundaries before casting
-      if(n < Integer.MIN_VALUE || n > Integer.MAX_VALUE
-          || !XMLToken.valid((int) n)) INVCODE.thrw(info, i);
-      tb.add((int) n);
+      if(n < Integer.MIN_VALUE || n > Integer.MAX_VALUE || !XMLToken.valid(i))
+        INVCODE.thrw(info, Long.toHexString(n));
+      tb.add(i);
     }
     return Str.get(tb.finish());
   }

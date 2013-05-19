@@ -24,13 +24,13 @@ public final class Jav extends Item {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) {
-    return Token.token(val.toString());
+  public byte[] string(final InputInfo ii) throws QueryException {
+    return Str.get(ii, val).val;
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return string(ii).length != 0;
+    return !val.toString().isEmpty();
   }
 
   @Override

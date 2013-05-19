@@ -111,7 +111,7 @@ public final class FNInfo extends StandardFunc {
    */
   private static ValueIter avlEnvVars() {
     final ValueBuilder vb = new ValueBuilder();
-    for(final Object k : System.getenv().keySet()) vb.add(Str.get(k));
+    for(final Object k : System.getenv().keySet()) vb.add(Str.get(k.toString()));
     return vb;
   }
 

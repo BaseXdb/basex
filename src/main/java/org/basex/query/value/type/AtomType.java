@@ -68,8 +68,8 @@ public enum AtomType implements Type {
       return Str.get(it.string(ii));
     }
     @Override
-    public Str cast(final Object o, final InputInfo ii) {
-      return Str.get(o);
+    public Str cast(final Object o, final InputInfo ii) throws QueryException {
+      return Str.get(ii, o);
     }
   },
 
@@ -88,7 +88,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -101,7 +101,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -116,7 +116,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -131,7 +131,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -146,7 +146,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -159,7 +159,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -172,7 +172,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -185,7 +185,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -198,7 +198,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Str cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -211,7 +211,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Flt cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -224,7 +224,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Dbl cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -428,7 +428,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -442,7 +442,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -456,7 +456,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -470,7 +470,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -487,7 +487,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -501,7 +501,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -516,7 +516,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -531,7 +531,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -546,7 +546,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -561,7 +561,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 
@@ -576,7 +576,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return cast(Str.get(o), null, ii);
+      return cast(Str.get(ii, o), null, ii);
     }
   },
 

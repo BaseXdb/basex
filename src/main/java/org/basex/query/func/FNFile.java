@@ -148,7 +148,7 @@ public final class FNFile extends StandardFunc {
    */
   private Str pathToNative(final File path) throws QueryException {
     try {
-      return Str.get(path.getCanonicalFile());
+      return Str.get(path.getCanonicalFile().getPath());
     } catch(final IOException ex) {
       throw FILE_PATH.thrw(info, path);
     }

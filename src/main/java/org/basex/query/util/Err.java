@@ -340,7 +340,7 @@ public enum Err {
   DATECALC(FOCA, 5, "Invalid % calculation: %."),
 
   /** FOCH0001. */
-  INVCODE(FOCH, 1, "Invalid codepoint '%'."),
+  INVCODE(FOCH, 1, "Invalid XML character '&#x%;'."),
   /** FOCH0002. */
   IMPLCOL(FOCH, 2, "Unknown collation %."),
   /** FOCH0003. */
@@ -430,6 +430,8 @@ public enum Err {
   INVCAST(FORG, 1, "Invalid cast from % to %: %."),
   /** FORG0001. */
   DATEFORMAT(FORG, 1, "Wrong % format: '%' (try e.g. '%')."),
+  /** FORG0001. */
+  INVSTRING(FORG, 1, "Invalid XML character '&#x%;' in specified string."),
   /** FORG0002. */
   URIINVRES(FORG, 2, "URI argument is invalid: %."),
   /** FORG0002. */

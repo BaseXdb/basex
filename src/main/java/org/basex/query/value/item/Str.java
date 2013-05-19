@@ -1,7 +1,9 @@
 package org.basex.query.value.item;
 
 import static org.basex.data.DataText.*;
+import static org.basex.query.util.Err.*;
 
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -49,11 +51,28 @@ public class Str extends AStr {
 
   /**
    * Returns an instance of this class.
-   * @param v object (will be converted to token)
+   * @param s string
    * @return instance
    */
-  public static Str get(final Object v) {
-    return get(Token.token(v.toString()));
+  public static Str get(final String s) {
+    return get(Token.token(s.toString()));
+  }
+
+  /**
+   * Returns an instance of this class.
+   * @param ii input info
+   * @param v object (will be converted to token)
+   * @return instance
+   * @throws QueryException query exception
+   */
+  public static Str get(final InputInfo ii, final Object v) throws QueryException {
+    final byte[] bytes = Token.token(v.toString());
+    final int bl = bytes.length;
+    for(int b = 0; b < bl; b += Token.cl(bytes, b)) {
+      final int cp = Token.cp(bytes, b);
+      if(!XMLToken.valid(cp)) INVCODE.thrw(ii, Integer.toHexString(cp));
+    }
+    return get(bytes);
   }
 
   @Override

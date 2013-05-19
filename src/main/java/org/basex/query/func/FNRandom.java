@@ -33,7 +33,7 @@ public final class FNRandom extends StandardFunc {
     switch(sig) {
       case _RANDOM_DOUBLE:  return Dbl.get(randomDouble());
       case _RANDOM_INTEGER: return Int.get(randomInt(ctx));
-      case _RANDOM_UUID:    return Str.get(UUID.randomUUID());
+      case _RANDOM_UUID:    return Str.get(UUID.randomUUID().toString());
       default:              return super.item(ctx, ii);
     }
   }
