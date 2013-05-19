@@ -271,7 +271,7 @@ public abstract class AProp implements Iterable<String> {
     final byte[] name = token(key);
     final Levenshtein ls = new Levenshtein();
     for(final String prop : props.keySet()) {
-      if(ls.similar(name, token(prop), 0)) return prop;
+      if(ls.similar(name, token(prop))) return prop;
     }
     return null;
   }
