@@ -45,6 +45,9 @@ public enum ListType implements Type {
     }
   };
 
+  /** Cached enums (faster). */
+  public static final ListType[] VALUES = values();
+
   /** Name. */
   private final QNm name;
   /** Sequence type (lazy). */
@@ -84,9 +87,7 @@ public enum ListType implements Type {
    * @return type or {@code null}
    */
   public static ListType find(final QNm type) {
-    for(final ListType t : values()) {
-      if(t.name.eq(type)) return t;
-    }
+    for(final ListType t : VALUES) if(t.name.eq(type)) return t;
     return null;
   }
 

@@ -64,20 +64,23 @@ public final class Functions extends TokenSet {
     final byte[] ln = name.local();
     Type type = ListType.find(name);
     if(type == null) type = AtomType.find(name, false);
-    if(type == null) {
-      final Levenshtein ls = new Levenshtein();
-      for(final AtomType t : AtomType.values()) {
-        if(t.par != null && t != AtomType.NOT && t != AtomType.AAT && t != AtomType.BIN &&
-           t != AtomType.JAVA && ls.similar(lc(ln), lc(t.string())))
-          FUNSIMILAR.thrw(ii, name.string(), t.string());
-      }
-    }
-    // no constructor function found, or abstract type specified
-    if(type == null || type == AtomType.NOT || type == AtomType.AAT)
-      FUNCUNKNOWN.thrw(ii, name.string());
 
-    if(arity != 1) FUNCTYPE.thrw(ii, name.string());
-    return type;
+    // no constructor function found, or abstract type specified
+    if(type != null && type != AtomType.NOT && type != AtomType.AAT) {
+      if(arity != 1) FUNCTYPE.thrw(ii, name.string());
+      return type;
+    }
+
+    // include similar function name in error message
+    final Levenshtein ls = new Levenshtein();
+    for(final AtomType t : AtomType.VALUES) {
+      if(t.par == null) continue;
+      final byte[] u = t.name.uri();
+      if(eq(u, XSURI) && t != AtomType.NOT && t != AtomType.AAT && ls.similar(
+          lc(ln), lc(t.string()))) FUNCSIMILAR.thrw(ii, name.string(), t.string());
+    }
+    // no similar name: constructor function found, or abstract type specified
+    throw FUNCUNKNOWN.thrw(ii, name.string());
   }
 
   /**
@@ -95,7 +98,7 @@ public final class Functions extends TokenSet {
     final Function fl = funcs[id];
     if(!eq(fl.uri(), name.uri())) return null;
     // check number of arguments
-    if(arity < fl.min || arity > fl.max) throw XPARGS.thrw(ii, fl);
+    if(arity < fl.min || arity > fl.max) throw FUNCARGS.thrw(ii, fl);
     return fl;
   }
 
@@ -197,7 +200,7 @@ public final class Functions extends TokenSet {
     // pre-defined functions
     final StandardFunc fun = Functions.get().get(name, args, ii);
     if(fun != null) {
-      if(!ctx.sc.xquery3() && fun.xquery3()) FEATURE30.thrw(ii);
+      if(!ctx.sc.xquery3() && fun.xquery3()) FUNC30.thrw(ii);
       for(final Function f : Function.UPDATING) {
         if(fun.sig == f) {
           ctx.updating(true);
@@ -242,11 +245,11 @@ public final class Functions extends TokenSet {
       final byte[] l = substring(keys[k], i + 1);
       if(eq(ln, l)) {
         final byte[] ur = name.uri();
-        FUNSIMILAR.thrw(ii,
+        FUNCSIMILAR.thrw(ii,
             new TokenBuilder(NSGlobal.prefix(ur)).add(':').add(l),
             new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
       } else if(ls.similar(ln, l)) {
-        FUNSIMILAR.thrw(ii, name.string(), l);
+        FUNCSIMILAR.thrw(ii, name.string(), l);
       }
     }
   }

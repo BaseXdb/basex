@@ -87,8 +87,11 @@ public interface Type {
     /** xs:NOTATION.              */ NOT(83),
     /** java().                   */ JAVA(86);
 
+    /** Cached enums (faster). */
+    public static final ID[] VALUES = values();
     /** Node ID. */
     private final byte id;
+
     /**
      * Constructor.
      * @param i type id
@@ -111,7 +114,7 @@ public interface Type {
      * @return type ID if found, {@code null} otherwise
      */
     public static ID get(final byte b) {
-      for(final ID i : values()) if(i.id == b) return i;
+      for(final ID i : VALUES) if(i.id == b) return i;
       return null;
     }
 

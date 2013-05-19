@@ -25,10 +25,10 @@ public enum AtomType implements Type {
   /** Item type. */
   ITEM("item", null, EMPTY, false, false, false, Type.ID.ITEM),
 
-  /** Any simple type. */
+  /** Untyped type. */
   UTY("untyped", null, XSURI, false, false, false, Type.ID.UTY),
 
-  /** Any simple type. */
+  /** Any type. */
   ATY("anyType", null, XSURI, false, false, false, Type.ID.ATY),
 
   /** Any simple type. */
@@ -242,7 +242,7 @@ public enum AtomType implements Type {
   },
 
   /** Precision decimal type. */
-  PDC("precisionDecimal", null, EMPTY, false, false, false, Type.ID.PDC),
+  PDC("precisionDecimal", null, XSURI, false, false, false, Type.ID.PDC),
 
   /** Integer type. */
   ITR("integer", DEC, XSURI, true, false, false, Type.ID.ITR) {
@@ -475,7 +475,7 @@ public enum AtomType implements Type {
   },
 
   /** DateTimeStamp type. */
-  DTS("dateTimeStamp", null, EMPTY, false, false, false, Type.ID.DTS),
+  DTS("dateTimeStamp", null, XSURI, false, false, false, Type.ID.DTS),
 
   /** Date type. */
   DAT("date", AAT, XSURI, false, false, false, Type.ID.DAT) {
@@ -667,7 +667,7 @@ public enum AtomType implements Type {
   NOT("NOTATION", AAT, XSURI, false, false, false, Type.ID.NOT),
 
   /** Java type. */
-  JAVA("java", null, EMPTY, true, true, true, Type.ID.JAVA) {
+  JAVA("java", ITEM, BASEXURI, true, true, true, Type.ID.JAVA) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final InputInfo ii) {
       return new Jav(it);
@@ -904,7 +904,7 @@ public enum AtomType implements Type {
    * @throws QueryException query exception
    */
   Item invValue(final Item it, final InputInfo ii) throws QueryException {
-    throw INVCAST.thrw(ii, it.type(), this, it);
+    throw FUNCCASTEX.thrw(ii, it.type(), this, it);
   }
 
   /**
@@ -914,9 +914,10 @@ public enum AtomType implements Type {
    * @return type or {@code null}
    */
   public static AtomType find(final QNm type, final boolean all) {
-    for(final AtomType t : VALUES) {
-      if(!t.name.eq(type)) continue;
-      if(all || t.par != null) return t;
+    if(!Token.eq(type.uri(), BASEXURI)) {
+      for(final AtomType t : VALUES) {
+        if(t.name.eq(type) && (all || t.par != null)) return t;
+      }
     }
     return null;
   }
