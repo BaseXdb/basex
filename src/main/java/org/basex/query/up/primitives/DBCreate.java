@@ -55,9 +55,9 @@ public final class DBCreate extends DBNew {
 
   @Override
   public void apply() throws QueryException {
-    // close data instance in query processor
+    // remove data instance from list of opened resources
     qc.resource.removeData(name);
-    // check if addressed databases are still pinned
+    // check if addressed database is still pinned by any other process
     if(qc.context.pinned(name)) BXDB_OPENED.thrw(info, name);
 
     try {

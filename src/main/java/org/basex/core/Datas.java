@@ -23,11 +23,19 @@ public final class Datas {
   public synchronized Data pin(final String db) {
     for(final Data d : list) {
       if(d.meta.name.equals(db)) {
-        d.pins++;
+        pin(d);
         return d;
       }
     }
     return null;
+  }
+
+  /**
+   * Pins a data reference.
+   * @param data data reference
+   */
+  public synchronized void pin(final Data data) {
+    data.pins++;
   }
 
   /**
@@ -39,7 +47,7 @@ public final class Datas {
     for(int d = 0; d < list.size(); d++) {
       final Data dt = list.get(d);
       if(dt == data) {
-        final boolean close = --dt.pins == 0;
+        final boolean close = --data.pins == 0;
         if(close) list.remove(d);
         return close;
       }
@@ -48,7 +56,7 @@ public final class Datas {
   }
 
   /**
-   * Adds a data reference to the pool.
+   * Adds an already pinned data reference to the pool.
    * @param d data reference
    */
   public synchronized void add(final Data d) {

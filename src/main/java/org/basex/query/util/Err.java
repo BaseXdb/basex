@@ -78,7 +78,8 @@ public enum Err {
   /** BXDB0006. */
   BXDB_SINGLE(BXDB, 6, "Database path '%' points to more than one document."),
   /** BXDB0007. */
-  BXDB_OPENED(BXDB, 7, "Database '%' is opened by another process."),
+  BXDB_OPENED(BXDB, 7,
+      "Database '%' cannot be updated, as it is opened by another process."),
   /** BXDB0008. */
   BXDB_RENAME(BXDB, 8, "%: Invalid target path."),
   /** BXDB0009. */
@@ -1082,8 +1083,8 @@ public enum Err {
   /** XUTY0007. */
   UPTRGDELEMPT(XUTY, 7, "Only nodes can be deleted."),
   /** XUTY0008. */
-  UPTRGMULT(XUTY, 8, "Single element, text, attribute, comment or pi expected"
-      + " as replace target."),
+  UPTRGMULT(XUTY, 8,
+      "Single element, text, attribute, comment or pi expected as replace target."),
   /** XUTY0010. */
   UPWRELM(XUTY, 10, "Replacing nodes must be no attribute nodes."),
   /** XUTY0011. */

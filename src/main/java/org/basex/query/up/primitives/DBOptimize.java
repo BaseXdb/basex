@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
@@ -17,8 +16,8 @@ import org.basex.util.*;
  * @author Dimitar Popov
  */
 public final class DBOptimize extends BasicOperation {
-  /** Database context. */
-  private final Context ctx;
+  /** Query context. */
+  private final QueryContext qc;
   /** Flag to optimize all database structures. */
   private boolean all;
 
@@ -29,9 +28,10 @@ public final class DBOptimize extends BasicOperation {
    * @param a optimize all database structures flag
    * @param ii input info
    */
-  public DBOptimize(final Data d, final Context c, final boolean a, final InputInfo ii) {
+  public DBOptimize(final Data d, final QueryContext c, final boolean a,
+      final InputInfo ii) {
     super(TYPE.DBOPTIMIZE, d, ii);
-    ctx = c;
+    qc = c;
     all = a;
   }
 
@@ -43,11 +43,14 @@ public final class DBOptimize extends BasicOperation {
   @Override
   public void apply() throws QueryException {
     try {
-      if(all) OptimizeAll.optimizeAll(data, ctx, null);
+      if(all) OptimizeAll.optimizeAll(data, qc.context, null);
       else Optimize.optimize(data, null);
     } catch(final IOException ex) {
       UPDBOPTERR.thrw(info, ex);
     }
+
+    // remove old database reference
+    if(all) qc.resource.removeData(data.meta.name);
   }
 
   @Override

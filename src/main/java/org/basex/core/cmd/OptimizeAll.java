@@ -44,6 +44,8 @@ public final class OptimizeAll extends ACreate {
       optimizeAll(data, context, this);
     } catch(final IOException ex) {
       return error(Util.message(ex));
+    } finally {
+      context.closeDB();
     }
 
     final Open open = new Open(data.meta.name);
@@ -82,8 +84,8 @@ public final class OptimizeAll extends ACreate {
   }
 
   /**
-   * Optimizes all data structures. Recreates the database, drops the
-   * old instance and renames the recreated instance.
+   * Optimizes all data structures and closes the database.
+   * Recreates the database, drops the old instance and renames the recreated instance.
    * @param data disk data
    * @param ctx database context
    * @param cmd command reference, or {@code null}
@@ -126,7 +128,7 @@ public final class OptimizeAll extends ACreate {
       if(m.createftxt) create(IndexType.FULLTEXT, d, cmd);
       // adopt original meta data
       d.meta.createtext = m.createtext;
-      d.meta.createattr =  m.createattr;
+      d.meta.createattr = m.createattr;
       d.meta.createftxt = m.createftxt;
       d.meta.filesize   = m.filesize;
       d.meta.users      = m.users;

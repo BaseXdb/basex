@@ -460,11 +460,16 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/html"), 1);
   }
 
-  /** Test method. */
+  /**
+   * Test method.
+   * @throws BaseXException database exception
+   */
   @Test
-  public void optimize() {
+  public void optimize() throws BaseXException {
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_OPTIMIZE.args(NAME));
+    error(_DB_OPTIMIZE.args(NAME, "true()"), Err.UPDBOPTERR);
+    new Close().execute(context);
     query(_DB_OPTIMIZE.args(NAME, "true()"));
   }
 
