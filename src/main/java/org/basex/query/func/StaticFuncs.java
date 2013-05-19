@@ -91,7 +91,7 @@ public final class StaticFuncs extends ExprInfo {
   public TypedFunc getFuncRef(final QNm name, final Expr[] args, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
-    if(NSGlobal.reserved(name.uri())) funError(name, ii);
+    if(NSGlobal.reserved(name.uri())) errorIfSimilar(name, ii);
     final byte[] sig = sig(name, args.length);
     if(!funcs.contains(sig)) funcs.add(sig, new FuncCache(null));
     return getRef(name, args, sc, ii);
@@ -156,28 +156,28 @@ public final class StaticFuncs extends ExprInfo {
    */
   public StaticFunc get(final QNm name, final long arity, final InputInfo ii)
       throws QueryException {
-    if(NSGlobal.reserved(name.uri())) funError(name, ii);
+
+    if(NSGlobal.reserved(name.uri())) errorIfSimilar(name, ii);
     final FuncCache fc = funcs.get(sig(name, arity));
     return fc == null ? null : fc.func;
   }
 
   /**
-   * Finds similar function names and throws an error message.
+   * Throws an error if the name of a function is similar to the specified function name.
    * @param name function name
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void funError(final QNm name, final InputInfo ii) throws QueryException {
+  public void errorIfSimilar(final QNm name, final InputInfo ii) throws QueryException {
     // find global function
-    Functions.get().error(name, ii);
-
-    // find similar local function
+    Functions.get().errorIfSimilar(name, ii);
+    // find local functions
     final Levenshtein ls = new Levenshtein();
     final byte[] nm = lc(name.local());
     final int fs = funcs.size();
     for(int id = 1; id <= fs; ++id) {
       final StaticFunc sf = funcs.value(id).func;
-      if(sf != null && ls.similar(nm, lc(sf.name.local()), 0)) {
+      if(sf != null && ls.similar(nm, lc(sf.name.local()))) {
         FUNSIMILAR.thrw(ii, name.string(), sf.name.string());
       }
     }
@@ -186,16 +186,6 @@ public final class StaticFuncs extends ExprInfo {
   @Override
   public void plan(final FElem plan) {
     if(!funcs.isEmpty()) addPlan(plan, planElem(), funcs());
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    final int fs = funcs.size();
-    for(int id = 1; id <= fs; ++id) {
-      sb.append(funcs.value(id).func.toString()).append(Text.NL);
-    }
-    return sb.toString();
   }
 
   /**
@@ -207,6 +197,16 @@ public final class StaticFuncs extends ExprInfo {
     final StaticFunc[] sf = new StaticFunc[fs];
     for(int id = 1; id <= fs; ++id) sf[id - 1] = funcs.value(id).func;
     return sf;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    final int fs = funcs.size();
+    for(int id = 1; id <= fs; ++id) {
+      sb.append(funcs.value(id).func.toString()).append(Text.NL);
+    }
+    return sb.toString();
   }
 
   /** Function cache. */

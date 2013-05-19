@@ -167,6 +167,16 @@ public final class QueryException extends Exception {
   }
 
   /**
+   * Sets an error.
+   * @param e error
+   * @return self reference
+   */
+  public QueryException err(final Err e) {
+    err = e;
+    return this;
+  }
+
+  /**
    * Finds line and column for the specified query parser.
    * @param parser parser
    */
