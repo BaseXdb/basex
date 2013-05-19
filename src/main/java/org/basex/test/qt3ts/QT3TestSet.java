@@ -75,15 +75,11 @@ public abstract class QT3TestSet {
   protected boolean assertQuery(final String exp) {
     final XdmValue value = result.value;
     if(value == null) return fail(exp);
-
-    final XQuery query = new XQuery(exp, ctx);
     try {
-      return result(query.bind("result", value).value().getBoolean(), exp);
+      return result(new XQuery(exp, ctx).bind("result", value).value().getBoolean(), exp);
     } catch(final XQueryException ex) {
       // should not occur
       return fail(ex.getException().getMessage());
-    } finally {
-      query.close();
     }
   }
 
@@ -108,15 +104,12 @@ public abstract class QT3TestSet {
     final XdmValue value = result.value;
     if(value == null) return fail(Util.info("Equal to: '%'", expect));
 
-    final XQuery query = new XQuery(expect, ctx);
     try {
-      final XdmItem exp = query.next();
+      final XdmItem exp = new XQuery(expect, ctx).next();
       final XdmItem res = value instanceof XdmItem ? (XdmItem) value : null;
       return result(exp.equal(res), exp.toString());
     } catch(final XQueryException err) {
       return result(expect.equals(value.getString()), err.getException().getMessage());
-    } finally {
-      query.close();
     }
   }
 
@@ -128,13 +121,8 @@ public abstract class QT3TestSet {
   protected boolean assertDeepEq(final String expect) {
     final XdmValue value = result.value;
     if(value == null) return fail(Util.info("Deep-equal to: '%'", expect));
-    final XQuery query = new XQuery(expect, ctx);
-    try {
-      final XdmValue exp = query.value();
-      return result(exp.deepEqual(value), exp.toString());
-    } finally {
-      query.close();
-    }
+    final XdmValue exp = new XQuery(expect, ctx).value();
+    return result(exp.deepEqual(value), exp.toString());
   }
 
   /**
@@ -146,29 +134,24 @@ public abstract class QT3TestSet {
   protected boolean assertPermutation(final String expect) {
     final XdmValue value = result.value;
     if(value == null) return fail(Util.info("Permutation of: '%'", expect));
-    final XQuery query = new XQuery(expect, ctx);
-    try {
-      // cache expected results
-      final HashSet<String> exp = new HashSet<String>();
-      for(final XdmItem it : query) exp.add(it.getString());
-      // cache actual results
-      final HashSet<String> res = new HashSet<String>();
-      for(final XdmItem it : value) res.add(it.getString());
+    // cache expected results
+    final HashSet<String> exp = new HashSet<String>();
+    for(final XdmItem it : new XQuery(expect, ctx)) exp.add(it.getString());
+    // cache actual results
+    final HashSet<String> res = new HashSet<String>();
+    for(final XdmItem it : value) res.add(it.getString());
 
-      if(exp.size() != res.size())
-        return fail(Util.info("% results (found: %)", exp.size(), res.size()));
+    if(exp.size() != res.size())
+      return fail(Util.info("% results (found: %)", exp.size(), res.size()));
 
-      for(final String s : exp.toArray(new String[exp.size()])) {
-        if(!res.contains(s)) return fail(Util.info("% (missing)", s));
-      }
-      for(final String s : res.toArray(new String[exp.size()])) {
-        if(!exp.contains(s))
-          return fail(Util.info("% (missing in expected result)", s));
-      }
-      return true;
-    } finally {
-      query.close();
+    for(final String s : exp.toArray(new String[exp.size()])) {
+      if(!res.contains(s)) return fail(Util.info("% (missing)", s));
     }
+    for(final String s : res.toArray(new String[exp.size()])) {
+      if(!exp.contains(s))
+        return fail(Util.info("% (missing in expected result)", s));
+    }
+    return true;
   }
 
   /**
@@ -330,13 +313,8 @@ public abstract class QT3TestSet {
    * @return optional expected test suite result
    */
   private boolean asBoolean(final String query, final XdmValue value) {
-    final XQuery qp = new XQuery(query, ctx).context(value);
-    try {
-      final XdmItem it = qp.next();
-      return it != null && it.getBoolean();
-    } finally {
-      qp.close();
-    }
+    final XdmValue xv = new XQuery(query, ctx).context(value).value();
+    return xv.size() != 0 && xv.getBoolean();
   }
 
   /**
@@ -443,13 +421,7 @@ public abstract class QT3TestSet {
    * @return document node
    */
   protected XdmItem node(final String file) {
-    if(file == null) return null;
-    final XQuery xq = new XQuery("doc('" + file + "')", ctx);
-    try {
-      return xq.next();
-    } finally {
-      xq.close();
-    }
+    return file == null ? null : new XQuery("doc('" + file + "')", ctx).next();
   }
 
   /**

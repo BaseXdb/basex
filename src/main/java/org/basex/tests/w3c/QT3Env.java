@@ -69,31 +69,27 @@ final class QT3Env {
     // collections
     collURI = XQuery.string("*:collection/@uri", env, ctx);
 
-    XQuery xq = new XQuery("*:collection/*:source/@role = '.'", ctx).context(env);
-    collContext = xq.next().getBoolean();
-    xq.close();
+    collContext = new XQuery("*:collection/*:source/@role = '.'", ctx).
+        context(env).value().getBoolean();
 
     collSources = new StringList();
-    xq = new XQuery("*:collection/*:source/@file", ctx).context(env);
-    for(final XdmItem iatt : xq) collSources.add(iatt.getString());
-    xq.close();
+    for(final XdmItem iatt : new XQuery("*:collection/*:source/@file", ctx).context(env))
+      collSources.add(iatt.getString());
 
     decFormats = new HashMap<QName, HashMap<String, String>>();
-    xq = new XQuery("*:decimal-format", ctx).context(env);
-    for(final XdmItem it : xq) {
-      final XdmItem xq2 = new XQuery(
+    for(final XdmItem it : new XQuery("*:decimal-format", ctx).context(env)) {
+      final XdmValue it1 = new XQuery(
         "for $n in @name " +
         "let $b := substring-before($n, ':') " +
         "return QName(if($b) then namespace-uri-for-prefix($b, .) else '', $n)",
-        ctx).context(it).next();
+        ctx).context(it).value();
       final HashMap<String, String> hm = new HashMap<String, String>();
-      final QNm qnm = xq2 != null ? (QNm) xq2.internal() : new QNm(Token.EMPTY);
+      final QNm qnm = it1.size() != 0 ? (QNm) it1.internal() : new QNm(Token.EMPTY);
       decFormats.put(qnm.toJava(), hm);
       for(final XdmItem it2 : new XQuery("@*[name() != 'name']", ctx).context(it)) {
         hm.put(it2.getName().getLocalPart(), it2.getString());
       }
     }
-    xq.close();
   }
 
   /**
@@ -108,9 +104,9 @@ final class QT3Env {
 
     final ArrayList<HashMap<String, String>> list =
         new ArrayList<HashMap<String, String>>();
-    final XQuery query = new XQuery("*:" + elem, ctx).context(env);
-    for(final XdmItem it : query) list.add(map(ctx, it));
-    query.close();
+    for(final XdmItem it : new XQuery("*:" + elem, ctx).context(env)) {
+      list.add(map(ctx, it));
+    }
     return list;
   }
 
@@ -122,9 +118,8 @@ final class QT3Env {
    */
   static HashMap<String, String> map(final Context ctx, final XdmValue env) {
     final HashMap<String, String> map = new HashMap<String, String>();
-    final XQuery query = new XQuery("@*", ctx).context(env);
-    for(final XdmItem it : query) map.put(it.getName().getLocalPart(), it.getString());
-    query.close();
+    for(final XdmItem it : new XQuery("@*", ctx).context(env))
+      map.put(it.getName().getLocalPart(), it.getString());
     return map;
   }
 
@@ -136,15 +131,8 @@ final class QT3Env {
    * @return map
    */
   static String string(final String elm, final Context ctx, final XdmValue env) {
-    String value = null;
-    final XQuery query = new XQuery("*:" + elm, ctx).context(env);
-    final XdmItem it = query.next();
-    if(it != null) {
-      final XQuery qattr = new XQuery("string(@*)", ctx).context(it);
-      value = qattr.next().getString();
-      qattr.close();
-    }
-    query.close();
-    return value;
+    final XdmItem it = new XQuery("*:" + elm, ctx).context(env).next();
+    return it == null ? null :
+      new XQuery("string(@*)", ctx).context(it).next().getString();
   }
 }

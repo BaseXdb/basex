@@ -114,22 +114,17 @@ public final class QT3TS {
     ctx.prop.set(Prop.INTPARSE, false);
     ctx.prop.set(Prop.SERIALIZER, "omit-xml-declaration=no,indent=no");
 
-    final XQuery qdoc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx);
-    final XdmValue doc = qdoc.value();
+    final XdmValue doc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx).value();
     final String version = asString("*:catalog/@version", doc);
     Util.outln(NL + "QT3 Test Suite " + version);
     Util.outln("Test directory: " + new File(".").getCanonicalPath());
     Util.out("Parsing queries");
 
-    final XQuery qenv = new XQuery("*:catalog/*:environment", ctx).context(doc);
-    for(final XdmItem ienv : qenv) genvs.add(new QT3Env(ctx, ienv));
-    qenv.close();
+    for(final XdmItem ienv : new XQuery("*:catalog/*:environment", ctx).context(doc))
+      genvs.add(new QT3Env(ctx, ienv));
 
-    final XQuery qset = new XQuery(
-        "for $f in //*:test-set/@file return string($f)", ctx).context(doc);
-    for(final XdmItem it : qset) testSet(it.getString());
-    qset.close();
-    qdoc.close();
+    for(final XdmItem it : new XQuery("for $f in //*:test-set/@file return string($f)",
+        ctx).context(doc)) testSet(it.getString());
 
     final StringBuilder result = new StringBuilder();
     result.append(" Rate    : ").append(pc(correct, tested)).append(NL);
@@ -183,36 +178,29 @@ public final class QT3TS {
    * @throws Exception exception
    */
   private void testSet(final String name) throws Exception {
-    final XQuery qdoc = new XQuery("doc(' " + file(false, name) + "')", ctx);
-    final XdmValue doc = qdoc.value();
-    final XQuery qset = new XQuery("*:test-set", ctx).context(doc);
-    final XdmValue set = qset.value();
+    final XdmValue doc = new XQuery("doc(' " + file(false, name) + "')", ctx).value();
+    final XdmValue set = new XQuery("*:test-set", ctx).context(doc).value();
     final IO base = IO.get(doc.getBaseURI());
     baseURI = base.path();
     baseDir = base.dirPath();
-    qdoc.close();
 
     if(supported(set)) {
       // parse environment of test-set
-      final XQuery qenv = new XQuery("*:environment", ctx).context(set);
       final ArrayList<QT3Env> envs = new ArrayList<QT3Env>();
-      for(final XdmItem ienv : qenv) envs.add(new QT3Env(ctx, ienv));
-      qenv.close();
+      for(final XdmItem ienv : new XQuery("*:environment", ctx).context(set))
+        envs.add(new QT3Env(ctx, ienv));
 
       if(report != null) report.addSet(asString("@name", set));
 
       // run all test cases
-      final XQuery qts = new XQuery("*:test-case", ctx).context(set);
-      for(final XdmItem its : qts) {
+      for(final XdmItem its : new XQuery("*:test-case", ctx).context(set)) {
         try {
           testCase(its, envs);
         } catch(final IOException ex) {
           Util.debug(ex);
         }
       }
-      qts.close();
     }
-    qset.close();
   }
 
   /**
@@ -243,21 +231,16 @@ public final class QT3TS {
     tested++;
 
     // expected result
-    final XQuery qexp = new XQuery("*:result/*[1]", ctx).context(test);
-    final XdmValue expected = qexp.value();
+    final XdmValue expected = new XQuery("*:result/*[1]", ctx).context(test).value();
 
     // use XQuery 1.0 if XQ10 or XP20 is specified
-    final XQuery q = new XQuery("*:dependency[@type='spec']" +
-        "[matches(@value,'(XQ10)([^+]|$)')]", ctx);
-    if(q.context(test).next() != null) ctx.prop.set(Prop.XQUERY3, false);
-    q.close();
+    if(new XQuery("*:dependency[@type='spec'][matches(@value,'(XQ10)([^+]|$)')]", ctx).
+        context(test).next() != null) ctx.prop.set(Prop.XQUERY3, false);
 
     // check if environment is defined in test-case
     QT3Env e = null;
-    final XQuery qenv = new XQuery("*:environment[*]", ctx).context(test);
-    final XdmValue ienv = qenv.next();
-    if(ienv != null) e = new QT3Env(ctx, ienv);
-    qenv.close();
+    final XdmValue ienv = new XQuery("*:environment[*]", ctx).context(test).value();
+    if(ienv.size() != 0) e = new QT3Env(ctx, ienv);
 
     // parse local environment
     boolean base = true;
@@ -397,9 +380,6 @@ public final class QT3TS {
       wrong.add(tmp.finish());
     }
     if(report != null) report.addTest(name, exp == null);
-
-    query.close();
-    qexp.close();
   }
 
   /**
@@ -423,7 +403,7 @@ public final class QT3TS {
    */
   private boolean supported(final XdmValue test) {
     // the following query generates a result if the specified test is not supported
-    final XQuery q = new XQuery(
+    return new XQuery(
       "*:environment/*:collation |" + // skip collation tests
       "*:dependency[" +
       // skip schema imports, schema validation, namespace axis, static typing
@@ -436,13 +416,7 @@ public final class QT3TS {
       "@type = ('xml-version', 'xsd-version') and @value = ('1.1', '1.0:4-') or " +
       // skip non-XQuery tests
       "@type = 'spec' and not(contains(@value, 'XQ'))" +
-      "]", ctx).context(test);
-
-    try {
-      return q.next() == null;
-    } finally {
-      q.close();
-    }
+      "]", ctx).context(test).value().size() == 0;
   }
 
   /**
@@ -544,17 +518,12 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String allOf(final QT3Result res, final XdmValue exp) {
-    final XQuery query = new XQuery("*", ctx).context(exp);
-    try {
-      final TokenBuilder tb = new TokenBuilder();
-      for(final XdmItem it : query) {
-        final String msg = test(res, it);
-        if(msg != null) tb.add(tb.isEmpty() ? "" : ", ").add(msg);
-      }
-      return tb.isEmpty() ? null : tb.toString();
-    } finally {
-      query.close();
+    final TokenBuilder tb = new TokenBuilder();
+    for(final XdmItem it : new XQuery("*", ctx).context(exp)) {
+      final String msg = test(res, it);
+      if(msg != null) tb.add(tb.isEmpty() ? "" : ", ").add(msg);
     }
+    return tb.isEmpty() ? null : tb.toString();
   }
 
   /**
@@ -564,18 +533,13 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String anyOf(final QT3Result res, final XdmValue exp) {
-    final XQuery query = new XQuery("*", ctx).context(exp);
     final TokenBuilder tb = new TokenBuilder();
-    try {
-      for(final XdmItem it : query) {
-        final String msg = test(res, it);
-        if(msg == null) return null;
-        tb.add(tb.isEmpty() ? "" : ", ").add(msg);
-      }
-      return "any of { " + tb + " }";
-    } finally {
-      query.close();
+    for(final XdmItem it : new XQuery("*", ctx).context(exp)) {
+      final String msg = test(res, it);
+      if(msg == null) return null;
+      tb.add(tb.isEmpty() ? "" : ", ").add(msg);
     }
+    return "any of { " + tb + " }";
   }
 
   /**
@@ -586,14 +550,11 @@ public final class QT3TS {
    */
   private String assertQuery(final XdmValue value, final XdmValue expect) {
     final String exp = expect.getString();
-    final XQuery query = new XQuery(exp, ctx);
     try {
-      return query.bind("result", value).value().getBoolean() ? null : exp;
+      return new XQuery(exp, ctx).bind("result", value).value().getBoolean() ? null : exp;
     } catch(final XQueryException ex) {
       // should not occur
       return ex.getException().getMessage();
-    } finally {
-      query.close();
     }
   }
 
@@ -616,17 +577,14 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String assertEq(final XdmValue value, final XdmValue expect) {
-    final XQuery query = new XQuery(expect.getString(), ctx);
     try {
-      final XdmItem exp = query.next();
+      final XdmItem exp = new XQuery(expect.getString(), ctx).next();
       final XdmItem res = value instanceof XdmItem ? (XdmItem) value : null;
       return exp.equal(res) ? null : exp.toString();
     } catch(final XQueryException err) {
       // try simple string comparison
       return expect.getString().equals(value.getString()) ? null :
         err.getException().getMessage();
-    } finally {
-      query.close();
     }
   }
 
@@ -637,13 +595,8 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String assertDeepEq(final XdmValue value, final XdmValue expect) {
-    final XQuery query = new XQuery(expect.getString(), ctx);
-    try {
-      final XdmValue exp = query.value();
-      return exp.deepEqual(value) ? null : exp.toString();
-    } finally {
-      query.close();
-    }
+    final XdmValue exp = new XQuery(expect.getString(), ctx).value();
+    return exp.deepEqual(value) ? null : exp.toString();
   }
 
   /**
@@ -653,29 +606,25 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String assertPermutation(final XdmValue value, final XdmValue expect) {
-    final XQuery query = new XQuery(expect.getString(), ctx);
-    try {
-      // cache expected results
-      final HashSet<String> exp = new HashSet<String>();
-      for(final XdmItem it : query) exp.add(it.getString());
-      // cache actual results
-      final HashSet<String> res = new HashSet<String>();
-      for(final XdmItem it : value) res.add(it.getString());
+    // cache expected results
+    final HashSet<String> exp = new HashSet<String>();
+    for(final XdmItem it : new XQuery(expect.getString(), ctx))
+      exp.add(it.getString());
+    // cache actual results
+    final HashSet<String> res = new HashSet<String>();
+    for(final XdmItem it : value) res.add(it.getString());
 
-      if(exp.size() != res.size())
-        return Util.info("% results (found: %)", exp.size(), res.size());
+    if(exp.size() != res.size())
+      return Util.info("% results (found: %)", exp.size(), res.size());
 
-      for(final String s : exp.toArray(new String[exp.size()])) {
-        if(!res.contains(s)) return Util.info("% (missing)", s);
-      }
-      for(final String s : res.toArray(new String[exp.size()])) {
-        if(!exp.contains(s))
-          return Util.info("% (missing in expected result)", s);
-      }
-      return null;
-    } finally {
-      query.close();
+    for(final String s : exp.toArray(new String[exp.size()])) {
+      if(!res.contains(s)) return Util.info("% (missing)", s);
     }
+    for(final String s : res.toArray(new String[exp.size()])) {
+      if(!exp.contains(s))
+        return Util.info("% (missing in expected result)", s);
+    }
+    return null;
   }
 
   /**
@@ -858,13 +807,8 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   boolean asBoolean(final String query, final XdmValue value) {
-    final XQuery qp = new XQuery(query, ctx).context(value);
-    try {
-      final XdmItem it = qp.next();
-      return it != null && it.getBoolean();
-    } finally {
-      qp.close();
-    }
+    final XdmValue val = new XQuery(query, ctx).context(value).value();
+    return val.size() != 0 && val.getBoolean();
   }
 
   /**

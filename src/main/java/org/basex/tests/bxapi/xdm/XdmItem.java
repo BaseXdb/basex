@@ -21,8 +21,7 @@ public abstract class XdmItem extends XdmValue {
    * @return result
    */
   public static XdmItem get(final Item val) {
-    return val == null ? null : val instanceof ANode ?
-        new XdmNode((ANode) val) : new XdmAtomic(val);
+    return val instanceof ANode ? new XdmNode((ANode) val) : new XdmAtomic(val);
   }
 
   @Override

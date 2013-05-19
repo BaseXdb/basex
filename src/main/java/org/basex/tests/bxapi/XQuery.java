@@ -12,6 +12,7 @@ import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -96,7 +97,11 @@ public final class XQuery implements Iterable<XdmItem> {
    */
   public XQuery decimalFormat(final QName name, final HashMap<String, String> map) {
     try {
-      qp.ctx.sc.decFormats.add(new QNm(name).id(), new DecFormatter(null, map));
+      final TokenMap tm = new TokenMap();
+      for(final Map.Entry<String, String> e : map.entrySet()) {
+        tm.add(Token.token(e.getKey()), Token.token(e.getValue()));
+      }
+      qp.ctx.sc.decFormats.add(new QNm(name).id(), new DecFormatter(null, tm));
       return this;
     } catch(final QueryException ex) {
       Util.debug(ex);
@@ -173,12 +178,16 @@ public final class XQuery implements Iterable<XdmItem> {
    * @throws XQueryException exception
    */
   public XdmItem next() {
+    Item it = null;
     try {
       if(ir == null) ir = qp.iter();
-      return XdmItem.get(ir.next());
+      it = ir.next();
+      return it != null ? XdmItem.get(it) : null;
     } catch(final QueryException ex) {
       Util.debug(ex);
       throw new XQueryException(ex);
+    } finally {
+      if(it == null) qp.close();
     }
   }
 
@@ -193,6 +202,8 @@ public final class XQuery implements Iterable<XdmItem> {
     } catch(final QueryException ex) {
       Util.debug(ex);
       throw new XQueryException(ex);
+    } finally {
+      qp.close();
     }
   }
 
@@ -206,8 +217,8 @@ public final class XQuery implements Iterable<XdmItem> {
   }
 
   /**
-   * Closes the query; should always be called after all items have been
-   * processed.
+   * Closes the query; will be called whenever if items have been returned.
+   * Should be manually called if not all items are retrieved.
    * @throws XQueryException exception
    */
   public void close() {
@@ -248,13 +259,8 @@ public final class XQuery implements Iterable<XdmItem> {
    * @return optional expected test suite result
    */
   public static String string(final String query, final XdmValue val, final Context ctx) {
-    final XQuery qp = new XQuery(query, ctx).context(val);
-    try {
-      final XdmItem it = qp.next();
-      return it == null ? "" : it.getString();
-    } finally {
-      qp.close();
-    }
+    final XdmValue xv = new XQuery(query, ctx).context(val).value();
+    return xv.size() == 0 ? "" : xv.getString();
   }
 
   @Override
