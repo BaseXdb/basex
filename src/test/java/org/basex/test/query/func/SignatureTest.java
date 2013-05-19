@@ -59,8 +59,11 @@ public class SignatureTest extends AdvancedQueryTest {
       // skip test if all types are arbitrary
       if((def.min > 0 || al != 0) && (any == 0 || any != al)) {
         final String query = qu.append(')').toString();
-        if(in) error(query, Err.NOCAST, Err.BXDB_NODB, Err.BXDB_OPEN, Err.FUNCMP,
-            Err.BXDB_INDEX, Err.NODEERR);
+        // wrong types: XPTY0004, FORG0006, FODC0002, BXDB0001, BXDB0004
+        if(in) error(query, Err.NOCAST, Err.XPTYPENUM,
+            Err.STRNODTYPE, Err.ELMMAPTYPE, Err.BINARYTYPE,
+            Err.STRBINTYPE, Err.WHICHRES, Err.BXDB_NODB, Err.BXDB_INDEX);
+        // wrong number of arguments: XPST0017
         else error(query, Err.XPARGS);
       }
     }

@@ -97,12 +97,6 @@ public final class FuncLit extends Single implements Scope {
     return u == Use.X30 || u == Use.CTX || u == Use.POS;
   }
 
-  @Override
-  public String toString() {
-    return new TokenBuilder(name.string()).add('#').add(
-        Token.token(args.length)).toString();
-  }
-
   /**
    * Creates a function literal for a function that was not yet encountered while parsing.
    * @param nm function name
@@ -136,5 +130,10 @@ public final class FuncLit extends Single implements Scope {
   @Override
   public boolean compiled() {
     return compiled;
+  }
+
+  @Override
+  public String toString() {
+    return new TokenBuilder(name.string()).add('#').addExt(args.length).toString();
   }
 }

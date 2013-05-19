@@ -592,9 +592,9 @@ public enum Err {
   SERWHICH(SEPM, 17, "Unknown serialization parameter: '%'."),
 
   /** XPDY0002. */
-  VAREMPTY(XPDY, 2, "No value assigned to %."),
-  /** XPDY0002. */
   XPNOCTX(XPDY, 2, "No context item defined to evaluate '%'."),
+  /** XPDY0002. */
+  VAREMPTY(XPDY, 2, "No value assigned to %."),
   /** XPDY0050. */
   CTXNODE(XPDY, 50, "Root of the context item must be a document node."),
   /** XPDY0050. */
@@ -1096,6 +1096,9 @@ public enum Err {
   /** XUTY0022. */
   UPATTELM2(XUTY, 22, "Insert target must be an element.");
 
+  /** Cached enums (faster). */
+  public static final Err[] VALUES = values();
+
   /** Error type. */
   public final ErrType type;
   /** Error number. */
@@ -1212,11 +1215,11 @@ public enum Err {
     /**
      * Constructor for non-standard errors.
      * @param pref QName prefix
-     * @param euri error URI
+     * @param u error URI
      */
-    ErrType(final byte[] pref, final byte[] euri) {
+    ErrType(final byte[] pref, final byte[] u) {
       prefix = Token.string(pref);
-      uri = euri;
+      uri = u;
     }
 
     /**
@@ -1244,6 +1247,24 @@ public enum Err {
   public final QNm qname() {
     return type.qname(num);
   }
+
+  /**
+   * Returns an error for the specified name.
+   * @param name error name
+   * @param ii input info
+   * @param msg error message
+   * @return exception or null
+   * @throws QueryException query exception
+   */
+  public static QueryException thrw(final String name, final InputInfo ii,
+      final String msg) throws QueryException {
+
+    for(final Err e : VALUES) {
+      if(e.toString().equals(name)) throw new QueryException(ii, e.qname(), msg).err(e);
+    }
+    return null;
+  }
+
 
   /**
    * Throws a comparison exception.

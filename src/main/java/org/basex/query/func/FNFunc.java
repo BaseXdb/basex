@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
+import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -67,8 +68,9 @@ public final class FNFunc extends StandardFunc {
   private Item lookup(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final QNm name = checkQNm(expr[0].item(ctx, ii), ctx);
     final long arity = checkItr(expr[1], ctx);
+    if(arity < 0 || arity > Integer.MAX_VALUE) FUNCUNKNOWN.thrw(ii, name);
     try {
-      final Expr lit = Functions.getLiteral(name, arity, ctx, ii);
+      final Expr lit = Functions.getLiteral(name, (int) arity, ctx, ii);
       return lit == null ? null : lit.item(ctx, ii);
     } catch(final QueryException e) {
       // function not found

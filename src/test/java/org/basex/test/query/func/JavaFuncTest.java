@@ -83,4 +83,11 @@ public class JavaFuncTest extends AdvancedQueryTest {
     error("import module namespace n='java:java.lang.StringBuilder'; n:append('x')",
         Err.JAVAAMB);
   }
+
+
+  /** Ensure that items cannot be cast to Java. */
+  @Test
+  public void javaCast() {
+    error("xs:java('x')", Err.FUNCUNKNOWN);
+  }
 }

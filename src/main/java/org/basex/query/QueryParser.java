@@ -2166,7 +2166,7 @@ public class QueryParser extends InputParser {
       if(!(ex instanceof Int)) return ex;
       final long card = ex instanceof Int ? ((Int) ex).itr() : -1;
       if(card < 0 || card > Integer.MAX_VALUE) error(FUNCUNKNOWN, name);
-      final Expr lit = Functions.getLiteral(name, card, ctx, info());
+      final Expr lit = Functions.getLiteral(name, (int) card, ctx, info());
       return lit != null ? lit : FuncLit.unknown(name, card, ctx, info());
     }
 
@@ -3951,7 +3951,7 @@ public class QueryParser extends InputParser {
   private QueryException error() throws QueryException {
     ip = ap;
     if(alter != FUNCUNKNOWN) error(alter);
-    ctx.funcs.funError(alterFunc, info());
+    ctx.funcs.errorIfSimilar(alterFunc, info());
     throw error(alter, alterFunc.string());
   }
 
