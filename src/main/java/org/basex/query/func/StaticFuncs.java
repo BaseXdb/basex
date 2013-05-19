@@ -178,7 +178,7 @@ public final class StaticFuncs extends ExprInfo {
     for(int id = 1; id <= fs; ++id) {
       final StaticFunc sf = funcs.value(id).func;
       if(sf != null && ls.similar(nm, lc(sf.name.local()))) {
-        FUNSIMILAR.thrw(ii, name.string(), sf.name.string());
+        FUNCSIMILAR.thrw(ii, name.string(), sf.name.string());
       }
     }
   }

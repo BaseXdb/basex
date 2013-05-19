@@ -214,7 +214,7 @@ public final class QueryContext extends Proc {
         ctxItem.compile(this);
         value = ctxItem.value(this);
       } catch(final QueryException ex) {
-        if(ex.err() != XPNOCTX) throw ex;
+        if(ex.err() != NOCTX) throw ex;
         // only {@link ParseExpr} instances may cause this error
         CIRCCTX.thrw(ctxItem.info);
       }

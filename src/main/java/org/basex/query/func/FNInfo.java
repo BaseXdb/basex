@@ -77,7 +77,7 @@ public final class FNInfo extends StandardFunc {
 
     final Item it = expr[0].item(ctx, info);
     if(it == null) {
-      if(al == 1) XPEMPTY.thrw(info, description());
+      if(al == 1) INVEMPTY.thrw(info, description());
     } else {
       name = checkQNm(it, ctx);
     }

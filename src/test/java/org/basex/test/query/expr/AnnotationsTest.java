@@ -48,6 +48,6 @@ public final class AnnotationsTest extends AdvancedQueryTest {
   /**  Test for empty-sequence() as function item. */
   @Test
   public void emptyFunTest() {
-    error("()()", Err.XPEMPTY);
+    error("()()", Err.INVEMPTY);
   }
 }

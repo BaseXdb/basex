@@ -73,7 +73,7 @@ public final class Map extends FItem {
    */
   private Item key(final Item it, final InputInfo ii) throws QueryException {
     // no empty sequence allowed
-    if(it == null) throw XPEMPTY.thrw(ii, description());
+    if(it == null) throw INVEMPTY.thrw(ii, description());
 
     // function items can't be keys
     if(it instanceof FItem) throw FIATOM.thrw(ii, it.description());

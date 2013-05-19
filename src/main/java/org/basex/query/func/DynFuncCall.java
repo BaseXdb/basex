@@ -92,7 +92,7 @@ public final class DynFuncCall extends Arr {
   private FItem getFun(final QueryContext ctx) throws QueryException {
     final int ar = expr.length - 1;
     final Item it = checkItem(expr[ar], ctx);
-    if(!(it instanceof FItem)) NOCAST.thrw(info, it.type, "function item");
+    if(!(it instanceof FItem)) INVCAST.thrw(info, it.type, "function item");
     final FItem fit = (FItem) it;
     if(fit.arity() != ar) throw INVARITY.thrw(info, fit, ar);
     return fit;

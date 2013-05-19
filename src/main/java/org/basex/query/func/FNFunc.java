@@ -69,14 +69,15 @@ public final class FNFunc extends StandardFunc {
     final QNm name = checkQNm(expr[0].item(ctx, ii), ctx);
     final long arity = checkItr(expr[1], ctx);
     if(arity < 0 || arity > Integer.MAX_VALUE) FUNCUNKNOWN.thrw(ii, name);
+
+    Expr lit = null;
     try {
-      final Expr lit = Functions.getLiteral(name, (int) arity, ctx, ii);
-      return lit == null ? null : lit.item(ctx, ii);
+      lit = Functions.getLiteral(name, (int) arity, ctx, ii);
     } catch(final QueryException e) {
-      // function not found
-      if(e.err() == Err.FUNCUNKNOWN) return null;
-      throw e;
+      // function not found (in most cases: XPST0017)
+      return null;
     }
+    return lit == null ? null : lit.item(ctx, ii);
   }
 
   /**

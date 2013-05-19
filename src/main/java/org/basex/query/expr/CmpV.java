@@ -211,7 +211,7 @@ public final class CmpV extends Cmp {
 
     if(a instanceof FItem) Err.FIEQ.thrw(info, a);
     if(b instanceof FItem) Err.FIEQ.thrw(info, b);
-    throw Err.XPTYPECMP.thrw(info, a.type, b.type);
+    throw Err.INVTYPECMP.thrw(info, a.type, b.type);
   }
 
   @Override

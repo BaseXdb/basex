@@ -217,7 +217,7 @@ public class QueryParser extends InputParser {
       wsCheck(MODULE);
       wsCheck(NSPACE);
       skipWS();
-      final byte[] name = ncName(XPNAME);
+      final byte[] name = ncName(NONAME);
       wsCheck(IS);
       final byte[] uri = stringLiteral();
       if(uri.length == 0) error(NSMODURI);
@@ -498,7 +498,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void namespaceDecl() throws QueryException {
-    final byte[] pref = ncName(XPNAME);
+    final byte[] pref = ncName(NONAME);
     wsCheck(IS);
     final byte[] uri = stringLiteral();
     if(ctx.sc.ns.staticURI(pref) != null) error(DUPLNSDECL, pref);
@@ -742,7 +742,7 @@ public class QueryParser extends InputParser {
   private void schemaImport() throws QueryException {
     byte[] pref = null;
     if(wsConsumeWs(NSPACE)) {
-      pref = ncName(XPNAME);
+      pref = ncName(NONAME);
       if(eq(pref, XML, XMLNS)) error(BINDXML, pref);
       wsCheck(IS);
     } else if(wsConsumeWs(DEFAULT)) {
@@ -768,7 +768,7 @@ public class QueryParser extends InputParser {
   private void moduleImport() throws QueryException {
     byte[] ns = EMPTY;
     if(wsConsumeWs(NSPACE)) {
-      ns = ncName(XPNAME);
+      ns = ncName(NONAME);
       wsCheck(IS);
     }
 
@@ -2842,11 +2842,8 @@ public class QueryParser extends InputParser {
       if(t == null) {
         if(wsConsume(PAR1)) error(SIMPLETYPE, name);
         if(ctx.sc.xquery3) {
-          if(AtomType.AST.name.eq(name)) {
-            t = AtomType.AST;
-          } else {
-            error(XQTYPEUNKNOWN, name);
-          }
+          if(!AtomType.AST.name.eq(name)) error(TYPEUNKNOWN30, name);
+          t = AtomType.AST;
         } else {
           error(TYPEUNKNOWN, name);
         }
@@ -3616,7 +3613,7 @@ public class QueryParser extends InputParser {
   private byte[] ncName(final Err err) throws QueryException {
     tok.reset();
     if(ncName()) return tok.finish();
-    if(err != null) error(err, tok);
+    if(err != null) error(err, consume());
     return EMPTY;
   }
 
@@ -3694,9 +3691,7 @@ public class QueryParser extends InputParser {
    */
   private boolean ncName() {
     if(!XMLToken.isNCStartChar(curr())) return false;
-    do {
-      tok.add(consume());
-    } while(XMLToken.isNCChar(curr()));
+    do tok.add(consume()); while(XMLToken.isNCChar(curr()));
     return true;
   }
 
