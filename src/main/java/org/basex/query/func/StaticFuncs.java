@@ -193,7 +193,7 @@ public final class StaticFuncs extends ExprInfo {
     final StringBuilder sb = new StringBuilder();
     final int fs = funcs.size();
     for(int id = 1; id <= fs; ++id) {
-      sb.append(funcs.value(id).toString()).append(Text.NL);
+      sb.append(funcs.value(id).func.toString()).append(Text.NL);
     }
     return sb.toString();
   }
