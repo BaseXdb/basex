@@ -9,8 +9,8 @@ declare function local:randomize($seq) {
 let $seq := local:randomize(1 to 1000)
 return bin:serialize(
   fold-left(
-    function($tree, $x) { bin:insert($x, $tree) },
+    $seq,
     bin:empty(),
-    $seq
+    function($tree, $x) { bin:insert($x, $tree) }
   )
 )
