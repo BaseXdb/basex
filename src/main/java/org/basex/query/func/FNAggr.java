@@ -59,7 +59,7 @@ public final class FNAggr extends StandardFunc {
   }
 
   @Override
-  Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx) throws QueryException {
     // skip non-deterministic and variable expressions
     final Expr e = expr[0];
     if(e.uses(Use.NDT) || e instanceof VarRef) return this;

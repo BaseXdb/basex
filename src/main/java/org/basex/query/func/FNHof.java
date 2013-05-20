@@ -69,7 +69,7 @@ public final class FNHof extends StandardFunc {
   }
 
   @Override
-  Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx) throws QueryException {
     return oneOf(sig, _HOF_ID, _HOF_CONST) ? expr[0] : this;
   }
 

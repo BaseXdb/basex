@@ -53,7 +53,7 @@ public final class FNXQuery extends StandardFunc {
   }
 
   @Override
-  Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx) throws QueryException {
     if(sig == Function._XQUERY_TYPE) {
       FNInfo.dump(Util.inf("{ type: %, size: % }", expr[0].type(), expr[0].size()),
           Token.token(expr[0].toString()), ctx);

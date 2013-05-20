@@ -10,6 +10,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.data.atomic.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
@@ -193,7 +194,8 @@ final class DatabaseUpdates {
 
     if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
       try {
-        Export.export(data, data.meta.original, null);
+        final SerializerProp sp = new SerializerProp(data.meta.prop.get(Prop.EXPORTER));
+        Export.export(data, data.meta.original, sp, null);
       } catch(final IOException ex) {
         UPPUTERR.thrw(null, data.meta.original);
       }

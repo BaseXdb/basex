@@ -37,7 +37,7 @@ public abstract class StandardFunc extends Arr {
    * @param s function definition
    * @param args arguments
    */
-  StandardFunc(final InputInfo ii, final Function s, final Expr... args) {
+  protected StandardFunc(final InputInfo ii, final Function s, final Expr... args) {
     super(ii, args);
     sig = s;
     type = sig.ret;
@@ -66,13 +66,12 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx) throws QueryException {
     return this;
   }
 
   @Override
-  public
-  final StandardFunc copy(final QueryContext ctx, final VarScope scp,
+  public final StandardFunc copy(final QueryContext ctx, final VarScope scp,
       final IntMap<Var> vs) {
     final int es = expr.length;
     final Expr[] arg = new Expr[es];
@@ -129,22 +128,16 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns a data instance for the first argument of the function.
+   * Returns a data instance for the first string argument of the function.
    * This method assumes that the function has at least one argument.
    * @param ctx query context
    * @return data instance
    * @throws QueryException query exception
    */
-  Data data(final QueryContext ctx) throws QueryException {
-    final Item it = checkNoEmpty(expr[0].item(ctx, info));
-    final Type ip = it.type;
-    if(it instanceof ANode) return checkDBNode(it).data;
-    if(it instanceof AStr)  {
-      final String name = string(it.string(info));
-      if(!MetaData.validName(name, false)) INVDB.thrw(info, name);
-      return ctx.resource.data(name, info);
-    }
-    throw STRNODTYPE.thrw(info, this, ip);
+  protected final Data data(final QueryContext ctx) throws QueryException {
+    final String name = string(checkStr(expr[0], ctx));
+    if(!MetaData.validName(name, false)) INVDB.thrw(info, name);
+    return ctx.resource.data(name, info);
   }
 
   /**
@@ -154,7 +147,7 @@ public abstract class StandardFunc extends Arr {
    * @param visitor visitor
    * @return result of check
    */
-  protected boolean dataLock(final ASTVisitor visitor) {
+  protected final boolean dataLock(final ASTVisitor visitor) {
     return visitor.lock(expr[0] instanceof Str ? string(((Str) expr[0]).string()) : null);
   }
 
@@ -166,7 +159,7 @@ public abstract class StandardFunc extends Arr {
    * @return text entry
    * @throws QueryException query exception
    */
-  String encoding(final int i, final Err err, final QueryContext ctx)
+  protected final String encoding(final int i, final Err err, final QueryContext ctx)
       throws QueryException {
 
     if(i >= expr.length) return null;
@@ -186,7 +179,9 @@ public abstract class StandardFunc extends Arr {
    * @return resulting value
    * @throws QueryException query exception
    */
-  long dateTimeToMs(final Expr e, final QueryContext ctx) throws QueryException {
+  protected final long dateTimeToMs(final Expr e, final QueryContext ctx)
+      throws QueryException {
+
     final Dtm dtm = (Dtm) checkType(checkItem(e, ctx), AtomType.DTM);
     if(dtm.yea() > 292278993) INTRANGE.thrw(info, dtm);
     return dtm.toJava().toGregorianCalendar().getTimeInMillis();
@@ -199,7 +194,7 @@ public abstract class StandardFunc extends Arr {
    * @return resulting map
    * @throws QueryException query exception
    */
-  HashMap<String, Value> bindings(final int i, final QueryContext ctx)
+  protected final HashMap<String, Value> bindings(final int i, final QueryContext ctx)
       throws QueryException {
 
     final HashMap<String, Value> hm = new HashMap<String, Value>();
@@ -229,7 +224,7 @@ public abstract class StandardFunc extends Arr {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  protected void cache(final Iter ir, final ValueBuilder vb, final QueryContext ctx)
+  protected final void cache(final Iter ir, final ValueBuilder vb, final QueryContext ctx)
       throws QueryException {
 
     for(Item it; (it = ir.next()) != null;) {

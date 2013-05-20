@@ -53,7 +53,7 @@ public final class FNStream extends StandardFunc {
   }
 
   @Override
-  Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx) throws QueryException {
     if(sig == Function._STREAM_MATERIALIZE) type = expr[0].type();
     return this;
   }
