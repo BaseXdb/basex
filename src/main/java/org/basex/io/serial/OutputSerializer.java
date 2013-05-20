@@ -135,12 +135,8 @@ public abstract class OutputSerializer extends Serializer {
 
     if(!maps.isEmpty()) SERMAP.thrwSerial(maps);
 
-    if(docsys.isEmpty()) {
-      docsys = null;
-      docpub = null;
-    } else if(docpub.isEmpty()) {
-      docpub = null;
-    }
+    if(docsys.isEmpty()) docsys = null;
+    if(docpub.isEmpty()) docpub = null;
 
     // print byte-order-mark
     out = PrintOutput.get(os);
@@ -404,17 +400,14 @@ public abstract class OutputSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   protected boolean doctype(final byte[] dt) throws IOException {
-    if(level != 0 || docsys == null) return false;
+    if(level != 0 || docsys == null && docpub == null) return false;
     if(sep) indent();
     print(DOCTYPE);
     if(dt == null) print(M_HTML);
     else print(dt);
-    if(docpub != null) {
-      print(' ' + PUBLIC + " \"" + docpub + '"');
-    } else {
-      print(' ' + SYSTEM);
-    }
-    print(" \"" + docsys + '"');
+    if(docpub != null) print(' ' + PUBLIC + " \"" + docpub + '"');
+    else print(' ' + SYSTEM);
+    if(docsys != null) print(" \"" + docsys + '"');
     print(ELEM_C);
     sep = true;
     return true;

@@ -70,7 +70,7 @@ public final class Store extends ACreate {
 
     try {
       store(in, file);
-      return info(QUERY_EXECUTED_X, perf);
+      return info(QUERY_EXECUTED_X_X, "", perf);
     } catch(final IOException ex) {
       return error(FILE_NOT_STORED_X, Util.message(ex));
     } finally {

@@ -639,7 +639,7 @@ public interface Text {
   /** "Results: %". */
   String RESULTS_X = lang("results_%");
   /** "Query executed in %". */
-  String QUERY_EXECUTED_X = lang("query_executed_%");
+  String QUERY_EXECUTED_X_X = lang("query_executed_%_%");
 
   /** Stopped info. */
   String STOPPED_AT = lang("stopped_at") + ' ';
