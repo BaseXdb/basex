@@ -1,18 +1,15 @@
 package org.basex.http.webdav.milton2;
 
-import io.milton.config.HttpManagerBuilder;
-import io.milton.http.HttpManager;
-import io.milton.http.Request;
-import io.milton.http.Response;
-import io.milton.servlet.ServletRequest;
-import io.milton.servlet.ServletResponse;
-import org.basex.http.BaseXServlet;
-import org.basex.http.HTTPContext;
-import org.basex.util.Util;
+import io.milton.config.*;
+import io.milton.http.*;
+import io.milton.servlet.*;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
+
+import org.basex.http.*;
+import org.basex.util.*;
 
 /**
  * WebDAV servlet.
@@ -25,20 +22,8 @@ public final class WebDAVServlet extends BaseXServlet {
   private static final String HTTP_MANAGER_BUILDER_ENT =
       "io.milton.ent.config.HttpManagerBuilderEnt";
   /** Class implementing {@link HttpManagerBuilder}. */
-  private Class<? extends HttpManagerBuilder> httpManagerBuilderClass;
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public void init(final ServletConfig config) throws ServletException {
-    super.init(config);
-    try {
-      httpManagerBuilderClass = (Class<? extends HttpManagerBuilder>) config.
-          getServletContext().getClassLoader().loadClass(HTTP_MANAGER_BUILDER_ENT);
-      Util.debug("Using milton2 server enterprise");
-    } catch(Exception e) {
-      Util.debug("milton2 server enterprise is not available");
-    }
-  }
+  private static Class<? extends HttpManagerBuilder> httpManagerBuilderClass = 
+      findHttpManagerBuilderClass();
 
   @Override
   protected void run(final HTTPContext http) throws IOException {
@@ -71,5 +56,34 @@ public final class WebDAVServlet extends BaseXServlet {
       Util.debug("Cannot create instance of milton2 enterprise HttpManagerBuilder");
     }
     return new HttpManagerBuilder();
+  }
+  
+  /**
+   * Search the class path for the enterprise version of Milton2.
+   * @return {@code null} if the enterprise version of Milton2 is not available
+   */
+  @SuppressWarnings("unchecked")
+  private static Class<? extends HttpManagerBuilder> findHttpManagerBuilderClass() {
+    try {
+      // use only for development; a valid license should be obtained for production!
+      enableLocking();
+      return (Class<? extends HttpManagerBuilder>)
+          WebDAVServlet.class.getClassLoader().loadClass(HTTP_MANAGER_BUILDER_ENT);
+    } catch(Throwable e) {
+      Util.debug("milton2 server enterprise is not available");
+      return null;
+    }
+  }
+
+  /**
+   * Circumvents the Milton2 checks for a valid license.<br/>
+   * <b>Use only for development and testing!!!</b>
+   * @throws Throwable error
+   */
+  private static void enableLocking() throws Throwable {
+    Class<?> clz = Reflect.forName("io.milton.webdav.utils.LockUtils");
+    Field field = clz.getDeclaredField("validatedLicenseProps");
+    field.setAccessible(true);
+    field.set(null, new Properties());
   }
 }
