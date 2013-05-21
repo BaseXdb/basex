@@ -19,11 +19,11 @@ import org.basex.query.func.*;
  */
 final class RestXqModule {
   /** Supported methods. */
-  final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
+  private final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
   /** File reference. */
-  final IOFile file;
+  private final IOFile file;
   /** Parsing timestamp. */
-  long time;
+  private long time;
 
   /**
    * Constructor.
@@ -71,6 +71,14 @@ final class RestXqModule {
    */
   void touch() {
     time = file.timeStamp();
+  }
+
+  /**
+   * Returns all functions.
+   * @return functions
+   */
+  ArrayList<RestXqFunction> functions() {
+    return functions;
   }
 
   /**
