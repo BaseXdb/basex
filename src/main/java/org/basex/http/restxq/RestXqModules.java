@@ -12,7 +12,7 @@ import org.basex.query.*;
 import org.basex.util.*;
 
 /**
- * This class caches RESXQ modules found in the HTTP root directory.
+ * This class caches RESTXQ modules found in the HTTP root directory.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

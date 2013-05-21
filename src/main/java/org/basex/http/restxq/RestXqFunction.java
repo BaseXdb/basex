@@ -387,7 +387,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       final Var var = function.args[i];
       if(!var.name.eq(name)) continue;
       // casts and binds the value
-      args[i] = var.checkType(value, context, null);
+      final SeqType decl = var.declaredType();
+      final Value val = value.type().instanceOf(decl) ? value :
+        decl.cast(value, context, null, var);
+      args[i] = var.checkType(val, context, null);
       break;
     }
   }
