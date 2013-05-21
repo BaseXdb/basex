@@ -35,27 +35,26 @@ public final class FNNode extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // functions have 0 or 1 arguments...
     final Item it = (expr.length != 0 ? expr[0] : checkCtx(ctx)).item(ctx, info);
+    final ANode node = it == null ? null : checkNode(it);
 
     switch(sig) {
       case NODE_NAME:
-        QNm qname = it != null ? checkNode(it).qname() : null;
+        QNm qname = node != null ? node.qname() : null;
         return qname != null && qname.string().length != 0 ? qname : null;
       case DOCUMENT_URI:
-        if(it == null) return null;
-        final ANode node = checkNode(it);
-        if(node.type != NodeType.DOC) return null;
+        if(node == null || node.type != NodeType.DOC) return null;
         final byte[] uri = node.baseURI();
         return uri.length == 0 ? null : Uri.uri(uri, false);
       case NILLED:
         // always false, as no schema information is given
-        return it == null || checkNode(it).type != NodeType.ELM ? null : Bln.FALSE;
+        return node == null || node.type != NodeType.ELM ? null : Bln.FALSE;
       case BASE_URI:
-        if(it == null) return null;
-        ANode n = checkNode(it);
-        if(n.type != NodeType.ELM && n.type != NodeType.DOC && n.parent() == null)
-          return null;
+        if(node == null) return null;
+        if(node.type != NodeType.ELM && node.type != NodeType.DOC &&
+            node.parent() == null) return null;
 
         Uri base = Uri.EMPTY;
+        ANode n = node;
         do {
           if(n == null) return ctx.sc.baseURI().resolve(base, info);
           final Uri bu = Uri.uri(n.baseURI(), false);
@@ -66,26 +65,29 @@ public final class FNNode extends StandardFunc {
         } while(!base.isAbsolute());
         return base;
       case NAME:
-        qname = it != null ? checkNode(it).qname() : null;
+        qname = node != null ? node.qname() : null;
         return qname != null ? Str.get(qname.string()) : Str.ZERO;
       case LOCAL_NAME:
-        qname = it != null ? checkNode(it).qname() : null;
+        qname = node != null ? node.qname() : null;
         return qname != null ? Str.get(qname.local()) : Str.ZERO;
       case NAMESPACE_URI:
-        qname = it != null ? checkNode(it).qname() : null;
+        qname = node != null ? node.qname() : null;
         return qname != null ? Uri.uri(qname.uri(), false) : Uri.EMPTY;
       case ROOT:
-        if(it == null) return null;
-        n = checkNode(it);
-        while(n.parent() != null) n = n.parent();
+        n = node;
+        while(n != null) {
+          final ANode p = n.parent();
+          if(p == null) break;
+          n = p;
+        }
         return n;
       case GENERATE_ID:
-        return it == null ? Str.ZERO : Str.get(new TokenBuilder(
-            QueryText.ID).addInt(checkNode(it).id).finish());
+        return node == null ? Str.ZERO :
+          Str.get(new TokenBuilder(QueryText.ID).addInt(node.id).finish());
       case HAS_CHILDREN:
-        return Bln.get(it != null && checkNode(it).hasChildren());
+        return Bln.get(node != null && node.hasChildren());
       case PATH:
-        return it != null ? path(it) : null;
+        return node != null ? path(node) : null;
       default:
         return super.item(ctx, ii);
     }
@@ -93,13 +95,12 @@ public final class FNNode extends StandardFunc {
 
   /**
    * Performs the path function.
-   * @param it item to be resolved
+   * @param node node to start from
    * @return resulting iterator
-   * @throws QueryException query exception
    */
-  private Str path(final Item it) throws QueryException {
+  private Str path(final ANode node) {
+    ANode n = node;
     final TokenList tl = new TokenList();
-    ANode n = checkNode(it);
     while(n.parent() != null) {
       int i = 1;
       final TokenBuilder tb = new TokenBuilder();

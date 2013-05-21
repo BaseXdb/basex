@@ -33,10 +33,8 @@ public final class FNId extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = checkNoEmpty((expr.length == 2 ? expr[1] :
-      checkCtx(ctx)).item(ctx, info));
+    final ANode node = checkNode(expr.length == 2 ? expr[1] : checkCtx(ctx), ctx);
 
-    final ANode node = checkNode(it);
     switch(sig) {
       case ID:              return id(ctx.iter(expr[0]), node);
       case IDREF:           return idref(ctx.iter(expr[0]), node);
@@ -48,11 +46,10 @@ public final class FNId extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = checkNoEmpty((expr.length == 2 ? expr[1] :
-      checkCtx(ctx)).item(ctx, info));
+    final ANode node = checkNode(expr.length == 2 ? expr[1] : checkCtx(ctx), ctx);
 
     switch(sig) {
-      case LANG:  return lang(lc(checkEStr(expr[0], ctx)), checkNode(it));
+      case LANG:  return lang(lc(checkEStr(expr[0], ctx)), node);
       default:    return super.item(ctx, ii);
     }
   }

@@ -253,7 +253,20 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression is a node.
+   * Checks if the specified expression yields a node.
+   * Returns the boolean or throws an exception.
+   * @param e expression to be checked
+   * @param ctx query context
+   * @return boolean
+   * @throws QueryException query exception
+   */
+  public final ANode checkNode(final Expr e, final QueryContext ctx)
+      throws QueryException {
+    return checkNode(checkItem(e, ctx));
+  }
+
+  /**
+   * Checks if the specified item is a node.
    * Returns the node or an exception.
    * @param it item to be checked
    * @return item
@@ -408,7 +421,7 @@ public abstract class ParseExpr extends Expr {
   public final QNm checkQNm(final Item it, final QueryContext ctx)
       throws QueryException {
 
-    if(checkNoEmpty(it).type == AtomType.QNM) return (QNm) it;
+    if(checkNoEmpty(it, AtomType.QNM).type == AtomType.QNM) return (QNm) it;
     if(it.type.isUntyped() && ctx.sc.xquery3()) NSSENS.thrw(info, it.type, AtomType.QNM);
     throw Err.INVCAST.thrw(info, it.type, AtomType.QNM);
   }
@@ -422,7 +435,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final Item checkType(final Item it, final Type t) throws QueryException {
-    if(checkNoEmpty(it).type.instanceOf(t)) return it;
+    if(checkNoEmpty(it, t).type.instanceOf(t)) return it;
     throw Err.INVCAST.thrw(info, it.type, t);
   }
 

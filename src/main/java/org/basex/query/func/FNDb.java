@@ -475,7 +475,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str path(final QueryContext ctx) throws QueryException {
-    ANode node, par = checkNode(checkItem(expr[0], ctx));
+    ANode node, par = checkNode(expr[0], ctx);
     do {
       node = par;
       par = node.parent();

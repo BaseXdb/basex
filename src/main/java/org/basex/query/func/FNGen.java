@@ -148,7 +148,7 @@ public final class FNGen extends StandardFunc {
   private Item put(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
     final byte[] file = checkEStr(expr[1], ctx);
-    final ANode nd = checkNode(checkNoEmpty(expr[0].item(ctx, info)));
+    final ANode nd = checkNode(expr[0], ctx);
     if(nd.type != NodeType.DOC && nd.type != NodeType.ELM) UPFOTYPE.thrw(info, expr[0]);
 
     final Uri u = Uri.uri(file);

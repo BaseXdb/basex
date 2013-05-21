@@ -208,14 +208,6 @@ public final class Var extends ExprInfo {
   }
 
   /**
-   * Sets the declared return type of this variable.
-   * @param t return type
-   */
-  public void setDeclaredType(final SeqType t) {
-    declared = t;
-  }
-
-  /**
    * Tries to adopt the given type check.
    * @param t type to check
    * @param prom if function conversion should be applied

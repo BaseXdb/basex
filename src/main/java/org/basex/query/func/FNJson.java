@@ -93,7 +93,7 @@ public final class FNJson extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str serialize(final boolean ml, final QueryContext ctx) throws QueryException {
-    final ANode node = checkNode(checkItem(expr[0], ctx));
+    final ANode node = checkNode(expr[0], ctx);
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization

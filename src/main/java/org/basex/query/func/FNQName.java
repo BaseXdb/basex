@@ -83,7 +83,7 @@ public final class FNQName extends StandardFunc {
    */
   private Item qName(final Item it, final Item it2) throws QueryException {
     final byte[] uri = checkEStr(it);
-    if(it2 == null) INVEMPTY.thrw(info, description());
+    if(it2 == null) INVEMPTYEX.thrw(info, description(), AtomType.STR);
 
     final byte[] name = checkEStr(it2);
     final byte[] str = !contains(name, ':') && eq(uri, XMLURI) ?
