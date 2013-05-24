@@ -126,7 +126,9 @@ public final class EditorView extends View {
     stop.addKeyListener(this);
     stop.setEnabled(false);
 
-    go = new BaseXButton(gui, "go", H_EXECUTE_QUERY);
+    go = new BaseXButton(gui, "go", H_EXECUTE_QUERY  + " (" +
+        KeyEvent.getKeyText(KeyEvent.VK_CONTROL) + '+' +
+        KeyEvent.getKeyText(KeyEvent.VK_ENTER) + ')');
     go.addKeyListener(this);
 
     filter = BaseXButton.command(GUICommands.C_FILTER, gui);
