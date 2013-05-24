@@ -26,10 +26,10 @@ import org.eclipse.jetty.xml.*;
 public final class BaseXHTTP {
   /** Database context. */
   final Context context = HTTPContext.init();
+  /** HTTP port. */
+  int httpPort;
   /** HTTP server. */
   private final Server jetty;
-  /** HTTP port. */
-  private int httpPort;
   /** Start as daemon. */
   private boolean service;
   /** Stopped flag. */
@@ -75,7 +75,7 @@ public final class BaseXHTTP {
     // stop server
     if(stopped) {
       stop();
-      Util.outln(HTTP + ' ' + SRV_STOPPED);
+      Util.outln(HTTP + ' ' + SRV_STOPPED_PORT_X, httpPort);
       // temporary console windows: keep the message visible for a while
       Performance.sleep(1000);
       return;
@@ -84,7 +84,7 @@ public final class BaseXHTTP {
     // start web server in a new process
     if(service) {
       start(httpPort, args);
-      Util.outln(HTTP + ' ' + SRV_STARTED);
+      Util.outln(HTTP + ' ' + SRV_STARTED_PORT_X, httpPort);
       // temporary console windows: keep the message visible for a while
       Performance.sleep(1000);
       return;
@@ -100,7 +100,7 @@ public final class BaseXHTTP {
 
     // start web server
     jetty.start();
-    Util.outln(HTTP + ' ' + SRV_STARTED, SERVERMODE);
+    Util.outln(HTTP + ' ' + SRV_STARTED_PORT_X, httpPort);
 
     // initialize web.xml settings, assign system properties and run database server
     // if not done so already. this must be called after starting jetty
@@ -114,15 +114,15 @@ public final class BaseXHTTP {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        Util.outln(HTTP + ' ' + SRV_STOPPED);
+        Util.outln(HTTP + ' ' + SRV_STOPPED_PORT_X, httpPort);
         final Log l = context.log;
-        if(l != null) l.writeServer(OK, HTTP + ' ' + SRV_STOPPED);
+        if(l != null) l.writeServer(OK, HTTP + ' ' + SRV_STOPPED_PORT_X, httpPort);
         context.close();
       }
     });
 
     // log server start at very end (logging flag could have been updated by web.xml)
-    context.log.writeServer(OK, HTTP + ' ' + SRV_STARTED);
+    context.log.writeServer(OK, HTTP + ' ' + SRV_STARTED_PORT_X, httpPort);
   }
 
   /**
