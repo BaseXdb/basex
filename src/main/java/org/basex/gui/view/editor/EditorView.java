@@ -240,7 +240,7 @@ public final class EditorView extends View {
   @Override
   public void refreshMark() {
     final EditorArea edit = getEditor();
-    go.setEnabled(edit.script || edit.xquery && !gui.gprop.is(GUIProp.EXECRT));
+    go.setEnabled(edit.script || !gui.gprop.is(GUIProp.EXECRT));
     final Nodes mrk = gui.context.marked;
     filter.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) && mrk != null && mrk.size() != 0);
   }

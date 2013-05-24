@@ -144,7 +144,10 @@ final class EditorArea extends Editor {
     script = file.hasSuffix(IO.BXSSUFFIX);
     xquery = !script && !opened() || file.hasSuffix(IO.XQSUFFIXES);
     String input = string(in);
-    if(xquery) {
+    if(action == Action.EXECUTE && script) {
+      // execute query if forced, or if realtime execution is activated
+      gui.execute(true, new Execute(input));
+    } else if(xquery || action == Action.EXECUTE) {
       // check if input is/might be an xquery main module
       if(input.isEmpty()) input = "()";
       xquery = !module(in);
@@ -165,9 +168,6 @@ final class EditorArea extends Editor {
           qc.close();
         }
       }
-    } else if(action == Action.EXECUTE && script) {
-      // execute query if forced, or if realtime execution is activated
-      gui.execute(true, new Execute(input));
     } else if(script || file.hasSuffix(IO.XMLSUFFIXES) ||
         file.hasSuffix(IO.XSLSUFFIXES) || file.hasSuffix(IO.HTMLSUFFIXES)) {
       try {
