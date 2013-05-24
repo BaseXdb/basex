@@ -23,6 +23,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -388,7 +389,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       if(!var.name.eq(name)) continue;
       // casts and binds the value
       final SeqType decl = var.declaredType();
-      final Value val = value.type().instanceOf(decl) ? value :
+      final Value val = value == Empty.SEQ || value.type().instanceOf(decl) ? value :
         decl.cast(value, context, null, var);
       args[i] = var.checkType(val, context, null);
       break;
