@@ -175,8 +175,7 @@ public final class MetaData {
     final int nl = name.length();
     for(int n = 0; n < nl; n++) {
       final char ch = name.charAt(n);
-      if((!glob || ch != '?' && ch != '*' && ch != ',') &&
-          !letterOrDigit(ch) && ch != '-') return false;
+      if((!glob || ch != '?' && ch != '*' && ch != ',') && !dbChar(ch)) return false;
     }
     return nl != 0;
   }

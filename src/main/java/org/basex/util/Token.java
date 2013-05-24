@@ -60,6 +60,8 @@ public final class Token {
   private static final byte[] IRIRES = token("!#$%&*'()+,-./:;=?@[]~_");
   /** Reserved characters. */
   private static final byte[] RES = token("-._~");
+  /** Allowed characters for database names. */
+  public static final String DBCHARS = "-=~!#$%^&()[]{}";
 
   /** UTF8 encoding string. */
   public static final String UTF8 = "UTF-8";
@@ -1118,6 +1120,15 @@ public final class Token {
    */
   public static boolean letterOrDigit(final int ch) {
     return letter(ch) || digit(ch);
+  }
+
+  /**
+   * Checks if the specified character is a valid character for a database name.
+   * @param ch the letter to be checked
+   * @return result of comparison
+   */
+  public static boolean dbChar(final int ch) {
+    return letterOrDigit(ch) || DBCHARS.indexOf(ch) != -1;
   }
 
   /**
