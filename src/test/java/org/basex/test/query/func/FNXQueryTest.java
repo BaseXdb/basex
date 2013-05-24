@@ -24,7 +24,7 @@ public final class FNXQueryTest extends AdvancedQueryTest {
     query(_XQUERY_EVAL.args("\"declare variable $local:a external;$local:a\"",
         " map { xs:QName('local:a') := 1 }"), "1");
     query(_XQUERY_EVAL.args(".", " map { '' := 1 }"), "1");
-    error(_XQUERY_EVAL.args("1+"), Err.INCOMPLETE);
+    error(_XQUERY_EVAL.args("1+"), Err.CALCEXPR);
     error("declare variable $a:=1;" + _XQUERY_EVAL.args("\"$a\""), Err.VARUNDEF);
     error("for $a in (1,2) return " + _XQUERY_EVAL.args("\"$a\""), Err.VARUNDEF);
     // check updating expressions

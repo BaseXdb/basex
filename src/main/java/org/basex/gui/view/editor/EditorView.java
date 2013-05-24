@@ -48,7 +48,7 @@ public final class EditorView extends View {
       Pattern.DOTALL);
   /** Error tooltip pattern. */
   private static final Pattern ERRORTT = Pattern.compile(
-      "^.*\r?\n" + STOPPED_AT + " |\r?\n" + STACK_TRACE_C + ".*", Pattern.DOTALL);
+      "^.*\r?\n" + STOPPED_AT + "|\r?\n" + STACK_TRACE_C + ".*", Pattern.DOTALL);
 
   /** Search panel. */
   final SearchPanel search;
@@ -68,7 +68,7 @@ public final class EditorView extends View {
   /** Thread counter. */
   int threadID;
   /** File in which the most recent error occurred. */
-  String errFile;
+  IO errFile;
 
   /** Last error message. */
   private String errMsg;
@@ -336,7 +336,7 @@ public final class EditorView extends View {
    * @param parse parse contents
    * @return opened editor
    */
-  public EditorArea open(final IOFile file, final boolean parse) {
+  public EditorArea open(final IO file, final boolean parse) {
     if(!visible()) GUICommands.C_SHOWEDITOR.execute(gui);
 
     EditorArea edit = find(file, true);
@@ -364,7 +364,7 @@ public final class EditorView extends View {
    * Refreshes the list of recent query files and updates the query path.
    * @param file new file
    */
-  void refreshHistory(final IOFile file) {
+  void refreshHistory(final IO file) {
     final StringList sl = new StringList();
     String path = null;
     if(file != null) {
@@ -514,19 +514,19 @@ public final class EditorView extends View {
     Matcher m = XQERROR.matcher(errMsg);
     int el, ec = 2;
     if(m.matches()) {
-      errFile = m.group(1);
+      errFile = new IOFile(m.group(1));
       el = Token.toInt(m.group(2));
       ec = Token.toInt(m.group(3));
     } else {
       m = XMLERROR.matcher(errMsg);
       if(!m.matches()) return;
       el = Token.toInt(m.group(1));
-      errFile = getEditor().file.path();
+      errFile = getEditor().file;
     }
 
-    EditorArea edit = find(IO.get(errFile), false);
+    EditorArea edit = find(errFile, false);
     if(open) {
-      if(edit == null) edit = open(new IOFile(errFile), false);
+      if(edit == null) edit = open(errFile, false);
       tabs.setSelectedComponent(edit);
     } else {
       if(edit == null) return;
@@ -636,13 +636,13 @@ public final class EditorView extends View {
    * @param file file to write
    * @return {@code false} if confirmation was canceled
    */
-  private boolean save(final IOFile file) {
+  private boolean save(final IO file) {
     try {
       final EditorArea edit = getEditor();
-      file.write(edit.getText());
+      ((IOFile) file).write(edit.getText());
       edit.file(file);
       return true;
-    } catch(final IOException ex) {
+    } catch(final Exception ex) {
       BaseXDialog.error(gui, FILE_NOT_SAVED);
       return false;
     }

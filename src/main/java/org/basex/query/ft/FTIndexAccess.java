@@ -106,7 +106,12 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public String toString() {
-    return Function._DB_FULLTEXT.get(info, Str.get(db), ftexpr).toString();
+    Expr e = ftexpr;
+    if(ftexpr instanceof FTWords) {
+      final FTWords f = (FTWords) ftexpr;
+      if(f.mode == FTMode.ANY && f.occ == null) e = f.query;
+    }
+    return Function._DB_FULLTEXT.get(info, Str.get(db), e).toString();
   }
 
   @Override

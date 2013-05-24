@@ -67,11 +67,11 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     error(_ARCHIVE_CREATE.args("<archive:entry encoding='US-ASCII'>X</archive:entry>",
         "\u00fc"), Err.ARCH_ENCODE);
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        " map { 'format':='rar' }"), Err.ARCH_SUPP);
+        " map { 'format':='rar' }"), Err.ARCH_UNKNOWN);
     // format not supported
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         "<archive:options><archive:format value='rar'/></archive:options>"),
-        Err.ARCH_SUPP);
+        Err.ARCH_UNKNOWN);
     // algorithm not supported
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         "<archive:options><archive:algorithm value='unknown'/></archive:options>"),

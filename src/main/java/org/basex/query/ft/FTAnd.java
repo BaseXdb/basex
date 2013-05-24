@@ -41,7 +41,8 @@ public final class FTAnd extends FTExpr {
     for(final FTExpr e : expr) not &= e instanceof FTNot;
     if(not) {
       // convert (!A and !B and ...) to !(A or B or ...)
-      for(int e = 0; e < expr.length; ++e) expr[e] = expr[e].expr[0];
+      final int es = expr.length;
+      for(int e = 0; e < es; ++e) expr[e] = expr[e].expr[0];
       return new FTNot(info, new FTOr(info, expr));
     }
     return this;
@@ -50,18 +51,18 @@ public final class FTAnd extends FTExpr {
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final FTNode item = expr[0].item(ctx, info);
-    for(int e = 1; e < expr.length; ++e) {
-      and(item, expr[e].item(ctx, info));
-    }
+    final int es = expr.length;
+    for(int e = 1; e < es; ++e) and(item, expr[e].item(ctx, info));
     return item;
   }
 
   @Override
   public FTIter iter(final QueryContext ctx) throws QueryException {
     // initialize iterators
-    final FTIter[] ir = new FTIter[expr.length];
-    final FTNode[] it = new FTNode[expr.length];
-    for(int e = 0; e < expr.length; ++e) {
+    final int es = expr.length;
+    final FTIter[] ir = new FTIter[es];
+    final FTNode[] it = new FTNode[es];
+    for(int e = 0; e < es; ++e) {
       ir[e] = expr[e].iter(ctx);
       it[e] = ir[e].next();
     }
@@ -126,11 +127,12 @@ public final class FTAnd extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
-    neg = new boolean[expr.length];
+    final int es = expr.length;
+    neg = new boolean[es];
 
     int is = 0;
     int n = 0;
-    for(int i = 0; i < expr.length; ++i) {
+    for(int i = 0; i < es; ++i) {
       if(!expr[i].indexAccessible(ic)) return false;
       neg[i] = ic.not;
       if(ic.not) ++n;
@@ -141,7 +143,7 @@ public final class FTAnd extends FTExpr {
     ic.costs(is);
 
     // no index access if first or all operators are negative
-    return !neg[0] && n < expr.length;
+    return !neg[0] && n < es;
   }
 
   @Override

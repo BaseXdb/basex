@@ -52,6 +52,53 @@ public final class FuncItem extends FItem implements Scope {
    * @param arg function arguments
    * @param body function body
    * @param t function type
+   * @param scp variable scope
+   * @param sctx static context
+   */
+  public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
+      final VarScope scp, final StaticContext sctx) {
+    this(n, arg, body, t, false, null, 0, 0, null, scp, sctx);
+  }
+
+  /**
+   * Constructor.
+   * @param n function name
+   * @param arg function arguments
+   * @param body function body
+   * @param t function type
+   * @param cst cast flag
+   * @param cls closure
+   * @param scp variable scope
+   * @param sctx static context
+   */
+  public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
+      final boolean cst, final Map<Var, Value> cls, final VarScope scp,
+      final StaticContext sctx) {
+    this(n, arg, body, t, cst, null, 0, 0, cls, scp, sctx);
+  }
+
+  /**
+   * Constructor for anonymous functions.
+   * @param arg function arguments
+   * @param body function body
+   * @param t function type
+   * @param cl variables in the closure
+   * @param cst cast flag
+   * @param scp variable scope
+   * @param sctx static context
+   */
+  public FuncItem(final Var[] arg, final Expr body, final FuncType t,
+      final Map<Var, Value> cl, final boolean cst, final VarScope scp,
+      final StaticContext sctx) {
+    this(null, arg, body, t, cst, cl, scp, sctx);
+  }
+
+  /**
+   * Constructor.
+   * @param n function name
+   * @param arg function arguments
+   * @param body function body
+   * @param t function type
    * @param cst cast flag
    * @param vl context value
    * @param ps context position
@@ -75,22 +122,6 @@ public final class FuncItem extends FItem implements Scope {
     ctxVal = vl;
     pos = ps;
     size = sz;
-  }
-
-  /**
-   * Constructor for anonymous functions.
-   * @param arg function arguments
-   * @param body function body
-   * @param t function type
-   * @param cl variables in the closure
-   * @param cst cast flag
-   * @param scp variable scope
-   * @param sctx static context
-   */
-  public FuncItem(final Var[] arg, final Expr body, final FuncType t,
-      final Map<Var, Value> cl, final boolean cst, final VarScope scp,
-      final StaticContext sctx) {
-    this(null, arg, body, t, cst, null, 0, 0, cl, scp, sctx);
   }
 
   @Override
@@ -178,16 +209,6 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public String toString() {
-    final FuncType ft = (FuncType) type;
-    final StringBuilder sb = new StringBuilder(FUNCTION).append('(');
-    for(final Var v : vars)
-      sb.append(v).append(v == vars[vars.length - 1] ? "" : ", ");
-    return sb.append(')').append(ft.ret != null ? " as " + ft.ret :
-      "").append(" { ").append(expr).append(" }").toString();
-  }
-
-  @Override
   public boolean uses(final Use u) {
     return u == Use.X30 || expr.uses(u);
   }
@@ -210,7 +231,7 @@ public final class FuncItem extends FItem implements Scope {
       refs[i] = new VarRef(ii, vars[i]);
     }
     return new FuncItem(fun.name, vars, new DynFuncCall(ii, fun, refs), t,
-        fun.cast != null, null, 0, 0, null, sc, ctx.sc);
+        fun.cast != null, null, sc, ctx.sc);
   }
 
   @Override
@@ -246,5 +267,14 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean compiled() {
     return true;
+  }
+
+  @Override
+  public String toString() {
+    final FuncType ft = (FuncType) type;
+    final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
+    for(final Var v : vars) tb.addExt(v).add(v == vars[vars.length - 1] ? "" : ", ");
+    return tb.add(')').add(ft.ret != null ? " as " + ft.ret : "").add(" { ").
+        addExt(expr).add(" }").toString();
   }
 }

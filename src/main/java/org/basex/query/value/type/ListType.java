@@ -45,6 +45,9 @@ public enum ListType implements Type {
     }
   };
 
+  /** Cached enums (faster). */
+  public static final ListType[] VALUES = values();
+
   /** Name. */
   private final QNm name;
   /** Sequence type (lazy). */
@@ -84,9 +87,7 @@ public enum ListType implements Type {
    * @return type or {@code null}
    */
   public static ListType find(final QNm type) {
-    for(final ListType t : values()) {
-      if(t.name.eq(type)) return t;
-    }
+    for(final ListType t : VALUES) if(t.name.eq(type)) return t;
     return null;
   }
 
@@ -120,13 +121,15 @@ public enum ListType implements Type {
       throws QueryException;
 
   @Override
-  public Value cast(final Object o, final InputInfo ii) throws QueryException {
-    return cast(Str.get(o), null, ii);
+  public Value cast(final Object o, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return cast(Str.get(o, ctx, ii), null, ii);
   }
 
   @Override
-  public Value castString(final String o, final InputInfo ii) throws QueryException {
-    return cast(o, ii);
+  public Value castString(final String o, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return cast(o, ctx, ii);
   }
 
   @Override

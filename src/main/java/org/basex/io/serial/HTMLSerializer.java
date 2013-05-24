@@ -113,8 +113,7 @@ public class HTMLSerializer extends OutputSerializer {
   protected void finishEmpty() throws IOException {
     if(ct(true, true)) return;
     print(ELEM_C);
-    if((html5 ? EMPTIES5 : EMPTIES).contains(lc(elem)))
-      return;
+    if((html5 ? EMPTIES5 : EMPTIES).contains(lc(elem))) return;
     sep = false;
     finishClose();
   }
@@ -134,7 +133,7 @@ public class HTMLSerializer extends OutputSerializer {
       if(dt == null) print(M_HTML);
       else print(dt);
       print(ELEM_C);
-      print(nl);
+      if(indent) print(nl);
     }
     return true;
   }
@@ -174,6 +173,7 @@ public class HTMLSerializer extends OutputSerializer {
     EMPTIES.add("base");
     EMPTIES.add("br");
     EMPTIES.add("col");
+    EMPTIES.add("embed");
     EMPTIES.add("hr");
     EMPTIES.add("img");
     EMPTIES.add("input");
@@ -200,6 +200,9 @@ public class HTMLSerializer extends OutputSerializer {
     EMPTIES5.add("source");
     EMPTIES5.add("track");
     EMPTIES5.add("wbr");
+    EMPTIES.add("basefont");
+    EMPTIES.add("frame");
+    EMPTIES.add("isindex");
     // URI attributes
     URIS.add("a:href");
     URIS.add("a:name");

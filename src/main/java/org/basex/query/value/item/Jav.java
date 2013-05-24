@@ -13,24 +13,28 @@ import org.basex.util.*;
 public final class Jav extends Item {
   /** Java object. */
   private final Object val;
+  /** Query context. */
+  private final QueryContext qc;
 
   /**
    * Constructor.
-   * @param v value
+   * @param o value
+   * @param ctx query context
    */
-  public Jav(final Object v) {
+  public Jav(final Object o, final QueryContext ctx) {
     super(AtomType.JAVA);
-    val = v;
+    val = o;
+    qc = ctx;
   }
 
   @Override
-  public byte[] string(final InputInfo ii) {
-    return Token.token(val.toString());
+  public byte[] string(final InputInfo ii) throws QueryException {
+    return Str.get(val, qc, ii).val;
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return string(ii).length != 0;
+    return !val.toString().isEmpty();
   }
 
   @Override

@@ -39,7 +39,8 @@ public abstract class FTExpr extends ParseExpr {
   @Override
   public FTExpr compile(final QueryContext ctx, final VarScope scp)
       throws QueryException {
-    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].compile(ctx, scp);
+    final int es = expr.length;
+    for(int e = 0; e < es; e++) expr[e] = expr[e].compile(ctx, scp);
     return this;
   }
 
@@ -96,7 +97,8 @@ public abstract class FTExpr extends ParseExpr {
 
   @Override
   public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
-    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].indexEquivalent(ic);
+    final int es = expr.length;
+    for(int e = 0; e < es; e++) expr[e] = expr[e].indexEquivalent(ic);
     return this;
   }
 
@@ -126,9 +128,8 @@ public abstract class FTExpr extends ParseExpr {
    */
   final String toString(final Object sep) {
     final StringBuilder sb = new StringBuilder();
-    for(int e = 0; e != expr.length; ++e) {
-      sb.append(e != 0 ? sep.toString() : "").append(expr[e]);
-    }
+    final int es = expr.length;
+    for(int e = 0; e < es; e++) sb.append(e != 0 ? sep.toString() : "").append(expr[e]);
     return sb.toString();
   }
 

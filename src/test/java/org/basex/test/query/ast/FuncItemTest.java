@@ -67,7 +67,7 @@ public final class FuncItemTest extends QueryPlanTest {
   /** Checks if {@code fold-left1(...)} can be used. */
   @Test
   public void foldLeft1Test() {
-    check("hof:fold-left1(function($a, $b) { max(($a, $b)) }, 1 to 42)",
+    check("hof:fold-left1(1 to 42, function($a, $b) { max(($a, $b)) })",
         "42"
     );
   }
@@ -110,7 +110,7 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test
   public void noLoopTest2() {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
-        "map(local:Y#1, function($x) { $x() })[2]",
+        "for-each(function($x) { $x() }, local:Y#1)[2]",
         "",
         "exists(//" + Util.name(FuncItem.class) + ")"
     );
@@ -120,7 +120,7 @@ public final class FuncItemTest extends QueryPlanTest {
   @Test
   public void noLoopTest3() {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
-        "let $f := map(local:Y#1, function($x) { $x() }) return $f[2]",
+        "let $f := for-each(function($x) { $x() }, local:Y#1) return $f[2]",
         "",
         "exists(//" + Util.name(FuncItem.class) + ")"
     );

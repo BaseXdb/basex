@@ -17,7 +17,15 @@ public final class ExprList extends ElementList {
    * Default constructor.
    */
   public ExprList() {
-    list = new Expr[1];
+    this(1);
+  }
+
+  /**
+   * Constructor, specifying an initial array capacity.
+   * @param c array capacity
+   */
+  public ExprList(final int c) {
+    list = new Expr[c];
   }
 
   /**

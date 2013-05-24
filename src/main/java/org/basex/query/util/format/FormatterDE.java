@@ -16,13 +16,13 @@ final class FormatterDE extends Formatter {
 
   /** Written numbers (1-20). */
   private static final byte[][] WORDS = tokens("", "eins", "zwei", "drei",
-      "vier", "fünf", "sechs", "sieben", "acht", "neun", "zehn", "elf",
-      "zwölf", "dreizehn", "vierzehn", "fünfzehn", "sechzehn",
+      "vier", "f\u00fcnf", "sechs", "sieben", "acht", "neun", "zehn", "elf",
+      "zw\u00f6lf", "dreizehn", "vierzehn", "f\u00fcnfzehn", "sechzehn",
       "siebzehn", "achtzehn", "neunzehn");
 
   /** Written numbers (20-100). */
-  private static final byte[][] WORDS20 = tokens("", "", "zwanzig", "dreißig",
-      "vierzig", "fünfzig", "sechzig", "siebzig", "achtzig", "neunzig");
+  private static final byte[][] WORDS20 = tokens("", "", "zwanzig", "drei\u00dfig",
+      "vierzig", "f\u00fcnfzig", "sechzig", "siebzig", "achtzig", "neunzig");
 
   /** Written numbers (1000000, ...). */
   private static final byte[][] WORDS1000000 = tokens(
@@ -34,8 +34,8 @@ final class FormatterDE extends Formatter {
 
   /** Ordinal Numbers (1-20). */
   private static final byte[][] ORDINALS = tokens("", "erst", "zweit",
-      "dritt", "viert", "fünft", "sechst", "siebt", "acht", "neunt",
-      "zehnt", "elft", "zwölft", "dreizehnt", "vierzehnt", "fünfzehnt",
+      "dritt", "viert", "f\u00fcnft", "sechst", "siebt", "acht", "neunt",
+      "zehnt", "elft", "zw\u00f6lft", "dreizehnt", "vierzehnt", "f\u00fcnfzehnt",
       "sechzehnt", "siebzehnt", "achtzehnt", "neunzehnt");
 
   /** Days. */
@@ -51,7 +51,7 @@ final class FormatterDE extends Formatter {
 
   /** Months. */
   private static final byte[][] MONTHS = tokens(
-      "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
+      "Januar", "Februar", "M\u00e4rz", "April", "Mai", "Juni", "Juli",
       "August", "September", "Oktober", "November", "Dezember");
 
   /** AM/PM Markers. */

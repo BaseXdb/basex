@@ -8,6 +8,7 @@ import java.math.*;
 import java.nio.*;
 import java.nio.charset.*;
 
+import org.basex.core.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -234,7 +235,7 @@ public final class FNConvert extends StandardFunc {
     final String enc = encoding(1, BXCO_ENCODING, ctx);
 
     try {
-      return Str.get(toString(bin.input(info), enc));
+      return Str.get(toString(bin.input(info), enc, ctx));
     } catch(final IOException ex) {
       throw BXCO_STRING.thrw(info, ex);
     }
@@ -244,14 +245,16 @@ public final class FNConvert extends StandardFunc {
    * Converts the specified input to a string in the specified encoding.
    * @param is input stream
    * @param enc encoding
+   * @param ctx query context
    * @return resulting value
    * @throws IOException I/O exception
    */
-  public static byte[] toString(final InputStream is, final String enc)
-      throws IOException {
+  public static byte[] toString(final InputStream is, final String enc,
+      final QueryContext ctx) throws IOException {
 
+    final boolean val = ctx.context.prop.is(Prop.CHECKSTRINGS);
     try {
-      return new NewlineInput(is).encoding(enc).validate(true).content();
+      return new NewlineInput(is).encoding(enc).validate(val).content();
     } finally {
       is.close();
     }

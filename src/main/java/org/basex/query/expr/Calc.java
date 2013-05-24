@@ -271,7 +271,7 @@ public enum Calc {
    * @throws QueryException query exception
    */
   final QueryException errNum(final InputInfo ii, final Item it) throws QueryException {
-    throw XPTYPENUM.thrw(ii, info(), it.type);
+    throw NONUMBER.thrw(ii, info(), it.type);
   }
 
   /**
@@ -283,8 +283,8 @@ public enum Calc {
    */
   final Dur checkDur(final InputInfo ii, final Item it) throws QueryException {
     final Type ip = it.type;
-    if(!(it instanceof Dur)) XPDUR.thrw(ii, info(), ip);
-    if(ip == DUR) throw SIMPLDUR.thrw(ii, info(), it);
+    if(!(it instanceof Dur)) NODUR.thrw(ii, info(), ip);
+    if(ip == DUR) throw NOSUBDUR.thrw(ii, info(), it);
     return (Dur) it;
   }
 

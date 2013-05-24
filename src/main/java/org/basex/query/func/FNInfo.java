@@ -46,7 +46,7 @@ public final class FNInfo extends StandardFunc {
   }
 
   @Override
-  Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx) throws QueryException {
     if(sig == Function.TRACE) type = expr[0].type();
     return this;
   }
@@ -77,7 +77,7 @@ public final class FNInfo extends StandardFunc {
 
     final Item it = expr[0].item(ctx, info);
     if(it == null) {
-      if(al == 1) XPEMPTY.thrw(info, description());
+      if(al == 1) INVEMPTY.thrw(info, description());
     } else {
       name = checkQNm(it, ctx);
     }
@@ -111,7 +111,7 @@ public final class FNInfo extends StandardFunc {
    */
   private static ValueIter avlEnvVars() {
     final ValueBuilder vb = new ValueBuilder();
-    for(final Object k : System.getenv().keySet()) vb.add(Str.get(k));
+    for(final Object k : System.getenv().keySet()) vb.add(Str.get(k.toString()));
     return vb;
   }
 

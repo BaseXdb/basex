@@ -167,6 +167,16 @@ public final class QueryException extends Exception {
   }
 
   /**
+   * Sets an error.
+   * @param e error
+   * @return self reference
+   */
+  public QueryException err(final Err e) {
+    err = e;
+    return this;
+  }
+
+  /**
    * Finds line and column for the specified query parser.
    * @param parser parser
    */
@@ -210,7 +220,7 @@ public final class QueryException extends Exception {
   @Override
   public String getMessage() {
     final TokenBuilder tb = new TokenBuilder();
-    if(info != null) tb.add(STOPPED_AT).add(' ').add(info.toString()).add(COL).add(NL);
+    if(info != null) tb.add(STOPPED_AT).add(info.toString()).add(COL).add(NL);
     final byte[] code = name.local();
     if(code.length != 0) tb.add('[').add(code).add("] ");
     tb.add(getLocalizedMessage());

@@ -2,9 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -22,7 +21,7 @@ public abstract class Logical extends Arr {
    * @param ii input info
    * @param e expression list
    */
-  Logical(final InputInfo ii, final Expr[] e) {
+  protected Logical(final InputInfo ii, final Expr[] e) {
     super(ii, e);
     type = SeqType.BLN;
   }
@@ -31,33 +30,41 @@ public abstract class Logical extends Arr {
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
     final boolean and = this instanceof And;
-    for(int e = 0; e < expr.length; e++) {
-      expr[e] = expr[e].compEbv(ctx);
-      if(!expr[e].isValue()) continue;
-
-      // atomic items can be pre-evaluated
-      ctx.compInfo(OPTREMOVE, description(), expr[e]);
-      if(expr[e].ebv(ctx, info).bool(info) ^ and) return Bln.get(!and);
-      expr = Array.delete(expr, e--);
+    final int es = expr.length;
+    final ExprList el = new ExprList(es);
+    for(int e = 0; e < es; e++) {
+      final Expr ex = expr[e].compEbv(ctx);
+      if(ex.isValue()) {
+        // atomic items can be pre-evaluated
+        ctx.compInfo(OPTREMOVE, this, expr[e]);
+        if(ex.ebv(ctx, info).bool(info) ^ and) return Bln.get(!and);
+      } else {
+        el.add(ex);
+      }
     }
-    return expr.length == 0 ? Bln.get(and) : this;
+    if(el.isEmpty()) return Bln.get(and);
+    expr = el.finish();
+    return this;
   }
 
   /**
    * Flattens nested logical expressions.
    * @param ctx query context
    */
-  final void compFlatten(final QueryContext ctx) {
+  protected final void compFlatten(final QueryContext ctx) {
     // flatten nested expressions
-    final ArrayList<Expr> tmp = new ArrayList<Expr>(expr.length);
+    final int es = expr.length;
+    final ExprList tmp = new ExprList(es);
+    final boolean and = this instanceof And;
+    final boolean or = this instanceof Or;
     for(final Expr ex : expr) {
-      if(ex.getClass().isInstance(this)) {
-        Collections.addAll(tmp, ((Logical) ex).expr);
+      if(and && ex instanceof And || or && ex instanceof Or) {
+        for(final Expr e : ((Logical) ex).expr) tmp.add(e);
         ctx.compInfo(OPTFLAT, ex);
       } else {
         tmp.add(ex);
       }
     }
-    if(expr.length != tmp.size()) expr = tmp.toArray(new Expr[tmp.size()]);
+    if(es != tmp.size()) expr = tmp.finish();
   }
 }

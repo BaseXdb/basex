@@ -67,15 +67,14 @@ public final class QueryResources {
       DBNodeSeq.get(d.resources.docs(), d, true, true), d.meta.name);
 
     addData(d);
+    synchronized(ctx.context.dbs) { ctx.context.dbs.pin(d); }
   }
 
   /**
    * Closes all opened data references that have not been added by the global context.
    */
   void close() {
-    for(int d = ctx.nodes != null ? 1 : 0; d < datas; d++) {
-      Close.close(data[d], ctx.context);
-    }
+    for(int d = 0; d < datas; d++) Close.close(data[d], ctx.context);
     datas = 0;
   }
 

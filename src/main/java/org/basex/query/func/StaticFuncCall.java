@@ -58,7 +58,7 @@ public abstract class StaticFuncCall extends Arr {
 
     if(func.inline(ctx)) {
       // inline the function
-      ctx.compInfo(OPTINLINEFN, func.name.string());
+      ctx.compInfo(OPTINLINEFN, func.name);
 
       // create let bindings for all variables
       final LinkedList<GFLWOR.Clause> cls = expr.length == 0 ? null :

@@ -179,7 +179,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    throw (this == it ? TYPECMP : XPTYPECMP).thrw(ii, type, it.type);
+    throw (this == it ? TYPECMP : INVTYPECMP).thrw(ii, type, it.type);
   }
 
   /**

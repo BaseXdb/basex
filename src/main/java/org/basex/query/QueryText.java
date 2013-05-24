@@ -373,9 +373,9 @@ public interface QueryText {
   String IGNORE = null;
 
   /** Decimal declarations. */
-  String[] DECFORMATS = {
+  byte[][] DECFORMATS = tokens(
     DF_DEC, DF_DIG, DF_GRP, DF_INF, DF_MIN, DF_NAN, DF_PAT, DF_PC, DF_PM, DF_ZG
-  };
+  );
 
   /** Parser token. */
   String CONCAT = "||";
@@ -760,7 +760,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTFLWOR = "simplifying flwor expression";
   /** Optimization info. */
-  String OPTINLINEFN = "inlining function %(...)";
+  String OPTINLINEFN = "inlining function %";
   /** Optimization info. */
   String OPTINLINE = "inlining %";
   /** Optimization info. */

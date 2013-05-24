@@ -26,13 +26,15 @@ public final class SwitchCase extends Arr {
 
   @Override
   public void checkUp() throws QueryException {
-    for(int e = 1; e < expr.length; ++e) checkNoUp(expr[e]);
+    final int es = expr.length;
+    for(int e = 1; e < es; ++e) checkNoUp(expr[e]);
   }
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     // compile and simplify branches
-    for(int e = 0; e < expr.length; e++) {
+    final int es = expr.length;
+    for(int e = 0; e < es; e++) {
       try {
         expr[e] = expr[e].compile(ctx, scp);
       } catch(final QueryException ex) {
@@ -52,7 +54,8 @@ public final class SwitchCase extends Arr {
   public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
       final Expr e) throws QueryException {
     boolean change = false;
-    for(int i = 0; i < expr.length; i++) {
+    final int es = expr.length;
+    for(int i = 0; i < es; i++) {
       Expr nw;
       try {
         nw = expr[i].inline(ctx, scp, v, e);
@@ -70,8 +73,9 @@ public final class SwitchCase extends Arr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int e = 1; e < expr.length; ++e) sb.append(' ' + CASE + ' ' + expr[e]);
-    if(expr.length == 1) sb.append(' ' + DEFAULT);
+    final int es = expr.length;
+    for(int e = 1; e < es; ++e) sb.append(' ' + CASE + ' ' + expr[e]);
+    if(es == 1) sb.append(' ' + DEFAULT);
     sb.append(' ' + RETURN + ' ' + expr[0]);
     return sb.toString();
   }
@@ -93,7 +97,8 @@ public final class SwitchCase extends Arr {
    */
   protected VarUsage countCases(final Var v) {
     final VarUsage all = VarUsage.NEVER;
-    for(int i = 1; i < expr.length; i++)
+    final int es = expr.length;
+    for(int i = 1; i < es; i++)
       if(all.plus(expr[i].count(v)) == VarUsage.MORE_THAN_ONCE) break;
     return all;
   }

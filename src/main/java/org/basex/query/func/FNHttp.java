@@ -29,8 +29,8 @@ public final class FNHttp extends StandardFunc {
     checkCreate(ctx);
 
     // get request node
-    final ANode request = expr[0].item(ctx, info) == null ? null :
-      checkNode(expr[0].item(ctx, info));
+    final Item req = expr[0].item(ctx, info);
+    final ANode request = req == null ? null : checkNode(req);
 
     // get HTTP URI
     final byte[] href = expr.length >= 2 ? checkEStr(expr[1].item(ctx, info)) : null;

@@ -106,7 +106,7 @@ public final class Var extends ExprInfo {
 
     if(t == null) return;
     if(declared != null) {
-      if(declared.occ.intersect(t.occ) == null) Err.NOCAST.thrw(ii, t, declared);
+      if(declared.occ.intersect(t.occ) == null) Err.INVCAST.thrw(ii, t, declared);
       if(!t.convertibleTo(declared)) return;
     }
 
@@ -157,7 +157,7 @@ public final class Var extends ExprInfo {
       throws QueryException {
     if(!checksType() || declared.instance(val)) return val;
     if(promote) return declared.funcConvert(ctx, ii, val);
-    throw Err.NOCAST.thrw(ii, val.type(), declared);
+    throw Err.INVCAST.thrw(ii, val.type(), declared);
   }
 
   /**
@@ -205,14 +205,6 @@ public final class Var extends ExprInfo {
   @Override
   public int hashCode() {
     return id;
-  }
-
-  /**
-   * Sets the declared return type of this variable.
-   * @param t return type
-   */
-  public void setDeclaredType(final SeqType t) {
-    declared = t;
   }
 
   /**

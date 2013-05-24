@@ -86,7 +86,7 @@ public final class FNFormat extends StandardFunc {
     if(it == null) it = Dbl.NAN;
     else if(!it.type.isNumberOrUntyped()) number(this, it);
     // retrieve picture
-    final String pic = string(checkStr(expr[1], ctx));
+    final byte[] pic = checkStr(expr[1], ctx);
     // retrieve format declaration
     final byte[] name = expr.length == 3 ? trim(checkEStr(expr[2], ctx)) : EMPTY;
     final QNm frm = new QNm(name, ctx);

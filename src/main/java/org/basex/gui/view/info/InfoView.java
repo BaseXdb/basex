@@ -200,11 +200,11 @@ public final class InfoView extends View implements LinkListener {
         result.add(LI + line);
       } else if(line.startsWith(ERROR_C)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) {
-          final Pattern p = Pattern.compile(STOPPED_AT + " (.*)" + COL);
+          final Pattern p = Pattern.compile(STOPPED_AT + "(.*)" + COL);
           final Matcher m = p.matcher(split[i]);
           if(m.find()) {
             final TokenBuilder tb = new TokenBuilder();
-            tb.add(STOPPED_AT).add(' ').uline().add(m.group(1)).uline().add(COL);
+            tb.add(STOPPED_AT).uline().add(m.group(1)).uline().add(COL);
             split[i] = tb.toString();
           }
           err.add(split[i]);

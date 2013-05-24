@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.util.*;
 
+import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -64,7 +65,9 @@ public final class QueryInfo {
       else tb.add("local ").add(Arrays.toString(writeLocked.toArray()));
       tb.add(NL);
     }
-    tb.addExt(NL + QUERY_EXECUTED_X, Performance.getTime(total, runs));
+    final IO io = qp.ctx.sc.baseIO();
+    final String name = io == null ? "" : " \"" + io.name() + "\"";
+    tb.addExt(NL + QUERY_EXECUTED_X_X, name, Performance.getTime(total, runs));
     return tb.toString();
   }
 }

@@ -11,6 +11,7 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -143,12 +144,15 @@ public final class FNClient extends StandardFunc {
       // evaluate query
       while(cq.more()) {
         final String result = cq.next();
-        vb.add(cq.type().castString(result, info));
+        vb.add(cq.type().castString(result, ctx, info));
       }
       return vb.value();
     } catch(final BaseXException ex) {
       final Matcher m = QUERYPAT.matcher(ex.getMessage());
-      if(m.find()) throw new QueryException(info, new QNm(m.group(1)), m.group(2));
+      if(m.find()) {
+        Err.thrw(m.group(1), info, m.group(2));
+        throw new QueryException(info, new QNm(m.group(1)), m.group(2));
+      }
       throw BXCL_QUERY.thrw(info, ex);
     } catch(final IOException ex) {
       throw BXCL_COMM.thrw(info, ex);

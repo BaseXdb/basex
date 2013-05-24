@@ -481,20 +481,19 @@ final class XMLScanner extends Proc {
       int ch = nextChar();
       ent.add(ch);
       if(ch == 'x') {
-        b = 16;
+        b = 0x10;
         ent.add(ch = nextChar());
       }
       int n = 0;
       do {
         final boolean m = ch >= '0' && ch <= '9';
-        final boolean h = b == 16 && (ch >= 'a' && ch <= 'f' ||
-            ch >= 'A' && ch <= 'F');
+        final boolean h = b == 0x10 && (ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F');
         if(!m && !h) {
           completeRef(ent);
           return QUESTION;
         }
         n *= b;
-        n += ch & 15;
+        n += ch & 0x0F;
         if(!m) n += 9;
         ent.add(ch = nextChar());
       } while(ch != ';');

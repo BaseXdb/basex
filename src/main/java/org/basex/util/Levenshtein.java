@@ -21,6 +21,16 @@ public final class Levenshtein {
    * Compares two character arrays for similarity.
    * @param token token to be compared
    * @param sub second token to be compared
+   * @return true if the arrays are similar
+   */
+  public boolean similar(final byte[] token, final byte[] sub) {
+    return similar(token, sub, 0);
+  }
+
+  /**
+   * Compares two character arrays for similarity.
+   * @param token token to be compared
+   * @param sub second token to be compared
    * @param err number of allowed errors; dynamic calculation if value is 0
    * @return true if the arrays are similar
    */

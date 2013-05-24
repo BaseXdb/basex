@@ -39,11 +39,11 @@ public final class FTWords extends FTExpr {
   boolean first;
   /** Search mode; default: {@link FTMode#ANY}. */
   FTMode mode = FTMode.ANY;
-
   /** Query expression. */
-  private Expr query;
+  Expr query;
   /** Minimum and maximum occurrences. */
-  private Expr[] occ;
+  Expr[] occ;
+
   /** Current token number. */
   private int tokNum;
   /** Fast evaluation. */

@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -31,15 +32,23 @@ public final class Union extends Set {
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
 
-    for(int e = 0; e != expr.length; ++e) {
-      // remove empty operands
-      if(expr[e].isEmpty()) {
-        ctx.compInfo(OPTREMOVE, description(), expr[e]);
-        expr = Array.delete(expr, e--);
+    final int es = expr.length;
+    final ExprList el = new ExprList(es);
+    for(final Expr ex : expr) {
+      if(ex.isEmpty()) {
+        // remove empty operands
+        ctx.compInfo(OPTREMOVE, this, ex);
+      } else {
+        el.add(ex);
       }
     }
-    // results must always be sorted
-    return expr.length == 0 ? Empty.SEQ : expr.length == 1 && iterable ? expr[0] : this;
+    // no expressions: return empty sequence
+    if(el.isEmpty()) return Empty.SEQ;
+    // ensure that results are always sorted
+    if(el.size() == 1 && iterable) return el.get(0);
+    // replace expressions with optimized list
+    if(el.size() != es) expr = el.finish();
+    return this;
   }
 
   @Override

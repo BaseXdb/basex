@@ -78,7 +78,8 @@ public enum Err {
   /** BXDB0006. */
   BXDB_SINGLE(BXDB, 6, "Database path '%' points to more than one document."),
   /** BXDB0007. */
-  BXDB_OPENED(BXDB, 7, "Database '%' is opened by another process."),
+  BXDB_OPENED(BXDB, 7,
+      "Database '%' cannot be updated, as it is opened by another process."),
   /** BXDB0008. */
   BXDB_RENAME(BXDB, 8, "%: Invalid target path."),
   /** BXDB0009. */
@@ -340,7 +341,7 @@ public enum Err {
   DATECALC(FOCA, 5, "Invalid % calculation: %."),
 
   /** FOCH0001. */
-  INVCODE(FOCH, 1, "Invalid codepoint '%'."),
+  INVCODE(FOCH, 1, "Invalid XML character '&#x%;'."),
   /** FOCH0002. */
   IMPLCOL(FOCH, 2, "Unknown collation %."),
   /** FOCH0003. */
@@ -427,9 +428,11 @@ public enum Err {
   /** FORG0001. */
   FUNCAST(FORG, 1, "Invalid % cast: %."),
   /** FORG0001. */
-  INVCAST(FORG, 1, "Invalid cast from % to %: %."),
+  FUNCCASTEX(FORG, 1, "Invalid cast from % to %: %."),
   /** FORG0001. */
   DATEFORMAT(FORG, 1, "Wrong % format: '%' (try e.g. '%')."),
+  /** FORG0001. */
+  INVSTRING(FORG, 1, "Invalid XML character '&#x%;' in specified string."),
   /** FORG0002. */
   URIINVRES(FORG, 2, "URI argument is invalid: %."),
   /** FORG0002. */
@@ -563,6 +566,10 @@ public enum Err {
   SERATTR(SENR, 1, "Attributes and namespaces cannot be serialized:%."),
   /** SENR0001. */
   SERFUNC(SENR, 1, "Functions cannot be serialized: %."),
+  /** SEPM0004. */
+  SERSA(SEPM, 4, "If 'standalone' is specified, the root must be a single element."),
+  /** SEPM0004. */
+  SERDT(SEPM, 4, "If 'doctype-system' is specified, the root must be a single element."),
   /** SESU0007. */
   SERENCODING(SESU, 7, "Encoding not supported: '%'."),
   /** SEPM0009. */
@@ -585,9 +592,9 @@ public enum Err {
   SERWHICH(SEPM, 17, "Unknown serialization parameter: '%'."),
 
   /** XPDY0002. */
-  VAREMPTY(XPDY, 2, "No value assigned to %."),
+  NOCTX(XPDY, 2, "No context item defined to evaluate '%'."),
   /** XPDY0002. */
-  XPNOCTX(XPDY, 2, "No context item defined to evaluate '%'."),
+  VAREMPTY(XPDY, 2, "No value assigned to %."),
   /** XPDY0050. */
   CTXNODE(XPDY, 50, "Root of the context item must be a document node."),
   /** XPDY0050. */
@@ -762,21 +769,21 @@ public enum Err {
   /** XPST0017. */
   FUNCPRIV(XPST, 17, "Function is private: %(...)."),
   /** XPST0017. */
-  XPARGS(XPST, 17, "%: wrong number of arguments."),
+  FUNCARGS(XPST, 17, "%: wrong number of arguments."),
   /** XPST0017. */
-  FUNSIMILAR(XPST, 17, "Unknown function '%'; similar: '%'."),
+  FUNCSIMILAR(XPST, 17, "Unknown function '%'; similar: '%'."),
   /** XPST0017. */
   FUNCTYPE(XPST, 17, "%(...): wrong number of arguments."),
-  /** XPST0003. */
-  FEATURE30(XPST, 17, "Feature not available in XQuery 1.0."),
   /** XPST0017. */
   FUNCUNKNOWN(XPST, 17, "Unknown function: %(...)."),
   /** XPST0017. */
-  WHICHJAVA(XPST, 17, "Java function '%(...)' not found."),
+  FUNCJAVA(XPST, 17, "Java function '%(...)' not found."),
   /** XPST0017. */
-  JAVAAMB(XPST, 17, "Signature is ambiguous: '%(...)'."),
+  JAVAAMBIG(XPST, 17, "Signature is ambiguous: '%(...)'."),
   /** XPST0017. */
-  INITJAVA(XPST, 17, "Class cannot be initialized: %."),
+  JAVAINIT(XPST, 17, "Class cannot be initialized: %."),
+  /** XPST0003. */
+  FUNC30(XPST, 17, "Function not available in XQuery 1.0."),
 
   /** XPST0051. */
   TYPEUNKNOWN(XPST, 51, "Unknown type '%'."),
@@ -788,34 +795,34 @@ public enum Err {
   NSMISS(XPST, 81, "QName '%' has no namespace."),
 
   /** XPTY0004. */
-  XPSEQ(XPTY, 4, "Single item expected, % found."),
+  SEQCAST(XPTY, 4, "Single item expected, % found."),
   /** XPTY0004. */
-  XPINVCAST(XPTY, 4, "Invalid cast from % to %: %."),
+  INVCAST(XPTY, 4, "Cannot cast from % to %."),
   /** XPTY0004. */
-  XPINVTREAT(XPTY, 4, "Cannot treat % as %: %."),
+  INVCASTEX(XPTY, 4, "Invalid cast from % to %: %."),
   /** XPTY0004. */
-  NOCAST(XPTY, 4, "Cannot cast from % to %."),
+  INVTREAT(XPTY, 4, "Cannot treat % as %: %."),
   /** XPTY0004. */
   CALCTYPE(XPTY, 4, "% not defined for % and %."),
 
   /** XPTY0004. */
-  SIMPLDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
+  NOSUBDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
   /** XPTY0004. */
-  XPEMPTY(XPTY, 4, "%: no empty sequence allowed."),
+  INVEMPTY(XPTY, 4, "%: no empty sequence allowed."),
   /** XPTY0004. */
-  XPEMPTYPE(XPTY, 4, "%: % expected, empty sequence found."),
+  INVEMPTYEX(XPTY, 4, "%: % expected, empty sequence found."),
   /** XPTY0004. */
-  XPDUR(XPTY, 4, "%: duration expected, % found."),
+  NODUR(XPTY, 4, "%: duration expected, % found."),
   /** XPTY0004. */
-  XPTYPECMP(XPTY, 4, "% and % cannot be compared."),
+  INVTYPECMP(XPTY, 4, "% and % cannot be compared."),
   /** XPTY0004. */
-  XPTYPENUM(XPTY, 4, "%: number expected, % found."),
+  NONUMBER(XPTY, 4, "%: number expected, % found."),
   /** XPTY0004. */
-  XPNAME(XPTY, 4, "Expecting name."),
+  NONAME(XPTY, 4, "Expecting name, '%' found."),
   /** XPTY0004. */
-  XPATT(XPTY, 4, "Cannot add attributes to a document node."),
+  DOCATTS(XPTY, 4, "Cannot add attributes to a document node."),
   /** XPTY0004. */
-  XPNS(XPTY, 4, "Cannot add namespaces to a document node."),
+  DOCNS(XPTY, 4, "Cannot add namespaces to a document node."),
   /** XPTY0004. */
   CPIWRONG(XPTY, 4, "Name has invalid type: '%'."),
   /** XPTY0004. */
@@ -906,7 +913,7 @@ public enum Err {
   /** XQST0049. */
   VARDUPL(XQST, 49, "Duplicate declaration of %."),
   /** XQST0052. */
-  XQTYPEUNKNOWN(XQST, 52, "Unknown type '%'."),
+  TYPEUNKNOWN30(XQST, 52, "Unknown cast type '%'."),
   /** XQST0054. */
   CIRCVAR(XQST, 54, "Global variable depends on itself: %"),
   /** XQST0055. */
@@ -965,6 +972,10 @@ public enum Err {
   GVARNOTDEFINED(XQST, 94, "Undeclared grouping variable '%'."),
   /** XPST0097. */
   INVDECFORM(XQST, 97, "Invalid decimal-format property: %='%'."),
+  /** XPST0097. */
+  INVDECSINGLE(XQST, 97, "Decimal-format property must be a single character: %='%'."),
+  /** XPST0097. */
+  INVDECZERO(XQST, 97, "Zero-digit property must be Unicode digit with value zero: '%'."),
   /** XPST0098. */
   DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format '%'."),
   /** XQST0099. */
@@ -1072,8 +1083,8 @@ public enum Err {
   /** XUTY0007. */
   UPTRGDELEMPT(XUTY, 7, "Only nodes can be deleted."),
   /** XUTY0008. */
-  UPTRGMULT(XUTY, 8, "Single element, text, attribute, comment or pi expected"
-      + " as replace target."),
+  UPTRGMULT(XUTY, 8,
+      "Single element, text, attribute, comment or pi expected as replace target."),
   /** XUTY0010. */
   UPWRELM(XUTY, 10, "Replacing nodes must be no attribute nodes."),
   /** XUTY0011. */
@@ -1084,6 +1095,9 @@ public enum Err {
   UPCOPYMULT(XUTY, 13, "Source expression in copy clause must return a single node."),
   /** XUTY0022. */
   UPATTELM2(XUTY, 22, "Insert target must be an element.");
+
+  /** Cached enums (faster). */
+  public static final Err[] VALUES = values();
 
   /** Error type. */
   public final ErrType type;
@@ -1201,11 +1215,11 @@ public enum Err {
     /**
      * Constructor for non-standard errors.
      * @param pref QName prefix
-     * @param euri error URI
+     * @param u error URI
      */
-    ErrType(final byte[] pref, final byte[] euri) {
+    ErrType(final byte[] pref, final byte[] u) {
       prefix = Token.string(pref);
-      uri = euri;
+      uri = u;
     }
 
     /**
@@ -1235,6 +1249,24 @@ public enum Err {
   }
 
   /**
+   * Returns an error for the specified name.
+   * @param name error name
+   * @param ii input info
+   * @param msg error message
+   * @return exception or null
+   * @throws QueryException query exception
+   */
+  public static QueryException thrw(final String name, final InputInfo ii,
+      final String msg) throws QueryException {
+
+    for(final Err e : VALUES) {
+      if(e.toString().equals(name)) throw new QueryException(ii, e.qname(), msg).err(e);
+    }
+    return null;
+  }
+
+
+  /**
    * Throws a comparison exception.
    * @param ii input info
    * @param it1 first item
@@ -1244,7 +1276,7 @@ public enum Err {
    */
   public static QueryException diff(final InputInfo ii, final Item it1, final Item it2)
       throws QueryException {
-    throw (it1 == it2 ? TYPECMP : XPTYPECMP).thrw(ii, it1.type, it2.type);
+    throw (it1 == it2 ? TYPECMP : INVTYPECMP).thrw(ii, it1.type, it2.type);
   }
 
   /**
@@ -1257,7 +1289,7 @@ public enum Err {
    */
   public static QueryException cast(final InputInfo ii, final Type t, final Value v)
       throws QueryException {
-    throw XPINVCAST.thrw(ii, v.type, t, v);
+    throw INVCASTEX.thrw(ii, v.type, t, v);
   }
 
   /**
@@ -1270,7 +1302,7 @@ public enum Err {
    */
   public static QueryException treat(final InputInfo ii, final SeqType t, final Expr e)
       throws QueryException {
-    throw XPINVTREAT.thrw(ii, e.description(), t, e);
+    throw INVTREAT.thrw(ii, e.description(), t, e);
   }
 
   /**
@@ -1283,7 +1315,7 @@ public enum Err {
    */
   public static QueryException type(final ParseExpr e, final Type t, final Item it)
       throws QueryException {
-    throw NOCAST.thrw(e.info, it.type, t);
+    throw INVCAST.thrw(e.info, it.type, t);
   }
 
   /**
@@ -1295,7 +1327,7 @@ public enum Err {
    */
   public static QueryException number(final ParseExpr e, final Item it)
       throws QueryException {
-    throw XPTYPENUM.thrw(e.info, e.description(), it.type);
+    throw NONUMBER.thrw(e.info, e.description(), it.type);
   }
 
   /**

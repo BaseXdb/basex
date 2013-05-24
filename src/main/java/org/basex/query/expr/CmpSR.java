@@ -99,7 +99,7 @@ public final class CmpSR extends Single {
    * @throws QueryException query exception
    */
   private boolean eval(final Item it) throws QueryException {
-    if(!it.type.isStringOrUntyped()) XPTYPECMP.thrw(info, it.type, AtomType.STR);
+    if(!it.type.isStringOrUntyped()) INVTYPECMP.thrw(info, it.type, AtomType.STR);
     final byte[] s = it.string(info);
     final int mn = min == null ? 1 : Token.diff(s, min);
     final int mx = max == null ? -1 : Token.diff(s, max);

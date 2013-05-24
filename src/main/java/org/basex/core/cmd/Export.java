@@ -41,7 +41,7 @@ public final class Export extends Command {
   protected boolean run() {
     try {
       final Data data = context.data();
-      export(data, args[0], this);
+      export(data, args[0], new SerializerProp(data.meta.prop.get(Prop.EXPORTER)), this);
       return info(DB_EXPORTED_X, data.meta.name, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));
@@ -57,16 +57,15 @@ public final class Export extends Command {
    * Exports the current database to the specified path.
    * Files and directories in {@code path} will be possibly overwritten.
    * @param data data reference
-   * @param target directory
+   * @param path directory
+   * @param sp serialization properties
    * @param e calling instance
    * @throws IOException I/O exception
    */
-  public static void export(final Data data, final String target,
+  public static void export(final Data data, final String path, final SerializerProp sp,
       final Export e) throws IOException {
 
-    final String exp = data.meta.prop.get(Prop.EXPORTER);
-    final SerializerProp sp = new SerializerProp(exp);
-    final IOFile root = new IOFile(target);
+    final IOFile root = new IOFile(path);
     root.md();
 
     final HashSet<String> exported = new HashSet<String>();

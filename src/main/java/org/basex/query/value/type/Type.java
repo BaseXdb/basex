@@ -87,8 +87,11 @@ public interface Type {
     /** xs:NOTATION.              */ NOT(83),
     /** java().                   */ JAVA(86);
 
+    /** Cached enums (faster). */
+    public static final ID[] VALUES = values();
     /** Node ID. */
     private final byte id;
+
     /**
      * Constructor.
      * @param i type id
@@ -111,7 +114,7 @@ public interface Type {
      * @return type ID if found, {@code null} otherwise
      */
     public static ID get(final byte b) {
-      for(final ID i : values()) if(i.id == b) return i;
+      for(final ID i : VALUES) if(i.id == b) return i;
       return null;
     }
 
@@ -143,20 +146,23 @@ public interface Type {
   /**
    * Casts the specified Java object to the XQuery data type.
    * @param o Java object
+   * @param ctx TODO
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value cast(final Object o, final InputInfo ii) throws QueryException;
+  Value cast(final Object o, QueryContext ctx, final InputInfo ii) throws QueryException;
 
   /**
    * Casts the specified string to the XQuery data type.
    * @param s string object
+   * @param ctx TODO
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Value castString(final String s, final InputInfo ii) throws QueryException;
+  Value castString(final String s, QueryContext ctx, final InputInfo ii)
+      throws QueryException;
 
   /**
    * Returns the sequence type of this data type.

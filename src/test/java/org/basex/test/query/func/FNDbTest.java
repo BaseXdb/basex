@@ -255,7 +255,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_OUTPUT.args("x"), "x");
     query(_DB_OUTPUT.args("('x','y')"), "x y");
     query(_DB_OUTPUT.args("<a/>"), "<a/>");
-    error(_DB_OUTPUT.args("x") + ",1", Err.UPNOT);
+    error(_DB_OUTPUT.args("x") + ",1", Err.UPALL);
     error(_DB_OUTPUT.args(" count#1"), Err.FIVALUE);
   }
 
@@ -460,11 +460,16 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/html"), 1);
   }
 
-  /** Test method. */
+  /**
+   * Test method.
+   * @throws BaseXException database exception
+   */
   @Test
-  public void optimize() {
+  public void optimize() throws BaseXException {
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_OPTIMIZE.args(NAME));
+    error(_DB_OPTIMIZE.args(NAME, "true()"), Err.UPDBOPTERR);
+    new Close().execute(context);
     query(_DB_OPTIMIZE.args(NAME, "true()"));
   }
 
@@ -543,5 +548,31 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_CONTENT_TYPE.args(NAME, "xml"), MimeTypes.APP_XML);
     query(_DB_CONTENT_TYPE.args(NAME, "raw"), MimeTypes.APP_OCTET);
     error(_DB_CONTENT_TYPE.args(NAME, "test"), Err.WHICHRES);
+  }
+
+  /** Test method. */
+  @Test
+  public void export() {
+    // exports the database
+    query(_DB_EXPORT.args(NAME, new IOFile(Prop.TMP, NAME)));
+    final IOFile f = new IOFile(new IOFile(Prop.TMP, NAME), FILE.replaceAll(".*/", ""));
+    query(_FILE_EXISTS.args(f));
+    // serializes as text; ensures that the output contains no angle bracket
+    query(_DB_EXPORT.args(NAME, new IOFile(Prop.TMP, NAME), " map{'method':='text'}"));
+    query("0[" + CONTAINS.args(_FILE_READ_TEXT.args(f), "&lt;") + "]", "");
+    // deletes the exported file
+    query(_FILE_DELETE.args(f));
+  }
+
+  /** Test method. */
+  @Test
+  public void name() {
+    query(_DB_NAME.args(_DB_OPEN.args(NAME)), NAME);
+  }
+
+  /** Test method. */
+  @Test
+  public void path() {
+    query(_DB_PATH.args(_DB_OPEN.args(NAME)), FILE.replaceAll(".*/", ""));
   }
 }

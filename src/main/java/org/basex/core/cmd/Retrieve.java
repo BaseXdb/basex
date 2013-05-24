@@ -40,7 +40,7 @@ public final class Retrieve extends ACreate {
       } finally {
         bi.close();
       }
-      return info(QUERY_EXECUTED_X, perf);
+      return info(QUERY_EXECUTED_X_X, "", perf);
     } catch(final IOException ex) {
       return error(FILE_NOT_STORED_X, ex);
     }

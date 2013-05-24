@@ -140,7 +140,7 @@ public abstract class AQuery extends Command {
     } catch(final QueryException ex) {
       Util.debug(ex);
       qe = ex;
-      if(qp != null) qp.close();
+      qp.close();
       return false;
     }
   }
@@ -154,6 +154,8 @@ public abstract class AQuery extends Command {
     } catch(final QueryException ex) {
       qp = null;
       error(Util.message(ex));
+    } finally {
+      qp.close();
     }
   }
 

@@ -59,7 +59,7 @@ public abstract class ParseExpr extends Expr {
       vb.add(n);
       n = ir.next();
       if(n != null) vb.add(Str.get("..."));
-      XPSEQ.thrw(ii, vb.value());
+      SEQCAST.thrw(ii, vb.value());
     }
     return it;
   }
@@ -208,7 +208,7 @@ public abstract class ParseExpr extends Expr {
     final Item it = checkNoEmpty(e.item(ctx, info), AtomType.BLN);
     final Type ip = it.type;
     if(ip == AtomType.BLN || ip.isUntyped()) return it.bool(info);
-    throw Err.NOCAST.thrw(info, it.type, AtomType.BLN);
+    throw Err.INVCAST.thrw(info, it.type, AtomType.BLN);
   }
 
   /**
@@ -249,11 +249,24 @@ public abstract class ParseExpr extends Expr {
   public final long checkItr(final Item it) throws QueryException {
     final Type ip = it.type;
     if(ip.instanceOf(AtomType.ITR) || ip.isUntyped()) return it.itr(info);
-    throw Err.NOCAST.thrw(info, it.type, AtomType.ITR);
+    throw Err.INVCAST.thrw(info, it.type, AtomType.ITR);
   }
 
   /**
-   * Checks if the specified expression is a node.
+   * Checks if the specified expression yields a node.
+   * Returns the boolean or throws an exception.
+   * @param e expression to be checked
+   * @param ctx query context
+   * @return boolean
+   * @throws QueryException query exception
+   */
+  public final ANode checkNode(final Expr e, final QueryContext ctx)
+      throws QueryException {
+    return checkNode(checkItem(e, ctx));
+  }
+
+  /**
+   * Checks if the specified item is a node.
    * Returns the node or an exception.
    * @param it item to be checked
    * @return item
@@ -261,7 +274,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final ANode checkNode(final Item it) throws QueryException {
     if(it instanceof ANode) return (ANode) it;
-    throw Err.NOCAST.thrw(info, it.type, NodeType.NOD);
+    throw Err.INVCAST.thrw(info, it.type, NodeType.NOD);
   }
 
   /**
@@ -315,7 +328,7 @@ public abstract class ParseExpr extends Expr {
   public final byte[] checkStr(final Item it) throws QueryException {
     final Type ip = it.type;
     if(ip.isStringOrUntyped()) return it.string(info);
-    throw Err.NOCAST.thrw(info, it.type, AtomType.STR);
+    throw Err.INVCAST.thrw(info, it.type, AtomType.STR);
   }
 
   /**
@@ -330,7 +343,7 @@ public abstract class ParseExpr extends Expr {
     final Type ip = it.type;
     if(ip.isStringOrUntyped()) return it.string(info);
     if(it instanceof FItem) FIATOM.thrw(info, this);
-    throw Err.NOCAST.thrw(info, it.type, AtomType.STR);
+    throw Err.INVCAST.thrw(info, it.type, AtomType.STR);
   }
 
   /**
@@ -342,7 +355,7 @@ public abstract class ParseExpr extends Expr {
   public final Value checkCtx(final QueryContext ctx) throws QueryException {
     final Value v = ctx.value;
     if(v != null) return v;
-    throw XPNOCTX.thrw(info, this);
+    throw NOCTX.thrw(info, this);
   }
 
   /**
@@ -353,7 +366,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final ANode checkNode(final QueryContext ctx) throws QueryException {
     final Value v = ctx.value;
-    if(v == null) XPNOCTX.thrw(info, this);
+    if(v == null) NOCTX.thrw(info, this);
     if(!(v instanceof ANode)) STEPNODE.thrw(info, this, v.type);
     return (ANode) v;
   }
@@ -408,9 +421,9 @@ public abstract class ParseExpr extends Expr {
   public final QNm checkQNm(final Item it, final QueryContext ctx)
       throws QueryException {
 
-    if(checkNoEmpty(it).type == AtomType.QNM) return (QNm) it;
+    if(checkNoEmpty(it, AtomType.QNM).type == AtomType.QNM) return (QNm) it;
     if(it.type.isUntyped() && ctx.sc.xquery3()) NSSENS.thrw(info, it.type, AtomType.QNM);
-    throw Err.NOCAST.thrw(info, it.type, AtomType.QNM);
+    throw Err.INVCAST.thrw(info, it.type, AtomType.QNM);
   }
 
   /**
@@ -422,8 +435,8 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final Item checkType(final Item it, final Type t) throws QueryException {
-    if(checkNoEmpty(it).type.instanceOf(t)) return it;
-    throw Err.NOCAST.thrw(info, it.type, t);
+    if(checkNoEmpty(it, t).type.instanceOf(t)) return it;
+    throw Err.INVCAST.thrw(info, it.type, t);
   }
 
   /**
@@ -434,7 +447,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final Item checkNoEmpty(final Item it) throws QueryException {
     if(it != null) return it;
-    throw XPEMPTY.thrw(info, description());
+    throw INVEMPTY.thrw(info, description());
   }
 
   /**
@@ -446,7 +459,7 @@ public abstract class ParseExpr extends Expr {
    */
   private Item checkNoEmpty(final Item it, final Type t) throws QueryException {
     if(it != null) return it;
-    throw XPEMPTYPE.thrw(info, description(), t);
+    throw INVEMPTYEX.thrw(info, description(), t);
   }
 
   /**
@@ -516,6 +529,6 @@ public abstract class ParseExpr extends Expr {
    */
   public Map checkMap(final Item it) throws QueryException {
     if(it instanceof Map) return (Map) it;
-    throw Err.NOCAST.thrw(info, it.type, SeqType.ANY_MAP);
+    throw Err.INVCAST.thrw(info, it.type, SeqType.ANY_MAP);
   }
 }

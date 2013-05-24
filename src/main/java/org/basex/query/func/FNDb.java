@@ -16,6 +16,7 @@ import org.basex.index.query.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -119,6 +120,9 @@ public final class FNDb extends StandardFunc {
       case _DB_EXISTS:       return exists(ctx);
       case _DB_IS_XML:       return isXML(ctx);
       case _DB_CONTENT_TYPE: return contentType(ctx);
+      case _DB_EXPORT:       return export(ctx);
+      case _DB_NAME:         return name(ctx);
+      case _DB_PATH:         return path(ctx);
       default:               return super.item(ctx, ii);
     }
   }
@@ -434,6 +438,53 @@ public final class FNDb extends StandardFunc {
   }
 
   /**
+   * Performs the export function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Item export(final QueryContext ctx) throws QueryException {
+    final Data data = data(ctx);
+    final String path = string(checkStr(expr[1], ctx));
+    final Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
+    final SerializerProp sp = FuncParams.serializerProp(it, info);
+    try {
+      Export.export(data, path, sp, null);
+    } catch(final SerializerException ex) {
+      throw ex.getCause(info);
+    } catch(final IOException ex) {
+      SERANY.thrw(info, ex);
+    }
+    return null;
+  }
+
+  /**
+   * Performs the name function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Str name(final QueryContext ctx) throws QueryException {
+    return Str.get(checkDBNode(checkItem(expr[0], ctx)).data.meta.name);
+  }
+
+  /**
+   * Performs the path function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Str path(final QueryContext ctx) throws QueryException {
+    ANode node, par = checkNode(expr[0], ctx);
+    do {
+      node = par;
+      par = node.parent();
+    } while(par != null);
+    final DBNode dbn = checkDBNode(node);
+    return Str.get(dbn.data.text(dbn.pre, true));
+  }
+
+  /**
    * Create a <code>&lt;resource/&gt;</code> node.
    * @param path path
    * @param raw is the resource a raw file
@@ -660,7 +711,7 @@ public final class FNDb extends StandardFunc {
   private Item optimize(final QueryContext ctx) throws QueryException {
     final Data data = checkWrite(data(ctx), ctx);
     final boolean all = expr.length == 2 && checkBln(expr[1], ctx);
-    ctx.updates.add(new DBOptimize(data, ctx.context, all, info), ctx);
+    ctx.updates.add(new DBOptimize(data, ctx, all, info), ctx);
     return null;
   }
 

@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * This class contains some methods for performing advanced query tests.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class AdvancedQueryTest extends SandboxTest {
@@ -112,8 +112,13 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       sb.append(query + "\n[E]");
       for(final Err e : error) sb.append(" " + e);
       fail(sb.append("\n[F] " + res).toString());
-    } catch(final Exception ex) {
+    } catch(final SerializerException ex) {
+      check(query, ex.getCause(), error);
+    } catch(final QueryException ex) {
       check(query, ex, error);
+    } catch(final Exception ex) {
+      fail("Unexpected exception: " + ex);
+      ex.printStackTrace();
     } finally {
       qp.close();
     }
@@ -122,26 +127,30 @@ public abstract class AdvancedQueryTest extends SandboxTest {
   /**
    * Checks if an exception yields one of the specified error codes.
    * @param query query
-   * @param ex exception
+   * @param ex resulting query exception
    * @param error expected errors
    */
-  protected static void check(final String query, final Exception ex,
+  protected static void check(final String query, final QueryException ex,
       final Err... error) {
 
     if(error.length == 0) Util.notexpected("No error code specified");
-    final byte[] msg = Token.token(ex.getMessage());
     boolean found = false;
-    for(final Err e : error) found |= Token.contains(msg, e.qname().local());
+    final Err err = ex.err();
+    for(final Err e : error) found |= err != null ? err == e : e.qname().eq(ex.qname());
+
     if(!found) {
       final TokenBuilder tb = new TokenBuilder("\n");
       if(query != null) tb.add("Query: ").add(query).add("\n");
       tb.add("Error(s): ");
-      int c = 0;
-      for(final Err er : error) {
-        if(c++ != 0) tb.add('/');
-        tb.add(er.qname().string());
+      if(err != null) {
+        int c = 0;
+        for(final Err er : error) tb.add(c++ != 0 ? "/" : "").add(er.name());
+        fail(tb.add("\nResult: ").add(err.name() + " (" + err.qname() + ')').toString());
+      } else {
+        int c = 0;
+        for(final Err er : error) tb.add(c++ != 0 ? "/" : "").add(er.qname().local());
+        fail(tb.add("\nResult: ").add(ex.qname().string()).toString());
       }
-      fail(tb.add("\nResult: ").add(msg).toString());
     }
   }
 

@@ -34,7 +34,7 @@ final class EditorArea extends Editor {
   final BaseXLabel label;
 
   /** File in tab. */
-  IOFile file;
+  IO file;
   /** Timestamp. */
   long tstamp;
   /** Flag for modified content. */
@@ -71,7 +71,7 @@ final class EditorArea extends Editor {
         // reload file if it has been changed
         if(!reopen(false)) {
           // skip parsing if editor contains file that is currently marked as erroneous
-          if(!path.equals(view.errFile)) release(Action.PARSE);
+          if(view.errFile == null || file.eq(view.errFile)) release(Action.PARSE);
         }
       }
     });
@@ -210,7 +210,7 @@ final class EditorArea extends Editor {
    * Updates the file reference, timestamp and history.
    * @param f file
    */
-  void file(final IOFile f) {
+  void file(final IO f) {
     file = f;
     tstamp = f.timeStamp();
     setSyntax(file, true);

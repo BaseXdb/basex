@@ -21,7 +21,7 @@ public class QueryContextTest extends SandboxTest {
     try {
       qc.module("module namespace m='foo'; declare function m:foo() { m:bar() }; ", "");
       fail("Unknown function 'm:bar()' was not detected.");
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
       assertSame(Err.FUNCUNKNOWN, e.err());
     }
   }

@@ -49,7 +49,8 @@ public final class If extends Arr {
     if(cond.isValue()) return optPre(eval(ctx).compile(ctx, scp), ctx);
 
     // compile and simplify branches
-    for(int e = 0; e < expr.length; e++) {
+    final int es = expr.length;
+    for(int e = 0; e < es; e++) {
       try {
         expr[e] = expr[e].compile(ctx, scp);
       } catch(final QueryException ex) {
@@ -134,7 +135,8 @@ public final class If extends Arr {
     final Expr sub = cond.inline(ctx, scp, v, e);
     if(sub != null) cond = sub;
     boolean te = false;
-    for(int i = 0; i < expr.length; i++) {
+    final int es = expr.length;
+    for(int i = 0; i < es; i++) {
       Expr nw;
       try {
         nw = expr[i].inline(ctx, scp, v, e);
@@ -157,7 +159,8 @@ public final class If extends Arr {
 
   @Override
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
-    for(int e = 0; e < expr.length; ++e) expr[e] = expr[e].indexEquivalent(ic);
+    final int es = expr.length;
+    for(int e = 0; e < es; ++e) expr[e] = expr[e].indexEquivalent(ic);
     return this;
   }
 

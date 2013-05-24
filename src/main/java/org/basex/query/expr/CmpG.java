@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
 
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -279,7 +278,7 @@ public final class CmpG extends Cmp {
         (ta == tb || ta.isUntyped() || tb.isUntyped() ||
         a instanceof ANum && b instanceof ANum ||
         a instanceof AStr && b instanceof AStr)) return op.op.eval(info, a, b);
-    throw XPTYPECMP.thrw(info, ta, tb);
+    throw Err.INVTYPECMP.thrw(info, ta, tb);
   }
 
   @Override

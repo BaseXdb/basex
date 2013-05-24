@@ -157,6 +157,9 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_READ_TEXT.args(PATH1), "a\u00e4");
     error(_FILE_READ_TEXT.args(PATH1, "UNKNOWN"), Err.FILE_ENCODING);
     assertEquals(3, query(_FILE_READ_TEXT.args(PATH1, "CP1252")).length());
+    query(_FILE_WRITE_BINARY.args(PATH1, "xs:hexBinary('00')"));
+    error(_FILE_READ_TEXT.args(PATH1), Err.FILE_IO);
+    query("declare option db:checkstrings 'off';" + _FILE_READ_TEXT.args(PATH1), "&#x0;");
     query(_FILE_DELETE.args(PATH1));
   }
 
@@ -231,7 +234,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void writeText() {
     error(_FILE_WRITE_TEXT.args(PATH, "x"), Err.FILE_DIR);
-    error(_FILE_WRITE_TEXT.args(PATH1, " 123"), Err.NOCAST);
+    error(_FILE_WRITE_TEXT.args(PATH1, " 123"), Err.INVCAST);
 
     query(_FILE_WRITE_TEXT.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), "1");
@@ -244,7 +247,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void writeTextLines() {
     error(_FILE_WRITE_TEXT_LINES.args(PATH, "x"), Err.FILE_DIR);
-    error(_FILE_WRITE_TEXT_LINES.args(PATH1, " 123"), Err.NOCAST);
+    error(_FILE_WRITE_TEXT_LINES.args(PATH1, " 123"), Err.INVCAST);
 
     query(_FILE_WRITE_TEXT_LINES.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());
@@ -285,7 +288,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void appendText() {
     error(_FILE_APPEND_TEXT.args(PATH, "x"), Err.FILE_DIR);
-    error(_FILE_APPEND_TEXT.args(PATH1, " 123"), Err.NOCAST);
+    error(_FILE_APPEND_TEXT.args(PATH1, " 123"), Err.INVCAST);
 
     query(_FILE_APPEND_TEXT.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), "1");
@@ -298,7 +301,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void appendTextLines() {
     error(_FILE_APPEND_TEXT_LINES.args(PATH, "x"), Err.FILE_DIR);
-    error(_FILE_APPEND_TEXT_LINES.args(PATH1, " 123"), Err.NOCAST);
+    error(_FILE_APPEND_TEXT_LINES.args(PATH1, " 123"), Err.INVCAST);
 
     query(_FILE_APPEND_TEXT_LINES.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());

@@ -90,12 +90,13 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final Item cast(final Object o, final InputInfo ii) {
+  public final Item cast(final Object o, final QueryContext ctx, final InputInfo ii) {
     throw Util.notexpected(o);
   }
 
   @Override
-  public final Item castString(final String s, final InputInfo ii) {
+  public final Item castString(final String s, final QueryContext ctx,
+      final InputInfo ii) {
     throw Util.notexpected(s);
   }
 

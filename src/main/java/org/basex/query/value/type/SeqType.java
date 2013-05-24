@@ -3,8 +3,8 @@ package org.basex.query.value.type;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
@@ -344,14 +344,14 @@ public final class SeqType {
    * @throws QueryException query exception
    */
   public Value cast(final Item it, final QueryContext ctx, final InputInfo ii,
-      final Expr e) throws QueryException {
+      final ExprInfo e) throws QueryException {
 
     if(it == null) {
-      if(!occ.check(0)) XPEMPTY.thrw(ii, e.description());
+      if(!occ.check(0)) INVEMPTYEX.thrw(ii, e.description(), this);
       return null;
     }
 
-    if(!occ.check(1)) NOCAST.thrw(ii, it.type, this);
+    if(!occ.check(1)) INVCAST.thrw(ii, it.type, this);
     final Value v = it.type.eq(type) ? it : type.cast(it, ctx, ii);
     if(kind != null) {
       for(final Item i : v) if(!kind.eq(it)) Err.cast(ii, type, i);
@@ -369,10 +369,10 @@ public final class SeqType {
    * @throws QueryException query exception
    */
   public Value cast(final Value val, final QueryContext ctx, final InputInfo ii,
-      final Expr e) throws QueryException {
+      final ExprInfo e) throws QueryException {
     if(val.size() < 2) return cast(val.isEmpty() ? null : val.itemAt(0), ctx, ii, e);
 
-    if(!occ.check(val.size())) NOCAST.thrw(ii, val.type(), this);
+    if(!occ.check(val.size())) INVCAST.thrw(ii, val.type(), this);
     final ValueBuilder vb = new ValueBuilder((int) val.size());
     for(int i = 0; i < val.size(); i++) vb.add(cast(val.itemAt(i), ctx, ii, e));
     return vb.value();

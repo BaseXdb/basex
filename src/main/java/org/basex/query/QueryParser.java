@@ -50,15 +50,26 @@ public class QueryParser extends InputParser {
   private static final byte[] URICHECK = {};
   /** QName check: skip namespace check. */
   private static final byte[] SKIPCHECK = {};
-  /** Reserved function names (sorted). */
-  private static final byte[][] KEYWORDS = {
-    NodeType.ATT.string(), NodeType.COM.string(), NodeType.DOC.string(),
-    NodeType.ELM.string(), token(EMPTY_SEQUENCE), FuncType.ANY_FUN.string(),
-    token(IF), AtomType.ITEM.string(),
-    NodeType.NSP.string(), NodeType.NOD.string(), NodeType.PI.string(),
-    token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT), token(SWITCH),
-    NodeType.TXT.string(), token(TYPESWITCH)
-  };
+  /** Reserved function names (XQuery 1.0). */
+  private static final TokenSet KEYWORDS10 = new TokenSet();
+  /** Reserved function names (XQuery 3.0). */
+  private static final TokenSet KEYWORDS30 = new TokenSet();
+
+  static {
+    final byte[][] keys = {
+      NodeType.ATT.string(), NodeType.COM.string(), NodeType.DOC.string(),
+      NodeType.ELM.string(), token(EMPTY_SEQUENCE), token(IF), AtomType.ITEM.string(),
+      NodeType.NOD.string(), NodeType.PI.string(), token(SCHEMA_ATTRIBUTE),
+      token(SCHEMA_ELEMENT), NodeType.TXT.string(), token(TYPESWITCH)
+    };
+    for(final byte[] key : keys) {
+      KEYWORDS10.add(key);
+      KEYWORDS30.add(key);
+    }
+    KEYWORDS30.add(FuncType.ANY_FUN.string());
+    KEYWORDS30.add(NodeType.NSP.string());
+    KEYWORDS30.add(SWITCH);
+  }
 
   /** Query context. */
   final QueryContext ctx;
@@ -206,7 +217,7 @@ public class QueryParser extends InputParser {
       wsCheck(MODULE);
       wsCheck(NSPACE);
       skipWS();
-      final byte[] name = ncName(XPNAME);
+      final byte[] name = ncName(NONAME);
       wsCheck(IS);
       final byte[] uri = stringLiteral();
       if(uri.length == 0) error(NSMODURI);
@@ -487,7 +498,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void namespaceDecl() throws QueryException {
-    final byte[] pref = ncName(XPNAME);
+    final byte[] pref = ncName(NONAME);
     wsCheck(IS);
     final byte[] uri = stringLiteral();
     if(ctx.sc.ns.staticURI(pref) != null) error(DUPLNSDECL, pref);
@@ -552,7 +563,10 @@ public class QueryParser extends InputParser {
       // output declaration
       if(module != null) error(MODOUT);
 
-      if(ctx.serProp == null) ctx.serProp = new SerializerProp();
+      if(ctx.serProp == null) {
+        final Prop prop = ctx.context.prop;
+        ctx.serProp = new SerializerProp(prop.get(Prop.SERIALIZER));
+      }
       if(ctx.serProp.get(key) == null) error(OUTWHICH, key);
       if(!decl.add("S " + key)) error(OUTDUPL, key);
       if(key.equals(SerializerProp.S_PARAMETER_DOCUMENT[0].toString())) {
@@ -675,18 +689,18 @@ public class QueryParser extends InputParser {
     if(ctx.sc.decFormats.get(name.id()) != null) error(DECDUPL);
 
     // create new format
-    final HashMap<String, String> map = new HashMap<String, String>();
+    final TokenMap map = new TokenMap();
     // collect all property declarations
     int n;
     do {
       n = map.size();
       skipWS();
-      final String prop = string(ncName(null));
-      for(final String s : DECFORMATS) {
-        if(!prop.equals(s)) continue;
+      final byte[] prop = ncName(null);
+      for(final byte[] s : DECFORMATS) {
+        if(!eq(prop, s)) continue;
         if(map.get(s) != null) error(DECDUPLPROP, s);
         wsCheck(IS);
-        map.put(s, string(stringLiteral()));
+        map.add(s, stringLiteral());
         break;
       }
       if(map.isEmpty()) error(NODECLFORM, prop);
@@ -728,7 +742,7 @@ public class QueryParser extends InputParser {
   private void schemaImport() throws QueryException {
     byte[] pref = null;
     if(wsConsumeWs(NSPACE)) {
-      pref = ncName(XPNAME);
+      pref = ncName(NONAME);
       if(eq(pref, XML, XMLNS)) error(BINDXML, pref);
       wsCheck(IS);
     } else if(wsConsumeWs(DEFAULT)) {
@@ -754,7 +768,7 @@ public class QueryParser extends InputParser {
   private void moduleImport() throws QueryException {
     byte[] ns = EMPTY;
     if(wsConsumeWs(NSPACE)) {
-      ns = ncName(XPNAME);
+      ns = ncName(NONAME);
       wsCheck(IS);
     }
 
@@ -943,7 +957,7 @@ public class QueryParser extends InputParser {
   private void functionDecl(final Ann ann) throws QueryException {
     final InputInfo ii = info();
     final QNm name = eQName(FUNCNAME, ctx.sc.nsFunc);
-    if(keyword(name)) error(RESERVED, name.local());
+    if(ctx.sc.xquery3() && keyword(name)) error(RESERVED, name.local());
     if(module != null && !eq(name.uri(), module.uri())) error(MODNS, name);
 
     wsCheck(PAR1);
@@ -966,10 +980,8 @@ public class QueryParser extends InputParser {
    * @return result of check
    */
   private boolean keyword(final QNm name) {
-    if(!ctx.sc.xquery3() || name.hasPrefix()) return false;
-    final byte[] str = name.string();
-    for(final byte[] key : KEYWORDS) if(eq(key, str)) return true;
-    return false;
+    return !name.hasPrefix() &&
+        (ctx.sc.xquery3() ? KEYWORDS30 : KEYWORDS10).contains(name.string());
   }
 
   /**
@@ -2042,9 +2054,9 @@ public class QueryParser extends InputParser {
         if(!wsConsume(PAR1)) break;
 
         final InputInfo ii = info();
-        final ArrayList<Expr> argList = new ArrayList<Expr>();
+        final ExprList argList = new ExprList();
         final int[] holes = argumentList(argList, e);
-        final Expr[] args = argList.toArray(new Expr[argList.size()]);
+        final Expr[] args = argList.finish();
 
         e = holes == null ? new DynFuncCall(ii, e, args) :
           new PartFunc(ii, e, args, holes);
@@ -2128,8 +2140,8 @@ public class QueryParser extends InputParser {
     skipWS();
     final int pos = ip;
 
-    // parse annotations
-    final Ann ann = ctx.sc.xquery3() && curr('%') ? annotations() : null;
+    // parse annotations; will only be visited for XQuery 3.0 expressions
+    final Ann ann = curr('%') ? annotations() : null;
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
       final VarScope inner = scope = scope.child();
@@ -2154,7 +2166,7 @@ public class QueryParser extends InputParser {
       if(!(ex instanceof Int)) return ex;
       final long card = ex instanceof Int ? ((Int) ex).itr() : -1;
       if(card < 0 || card > Integer.MAX_VALUE) error(FUNCUNKNOWN, name);
-      final Expr lit = Functions.getLiteral(name, card, ctx, info());
+      final Expr lit = Functions.getLiteral(name, (int) card, ctx, info());
       return lit != null ? lit : FuncLit.unknown(name, card, ctx, info());
     }
 
@@ -2320,9 +2332,9 @@ public class QueryParser extends InputParser {
     if(name != null && !keyword(name)) {
       if(wsConsume(PAR1)) {
         final InputInfo ii = info();
-        final ArrayList<Expr> argList = new ArrayList<Expr>();
+        final ExprList argList = new ExprList();
         final int[] holes = argumentList(argList, name.string());
-        final Expr[] args = argList.toArray(new Expr[argList.size()]);
+        final Expr[] args = argList.finish();
         alter = FUNCUNKNOWN;
         alterFunc = name;
         ap = ip;
@@ -2356,8 +2368,9 @@ public class QueryParser extends InputParser {
    * @return array of arguments, place-holders '?' are represented as {@code null} entries
    * @throws QueryException query exception
    */
-  private int[] argumentList(final ArrayList<Expr> args, final Object name)
+  private int[] argumentList(final ExprList args, final Object name)
       throws QueryException {
+
     int[] holes = null;
     if(!wsConsume(PAR2)) {
       int i = 0;
@@ -2829,11 +2842,8 @@ public class QueryParser extends InputParser {
       if(t == null) {
         if(wsConsume(PAR1)) error(SIMPLETYPE, name);
         if(ctx.sc.xquery3) {
-          if(AtomType.AST.name.eq(name)) {
-            t = AtomType.AST;
-          } else {
-            error(XQTYPEUNKNOWN, name);
-          }
+          if(!AtomType.AST.name.eq(name)) error(TYPEUNKNOWN30, name);
+          t = AtomType.AST;
         } else {
           error(TYPEUNKNOWN, name);
         }
@@ -3603,7 +3613,7 @@ public class QueryParser extends InputParser {
   private byte[] ncName(final Err err) throws QueryException {
     tok.reset();
     if(ncName()) return tok.finish();
-    if(err != null) error(err, tok);
+    if(err != null) error(err, consume());
     return EMPTY;
   }
 
@@ -3681,9 +3691,7 @@ public class QueryParser extends InputParser {
    */
   private boolean ncName() {
     if(!XMLToken.isNCStartChar(curr())) return false;
-    do {
-      tok.add(consume());
-    } while(XMLToken.isNCChar(curr()));
+    do tok.add(consume()); while(XMLToken.isNCChar(curr()));
     return true;
   }
 
@@ -3938,7 +3946,7 @@ public class QueryParser extends InputParser {
   private QueryException error() throws QueryException {
     ip = ap;
     if(alter != FUNCUNKNOWN) error(alter);
-    ctx.funcs.funError(alterFunc, info());
+    ctx.funcs.errorIfSimilar(alterFunc, info());
     throw error(alter, alterFunc.string());
   }
 

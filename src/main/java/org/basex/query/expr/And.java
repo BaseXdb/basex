@@ -33,7 +33,8 @@ public final class And extends Logical {
     if(c != this) return c;
 
     // merge predicates if possible
-    Expr[] ex = {};
+    final int es = expr.length;
+    final ExprList el = new ExprList(es);
     Pos ps = null;
     CmpR cr = null;
     CmpSR cs = null;
@@ -56,13 +57,13 @@ public final class And extends Logical {
         else if(tmp != null) return tmp;
       }
       // no optimization found; add original expression
-      if(tmp == null) ex = Array.add(ex, e);
+      if(tmp == null) el.add(e);
     }
-    expr = ex;
-    if(ps != null) expr = Array.add(expr, ps);
-    if(cr != null) expr = Array.add(expr, cr);
-    if(cs != null) expr = Array.add(expr, cs);
-    if(ex.length != expr.length) ctx.compInfo(OPTWRITE, this);
+    if(ps != null) el.add(ps);
+    if(cr != null) el.add(cr);
+    if(cs != null) el.add(cs);
+    if(es != el.size()) ctx.compInfo(OPTWRITE, this);
+    expr = el.finish();
     compFlatten(ctx);
 
     // return single expression if it yields a boolean
@@ -83,17 +84,19 @@ public final class And extends Logical {
 
   @Override
   public And copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vars) {
-    final Expr[] ex = new Expr[expr.length];
-    for(int i = 0; i < ex.length; i++) ex[i] = expr[i].copy(ctx, scp, vars);
+    final int es = expr.length;
+    final Expr[] ex = new Expr[es];
+    for(int i = 0; i < es; i++) ex[i] = expr[i].copy(ctx, scp, vars);
     return new And(info, ex);
   }
 
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     int is = 0;
-    final int[] ics = new int[expr.length];
+    final int es = expr.length;
+    final int[] ics = new int[es];
     boolean ia = true;
-    for(int e = 0; e < expr.length; ++e) {
+    for(int e = 0; e < es; ++e) {
       if(expr[e].indexAccessible(ic) && !ic.seq) {
         // skip queries with no results
         if(ic.costs() == 0) return true;
@@ -108,8 +111,8 @@ public final class And extends Logical {
     if(ia) {
       // evaluate arguments with high selectivity first
       final int[] ord = Array.createOrder(ics, true);
-      final Expr[] ex = new Expr[ics.length];
-      for(int e = 0; e < expr.length; ++e) ex[e] = expr[ord[e]];
+      final Expr[] ex = new Expr[es];
+      for(int e = 0; e < es; ++e) ex[e] = expr[ord[e]];
       expr = ex;
     }
 

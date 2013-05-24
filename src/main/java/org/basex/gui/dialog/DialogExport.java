@@ -87,7 +87,7 @@ public final class DialogExport extends BaseXDialog {
     method.setSelectedItem(sp.get(SerializerProp.S_METHOD).toUpperCase(Locale.ENGLISH));
 
     encoding = new BaseXCombo(this, ENCODINGS);
-    String enc = gui.context.data().meta.encoding;
+    String enc = sp.get(SerializerProp.S_ENCODING);
     boolean f = false;
     for(final String s : ENCODINGS) f |= s.equals(enc);
     if(!f) {
@@ -96,7 +96,7 @@ public final class DialogExport extends BaseXDialog {
     }
     encoding.setSelectedItem(f ? enc : sp.get(SerializerProp.S_ENCODING));
 
-    params = new BaseXTextField(exporter, this);
+    params = new BaseXTextField(parameters(sp, true), this);
 
     pp = new BaseXBack(new TableLayout(3, 2, 16, 6)).border(8, 0, 8, 0);
     pp.add(new BaseXLabel(METHOD + COL, true, true));
@@ -160,21 +160,6 @@ public final class DialogExport extends BaseXDialog {
 
   @Override
   public void action(final Object comp) {
-    if(comp == method || comp == encoding) {
-      final StringBuilder sb = new StringBuilder();
-      // add method
-      final String meth = method.getSelectedItem().toString().toLowerCase(Locale.ENGLISH);
-      final boolean noxml = Token.eq(meth, DataText.M_XML, DataText.M_XHTML);
-      add(sb, SerializerProp.S_METHOD, meth);
-      // add encoding
-      if(add(sb, SerializerProp.S_ENCODING, encoding.getSelectedItem()) && noxml) {
-        // add omit-xml-declaration if encoding was set and if method is not X(HT)ML
-        sb.append(',');
-        sb.append(SerializerProp.S_OMIT_XML_DECLARATION[0]).append('=').append(NO);
-      }
-      params.setText(sb.toString());
-    }
-
     final String pth = path();
     final IOFile io = new IOFile(pth);
     String inf = io.isDir() && io.children().length > 0 ? DIR_NOT_EMPTY : null;
@@ -182,16 +167,14 @@ public final class DialogExport extends BaseXDialog {
 
     if(ok) {
       gui.gprop.set(GUIProp.INPUTPATH, pth);
-      if(comp == params) {
-        // validate serialization parameters
-        try {
-          final String par = params.getText();
-          Serializer.get(new ArrayOutput(), new SerializerProp(par));
-          gui.set(Prop.EXPORTER, par);
-        } catch(final IOException ex) {
-          ok = false;
-          inf = ex.getLocalizedMessage();
-        }
+      // validate serialization parameters
+      try {
+        final String par = params.getText();
+        Serializer.get(new ArrayOutput(), new SerializerProp(par));
+        gui.set(Prop.EXPORTER, par);
+      } catch(final IOException ex) {
+        ok = false;
+        inf = ex.getLocalizedMessage();
       }
     }
 
@@ -199,27 +182,40 @@ public final class DialogExport extends BaseXDialog {
     enableOK(buttons, B_OK, ok);
   }
 
-  /**
-   * Adds a non-standard serialization parameter.
-   * @param sb string builder
-   * @param key key
-   * @param val value
-   * @return {@code true} if parameter was added
-   */
-  private static boolean add(final StringBuilder sb, final Object[] key,
-      final Object val) {
-
-    if(Serializer.PROPS.get(key).equals(val)) return false;
-    if(sb.length() != 0) sb.append(',');
-    sb.append(key[0]).append('=').append(val);
-    return true;
-  }
-
   @Override
   public void close() {
     if(!ok) return;
 
+    // remembers serialization parameters
+    final String mth = method.getSelectedItem().toString().toLowerCase(Locale.ENGLISH);
+    final String enc = encoding.getSelectedItem().toString();
+    final SerializerProp sp = new SerializerProp(params.getText());
+    sp.set(SerializerProp.S_METHOD, mth);
+    sp.set(SerializerProp.S_ENCODING, enc);
+    gui.set(Prop.EXPORTER, parameters(sp, false));
+
     super.close();
     path.store();
+  }
+
+  /**
+   * Create a serialization parameter string.
+   * @param sp serialization properties
+   * @param excl exclude method and encoding
+   * @return result string
+   */
+  private String parameters(final SerializerProp sp, final boolean excl) {
+    final String[] ex = !excl ? new String[0] : new String[] {
+      SerializerProp.S_METHOD[0].toString(), SerializerProp.S_ENCODING[0].toString() };
+    final StringBuilder sb = new StringBuilder();
+    for(final String key : sp) {
+      if(Token.eq(key, ex)) continue;
+      final Object val = sp.get(key);
+      if(!Serializer.PROPS.get(key).equals(val)) {
+        if(sb.length() != 0) sb.append(',');
+        sb.append(key).append('=').append(val);
+      }
+    }
+    return sb.toString();
   }
 }

@@ -139,7 +139,7 @@ public final class QNm extends Item {
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
     if(it instanceof QNm) return eq((QNm) it);
-    throw XPTYPECMP.thrw(ii, it.type, type);
+    throw INVTYPECMP.thrw(ii, it.type, type);
   }
 
   /**

@@ -9,6 +9,7 @@ import org.basex.query.expr.CmpG.OpG;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
 import org.basex.query.path.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -67,24 +68,24 @@ public abstract class Preds extends ParseExpr {
 
       if(pr.isValue()) {
         if(!pr.ebv(ctx, info).bool(info)) {
-          ctx.compInfo(OPTREMOVE, description(), pr);
+          ctx.compInfo(OPTREMOVE, this, pr);
           return Empty.SEQ;
         }
-        ctx.compInfo(OPTREMOVE, description(), pr);
+        ctx.compInfo(OPTREMOVE, this, pr);
         preds = Array.delete(preds, p--);
       } else if(pr instanceof And && !pr.uses(Use.POS)) {
         // replace AND expression with predicates (don't swap position tests)
-        ctx.compInfo(OPTPRED, pr.description());
+        ctx.compInfo(OPTPRED, pr);
         final Expr[] and = ((And) pr).expr;
         final int m = and.length - 1;
-        final ArrayList<Expr> tmp = new ArrayList<Expr>(preds.length + m);
-        tmp.addAll(Arrays.asList(preds).subList(0, p));
+        final ExprList tmp = new ExprList(preds.length + m);
+        for(final Expr e : Arrays.asList(preds).subList(0, p)) tmp.add(e);
         for(final Expr a : and) {
           // wrap test with boolean() if the result is numeric
           tmp.add(Function.BOOLEAN.get(info, a).compEbv(ctx));
         }
-        tmp.addAll(Arrays.asList(preds).subList(p + 1, preds.length));
-        preds = tmp.toArray(new Expr[tmp.size()]);
+        for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) tmp.add(e);
+        preds = tmp.finish();
       } else {
         preds[p] = pr;
       }

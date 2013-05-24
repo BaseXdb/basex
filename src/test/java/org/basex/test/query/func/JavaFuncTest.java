@@ -81,6 +81,22 @@ public class JavaFuncTest extends AdvancedQueryTest {
   @Test
   public void ambiguousSignature() {
     error("import module namespace n='java:java.lang.StringBuilder'; n:append('x')",
-        Err.JAVAAMB);
+        Err.JAVAAMBIG);
+  }
+
+  /** Ensure that items cannot be cast to Java. */
+  @Test
+  public void javaCast() {
+    error("xs:java('x')", Err.FUNCUNKNOWN);
+    error("java('x')", Err.FUNCUNKNOWN);
+    error("'x' cast as xs:java", Err.TYPEUNKNOWN30);
+    error("'x' cast as java", Err.TYPEUNKNOWN30);
+  }
+
+  /** Pass on Java items to functions. */
+  @Test
+  public void funcItem() {
+    query("function($x) { $x }(Q{java:java.io.File}new('x'))", "x");
+    query("declare function db:f($x) { $x }; db:f#1(Q{java:java.io.File}new('x'))", "x");
   }
 }
