@@ -84,14 +84,14 @@ public final class BaseXServer extends Main implements Runnable {
 
     if(service) {
       start(port, args);
-      Util.outln(SRV_STARTED);
+      Util.outln(SRV_STARTED_PORT_X, port);
       Performance.sleep(1000);
       return;
     }
 
     if(stopped) {
       stop(port, eport);
-      Util.outln(SRV_STOPPED);
+      Util.outln(SRV_STOPPED_PORT_X, port);
       Performance.sleep(1000);
       return;
     }
@@ -110,19 +110,20 @@ public final class BaseXServer extends Main implements Runnable {
       stop = stopFile(port);
 
       // show info when server is aborted
-      context.log.writeServer(OK, SRV_STARTED);
+      context.log.writeServer(OK, SRV_STARTED_PORT_X, port);
       Runtime.getRuntime().addShutdownHook(new Thread() {
         @Override
         public void run() {
-          context.log.writeServer(OK, SRV_STOPPED);
-          Util.outln(SRV_STOPPED);
+          context.log.writeServer(OK, SRV_STOPPED_PORT_X, port);
+          Util.outln(SRV_STOPPED_PORT_X, port);
         }
       });
 
       new Thread(this).start();
       while(!running) Performance.sleep(10);
 
-      Util.outln(CONSOLE + (console ? TRY_MORE_X : SRV_STARTED), SERVERMODE);
+      Util.outln(CONSOLE + (console ? TRY_MORE_X :
+        Util.info(SRV_STARTED_PORT_X, port)), SERVERMODE);
 
       if(console) {
         console();
