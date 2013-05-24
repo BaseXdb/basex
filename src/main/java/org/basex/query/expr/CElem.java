@@ -92,6 +92,8 @@ public final class CElem extends CName {
 
       // create node
       final FElem node = new FElem(nm, constr.children, constr.atts, ns);
+      if(constr.nspaces.contains(EMPTY) && !nm.hasURI())
+        DUPLNSCONS.thrw(info, EMPTY);
 
       // add namespaces from constructor
       final Atts cns = constr.nspaces;
