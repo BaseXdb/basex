@@ -69,8 +69,7 @@ final class DialogUser extends BaseXBack {
     user = new BaseXTextField("", dia);
     BaseXLayout.setWidth(user, 100);
     create = new BaseXButton(CREATE, dia);
-    pass = new BaseXPassword(dia.gui);
-    pass.addKeyListener(dia.keys);
+    pass = new BaseXPassword(dia);
 
     BaseXLayout.setWidth(pass, 100);
     alter = new BaseXButton(S_ALTER, dia);
