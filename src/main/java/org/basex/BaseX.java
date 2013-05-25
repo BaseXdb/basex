@@ -95,8 +95,10 @@ public class BaseX extends Main {
         } else if(c == 'L') {
           // toggle newline separators
           newline ^= true;
-          execute(new Set(Prop.SERIALIZER, newline ?
-            SerializerProp.S_ITEM_SEPARATOR[0] + "=\\n" : ""), false);
+          if(serial.length() != 0) serial.append(',');
+          val = serial.append(SerializerProp.S_ITEM_SEPARATOR[0]).append("=\\n").
+              toString();
+          prop = Prop.SERIALIZER;
         } else if(c == 'o') {
           // change output stream
           if(out != System.out) out.close();
