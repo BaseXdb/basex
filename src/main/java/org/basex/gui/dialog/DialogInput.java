@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.*;
@@ -83,7 +84,7 @@ public final class DialogInput extends BaseXDialog {
     ok = type != 0 && (db.contains(in) || in.equals(old));
     if(ok) msg = Util.info(DB_EXISTS_X, in);
     if(!ok) {
-      ok = type == 0 ? MetaData.normPath(in) != null : MetaData.validName(in, false);
+      ok = type == 0 ? MetaData.normPath(in) != null : Databases.validName(in);
       if(!ok) msg = in.isEmpty() ? ENTER_DB_NAME : Util.info(INVALID_X, NAME);
     }
 

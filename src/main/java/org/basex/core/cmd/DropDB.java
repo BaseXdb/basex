@@ -4,8 +4,8 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
-import org.basex.data.*;
+import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.CmdDrop;
 import org.basex.io.*;
 import org.basex.util.list.*;
 
@@ -26,7 +26,7 @@ public final class DropDB extends ACreate {
 
   @Override
   protected boolean run() {
-    if(!MetaData.validName(args[0], true)) return error(NAME_INVALID_X, args[0]);
+    if(!Databases.validName(args[0], true)) return error(NAME_INVALID_X, args[0]);
 
     // retrieve all databases; return true if no database is found (no error)
     final StringList dbs = context.databases.listDBs(args[0]);

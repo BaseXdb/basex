@@ -1,11 +1,13 @@
 package org.basex.io;
 
 import static org.basex.util.Token.*;
+
 import java.io.*;
 import java.util.*;
 
 import javax.xml.transform.stream.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -257,7 +259,7 @@ public abstract class IO {
     if(i == -1) i = n.length;
     for(int c = 0; c < i; c += cl(n, c)) {
       final int ch = norm(cp(n, c));
-      if(dbChar(ch)) tb.add(ch);
+      if(Databases.validChar(ch)) tb.add(ch);
     }
     return tb.toString();
   }

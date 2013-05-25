@@ -6,7 +6,6 @@ import java.awt.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.List;
-import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.*;
@@ -108,7 +107,7 @@ public final class DialogNew extends BaseXDialog {
     String inf = !valid ? RES_NOT_FOUND : !ok ? ENTER_DB_NAME : null;
     Msg icon = Msg.ERROR;
     if(ok) {
-      ok = MetaData.validName(nm, false);
+      ok = Databases.validName(nm);
       if(ok) gui.gprop.set(GUIProp.DBNAME, nm);
 
       if(!ok) {

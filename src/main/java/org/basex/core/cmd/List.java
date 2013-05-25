@@ -109,7 +109,7 @@ public final class List extends Command {
   private boolean listDB() throws IOException {
     final String db = args[0];
     final String path = args[1] != null ? args[1] : "";
-    if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
+    if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
 
     final Table table = new Table();
     table.description = RESOURCES;

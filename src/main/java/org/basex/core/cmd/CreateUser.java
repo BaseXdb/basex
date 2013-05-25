@@ -6,7 +6,6 @@ import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdCreate;
-import org.basex.data.*;
 import org.basex.util.*;
 
 /**
@@ -50,7 +49,7 @@ public final class CreateUser extends AUser {
   public static void create(final String user, final String pass,
       final Context ctx) throws BaseXException {
 
-    if(!MetaData.validName(user, false)) throw new BaseXException(NAME_INVALID_X, user);
+    if(!Databases.validName(user)) throw new BaseXException(NAME_INVALID_X, user);
     if(!isMD5(pass)) throw new BaseXException(PW_NOT_VALID);
     if(!ctx.users.create(user, pass)) throw new BaseXException(USER_EXISTS_X, user);
   }

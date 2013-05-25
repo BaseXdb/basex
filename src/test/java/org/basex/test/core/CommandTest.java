@@ -83,8 +83,8 @@ public class CommandTest extends SandboxTest {
     ok(new AlterDB(NAME, NAME2));
     ok(new Close());
     no(new AlterDB(NAME, NAME2));
-    no(new AlterDB(NAME2, "!"));
-    no(new AlterDB("!", NAME2));
+    no(new AlterDB(NAME2, "?"));
+    no(new AlterDB("?", NAME2));
   }
 
   /** Command test. */
@@ -163,6 +163,9 @@ public class CommandTest extends SandboxTest {
     ok(new DropUser(NAME2));
     no(new CreateUser("", ""));
     no(new CreateUser(":", ""));
+
+    ok(new CreateUser(Databases.DBCHARS, md5("")));
+    ok(new DropUser(Databases.DBCHARS));
   }
 
   /** Command test. */
@@ -443,6 +446,13 @@ public class CommandTest extends SandboxTest {
     no(new Restore("test"));
     ok(new DropBackup("test-1"));
     ok(new DropDB("test-1"));
+
+    ok(new CreateDB(Databases.DBCHARS));
+    no(new Restore(Databases.DBCHARS));
+    ok(new CreateBackup(Databases.DBCHARS));
+    ok(new Restore(Databases.DBCHARS));
+    ok(new DropBackup(Databases.DBCHARS));
+    ok(new DropDB(Databases.DBCHARS));
   }
 
   /**

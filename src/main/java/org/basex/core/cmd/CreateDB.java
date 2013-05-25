@@ -55,7 +55,7 @@ public final class CreateDB extends ACreate {
   @Override
   protected boolean run() {
     final String name = args[0];
-    if(!MetaData.validName(name, false)) return error(NAME_INVALID_X, name);
+    if(!Databases.validName(name)) return error(NAME_INVALID_X, name);
 
     // choose parser and input
     IO io;

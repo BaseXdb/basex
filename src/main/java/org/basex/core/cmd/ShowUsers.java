@@ -35,7 +35,7 @@ public final class ShowUsers extends Command {
   @Override
   protected boolean run() throws IOException {
     final String name = args[0] == null || args[0].isEmpty() ? null : args[0];
-    if(name != null && !MetaData.validName(name, false))
+    if(name != null && !Databases.validName(name))
       return error(NAME_INVALID_X, name);
 
     if(name == null) {

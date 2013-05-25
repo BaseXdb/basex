@@ -4,8 +4,8 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
-import org.basex.data.*;
+import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.CmdAlter;
 
 /**
  * Evaluates the 'alter database' command and renames a database.
@@ -31,8 +31,8 @@ public final class AlterDB extends ACreate {
     final String src = args[0];
     final String trg = args[1];
     // check if names are valid
-    if(!MetaData.validName(src, false)) return error(NAME_INVALID_X, src);
-    if(!MetaData.validName(trg, false)) return error(NAME_INVALID_X, trg);
+    if(!Databases.validName(src)) return error(NAME_INVALID_X, src);
+    if(!Databases.validName(trg)) return error(NAME_INVALID_X, trg);
 
     // database does not exist
     if(!mprop.dbexists(src)) return error(DB_NOT_FOUND_X, src);

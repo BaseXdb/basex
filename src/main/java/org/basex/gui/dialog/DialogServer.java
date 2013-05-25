@@ -373,7 +373,7 @@ public final class DialogServer extends BaseXDialog {
       Integer.parseInt(portc.getText()) <= 65535;
     final boolean valpl = ports.getText().matches("[\\d]+") &&
       Integer.parseInt(ports.getText()) <= 65535;
-    final boolean vallu = admuser.getText().matches("[\\w]*");
+    final boolean vallu = Databases.validName(admuser.getText());
     final boolean vallp = new String(admpass.getPassword()).matches("[^ ;'\"]*");
     final boolean valh = host.getText().matches("([\\w]+://)?[\\w.-]+");
 

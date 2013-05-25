@@ -305,9 +305,7 @@ final class StringParser extends CmdParser {
   private String name(final Cmd cmd) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
-    while(letterOrDigit(parser.curr()) || parser.curr('-')) {
-      sb.append(parser.consume());
-    }
+    while(Databases.validChar(parser.curr())) sb.append(parser.consume());
     return finish(cmd, eoc() || ws(parser.curr()) ? sb : null);
   }
 
@@ -334,7 +332,7 @@ final class StringParser extends CmdParser {
     final StringBuilder sb = new StringBuilder();
     while(true) {
       final char c = parser.curr();
-      if(!letterOrDigit(c) && c != '-' && c != '*' && c != '?' && c != ',') {
+      if(!Databases.validChar(c) && c != '*' && c != '?' && c != ',') {
         return finish(cmd, eoc() || ws(parser.curr()) ? sb : null);
       }
       sb.append(parser.consume());
