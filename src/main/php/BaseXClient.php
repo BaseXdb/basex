@@ -8,7 +8,7 @@
  * (C) BaseX Team 2005-12, BSD License
  */
 class Session {
-  /* Class variables.*/
+  // class variables.
   var $socket, $info, $buffer, $bpos, $bsize;
 
   function __construct($h, $p, $user, $pw) {
@@ -43,13 +43,13 @@ class Session {
     }
     return $result;
   }
-  
+
   public function query($q) {
     return new Query($this, $q);
   }
-  
+
   public function create($name, $input) {
-    $this->sendCmd(8, $path, $input);
+    $this->sendCmd(8, $name, $input);
   }
 
   public function add($path, $input) {
@@ -63,7 +63,7 @@ class Session {
   public function store($path, $input) {
     $this->sendCmd(13, $path, $input);
   }
-  
+
   public function info() {
     return $this->info;
   }
@@ -93,7 +93,7 @@ class Session {
     }
     return $this->buffer[$this->bpos++];
   }
-  
+
   private function sendCmd($code, $arg, $input) {
     socket_write($this->socket, chr($code).$arg.chr(0).$input.chr(0));
     $this->info = $this->receive();
@@ -101,15 +101,15 @@ class Session {
       throw new Exception($this->info);
     }
   }
-  
+
   public function send($str) {
     socket_write($this->socket, $str.chr(0));
   }
-  
+
   public function ok() {
     return $this->read() == chr(0);
   }
-  
+
   public function receive() {
     $this->init();
     return $this->readString();
@@ -117,13 +117,13 @@ class Session {
 }
 
 class Query {
-  var $session, $id, $open;
+  var $session, $id, $open, $cache;
  
   public function __construct($s, $q) {
     $this->session = $s;
     $this->id = $this->exec(chr(0), $q);
   }
-  
+
   public function bind($name, $value, $type = "") {
     $this->exec(chr(3), $this->id.chr(0).$name.chr(0).$value.chr(0).$type);
   }
@@ -135,11 +135,33 @@ class Query {
   public function execute() {
     return $this->exec(chr(5), $this->id);
   }
-  
+
+  public function more() {
+    if($this->cache == NULL) {
+      $this->pos = 0;
+      $this->session->send(chr(4).$this->id.chr(0));
+      while(!$this->session->ok()) {
+        $this->cache[] = $this->session->readString();
+      }
+      if(!$this->session->ok()) {
+        throw new Exception($this->session->readString());
+      }
+    }
+    if($this->pos < count($this->cache)) return true;
+    $this->cache = NULL;
+    return false;
+  }
+
+  public function next() {
+    if($this->more()) {
+      return $this->cache[$this->pos++];
+    }
+  }
+
   public function info() {
     return $this->exec(chr(6), $this->id);
   }
-  
+
   public function options() {
     return $this->exec(chr(7), $this->id);
   }
@@ -147,7 +169,7 @@ class Query {
   public function close() {
     $this->exec(chr(2), $this->id);   
   }
-  
+
   public function exec($cmd, $arg) {
     $this->session->send($cmd.$arg);
     $s = $this->session->receive();

@@ -20,7 +20,7 @@ try {
 
     // loop through all results
     while($query->more()) {
-      print $query->next()."<br/>";
+      print $query->next()."\n";
     }
 
     // close query instance

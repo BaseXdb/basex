@@ -14,14 +14,14 @@ try {
   
   try {
     // create query instance
-    $input = "declare variable \$name external; for \$i in 1 to 10 return element { \$name } { \$i }";
+    $input = 'declare variable $name external; for $i in 1 to 10 return element { $name } { $i }';
     $query = $session->query($input);
 
     // bind variable
     $query->bind("name", "number");
 
     // print results
-    print $query->execute()."<br/>";
+    print $query->execute()."\n";
 
     // close query instance
     $query->close();
