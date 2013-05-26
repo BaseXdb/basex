@@ -483,7 +483,7 @@ public final class ClientListener extends Thread {
           qp.context(val, typ);
           info.append(val);
           if(!typ.isEmpty()) info.append(" as ").append(typ);
-        } else if(sc == ServerCmd.ITER) {
+        } else if(sc == ServerCmd.RESULTS) {
           qp.execute(true, out, true, false);
         } else if(sc == ServerCmd.EXEC) {
           qp.execute(false, out, true, false);

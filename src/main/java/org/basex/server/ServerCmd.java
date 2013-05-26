@@ -16,7 +16,7 @@ public enum ServerCmd {
   /** Code for binding an external query variable: {id}0{name}0{val}0{type}0. */
   BIND(3),
   /** Code for executing the query in an iterative manner: {id}0. */
-  ITER(4),
+  RESULTS(4),
   /** Code for executing the query: {id}0. */
   EXEC(5),
   /** Code for showing the query info: {id}0. */
