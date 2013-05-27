@@ -627,7 +627,7 @@ public final class FNDb extends StandardFunc {
    */
   private Item create(final QueryContext ctx) throws QueryException {
     final String name = string(checkStr(expr[0], ctx));
-    if(!MetaData.validName(name, false)) BXDB_NAME.thrw(info, name);
+    if(!Databases.validName(name)) BXDB_NAME.thrw(info, name);
 
     final TokenList paths = new TokenList();
     if(expr.length > 2) {

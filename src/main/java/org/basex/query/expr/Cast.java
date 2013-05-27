@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
@@ -57,8 +56,7 @@ public final class Cast extends Single {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final Value v = type.cast(expr.item(ctx, info), ctx, info, this);
-    return v == null ? Empty.SEQ : v;
+    return type.cast(expr.item(ctx, info), ctx, info, this);
   }
 
   @Override

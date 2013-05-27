@@ -69,7 +69,8 @@ final class DialogUser extends BaseXBack {
     user = new BaseXTextField("", dia);
     BaseXLayout.setWidth(user, 100);
     create = new BaseXButton(CREATE, dia);
-    pass = new BaseXPassword(dia.gui);
+    pass = new BaseXPassword(dia);
+
     BaseXLayout.setWidth(pass, 100);
     alter = new BaseXButton(S_ALTER, dia);
     drop = new BaseXButton(DROP + DOTS, dia);
@@ -208,7 +209,7 @@ final class DialogUser extends BaseXBack {
       ok = false;
     }
 
-    final boolean valname = user.getText().matches("[\\w]*");
+    final boolean valname = Databases.validName(user.getText());
     final boolean valpass = new String(pass.getPassword()).matches("[^ ;'\"]*");
     boolean newname = true;
     for(int r = 0; r < users.contents.size(); ++r)

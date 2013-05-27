@@ -1087,7 +1087,7 @@ public final class Token {
   /**
    * Checks if the specified character is a whitespace.
    * @param ch the letter to be checked
-   * @return result of comparison
+   * @return result of check
    */
   public static boolean ws(final int ch) {
     return ch == 0x09 || ch == 0x0A || ch == 0x0D || ch == 0x20;
@@ -1096,7 +1096,7 @@ public final class Token {
   /**
    * Checks if the specified character is a computer letter (A - Z, a - z, _).
    * @param ch the letter to be checked
-   * @return result of comparison
+   * @return result of check
    */
   public static boolean letter(final int ch) {
     return ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch == '_';
@@ -1105,7 +1105,7 @@ public final class Token {
   /**
    * Checks if the specified character is a digit (0 - 9).
    * @param ch the letter to be checked
-   * @return result of comparison
+   * @return result of check
    */
   public static boolean digit(final int ch) {
     return ch >= '0' && ch <= '9';
@@ -1114,7 +1114,7 @@ public final class Token {
   /**
    * Checks if the specified character is a computer letter or digit.
    * @param ch the letter to be checked
-   * @return result of comparison
+   * @return result of check
    */
   public static boolean letterOrDigit(final int ch) {
     return letter(ch) || digit(ch);

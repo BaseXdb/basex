@@ -348,7 +348,7 @@ public final class SeqType {
 
     if(it == null) {
       if(!occ.check(0)) INVEMPTYEX.thrw(ii, e.description(), this);
-      return null;
+      return Empty.SEQ;
     }
 
     if(!occ.check(1)) INVCAST.thrw(ii, it.type, this);

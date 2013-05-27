@@ -146,9 +146,9 @@ public interface Text {
   // SERVER ===================================================================
 
   /** Server was started. */
-  String SRV_STARTED = lang("srv_started");
+  String SRV_STARTED_PORT_X = lang("srv_started_port_%");
   /** Server was stopped. */
-  String SRV_STOPPED = lang("srv_stopped");
+  String SRV_STOPPED_PORT_X = lang("srv_stopped_port_%");
   /** Server is running or permission was denied. */
   String SRV_RUNNING = lang("srv_running");
   /** Ports was specified twice. */

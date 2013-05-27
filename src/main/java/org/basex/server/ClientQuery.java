@@ -73,7 +73,7 @@ public class ClientQuery extends Query {
 
   @Override
   protected void cache() throws IOException {
-    cs.sout.write(ServerCmd.ITER.code);
+    cs.sout.write(ServerCmd.RESULTS.code);
     cs.send(id);
     cs.sout.flush();
     final BufferInput bi = new BufferInput(cs.sin);

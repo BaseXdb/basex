@@ -29,7 +29,7 @@ public final class Open extends Command {
     new Close().run(context);
 
     final String db = args[0];
-    if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
+    if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
 
     try {
       final Data data = open(db, context);

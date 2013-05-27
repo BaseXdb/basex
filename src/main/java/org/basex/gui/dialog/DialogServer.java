@@ -286,18 +286,18 @@ public final class DialogServer extends BaseXDialog {
             portc.setText(String.valueOf(p));
           }
           BaseXServer.start(p, "-p", Integer.toString(p), "-e", Integer.toString(p + 1));
-          msg = SRV_STARTED;
+          msg = Util.info(SRV_STARTED_PORT_X, p);
           running = true;
         } catch(final BaseXException ex) {
           msg = Util.message(ex);
           icon = Msg.ERROR;
         }
       } else if(cmp == stop) {
-        if(running) BaseXServer.stop(gui.gprop.num(GUIProp.S_SERVERPORT),
-            gui.gprop.num(GUIProp.S_EVENTPORT));
+        final int p = gui.gprop.num(GUIProp.S_SERVERPORT);
+        if(running) BaseXServer.stop(p, gui.gprop.num(GUIProp.S_EVENTPORT));
         running = ping(true);
         connected = connected && ping(false);
-        if(!connected) msg = SRV_STOPPED;
+        if(!connected) msg = Util.info(SRV_STOPPED_PORT_X, p);
         if(!connected) setTitle(S_SERVER_ADMIN);
       } else if(cmp == connect) {
         final String pw = new String(admpass.getPassword());
@@ -373,7 +373,7 @@ public final class DialogServer extends BaseXDialog {
       Integer.parseInt(portc.getText()) <= 65535;
     final boolean valpl = ports.getText().matches("[\\d]+") &&
       Integer.parseInt(ports.getText()) <= 65535;
-    final boolean vallu = admuser.getText().matches("[\\w]*");
+    final boolean vallu = Databases.validName(admuser.getText());
     final boolean vallp = new String(admpass.getPassword()).matches("[^ ;'\"]*");
     final boolean valh = host.getText().matches("([\\w]+://)?[\\w.-]+");
 

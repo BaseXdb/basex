@@ -1,12 +1,16 @@
 package org.basex.io;
 
+import static org.basex.util.Token.*;
+
 import java.io.*;
 import java.util.*;
 
 import javax.xml.transform.stream.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.in.*;
+import org.basex.util.*;
 import org.xml.sax.*;
 
 /**
@@ -249,9 +253,15 @@ public abstract class IO {
    * @return database name
    */
   public final String dbname() {
-    final String n = name();
-    final int i = n.lastIndexOf('.');
-    return (i != -1 ? n.substring(0, i) : n).replaceAll("[^\\w-]", "");
+    final TokenBuilder tb = new TokenBuilder();
+    final byte[] n = token(name());
+    int i = lastIndexOf(n, '.');
+    if(i == -1) i = n.length;
+    for(int c = 0; c < i; c += cl(n, c)) {
+      final int ch = norm(cp(n, c));
+      if(Databases.validChar(ch)) tb.add(ch);
+    }
+    return tb.toString();
   }
 
   /**

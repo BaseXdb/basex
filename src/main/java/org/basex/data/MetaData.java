@@ -163,25 +163,6 @@ public final class MetaData {
   }
 
   /**
-   * Checks if the specified database name is valid, matching the pattern
-   * {@code [-\w]+}, or {@code [-\w*?,]+} if the glob flag is activated.
-   * @param name name to be checked
-   * @param glob allow glob syntax
-   * @return result of check
-   */
-  public static boolean validName(final String name, final boolean glob) {
-    if(name == null) return false;
-    // faster than a regular expression..
-    final int nl = name.length();
-    for(int n = 0; n < nl; n++) {
-      final char ch = name.charAt(n);
-      if((!glob || ch != '?' && ch != '*' && ch != ',') &&
-          !letterOrDigit(ch) && ch != '-') return false;
-    }
-    return nl != 0;
-  }
-
-  /**
    * Calculates the database size.
    * @param io current file
    * @return file length

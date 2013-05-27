@@ -1,6 +1,6 @@
 package org.basex.io;
 
-import org.basex.data.*;
+import org.basex.core.*;
 
 /**
  * This class references input passed on in a query.
@@ -27,13 +27,13 @@ public final class QueryInput {
     input = IO.get(in);
 
     // checks if the specified input reference is a valid database name
-    if(MetaData.validName(in, false)) {
+    if(Databases.validName(in)) {
       db = in;
     } else {
       final int s = in.indexOf('/');
       if(s > 0 && in.indexOf(':') == -1) {
         final String n = in.substring(0, s);
-        if(MetaData.validName(n, false)) {
+        if(Databases.validName(n)) {
           path = in.substring(s + 1);
           db = n;
         }

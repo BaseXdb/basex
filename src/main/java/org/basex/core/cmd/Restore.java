@@ -6,7 +6,6 @@ import java.io.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -32,7 +31,7 @@ public class Restore extends ABackup {
   @Override
   protected boolean run() {
     String db = args[0];
-    if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
+    if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
 
     // find backup file with or without date suffix
     IOFile file = mprop.dbpath(db + IO.ZIPSUFFIX);

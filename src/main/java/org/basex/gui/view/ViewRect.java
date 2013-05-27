@@ -45,7 +45,7 @@ public class ViewRect {
    * Verifies if the specified coordinates are inside the rectangle.
    * @param xx x position
    * @param yy y position
-   * @return result of comparison
+   * @return result of check
    */
   public final boolean contains(final int xx, final int yy) {
     return (xx >= x && xx <= x + w || xx >= x + w && xx <= x) &&

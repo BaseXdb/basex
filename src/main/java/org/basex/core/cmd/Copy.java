@@ -3,9 +3,9 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.util.regex.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -17,6 +17,8 @@ import org.basex.util.list.*;
  * @author Andreas Weiler
  */
 public final class Copy extends Command {
+  /** Pattern to exclude locking files from database transfer operations. */
+  private static final Pattern FILES = Pattern.compile(".{3,5}" + IO.BASEXSUFFIX);
   /** Counter for outstanding files. */
   private int of;
   /** Counter of total files. */
@@ -36,8 +38,8 @@ public final class Copy extends Command {
     final String src = args[0];
     final String trg = args[1];
     // check if names are valid
-    if(!MetaData.validName(src, false)) return error(NAME_INVALID_X, src);
-    if(!MetaData.validName(trg, false)) return error(NAME_INVALID_X, trg);
+    if(!Databases.validName(src)) return error(NAME_INVALID_X, src);
+    if(!Databases.validName(trg)) return error(NAME_INVALID_X, trg);
 
     // source database does not exist
     if(!mprop.dbexists(src)) return error(DB_NOT_FOUND_X, src);
@@ -63,7 +65,7 @@ public final class Copy extends Command {
     tf = files.size();
     try {
       for(final String file : files) {
-        if(Databases.FILES.matcher(file).matches()) {
+        if(FILES.matcher(file).matches()) {
           new IOFile(src, file).copyTo(new IOFile(trg, file));
         }
         of++;

@@ -14,8 +14,18 @@ import org.basex.util.list.*;
  * @author Jens Erat
  */
 public final class Databases {
-  /** Pattern to exclude locking files from database transfer operations. */
-  public static final Pattern FILES = Pattern.compile(".{3,5}" + IO.BASEXSUFFIX);
+  /** Allowed characters for database names (additional to letters and digits).
+   * The following characters are invalid:
+   * <ul>
+   * <li> {@code ,?*}" are used by the glob syntax</li>
+   * <li> {@code ;} is reserved for separating commands.</li>
+   * <li> {@code :*?\"<>\/|}" are used for filenames and paths</li>
+   * </ul>
+   */
+  public static final String DBCHARS = "-+=~!#$%^&()[]{}@'`";
+  /** Regex representation of allowed database characters. */
+  public static final String REGEXCHARS = DBCHARS.replaceAll("(.)", "\\\\$1");
+
   /** Pattern to extract the database name from a backup file name. */
   private static final Pattern ZIPPATTERN =
       Pattern.compile(DateTime.PATTERN + IO.ZIPSUFFIX + '$');
@@ -83,9 +93,14 @@ public final class Databases {
    * @return database and backups list
    */
   private StringList list(final boolean db, final boolean backup, final String name) {
-    final Pattern pt = name == null ? null : Pattern.compile(
-        REGEX.matcher(name).matches() ? IOFile.regex(name) : name,
-        Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
+    final Pattern pt;
+    if(name != null) {
+      final String nm = REGEX.matcher(name).matches() ? IOFile.regex(name) :
+        name.replaceAll("([" + REGEXCHARS + "])", "\\\\$1");
+      pt = Pattern.compile(nm, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
+    } else {
+      pt = null;
+    }
 
     final IOFile[] children = mprop.dbpath().children();
     final StringList list = new StringList(children.length);
@@ -114,10 +129,45 @@ public final class Databases {
    */
   public static StringList backupPaths(final String db, final Context ctx) {
     final StringList sl = new StringList();
+    final String regex = db.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") +
+        DateTime.PATTERN + IO.ZIPSUFFIX;
     for(final IOFile f : ctx.mprop.dbpath().children()) {
-      final String name = f.name();
-      if(name.matches(db + DateTime.PATTERN + IO.ZIPSUFFIX)) sl.add(f.path());
+      if(f.name().matches(regex)) sl.add(f.path());
     }
     return sl.sort(false, false);
+  }
+
+  /**
+   * Checks if the specified character is a valid character for a database name.
+   * @param ch the character to be checked
+   * @return result of check
+   */
+  public static boolean validChar(final int ch) {
+    return Token.letterOrDigit(ch) || DBCHARS.indexOf(ch) != -1;
+  }
+
+  /**
+   * Checks if the specified string is a valid database name.
+   * @param name name to be checked
+   * @return result of check
+   */
+  public static boolean validName(final String name) {
+    return validName(name, false);
+  }
+
+  /**
+   * Checks if the specified string is a valid database name.
+   * @param name name to be checked
+   * @param glob allow glob syntax
+   * @return result of check
+   */
+  public static boolean validName(final String name, final boolean glob) {
+    if(name == null) return false;
+    final int nl = name.length();
+    for(int n = 0; n < nl; n++) {
+      final char ch = name.charAt(n);
+      if((!glob || ch != '?' && ch != '*' && ch != ',') && !validChar(ch)) return false;
+    }
+    return nl != 0;
   }
 }

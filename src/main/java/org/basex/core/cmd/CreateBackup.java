@@ -1,13 +1,14 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
-import org.basex.data.*;
+import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.CmdCreate;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -31,7 +32,7 @@ public final class CreateBackup extends ABackup {
   @Override
   protected boolean run() {
     final String name = args[0];
-    if(!MetaData.validName(name, true)) return error(NAME_INVALID_X, name);
+    if(!Databases.validName(name, true)) return error(NAME_INVALID_X, name);
 
     // retrieve all databases
     final StringList dbs = context.databases.listDBs(name);

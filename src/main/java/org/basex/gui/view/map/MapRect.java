@@ -65,7 +65,7 @@ final class MapRect extends ViewRect implements Comparable<MapRect> {
   /**
    * Verifies if the specified rectangle is contained inside the rectangle.
    * @param r rectangle
-   * @return result of comparison
+   * @return result of check
    */
   boolean contains(final MapRect r) {
     return r.x >= x && r.y >= y && r.x + r.w <= x + w && r.y + r.h <= y + h;

@@ -5,7 +5,6 @@ import static org.basex.core.Text.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.list.*;
 
@@ -43,8 +42,8 @@ abstract class AUser extends Command {
     final String u = args[off];
     final String d = off + 1 < args.length ? args[off + 1] : null;
 
-    if(!MetaData.validName(u, true)) return error(NAME_INVALID_X, u);
-    if(d != null && !MetaData.validName(d, true)) return error(NAME_INVALID_X, d);
+    if(!Databases.validName(u, true)) return error(NAME_INVALID_X, u);
+    if(d != null && !Databases.validName(d, true)) return error(NAME_INVALID_X, d);
 
     // retrieve all users; stop if no user is found
     final String[] users = users(u);
@@ -96,7 +95,8 @@ abstract class AUser extends Command {
    * @return array with database names
    */
   private String[] users(final String name) {
-    final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) : name;
+    final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) :
+      name.replaceAll("([" + Databases.REGEXCHARS + "])", "\\\\$1");
     return context.users.find(Pattern.compile(pat,
         Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE));
   }

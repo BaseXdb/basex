@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.nio.charset.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -136,7 +137,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Data data(final QueryContext ctx) throws QueryException {
     final String name = string(checkStr(expr[0], ctx));
-    if(!MetaData.validName(name, false)) INVDB.thrw(info, name);
+    if(!Databases.validName(name)) INVDB.thrw(info, name);
     return ctx.resource.data(name, info);
   }
 

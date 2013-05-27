@@ -27,7 +27,7 @@ public final class ViewData {
    * @param prop gui properties
    * @param d data reference
    * @param pre pre value
-   * @return result of comparison
+   * @return result of check
    */
   public static boolean leaf(final GUIProp prop, final Data d,
       final int pre) {
