@@ -129,7 +129,7 @@ public final class FNAdmin extends StandardFunc {
   private Iter users(final QueryContext ctx) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     for(final User u : expr.length == 0 ? ctx.context.users.users(null) :
-      data(ctx).meta.users.users(ctx.context.users)) {
+      checkData(ctx).meta.users.users(ctx.context.users)) {
       vb.add(new FElem(Q_USER).add(u.name).add(Q_PERMISSION,
           u.perm.toString().toLowerCase(Locale.ENGLISH)));
     }

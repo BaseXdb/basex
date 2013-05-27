@@ -46,8 +46,8 @@ public final class FNFile extends StandardFunc {
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
     switch(sig) {
-      case _FILE_LIST:            return list(file(0, ctx), ctx);
-      case _FILE_READ_TEXT_LINES: return readTextLines(file(0, ctx), ctx);
+      case _FILE_LIST:            return list(checkFile(0, ctx), ctx);
+      case _FILE_READ_TEXT_LINES: return readTextLines(checkFile(0, ctx), ctx);
       default:                    return super.iter(ctx);
     }
   }
@@ -57,34 +57,34 @@ public final class FNFile extends StandardFunc {
     checkCreate(ctx);
     try {
       switch(sig) {
-        case _FILE_APPEND:            return write(file(0, ctx), true, ctx);
-        case _FILE_APPEND_BINARY:     return writeBinary(file(0, ctx), ctx, true);
-        case _FILE_APPEND_TEXT:       return writeText(file(0, ctx), true, ctx);
-        case _FILE_APPEND_TEXT_LINES: return writeTextLines(file(0, ctx), true, ctx);
-        case _FILE_COPY:              return copy(file(0, ctx), ctx, true);
-        case _FILE_CREATE_DIR:        return createDirectory(file(0, ctx));
-        case _FILE_DELETE:            return delete(file(0, ctx), ctx);
-        case _FILE_MOVE:              return copy(file(0, ctx), ctx, false);
-        case _FILE_READ_BINARY:       return readBinary(file(0, ctx));
-        case _FILE_READ_TEXT:         return readText(file(0, ctx), ctx);
-        case _FILE_WRITE:             return write(file(0, ctx), false, ctx);
-        case _FILE_WRITE_BINARY:      return writeBinary(file(0, ctx), ctx, false);
-        case _FILE_WRITE_TEXT:        return writeText(file(0, ctx), false, ctx);
-        case _FILE_WRITE_TEXT_LINES:  return writeTextLines(file(0, ctx), false, ctx);
-        case _FILE_PATH_SEPARATOR:    return Str.get(File.pathSeparator);
-        case _FILE_DIR_SEPARATOR:     return Str.get(File.separator);
-        case _FILE_LINE_SEPARATOR:    return Str.get(NL);
-        case _FILE_EXISTS:            return Bln.get(file(0, ctx).exists());
-        case _FILE_IS_DIR:            return Bln.get(file(0, ctx).isDirectory());
-        case _FILE_IS_FILE:           return Bln.get(file(0, ctx).isFile());
-        case _FILE_LAST_MODIFIED:     return lastModified(file(0, ctx));
-        case _FILE_SIZE:              return size(file(0, ctx));
-        case _FILE_BASE_NAME:         return baseName(file(0, ctx), ctx);
-        case _FILE_DIR_NAME:          return dirName(file(0, ctx));
-        case _FILE_PATH_TO_NATIVE:    return pathToNative(file(0, ctx));
-        case _FILE_RESOLVE_PATH:      return Str.get(file(0, ctx).getAbsolutePath());
-        case _FILE_PATH_TO_URI:       return pathToUri(file(0, ctx));
-        default:                      return super.item(ctx, ii);
+        case _FILE_APPEND:           return write(checkFile(0, ctx), true, ctx);
+        case _FILE_APPEND_BINARY:    return writeBinary(checkFile(0, ctx), ctx, true);
+        case _FILE_APPEND_TEXT:      return writeText(checkFile(0, ctx), true, ctx);
+        case _FILE_APPEND_TEXT_LINES: return writeTextLines(checkFile(0, ctx), true, ctx);
+        case _FILE_COPY:             return copy(checkFile(0, ctx), ctx, true);
+        case _FILE_CREATE_DIR:       return createDirectory(checkFile(0, ctx));
+        case _FILE_DELETE:           return delete(checkFile(0, ctx), ctx);
+        case _FILE_MOVE:             return copy(checkFile(0, ctx), ctx, false);
+        case _FILE_READ_BINARY:      return readBinary(checkFile(0, ctx));
+        case _FILE_READ_TEXT:        return readText(checkFile(0, ctx), ctx);
+        case _FILE_WRITE:            return write(checkFile(0, ctx), false, ctx);
+        case _FILE_WRITE_BINARY:     return writeBinary(checkFile(0, ctx), ctx, false);
+        case _FILE_WRITE_TEXT:       return writeText(checkFile(0, ctx), false, ctx);
+        case _FILE_WRITE_TEXT_LINES: return writeTextLines(checkFile(0, ctx), false, ctx);
+        case _FILE_PATH_SEPARATOR:   return Str.get(File.pathSeparator);
+        case _FILE_DIR_SEPARATOR:    return Str.get(File.separator);
+        case _FILE_LINE_SEPARATOR:   return Str.get(NL);
+        case _FILE_EXISTS:           return Bln.get(checkFile(0, ctx).exists());
+        case _FILE_IS_DIR:           return Bln.get(checkFile(0, ctx).isDirectory());
+        case _FILE_IS_FILE:          return Bln.get(checkFile(0, ctx).isFile());
+        case _FILE_LAST_MODIFIED:    return lastModified(checkFile(0, ctx));
+        case _FILE_SIZE:             return size(checkFile(0, ctx));
+        case _FILE_BASE_NAME:        return baseName(checkFile(0, ctx), ctx);
+        case _FILE_DIR_NAME:         return dirName(checkFile(0, ctx));
+        case _FILE_PATH_TO_NATIVE:   return pathToNative(checkFile(0, ctx));
+        case _FILE_RESOLVE_PATH:     return Str.get(checkFile(0, ctx).getAbsolutePath());
+        case _FILE_PATH_TO_URI:      return pathToUri(checkFile(0, ctx));
+        default:                     return super.item(ctx, ii);
       }
     } catch(final IOException ex) {
       throw FILE_IO.thrw(info, ex);
@@ -487,7 +487,7 @@ public final class FNFile extends StandardFunc {
   private synchronized Item copy(final File source, final QueryContext ctx,
       final boolean copy) throws QueryException, IOException {
 
-    File trg = file(1, ctx).getCanonicalFile();
+    File trg = checkFile(1, ctx).getCanonicalFile();
     final File src = source.getCanonicalFile();
     if(!src.exists()) FILE_WHICH.thrw(info, src.getAbsolutePath());
 
@@ -549,19 +549,6 @@ public final class FNFile extends StandardFunc {
   private boolean optionalBool(final int i, final QueryContext ctx)
       throws QueryException {
     return i < expr.length && checkBln(expr[i], ctx);
-  }
-
-  /**
-   * Converts the specified argument to a file instance.
-   * @param i argument index
-   * @param ctx query context
-   * @return file instance
-   * @throws QueryException query exception
-   */
-  private File file(final int i, final QueryContext ctx) throws QueryException {
-    if(i >= expr.length) return null;
-    final String file = string(checkStr(expr[i], ctx));
-    return (IOUrl.isFileURL(file) ? IOFile.get(file) : new IOFile(file)).file();
   }
 
   @Override

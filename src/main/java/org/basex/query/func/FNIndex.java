@@ -84,7 +84,7 @@ public final class FNIndex extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item facets(final QueryContext ctx) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     final boolean flat = expr.length == 2 && eq(checkStr(expr[1], ctx), FLAT);
     return new FDoc().add(flat ? flat(data) : tree(data, data.paths.root().get(0)));
   }
@@ -97,7 +97,7 @@ public final class FNIndex extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter values(final QueryContext ctx, final IndexType it) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     final byte[] entry = expr.length < 2 ? Token.EMPTY : checkStr(expr[1], ctx);
     if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
 
@@ -143,7 +143,7 @@ public final class FNIndex extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter names(final QueryContext ctx, final IndexType it) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     return entries(it == IndexType.TAG ? data.tagindex : data.atnindex,
       new IndexEntries(Token.EMPTY, it));
   }

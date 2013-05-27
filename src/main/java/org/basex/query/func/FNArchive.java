@@ -9,6 +9,7 @@ import java.nio.charset.*;
 import java.util.*;
 import java.util.zip.*;
 
+import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -94,6 +95,7 @@ public final class FNArchive extends StandardFunc {
       case _ARCHIVE_UPDATE:  return update(ctx);
       case _ARCHIVE_DELETE:  return delete(ctx);
       case _ARCHIVE_OPTIONS: return options(ctx);
+      case _ARCHIVE_WRITE:   return write(ctx);
       default:               return super.item(ctx, ii);
     }
   }
@@ -335,23 +337,15 @@ public final class FNArchive extends StandardFunc {
    */
   private TokenList extract(final QueryContext ctx) throws QueryException {
     final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
-    TokenSet hs = null;
-    if(expr.length > 1) {
-      // filter result to specified entries
-      hs = new TokenSet();
-      final Iter names = ctx.iter(expr[1]);
-      for(Item en; (en = names.next()) != null;) {
-        hs.add(checkElmStr(en).string(info));
-      }
-    }
+    final TokenSet hs = entries(1, ctx);
 
     final TokenList tl = new TokenList();
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
     try {
       while(in.more()) {
         final ZipEntry ze = in.entry();
-        if(ze.isDirectory()) continue;
-        if(hs == null || hs.delete(token(ze.getName())) != 0) tl.add(in.read());
+        if(!ze.isDirectory() && (hs == null || hs.delete(token(ze.getName())) != 0))
+          tl.add(in.read());
       }
     } catch(final IOException ex) {
       ARCH_FAIL.thrw(info, ex);
@@ -359,6 +353,61 @@ public final class FNArchive extends StandardFunc {
       in.close();
     }
     return tl;
+  }
+
+  /**
+   * Writes entries from an archive to disk.
+   * @param ctx query context
+   * @return text entries
+   * @throws QueryException query exception
+   */
+  private Item write(final QueryContext ctx) throws QueryException {
+    final File path = checkFile(0, ctx);
+    final B64 archive = (B64) checkType(checkItem(expr[1], ctx), AtomType.B64);
+    final TokenSet hs = entries(2, ctx);
+
+    final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
+    try {
+      while(in.more()) {
+        final ZipEntry ze = in.entry();
+        final String name = ze.getName();
+        if(hs == null || hs.delete(token(name)) != 0) {
+          final IOFile file = new IOFile(path.getPath(), name);
+          if(ze.isDirectory()) {
+            file.md();
+          } else {
+            file.dir().md();
+            file.write(in.read());
+          }
+        }
+      }
+    } catch(final IOException ex) {
+      ARCH_FAIL.thrw(info, ex);
+    } finally {
+      in.close();
+    }
+    return null;
+  }
+
+  /**
+   * Returns all archive entries from the specified argument.
+   * A {@code null} reference is returned if no entries are specified.
+   * @param e argument index
+   * @param ctx query context
+   * @return set with all entries
+   * @throws QueryException query exception
+   */
+  private TokenSet entries(final int e, final QueryContext ctx) throws QueryException {
+    TokenSet hs = null;
+    if(e < expr.length) {
+      // filter result to specified entries
+      hs = new TokenSet();
+      final Iter names = ctx.iter(expr[e]);
+      for(Item en; (en = names.next()) != null;) {
+        hs.add(checkElmStr(en).string(info));
+      }
+    }
+    return hs;
   }
 
   /**

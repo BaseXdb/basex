@@ -465,7 +465,7 @@ public enum Function {
   /** XQuery function. */
   _ARCHIVE_ENTRIES(FNArchive.class, "entries(archive)", ELM_ZM, B64),
   /** XQuery function. */
-  _ARCHIVE_EXTRACT_TEXT(FNArchive.class, "extract-text(archiveip[,entries[,encoding]])",
+  _ARCHIVE_EXTRACT_TEXT(FNArchive.class, "extract-text(archive[,entries[,encoding]])",
       STR_ZM, 1, B64, ITEM_ZM, STR),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_BINARY(FNArchive.class, "extract-binary(archive[,entries])",
@@ -477,6 +477,9 @@ public enum Function {
   _ARCHIVE_DELETE(FNArchive.class, "delete(archive,entries)", B64, B64, ITEM_ZM),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(FNArchive.class, "options(archive)", ELM, B64),
+  /** XQuery function. */
+  _ARCHIVE_WRITE(FNArchive.class, "write(path,archive[,entries])",
+      EMP, 2, STR, B64, ITEM_ZM),
 
   /* FNClient functions. */
 

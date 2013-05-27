@@ -2,6 +2,7 @@ package org.basex.test.query.func;
 
 import static org.basex.query.func.Function.*;
 
+import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
@@ -192,5 +193,26 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     error(_ARCHIVE_CREATE.args("X", "X",
         "<archive:options><archive:format value='gzip'/></archive:options>") + " ! " +
         _ARCHIVE_DELETE.args(" .", "X"), Err.ARCH_MODIFY);
+  }
+
+
+  /** Test method. */
+  @Test
+  public void write() {
+    // write archive and count number of entries
+    final String tmp = new IOFile(sandbox(), "tmp").path();
+    query(_ARCHIVE_WRITE.args(tmp, _FILE_READ_BINARY.args(ZIP)));
+    query(COUNT.args(_ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(ZIP))), "5");
+    // write archive and count number of entries
+    query(_ARCHIVE_WRITE.args(tmp, _FILE_READ_BINARY.args(ZIP),
+        _ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(ZIP))));
+    query(COUNT.args(_ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(ZIP))), "5");
+
+    query("let $a := " + _ARCHIVE_ENTRIES.args(
+      _FILE_READ_BINARY.args(ZIP)) + "/string() " +
+      "let $f := " + _FILE_LIST.args(tmp, "true()") + "[" +
+      _FILE_IS_FILE.args(" '" + tmp + "/'||.") + "] ! replace(., '\\\\', '/') " +
+      "return (every $e in $a satisfies $e = $f) and (every $e in $f satisfies $e =$ a)",
+      "true");
   }
 }
