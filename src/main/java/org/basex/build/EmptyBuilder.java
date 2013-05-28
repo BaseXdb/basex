@@ -31,7 +31,7 @@ public final class EmptyBuilder extends Builder {
 
   @Override
   public Data build() throws IOException {
-    meta = new MetaData(name, context);
+    meta = new MetaData(dbname, context);
     tags = new Names(meta);
     atts = new Names(meta);
     try { parse(); } finally { close(); }

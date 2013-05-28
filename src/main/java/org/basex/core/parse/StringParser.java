@@ -9,8 +9,17 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Set;
-import org.basex.core.parse.Commands.*;
-import org.basex.io.*;
+import org.basex.core.parse.Commands.Cmd;
+import org.basex.core.parse.Commands.CmdAlter;
+import org.basex.core.parse.Commands.CmdCreate;
+import org.basex.core.parse.Commands.CmdDrop;
+import org.basex.core.parse.Commands.CmdIndex;
+import org.basex.core.parse.Commands.CmdIndexInfo;
+import org.basex.core.parse.Commands.CmdInfo;
+import org.basex.core.parse.Commands.CmdOptimize;
+import org.basex.core.parse.Commands.CmdPerm;
+import org.basex.core.parse.Commands.CmdRepo;
+import org.basex.core.parse.Commands.CmdShow;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -321,8 +330,7 @@ final class StringParser extends CmdParser {
 
   /**
    * Parses and returns a glob expression, which extends the {@link #name}
-   * with asterisks, question marks and commands. See {@link IOFile#regex}
-   * for more details.
+   * with asterisks, question marks and commands.
    * @param cmd referring command; if specified, the result must not be empty
    * @return glob expression
    * @throws QueryException query exception
@@ -331,9 +339,9 @@ final class StringParser extends CmdParser {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     while(true) {
-      final char c = parser.curr();
-      if(!Databases.validChar(c) && c != '*' && c != '?' && c != ',') {
-        return finish(cmd, eoc() || ws(parser.curr()) ? sb : null);
+      final char ch = parser.curr();
+      if(!Databases.validChar(ch) && ch != '*' && ch != '?' && ch != ',') {
+        return finish(cmd, eoc() || ws(ch) ? sb : null);
       }
       sb.append(parser.consume());
     }
@@ -468,7 +476,7 @@ final class StringParser extends CmdParser {
   }
 
   /**
-   * Consumes end-of-command.
+   * Checks if the end of a command has been reached.
    * @return true if command has ended
    */
   private boolean eoc() {

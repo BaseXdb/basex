@@ -68,9 +68,8 @@ final class NSNode {
   /**
    * Sorts the specified node into the child array.
    * @param n child node
-   * @return node
    */
-  NSNode add(final NSNode n) {
+  void add(final NSNode n) {
     int s = size;
     if(s == children.length) {
       final NSNode[] tmp = new NSNode[Math.max(s << 1, 1)];
@@ -81,7 +80,6 @@ final class NSNode {
     System.arraycopy(children, ++s, children, s + 1, size++ - s);
     children[s] = n;
     n.parent = this;
-    return n;
   }
 
   /**

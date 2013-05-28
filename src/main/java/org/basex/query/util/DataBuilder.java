@@ -48,220 +48,216 @@ public final class DataBuilder {
 
   /**
    * Fills the data instance with the specified node.
-   * @param n node
+   * @param node node
    */
-  public void build(final ANode n) {
-    build(new ANodeList(n));
+  public void build(final ANode node) {
+    build(new ANodeList(node));
   }
 
   /**
    * Fills the data instance with the specified nodes.
-   * @param nl node list
+   * @param nodes node list
    */
-  public void build(final ANodeList nl) {
-    int pre = data.meta.size;
-    for(final ANode n : nl) pre = addNode(n, pre, -1, null);
+  public void build(final ANodeList nodes) {
+    int ds = data.meta.size;
+    for(final ANode n : nodes) ds = addNode(n, ds, -1, null);
   }
 
   /**
    * Adds a fragment to a database instance.
    * Document nodes are ignored.
-   * @param nd node to be added
+   * @param node node to be added
    * @param pre node position
    * @param par node parent
-   * @param ndPar parent of node to be added
+   * @param pNode parent of node to be added
    * @return pre value of next node
    */
-  private int addNode(final ANode nd, final int pre, final int par, final ANode ndPar) {
-    switch(nd.nodeType()) {
-      case DOC: return addDoc(nd, pre);
-      case ELM: return addElem(nd, pre, par);
-      case TXT: return pre + addText(nd, pre, par, ndPar);
-      case ATT: return pre + addAttr(nd, pre, par);
-      case COM: return pre + addComm(nd, pre, par);
+  private int addNode(final ANode node, final int pre, final int par, final ANode pNode) {
+    switch(node.nodeType()) {
+      case DOC: return addDoc(node, pre);
+      case ELM: return addElem(node, pre, par);
+      case TXT: return addText(node, pre, par, pNode);
+      case ATT: return addAttr(node, pre, par);
+      case COM: return addComm(node, pre, par);
       // will always be processing instruction
-      default:  return pre + addPI(nd, pre, par);
+      default:  return addPI(node, pre, par);
     }
   }
 
   /**
    * Adds a document node.
-   * @param nd node to be added
+   * @param node node to be added
    * @param pre pre reference
-   * @return number of added nodes
+   * @return pre value of next node
    */
-  private int addDoc(final ANode nd, final int pre) {
+  private int addDoc(final ANode node, final int pre) {
     final int ms = data.meta.size;
-    data.doc(ms, size(nd, false), nd.baseURI());
+    data.doc(ms, size(node, false), node.baseURI());
     data.insert(ms);
     int p = pre + 1;
-    final AxisIter ai = nd.children();
+    final AxisIter ai = node.children();
     for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, null);
     return p;
   }
 
   /**
    * Adds an attribute.
-   * @param nd node to be added
+   * @param node node to be added
    * @param pre pre reference
    * @param par parent reference
    * @return number of added nodes
    */
-  private int addAttr(final ANode nd, final int pre, final int par) {
-    final int ms = data.meta.size;
-    final QNm q = nd.qname();
+  private int addAttr(final ANode node, final int pre, final int par) {
+    final int ds = data.meta.size;
+    final QNm q = node.qname();
     final byte[] uri = q.uri();
     int u = 0;
-    final boolean ne = uri.length != 0;
-    if(ne) {
-      if(par == -1) data.nspaces.add(ms, pre - par, q.prefix(), uri);
-      u = data.nspaces.addURI(uri);
+    if(uri.length != 0) {
+      if(par == -1) data.nspaces.add(ds, pre - par, q.prefix(), uri);
+      u = data.nspaces.uri(uri);
     }
     final int n = data.atnindex.index(q.string(), null, false);
     // attribute namespace flag is only set in main memory instance
-    data.attr(ms, pre - par, n, nd.string(), u, ne);
-    data.insert(ms);
-    return 1;
+    data.attr(ds, pre - par, n, node.string(), u, u != 0);
+    data.insert(ds);
+    return pre + 1;
   }
 
   /**
    * Adds a text node.
-   * @param nd node to be added
+   * @param node node to be added
    * @param pre pre reference
    * @param par parent reference
-   * @param ndPar parent node
-   * @return number of added nodes
+   * @param pNode parent node
+   * @return pre value of next node
    */
-  private int addText(final ANode nd, final int pre, final int par, final ANode ndPar) {
+  private int addText(final ANode node, final int pre, final int par, final ANode pNode) {
     // check full-text mode
     final int dist = pre - par;
-    final TokenList tl = ftbuilder != null ? ftbuilder.build(nd) : null;
-    if(tl == null) return addText(nd.string(), dist);
+    final TokenList tl = ftbuilder != null ? ftbuilder.build(node) : null;
+    if(tl == null) return pre + addText(node.string(), dist);
 
     // adopt namespace from parent
     int u = 0;
-    ANode p = ndPar;
+    ANode p = pNode;
     while(p != null && p.qname().hasPrefix()) p = p.parent();
     if(p != null) u = data.nspaces.uri(p.name(), true);
 
-    for(int i = 0; i < tl.size(); i++) {
-      byte[] text = tl.get(i);
+    final int ts = tl.size();
+    for(int t = 0; t < ts; t++) {
+      byte[] text = tl.get(t);
       final boolean elem = text == null;
       if(elem) {
         // open element
-        data.elem(dist + i, marker, 1, 2, u, false);
+        data.elem(dist + t, marker, 1, 2, u, false);
         data.insert(data.meta.size);
-        text = tl.get(++i);
+        text = tl.get(++t);
       }
-      addText(text, elem ? 1 : dist + i);
+      addText(text, elem ? 1 : dist + t);
     }
-    return tl.size();
+    return pre + ts;
   }
 
   /**
    * Adds a text.
-   * @param txt text node
+   * @param text text node
    * @param dist distance
    * @return number of added nodes
    */
-  private int addText(final byte[] txt, final int dist) {
-    final int ms = data.meta.size;
-    data.text(ms, dist, txt, Data.TEXT);
-    data.insert(ms);
+  private int addText(final byte[] text, final int dist) {
+    final int ds = data.meta.size;
+    data.text(ds, dist, text, Data.TEXT);
+    data.insert(ds);
     return 1;
   }
 
   /**
    * Adds a processing instruction.
-   * @param nd node to be added
+   * @param node node to be added
    * @param pre pre reference
    * @param par parent reference
    * @return number of added nodes
    */
-  private int addPI(final ANode nd, final int pre, final int par) {
-    final int ms = data.meta.size;
-    final byte[] v = trim(concat(nd.name(), SPACE, nd.string()));
-    data.text(ms, pre - par, v, Data.PI);
-    data.insert(ms);
-    return 1;
+  private int addPI(final ANode node, final int pre, final int par) {
+    final int ds = data.meta.size;
+    final byte[] v = trim(concat(node.name(), SPACE, node.string()));
+    data.text(ds, pre - par, v, Data.PI);
+    data.insert(ds);
+    return pre + 1;
   }
 
   /**
    * Adds a comment.
-   * @param nd node to be added
+   * @param node node to be added
    * @param pre pre reference
    * @param par parent reference
    * @return number of added nodes
    */
-  private int addComm(final ANode nd, final int pre, final int par) {
-    final int ms = data.meta.size;
-    data.text(ms, pre - par, nd.string(), Data.COMM);
-    data.insert(ms);
-    return 1;
+  private int addComm(final ANode node, final int pre, final int par) {
+    final int ds = data.meta.size;
+    data.text(ds, pre - par, node.string(), Data.COMM);
+    data.insert(ds);
+    return pre + 1;
   }
 
   /**
    * Adds an element node.
-   * @param nd node to be added
+   * @param node node to be added
    * @param pre pre reference
    * @param par parent reference
-   * @return number of added nodes
+   * @return pre value of next node
    */
-  private int addElem(final ANode nd, final int pre, final int par) {
-    final int size = data.meta.size;
-    data.nspaces.prepare();
+  private int addElem(final ANode node, final int pre, final int par) {
+    final int ds = data.meta.size;
 
     // add new namespaces
-    final Atts ns = nd.nsScope();
-    final int as = ns.size();
-    for(int a = 0; a < as; a++) data.nspaces.add(ns.name(a), ns.string(a), size);
+    data.nspaces.prepare();
+    final Atts ns = node.nsScope();
+    final int nl = ns.size();
+    for(int n = 0; n < nl; n++) data.nspaces.add(ns.name(n), ns.string(n), ds);
 
-    final QNm q = nd.qname();
-    final byte[] uri = q.uri();
-    final int u = uri.length != 0 ? data.nspaces.addURI(uri) : 0;
-    final int tn = data.tagindex.index(q.string(), null, false);
-    final int s = size(nd, false);
+    // analyze node name
+    final QNm name = node.qname();
+    final int tn = data.tagindex.index(name.string(), null, false);
+    final int s = size(node, false);
+    final int u = data.nspaces.uri(name.uri());
 
     // add element node
-    final boolean ne = data.nspaces.finish();
-    data.elem(pre - par, tn, size(nd, true), s, u, ne);
-    data.insert(size);
+    data.elem(pre - par, tn, size(node, true), s, u, nl != 0);
+    data.insert(ds);
 
+    // add attributes and children
     int p = pre + 1;
-
-    // add attributes
-    AxisIter ai = nd.attributes();
-    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, nd);
-
-    // add children
-    ai = nd.children();
-    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, nd);
-    data.nspaces.close(size);
+    AxisIter ai = node.attributes();
+    for(ANode ch; (ch = ai.next()) != null;) p = addAttr(ch, p, pre);
+    ai = node.children();
+    for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, node);
+    data.nspaces.close(ds);
 
     // update size if additional nodes have been added by the descendants
-    if(s != p - pre) data.size(size, Data.ELEM, p - pre);
+    if(s != p - pre) data.size(ds, Data.ELEM, p - pre);
     return p;
   }
 
   /**
    * Determines the number of descendants of a fragment.
-   * @param n fragment node
-   * @param a count attribute size of node
+   * @param node fragment node
+   * @param att count attributes instead of elements
    * @return number of descendants + 1 or attribute size + 1
    */
-  private static int size(final ANode n, final boolean a) {
-    if(n instanceof DBNode) {
-      final DBNode dbn = (DBNode) n;
-      final int k = n.kind();
-      return a ? dbn.data.attSize(dbn.pre, k) : dbn.data.size(dbn.pre, k);
+  private static int size(final ANode node, final boolean att) {
+    if(node instanceof DBNode) {
+      final DBNode dbn = (DBNode) node;
+      final int k = node.kind();
+      return att ? dbn.data.attSize(dbn.pre, k) : dbn.data.size(dbn.pre, k);
     }
 
     int s = 1;
-    AxisIter ai = n.attributes();
+    AxisIter ai = node.attributes();
     while(ai.next() != null) ++s;
-    if(!a) {
-      ai = n.children();
-      for(ANode i; (i = ai.next()) != null;) s += size(i, a);
+    if(!att) {
+      ai = node.children();
+      for(ANode i; (i = ai.next()) != null;) s += size(i, att);
     }
     return s;
   }

@@ -748,7 +748,7 @@ public abstract class Data {
             if(!cand.isEmpty()) curr = cand.remove(0);
           }
         }
-        nspaces.setNearestRoot(cn, par);
+        nspaces.nearestRoot(cn, par);
       }
 
       while(!preStack.isEmpty() && preStack.peek() > par) nspaces.close(preStack.pop());
@@ -765,6 +765,7 @@ public abstract class Data {
         case ELEM:
           // add element
           nspaces.prepare();
+          boolean ne = false;
           if(data.nsFlag(dpre)) {
             final Atts at = data.ns(dpre);
             for(int a = 0; a < at.size(); ++a) {
@@ -778,12 +779,13 @@ public abstract class Data {
                 // location pre == 3 we have to make sure N and only N gets
                 // updated.
                 newNodes.add(nspaces.add(at.name(a), at.string(a), pre));
+                ne = true;
               }
             }
           }
           byte[] nm = data.name(dpre, dkind);
           elem(dis, tagindex.index(nm, null, false), data.attSize(dpre, dkind),
-              data.size(dpre, dkind), nspaces.uri(nm, true), nspaces.finish());
+              data.size(dpre, dkind), nspaces.uri(nm, true), ne);
           preStack.push(pre);
           break;
         case TEXT:

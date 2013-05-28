@@ -60,7 +60,7 @@ public final class DiskBuilder extends Builder {
   @Override
   public DiskData build() throws IOException {
     final IO file = parser.src;
-    final MetaData md = new MetaData(name, context);
+    final MetaData md = new MetaData(dbname, context);
     md.original = file != null ? file.path() : "";
     md.filesize = file != null ? file.length() : 0;
     md.time = file != null ? file.timeStamp() : System.currentTimeMillis();
@@ -73,8 +73,8 @@ public final class DiskBuilder extends Builder {
     bs = Math.max(IO.BLOCKSIZE, bs - bs % IO.BLOCKSIZE);
 
     // drop old database (if available) and create new one
-    DropDB.drop(name, context);
-    context.mprop.dbpath(name).md();
+    DropDB.drop(dbname, context);
+    context.mprop.dbpath(dbname).md();
 
     meta = md;
     tags = new Names(md);

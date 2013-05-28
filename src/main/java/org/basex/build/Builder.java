@@ -31,7 +31,7 @@ public abstract class Builder extends Proc {
   /** Parser instance. */
   final Parser parser;
   /** Database name. */
-  final String name;
+  final String dbname;
 
   /** Number of cached size values. */
   int ssize;
@@ -54,12 +54,12 @@ public abstract class Builder extends Proc {
 
   /**
    * Constructor.
-   * @param nm name of database
+   * @param name name of database
    * @param parse parser
    */
-  Builder(final String nm, final Parser parse) {
+  Builder(final String name, final Parser parse) {
     parser = parse;
-    name = nm;
+    dbname = name;
   }
 
   // PUBLIC METHODS ===========================================================
@@ -260,16 +260,16 @@ public abstract class Builder extends Proc {
 
   /**
    * Adds an element node to the storage.
-   * @param nm element name
+   * @param name element name
    * @param att attributes
    * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  private void addElem(final byte[] nm, final Atts att, final Atts nsp)
+  private void addElem(final byte[] name, final Atts att, final Atts nsp)
       throws IOException {
 
     // get tag reference
-    int n = tags.index(nm, null, true);
+    int n = tags.index(name, null, true);
     path.index(n, Data.ELEM, level);
 
     // cache pre value
@@ -280,16 +280,16 @@ public abstract class Builder extends Proc {
 
     // parse namespaces
     ns.prepare();
-    final int nps = nsp.size();
-    for(int nx = 0; nx < nps; nx++) ns.add(nsp.name(nx), nsp.string(nx), meta.size);
+    final int nl = nsp.size();
+    for(int nx = 0; nx < nl; nx++) ns.add(nsp.name(nx), nsp.string(nx), meta.size);
 
     // get and store element references
     final int dis = level != 0 ? pre - pstack.get(level - 1) : 1;
     final int as = att.size();
-    int u = ns.uri(nm, true);
-    if(u == 0 && indexOf(nm, ':') != -1 && !eq(prefix(nm), XML))
-      throw new BuildException(WHICHNS, parser.detail(), prefix(nm));
-    addElem(dis, n, Math.min(IO.MAXATTS, as + 1), u, ns.finish());
+    int u = ns.uri(name, true);
+    if(u == 0 && indexOf(name, ':') != -1 && !eq(prefix(name), XML))
+      throw new BuildException(WHICHNS, parser.detail(), prefix(name));
+    addElem(dis, n, Math.min(IO.MAXATTS, as + 1), u, nl != 0);
 
     // get and store attribute references
     for(int a = 0; a < as; ++a) {
