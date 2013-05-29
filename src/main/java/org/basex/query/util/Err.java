@@ -200,7 +200,7 @@ public enum Err {
   /** UNIT0003. */
   UNIT_UPDATE(UNIT, 3, "Function '%' is updating."),
   /** UNIT0004. */
-  UNIT_TWICE(UNIT, 4, "Annotation %restxq:% was declare twice."),
+  UNIT_TWICE(UNIT, 4, "Annotation %:% was declare twice."),
   /** UNIT0005. */
   UNIT_ANN(UNIT, 5, "Annotation '%%' has invalid arguments."),
 

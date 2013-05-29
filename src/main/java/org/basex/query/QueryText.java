@@ -527,6 +527,8 @@ public interface QueryText {
   byte[] XQRY = token(XQUERY);
   /** XQUnit token. */
   byte[] UNIT = token("unit");
+  /** Rest token. */
+  byte[] REST = token("rest");
   /** RestXQ token. */
   byte[] RESTXQ = token("restxq");
   /** EXErr token. */
@@ -578,7 +580,7 @@ public interface QueryText {
   /** EXQuery URI. */
   String EXQUERY = "http://exquery.org/ns/";
   /** RESTXQ URI. */
-  byte[] RESTXQURI = token(EXQUERY + "restxq");
+  byte[] RESTURI = token(EXQUERY + "restxq");
 
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns/";

@@ -40,7 +40,8 @@ public final class NSGlobal {
     NS.add(PKG, PKGURI);
     NS.add(ZIP, ZIPURI);
     // EXQuery namespaces
-    NS.add(RESTXQ, RESTXQURI);
+    NS.add(REST, RESTURI);
+    NS.add(RESTXQ, RESTURI);
     // BaseX namespaces
     NS.add(BXERR, BXERRORS);
     NS.add(BASEX, BASEXURI);
