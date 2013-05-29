@@ -186,7 +186,7 @@ public final class QNm extends Item {
    * @param n name
    * @param u URI
    */
-  public void update(final byte[] n, final byte[] u) {
+  public void set(final byte[] n, final byte[] u) {
     name = n;
     pref = indexOf(name, ':');
     uri = u;

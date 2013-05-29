@@ -44,6 +44,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     { "d17", "<ns:a xmlns:ns='NS'><b/></ns:a>" },
     { "d18", "<n xmlns:ns='ns'><a/></n>"},
     { "d19", "<x:n xmlns:x='X'/>"},
+    { "d20", "<x:a xmlns:x='A'><x:b xmlns:x='B'/><x:c/></x:a>"},
   };
 
   /**
@@ -769,6 +770,21 @@ public final class NamespaceTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test query.
+   * @throws Exception exception
+   */
+  @Test
+  public void precedingSiblingNsDecl() throws Exception {
+    create(20);
+    query("//Q{A}a", "<x:a xmlns:x='A'><x:b xmlns:x='B'/><x:c/></x:a>");
+    query("//Q{A}b", "");
+    query("//Q{A}c", "<x:c xmlns:x='A'/>");
+    query("//Q{B}a", "");
+    query("//Q{B}b", "<x:b xmlns:x='B'/>");
+    query("//Q{B}c", "");
+  }
+
+  /**
    * Creates the database context.
    * @throws BaseXException database exception
    */
@@ -816,7 +832,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
       // quotes are replaced by apostrophes to simplify comparison
       final String res = result.replaceAll("\"", "'");
       final String exp = expected.replaceAll("\"", "'");
-      if(!exp.equals(res)) fail("\nExpected: " + exp + "\nFound: " + res);
+      if(!exp.equals(res)) fail("\n[E] " + exp + "\n[F] " + res);
     } catch(final BaseXException ex) {
       fail(Util.message(ex));
     }

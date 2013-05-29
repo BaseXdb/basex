@@ -316,9 +316,10 @@ public final class GUI extends AGUI {
    */
   public void xquery(final String qu, final boolean edit) {
     // check and add default namespace
-    final Namespaces ns = context.data().nspaces;
+    final Data data = context.data();
+    final Namespaces ns = data.nspaces;
     String in = qu.trim().isEmpty() ? "()" : qu;
-    final int u = ns.uri(Token.EMPTY, 0);
+    final int u = ns.uri(Token.EMPTY, 0, data);
     if(u != 0) in = Util.info("declare default element namespace \"%\"; %",
         ns.uri(u), in);
     execute(edit, new XQuery(in));

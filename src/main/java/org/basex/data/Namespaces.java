@@ -20,23 +20,23 @@ import org.basex.util.list.*;
  */
 public final class Namespaces {
   /** Stack with references to default namespaces. */
-  private final IntList defaults = new IntList();
+  private final IntList defaults = new IntList(2);
   /** Namespace prefixes. */
   private final TokenSet prefs;
   /** Namespace URIs. */
-  public final TokenSet uris;
+  private final TokenSet uris;
   /** Root node. */
-  final NSNode root;
+  private final NSNode root;
 
   /** Indicates if new namespaces have been added for an XML node. */
   private boolean newns;
-  /** Current level. Index starts at 1 to reserve an additional level for
-   * XQUP insert operations. */
-  private int uriL = 1;
+  /** Current level. Index starts at 1 (required by XQUF operations). */
+  private int level = 1;
+
   /** Current namespace node. */
   NSNode current;
 
-  // Building Namespaces ======================================================
+  // Building Namespaces ================================================================
 
   /**
    * Empty constructor.
@@ -75,8 +75,8 @@ public final class Namespaces {
    * Prepares the generation of new namespaces.
    */
   public void prepare() {
-    final int nu = defaults.get(uriL);
-    defaults.set(++uriL, nu);
+    final int nu = defaults.get(level);
+    defaults.set(++level, nu);
     newns = false;
   }
 
@@ -98,7 +98,7 @@ public final class Namespaces {
     final int k = addPrefix(pref);
     final int v = addURI(uri);
     current.add(k, v);
-    if(pref.length == 0) defaults.set(uriL, v);
+    if(pref.length == 0) defaults.set(level, v);
     return node;
   }
 
@@ -108,7 +108,7 @@ public final class Namespaces {
    */
   public void close(final int pre) {
     while(current.pre >= pre && current.parent != null) current = current.parent;
-    --uriL;
+    --level;
   }
 
   /**
@@ -121,23 +121,21 @@ public final class Namespaces {
   public int uri(final byte[] name, final boolean elem) {
     if(uris.size() == 0) return 0;
     final byte[] pref = Token.prefix(name);
-    int nu = elem ? defaults.get(uriL) : 0;
+    int nu = elem ? defaults.get(level) : 0;
     if(pref.length != 0) nu = uri(pref, current);
     return nu;
   }
 
-  // Requesting Namespaces ====================================================
+  // Requesting Namespaces ==============================================================
 
   /**
-   * Returns the number of uri references.
+   * Returns the size of the uri container.
+   * Note that the container size does not change if namespaces are deleted.
+   * This function is basically used to decide if there are any namespaces at all,
+   * and if namespaces need to be considered in query optimizations.
    * @return number of uri references
    */
   public int size() {
-    /* returns the size of the uri container - if we delete nodes from
-     * the namespace structure via delete(pre,s) the container size isn't
-     * changed at all, as only NSNodes in the range pre,pre+s-1 are deleted.
-     * COUNTERINTUITIVE?
-     */
     return uris.size();
   }
 
@@ -173,10 +171,11 @@ public final class Namespaces {
    * Returns the namespace URI reference for the specified QName and pre value.
    * @param name tag/attribute name
    * @param pre pre value
+   * @param data data reference
    * @return namespace URI reference or 0 if no namespace was found
    */
-  public int uri(final byte[] name, final int pre) {
-    return uri(Token.prefix(name), current.find(pre));
+  public int uri(final byte[] name, final int pre, final Data data) {
+    return uri(Token.prefix(name), current.find(pre, data));
   }
 
   /**
@@ -198,12 +197,84 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the prefix and URI references for the specified pre value.
+   * Returns the prefix and URI references of all namespaces defined for the node with
+   * the specified pre value.
    * @param pre pre value
+   * @param data data reference
    * @return namespace references
    */
-  int[] get(final int pre) {
-    return current.find(pre).values;
+  int[] get(final int pre, final Data data) {
+    return current.find(pre, data).values;
+  }
+
+  /**
+   * Returns a map with all namespaces that are valid for the specified pre value.
+   * @param pre pre value
+   * @param data data reference
+   * @return scope
+   */
+  TokenMap scope(final int pre, final Data data) {
+    final TokenMap nsScope = new TokenMap();
+    NSNode node = current;
+    do {
+      for(int i = 0; i < node.values.length; i += 2)
+        nsScope.add(prefix(node.values[i]), uri(node.values[i + 1]));
+      final int pos = node.find(pre);
+      if(pos < 0) break;
+      node = node.children[pos];
+    } while(node.pre <= pre && pre < node.pre + data.size(node.pre, Data.ELEM));
+    return nsScope;
+  }
+
+  /**
+   * Finds the nearest namespace node on the ancestor axis of the insert
+   * location and sets it as new root. Possible candidates for this node are collected
+   * and the match with the highest pre value between ancestors and candidates
+   * is determined.
+   * @param pre pre value
+   * @param data data reference
+   */
+  void root(final int pre, final Data data) {
+    // collect possible candidates for namespace root
+    final List<NSNode> cand = new LinkedList<NSNode>();
+    NSNode node = root;
+    cand.add(node);
+    for(int p; (p = node.find(pre)) > -1;) {
+      // add candidate to stack
+      node = node.children[p];
+      cand.add(0, node);
+    }
+
+    node = root;
+    if(cand.size() > 1) {
+      // compare candidates to ancestors of pre value
+      int ancPre = pre;
+      // take first candidate from stack
+      NSNode curr = cand.remove(0);
+      while(ancPre > -1 && node == root) {
+        // this is the new root
+        if(curr.pre == ancPre) node = curr;
+        // if the current candidate's pre value is lower than the current
+        // ancestor of par or par itself, we have to look for a potential
+        // match for this candidate. therefore we iterate through ancestors
+        // until we find one with a lower than or the same pre value as the
+        // current candidate.
+        else if(curr.pre < ancPre) {
+          while((ancPre = data.parent(ancPre, data.kind(ancPre))) > curr.pre);
+          if(curr.pre == ancPre) node = curr;
+        }
+        // no potential for infinite loop, because dummy root is always a match,
+        // in this case ancPre ends iteration
+        if(!cand.isEmpty()) curr = cand.remove(0);
+      }
+    }
+
+    final int uri = uri(Token.EMPTY, pre, data);
+    defaults.set(level, uri);
+    // remind uri before insert of first node n to connect siblings of n to
+    // according namespace
+    defaults.set(level - 1, uri);
+    current = node;
   }
 
   /**
@@ -227,15 +298,16 @@ public final class Namespaces {
     return 0;
   }
 
-  // Updating Namespaces ======================================================
+  // Updating Namespaces ================================================================
 
   /**
    * Deletes the specified number of entries from the namespace structure.
    * @param pre pre value of the first node to delete
+   * @param data data reference
    * @param size number of entries to be deleted
    */
-  void delete(final int pre, final int size) {
-    NSNode nd = current.find(pre);
+  void delete(final int pre, final int size, final Data data) {
+    NSNode nd = current.find(pre, data);
     if(nd.pre == pre) nd = nd.parent;
     while(nd != null) {
       nd.delete(pre, size);
@@ -285,10 +357,12 @@ public final class Namespaces {
    * @param par parent value
    * @param pref prefix
    * @param uri uri
+   * @param data data reference
    * @return uri reference
    */
-  public int add(final int pre, final int par, final byte[] pref, final byte[] uri) {
-    final NSNode nd = current.find(par);
+  public int add(final int pre, final int par, final byte[] pref, final byte[] uri,
+      final Data data) {
+    final NSNode nd = current.find(par, data);
     final NSNode t = new NSNode(pre);
 
     final int k = addPrefix(pref);
@@ -331,22 +405,6 @@ public final class Namespaces {
   }
 
   /**
-   * This is only called when a MemData instance is inserted. The
-   * namespace node which is next on the ancestor axis of the insert location
-   * is set as new root.
-   * @param node nearest namespace node on ancestor axis
-   * @param pre pre value to find nearest namespace node for
-   */
-  void nearestRoot(final NSNode node, final int pre) {
-    final int uriI = uri(Token.EMPTY, pre);
-    defaults.set(uriL, uriI);
-    // remind uri before insert of first node n to connect siblings of n to
-    // according namespace
-    defaults.set(uriL - 1, uriI);
-    current = node;
-  }
-
-  /**
    * Setter for namespaces root node.
    * @param node new root
    */
@@ -354,7 +412,7 @@ public final class Namespaces {
     current = node;
   }
 
-  // Printing Namespaces ======================================================
+  // Printing Namespaces ================================================================
 
   /**
    * Returns a tabular representation of the namespaces.

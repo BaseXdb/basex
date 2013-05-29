@@ -113,7 +113,7 @@ public final class DataBuilder {
     final byte[] uri = q.uri();
     int u = 0;
     if(uri.length != 0) {
-      if(par == -1) data.nspaces.add(ds, pre - par, q.prefix(), uri);
+      if(par == -1) data.nspaces.add(ds, pre - par, q.prefix(), uri, data);
       u = data.nspaces.uri(uri);
     }
     final int n = data.atnindex.index(q.string(), null, false);

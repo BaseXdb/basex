@@ -273,7 +273,7 @@ final class DatabaseUpdates {
       if(data.kind(pre) == Data.ATTR) {
         final byte[] nm = data.name(pre, Data.ATTR);
         final QNm name = new QNm(nm);
-        final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, pre));
+        final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, pre, data));
         if(uri != null) name.uri(uri);
         pool.add(name, NodeType.ATT);
         il.add(pre);
@@ -283,7 +283,7 @@ final class DatabaseUpdates {
           final byte[] nm = data.name(p, Data.ATTR);
           if(!il.contains(p)) {
             final QNm name = new QNm(nm);
-            final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, p));
+            final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, p, data));
             if(uri != null) name.uri(uri);
             pool.add(name, NodeType.ATT);
           }
