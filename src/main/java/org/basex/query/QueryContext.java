@@ -168,11 +168,23 @@ public final class QueryContext extends Proc {
 
   /**
    * Parses the specified query.
+   * @param query input query
+   * @param path file path (may be {@code null})
+   * @throws QueryException query exception
+   */
+  public void parse(final String query, final String path) throws QueryException {
+    final boolean library = QueryProcessor.isLibrary(query);
+    if(library) parseLibrary(query, path);
+    else parseMain(query, path);
+  }
+
+  /**
+   * Parses the specified query.
    * @param qu input query
    * @param path file path (may be {@code null})
    * @throws QueryException query exception
    */
-  public void parse(final String qu, final String path) throws QueryException {
+  public void parseMain(final String qu, final String path) throws QueryException {
     root = new QueryParser(qu, path, this).parseMain();
   }
 
@@ -183,8 +195,8 @@ public final class QueryContext extends Proc {
    * @return name of module
    * @throws QueryException query exception
    */
-  public QNm module(final String qu, final String path) throws QueryException {
-    return new QueryParser(qu, path, this).parseModule(true);
+  public QNm parseLibrary(final String qu, final String path) throws QueryException {
+    return new QueryParser(qu, path, this).parseLibrary(true);
   }
 
   /**

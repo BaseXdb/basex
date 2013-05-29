@@ -94,7 +94,7 @@ public final class FNXQuery extends StandardFunc {
     }
     // evaluate query
     try {
-      qc.parse(string(qu), path);
+      qc.parseMain(string(qu), path);
       if(qc.updating) BXXQ_UPDATING.thrw(info);
       qc.compile();
       final ValueBuilder vb = new ValueBuilder();

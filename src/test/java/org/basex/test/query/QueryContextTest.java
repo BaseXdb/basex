@@ -14,12 +14,13 @@ import org.junit.*;
  * @author Leo Woerteler
  */
 public class QueryContextTest extends SandboxTest {
-  /** Tests the {@link QueryContext#module(String, String)} method. */
+  /** Tests the {@link QueryContext#parseLibrary(String, String)} method. */
   @Test
   public void module() {
     final QueryContext qc = new QueryContext(context);
     try {
-      qc.module("module namespace m='foo'; declare function m:foo() { m:bar() }; ", "");
+      qc.parseLibrary(
+          "module namespace m='foo'; declare function m:foo() { m:bar() }; ", "");
       fail("Unknown function 'm:bar()' was not detected.");
     } catch(final QueryException e) {
       assertSame(Err.FUNCUNKNOWN, e.err());

@@ -769,6 +769,8 @@ public enum Err {
   /** XPST0017. */
   FUNCUNKNOWN(XPST, 17, "Unknown function: %(...)."),
   /** XPST0017. */
+  FUNCNOIMPL(XPST, 17, "Function not implemented: %(...)."),
+  /** XPST0017. */
   FUNCJAVA(XPST, 17, "Java function '%(...)' not found."),
   /** XPST0017. */
   JAVAAMBIG(XPST, 17, "Signature is ambiguous: '%(...)'."),

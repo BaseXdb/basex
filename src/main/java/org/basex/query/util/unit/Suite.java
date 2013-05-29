@@ -50,7 +50,7 @@ public final class Suite {
       try {
         final QueryContext qc = new QueryContext(ctx.context);
         try {
-          qc.module(string(io.read()), io.path());
+          qc.parseLibrary(string(io.read()), io.path());
           qc.compile();
           suites.add(new Unit(qc, info).test());
         } finally {

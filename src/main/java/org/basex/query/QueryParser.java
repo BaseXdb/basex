@@ -100,8 +100,8 @@ public class QueryParser extends InputParser {
   /**
    * Constructor.
    * @param in input
-   * @param c query context
    * @param path file path (if {@code null}, {@link Prop#QUERYPATH} will be assigned)
+   * @param c query context
    * @throws QueryException query exception
    */
   public QueryParser(final String in, final String path, final QueryContext c)
@@ -208,7 +208,7 @@ public class QueryParser extends InputParser {
    * @return name of the module
    * @throws QueryException query exception
    */
-  protected final QNm parseModule(final boolean check) throws QueryException {
+  protected final QNm parseLibrary(final boolean check) throws QueryException {
     file(ctx.sc.baseIO(), ctx.context);
     checkValidChars();
 
@@ -852,7 +852,7 @@ public class QueryParser extends InputParser {
     ctx.modStack.push(p);
     final StaticContext sc = ctx.sc;
     ctx.sc = new StaticContext(sc.xquery3());
-    final byte[] muri = new QueryParser(qu, io.path(), ctx).parseModule(!imprt).uri();
+    final byte[] muri = new QueryParser(qu, io.path(), ctx).parseLibrary(!imprt).uri();
     // check if import and declaration uri match
     if(!eq(uri, muri)) error(WRONGMODULE, muri, file);
     // check if context item declaration types are compatible to each other
@@ -967,10 +967,9 @@ public class QueryParser extends InputParser {
     final SeqType tp = optAsType();
     if(ann.contains(Ann.Q_UPDATING)) ctx.updating(false);
 
-    if(!wsConsumeWs(EXTERNAL)) {
-      final Expr body = enclosed(NOFUNBODY);
-      ctx.funcs.declare(ann, name, args, tp, body, ctx.sc, ii, scope);
-    }
+    Expr body = null;
+    if(!wsConsumeWs(EXTERNAL)) body = enclosed(NOFUNBODY);
+    ctx.funcs.declare(ann, name, args, tp, body, ctx.sc, ii, scope);
     scope = null;
   }
 

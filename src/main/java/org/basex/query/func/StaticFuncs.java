@@ -108,8 +108,8 @@ public final class StaticFuncs extends ExprInfo {
     final int fs = funcs.size();
     for(int id = 1; id <= fs; ++id) {
       final FuncCache fc = funcs.value(id);
+      final StaticFuncCall call = fc.calls.isEmpty() ? null : fc.calls.get(0);
       if(fc.func == null) {
-        final StaticFuncCall call = fc.calls.get(0);
         // check if another function with same name exists
         for(int i = 1; i <= fs; ++i) {
           if(i == id) continue;
@@ -119,7 +119,10 @@ public final class StaticFuncs extends ExprInfo {
         // if not, indicate that function is unknown
         FUNCUNKNOWN.thrw(call.info, call.name.string());
       }
-      if(!fc.calls.isEmpty()) qc.updating |= fc.func.updating;
+      if(call != null) {
+        if(fc.func.expr == null) FUNCNOIMPL.thrw(call.info, call.name.string());
+        qc.updating |= fc.func.updating;
+      }
     }
   }
 
@@ -177,7 +180,7 @@ public final class StaticFuncs extends ExprInfo {
     final int fs = funcs.size();
     for(int id = 1; id <= fs; ++id) {
       final StaticFunc sf = funcs.value(id).func;
-      if(sf != null && ls.similar(nm, lc(sf.name.local()))) {
+      if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
         FUNCSIMILAR.thrw(ii, name.string(), sf.name.string());
       }
     }

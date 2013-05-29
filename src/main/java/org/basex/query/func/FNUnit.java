@@ -34,7 +34,7 @@ public final class FNUnit extends StandardFunc {
       case _UNIT_FAIL:           return fail(ctx);
       case _UNIT_TEST:           return test(ctx);
       case _UNIT_TEST_LIBRARIES: return testLibraries(ctx);
-      default:                     return super.item(ctx, ii);
+      default:                   return super.item(ctx, ii);
     }
   }
 
