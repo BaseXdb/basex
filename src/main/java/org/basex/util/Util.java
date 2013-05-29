@@ -220,7 +220,8 @@ public final class Util {
    * @param th error/exception instance
    */
   public static void stack(final Throwable th) {
-    for(final String s : toArray(th)) errln(s);
+    //for(final String s : toArray(th)) errln(s);
+    th.printStackTrace();
   }
 
   /**
