@@ -72,7 +72,7 @@ public final class Unit {
       final int as = ann.size();
       boolean xq = false;
       for(int a = 0; !xq && a < as; a++) {
-        xq |= eq(ann.names[a].uri(), QueryText.XQUNITURI);
+        xq |= eq(ann.names[a].uri(), QueryText.UNITURI);
       }
       if(!xq) continue;
 
@@ -142,7 +142,7 @@ public final class Unit {
           } catch(final QueryException ex) {
             final QNm name = ex.qname();
             if(code == null || !eq(code, name.local())) {
-              final boolean failure = eq(name.uri(), QueryText.XQUNITURI);
+              final boolean failure = eq(name.uri(), QueryText.UNITURI);
               if(failure) f++;
               else e++;
 
@@ -202,7 +202,7 @@ public final class Unit {
     int pos = -1;
     for(int a = 0; a < as; a++) {
       final QNm nm = ann.names[a];
-      if(eq(nm.uri(), QueryText.XQUNITURI) && eq(nm.local(), name)) {
+      if(eq(nm.uri(), QueryText.UNITURI) && eq(nm.local(), name)) {
         if(pos != -1) UNIT_TWICE.thrw(info, '%', nm.local());
         pos = a;
       }

@@ -65,10 +65,10 @@ public final class NSGlobal {
     NS.add(REPO, REPOURI);
     NS.add(SQL, SQLURI);
     NS.add(STREAM, STREAMURI);
+    NS.add(UNIT, UNITURI);
     NS.add(VLDT, VALIDATEURI);
     NS.add(XSLT, XSLTURI);
     NS.add(XQRY, XQUERYURI);
-    NS.add(XQUNIT, XQUNITURI);
   }
 
   /** Private constructor. */

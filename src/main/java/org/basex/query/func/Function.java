@@ -896,16 +896,16 @@ public enum Function {
   /** XQuery function. */
   _XQUERY_TYPE(FNXQuery.class, "type(value)", ITEM_ZM, ITEM_ZM),
 
-  /* FNXQUnit functions. */
+  /* FNUnit functions. */
 
   /** XQuery function. */
-  _XQUNIT_ASSERT(FNXQUnit.class, "assert(test[,message])", EMP, 1, ITEM_ZM, STR),
+  _UNIT_ASSERT(FNUnit.class, "assert(test[,message])", EMP, 1, ITEM_ZM, STR),
   /** XQuery function. */
-  _XQUNIT_FAIL(FNXQUnit.class, "fail(message)", EMP, STR),
+  _UNIT_FAIL(FNUnit.class, "fail(message)", EMP, STR),
   /** XQuery function. */
-  _XQUNIT_TEST(FNXQUnit.class, "test()", ELM),
+  _UNIT_TEST(FNUnit.class, "test()", ELM),
   /** XQuery function. */
-  _XQUNIT_TEST_LIBRARIES(FNXQUnit.class, "test-libraries(uris)", ELM, STR_ZM),
+  _UNIT_TEST_LIBRARIES(FNUnit.class, "test-libraries(uris)", ELM, STR_ZM),
 
   /* FNXslt functions. */
 
@@ -984,7 +984,7 @@ public enum Function {
     URIS.put(FNValidate.class, VALIDATEURI);
     URIS.put(FNXslt.class,     XSLTURI);
     URIS.put(FNXQuery.class,   XQUERYURI);
-    URIS.put(FNXQUnit.class,   XQUNITURI);
+    URIS.put(FNUnit.class,     UNITURI);
   }
 
   /** Cached enums (faster). */

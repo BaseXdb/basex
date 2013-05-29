@@ -12,32 +12,32 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNXQUnitTest extends AdvancedQueryTest {
+public final class FNUnitTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void faill() {
-    error(_XQUNIT_FAIL.args("1"), Err.UNIT_MESSAGE);
+    error(_UNIT_FAIL.args("1"), Err.UNIT_MESSAGE);
   }
 
   /** Test method. */
   @Test
   public void assrt() {
-    query(_XQUNIT_ASSERT.args("1"), "");
-    query(_XQUNIT_ASSERT.args("(<a/>,<b/>)"), "");
-    error(_XQUNIT_ASSERT.args("()"), Err.UNIT_ASSERT);
-    error(_XQUNIT_ASSERT.args("()", "X"), Err.UNIT_MESSAGE);
+    query(_UNIT_ASSERT.args("1"), "");
+    query(_UNIT_ASSERT.args("(<a/>,<b/>)"), "");
+    error(_UNIT_ASSERT.args("()"), Err.UNIT_ASSERT);
+    error(_UNIT_ASSERT.args("()", "X"), Err.UNIT_MESSAGE);
   }
 
   /** Test method. */
   @Test
   public void test() {
     String func = "declare %xqunit:test function local:x() { 1 }; ";
-    query(func + COUNT.args(_XQUNIT_TEST.args()), "1");
+    query(func + COUNT.args(_UNIT_TEST.args()), "1");
 
     func = "declare %xqunit:test function local:x() { xqunit:fail('') }; ";
-    query(func + COUNT.args(_XQUNIT_TEST.args() + "//failure"), "1");
+    query(func + COUNT.args(_UNIT_TEST.args() + "//failure"), "1");
 
     func = "declare %xqunit:test function local:x() { 1+<a/> }; ";
-    query(func + COUNT.args(_XQUNIT_TEST.args() + "//error"), "1");
+    query(func + COUNT.args(_UNIT_TEST.args() + "//error"), "1");
   }
 }

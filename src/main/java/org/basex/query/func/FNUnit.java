@@ -16,24 +16,24 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class FNXQUnit extends StandardFunc {
+public final class FNUnit extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNXQUnit(final InputInfo ii, final Function f, final Expr... e) {
+  public FNUnit(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _XQUNIT_ASSERT:         return assrt(ctx);
-      case _XQUNIT_FAIL:           return fail(ctx);
-      case _XQUNIT_TEST:           return test(ctx);
-      case _XQUNIT_TEST_LIBRARIES: return testLibraries(ctx);
+      case _UNIT_ASSERT:         return assrt(ctx);
+      case _UNIT_FAIL:           return fail(ctx);
+      case _UNIT_TEST:           return test(ctx);
+      case _UNIT_TEST_LIBRARIES: return testLibraries(ctx);
       default:                     return super.item(ctx, ii);
     }
   }

@@ -526,7 +526,7 @@ public interface QueryText {
   /** XQuery token. */
   byte[] XQRY = token(XQUERY);
   /** XQUnit token. */
-  byte[] XQUNIT = token("xqunit");
+  byte[] UNIT = token("unit");
   /** RestXQ token. */
   byte[] RESTXQ = token("restxq");
   /** EXErr token. */
@@ -642,14 +642,14 @@ public interface QueryText {
   byte[] SQLURI = token(BXMODULES + "sql");
   /** Streaming module URI. */
   byte[] STREAMURI = token(BXMODULES + "stream");
+  /** XQUnit module URI. */
+  byte[] UNITURI = token(BXMODULES + "unit");
   /** Validate module URI. */
   byte[] VALIDATEURI = token(BXMODULES + "validate");
   /** XSLT module URI. */
   byte[] XSLTURI = token(BXMODULES + "xslt");
   /** XQuery module URI. */
   byte[] XQUERYURI = token(BXMODULES + "xquery");
-  /** XQUnit module URI. */
-  byte[] XQUNITURI = token(BXMODULES + "xqunit");
 
   /** Java prefix. */
   byte[] JAVAPREF = token("java:");

@@ -1153,7 +1153,7 @@ public enum Err {
     /** BXVA Error type. */ BXVA(QueryText.BXERR, QueryText.BXERRORS),
     /** BXXQ Error type. */ BXXQ(QueryText.BXERR, QueryText.BXERRORS),
     /** HASH Error type. */ HASH(QueryText.BXERR, QueryText.BXERRORS),
-    /** UNIT Error type. */ UNIT(QueryText.XQUNIT, QueryText.XQUNITURI),
+    /** UNIT Error type. */ UNIT(QueryText.UNIT, QueryText.UNITURI),
 
     // EXPath errors
 
