@@ -42,14 +42,14 @@ final class RestXqResponse {
   private static final ExtTest HTTP_RESPONSE = new ExtTest(NodeType.ELM,
       new QNm(RESPONSE, QueryText.HTTPURI));
   /** RESTXQ Response test. */
-  private static final ExtTest RESTXQ_RESPONSE = new ExtTest(NodeType.ELM,
-      new QNm(RESPONSE, QueryText.RESTXQURI));
+  private static final ExtTest REST_RESPONSE = new ExtTest(NodeType.ELM,
+      new QNm(RESPONSE, QueryText.RESTURI));
   /** RESTXQ Redirect test. */
-  private static final ExtTest RESTXQ_REDIRECT = new ExtTest(NodeType.ELM,
-      new QNm(REDIRECT, QueryText.RESTXQURI));
+  private static final ExtTest REST_REDIRECT = new ExtTest(NodeType.ELM,
+      new QNm(REDIRECT, QueryText.RESTURI));
   /** RESTXQ Forward test. */
-  private static final ExtTest RESTXQ_FORWARD = new ExtTest(NodeType.ELM,
-      new QNm(FORWARD, QueryText.RESTXQURI));
+  private static final ExtTest REST_FORWARD = new ExtTest(NodeType.ELM,
+      new QNm(FORWARD, QueryText.RESTURI));
   /** HTTP Header test. */
   private static final ExtTest HTTP_HEADER = new ExtTest(NodeType.ELM,
       new QNm(HEADER, QueryText.HTTPURI));
@@ -110,20 +110,20 @@ final class RestXqResponse {
       if(item != null && item.type.isNode()) {
         final ANode node = (ANode) item;
         // send redirect to browser
-        if(RESTXQ_REDIRECT.eq(node)) {
+        if(REST_REDIRECT.eq(node)) {
           final ANode ch = node.children().next();
           if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
           redirect = string(ch.string()).trim();
           return;
         }
         // server-side forwarding
-        if(RESTXQ_FORWARD.eq(node)) {
+        if(REST_FORWARD.eq(node)) {
           final ANode ch = node.children().next();
           if(ch == null || ch.type != NodeType.TXT) function.error(NO_VALUE, node.name());
           forward = string(ch.string()).trim();
           return;
         }
-        if(RESTXQ_RESPONSE.eq(node)) {
+        if(REST_RESPONSE.eq(node)) {
           resp = node;
           item = iter.next();
         }

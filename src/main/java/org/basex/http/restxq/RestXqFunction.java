@@ -111,7 +111,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       final Value value = function.ann.values[a];
       final byte[] local = name.local();
       final byte[] uri = name.uri();
-      final boolean rexq = eq(uri, QueryText.RESTXQURI);
+      final boolean rexq = eq(uri, QueryText.RESTURI);
       if(rexq) {
         if(eq(PATH, local)) {
           // annotation "path"
