@@ -319,6 +319,9 @@ public abstract class Command extends Proc {
       ctx.register(this);
       // run command and return success flag
       return run(ctx, os);
+    } catch(final RuntimeException th) {
+      Util.stack(th);
+      throw th;
     } finally {
       // guarantee that process will be unregistered
       ctx.unregister(this);
