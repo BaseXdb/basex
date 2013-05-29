@@ -187,14 +187,6 @@ public final class For extends GFLWOR.Clause {
   }
 
   /**
-   * Tests if this for clause binds only one variable and does not check types.
-   * @return {@code true} if the clause is a simple loop, {@code false} otherwise
-   */
-  protected boolean simple() {
-    return !empty && !var.checksType() && pos == null && score == null;
-  }
-
-  /**
    * Gathers all non-{@code null} variables.
    * @param v var
    * @param p pos

@@ -206,18 +206,6 @@ public final class VarScope {
   }
 
   /**
-   * Gathers all parameters in this scope.
-   * @return array of parameters
-   */
-  public Var[] params() {
-    int n = 0;
-    for(final Var v : vars) if(v.param) n++;
-    final Var[] arr = new Var[n];
-    for(final Var v : vars) if(v.param) arr[arr.length - n--] = v;
-    return arr;
-  }
-
-  /**
    * Stack-frame size needed for this scope.
    * @return stack-frame size
    */

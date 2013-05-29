@@ -23,16 +23,6 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   private final HashMap<QNm, VarEntry> vars = new HashMap<QNm, VarEntry>();
 
   /**
-   * Looks for a variable with the given name in the defined variables.
-   * @param name variable name
-   * @return declaration if found, {@null} otherwise
-   */
-  public StaticVar get(final QNm name) {
-    final VarEntry e = vars.get(name);
-    return e == null ? null : e.var;
-  }
-
-  /**
    * Declares a new static variable.
    * @param nm variable name
    * @param t type
@@ -75,14 +65,6 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
         ve.setVar(new StaticVar(ctx, name, ve.refs[0].info));
       }
     }
-  }
-
-  /**
-   * Checks if no static variables are declared.
-   * @return {@code true} if no static variables are used, {@code false} otherwise
-   */
-  public boolean isEmpty() {
-    return vars.isEmpty();
   }
 
   @Override

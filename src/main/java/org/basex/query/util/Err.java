@@ -364,8 +364,6 @@ public enum Err {
   /** FODC0006. */
   SAXERR(FODC, 6, "SAX: %"),
   /** FODC0007. */
-  BASEINV(FODC, 7, "Base URI % is invalid."),
-  /** FODC0007. */
   RESINV(FODC, 7, "Resource path '%' is invalid."),
   /** FODC0007. */
   INVDB(FODC, 7, "Invalid database name: '%'."),
@@ -381,11 +379,7 @@ public enum Err {
   /** FODF1310. */
   INVGROUP(FODF, 1310, "Invalid position of grouping separator signs: '%'."),
   /** FODF1310. */
-  PICCOMP(FODF, 1310, "Invalid component in string: '%'."),
-  /** FODF1310. */
   DIFFMAND(FODF, 1310, "Mandatory digits must be of the same group: '%'."),
-  /** FODF1310. */
-  GROUPSTART(FODF, 1310, "Picture begins with grouping separator: '%'."),
   /** FODF1310. */
   INVORDINAL(FODF, 1310, "Invalid specification of ordinal numbering: '%'."),
   /** FODF1310. */
@@ -431,8 +425,6 @@ public enum Err {
   FUNCCASTEX(FORG, 1, "Invalid cast from % to %: %."),
   /** FORG0001. */
   DATEFORMAT(FORG, 1, "Wrong % format: '%' (try e.g. '%')."),
-  /** FORG0001. */
-  INVSTRING(FORG, 1, "Invalid XML character '&#x%;' in specified string."),
   /** FORG0002. */
   URIINVRES(FORG, 2, "URI argument is invalid: %."),
   /** FORG0002. */
@@ -832,8 +824,6 @@ public enum Err {
   /** XPTY0004. */
   INVNCNAME(XPTY, 4, "Invalid NCName: '%'."),
   /** XPTY0004. */
-  INVPOS(XPTY, 4, "Illegal argument position for %: %."),
-  /** XPTY0004. */
   CITYPES(XPTY, 4, "Incompatible types in context item declarations: % vs. %."),
 
   /** XPTY0018. */
@@ -867,8 +857,6 @@ public enum Err {
   INVNAME(XQDY, 74, "Invalid name: '%'."),
   /** XQDY0074. */
   INVPREF(XQDY, 74, "No namespace declared for %."),
-  /** XQDY0095. */
-  XGRP(XQDY, 95, "No sequence allowed as grouping variable."),
   /** XQDY0096. */
   CEXML(XQDY, 96, "XML prefix and namespace cannot be rebound."),
   /** XQDY0096. */

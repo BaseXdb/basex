@@ -158,8 +158,6 @@ public final class SeqType {
   public static final SeqType STR_ZO = new SeqType(AtomType.STR, Occ.ZERO_ONE);
   /** Zero or more strings. */
   public static final SeqType STR_ZM = new SeqType(AtomType.STR, Occ.ZERO_MORE);
-  /** One or more strings. */
-  public static final SeqType STR_OM = new SeqType(AtomType.STR, Occ.ONE_MORE);
   /** Zero or one NCName. */
   public static final SeqType NCN_ZO = new SeqType(AtomType.NCN, Occ.ZERO_ONE);
   /** Single date. */
@@ -569,14 +567,6 @@ public final class SeqType {
    */
   public boolean mayBeNumber() {
     return type.isNumber() || type == AtomType.ITEM;
-  }
-
-  /**
-   * Checks if this type is namespace-sensitive.
-   * @return result of check
-   */
-  public boolean nsSensitive() {
-    return kind != null && kind.nsSensitive() || type.nsSensitive();
   }
 
   /**

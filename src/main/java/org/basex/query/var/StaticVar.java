@@ -5,7 +5,7 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.*;
+import org.basex.query.expr.Expr.Use;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -30,8 +30,6 @@ public final class StaticVar extends StaticDecl {
   private final boolean implicit;
   /** Bound value. */
   Value value;
-  /** Inferred type. */
-  private final SeqType type;
   /** Flag for lazy evaluation. */
   private final boolean lazy;
 
@@ -49,7 +47,6 @@ public final class StaticVar extends StaticDecl {
   StaticVar(final StaticContext sctx, final VarScope scp, final InputInfo ii, final Ann a,
       final QNm n, final SeqType t, final Expr e, final boolean ext) {
     super(sctx, a, n, t, scp, ii);
-    type = t == null ? SeqType.ITEM_ZM : t;
     expr = e;
     external = ext;
     lazy = ann.contains(LAZY);
@@ -64,7 +61,6 @@ public final class StaticVar extends StaticDecl {
    */
   public StaticVar(final QueryContext ctx, final QNm nm, final InputInfo ii) {
     super(ctx.sc, null, nm, null, new VarScope(), ii);
-    type = SeqType.ITEM_ZM;
     expr = null;
     external = true;
     lazy = false;
@@ -220,14 +216,6 @@ public final class StaticVar extends StaticDecl {
     final FElem e = planElem(NAM, name.string());
     if(expr != null) expr.plan(e);
     plan.add(e);
-  }
-
-  /**
-   * returns this variable's inferred type.
-   * @return inferred type
-   */
-  public SeqType type() {
-    return type != null ? type : SeqType.ITEM_ZM;
   }
 
   @Override

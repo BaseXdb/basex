@@ -100,24 +100,6 @@ public final class NSContext {
   }
 
   /**
-   * Sets the specified stack.
-   * @param s stack to be set
-   */
-  public void stack(final Atts s) {
-    stack = s;
-  }
-
-  /**
-   * Resets the stack and returns the old instance.
-   * @return old instance
-   */
-  public Atts reset() {
-    final Atts s = stack;
-    stack = null;
-    return s;
-  }
-
-  /**
    * Returns the namespace stack.
    * @return stack
    */

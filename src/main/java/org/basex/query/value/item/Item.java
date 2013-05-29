@@ -3,11 +3,9 @@ package org.basex.query.value.item;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
 import java.math.*;
 
 import org.basex.io.in.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -232,15 +230,6 @@ public abstract class Item extends Value {
    */
   public final void score(final double s) {
     if(score != null || s != 0) score = s;
-  }
-
-  /**
-   * Serializes the item. This method calls {@link Serializer#serialize(Item)}.
-   * @param ser serializer
-   * @throws IOException I/O exception
-   */
-  public final void serialize(final Serializer ser) throws IOException {
-    ser.serialize(this);
   }
 
   /**

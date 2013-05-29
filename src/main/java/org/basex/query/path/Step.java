@@ -32,15 +32,6 @@ public abstract class Step extends Preds {
   public Test test;
 
   /**
-   * This method creates a copy from the specified step.
-   * @param s step to be copied
-   * @return step
-   */
-  public static Step get(final Step s) {
-    return get(s.info, s.axis, s.test, s.preds);
-  }
-
-  /**
    * This method creates a step instance.
    * @param ii input info
    * @param a axis
