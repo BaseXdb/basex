@@ -5,7 +5,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 
 /**
  * This is a simple XQuery demo module written in Java.
@@ -26,8 +25,8 @@ public class QueryModuleExamples extends QueryModule {
    * @return node
    */
   public ANode create() {
-    FDoc doc = new FDoc(Token.token("http://www.example.com"));
-    FElem elem = new FElem(new QNm("root")).add(new QNm("attr"), "value");
+    FDoc doc = new FDoc("http://www.example.com");
+    FElem elem = new FElem("root").add("attr", "value");
     doc.add(elem);
     return doc;
   }
@@ -37,8 +36,8 @@ public class QueryModuleExamples extends QueryModule {
    * @return resulting value
    */
   public Value sequence() {
-    FElem elem1 = new FElem(new QNm("root1"));
-    FElem elem2 = new FElem(new QNm("root2"));
+    FElem elem1 = new FElem("root1");
+    FElem elem2 = new FElem("root2");
     ValueBuilder vb = new ValueBuilder();
     vb.add(elem1);
     vb.add(elem2);
