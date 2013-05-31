@@ -1,15 +1,11 @@
 package org.basex.tests.w3c;
 
-import static org.basex.util.Token.*;
-
 import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.out.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 
 /**
  * QT3TS Report builder.
@@ -55,7 +51,7 @@ public final class QT3TSReport {
   };
 
   /** URI of test suite. */
-  private static final byte[] URI = token("http://www.w3.org/2012/08/qt-fots-results");
+  private static final String URI = "http://www.w3.org/2012/08/qt-fots-results";
   /** List of test sets and test cases (test sets only consist of a name; test cases
    * consist of a name and a result (pass/fail). */
   private final ArrayList<String[]> tests = new ArrayList<String[]>();
@@ -87,39 +83,39 @@ public final class QT3TSReport {
     final String dquery = "replace(string(current-date()),'\\+.*','')";
     final String date = new XQuery(dquery).execute(ctx);
 
-    final FElem root = element("test-suite-result", null);
+    final FElem root = element("test-suite-result");
 
     // submission element
     final FElem submission = element("submission", root);
-    submission.add(new QNm("anonymous"), "false");
+    submission.add("anonymous", "false");
 
     final FElem created = element("created", submission);
-    add(created, "by", Prop.AUTHOR);
-    add(created, "email", "cg@basex.org");
-    add(created, "organization", Prop.ENTITY);
-    add(created, "on", date);
+    created.add("by", Prop.AUTHOR);
+    created.add("email", "cg@basex.org");
+    created.add("organization", Prop.ENTITY);
+    created.add("on", date);
 
     final FElem testRun = element("test-run", submission);
-    add(testRun, "test-suite-version", "CVS");
-    add(testRun, "date-run", date);
+    testRun.add("test-suite-version", "CVS");
+    testRun.add("date-run", date);
 
     element("notes", submission);
 
     // product element
     final FElem product = element("product", root);
-    add(product, "vendor", Prop.ENTITY);
-    add(product, "name", Prop.NAME);
-    add(product, "version", Prop.VERSION);
-    add(product, "released", "true");
-    add(product, "open-source", "true");
-    add(product, "language", "XQ30");
+    product.add("vendor", Prop.ENTITY);
+    product.add("name", Prop.NAME);
+    product.add("version", Prop.VERSION);
+    product.add("released", "true");
+    product.add("open-source", "true");
+    product.add("language", "XQ30");
 
     // dependency element
     for(final String[] deps : DEPENDENCIES) {
       final FElem dependency = element("dependency", product);
-      add(dependency, "type", deps[0]);
-      add(dependency, "value", deps[1]);
-      add(dependency, "satisfied", deps[2]);
+      dependency.add("type", deps[0]);
+      dependency.add("value", deps[1]);
+      dependency.add("satisfied", deps[2]);
     }
 
     // test-set elements
@@ -127,39 +123,34 @@ public final class QT3TSReport {
     for(final String[] test : tests) {
       if(test.length == 1) {
         ts = element("test-set", root);
-        add(ts, "name", test[0]);
+        ts.add("name", test[0]);
       } else {
         final FElem tc = element("test-case", ts);
-        add(tc, "name", test[0]);
-        add(tc, "result", test[1]);
+        tc.add("name", test[0]);
+        tc.add("result", test[1]);
       }
     }
     return root.serialize();
   }
 
   /**
-   * Creates a new element.
+   * Creates a root element.
    * @param name name of element
-   * @param root optional root node
    * @return element node
    */
-  private FElem element(final String name, final FElem root) {
-    final QNm qn = new QNm(name, URI);
-    if(root == null) return new FElem(qn, new Atts(EMPTY, URI));
-
-    final FElem elem = new FElem(qn);
-    root.add(elem);
-    return elem;
+  private FElem element(final String name) {
+    return new FElem(name, URI).declareNS();
   }
 
   /**
-   * Adds attributes to the specified element.
-   * @param elem element
-   * @param name attribute name
-   * @param value attribute value
+   * Creates an element.
+   * @param name name of element
+   * @param parent parent node
    * @return element node
    */
-  private FElem add(final FElem elem, final String name, final String value) {
-    return elem.add(new QNm(name), value);
+  private FElem element(final String name, final FElem parent) {
+    final FElem elem = new FElem(name, URI);
+    parent.add(elem);
+    return elem;
   }
 }

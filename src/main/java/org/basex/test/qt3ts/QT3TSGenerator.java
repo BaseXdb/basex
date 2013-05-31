@@ -4,6 +4,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.util.*;
 
 /**
  * Generates the QT3TS JUnit tests from XML files.
@@ -28,13 +29,13 @@ public final class QT3TSGenerator {
   public static void main(final String[] args) throws BaseXException {
     final File qt3ts = args.length > 0 ? new File(args[0]) : null;
     if(qt3ts == null || !qt3ts.isDirectory()) {
-      System.err.println("Usage: java " + QT3TSGenerator.class.getName() + " [<path>]\n" +
+      Util.errln("Usage: java " + QT3TSGenerator.class.getName() + " [<path>]\n" +
           "    - <path>: Path to the QT3 test suite files");
       System.exit(1);
     }
 
     System.setProperty("QT3TS", qt3ts.getAbsolutePath());
-    System.out.println(qt3ts.getAbsolutePath());
+    Util.outln(qt3ts.getAbsolutePath());
 
     final Context ctx = new Context();
     new Set("QUERYPATH", XQ_PATH).execute(ctx);
