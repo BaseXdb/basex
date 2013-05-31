@@ -60,7 +60,7 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item lookup(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final QNm name = checkQNm(expr[0].item(ctx, ii), ctx);
+    final QNm name = checkQNm(expr[0], ctx);
     final long arity = checkItr(expr[1], ctx);
     if(arity < 0 || arity > Integer.MAX_VALUE) FUNCUNKNOWN.thrw(ii, name);
 

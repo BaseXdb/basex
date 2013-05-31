@@ -413,15 +413,16 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression has the specified type; if no, throws
    * an exception.
-   * @param it item to be checked
+   * @param e expression to be checked
    * @param ctx query context
    * @return specified item
    * @throws QueryException query exception
    */
-  public final QNm checkQNm(final Item it, final QueryContext ctx)
+  public final QNm checkQNm(final Expr e, final QueryContext ctx)
       throws QueryException {
 
-    if(checkNoEmpty(it, AtomType.QNM).type == AtomType.QNM) return (QNm) it;
+    final Item it = checkItem(e, ctx);
+    if(it.type == AtomType.QNM) return (QNm) it;
     if(it.type.isUntyped() && ctx.sc.xquery3()) NSSENS.thrw(info, it.type, AtomType.QNM);
     throw Err.INVCAST.thrw(info, it.type, AtomType.QNM);
   }
