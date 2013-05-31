@@ -485,7 +485,7 @@ public class HTTPClientTest extends HTTPTest {
         "http://www.test.com"));
     req1.payloadAttrs.add(MEDIATYPE, token("text/xml"));
     // Node child
-    final FElem e1 = new FElem(new QNm("a")).add("a");
+    final FElem e1 = new FElem("a").add("a");
     req1.bodyContent.add(e1);
     // String item child
     req1.bodyContent.add(Str.get("<b>b</b>"));
@@ -499,7 +499,7 @@ public class HTTPClientTest extends HTTPTest {
         "http://www.test.com"));
     req2.payloadAttrs.add(MEDIATYPE, token("text/plain"));
     // Node child
-    final FElem e2 = new FElem(new QNm("a")).add("a");
+    final FElem e2 = new FElem("a").add("a");
     req2.bodyContent.add(e2);
     // String item child
     req2.bodyContent.add(Str.get("<b>b</b>"));
@@ -514,7 +514,7 @@ public class HTTPClientTest extends HTTPTest {
     req3.payloadAttrs.add(MEDIATYPE, token("text/xml"));
     req3.payloadAttrs.add(token("method"), token("text"));
     // Node child
-    final FElem e3 = new FElem(new QNm("a")).add("a");
+    final FElem e3 = new FElem("a").add("a");
     req3.bodyContent.add(e3);
     // String item child
     req3.bodyContent.add(Str.get("<b>b</b>"));
@@ -543,7 +543,7 @@ public class HTTPClientTest extends HTTPTest {
     // Case 2: content is a node
     final HTTPRequest req2 = new HTTPRequest();
     req2.payloadAttrs.add(METHOD, token("http:base64Binary"));
-    final FElem e3 = new FElem(new QNm("a")).add("dGVzdA==");
+    final FElem e3 = new FElem("a").add("dGVzdA==");
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
@@ -572,7 +572,7 @@ public class HTTPClientTest extends HTTPTest {
     // Case 2: content is a node
     final HTTPRequest req2 = new HTTPRequest();
     req2.payloadAttrs.add(METHOD, token("http:base64Binary"));
-    final FElem e3 = new FElem(new QNm("a")).add("74657374");
+    final FElem e3 = new FElem("a").add("74657374");
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));

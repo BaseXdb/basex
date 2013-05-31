@@ -91,7 +91,8 @@ public class RESTPost extends RESTCode {
       for(final Item it : qp.value()) {
         if(item != null) HTTPErr.MULTIPLE_CONTEXT_X.thrw();
         // create main memory instance of the specified node
-        item = DataBuilder.stripNS((ANode) it, RESTURI, ctx).serialize().toArray();
+        item = DataBuilder.stripNS((ANode) it, Token.token(RESTURI), ctx).
+            serialize().toArray();
       }
 
       // handle request

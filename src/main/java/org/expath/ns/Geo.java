@@ -25,25 +25,24 @@ import com.vividsolutions.jts.io.gml2.*;
  */
 public class Geo extends QueryModule {
   /** GML URI. */
-  private static final byte[] GMLURI = token("http://www.opengis.net/gml");
+  private static final byte[] URI = token("http://www.opengis.net/gml");
+  /** Prefix: "gml". */
+  private static final String GML = "gml";
 
-  /** Prefix: "gml:". */
-  private static final String GML = "gml:";
   /** QName gml:Point. */
-  private static final QNm Q_GML_POINT = new QNm(GML + "Point", GMLURI);
+  private static final QNm Q_GML_POINT = QNm.get(GML, "Point", URI);
   /** QName gml:MultiPoint. */
-  private static final QNm Q_GML_MULTIPOINT = new QNm(GML + "MultiPoint", GMLURI);
+  private static final QNm Q_GML_MULTIPOINT = QNm.get(GML, "MultiPoint", URI);
   /** QName gml:LineString. */
-  private static final QNm Q_GML_LINESTRING = new QNm(GML + "LineString", GMLURI);
+  private static final QNm Q_GML_LINESTRING = QNm.get(GML, "LineString", URI);
   /** QName gml:LinearRing. */
-  private static final QNm Q_GML_LINEARRING = new QNm(GML + "LinearRing", GMLURI);
+  private static final QNm Q_GML_LINEARRING = QNm.get(GML, "LinearRing", URI);
   /** QName gml:Polygon. */
-  private static final QNm Q_GML_POLYGON = new QNm(GML + "Polygon", GMLURI);
+  private static final QNm Q_GML_POLYGON = QNm.get(GML, "Polygon", URI);
   /** QName gml:MultiPolygon. */
-  private static final QNm Q_GML_MULTIPOLYGON = new QNm(GML + "MultiPolygon", GMLURI);
+  private static final QNm Q_GML_MULTIPOLYGON = QNm.get(GML, "MultiPolygon", URI);
   /** QName gml:MultiLineString. */
-  private static final QNm Q_GML_MULTILINESTRING =
-      new QNm(GML + "MultiLineString", GMLURI);
+  private static final QNm Q_GML_MULTILINESTRING = QNm.get(GML, "MultiLineString", URI);
 
   /** Array containing all QNames. */
   private static final QNm[] QNAMES = {
@@ -70,7 +69,7 @@ public class Geo extends QueryModule {
    */
   @Deterministic
   public QNm geometryType(final ANode node) throws QueryException {
-    return new QNm(GML + checkGeo(node).getGeometryType());
+    return new QNm(GML + ':' + checkGeo(node).getGeometryType(), URI);
   }
 
   /**
@@ -682,8 +681,7 @@ public class Geo extends QueryModule {
    * @throws QueryException query exception
    */
   private Geometry geo(final ANode node, final QNm... names) throws QueryException {
-    if(node.type != NodeType.ELM)
-      Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
+    if(node.type != NodeType.ELM) Err.FUNCMP.thrw(null, this, NodeType.ELM, node.type);
 
     final QNm qname = node.qname();
     for(final QNm geo : names) {
@@ -712,7 +710,7 @@ public class Geo extends QueryModule {
     try {
       // write geometry and add namespace declaration
       geo = new GMLWriter().write(geometry).replaceAll(
-          "^<gml:(.*?)>", "<gml:$1 xmlns:gml='" + string(GMLURI) + "'>");
+          "^<gml:(.*?)>", "<gml:$1 xmlns:gml='" + string(URI) + "'>");
     } catch(final Exception ex) {
       throw GeoErrors.gmlWriterErr(ex);
     }

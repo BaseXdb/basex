@@ -1,7 +1,5 @@
 package org.basex.http.rest;
 
-import static org.basex.util.Token.*;
-
 import org.basex.core.*;
 import org.basex.query.value.item.*;
 
@@ -13,20 +11,21 @@ import org.basex.query.value.item.*;
  */
 public interface RESTText {
   /** REST string.  */
-  byte[] REST = token("rest");
+  String REST = "rest";
   /** REST URI. */
-  byte[] RESTURI = concat(token(Text.URL), SLASH, REST);
+  String RESTURI = Text.URL + '/' + REST;
 
-  /** Element. */
-  byte[] DATABASES = concat(REST, COLON, token("databases"));
-  /** Element. */
-  byte[] DATABASE = concat(REST, COLON, token("database"));
-  /** Element. */
-  byte[] RESOURCE = concat(REST, COLON, token("resource"));
+  /** Name. */
+  QNm Q_DATABASES = QNm.get(REST, "databases", RESTURI);
+  /** Name. */
+  QNm Q_DATABASE = QNm.get(REST, "databases", RESTURI);
+  /** Name. */
+  QNm Q_RESOURCE = QNm.get(REST, "resource", RESTURI);
+
   /** Attribute. */
-  QNm Q_RESOURCES = new QNm("resources");
+  String RESOURCES = "resources";
   /** Attribute. */
-  QNm Q_NAME = new QNm("name");
+  String NAME = "name";
 
   /** Command operation. */
   String COMMAND = "command";

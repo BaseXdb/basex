@@ -89,7 +89,7 @@ final class RestXqResponse {
       // wrap function with a function call
       final StaticFuncCall call = new BaseFuncCall(uf.name, args, uf.sc, uf.info);
       call.init(uf);
-      final MainModule mod = new MainModule(call, new VarScope());
+      final MainModule mod = new MainModule(call, new VarScope(), null);
 
       // assign main module and http context and register process
       qc.mainModule(mod);

@@ -48,9 +48,9 @@ final class RESTRetrieve extends RESTQuery {
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sprop);
       http.initResponse(sprop);
 
-      final FElem el = new FElem(DATABASES, new Atts(REST, RESTURI));
-      el.add(Q_RESOURCES, token(table.contents.size()));
-      list(table, el, DATABASE, 1);
+      final FElem el = new FElem(Q_DATABASES).declareNS();
+      el.add(RESOURCES, token(table.contents.size()));
+      list(table, el, Q_DATABASE, 1);
       ser.serialize(el);
       ser.close();
     } else if(!exists(http)) {
@@ -61,10 +61,10 @@ final class RESTRetrieve extends RESTQuery {
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sprop);
       http.initResponse(sprop);
 
-      final FElem el = new FElem(DATABASE, new Atts(REST, RESTURI));
-      el.add(Q_NAME, http.db());
-      el.add(Q_RESOURCES, token(table.contents.size()));
-      list(table, el, RESOURCE, 0);
+      final FElem el = new FElem(Q_DATABASE).declareNS();
+      el.add(NAME, http.db());
+      el.add(RESOURCES, token(table.contents.size()));
+      list(table, el, Q_RESOURCE, 0);
       ser.serialize(el);
       ser.close();
     } else if(isRaw(http)) {
@@ -89,7 +89,7 @@ final class RESTRetrieve extends RESTQuery {
    * @param header table header
    * @param skip number of columns to skip
    */
-  private static void list(final Table table, final FElem root, final byte[] header,
+  private static void list(final Table table, final FElem root, final QNm header,
       final int skip) {
 
     for(final TokenList l : table.contents) {
