@@ -32,7 +32,7 @@ import org.basex.util.list.*;
  */
 public final class FNFt extends StandardFunc {
   /** Element: options. */
-  private static final QNm Q_FTOPTIONS = new QNm("options");
+  private static final QNm Q_OPTIONS = QNm.get("options");
   /** Marker element. */
   private static final byte[] MARK = token("mark");
   /** Fuzzy option. */
@@ -175,7 +175,7 @@ public final class FNFt extends StandardFunc {
     final Data data = checkData(ctx);
     final Value terms = ctx.value(expr[1]);
     final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final TokenMap tm = new FuncParams(Q_FTOPTIONS, info).parse(opt);
+    final TokenMap tm = new FuncParams(Q_OPTIONS, info).parse(opt);
     return search(data, terms, tm, this, ctx);
   }
 

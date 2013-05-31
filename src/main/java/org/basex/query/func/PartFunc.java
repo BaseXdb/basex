@@ -105,7 +105,7 @@ public final class PartFunc extends Arr {
     int p = -1;
     for(int i = 0; i < hs; i++) {
       while(++p < holes[i]) expr[p - i].plan(e);
-      final FElem a = new FElem(Token.token(QueryText.ARG));
+      final FElem a = new FElem(QueryText.ARG);
       e.add(a.add(planAttr(QueryText.POS, Token.token(i))));
     }
     while(++p < es + hs - 1) expr[p - hs].plan(e);

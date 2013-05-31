@@ -46,11 +46,14 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param e function body
    * @param stc static context
    * @param scp variable scope
+   * @param xqdoc current xqdoc cache
    * @param ii input info
    */
   public StaticFunc(final Ann a, final QNm n, final Var[] v, final SeqType r,
-      final Expr e, final StaticContext stc, final VarScope scp, final InputInfo ii) {
-    super(stc, a, n, r, scp, ii);
+      final Expr e, final StaticContext stc, final VarScope scp,
+      final StringBuilder xqdoc, final InputInfo ii) {
+
+    super(stc, a, n, r, scp, xqdoc, ii);
     args = v;
     expr = e;
     cast = r != null;
@@ -121,7 +124,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     tb.add(FUNCTION).add(' ').add(name.string());
     tb.add(PAR1).addSep(args, SEP).add(PAR2);
     if(declType != null) tb.add(' ' + AS + ' ' + declType);
-    if(expr != null) tb.add(" { " + expr + " }; ");
+    if(expr != null) tb.add(" { ").addExt(expr).add(" }; ");
+    else tb.add(" external; ");
     return tb.toString();
   }
 

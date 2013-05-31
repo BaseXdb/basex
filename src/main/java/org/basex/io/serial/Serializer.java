@@ -14,6 +14,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -100,7 +101,7 @@ public abstract class Serializer {
    */
   public void serialize(final ANode node) throws IOException {
     if(node instanceof DBNode) {
-      node((DBNode) node);
+      serialize((DBNode) node);
     } else {
       if(node.type == NodeType.COM) {
         comment(node.string());
@@ -315,7 +316,7 @@ public abstract class Serializer {
    * @param node database node
    * @throws IOException I/O exception
    */
-  private void node(final DBNode node) throws IOException {
+  private void serialize(final DBNode node) throws IOException {
     final FTPosData ft = node instanceof FTPosNode ? ((FTPosNode) node).ft : null;
     final Data data = node.data;
     int p = node.pre;
@@ -323,7 +324,7 @@ public abstract class Serializer {
     if(k == Data.ATTR) SERATTR.thrwSerial(node);
 
     boolean doc = false;
-    final TokenList nsp = data.nspaces.size() != 0 ? new TokenList() : null;
+    final TokenSet nsp = data.nspaces.size() != 0 ? new TokenSet() : null;
     final IntList pars = new IntList();
     int l = 0;
 
@@ -377,10 +378,7 @@ public abstract class Serializer {
             for(int n = 0; n < atn.size(); ++n) {
               key = atn.name(n);
               val = atn.string(n);
-              if(!nsp.contains(key)) {
-                nsp.add(key);
-                namespace(key, val);
-              }
+              if(nsp.add(key) > 0) namespace(key, val);
             }
             // check ancestors only on top level
             if(level != 0 || l != 0) break;
@@ -391,9 +389,7 @@ public abstract class Serializer {
 
         // serialize attributes
         final int as = p + data.attSize(p, k);
-        while(++p != as) {
-          attribute(data.name(p, Data.ATTR), data.text(p, false));
-        }
+        while(++p != as) attribute(data.name(p, Data.ATTR), data.text(p, false));
         pars.set(l++, r);
       }
     }

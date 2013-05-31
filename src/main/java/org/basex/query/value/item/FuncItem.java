@@ -23,6 +23,9 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class FuncItem extends FItem implements Scope {
+  /** Original function. */
+  public final StaticFunc func;
+
   /** Static context. */
   private final StaticContext sc;
   /** Variables. */
@@ -54,10 +57,11 @@ public final class FuncItem extends FItem implements Scope {
    * @param t function type
    * @param scp variable scope
    * @param sctx static context
+   * @param sf original function
    */
   public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
-      final VarScope scp, final StaticContext sctx) {
-    this(n, arg, body, t, false, null, 0, 0, null, scp, sctx);
+      final VarScope scp, final StaticContext sctx, final StaticFunc sf) {
+    this(n, arg, body, t, false, null, 0, 0, null, scp, sctx, sf);
   }
 
   /**
@@ -70,11 +74,12 @@ public final class FuncItem extends FItem implements Scope {
    * @param cls closure
    * @param scp variable scope
    * @param sctx static context
+   * @param sf original function
    */
   public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
       final boolean cst, final Map<Var, Value> cls, final VarScope scp,
-      final StaticContext sctx) {
-    this(n, arg, body, t, cst, null, 0, 0, cls, scp, sctx);
+      final StaticContext sctx, final StaticFunc sf) {
+    this(n, arg, body, t, cst, null, 0, 0, cls, scp, sctx, sf);
   }
 
   /**
@@ -90,7 +95,7 @@ public final class FuncItem extends FItem implements Scope {
   public FuncItem(final Var[] arg, final Expr body, final FuncType t,
       final Map<Var, Value> cl, final boolean cst, final VarScope scp,
       final StaticContext sctx) {
-    this(null, arg, body, t, cst, cl, scp, sctx);
+    this(null, arg, body, t, cst, cl, scp, sctx, null);
   }
 
   /**
@@ -106,10 +111,13 @@ public final class FuncItem extends FItem implements Scope {
    * @param cls closure
    * @param scp variable scope
    * @param sctx static context
+   * @param sf original function
    */
   public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
       final boolean cst, final Value vl, final long ps, final long sz,
-      final Map<Var, Value> cls, final VarScope scp, final StaticContext sctx) {
+      final Map<Var, Value> cls, final VarScope scp, final StaticContext sctx,
+      final StaticFunc sf) {
+
     super(t);
     name = n;
     vars = arg;
@@ -122,6 +130,7 @@ public final class FuncItem extends FItem implements Scope {
     ctxVal = vl;
     pos = ps;
     size = sz;
+    func = sf;
   }
 
   @Override
@@ -231,7 +240,7 @@ public final class FuncItem extends FItem implements Scope {
       refs[i] = new VarRef(ii, vars[i]);
     }
     return new FuncItem(fun.name, vars, new DynFuncCall(ii, fun, refs), t,
-        fun.cast != null, null, sc, ctx.sc);
+        fun.cast != null, null, sc, ctx.sc, fun.func);
   }
 
   @Override

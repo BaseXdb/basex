@@ -31,13 +31,13 @@ public final class FNUnitTest extends AdvancedQueryTest {
   /** Test method. */
   @Test
   public void test() {
-    String func = "declare %xqunit:test function local:x() { 1 }; ";
+    String func = "declare %unit:test function local:x() { 1 }; ";
     query(func + COUNT.args(_UNIT_TEST.args()), "1");
 
-    func = "declare %xqunit:test function local:x() { xqunit:fail('') }; ";
+    func = "declare %unit:test function local:x() { unit:fail('') }; ";
     query(func + COUNT.args(_UNIT_TEST.args() + "//failure"), "1");
 
-    func = "declare %xqunit:test function local:x() { 1+<a/> }; ";
+    func = "declare %unit:test function local:x() { 1+<a/> }; ";
     query(func + COUNT.args(_UNIT_TEST.args() + "//error"), "1");
   }
 }

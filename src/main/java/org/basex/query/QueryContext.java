@@ -168,24 +168,14 @@ public final class QueryContext extends Proc {
 
   /**
    * Parses the specified query.
-   * @param query input query
-   * @param path file path (may be {@code null})
-   * @throws QueryException query exception
-   */
-  public void parse(final String query, final String path) throws QueryException {
-    final boolean library = QueryProcessor.isLibrary(query);
-    if(library) parseLibrary(query, path);
-    else parseMain(query, path);
-  }
-
-  /**
-   * Parses the specified query.
    * @param qu input query
    * @param path file path (may be {@code null})
+   * @return main module
    * @throws QueryException query exception
    */
-  public void parseMain(final String qu, final String path) throws QueryException {
+  public MainModule parseMain(final String qu, final String path) throws QueryException {
     root = new QueryParser(qu, path, this).parseMain();
+    return root;
   }
 
   /**
@@ -364,7 +354,7 @@ public final class QueryContext extends Proc {
     if(val.getClass().getName().equals("org.basex.http.HTTPContext")) {
       http = val;
     } else {
-      ctxItem = new MainModule(cast(val, type), new VarScope());
+      ctxItem = new MainModule(cast(val, type), new VarScope(), null);
     }
   }
 
@@ -661,5 +651,26 @@ public final class QueryContext extends Proc {
   public void set(final Var vr, final Value vl, final InputInfo ii)
       throws QueryException {
     stack.set(vr, vl, this, ii);
+  }
+
+  /**
+   * Initializes the static date and time context of a query if not done yet.
+   * @param ii input info
+   * @return self reference
+   * @throws QueryException query exception
+   */
+  public QueryContext initDateTime(final InputInfo ii) throws QueryException {
+    if(time == null) {
+      final Date d = Calendar.getInstance().getTime();
+      final String zon = DateTime.format(d, DateTime.ZONE);
+      final String ymd = DateTime.format(d, DateTime.DATE);
+      final String hms = DateTime.format(d, DateTime.TIME);
+      final String zn = zon.substring(0, 3) + ':' + zon.substring(3);
+      time = new Tim(Token.token(hms + zn), ii);
+      date = new Dat(Token.token(ymd + zn), ii);
+      dtm = new Dtm(Token.token(ymd + 'T' + hms + zn), ii);
+      zone = new DTDur(toInt(zon.substring(0, 3)), toInt(zon.substring(3)));
+    }
+    return this;
   }
 }

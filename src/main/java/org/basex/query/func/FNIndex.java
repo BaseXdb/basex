@@ -30,21 +30,21 @@ import org.basex.util.*;
  */
 public final class FNIndex extends StandardFunc {
   /** Name: name. */
-  static final QNm Q_NAME = new QNm(QueryText.NAM);
-  /** Name: count. */
-  static final QNm Q_COUNT = new QNm(QueryText.COUNT);
+  static final String NAME = "name";
   /** Name: type. */
-  static final QNm Q_TYPE = new QNm(QueryText.TYP);
+  static final String TYPE = "type";
+  /** Name: count. */
+  static final String COUNT = "count";
   /** Name: value. */
-  static final QNm Q_ENTRY = new QNm("entry");
+  static final String ENTRY = "entry";
   /** Name: min. */
-  static final QNm Q_MIN = new QNm(QueryText.MIN);
+  static final String MIN = "min";
   /** Name: max. */
-  static final QNm Q_MAX = new QNm(QueryText.MAX);
+  static final String MAX = "max";
   /** Name: elements. */
-  static final QNm Q_ELM = new QNm(NodeType.ELM.string());
+  static final byte[] ELM = NodeType.ELM.string();
   /** Name: attributes. */
-  static final QNm Q_ATT = new QNm(NodeType.ATT.string());
+  static final byte[] ATT = NodeType.ATT.string();
   /** Flag: flat output. */
   static final byte[] FLAT = token("flat");
 
@@ -161,7 +161,7 @@ public final class FNIndex extends StandardFunc {
       public ANode next() {
         final byte[] token = ei.next();
         return token == null ? null :
-          new FElem(Q_ENTRY).add(Q_COUNT, token(ei.count())).add(token);
+          new FElem(ENTRY).add(COUNT, token(ei.count())).add(token);
       }
     };
   }
@@ -173,8 +173,8 @@ public final class FNIndex extends StandardFunc {
    */
   private static FElem flat(final Data data) {
     final FElem elem = new FElem(new QNm(NodeType.DOC.string()));
-    index(data.tagindex, Q_ELM, elem);
-    index(data.atnindex, Q_ATT, elem);
+    index(data.tagindex, ELM, elem);
+    index(data.atnindex, ATT, elem);
     return elem;
   }
 
@@ -184,9 +184,9 @@ public final class FNIndex extends StandardFunc {
    * @param name element name
    * @param root root node
    */
-  private static void index(final Names names, final QNm name, final FElem root) {
+  private static void index(final Names names, final byte[] name, final FElem root) {
     for(int i = 0; i < names.size(); ++i) {
-      final FElem sub = new FElem(name).add(Q_NAME, names.key(i + 1));
+      final FElem sub = new FElem(name).add(NAME, names.key(i + 1));
       stats(names.stat(i + 1), sub);
       root.add(sub);
     }
@@ -202,7 +202,7 @@ public final class FNIndex extends StandardFunc {
     final FElem elem = new FElem(new QNm(ANode.type(root.kind).string()));
     final boolean elm = root.kind == Data.ELEM;
     final Names names = elm ? data.tagindex : data.atnindex;
-    if(root.kind == Data.ATTR || elm) elem.add(Q_NAME, names.key(root.name));
+    if(root.kind == Data.ATTR || elm) elem.add(NAME, names.key(root.name));
     stats(root.stats, elem);
     for(final PathNode p : root.ch) elem.add(tree(data, p));
     return elem;
@@ -215,18 +215,18 @@ public final class FNIndex extends StandardFunc {
    */
   private static void stats(final Stats stats, final FElem elem) {
     final String k = stats.type.toString().toLowerCase(Locale.ENGLISH);
-    elem.add(Q_TYPE, k);
-    elem.add(Q_COUNT, token(stats.count));
+    elem.add(TYPE, k);
+    elem.add(COUNT, token(stats.count));
     switch(stats.type) {
       case CATEGORY:
         for(final byte[] c : stats.cats) {
-          elem.add(new FElem(Q_ENTRY).add(Q_COUNT, token(stats.cats.value(c))).add(c));
+          elem.add(new FElem(ENTRY).add(COUNT, token(stats.cats.value(c))).add(c));
         }
         break;
       case DOUBLE:
       case INTEGER:
-        elem.add(Q_MIN, token(stats.min));
-        elem.add(Q_MAX, token(stats.max));
+        elem.add(MIN, token(stats.min));
+        elem.add(MAX, token(stats.max));
         break;
       default:
         break;

@@ -4,7 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.iter.*;
-import org.basex.query.util.ANodeList;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -29,15 +29,67 @@ public final class FElem extends FNode {
   private Atts ns;
 
   /**
-   * Convenience constructor.
-   * @param n element name
+   * Convenience constructor for creating an element.
+   * All QNames that are created from the specified name will be cached.
+   * @param nm element name
    */
-  public FElem(final byte[] n) {
-    this(new QNm(n));
+  public FElem(final String nm) {
+    this(token(nm));
   }
 
   /**
-   * Constructor.
+   * Convenience constructor for creating an element.
+   * All QNames that are created from the specified name will be cached.
+   * @param nm element name
+   */
+  public FElem(final byte[] nm) {
+    this(QNm.get(nm));
+  }
+
+  /**
+   * Convenience constructor for creating an element with a new namespace.
+   * QNames will be cached and reused.
+   * @param local local name
+   * @param uri namespace uri
+   */
+  public FElem(final byte[] local, final byte[] uri) {
+    this(Token.EMPTY, local, uri);
+  }
+
+  /**
+   * Convenience constructor for creating an element with a new namespace.
+   * QNames will be cached and reused.
+   * @param local local name
+   * @param uri namespace uri
+   */
+  public FElem(final String local, final String uri) {
+    this(Token.EMPTY, Token.token(local), Token.token(uri));
+  }
+
+  /**
+   * Convenience constructor for creating an element with a new namespace.
+   * QNames will be cached and reused.
+   * @param prefix prefix (a default namespace will be created if the string is empty)
+   * @param local local name
+   * @param uri namespace uri
+   */
+  public FElem(final String prefix, final String local, final String uri) {
+    this(Token.token(prefix), Token.token(local), Token.token(uri));
+  }
+
+  /**
+   * Convenience constructor for creating an element with a new namespace.
+   * QNames will be cached and reused.
+   * @param prefix prefix (a default namespace will be created if the string is empty)
+   * @param local local name
+   * @param uri namespace uri
+   */
+  public FElem(final byte[] prefix, final byte[] local, final byte[] uri) {
+    this(QNm.get(prefix, local, uri));
+  }
+
+  /**
+   * Constructor for creating an element.
    * @param n element name
    */
   public FElem(final QNm n) {
@@ -45,25 +97,17 @@ public final class FElem extends FNode {
   }
 
   /**
-   * Convenience constructor.
+   * Constructor for creating an element with namespace declarations.
    * @param n element name
    * @param nsp namespaces
    */
-  public FElem(final byte[] n, final Atts nsp) {
-    this(new QNm(n), nsp);
-  }
-
-  /**
-   * Constructor.
-   * @param n element name
-   * @param nsp namespaces
-   */
-  public FElem(final QNm n, final Atts nsp) {
+  private FElem(final QNm n, final Atts nsp) {
     this(n, null, null, nsp);
   }
 
   /**
-   * Constructor.
+   * Constructor for creating an element with nodes, attributes and
+   * namespace declarations.
    * @param nm element name
    * @param ch children; can be {@code null}
    * @param at attributes; can be {@code null}
@@ -82,7 +126,7 @@ public final class FElem extends FNode {
   }
 
   /**
-   * Constructor for DOM nodes.
+   * Constructor for creating an element from a DOM node.
    * Originally provided by Erdal Karaca.
    * @param elem DOM node
    * @param p parent reference
@@ -194,6 +238,16 @@ public final class FElem extends FNode {
     return this;
   }
 
+
+  /**
+   * Adds a namespace declaration for the namespace in the given QName.
+   * @return self reference
+   */
+  public FElem declareNS() {
+    namespaces().add(name.prefix(), name.uri());
+    return this;
+  }
+
   /**
    * Adds a node and updates its parent reference.
    * @param node node to be added
@@ -213,7 +267,46 @@ public final class FElem extends FNode {
 
   /**
    * Adds an attribute and updates its parent reference.
-   * Converts the specified value to a token and calls {@link #add(QNm, byte[])}.
+   * @param nm attribute name
+   * @param value attribute value
+   * @return self reference
+   */
+  public FElem add(final String nm, final String value) {
+    return add(token(nm), token(value));
+  }
+
+  /**
+   * Adds an attribute and updates its parent reference.
+   * @param nm attribute name
+   * @param value attribute value
+   * @return self reference
+   */
+  public FElem add(final byte[] nm, final String value) {
+    return add(nm, token(value));
+  }
+
+  /**
+   * Adds an attribute and updates its parent reference.
+   * @param nm attribute name
+   * @param value attribute value
+   * @return self reference
+   */
+  public FElem add(final String nm, final byte[] value) {
+    return add(token(nm), value);
+  }
+
+  /**
+   * Adds an attribute and updates its parent reference.
+   * @param nm attribute name
+   * @param value attribute value
+   * @return self reference
+   */
+  public FElem add(final byte[] nm, final byte[] value) {
+    return add(new FAttr(nm, value));
+  }
+
+  /**
+   * Adds an attribute and updates its parent reference.
    * @param nm attribute name
    * @param value attribute value
    * @return self reference

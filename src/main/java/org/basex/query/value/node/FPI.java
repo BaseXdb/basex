@@ -24,7 +24,16 @@ public final class FPI extends FNode {
   private final QNm name;
 
   /**
-   * Constructor.
+   * Constructor for creating a processing instruction.
+   * @param n name
+   * @param v value
+   */
+  public FPI(final String n, final String v) {
+    this(QNm.get(n), token(v));
+  }
+
+  /**
+   * Constructor for creating a processing instruction.
    * @param n name
    * @param v value
    */
@@ -35,12 +44,12 @@ public final class FPI extends FNode {
   }
 
   /**
-   * Constructor for DOM nodes.
+   * Constructor for creating a processing instruction from a DOM node.
    * Originally provided by Erdal Karaca.
    * @param pi DOM node
    */
   public FPI(final ProcessingInstruction pi) {
-    this(new QNm(pi.getTarget()), token(pi.getData()));
+    this(pi.getTarget(), pi.getData());
   }
 
   @Override

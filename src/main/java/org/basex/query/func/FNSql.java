@@ -12,7 +12,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -26,7 +25,19 @@ import org.basex.util.hash.*;
  * @author Rositsa Shadura
  */
 public final class FNSql extends StandardFunc {
-  /** Types. */
+  /** Module prefix. */
+  private static final String PREFIX = "zip";
+  /** QName. */
+  private static final QNm Q_ROW = QNm.get(PREFIX, "row", SQLURI);
+  /** QName. */
+  private static final QNm Q_COLUMN = QNm.get(PREFIX, "column", SQLURI);
+  /** QName. */
+  private static final QNm Q_OPTIONS = QNm.get(PREFIX, "options", SQLURI);
+  /** QName. */
+  private static final QNm Q_PARAMETERS = QNm.get(PREFIX, "parameters", SQLURI);
+  /** QName. */
+  private static final QNm Q_PARAMETER = QNm.get(PREFIX, "parameter", SQLURI);
+
   /** Type int. */
   private static final byte[] INT = AtomType.INT.string();
   /** Type string. */
@@ -46,21 +57,8 @@ public final class FNSql extends StandardFunc {
   /** Type timestamp. */
   private static final byte[] TIMESTAMP = token("timestamp");
 
-  /** Row. */
-  private static final QNm Q_ROW = new QNm("sql:row", SQLURI);
-  /** Column. */
-  private static final QNm Q_COLUMN = new QNm("sql:column", SQLURI);
   /** Name. */
-  private static final QNm Q_NAME = new QNm("name");
-
-  /** <sql:options/>. */
-  private static final QNm E_OPS = new QNm("options", SQLURI);
-  /** <sql:parameters/>. */
-  private static final QNm E_PARAMS = new QNm("parameters", SQLURI);
-  /** <sql:parameter/>. */
-  private static final QNm E_PARAM = new QNm("parameter", SQLURI);
-
-  /** Connection options. */
+  private static final String NAME = "name";
   /** Auto-commit mode. */
   private static final byte[] AUTO_COMM = token("autocommit");
   /** User. */
@@ -68,9 +66,6 @@ public final class FNSql extends StandardFunc {
   /** Password. */
   private static final String PASS = "password";
 
-  /** Other. */
-  /** SQL Namespace attribute. */
-  private static final Atts NS_SQL = new Atts(SQL, SQLURI);
   /** Attribute "type" of <sql:parameter/>. */
   private static final byte[] TYPE = token("type");
 
@@ -137,7 +132,7 @@ public final class FNSql extends StandardFunc {
         if(expr.length == 4) {
           // connection options
           final Item opt = checkItem(expr[3], ctx);
-          final TokenMap options = new FuncParams(E_OPS, info).parse(opt);
+          final TokenMap options = new FuncParams(Q_OPTIONS, info).parse(opt);
           // extract auto-commit mode from options
           boolean ac = true;
           final byte[] commit = options.get(AUTO_COMM);
@@ -236,7 +231,7 @@ public final class FNSql extends StandardFunc {
     ANode params = null;
     if(expr.length > 1) {
       params = (ANode) checkType(checkItem(expr[1], ctx), NodeType.ELM);
-      if(!params.qname().eq(E_PARAMS)) ELMOPTION.thrw(info, params.qname());
+      if(!params.qname().eq(Q_PARAMETERS)) ELMOPTION.thrw(info, params.qname());
       c = countParams(params);
     }
 
@@ -276,7 +271,7 @@ public final class FNSql extends StandardFunc {
     int i = 0;
     for(ANode next; (next = params.next()) != null;) {
       // Check name
-      if(!next.qname().eq(E_PARAM)) ELMOPTION.thrw(info, next.qname());
+      if(!next.qname().eq(Q_PARAMETER)) ELMOPTION.thrw(info, next.qname());
       final AxisIter attrs = next.attributes();
       byte[] paramType = null;
       boolean isNull = false;
@@ -358,24 +353,17 @@ public final class FNSql extends StandardFunc {
       final int cc = metadata.getColumnCount();
       final NodeSeqBuilder rows = new NodeSeqBuilder();
       while(rs.next()) {
-        final ANodeList columns = new ANodeList(cc);
+        final FElem row = new FElem(Q_ROW);
+        rows.add(row);
         for(int k = 1; k <= cc; k++) {
           // For each row add column values as children
           final String label = metadata.getColumnLabel(k);
           final Object value = rs.getObject(label);
           // Null values are ignored
-          if(value != null) {
-            // Column name
-            final FAttr columnName = new FAttr(Q_NAME, token(label));
-            final ANodeList attr = new ANodeList(columnName);
-            // Column value
-            final FTxt columnValue = new FTxt(token(value.toString()));
-            final ANodeList ch = new ANodeList(columnValue);
-            // Element <sql:column name='...'>...</sql:column>
-            columns.add(new FElem(Q_COLUMN, ch, attr, NS_SQL));
-          }
+          if(value == null) continue;
+          // Element <sql:column name='...'>...</sql:column>
+          row.add(new FElem(Q_COLUMN).add(NAME, label).add(value.toString()));
         }
-        rows.add(new FElem(Q_ROW, columns, null, NS_SQL));
       }
       return rows;
     } catch(final SQLException ex) {

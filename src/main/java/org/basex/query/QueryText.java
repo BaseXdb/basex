@@ -523,6 +523,8 @@ public interface QueryText {
   byte[] REPO = token("repo");
   /** Validate token. */
   byte[] VLDT = token("validate");
+  /** XQDoc token. */
+  byte[] INSPECT = token("inspect");
   /** XQuery token. */
   byte[] XQRY = token(XQUERY);
   /** XQUnit token. */
@@ -626,6 +628,8 @@ public interface QueryText {
   byte[] HTMLURI = token(BXMODULES + "html");
   /** Index module URI. */
   byte[] INDEXURI = token(BXMODULES + "index");
+  /** Inspect module URI. */
+  byte[] INSPECTURI = token(BXMODULES + "inspect");
   /** JSON module URI. */
   byte[] JSONURI = token(BXMODULES + "json");
   /** Output module URI. */
@@ -648,15 +652,23 @@ public interface QueryText {
   byte[] UNITURI = token(BXMODULES + "unit");
   /** Validate module URI. */
   byte[] VALIDATEURI = token(BXMODULES + "validate");
-  /** XSLT module URI. */
-  byte[] XSLTURI = token(BXMODULES + "xslt");
   /** XQuery module URI. */
   byte[] XQUERYURI = token(BXMODULES + "xquery");
+  /** XSLT module URI. */
+  byte[] XSLTURI = token(BXMODULES + "xslt");
 
   /** Java prefix. */
   byte[] JAVAPREF = token("java:");
   /** Default collation. */
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
+
+  /** Supported documentation tags. */
+  byte[][] DOC_TAGS = tokens("description", "author", "version", "param",
+      "return", "error", "deprecated", "see", "since");
+  /** Documentation: param tag. */
+  byte[] DOC_PARAM = token("param");
+  /** Documentation: return tag. */
+  byte[] DOC_RETURN = token("return");
 
   // QUERY PLAN ===============================================================
 

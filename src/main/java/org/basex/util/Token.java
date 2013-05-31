@@ -954,6 +954,18 @@ public final class Token {
   }
 
   /**
+   * Performs a regular expression on the specified string.
+   * @param token token to match
+   * @param pattern regular expression
+   * @param replace replacement string
+   * @return resulting string
+   */
+  public static byte[] replaceAll(final byte[] token, final String pattern,
+      final String replace) {
+    return token(string(token).replaceAll(pattern, replace));
+  }
+
+  /**
    * Checks if the specified token has only whitespaces.
    * @param token token
    * @return true if all characters are whitespaces

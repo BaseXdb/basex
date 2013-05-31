@@ -35,7 +35,7 @@ public enum NodeType implements Type {
     public ANode cast(final Object o, final QueryContext ctx, final InputInfo ii) {
       if(o instanceof BXText) return ((BXText) o).getNode();
       if(o instanceof Text) return new FTxt((Text) o);
-      return new FTxt(Token.token(o.toString()));
+      return new FTxt(o.toString());
     }
   },
 
@@ -47,9 +47,7 @@ public enum NodeType implements Type {
       if(o instanceof BXPI) return ((BXPI) o).getNode();
       if(o instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) o);
       final Matcher m = Pattern.compile("<\\?(.*?) (.*)\\?>").matcher(o.toString());
-      if(m.find()) {
-        return new FPI(new QNm(m.group(1)), Token.token(m.group(2)));
-      }
+      if(m.find()) return new FPI(m.group(1), m.group(2));
       throw NODEERR.thrw(ii, this, o);
     }
   },
@@ -90,7 +88,7 @@ public enum NodeType implements Type {
         }
         final String c = o.toString();
         if(c.startsWith("<")) return new DBNode(new IOContent(c), new Prop());
-        return new FDoc().add(new FTxt(Token.token(c)));
+        return new FDoc().add(new FTxt(c));
       } catch(final IOException ex) {
         throw NODEERR.thrw(ii, this, ex);
       }
@@ -114,7 +112,7 @@ public enum NodeType implements Type {
       if(o instanceof BXAttr) return ((BXAttr) o).getNode();
       if(o instanceof Attr) return new FAttr((Attr) o);
       final Matcher m = Pattern.compile(" (.*?)=\"(.*)\"").matcher(o.toString());
-      if(m.find()) return new FAttr(Token.token(m.group(1)), Token.token(m.group(2)));
+      if(m.find()) return new FAttr(m.group(1), m.group(2));
       throw NODEERR.thrw(ii, this, o);
     }
   },
@@ -127,7 +125,7 @@ public enum NodeType implements Type {
       if(o instanceof BXComm) return ((BXComm) o).getNode();
       if(o instanceof Comment) return new FComm((Comment) o);
       final Matcher m = Pattern.compile("<!--(.*?)-->").matcher(o.toString());
-      if(m.find()) return new FComm(Token.token(m.group(1)));
+      if(m.find()) return new FComm(m.group(1));
       throw NODEERR.thrw(ii, this, o);
     }
   },

@@ -427,6 +427,19 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the specified expression yields a string or binary item.
+   * Checks the type of the given function item.
+   * @param e expression to be evaluated
+   * @param ctx query context
+   * @return function item
+   * @throws QueryException query exception
+   */
+  public FItem checkFunc(final Expr e, final QueryContext ctx)
+      throws QueryException {
+    return (FItem) checkType(checkItem(e, ctx), FuncType.ANY_FUN);
+  }
+
+  /**
    * Checks if the specified expression is an empty sequence; if yes, throws
    * an exception.
    * @param it item to be checked

@@ -1,6 +1,5 @@
 package org.basex.query.util.http;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.query.util.http.HTTPText.*;
 import static org.basex.util.Token.*;
@@ -57,31 +56,28 @@ public final class HTTPResponse {
   public ValueIter getResponse(final HttpURLConnection conn, final byte[] status,
       final byte[] ctype) throws IOException, QueryException {
 
-    final ANodeList attrs = extractAttrs(conn);
-    final ANodeList hdrs = extractHdrs(conn);
     final String type = conn.getContentType();
     final ValueBuilder payloads = new ValueBuilder();
     final boolean s = status != null && Bln.parse(status, info);
 
     // multipart response
-    final FNode body;
+    final FElem body;
     InputStream is = conn.getErrorStream();
 
-    final String cType;
+    final byte[] cType;
     if(is == null) {
-      cType = ctype == null ? extractContentType(type) : string(ctype);
+      cType = ctype == null ? token(extractContentType(type)) : ctype;
       is = conn.getInputStream();
     } else {
       // error: use text/plain as content type
-      cType = MimeTypes.TEXT_PLAIN;
+      cType = token(MimeTypes.TEXT_PLAIN);
     }
 
-    if(cType.startsWith(MULTIPART)) {
+    if(startsWith(cType, MULTIPART)) {
       final byte[] boundary = extractBoundary(type);
-      final ANodeList a = new ANodeList(
-          new FAttr(Q_MEDIA_TYPE, token(cType)), new FAttr(Q_BOUNDARY, boundary));
-      body = new FElem(Q_HTTP_MULTIPART, extractParts(is, s,
-          payloads, concat(token("--"), boundary)), a, new Atts(HTTP, HTTPURI));
+      body = new FElem(Q_MULTIPART).add(MEDIA_TYPE, cType).add(BOUNDARY, boundary);
+      final ANodeList list = extractParts(is, s, payloads, concat(token("--"), boundary));
+      for(final ANode node : list) body.add(node);
       // single part response
     } else {
       body = createBody(cType);
@@ -92,8 +88,18 @@ public final class HTTPResponse {
     }
 
     // construct <http:response/>
-    final FElem responseEl = new FElem(Q_HTTP_RESPONSE, hdrs, attrs,
-        new Atts(HTTP, HTTPURI));
+    final FElem responseEl = new FElem(Q_RESPONSE).declareNS();
+    responseEl.add(STATUS, token(conn.getResponseCode()));
+    responseEl.add(MESSAGE, token(conn.getResponseMessage()));
+
+    for(final String headerName : conn.getHeaderFields().keySet()) {
+      if(headerName != null) {
+        final FElem hdr = new FElem(Q_HEADER);
+        hdr.add(NAME, token(headerName));
+        hdr.add(VALUE, token(conn.getHeaderField(headerName)));
+        responseEl.add(hdr);
+      }
+    }
     responseEl.add(body);
 
     // result
@@ -103,60 +109,30 @@ public final class HTTPResponse {
     return result;
   }
 
-  /**
-   * Extracts status code and status message in order to set them later as
-   * attributes of <http:response/>.
-   * @param conn http connection
-   * @return node cache with attributes
-   * @throws IOException I/O Exception
-   */
-  private static ANodeList extractAttrs(final HttpURLConnection conn) throws IOException {
-    return new ANodeList(
-        new FAttr(Q_STATUS, token(conn.getResponseCode())),
-        new FAttr(Q_MESSAGE, token(conn.getResponseMessage())));
-  }
-
-  /**
-   * Extracts response headers in order to set them later as children of
-   * <http:response/>.
-   * @param conn HTTP connection
-   * @return node cache with http:header elements
-   */
-  private static ANodeList extractHdrs(final HttpURLConnection conn) {
-    final ANodeList h = new ANodeList();
-    for(final String headerName : conn.getHeaderFields().keySet()) {
-      if(headerName != null) {
-        final FElem hdr = new FElem(Q_HTTP_HEADER, new Atts(HTTP, HTTPURI));
-        hdr.add(Q_NAME, headerName);
-        hdr.add(Q_VALUE, conn.getHeaderField(headerName));
-        h.add(hdr);
-      }
-    }
-    return h;
-  }
 
   /**
    * Creates a <http:body/> element.
    * @param cType content type
    * @return body
    */
-  private static FElem createBody(final String cType) {
-    return new FElem(Q_HTTP_BODY, new Atts(HTTP, HTTPURI)).add(Q_MEDIA_TYPE, cType);
+  private static FElem createBody(final byte[] cType) {
+    return new FElem(Q_BODY).add(MEDIA_TYPE, cType);
   }
 
   /**
    * Extracts payload from HTTP message and returns it as a byte array encoded
    * in UTF-8.
    * @param io connection input stream
-   * @param c content type
+   * @param ct content type
    * @param ce response content charset
    * @return payload as byte array
    * @throws IOException I/O Exception
    */
-  private static byte[] extractPayload(final InputStream io, final String c,
+  private static byte[] extractPayload(final InputStream io, final byte[] ct,
       final String ce) throws IOException {
 
     final BufferedInputStream bis = new BufferedInputStream(io);
+    final String c = string(ct);
     try {
       final ByteList bl = new ByteList();
       for(int i; (i = bis.read()) != -1;) bl.add(i);
@@ -181,11 +157,11 @@ public final class HTTPResponse {
    * @return interpreted payload
    * @throws QueryException query exception
    */
-  private Item interpretPayload(final byte[] p, final String ct) throws QueryException {
+  private Item interpretPayload(final byte[] p, final byte[] ct) throws QueryException {
     try {
       final IOContent io = new IOContent(p);
       io.name(PAYLOAD + IO.XMLSUFFIX);
-      return Parser.item(io, prop, ct);
+      return Parser.item(io, prop, string(ct));
     } catch(final IOException ex) {
       throw HC_PARSE.thrw(info, ex);
     }
@@ -239,7 +215,7 @@ public final class HTTPResponse {
 
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)
-    String partCType = MimeTypes.TEXT_PLAIN;
+    byte[] partCType = token(MimeTypes.TEXT_PLAIN);
     String charset = null;
     final byte[] firstLine = readLine(io);
     // last line is reached:
@@ -265,11 +241,8 @@ public final class HTTPResponse {
             // parse value
             final byte[] value = trim(substring(nextHdr, pos + 1, nextHdr.length));
             // construct attributes
-            final FElem hdr = new FElem(Q_HTTP_HEADER);
-            hdr.add(Q_NAME, name);
-            hdr.add(Q_VALUE, value);
-            nl.add(hdr);
-            if(eq(lc(name), CONTENT_TYPE_LC)) partCType = string(value);
+            nl.add(new FElem(Q_HEADER).add(NAME, name).add(VALUE, value));
+            if(eq(lc(name), CONTENT_TYPE_LC)) partCType = value;
           }
         }
         nextHdr = readLine(io);

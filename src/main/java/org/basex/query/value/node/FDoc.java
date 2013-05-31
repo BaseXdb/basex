@@ -33,6 +33,14 @@ public final class FDoc extends FNode {
    * Constructor.
    * @param b base uri
    */
+  public FDoc(final String b) {
+    this(Token.token(b));
+  }
+
+  /**
+   * Constructor.
+   * @param b base uri
+   */
   public FDoc(final byte[] b) {
     this(new ANodeList(), b);
   }

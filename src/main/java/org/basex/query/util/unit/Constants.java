@@ -2,8 +2,6 @@ package org.basex.query.util.unit;
 
 import static org.basex.util.Token.*;
 
-import org.basex.query.value.item.*;
-
 /**
  * XQuery Unit tests.
  *
@@ -26,30 +24,30 @@ public interface Constants {
   /** Token: expected. */
   byte[] EXPECTED = token("expected");
 
-  /** QName: testsuites. */
-  QNm Q_TESTSUITES = new QNm("testsuites");
-  /** QName: testsuite. */
-  QNm Q_TESTSUITE = new QNm("testsuite");
-  /** QName: testcase. */
-  QNm Q_TESTCASE = new QNm("testcase");
-  /** QName: failure. */
-  QNm Q_FAILURE = new QNm("failure");
-  /** QName: error. */
-  QNm Q_ERROR = new QNm("error");
-  /** QName: failure. */
-  QNm Q_FAILURES = new QNm("failures");
-  /** QName: error. */
-  QNm Q_ERRORS = new QNm("errors");
-  /** QName: skipped. */
-  QNm Q_SKIPPED = new QNm("skipped");
-  /** QName: error. */
-  QNm Q_TESTS = new QNm("tests");
-  /** QName: name. */
-  QNm Q_NAME = new QNm("name");
-  /** QName: message. */
-  QNm Q_MESSAGE = new QNm("message");
-  /** QName: type. */
-  QNm Q_TYPE = new QNm("type");
-  /** QName: time. */
-  QNm Q_TIME = new QNm("time");
+  /** Name: testsuites. */
+  String TESTSUITES = "testsuites";
+  /** Name: testsuite. */
+  String TESTSUITE = "testsuite";
+  /** Name: testcase. */
+  String TESTCASE = "testcase";
+  /** Name: failure. */
+  String FAILURE = "failure";
+  /** Name: error. */
+  String ERROR = "error";
+  /** Name: failure. */
+  String FAILURES = "failures";
+  /** Name: error. */
+  String ERRORS = "errors";
+  /** Name: skipped. */
+  String SKIPPED = "skipped";
+  /** Name: error. */
+  String TESTS = "tests";
+  /** Name: name. */
+  String NAME = "name";
+  /** Name: message. */
+  String MESSAGE = "message";
+  /** Name: type. */
+  String TYPE = "type";
+  /** Name: time. */
+  String TIME = "time";
 }

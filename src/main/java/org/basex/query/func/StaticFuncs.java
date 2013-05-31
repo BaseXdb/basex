@@ -45,22 +45,26 @@ public final class StaticFuncs extends ExprInfo {
    * @param ret return type
    * @param body function body
    * @param sc static context
-   * @param ii input info
    * @param scp variable scope
+   * @param xqdoc current xqdoc cache
+   * @param ii input info
+   * @return static function reference
    * @throws QueryException query exception
    */
-  public void declare(final Ann ann, final QNm nm, final Var[] args, final SeqType ret,
-      final Expr body, final StaticContext sc, final InputInfo ii, final VarScope scp)
-          throws QueryException {
+  public StaticFunc declare(final Ann ann, final QNm nm, final Var[] args,
+      final SeqType ret, final Expr body, final StaticContext sc, final VarScope scp,
+      final StringBuilder xqdoc, final InputInfo ii) throws QueryException {
+
     final byte[] uri = nm.uri();
     if(uri.length == 0) FUNNONS.thrw(ii, nm.string());
     if(NSGlobal.reserved(uri)) NAMERES.thrw(ii, nm.string());
 
-    final StaticFunc fn = new StaticFunc(ann, nm, args, ret, body, sc, scp, ii);
+    final StaticFunc fn = new StaticFunc(ann, nm, args, ret, body, sc, scp, xqdoc, ii);
     final byte[] sig = fn.id();
     final FuncCache fc = funcs.get(sig);
     if(fc != null) fc.setFunc(fn);
     else funcs.add(sig, new FuncCache(fn));
+    return fn;
   }
 
   /**

@@ -34,7 +34,7 @@ public class FuncType implements Type {
 
   /**
    * Constructor.
-   * @param a anntations
+   * @param a annotations
    * @param arg argument types
    * @param rt return type
    */

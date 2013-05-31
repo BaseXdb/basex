@@ -30,31 +30,31 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FNArchive extends StandardFunc {
-  /** Archive namespace. */
-  private static final Atts NS = new Atts(ARCHIVE, ARCHIVEURI);
-  /** Element: Entry. */
-  private static final QNm Q_ENTRY = new QNm("archive:entry", ARCHIVEURI);
-  /** Element: options. */
-  private static final QNm Q_OPTIONS = new QNm("archive:options", ARCHIVEURI);
-  /** Option: algorithm. */
-  private static final QNm Q_FORMAT = new QNm("archive:format", ARCHIVEURI);
-  /** Option: algorithm. */
-  private static final QNm Q_ALGORITHM = new QNm("archive:algorithm", ARCHIVEURI);
+  /** Module prefix. */
+  private static final String PREFIX = "archive";
+  /** QName. */
+  private static final QNm Q_ENTRY = QNm.get(PREFIX, "entry", ARCHIVEURI);
+  /** QName. */
+  private static final QNm Q_OPTIONS = QNm.get(PREFIX, "options", ARCHIVEURI);
+  /** QName. */
+  private static final QNm Q_FORMAT = QNm.get(PREFIX, "format", ARCHIVEURI);
+  /** QName. */
+  private static final QNm Q_ALGORITHM = QNm.get(PREFIX, "algorithm", ARCHIVEURI);
   /** Root node test. */
   private static final ExtTest TEST = new ExtTest(NodeType.ELM, Q_ENTRY);
 
   /** Level. */
-  private static final QNm Q_LEVEL = new QNm("compression-level");
+  private static final String LEVEL = "compression-level";
   /** Encoding. */
-  private static final QNm Q_ENCODING = new QNm("encoding");
+  private static final String ENCODING = "encoding";
   /** Last modified. */
-  private static final QNm Q_LAST_MOD = new QNm("last-modified");
+  private static final String LAST_MOD = "last-modified";
   /** Compressed size. */
-  private static final QNm Q_COMP_SIZE = new QNm("compressed-size");
+  private static final String COMP_SIZE = "compressed-size";
   /** Uncompressed size. */
-  private static final QNm Q_SIZE = new QNm("size");
+  private static final String SIZE = "size";
   /** Value. */
-  private static final QNm Q_VALUE = new QNm("value");
+  private static final String VALUE = "value";
 
   /** Option: format. */
   private static final byte[] FORMAT = token("format");
@@ -181,11 +181,11 @@ public final class FNArchive extends StandardFunc {
     }
 
     // create result element
-    final FElem e = new FElem(Q_OPTIONS, NS);
-    if(format != null) e.add(new FElem(Q_FORMAT).add(Q_VALUE, format));
+    final FElem e = new FElem(Q_OPTIONS).declareNS();
+    if(format != null) e.add(new FElem(Q_FORMAT).add(VALUE, format));
     if(level >= 0) {
       final byte[] lvl = level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN;
-      e.add(new FElem(Q_ALGORITHM).add(Q_VALUE, lvl));
+      e.add(new FElem(Q_ALGORITHM).add(VALUE, lvl));
     }
     return e;
   }
@@ -205,13 +205,13 @@ public final class FNArchive extends StandardFunc {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         if(ze.isDirectory()) continue;
-        final FElem e = new FElem(Q_ENTRY, NS);
+        final FElem e = new FElem(Q_ENTRY).declareNS();
         long s = ze.getSize();
-        if(s != -1) e.add(Q_SIZE, token(s));
+        if(s != -1) e.add(SIZE, token(s));
         s = ze.getTime();
-        if(s != -1) e.add(Q_LAST_MOD, new Dtm(s, info).string(info));
+        if(s != -1) e.add(LAST_MOD, new Dtm(s, info).string(info));
         s = ze.getCompressedSize();
-        if(s != -1) e.add(Q_COMP_SIZE, token(s));
+        if(s != -1) e.add(COMP_SIZE, token(s));
         e.add(ze.getName());
         vb.add(e);
       }
@@ -433,10 +433,10 @@ public final class FNArchive extends StandardFunc {
     byte[] lvl = null;
     if(entry instanceof ANode) {
       final ANode el = (ANode) entry;
-      lvl = el.attribute(Q_LEVEL);
+      lvl = el.attribute(LEVEL);
 
       // last modified
-      final byte[] mod = el.attribute(Q_LAST_MOD);
+      final byte[] mod = el.attribute(LAST_MOD);
       if(mod != null) {
         try {
           ze.setTime(dateTimeToMs(new Dtm(mod, info), ctx));
@@ -446,7 +446,7 @@ public final class FNArchive extends StandardFunc {
       }
 
       // encoding
-      final byte[] enc = el.attribute(Q_ENCODING);
+      final byte[] enc = el.attribute(ENCODING);
       if(enc != null) {
         en = string(enc);
         if(!Charset.isSupported(en)) ARCH_ENCODING.thrw(info, enc);

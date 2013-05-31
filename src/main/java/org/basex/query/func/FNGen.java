@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.*;
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
@@ -271,7 +270,7 @@ public final class FNGen extends StandardFunc {
         @Override
         public Item next() {
           try {
-            return nli.readLine(tb) == null ? null : Str.get(tb.finish());
+            return nli.readLine(tb) ? Str.get(tb.finish()) : null;
           } catch(final IOException ex) {
             throw Util.notexpected(ex);
           }
@@ -294,21 +293,11 @@ public final class FNGen extends StandardFunc {
 
     final Item item = expr[0].item(ctx, info);
     if(item == null) return null;
-
-    final byte[] cont = checkEStr(expr[0], ctx);
-    final IO io = new IOContent(cont, string(ctx.sc.baseURI().string()));
-    final Prop prop = ctx.context.prop;
-    final boolean chop = prop.is(Prop.CHOP);
     try {
-      prop.set(Prop.CHOP, false);
-
-      final Parser p = frag || prop.is(Prop.INTPARSE) ?
-        new XMLParser(io, ctx.context.prop, frag) : new SAXWrapper(io, ctx.context.prop);
-      return new DBNode(p);
+      final IO io = new IOContent(checkStr(item), string(ctx.sc.baseURI().string()));
+      return parseXml(io, ctx, frag);
     } catch(final IOException ex) {
       throw SAXERR.thrw(info, ex);
-    } finally {
-      prop.set(Prop.CHOP, chop);
     }
   }
 
@@ -373,5 +362,28 @@ public final class FNGen extends StandardFunc {
   public boolean iterable() {
     // collections will never yield duplicates
     return sig == COLLECTION || super.iterable();
+  }
+
+  /**
+   * Returns a document node for the parsed XML input.
+   * @param input string to be parsed
+   * @param ctx query context
+   * @param frag parse fragment
+   * @return result
+   * @throws IOException I/O exception
+   */
+  public static ANode parseXml(final IO input, final QueryContext ctx,
+      final boolean frag) throws IOException {
+
+    final Prop prop = ctx.context.prop;
+    final boolean chop = prop.is(Prop.CHOP);
+    try {
+      prop.set(Prop.CHOP, false);
+      return new DBNode(frag || prop.is(Prop.INTPARSE) ?
+        new XMLParser(input, ctx.context.prop, frag) :
+        new SAXWrapper(input, ctx.context.prop));
+    } finally {
+      prop.set(Prop.CHOP, chop);
+    }
   }
 }

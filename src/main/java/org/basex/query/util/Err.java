@@ -318,7 +318,7 @@ public enum Err {
   /** ZIP0001. */
   ZIP_NOTFOUND(ZIP, 1, "Path '%' is not found."),
   /** ZIP0002. */
-  ZIP_INVALID(ZIP, 2, "% element: % attribute expected."),
+  ZIP_INVALID(ZIP, 2, "% element: attribute '%' expected."),
   /** ZIP0002. */
   ZIP_UNKNOWN(ZIP, 2, "ZIP definition: unknown element %."),
   /** ZIP0003. */

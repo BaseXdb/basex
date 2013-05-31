@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -21,11 +22,10 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FuncParams {
-  /** Element: output:serialization-parameters. */
-  public static final QNm Q_SPARAM = new QNm("serialization-parameters",
-      QueryText.OUTPUTURI);
-  /** Attribute: value. */
-  private static final QNm A_VALUE = new QNm("value");
+  /** QName. */
+  public static final QNm Q_SPARAM = QNm.get("serialization-parameters", OUTPUTURI);
+  /** Value. */
+  private static final String VALUE = "value";
 
   /** Root element. */
   private final QNm root;
@@ -82,7 +82,7 @@ public final class FuncParams {
       }
       // retrieve key from element name and value from "value" attribute or text node
       final byte[] key = qn.local();
-      byte[] val = n.attribute(A_VALUE);
+      byte[] val = n.attribute(VALUE);
       if(val == null) val = n.string();
       // separate multiple entries with ","
       final byte[] o = tm.get(key);

@@ -24,9 +24,10 @@ public class MainModule extends StaticScope {
    * Constructor.
    * @param rt root expression
    * @param scp variable scope
+   * @param xqdoc documentation
    */
-  public MainModule(final Expr rt, final VarScope scp) {
-    super(scp, null);
+  public MainModule(final Expr rt, final VarScope scp, final StringBuilder xqdoc) {
+    super(scp, xqdoc, null);
     expr = rt;
   }
 

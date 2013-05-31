@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   /** The variables. */
-  private final HashMap<QNm, VarEntry> vars = new HashMap<QNm, VarEntry>();
+  public final HashMap<QNm, VarEntry> vars = new HashMap<QNm, VarEntry>();
 
   /**
    * Declares a new static variable.
@@ -31,16 +31,20 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @param ext {@code external} flag
    * @param sctx static context
    * @param scp variable scope
+   * @param xqdoc current xqdoc cache
    * @param ii input info
+   * @return static variable reference
    * @throws QueryException query exception
    */
-  public void declare(final QNm nm, final SeqType t, final Ann a, final Expr e,
-      final boolean ext, final StaticContext sctx, final VarScope scp, final InputInfo ii)
-          throws QueryException {
-    final StaticVar var = new StaticVar(sctx, scp, ii, a, nm, t, e, ext);
+  public StaticVar declare(final QNm nm, final SeqType t, final Ann a, final Expr e,
+      final boolean ext, final StaticContext sctx, final VarScope scp,
+      final StringBuilder xqdoc, final InputInfo ii) throws QueryException {
+
+    final StaticVar var = new StaticVar(sctx, scp, a, nm, t, e, ext, xqdoc, ii);
     final VarEntry ve = vars.get(nm);
     if(ve != null) ve.setVar(var);
     else vars.put(nm, new VarEntry(var));
+    return var;
   }
 
   /**

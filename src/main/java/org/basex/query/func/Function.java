@@ -774,6 +774,13 @@ public enum Function {
   /** XQuery function. */
   _INDEX_ATTRIBUTE_NAMES(FNIndex.class, "attribute-names(database)", NOD_ZM, STR),
 
+  /* FNInspect functions. */
+
+  /** XQuery function. */
+  _INSPECT_FUNCTION(FNInspect.class, "function(function)", ELM, STR),
+  /** XQuery function. */
+  _INSPECT_XQDOC(FNInspect.class, "xqdoc(uri)", ELM, STR),
+
   /* FNJson functions. */
 
   /** XQuery function. */
@@ -876,6 +883,17 @@ public enum Function {
   /** XQuery function. */
   _STREAM_IS_STREAMABLE(FNStream.class, "is-streamable(item)", BLN, ITEM),
 
+  /* FNUnit functions. */
+
+  /** XQuery function. */
+  _UNIT_ASSERT(FNUnit.class, "assert(test[,message])", EMP, 1, ITEM_ZM, STR),
+  /** XQuery function. */
+  _UNIT_FAIL(FNUnit.class, "fail(message)", EMP, STR),
+  /** XQuery function. */
+  _UNIT_TEST(FNUnit.class, "test()", ELM),
+  /** XQuery function. */
+  _UNIT_TEST_LIBRARIES(FNUnit.class, "test-libraries(uris)", ELM, STR_ZM),
+
   /* FNValidate functions. */
 
   /** XQuery function. */
@@ -895,17 +913,6 @@ public enum Function {
   _XQUERY_INVOKE(FNXQuery.class, "invoke(uri[,bindings])", ITEM_ZM, 1, STR, ITEM),
   /** XQuery function. */
   _XQUERY_TYPE(FNXQuery.class, "type(value)", ITEM_ZM, ITEM_ZM),
-
-  /* FNUnit functions. */
-
-  /** XQuery function. */
-  _UNIT_ASSERT(FNUnit.class, "assert(test[,message])", EMP, 1, ITEM_ZM, STR),
-  /** XQuery function. */
-  _UNIT_FAIL(FNUnit.class, "fail(message)", EMP, STR),
-  /** XQuery function. */
-  _UNIT_TEST(FNUnit.class, "test()", ELM),
-  /** XQuery function. */
-  _UNIT_TEST_LIBRARIES(FNUnit.class, "test-libraries(uris)", ELM, STR_ZM),
 
   /* FNXslt functions. */
 
@@ -974,6 +981,7 @@ public enum Function {
     URIS.put(FNHof.class,      HOFURI);
     URIS.put(FNHtml.class,     HTMLURI);
     URIS.put(FNIndex.class,    INDEXURI);
+    URIS.put(FNInspect.class,  INSPECTURI);
     URIS.put(FNJson.class,     JSONURI);
     URIS.put(FNOut.class,      OUTURI);
     URIS.put(FNProc.class,     PROCURI);
@@ -981,10 +989,10 @@ public enum Function {
     URIS.put(FNRandom.class,   RANDOMURI);
     URIS.put(FNSql.class,      SQLURI);
     URIS.put(FNStream.class,   STREAMURI);
+    URIS.put(FNUnit.class,     UNITURI);
     URIS.put(FNValidate.class, VALIDATEURI);
     URIS.put(FNXslt.class,     XSLTURI);
     URIS.put(FNXQuery.class,   XQUERYURI);
-    URIS.put(FNUnit.class,     UNITURI);
   }
 
   /** Cached enums (faster). */
@@ -1133,9 +1141,9 @@ public enum Function {
       sl.add(f.toString().replaceAll("^fn:|\\(.*", ""));
     }
     for(final String s : sl.sort(false, false)) {
-      System.out.print(s + ' ');
+      Util.out(s + ' ');
     }
-    System.out.println("fn:");
+    Util.outln("fn:");
   }
    */
 }

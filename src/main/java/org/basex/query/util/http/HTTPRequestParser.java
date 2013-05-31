@@ -56,16 +56,16 @@ public final class HTTPRequestParser {
     if(payload != null) {
       final QNm pl = payload.qname();
       // single part request
-      if(pl.eq(Q_HTTP_BODY)) {
+      if(pl.eq(Q_BODY)) {
         final Item it = bodies != null ? bodies.next() : null;
         parseBody(payload, it, r.payloadAttrs, r.bodyContent);
         r.isMultipart = false;
         // multipart request
-      } else if(pl.eq(Q_HTTP_MULTIPART)) {
+      } else if(pl.eq(Q_MULTIPART)) {
         parseMultipart(payload, bodies, r.payloadAttrs, r.parts);
         r.isMultipart = true;
       } else {
-        HC_REQ.thrw(info, "Unknown payload element " + pl);
+        HC_REQ.thrw(info, "Unknown payload element " + payload.qname());
       }
     }
     return r;
@@ -96,16 +96,16 @@ public final class HTTPRequestParser {
       if(n == null) break;
       final QNm nm = n.qname();
       if(nm == null) continue;
-      if(!nm.eq(Q_HTTP_HEADER)) break;
+      if(!nm.eq(Q_HEADER)) break;
 
       final AxisIter hdrAttrs = n.attributes();
       byte[] name = null;
       byte[] value = null;
 
       for(ANode attr; (attr = hdrAttrs.next()) != null;) {
-        final QNm qn = attr.qname();
-        if(qn.eq(Q_NAME)) name = attr.string();
-        if(qn.eq(Q_VALUE)) value = attr.string();
+        final byte[] qn = attr.qname().local();
+        if(eq(qn, NAME)) name = attr.string();
+        if(eq(qn, VALUE)) value = attr.string();
 
         if(name != null && name.length != 0 && value != null && value.length != 0) {
           hdrs.add(name, value);

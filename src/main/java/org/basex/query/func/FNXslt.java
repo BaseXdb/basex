@@ -28,7 +28,7 @@ import org.basex.util.hash.*;
  */
 public final class FNXslt extends StandardFunc {
   /** Element: parameters. */
-  private static final QNm E_PARAM = new QNm("parameters", XSLTURI);
+  private static final QNm Q_PARAM = QNm.get("parameters", XSLTURI);
 
   /** XSLT implementations. */
   private static final String[] IMPL = {
@@ -103,7 +103,7 @@ public final class FNXslt extends StandardFunc {
     final IO in = read(checkItem(expr[0], ctx));
     final IO xsl = read(checkItem(expr[1], ctx));
     final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(E_PARAM, info).parse(opt);
+    final TokenMap map = new FuncParams(Q_PARAM, info).parse(opt);
 
     final PrintStream tmp = System.err;
     final ArrayOutput ao = new ArrayOutput();

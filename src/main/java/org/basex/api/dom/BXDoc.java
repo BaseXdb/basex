@@ -44,12 +44,12 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXCData createCDATASection(final String dat) {
-    return new BXCData(new FTxt(token(dat)));
+    return new BXCData(new FTxt(dat));
   }
 
   @Override
   public BXComm createComment(final String dat) {
-    return new BXComm(new FComm(token(dat)));
+    return new BXComm(new FComm(dat));
   }
 
   @Override
@@ -74,12 +74,12 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXPI createProcessingInstruction(final String t, final String dat) {
-    return new BXPI(new FPI(new QNm(t), token(dat)));
+    return new BXPI(new FPI(t, dat));
   }
 
   @Override
   public BXText createTextNode(final String dat) {
-    return new BXText(new FTxt(token(dat)));
+    return new BXText(new FTxt(dat));
   }
 
   @Override

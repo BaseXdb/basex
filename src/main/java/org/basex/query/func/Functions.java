@@ -132,10 +132,10 @@ public final class Functions extends TokenSet {
     if(eq(name.uri(), XSURI)) {
       final Type type = getCast(name, arity, ii);
       final VarScope scp = new VarScope();
-      final Var arg = scp.uniqueVar(ctx, SeqType.AAT_ZO, true);
-      final Expr e = new Cast(ii, new VarRef(ii, arg), type.seqType());
+      final Var[] args = { scp.uniqueVar(ctx, SeqType.AAT_ZO, true) };
+      final Expr e = new Cast(ii, new VarRef(ii, args[0]), type.seqType());
       final FuncType tp = FuncType.get(e.type(), SeqType.AAT_ZO);
-      return new FuncItem(name, new Var[] { arg }, e, tp, scp, ctx.sc);
+      return new FuncItem(name, args, e, tp, scp, ctx.sc, null);
     }
 
     // pre-defined functions
@@ -143,12 +143,14 @@ public final class Functions extends TokenSet {
     if(fn != null) {
       final VarScope scp = new VarScope();
       final FuncType ft = fn.type(arity);
+      final QNm[] names = new QNm[arity];
+      for(int a = 0; a < arity; a++) names[a] = new QNm("value" + (a + 1));
       final Var[] args = new Var[arity];
       final Expr[] calls = ft.args(args, ctx, scp, ii);
 
       final StandardFunc f = fn.get(calls);
       if(!f.uses(Use.CTX) && !f.uses(Use.POS))
-        return new FuncItem(name, args, f, ft, scp, ctx.sc);
+        return new FuncItem(name, args, f, ft, scp, ctx.sc, null);
 
       return new FuncLit(name, args, f, ft, scp, ctx.sc, ii);
     }
@@ -158,10 +160,12 @@ public final class Functions extends TokenSet {
     if(sf != null) {
       final FuncType ft = sf.funcType();
       final VarScope scp = new VarScope();
+      final QNm[] names = new QNm[arity];
+      for(int a = 0; a < arity; a++) names[a] = sf.args[a].name;
       final Var[] args = new Var[arity];
       final Expr[] calls = ft.args(args, ctx, scp, ii);
       final TypedFunc tf = ctx.funcs.getFuncRef(name, calls, ctx.sc, ii);
-      return new FuncItem(name, args, tf.fun, ft, scp, ctx.sc);
+      return new FuncItem(name, args, tf.fun, ft, scp, ctx.sc, sf);
     }
 
     // Java function (only allowed with administrator permissions)

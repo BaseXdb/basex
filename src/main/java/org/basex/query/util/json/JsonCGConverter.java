@@ -3,7 +3,6 @@ package org.basex.query.util.json;
 import org.basex.query.QueryException;
 import org.basex.query.util.*;
 import org.basex.query.util.json.JsonParser.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 
 import static org.basex.util.Token.*;
@@ -61,15 +60,11 @@ public final class JsonCGConverter extends JsonXMLConverter {
     T_BOOLEAN, NULL };
   /** The underscore. */
   static final byte[] UNDERSCORE = { '_' };
-  /** The {@code type} QName. */
-  static final QNm TYPE = new QNm(T_TYPE);
-  /** The {@code entry} QName. */
-  static final QNm VALUE = new QNm(T_VALUE);
   /** The {@code types} QNames. */
-  private static final QNm[] TYPES = new QNm[NAMES.length];
+  private static final byte[][] TYPES = new byte[NAMES.length][];
   static {
     final byte[] s = { 's' };
-    for(int i = 0; i < NAMES.length; i++) TYPES[i] = new QNm(concat(NAMES[i], s));
+    for(int i = 0; i < NAMES.length; i++) TYPES[i] = concat(NAMES[i], s);
   }
 
   /** Spec to use. */
@@ -133,20 +128,13 @@ public final class JsonCGConverter extends JsonXMLConverter {
   }
 
   /** JSON handler containing the state of the conversion. */
-  private static class JsonCGHandler implements JsonHandler {
+  static class JsonCGHandler implements JsonHandler {
     /** Map from element name to a pair of all its nodes and the collective node type. */
     final TokenObjMap<TypedArray> names = new TokenObjMap<TypedArray>();
-    /** Cache for QNames. */
-    private final TokenObjMap<QNm> nameCache = new TokenObjMap<QNm>();
     /** The next element's name. */
-    private QNm name;
+    private byte[] name = T_JSON;
     /** The current node. */
     FElem elem;
-
-    /** Constructor. */
-    JsonCGHandler() {
-      nameCache.add(T_JSON, name = new QNm(T_JSON));
-    }
 
     /**
      * Adds a new element with the given type.
@@ -155,22 +143,21 @@ public final class JsonCGConverter extends JsonXMLConverter {
      */
     FElem addElem(final byte[] type) {
       final FElem e = new FElem(name);
-      final byte[] nm = name.string();
 
-      if(names.contains(nm)) {
-        final TypedArray arr = names.get(nm);
+      if(names.contains(name)) {
+        final TypedArray arr = names.get(name);
         if(arr != null && arr.type == type) {
           arr.add(e);
         } else {
           if(arr != null) {
-            names.add(nm, null);
+            names.add(name, null);
             if(arr.type != T_STRING)
-              for(int i = 0; i < arr.size; i++) arr.vals[i].add(TYPE, arr.type);
+              for(int i = 0; i < arr.size; i++) arr.vals[i].add(T_TYPE, arr.type);
           }
-          if(type != T_STRING) e.add(TYPE, type);
+          if(type != T_STRING) e.add(T_TYPE, type);
         }
       } else {
-        names.add(nm, new TypedArray(type, e));
+        names.add(name, new TypedArray(type, e));
       }
       if(elem != null) elem.add(e);
       else elem = e;
@@ -213,8 +200,7 @@ public final class JsonCGConverter extends JsonXMLConverter {
 
     @Override
     public void openEntry(final byte[] key) throws QueryException {
-      name = nameCache.get(key);
-      if(name == null) nameCache.add(key, name = new QNm(name(key)));
+      name = name(key);
     }
 
     @Override
@@ -233,7 +219,7 @@ public final class JsonCGConverter extends JsonXMLConverter {
 
     @Override
     public void openArrayEntry() throws QueryException {
-      name = VALUE;
+      name = T_VALUE;
     }
 
     @Override

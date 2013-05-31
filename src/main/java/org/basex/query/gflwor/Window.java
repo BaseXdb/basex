@@ -504,7 +504,7 @@ public final class Window extends GFLWOR.Clause {
 
     @Override
     public void plan(final FElem plan) {
-      final FElem e = new FElem(token(start ? START : END));
+      final FElem e = new FElem(start ? START : END);
 
       // mapping variable names to roles
       if(item != null) e.add(planAttr(VAR, token(item.toString())));

@@ -41,25 +41,25 @@ import org.basex.util.list.*;
  */
 public final class FNDb extends StandardFunc {
   /** Resource element name. */
-  static final QNm Q_SYSTEM = new QNm("system");
+  static final String SYSTEM = "system";
   /** Resource element name. */
-  static final QNm Q_DATABASE = new QNm("database");
+  static final String DATABASE = "database";
   /** Backup element name. */
-  static final QNm Q_BACKUP = new QNm("backup");
+  static final String BACKUP = "backup";
   /** Resource element name. */
-  static final QNm Q_RESOURCE = new QNm("resource");
+  static final String RESOURCE = "resource";
   /** Resource element name. */
-  static final QNm Q_RESOURCES = new QNm("resources");
+  static final String RESOURCES = "resources";
   /** Path element name. */
-  static final QNm Q_PATH = new QNm("path");
+  static final String PATH = "path";
   /** Raw element name. */
-  static final QNm Q_RAW = new QNm("raw");
+  static final String RAW = "raw";
   /** Size element name. */
-  static final QNm Q_SIZE = new QNm("size");
+  static final String SIZE = "size";
   /** Content type element name. */
-  static final QNm Q_CTYPE = new QNm("content-type");
+  static final String CTYPE = "content-type";
   /** Modified date element name. */
-  static final QNm Q_MDATE = new QNm("modified-date");
+  static final String MDATE = "modified-date";
 
   /**
    * Constructor.
@@ -286,7 +286,7 @@ public final class FNDb extends StandardFunc {
         if(++up >= list.size()) return null;
         final String name = list.get(up);
         final long length = new IOFile(dbpath, name).length();
-        return new FElem(Q_BACKUP).add(name).add(Q_SIZE, token(length));
+        return new FElem(BACKUP).add(name).add(SIZE, token(length));
       }
     };
   }
@@ -352,10 +352,10 @@ public final class FNDb extends StandardFunc {
           BXDB_OPEN.thrw(info, ex);
         }
 
-        final FElem res = new FElem(Q_DATABASE);
-        res.add(Q_RESOURCES, token(meta.ndocs));
-        res.add(Q_MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
-        if(ctx.context.perm(Perm.CREATE, meta)) res.add(Q_PATH, meta.original);
+        final FElem res = new FElem(DATABASE);
+        res.add(RESOURCES, token(meta.ndocs));
+        res.add(MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
+        if(ctx.context.perm(Perm.CREATE, meta)) res.add(PATH, meta.original);
         res.add(name);
         return res;
       }
@@ -497,9 +497,9 @@ public final class FNDb extends StandardFunc {
       final byte[] ctype, final long mdate) {
 
     final String tstamp = DateTime.format(new Date(mdate), DateTime.FULL);
-    final FElem res = new FElem(Q_RESOURCE).add(path).
-        add(Q_RAW, token(raw)).add(Q_CTYPE, ctype).add(Q_MDATE, tstamp);
-    return raw ? res.add(Q_SIZE, token(size)) : res;
+    final FElem res = new FElem(RESOURCE).add(path).
+        add(RAW, token(raw)).add(CTYPE, ctype).add(MDATE, tstamp);
+    return raw ? res.add(SIZE, token(size)) : res;
   }
 
   /**
@@ -508,7 +508,7 @@ public final class FNDb extends StandardFunc {
    * @return node
    */
   private static ANode system(final QueryContext ctx) {
-    return toNode(Info.info(ctx.context), Q_SYSTEM);
+    return toNode(Info.info(ctx.context), SYSTEM);
   }
 
   /**
@@ -520,7 +520,7 @@ public final class FNDb extends StandardFunc {
   private ANode info(final QueryContext ctx) throws QueryException {
     final Data data = checkData(ctx);
     final boolean create = ctx.context.user.has(Perm.CREATE);
-    return toNode(InfoDB.db(data.meta, false, true, create), Q_DATABASE);
+    return toNode(InfoDB.db(data.meta, false, true, create), DATABASE);
   }
 
   /**
@@ -529,7 +529,7 @@ public final class FNDb extends StandardFunc {
    * @param str string to be converted
    * @return node
    */
-  private static ANode toNode(final String str, final QNm root) {
+  private static ANode toNode(final String str, final String root) {
     final FElem top = new FElem(root);
     FElem node = null;
     for(final String l : str.split("\r\n?|\n")) {
@@ -537,7 +537,7 @@ public final class FNDb extends StandardFunc {
       if(cols[0].isEmpty()) continue;
 
       final String name = cols[0].replaceAll(" |-", "");
-      final FElem n = new FElem(new QNm(lc(token(name))));
+      final FElem n = new FElem(lc(token(name)));
       if(cols[0].startsWith(" ")) {
         if(node != null) node.add(n);
         if(!cols[1].isEmpty()) n.add(cols[1]);

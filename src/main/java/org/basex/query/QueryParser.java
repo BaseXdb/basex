@@ -37,7 +37,6 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Parser for XQuery expressions.
@@ -71,13 +70,22 @@ public class QueryParser extends InputParser {
     KEYWORDS30.add(SWITCH);
   }
 
+  /** Modules loaded by the current file. */
+  public final TokenSet modules = new TokenSet();
+  /** Parsed variables. */
+  public final ArrayList<StaticVar> vars = new ArrayList<StaticVar>();
+  /** Parsed functions. */
+  public final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
+  /** Namespaces. */
+  public final TokenMap namespaces = new TokenMap();
+
   /** Query context. */
   final QueryContext ctx;
 
-  /** Temporary token builder. */
+  /** XQDoc cache. */
+  private final StringBuilder xqdoc = new StringBuilder();
+  /** Temporary token cache. */
   private final TokenBuilder tok = new TokenBuilder();
-  /** Modules loaded by the current file. */
-  private final TokenList modules = new TokenList();
 
   /** Name of current module. */
   private QNm module;
@@ -175,7 +183,7 @@ public class QueryParser extends InputParser {
 
     try {
       versionDecl();
-
+      final String doc = xqdoc.length() == 0 ? null : xqdoc.toString();
       final int i = ip;
       if(wsConsumeWs(MODULE, NSPACE, null)) error(MAINMOD);
       ip = i;
@@ -190,7 +198,8 @@ public class QueryParser extends InputParser {
         else error(EXPREMPTY);
       }
 
-      final MainModule mm = new MainModule(e, scope);
+      final MainModule mm = new MainModule(e, scope,
+          doc != null && !doc.equals(xqdoc.toString()) ? new StringBuilder(doc) : null);
       scope = null;
       finish(mm, true);
       return mm;
@@ -208,7 +217,7 @@ public class QueryParser extends InputParser {
    * @return name of the module
    * @throws QueryException query exception
    */
-  protected final QNm parseLibrary(final boolean check) throws QueryException {
+  public final QNm parseLibrary(final boolean check) throws QueryException {
     file(ctx.sc.baseIO(), ctx.context);
     checkValidChars();
 
@@ -217,13 +226,15 @@ public class QueryParser extends InputParser {
       wsCheck(MODULE);
       wsCheck(NSPACE);
       skipWS();
-      final byte[] name = ncName(NONAME);
+      final byte[] pref = ncName(NONAME);
       wsCheck(IS);
       final byte[] uri = stringLiteral();
       if(uri.length == 0) error(NSMODURI);
-      module = new QNm(name, uri);
+      module = new QNm(pref, uri);
 
-      ctx.sc.ns.add(name, uri, info());
+      ctx.sc.ns.add(pref, uri, info());
+      namespaces.add(pref, uri);
+
       skipWS();
       check(';');
       prolog1();
@@ -503,6 +514,7 @@ public class QueryParser extends InputParser {
     final byte[] uri = stringLiteral();
     if(ctx.sc.ns.staticURI(pref) != null) error(DUPLNSDECL, pref);
     ctx.sc.ns.add(pref, uri, info());
+    namespaces.add(pref, uri);
   }
 
   /**
@@ -766,9 +778,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void moduleImport() throws QueryException {
-    byte[] ns = EMPTY;
+    byte[] pref = EMPTY;
     if(wsConsumeWs(NSPACE)) {
-      ns = ncName(NONAME);
+      pref = ncName(NONAME);
       wsCheck(IS);
     }
 
@@ -779,9 +791,10 @@ public class QueryParser extends InputParser {
     modules.add(uri);
 
     // add non-default namespace
-    if(ns != EMPTY) {
-      if(ctx.sc.ns.staticURI(ns) != null) error(DUPLNSDECL, ns);
-      ctx.sc.ns.add(ns, uri, info());
+    if(pref != EMPTY) {
+      if(ctx.sc.ns.staticURI(pref) != null) error(DUPLNSDECL, pref);
+      ctx.sc.ns.add(pref, uri, info());
+      namespaces.add(pref, uri);
     }
 
     // check modules at specified locations
@@ -889,7 +902,7 @@ public class QueryParser extends InputParser {
     else if(!wsConsumeWs(ASSIGN)) return;
     scope = new VarScope();
     final Expr e = check(single(), NOVARDECL);
-    ctx.ctxItem = new MainModule(e, scope);
+    ctx.ctxItem = new MainModule(e, scope, xqdoc);
     scope = null;
     if(module != null) error(DECITEM);
     if(e.uses(Use.UPD)) error(UPCTX, e);
@@ -915,7 +928,7 @@ public class QueryParser extends InputParser {
       bind = check(single(), NOVARDECL);
     }
 
-    ctx.vars.declare(vn, tp, ann, bind, external, ctx.sc, scope, info());
+    vars.add(ctx.vars.declare(vn, tp, ann, bind, external, ctx.sc, scope, xqdoc, info()));
     scope = null;
   }
 
@@ -967,9 +980,8 @@ public class QueryParser extends InputParser {
     final SeqType tp = optAsType();
     if(ann.contains(Ann.Q_UPDATING)) ctx.updating(false);
 
-    Expr body = null;
-    if(!wsConsumeWs(EXTERNAL)) body = enclosed(NOFUNBODY);
-    ctx.funcs.declare(ann, name, args, tp, body, ctx.sc, ii, scope);
+    final Expr body = wsConsumeWs(EXTERNAL) ? null : enclosed(NOFUNBODY);
+    funcs.add(ctx.funcs.declare(ann, name, args, tp, body, ctx.sc, scope, xqdoc, ii));
     scope = null;
   }
 
@@ -1070,7 +1082,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr flwor() throws QueryException {
-
     final int s = scope.open();
     final LinkedList<Clause> clauses = initialClause(null);
     if(clauses == null) return null;
@@ -3913,12 +3924,19 @@ public class QueryParser extends InputParser {
    */
   private void comment() throws QueryException {
     ++ip;
+    boolean doc = next() == '~';
+    if(doc) {
+      xqdoc.setLength(0);
+      ++ip;
+    }
     while(++ip < il) {
-      if(curr('(') && next() == ':') comment();
-      if(curr(':') && next() == ')') {
+      final char curr = curr();
+      if(curr == '(' && next() == ':') comment();
+      if(curr == ':' && next() == ')') {
         ip += 2;
         return;
       }
+      if(doc) xqdoc.append(curr);
     }
     error(COMCLOSE);
   }

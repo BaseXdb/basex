@@ -22,14 +22,14 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FNProc extends StandardFunc {
-  /** Element: result. */
-  private static final QNm E_RESULT = new QNm("result");
-  /** Element: standard output. */
-  private static final QNm E_OUTPUT = new QNm("output");
-  /** Element: standard error. */
-  private static final QNm E_ERROR = new QNm("error");
-  /** Element: code. */
-  private static final QNm E_CODE = new QNm("code");
+  /** Name: result. */
+  private static final String RESULT = "result";
+  /** Name: standard output. */
+  private static final String OUTPUT = "output";
+  /** Name: standard error. */
+  private static final String ERROR = "error";
+  /** Name: code. */
+  private static final String CODE = "code";
 
   /**
    * Constructor.
@@ -91,10 +91,10 @@ public final class FNProc extends StandardFunc {
    */
   private static FElem execute(final String[] args, final Charset cs) {
     final Result result = exec(args, cs);
-    final FElem root = new FElem(E_RESULT);
-    root.add(new FElem(E_OUTPUT).add(norm(result.output)));
-    root.add(new FElem(E_ERROR).add(norm(result.error)));
-    root.add(new FElem(E_CODE).add(token(result.code)));
+    final FElem root = new FElem(RESULT);
+    root.add(new FElem(OUTPUT).add(norm(result.output)));
+    root.add(new FElem(ERROR).add(norm(result.error)));
+    root.add(new FElem(CODE).add(token(result.code)));
     return root;
   }
 

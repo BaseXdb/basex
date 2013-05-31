@@ -45,14 +45,10 @@ public final class FNFunc extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case FUNCTION_ARITY:
-        return Int.get(getFun(0, FuncType.ANY_FUN, ctx).arity());
-      case FUNCTION_NAME:
-        return getFun(0, FuncType.ANY_FUN, ctx).fName();
-      case FUNCTION_LOOKUP:
-        return lookup(ctx, ii);
-      default:
-        return super.item(ctx, ii);
+      case FUNCTION_ARITY:  return Int.get(checkFunc(expr[0], ctx).arity());
+      case FUNCTION_NAME:   return checkFunc(expr[0], ctx).fName();
+      case FUNCTION_LOOKUP: return lookup(ctx, ii);
+      default:              return super.item(ctx, ii);
     }
   }
 
@@ -187,19 +183,6 @@ public final class FNFunc extends StandardFunc {
     Value res = ctx.value(expr[1]);
     for(long i = xs.size(); --i >= 0;) res = f.invValue(ctx, info, xs.itemAt(i), res);
     return res.iter();
-  }
-
-  /**
-   * Checks the type of the given function item.
-   * @param p position
-   * @param t type
-   * @param ctx query context
-   * @return function item
-   * @throws QueryException query exception
-   */
-  private FItem getFun(final int p, final FuncType t, final QueryContext ctx)
-      throws QueryException {
-    return (FItem) checkType(checkItem(expr[p], ctx), t);
   }
 
   /**

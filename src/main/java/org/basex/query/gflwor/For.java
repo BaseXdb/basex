@@ -102,13 +102,13 @@ public final class For extends GFLWOR.Clause {
     if(empty) e.add(planAttr(Token.token(EMPTYORD), Token.TRUE));
     var.plan(e);
     if(pos != null) {
-      final FElem e2 = new FElem(Token.token(QueryText.AT));
+      final FElem e2 = new FElem(QueryText.AT);
       pos.plan(e2);
       e.add(e2);
     }
 
     if(score != null) {
-      final FElem e2 = new FElem(Token.token(QueryText.SCORE));
+      final FElem e2 = new FElem(QueryText.SCORE);
       score.plan(e2);
       e.add(e2);
     }

@@ -118,6 +118,14 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
+   * Resets the data structure.
+   */
+  public final void reset() {
+    for(int b = 0; b < bucket.length; b++) bucket[b] = 0;
+    size = 1;
+  }
+
+  /**
    * Deletes the specified key.
    * <b>Warning</b>: After a deletion, the key array will have {@code null}
    * entries, and the total number of entries will not reflect the number
