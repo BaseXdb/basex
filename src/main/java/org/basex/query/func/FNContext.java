@@ -25,10 +25,10 @@ public final class FNContext extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case CURRENT_DATE:      return ctx.initDateTime(info).date;
-      case CURRENT_DATETIME:  return ctx.initDateTime(info).dtm;
-      case CURRENT_TIME:      return ctx.initDateTime(info).time;
-      case IMPLICIT_TIMEZONE: return ctx.initDateTime(info).zone;
+      case CURRENT_DATE:      return ctx.initDateTime().date;
+      case CURRENT_DATETIME:  return ctx.initDateTime().dtm;
+      case CURRENT_TIME:      return ctx.initDateTime().time;
+      case IMPLICIT_TIMEZONE: return ctx.initDateTime().zone;
       case DEFAULT_COLLATION: return ctx.sc.baseURI().resolve(ctx.sc.collation, info);
       case STATIC_BASE_URI:
         final Uri uri = ctx.sc.baseURI();

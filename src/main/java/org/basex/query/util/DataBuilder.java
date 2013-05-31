@@ -140,7 +140,11 @@ public final class DataBuilder {
     // adopt namespace from parent
     int u = 0;
     ANode p = pNode;
-    while(p != null && p.qname().hasPrefix()) p = p.parent();
+    while(p != null) {
+      final QNm n = p.qname();
+      if(n != null && !n.hasPrefix()) break;
+      p = p.parent();
+    }
     if(p != null) u = data.nspaces.uri(p.name(), true);
 
     final int ts = tl.size();
