@@ -655,20 +655,19 @@ public final class QueryContext extends Proc {
 
   /**
    * Initializes the static date and time context of a query if not done yet.
-   * @param ii input info
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryContext initDateTime(final InputInfo ii) throws QueryException {
+  public QueryContext initDateTime() throws QueryException {
     if(time == null) {
       final Date d = Calendar.getInstance().getTime();
       final String zon = DateTime.format(d, DateTime.ZONE);
       final String ymd = DateTime.format(d, DateTime.DATE);
       final String hms = DateTime.format(d, DateTime.TIME);
       final String zn = zon.substring(0, 3) + ':' + zon.substring(3);
-      time = new Tim(Token.token(hms + zn), ii);
-      date = new Dat(Token.token(ymd + zn), ii);
-      dtm = new Dtm(Token.token(ymd + 'T' + hms + zn), ii);
+      time = new Tim(Token.token(hms + zn), null);
+      date = new Dat(Token.token(ymd + zn), null);
+      dtm = new Dtm(Token.token(ymd + 'T' + hms + zn), null);
       zone = new DTDur(toInt(zon.substring(0, 3)), toInt(zon.substring(3)));
     }
     return this;

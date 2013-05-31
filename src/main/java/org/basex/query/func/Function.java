@@ -779,6 +779,8 @@ public enum Function {
   /** XQuery function. */
   _INSPECT_FUNCTION(FNInspect.class, "function(function)", ELM, STR),
   /** XQuery function. */
+  _INSPECT_MODULE(FNInspect.class, "module(uri)", ELM, STR),
+  /** XQuery function. */
   _INSPECT_XQDOC(FNInspect.class, "xqdoc(uri)", ELM, STR),
 
   /* FNJson functions. */

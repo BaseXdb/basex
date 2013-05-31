@@ -3924,14 +3924,17 @@ public class QueryParser extends InputParser {
    */
   private void comment() throws QueryException {
     ++ip;
-    boolean doc = next() == '~';
+    final boolean doc = next() == '~';
     if(doc) {
       xqdoc.setLength(0);
       ++ip;
     }
     while(++ip < il) {
-      final char curr = curr();
-      if(curr == '(' && next() == ':') comment();
+      char curr = curr();
+      if(curr == '(' && next() == ':') {
+        comment();
+        curr = curr();
+      }
       if(curr == ':' && next() == ')') {
         ip += 2;
         return;

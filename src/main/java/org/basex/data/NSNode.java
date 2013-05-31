@@ -124,7 +124,7 @@ final class NSNode {
     // no match found: return current nod
     if(s == -1) return this;
     final NSNode ch = children[s];
-    int cp = ch.pre;
+    final int cp = ch.pre;
     // return exact hit
     if(cp == p) return ch;
     // found node is preceding sibling

@@ -23,13 +23,13 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   protected final VarScope scope;
   /** Input info. */
   public final InputInfo info;
-  /** Documentation. */
-  public final byte[] doc;
 
   /** Root expression of this declaration. */
   public Expr expr;
   /** Compilation flag. */
   protected boolean compiled;
+  /** Documentation. */
+  private final byte[] doc;
 
   /**
    * Constructor.

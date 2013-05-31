@@ -142,18 +142,14 @@ public class DBNode extends ANode {
 
   @Override
   public final byte[] name() {
-    final NodeType t = nodeType();
-    switch(t) {
-      case ELM: case ATT: case PI:
-        return data.name(pre, kind(t));
-      default:
-        return Token.EMPTY;
-    }
+    return type == NodeType.ELM || type == NodeType.ATT || type == NodeType.PI ?
+      data.name(pre, kind(nodeType())) : Token.EMPTY;
   }
 
   @Override
   public final QNm qname() {
-    return qname(new QNm());
+    return type == NodeType.ELM || type == NodeType.ATT || type == NodeType.PI ?
+      qname(new QNm()) : null;
   }
 
   @Override
