@@ -50,15 +50,16 @@ public final class XQDoc extends Inspect {
     elem("date", control).add(ctx.initDateTime().dtm.string(info));
     elem("version", control).add("1.1");
 
-    final String type = main == null ? "library" : "main";
-    final FElem module = elem("module", xqdoc).add("type", type);
-    if(mod != null) {
-      elem("uri", module).add(mod.uri());
-      elem("name", module).add(io.name());
+    final String type = module instanceof LibraryModule ? "library" : "main";
+    final FElem modulee = elem("module", xqdoc).add("type", type);
+    if(module instanceof LibraryModule) {
+      final QNm name = ((LibraryModule) module).name;
+      elem("name", modulee).add(name.string());
+      elem("uri", modulee).add(name.uri());
     } else {
-      elem("uri", module).add(io.name());
+      elem("uri", modulee).add(io.name());
     }
-    if(main != null) comment(main, module);
+    comment(module, modulee);
 
     // imports
     final FElem imports = elem("imports", xqdoc);

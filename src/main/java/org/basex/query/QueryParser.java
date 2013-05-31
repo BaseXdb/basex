@@ -183,7 +183,7 @@ public class QueryParser extends InputParser {
 
     try {
       versionDecl();
-      final String doc = xqdoc.length() == 0 ? null : xqdoc.toString();
+      final String doc = xqdoc.toString();
       final int i = ip;
       if(wsConsumeWs(MODULE, NSPACE, null)) error(MAINMOD);
       ip = i;
@@ -198,8 +198,9 @@ public class QueryParser extends InputParser {
         else error(EXPREMPTY);
       }
 
-      final MainModule mm = new MainModule(e, scope,
-          doc != null && !doc.equals(xqdoc.toString()) ? new StringBuilder(doc) : null);
+      final StringBuilder sb = doc.equals(xqdoc.toString()) ? null :
+        new StringBuilder(doc);
+      final MainModule mm = new MainModule(e, scope, sb);
       scope = null;
       finish(mm, true);
       return mm;
@@ -217,12 +218,14 @@ public class QueryParser extends InputParser {
    * @return name of the module
    * @throws QueryException query exception
    */
-  public final QNm parseLibrary(final boolean check) throws QueryException {
+  public final LibraryModule parseLibrary(final boolean check) throws QueryException {
     file(ctx.sc.baseIO(), ctx.context);
     checkValidChars();
 
     try {
       versionDecl();
+      final String doc = xqdoc.length() == 0 ? null : xqdoc.toString();
+
       wsCheck(MODULE);
       wsCheck(NSPACE);
       skipWS();
@@ -239,8 +242,10 @@ public class QueryParser extends InputParser {
       check(';');
       prolog1();
       prolog2();
+
       finish(null, check);
-      return module;
+      return new LibraryModule(module, doc.equals(xqdoc.toString()) ? null :
+        new StringBuilder(doc));
     } catch(final QueryException ex) {
       mark();
       ex.pos(this);
@@ -865,7 +870,9 @@ public class QueryParser extends InputParser {
     ctx.modStack.push(p);
     final StaticContext sc = ctx.sc;
     ctx.sc = new StaticContext(sc.xquery3());
-    final byte[] muri = new QueryParser(qu, io.path(), ctx).parseLibrary(!imprt).uri();
+    final LibraryModule lib = new QueryParser(qu, io.path(), ctx).parseLibrary(!imprt);
+    final byte[] muri = lib.name.uri();
+
     // check if import and declaration uri match
     if(!eq(uri, muri)) error(WRONGMODULE, muri, file);
     // check if context item declaration types are compatible to each other

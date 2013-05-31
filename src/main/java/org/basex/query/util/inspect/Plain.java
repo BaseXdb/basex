@@ -40,32 +40,31 @@ public final class Plain extends Inspect {
    */
   public FElem parse(final IO io) throws QueryException {
     final QueryParser qp = parseQuery(io);
-    final FElem module = elem("module", null);
-    if(mod != null) {
-      module.add("prefix", mod.string());
-      module.add("uri", mod.uri());
+    final FElem modulee = elem("module", null);
+    if(module instanceof LibraryModule) {
+      final QNm name = ((LibraryModule) module).name;
+      modulee.add("prefix", name.string());
+      modulee.add("uri", name.uri());
     }
-    if(main != null) {
-      final TokenMap doc = main.doc();
-      if(doc != null) {
-        for(final byte[] key : doc) {
-          final FElem elem = eq(key, DOC_TAGS) ? elem(string(key), module) :
-            elem("tag", module).add("name", key);
-          add(elem, doc.get(key), ctx);
-        }
+    final TokenMap doc = module.doc();
+    if(doc != null) {
+      for(final byte[] key : doc) {
+        final FElem elem = eq(key, DOC_TAGS) ? elem(string(key), modulee) :
+          elem("tag", modulee).add("name", key);
+        add(elem, doc.get(key), ctx);
       }
     }
 
     for(final StaticVar sv : qp.vars) {
-      variable(sv, module);
+      variable(sv, modulee);
     }
     for(final StaticFunc sf : qp.funcs) {
       final SeqType[] types = new SeqType[sf.args.length];
       for(int t = 0; t < types.length; t++) types[t] = sf.args[t].declType;
-      function(sf.name, types, sf.declType, sf, module);
+      function(sf.name, types, sf.declType, sf, modulee);
     }
 
-    return module;
+    return modulee;
   }
 
   /**

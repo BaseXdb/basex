@@ -7,7 +7,6 @@ import java.io.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -24,9 +23,7 @@ public abstract class Inspect {
   protected final InputInfo info;
 
   /** Parsed main module. */
-  protected MainModule main;
-  /** Name of parsed library module. */
-  protected QNm mod;
+  protected StaticScope module;
 
   /**
    * Constructor.
@@ -52,12 +49,7 @@ public abstract class Inspect {
       final String input = string(io.read());
       // parse query
       final QueryParser qp = new QueryParser(input, io.path(), qc);
-
-      if(QueryProcessor.isLibrary(input)) {
-        mod = qp.parseLibrary(true);
-      } else {
-        main = qp.parseMain();
-      }
+      module = QueryProcessor.isLibrary(input) ? qp.parseLibrary(true) : qp.parseMain();
       return qp;
     } catch(final IOException ex) {
       throw IOERR.thrw(info, ex);

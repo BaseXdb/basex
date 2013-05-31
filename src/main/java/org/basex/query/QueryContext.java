@@ -185,7 +185,8 @@ public final class QueryContext extends Proc {
    * @return name of module
    * @throws QueryException query exception
    */
-  public QNm parseLibrary(final String qu, final String path) throws QueryException {
+  public LibraryModule parseLibrary(final String qu, final String path)
+      throws QueryException {
     return new QueryParser(qu, path, this).parseLibrary(true);
   }
 
