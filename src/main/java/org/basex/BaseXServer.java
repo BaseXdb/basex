@@ -20,6 +20,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  * @author Andreas Weiler
+ * @author N. Dustin Schultz
  */
 public final class BaseXServer extends Main implements Runnable {
   /** Flag for server activity. */
@@ -255,6 +256,8 @@ public final class BaseXServer extends Main implements Runnable {
           case 'z': // suppress logging
             context.mprop.set(MainProp.LOG, false);
             break;
+          case 'n': // host
+            context.mprop.set(MainProp.SERVERHOST, arg.numner());
           default:
             arg.usage();
         }
