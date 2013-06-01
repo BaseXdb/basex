@@ -67,7 +67,7 @@ public final class Functions extends TokenSet {
 
     // no constructor function found, or abstract type specified
     if(type != null && type != AtomType.NOT && type != AtomType.AAT) {
-      if(arity != 1) FUNCTYPE.thrw(ii, name.string());
+      if(arity != 1) FUNCTYPE.thrw(ii, name.string(), arity);
       return type;
     }
 
@@ -98,7 +98,7 @@ public final class Functions extends TokenSet {
     final Function fl = funcs[id];
     if(!eq(fl.uri(), name.uri())) return null;
     // check number of arguments
-    if(arity < fl.min || arity > fl.max) throw FUNCARGS.thrw(ii, fl);
+    if(arity < fl.min || arity > fl.max) throw FUNCARGS.thrw(ii, fl, arity);
     return fl;
   }
 

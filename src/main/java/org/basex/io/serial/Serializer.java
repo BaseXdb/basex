@@ -83,7 +83,9 @@ public abstract class Serializer {
   public final void serialize(final Item item) throws IOException {
     openResult();
     if(item instanceof ANode) {
-      if(item.type == NodeType.ATT || item.type == NodeType.NSP) SERATTR.thrwSerial(item);
+      final Type type = item.type;
+      if(type == NodeType.ATT) SERATTR.thrwSerial(item);
+      if(type == NodeType.NSP) SERNS.thrwSerial(item);
       serialize((ANode) item);
     } else if(item instanceof FItem) {
       SERFUNC.thrwSerial(item.description());
@@ -103,17 +105,18 @@ public abstract class Serializer {
     if(node instanceof DBNode) {
       serialize((DBNode) node);
     } else {
-      if(node.type == NodeType.COM) {
+      final Type type = node.type;
+      if(type == NodeType.COM) {
         comment(node.string());
-      } else if(node.type == NodeType.ATT) {
+      } else if(type == NodeType.ATT) {
         attribute(node.name(), node.string());
-      } else if(node.type == NodeType.TXT) {
+      } else if(type == NodeType.TXT) {
         text(node.string());
-      } else if(node.type == NodeType.PI) {
+      } else if(type == NodeType.PI) {
         pi(node.name(), node.string());
-      } else if(node.type == NodeType.NSP) {
+      } else if(type == NodeType.NSP) {
         namespace(node.name(), node.string());
-      } else if(node.type == NodeType.DOC) {
+      } else if(type == NodeType.DOC) {
         openDoc(node.baseURI());
         for(final ANode n : node.children()) serialize(n);
         closeDoc();

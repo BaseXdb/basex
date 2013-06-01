@@ -11,7 +11,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * XQUnit functions.
+ * Unit functions.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen

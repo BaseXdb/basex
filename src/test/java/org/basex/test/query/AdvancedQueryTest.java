@@ -133,7 +133,10 @@ public abstract class AdvancedQueryTest extends SandboxTest {
   protected static void check(final String query, final QueryException ex,
       final Err... error) {
 
-    if(error.length == 0) Util.notexpected("No error code specified");
+    if(error.length == 0) {
+      ex.printStackTrace();
+      Util.notexpected("No error code specified");
+    }
     boolean found = false;
     final Err err = ex.err();
     for(final Err e : error) found |= err != null ? err == e : e.qname().eq(ex.qname());

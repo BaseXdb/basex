@@ -189,7 +189,7 @@ public enum Err {
   /** BXXQ0001. */
   BXXQ_UPDATING(BXXQ, 1, "No updating expression allowed."),
 
-  // XQUnit module
+  // Unit module
 
   /** UNIT0001. */
   UNIT_ASSERT(UNIT, 1, "Assertion failed."),
@@ -555,7 +555,9 @@ public enum Err {
   FTDUP(FTST, 19, "Match option '%' was declared twice."),
 
   /** SENR0001. */
-  SERATTR(SENR, 1, "Attributes and namespaces cannot be serialized:%."),
+  SERATTR(SENR, 1, "Attributes cannot be serialized:%."),
+  /** SENR0001. */
+  SERNS(SENR, 1, "Namespaces cannot be serialized:%."),
   /** SENR0001. */
   SERFUNC(SENR, 1, "Functions cannot be serialized: %."),
   /** SEPM0004. */
@@ -761,11 +763,11 @@ public enum Err {
   /** XPST0017. */
   FUNCPRIV(XPST, 17, "Function is private: %(...)."),
   /** XPST0017. */
-  FUNCARGS(XPST, 17, "%: wrong number of arguments."),
+  FUNCARGS(XPST, 17, "%: % argument(s) were specified."),
   /** XPST0017. */
   FUNCSIMILAR(XPST, 17, "Unknown function '%'; similar: '%'."),
   /** XPST0017. */
-  FUNCTYPE(XPST, 17, "%(...): wrong number of arguments."),
+  FUNCTYPE(XPST, 17, "%(...): % argument(s) were specified."),
   /** XPST0017. */
   FUNCUNKNOWN(XPST, 17, "Unknown function: %(...)."),
   /** XPST0017. */

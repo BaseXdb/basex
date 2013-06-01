@@ -527,7 +527,7 @@ public interface QueryText {
   byte[] INSPECT = token("inspect");
   /** XQuery token. */
   byte[] XQRY = token(XQUERY);
-  /** XQUnit token. */
+  /** Unit token. */
   byte[] UNIT = token("unit");
   /** Rest token. */
   byte[] REST = token("rest");
@@ -648,7 +648,7 @@ public interface QueryText {
   byte[] SQLURI = token(BXMODULES + "sql");
   /** Streaming module URI. */
   byte[] STREAMURI = token(BXMODULES + "stream");
-  /** XQUnit module URI. */
+  /** Unit module URI. */
   byte[] UNITURI = token(BXMODULES + "unit");
   /** Validate module URI. */
   byte[] VALIDATEURI = token(BXMODULES + "validate");

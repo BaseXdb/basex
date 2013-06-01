@@ -53,7 +53,7 @@ public final class StaticFuncs extends ExprInfo {
    */
   public StaticFunc declare(final Ann ann, final QNm nm, final Var[] args,
       final SeqType ret, final Expr body, final StaticContext sc, final VarScope scp,
-      final StringBuilder xqdoc, final InputInfo ii) throws QueryException {
+      final String xqdoc, final InputInfo ii) throws QueryException {
 
     final byte[] uri = nm.uri();
     if(uri.length == 0) FUNNONS.thrw(ii, nm.string());
@@ -118,7 +118,8 @@ public final class StaticFuncs extends ExprInfo {
         for(int i = 1; i <= fs; ++i) {
           if(i == id) continue;
           final FuncCache ofc = funcs.value(i);
-          if(call.name.eq(ofc.name())) FUNCTYPE.thrw(call.info, call.name.string());
+          if(call.name.eq(ofc.name())) FUNCTYPE.thrw(call.info, call.name.string(),
+              call.expr.length);
         }
         // if not, indicate that function is unknown
         FUNCUNKNOWN.thrw(call.info, call.name.string());

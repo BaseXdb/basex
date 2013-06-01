@@ -41,8 +41,7 @@ public final class DynFuncCall extends Arr {
     final Type t = f.type().type;
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
-      if(ft.args != null && ft.args.length != ar)
-        throw INVARITY.thrw(info, f, ar);
+      if(ft.args != null && ft.args.length != ar) INVARITY.thrw(info, f, ar);
       if(ft.ret != null) type = ft.ret;
     }
     // maps can only contain fully evaluated Values, so this is safe
@@ -94,7 +93,7 @@ public final class DynFuncCall extends Arr {
     final Item it = checkItem(expr[ar], ctx);
     if(!(it instanceof FItem)) INVCAST.thrw(info, it.type, "function item");
     final FItem fit = (FItem) it;
-    if(fit.arity() != ar) throw INVARITY.thrw(info, fit, ar);
+    if(fit.arity() != ar) INVARITY.thrw(info, fit, ar);
     return fit;
   }
 

@@ -182,11 +182,13 @@ public class QueryParser extends InputParser {
     checkValidChars();
 
     try {
+      String doc = moduleDoc("");
       versionDecl();
-      final String doc = xqdoc.toString();
+      doc = moduleDoc(doc);
       final int i = ip;
       if(wsConsumeWs(MODULE, NSPACE, null)) error(MAINMOD);
       ip = i;
+      doc = moduleDoc(doc);
 
       prolog1();
       prolog2();
@@ -198,9 +200,8 @@ public class QueryParser extends InputParser {
         else error(EXPREMPTY);
       }
 
-      final StringBuilder sb = doc.equals(xqdoc.toString()) ? null :
-        new StringBuilder(doc);
-      final MainModule mm = new MainModule(e, scope, sb);
+      if(doc.equals(xqdoc.toString())) doc = null;
+      final MainModule mm = new MainModule(e, scope, doc);
       scope = null;
       finish(mm, true);
       return mm;
@@ -223,8 +224,9 @@ public class QueryParser extends InputParser {
     checkValidChars();
 
     try {
+      String doc = moduleDoc("");
       versionDecl();
-      final String doc = xqdoc.toString();
+      doc = moduleDoc(doc);
 
       wsCheck(MODULE);
       wsCheck(NSPACE);
@@ -234,23 +236,39 @@ public class QueryParser extends InputParser {
       final byte[] uri = stringLiteral();
       if(uri.length == 0) error(NSMODURI);
       module = new QNm(pref, uri);
-
       ctx.sc.ns.add(pref, uri, info());
       namespaces.add(pref, uri);
+      wsCheck(";");
+      doc = moduleDoc(doc);
 
-      skipWS();
-      check(';');
       prolog1();
       prolog2();
 
       finish(null, check);
-      return new LibraryModule(module, doc.equals(xqdoc.toString()) ? null :
-        new StringBuilder(doc));
+      if(doc.equals(xqdoc.toString())) doc = null;
+      return new LibraryModule(module, doc);
     } catch(final QueryException ex) {
       mark();
       ex.pos(this);
       throw ex;
     }
+  }
+
+  /**
+   * Tries to parse the module documentation.
+   * @param doc old documentation string
+   * @return resulting root expression
+   * @throws QueryException query exception
+   */
+  private String moduleDoc(final String doc) throws QueryException {
+    skipWS();
+    final String str = xqdoc.toString();
+    // no documentation exists: return current string
+    if(doc.isEmpty()) return str;
+
+    // nothing has changed: reset documentation buffer
+    if(doc.equals(str)) xqdoc.setLength(0);
+    return doc;
   }
 
   /**
@@ -389,6 +407,7 @@ public class QueryParser extends InputParser {
       } else {
         return;
       }
+      xqdoc.setLength(0);
       skipWS();
       check(';');
     }
@@ -435,6 +454,7 @@ public class QueryParser extends InputParser {
           break;
         }
       }
+      xqdoc.setLength(0);
       skipWS();
       check(';');
     }
@@ -909,7 +929,7 @@ public class QueryParser extends InputParser {
     else if(!wsConsumeWs(ASSIGN)) return;
     scope = new VarScope();
     final Expr e = check(single(), NOVARDECL);
-    ctx.ctxItem = new MainModule(e, scope, xqdoc);
+    ctx.ctxItem = new MainModule(e, scope, xqdoc.toString());
     scope = null;
     if(module != null) error(DECITEM);
     if(e.uses(Use.UPD)) error(UPCTX, e);
@@ -935,7 +955,8 @@ public class QueryParser extends InputParser {
       bind = check(single(), NOVARDECL);
     }
 
-    vars.add(ctx.vars.declare(vn, tp, ann, bind, external, ctx.sc, scope, xqdoc, info()));
+    vars.add(ctx.vars.declare(vn, tp, ann, bind, external, ctx.sc, scope,
+        xqdoc.toString(), info()));
     scope = null;
   }
 
@@ -988,7 +1009,8 @@ public class QueryParser extends InputParser {
     if(ann.contains(Ann.Q_UPDATING)) ctx.updating(false);
 
     final Expr body = wsConsumeWs(EXTERNAL) ? null : enclosed(NOFUNBODY);
-    funcs.add(ctx.funcs.declare(ann, name, args, tp, body, ctx.sc, scope, xqdoc, ii));
+    funcs.add(ctx.funcs.declare(ann, name, args, tp, body, ctx.sc, scope,
+        xqdoc.toString(), ii));
     scope = null;
   }
 

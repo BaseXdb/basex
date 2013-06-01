@@ -47,7 +47,7 @@ public class FNInspect extends StandardFunc {
     final FItem f = checkFunc(expr[0], ctx);
     final FuncType ftype = f.funcType();
     final StaticFunc sf = f instanceof FuncItem ? ((FuncItem) f).func : null;
-    return new Plain(ctx, info).function(f.fName(), ftype.args, ftype.ret, sf, null);
+    return new PlainDoc(ctx, info).function(f.fName(), ftype.args, ftype.ret, sf, null);
   }
 
   /**
@@ -58,7 +58,7 @@ public class FNInspect extends StandardFunc {
    */
   private Item module(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    return new Plain(ctx, info).parse(IO.get(string(checkStr(expr[0], ctx))));
+    return new PlainDoc(ctx, info).parse(IO.get(string(checkStr(expr[0], ctx))));
   }
 
   /**

@@ -47,7 +47,7 @@ public final class StaticVar extends StaticDecl {
    */
   StaticVar(final StaticContext sctx, final VarScope scp, final Ann a, final QNm n,
       final SeqType t, final Expr e, final boolean ext,
-      final StringBuilder xqdoc, final InputInfo ii) {
+      final String xqdoc, final InputInfo ii) {
     super(sctx, a, n, t, scp, xqdoc, ii);
     expr = e;
     external = ext;

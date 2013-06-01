@@ -7,7 +7,7 @@ import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the functions of the XQUnit Module.
+ * This class tests the functions of the Unit Module.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

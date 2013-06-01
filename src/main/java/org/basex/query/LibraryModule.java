@@ -19,7 +19,7 @@ public class LibraryModule extends StaticScope {
    * @param nm of library
    * @param xqdoc documentation
    */
-  public LibraryModule(final QNm nm, final StringBuilder xqdoc) {
+  public LibraryModule(final QNm nm, final String xqdoc) {
     super(null, xqdoc, null);
     name = nm;
   }

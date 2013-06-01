@@ -51,7 +51,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   public StaticFunc(final Ann a, final QNm n, final Var[] v, final SeqType r,
       final Expr e, final StaticContext stc, final VarScope scp,
-      final StringBuilder xqdoc, final InputInfo ii) {
+      final String xqdoc, final InputInfo ii) {
 
     super(stc, a, n, r, scp, xqdoc, ii);
     args = v;
