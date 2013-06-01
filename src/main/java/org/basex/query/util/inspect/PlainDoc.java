@@ -8,7 +8,6 @@ import java.io.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -18,18 +17,18 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class contains simple functions for inspecting XQuery modules.
+ * This class contains functions for generating a plain XQuery documentation.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class Plain extends Inspect {
+public final class PlainDoc extends Inspect {
   /**
    * Constructor.
    * @param qc query context
    * @param ii input info
    */
-  public Plain(final QueryContext qc, final InputInfo ii) {
+  public PlainDoc(final QueryContext qc, final InputInfo ii) {
     super(qc, ii);
   }
 
@@ -78,13 +77,13 @@ public final class Plain extends Inspect {
    * @return resulting value
    * @throws QueryException query exception
    */
-  public FElem variable(final StaticVar sv, final FElem parent) throws QueryException {
+  private FElem variable(final StaticVar sv, final FElem parent) throws QueryException {
     final FElem variable = elem("variable", parent);
     variable.add("name", sv.name.string());
     if(sv.name.uri().length != 0) variable.add("uri", sv.name.uri());
     type(sv.declType, variable);
     comment(sv, variable);
-    annotations(sv.ann, variable);
+    annotation(sv.ann, variable);
     return variable;
   }
 
@@ -141,14 +140,7 @@ public final class Plain extends Inspect {
       type(types[a], parameter);
     }
 
-    if(sf != null) {
-      annotations(sf.ann, function);
-      /*for(int a = 0; a < sf.ann.size(); a++) {
-        final FElem annotation = elem("annotation", function);
-        annotation.add("name", sf.ann.names[a].string());
-        annotation.add("uri", sf.ann.names[a].uri());
-      }*/
-    }
+    if(sf != null) annotation(sf.ann, function);
 
     if(doc != null) {
       for(final byte[] key : doc) {
@@ -206,49 +198,14 @@ public final class Plain extends Inspect {
    * @param parent parent element
    */
   private void comment(final StaticScope scope, final FElem parent) {
-    final TokenObjMap<TokenList> map = scope.doc();
-    if(map == null) return;
-    for(final byte[] entry : map) comment(entry, map.get(entry), parent);
+    final TokenObjMap<TokenList> tags = scope.doc();
+    if(tags != null) comment(tags, parent);
   }
 
-  /**
-   * Creates a comment sub element.
-   * @param key key
-   * @param values values
-   * @param parent parent element
-   */
-  private void comment(final byte[] key, final TokenList values, final FElem parent) {
-    for(final byte[] value : values) {
-      try {
-        final FElem elem = eq(key, QueryText.DOC_TAGS) ? elem(string(key), parent) :
-          elem("custom", parent).add("tag", key);
-        final IOContent io = new IOContent(trim(value));
-        final ANode node = FNGen.parseXml(io, ctx, true);
-        for(final ANode n : node.children()) elem.add(n.copy());
-      } catch(final IOException ex) {
-        // fallback: add string representation
-        elem(string(key), parent).add(trim(value));
-      }
-    }
-  }
-
-  /**
-   * Creates annotation elements.
-   * @param ann annotations
-   * @param parent parent node
-   * @throws QueryException query exception
-   */
-  private void annotations(final Ann ann, final FElem parent) throws QueryException {
-    final int as = ann.size();
-    for(int a = 0; a < as; a++) {
-      final FElem annotation = elem("annotation", parent);
-      annotation.add("name", ann.names[a].string());
-      annotation.add("uri", ann.names[a].uri());
-      for(final Item it : ann.values[a]) {
-        final FElem literal = elem("literal", annotation);
-        literal.add("type", it.type.toString()).add(it.string(null));
-      }
-    }
+  @Override
+  protected FElem tag(final byte[] tag, final FElem parent) {
+    final String t = string(tag);
+    return elem(eq(tag, DOC_TAGS) ? t : t + "_tag", parent);
   }
 
   /**

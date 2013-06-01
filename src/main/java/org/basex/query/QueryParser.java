@@ -183,11 +183,13 @@ public class QueryParser extends InputParser {
 
     try {
       versionDecl();
-      final String doc = xqdoc.toString();
+      String doc = xqdoc.toString();
       final int i = ip;
       if(wsConsumeWs(MODULE, NSPACE, null)) error(MAINMOD);
       ip = i;
 
+      if(doc.equals(xqdoc.toString())) xqdoc.setLength(0);
+      else doc = xqdoc.toString();
       prolog1();
       prolog2();
 
@@ -224,7 +226,7 @@ public class QueryParser extends InputParser {
 
     try {
       versionDecl();
-      final String doc = xqdoc.toString();
+      String doc = xqdoc.toString();
 
       wsCheck(MODULE);
       wsCheck(NSPACE);
@@ -234,12 +236,13 @@ public class QueryParser extends InputParser {
       final byte[] uri = stringLiteral();
       if(uri.length == 0) error(NSMODURI);
       module = new QNm(pref, uri);
-
       ctx.sc.ns.add(pref, uri, info());
       namespaces.add(pref, uri);
-
+      wsCheck(";");
       skipWS();
-      check(';');
+
+      if(doc.equals(xqdoc.toString())) xqdoc.setLength(0);
+      else doc = xqdoc.toString();
       prolog1();
       prolog2();
 
@@ -389,6 +392,7 @@ public class QueryParser extends InputParser {
       } else {
         return;
       }
+      xqdoc.setLength(0);
       skipWS();
       check(';');
     }
@@ -435,6 +439,7 @@ public class QueryParser extends InputParser {
           break;
         }
       }
+      xqdoc.setLength(0);
       skipWS();
       check(';');
     }

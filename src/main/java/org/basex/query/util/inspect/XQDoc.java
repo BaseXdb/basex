@@ -1,8 +1,7 @@
 package org.basex.query.util.inspect;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-
-import java.io.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
@@ -17,8 +16,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class provides functions for parsing XQuery expressions and returning XQDoc
- * documentation elements.
+ * This class contains functions for generating a xqDoc documentation.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
@@ -125,33 +123,13 @@ public final class XQDoc extends Inspect {
    */
   private void comment(final StaticScope scope, final FElem parent) {
     final TokenObjMap<TokenList> map = scope.doc();
-    if(map == null) return;
-
-    final FElem comment = elem("comment", parent);
-    for(final byte[] entry : map) {
-      comment(comment, entry, map.get(entry));
-    }
+    if(map != null) comment(map, elem("comment", parent));
   }
 
-  /**
-   * Creates a comment sub element.
-   * @param parent parent element
-   * @param key key
-   * @param values value
-   */
-  private void comment(final FElem parent, final byte[] key, final TokenList values) {
-    for(final byte[] value : values) {
-      try {
-        final FElem elem = eq(key, QueryText.DOC_TAGS) ? elem(string(key), parent) :
-          elem("custom", parent).add("tag", key);
-        final IOContent io = new IOContent(trim(value));
-        final ANode node = FNGen.parseXml(io, ctx, true);
-        for(final ANode n : node.children()) elem.add(n.copy());
-      } catch(final IOException ex) {
-        // fallback: add string representation
-        elem(string(key), parent).add(trim(value));
-      }
-    }
+  @Override
+  protected FElem tag(final byte[] tag, final FElem parent) {
+    return eq(tag, DOC_TAGS) ? elem(string(tag), parent) :
+      elem("tag", parent).add("name", tag);
   }
 
   /**
@@ -161,18 +139,7 @@ public final class XQDoc extends Inspect {
    * @throws QueryException query exception
    */
   private void annotations(final Ann ann, final FElem parent) throws QueryException {
-    final int as = ann.size();
-    if(as == 0) return;
-
-    final FElem annotations = elem("annotations", parent);
-    for(int a = 0; a < as; a++) {
-      final FElem annotation = elem("annotation", annotations);
-      annotation.add("name", ann.names[a].string());
-      for(final Item it : ann.values[a]) {
-        final FElem literal = elem("literal", annotation);
-        literal.add("type", it.type.toString()).add(it.string(null));
-      }
-    }
+    if(ann.size() != 0) annotation(ann, elem("annotations", parent));
   }
 
   /**

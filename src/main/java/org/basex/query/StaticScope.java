@@ -41,12 +41,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   public StaticScope(final VarScope scp, final StringBuilder xqdoc, final InputInfo ii) {
     scope = scp;
     info = ii;
-    if(xqdoc != null && xqdoc.length() != 0) {
-      doc = Token.token(xqdoc.toString());
-      xqdoc.setLength(0);
-    } else {
-      doc = null;
-    }
+    doc = xqdoc != null && xqdoc.length() != 0 ? Token.token(xqdoc.toString()) : null;
   }
 
   @Override
@@ -55,8 +50,10 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   }
 
   /**
-   * Returns a map with the documentation of this scope, or {@code null} if no
-   * documentation exists.
+   * Returns a map with all documentation tags found for this scope, or {@code null} if
+   * no documentation exists. The main description is flagged with the "description" key.
+   * The supported tags are defined in {@link QueryText#DOC_TAGS} (other tags will be
+   * included in the map, too).
    * @return documentation
    */
   public TokenObjMap<TokenList> doc() {
@@ -69,7 +66,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
     try {
       final NewlineInput nli = new NewlineInput(new IOContent(doc));
       while(nli.readLine(line)) {
-        String l = line.toString().replaceAll("^\\s+: *", "");
+        String l = line.toString().replaceAll("^\\s+: ?", "");
         if(l.startsWith("@")) {
           add(key, val, map);
           key = Token.token(l.replaceAll("^@(\\w*).*", "$1"));
