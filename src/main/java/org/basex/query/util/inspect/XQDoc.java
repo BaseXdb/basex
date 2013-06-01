@@ -64,7 +64,7 @@ public final class XQDoc extends Inspect {
     comment(module, mod);
 
     // namespaces
-    final FElem namespaces = qp.namespaces.isEmpty() ? null : elem("namespaces", xqdoc);
+    final FElem namespaces = elem("namespaces", xqdoc);
     for(final byte[] pref : qp.namespaces) nsCache.add(pref, qp.namespaces.get(pref));
 
     // imports
@@ -108,11 +108,9 @@ public final class XQDoc extends Inspect {
     }
 
     // add namespaces
-    if(namespaces != null) {
-      for(final byte[] pref : nsCache) {
-        final FElem namespace = elem("namespace", namespaces);
-        namespace.add("prefix", pref).add("uri", nsCache.get(pref));
-      }
+    for(final byte[] pref : nsCache) {
+      final FElem namespace = elem("namespace", namespaces);
+      namespace.add("prefix", pref).add("uri", nsCache.get(pref));
     }
 
     return xqdoc;
