@@ -15,6 +15,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class contains simple functions for inspecting XQuery modules.
@@ -40,31 +41,34 @@ public final class Plain extends Inspect {
    */
   public FElem parse(final IO io) throws QueryException {
     final QueryParser qp = parseQuery(io);
-    final FElem modulee = elem("module", null);
+    final FElem mod = elem("module", null);
     if(module instanceof LibraryModule) {
       final QNm name = ((LibraryModule) module).name;
-      modulee.add("prefix", name.string());
-      modulee.add("uri", name.uri());
+      mod.add("prefix", name.string());
+      mod.add("uri", name.uri());
     }
-    final TokenMap doc = module.doc();
+
+    final TokenObjMap<TokenList> doc = module.doc();
     if(doc != null) {
       for(final byte[] key : doc) {
-        final FElem elem = eq(key, DOC_TAGS) ? elem(string(key), modulee) :
-          elem("tag", modulee).add("name", key);
-        add(elem, doc.get(key), ctx);
+        for(final byte[] value : doc.get(key)) {
+          final FElem elem = eq(key, DOC_TAGS) ? elem(string(key), mod) :
+            elem("tag", mod).add("name", key);
+          add(value, ctx, elem);
+        }
       }
     }
 
     for(final StaticVar sv : qp.vars) {
-      variable(sv, modulee);
+      variable(sv, mod);
     }
     for(final StaticFunc sf : qp.funcs) {
       final SeqType[] types = new SeqType[sf.args.length];
       for(int t = 0; t < types.length; t++) types[t] = sf.args[t].declType;
-      function(sf.name, types, sf.declType, sf, modulee);
+      function(sf.name, types, sf.declType, sf, mod);
     }
 
-    return modulee;
+    return mod;
   }
 
   /**
@@ -88,13 +92,14 @@ public final class Plain extends Inspect {
    * Creates a description for the specified function.
    * @param fname name of function
    * @param types types of arguments
-   * @param ret return type
+   * @param type return type
    * @param sf static function
    * @param parent node
    * @return resulting value
+   * @throws QueryException query exception
    */
-  public FElem function(final QNm fname, final SeqType[] types, final SeqType ret,
-      final StaticFunc sf, final FElem parent) {
+  public FElem function(final QNm fname, final SeqType[] types, final SeqType type,
+      final StaticFunc sf, final FElem parent) throws QueryException {
 
     final FElem function = elem("function", parent);
     if(fname != null) {
@@ -102,7 +107,7 @@ public final class Plain extends Inspect {
       if(fname.uri().length != 0) function.add("uri", fname.uri());
     }
 
-    final TokenMap doc = sf != null ? sf.doc() : null;
+    final TokenObjMap<TokenList> doc = sf != null ? sf.doc() : null;
     QNm[] names = null;
     if(sf != null) {
       names = new QNm[sf.args.length];
@@ -120,14 +125,15 @@ public final class Plain extends Inspect {
         if(doc != null) {
           for(final byte[] key : doc) {
             if(!eq(key, DOC_PARAM)) continue;
-            final byte[] val = doc.get(key);
-            final int vl = val.length;
-            for(int v = 0; v < vl; v++) {
-              if(!ws(val[v])) continue;
-              if(eq(replaceAll(substring(val, 0, v), "^\\$", ""), name)) {
-                add(parameter, trim(substring(val, v + 1, vl)), ctx);
+            for(final byte[] val : doc.get(key)) {
+              final int vl = val.length;
+              for(int v = 0; v < vl; v++) {
+                if(!ws(val[v])) continue;
+                if(eq(replaceAll(substring(val, 0, v), "^\\$", ""), name)) {
+                  add(trim(substring(val, v + 1, vl)), ctx, parameter);
+                }
+                break;
               }
-              break;
             }
           }
         }
@@ -136,27 +142,30 @@ public final class Plain extends Inspect {
     }
 
     if(sf != null) {
-      for(int a = 0; a < sf.ann.size(); a++) {
+      annotations(sf.ann, function);
+      /*for(int a = 0; a < sf.ann.size(); a++) {
         final FElem annotation = elem("annotation", function);
         annotation.add("name", sf.ann.names[a].string());
         annotation.add("uri", sf.ann.names[a].uri());
-      }
+      }*/
     }
 
     if(doc != null) {
       for(final byte[] key : doc) {
         if(eq(key, DOC_PARAM, DOC_RETURN)) continue;
-        final FElem elem = eq(key, DOC_TAGS) ? elem(string(key), function) :
-          elem("tag", function).add("name", key);
-        add(elem, doc.get(key), ctx);
+        for(final byte[] value : doc.get(key)) {
+          final FElem elem = eq(key, DOC_TAGS) ? elem(string(key), function) :
+            elem("tag", function).add("name", key);
+          add(value, ctx, elem);
+        }
       }
     }
 
-    final FElem returnn = type(ret, elem("return", function));
+    final FElem ret = type(type, elem("return", function));
     if(doc != null) {
       for(final byte[] key : doc) {
         if(!eq(key, DOC_RETURN)) continue;
-        returnn.add(doc.get(key));
+        for(final byte[] value : doc.get(key)) ret.add(value);
         break;
       }
     }
@@ -178,16 +187,16 @@ public final class Plain extends Inspect {
 
   /**
    * Parses a string as XML and adds the resulting nodes to the specified parent.
-   * @param elem element
-   * @param val string to parse
+   * @param value string to parse
    * @param ctx query context
+   * @param elem element
    */
-  private static void add(final FElem elem, final byte[] val, final QueryContext ctx) {
+  private static void add(final byte[] value, final QueryContext ctx, final FElem elem) {
     try {
-      final ANode node = FNGen.parseXml(new IOContent(val), ctx, true);
+      final ANode node = FNGen.parseXml(new IOContent(value), ctx, true);
       for(final ANode n : node.children()) elem.add(n.copy());
     } catch(final IOException ex) {
-      elem.add(val);
+      elem.add(value);
     }
   }
 
@@ -197,27 +206,29 @@ public final class Plain extends Inspect {
    * @param parent parent element
    */
   private void comment(final StaticScope scope, final FElem parent) {
-    final TokenMap map = scope.doc();
+    final TokenObjMap<TokenList> map = scope.doc();
     if(map == null) return;
-    for(final byte[] entry : map) comment(parent, entry, map.get(entry));
+    for(final byte[] entry : map) comment(entry, map.get(entry), parent);
   }
 
   /**
    * Creates a comment sub element.
-   * @param parent parent element
    * @param key key
-   * @param val value
+   * @param values values
+   * @param parent parent element
    */
-  private void comment(final FElem parent, final byte[] key, final byte[] val) {
-    try {
-      final FElem elem = eq(key, QueryText.DOC_TAGS) ? elem(string(key), parent) :
-        elem("custom", parent).add("tag", key);
-      final IOContent io = new IOContent(trim(val));
-      final ANode node = FNGen.parseXml(io, ctx, true);
-      for(final ANode n : node.children()) elem.add(n.copy());
-    } catch(final IOException ex) {
-      // fallback: add string representation
-      elem(string(key), parent).add(trim(val));
+  private void comment(final byte[] key, final TokenList values, final FElem parent) {
+    for(final byte[] value : values) {
+      try {
+        final FElem elem = eq(key, QueryText.DOC_TAGS) ? elem(string(key), parent) :
+          elem("custom", parent).add("tag", key);
+        final IOContent io = new IOContent(trim(value));
+        final ANode node = FNGen.parseXml(io, ctx, true);
+        for(final ANode n : node.children()) elem.add(n.copy());
+      } catch(final IOException ex) {
+        // fallback: add string representation
+        elem(string(key), parent).add(trim(value));
+      }
     }
   }
 

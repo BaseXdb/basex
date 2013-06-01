@@ -224,7 +224,7 @@ public class QueryParser extends InputParser {
 
     try {
       versionDecl();
-      final String doc = xqdoc.length() == 0 ? null : xqdoc.toString();
+      final String doc = xqdoc.toString();
 
       wsCheck(MODULE);
       wsCheck(NSPACE);

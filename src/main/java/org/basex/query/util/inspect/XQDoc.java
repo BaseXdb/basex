@@ -14,6 +14,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class provides functions for parsing XQuery expressions and returning XQDoc
@@ -123,7 +124,7 @@ public final class XQDoc extends Inspect {
    * @param parent parent element
    */
   private void comment(final StaticScope scope, final FElem parent) {
-    final TokenMap map = scope.doc();
+    final TokenObjMap<TokenList> map = scope.doc();
     if(map == null) return;
 
     final FElem comment = elem("comment", parent);
@@ -136,18 +137,20 @@ public final class XQDoc extends Inspect {
    * Creates a comment sub element.
    * @param parent parent element
    * @param key key
-   * @param val value
+   * @param values value
    */
-  private void comment(final FElem parent, final byte[] key, final byte[] val) {
-    try {
-      final FElem elem = eq(key, QueryText.DOC_TAGS) ? elem(string(key), parent) :
-        elem("custom", parent).add("tag", key);
-      final IOContent io = new IOContent(trim(val));
-      final ANode node = FNGen.parseXml(io, ctx, true);
-      for(final ANode n : node.children()) elem.add(n.copy());
-    } catch(final IOException ex) {
-      // fallback: add string representation
-      elem(string(key), parent).add(trim(val));
+  private void comment(final FElem parent, final byte[] key, final TokenList values) {
+    for(final byte[] value : values) {
+      try {
+        final FElem elem = eq(key, QueryText.DOC_TAGS) ? elem(string(key), parent) :
+          elem("custom", parent).add("tag", key);
+        final IOContent io = new IOContent(trim(value));
+        final ANode node = FNGen.parseXml(io, ctx, true);
+        for(final ANode n : node.children()) elem.add(n.copy());
+      } catch(final IOException ex) {
+        // fallback: add string representation
+        elem(string(key), parent).add(trim(value));
+      }
     }
   }
 

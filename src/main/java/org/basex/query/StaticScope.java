@@ -11,6 +11,7 @@ import org.basex.query.expr.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Superclass for static functions, variables and the main expression.
@@ -58,10 +59,10 @@ public abstract class StaticScope extends ExprInfo implements Scope {
    * documentation exists.
    * @return documentation
    */
-  public TokenMap doc() {
+  public TokenObjMap<TokenList> doc() {
     if(doc == null) return null;
 
-    final TokenMap map = new TokenMap();
+    final TokenObjMap<TokenList> map = new TokenObjMap<TokenList>();
     byte[] key = null;
     final TokenBuilder val = new TokenBuilder();
     final TokenBuilder line = new TokenBuilder();
@@ -70,7 +71,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
       while(nli.readLine(line)) {
         String l = line.toString().replaceAll("^\\s+: *", "");
         if(l.startsWith("@")) {
-          map.add(key == null ? DOC_TAGS[0] : key, val.trim().finish());
+          add(key, val, map);
           key = Token.token(l.replaceAll("^@(\\w*).*", "$1"));
           l = l.replaceAll("^@\\w+ *", "");
           val.reset();
@@ -80,7 +81,25 @@ public abstract class StaticScope extends ExprInfo implements Scope {
     } catch(final IOException ex) {
       Util.notexpected(ex);
     }
-    map.add(key == null ? DOC_TAGS[0] : key, val.trim().finish());
+    add(key, val, map);
     return map;
+  }
+
+  /**
+   * Adds a key and a value to the specified map.
+   * @param key key
+   * @param val value
+   * @param map map
+   */
+  private void add(final byte[] key, final TokenBuilder val,
+      final TokenObjMap<TokenList> map) {
+
+    final byte[] k = key == null ? DOC_TAGS[0] : key;
+    TokenList tl = map.get(k);
+    if(tl == null) {
+      tl = new TokenList();
+      map.add(k, tl);
+    }
+    tl.add(val.trim().finish());
   }
 }
