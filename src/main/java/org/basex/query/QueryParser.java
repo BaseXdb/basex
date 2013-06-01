@@ -184,12 +184,13 @@ public class QueryParser extends InputParser {
     try {
       String doc = moduleDoc("");
       versionDecl();
+
       doc = moduleDoc(doc);
       final int i = ip;
       if(wsConsumeWs(MODULE, NSPACE, null)) error(MAINMOD);
       ip = i;
-      doc = moduleDoc(doc);
 
+      doc = moduleDoc(doc);
       prolog1();
       prolog2();
 
@@ -226,8 +227,8 @@ public class QueryParser extends InputParser {
     try {
       String doc = moduleDoc("");
       versionDecl();
-      doc = moduleDoc(doc);
 
+      doc = moduleDoc(doc);
       wsCheck(MODULE);
       wsCheck(NSPACE);
       skipWS();
@@ -239,8 +240,8 @@ public class QueryParser extends InputParser {
       ctx.sc.ns.add(pref, uri, info());
       namespaces.add(pref, uri);
       wsCheck(";");
-      doc = moduleDoc(doc);
 
+      doc = moduleDoc(doc);
       prolog1();
       prolog2();
 
