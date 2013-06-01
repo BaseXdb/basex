@@ -191,7 +191,7 @@ public final class PlainDoc extends Inspect {
    */
   private FElem type(final SeqType st, final FElem elem) {
     if(st != null) {
-      elem.add("type", st.type.toString());
+      elem.add("type", st.typeString());
       final String occ = st.occ.toString();
       if(!occ.isEmpty()) elem.add("occurrence", occ);
     }

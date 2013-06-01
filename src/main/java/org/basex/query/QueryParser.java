@@ -256,7 +256,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Tries to parse the module documentation.
+   * Parses module documentation.
    * @param doc old documentation string
    * @return resulting root expression
    * @throws QueryException query exception
@@ -264,10 +264,9 @@ public class QueryParser extends InputParser {
   private String xqDoc(final String doc) throws QueryException {
     skipWS();
     final String str = xqdoc.toString();
-    // no documentation exists: return current string
+    // documentation string is empty: return current string
     if(doc.isEmpty()) return str;
-
-    // nothing has changed: reset documentation buffer
+    // discard buffer if string has not changed since the last call
     if(doc.equals(str)) xqdoc.setLength(0);
     return doc;
   }

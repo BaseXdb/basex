@@ -162,7 +162,7 @@ public final class XQDoc extends Inspect {
    */
   protected void type(final SeqType st, final FElem parent) {
     if(st == null) return;
-    final FElem type = elem("type", parent).add(st.type.toString());
+    final FElem type = elem("type", parent).add(st.typeString());
     final String occ = st.occ.toString();
     if(!occ.isEmpty()) type.add("occurrence", occ);
   }

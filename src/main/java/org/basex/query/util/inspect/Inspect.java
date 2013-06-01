@@ -118,6 +118,7 @@ abstract class Inspect {
       }
     }
   }
+
   /**
    * Creates a new element for the specified tag.
    * @param tag tag
