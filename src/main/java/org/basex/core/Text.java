@@ -97,12 +97,13 @@ public interface Text {
   String SERVERMODE = "Server";
   /** Server start information. */
   String SERVERINFO =
-    " [-cdeipSz] [stop]" + NL +
+    " [-cdeinpSz] [stop]" + NL +
     "  stop      Stop running server" + NL +
     "  -c<cmds>  Execute initial database commands" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -e<port>  Set event port" + NL +
     "  -i        Enter interactive mode" + NL +
+    "  -n<name>  Set host the server is bound to" + NL +
     "  -p<port>  Set server port" + NL +
     "  -S        Start as service" + NL +
     "  -z        Suppress logging";

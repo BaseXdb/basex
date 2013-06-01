@@ -243,6 +243,9 @@ public final class BaseXServer extends Main implements Runnable {
           case 'i': // activate interactive mode
             console = true;
             break;
+          case 'n': // parse host the server is bound to
+            context.mprop.set(MainProp.SERVERHOST, arg.string());
+            break;
           case 'p': // parse server port
             context.mprop.set(MainProp.SERVERPORT, arg.number());
             break;
