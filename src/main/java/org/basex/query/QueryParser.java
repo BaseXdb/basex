@@ -182,15 +182,15 @@ public class QueryParser extends InputParser {
     checkValidChars();
 
     try {
-      String doc = moduleDoc("");
+      String doc = xqDoc("");
       versionDecl();
 
-      doc = moduleDoc(doc);
+      doc = xqDoc(doc);
       final int i = ip;
       if(wsConsumeWs(MODULE, NSPACE, null)) error(MAINMOD);
       ip = i;
 
-      doc = moduleDoc(doc);
+      doc = xqDoc(doc);
       prolog1();
       prolog2();
 
@@ -225,10 +225,10 @@ public class QueryParser extends InputParser {
     checkValidChars();
 
     try {
-      String doc = moduleDoc("");
+      String doc = xqDoc("");
       versionDecl();
 
-      doc = moduleDoc(doc);
+      doc = xqDoc(doc);
       wsCheck(MODULE);
       wsCheck(NSPACE);
       skipWS();
@@ -241,7 +241,7 @@ public class QueryParser extends InputParser {
       namespaces.add(pref, uri);
       wsCheck(";");
 
-      doc = moduleDoc(doc);
+      doc = xqDoc(doc);
       prolog1();
       prolog2();
 
@@ -261,7 +261,7 @@ public class QueryParser extends InputParser {
    * @return resulting root expression
    * @throws QueryException query exception
    */
-  private String moduleDoc(final String doc) throws QueryException {
+  private String xqDoc(final String doc) throws QueryException {
     skipWS();
     final String str = xqdoc.toString();
     // no documentation exists: return current string
