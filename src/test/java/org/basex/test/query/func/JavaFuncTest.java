@@ -99,4 +99,10 @@ public class JavaFuncTest extends AdvancedQueryTest {
     query("function($x) { $x }(Q{java:java.io.File}new('x'))", "x");
     query("declare function db:f($x) { $x }; db:f#1(Q{java:java.io.File}new('x'))", "x");
   }
+
+  /** Atomizing Java items. */
+  @Test
+  public void data() {
+    query("data(Q{java:java.lang.Object}new()) instance of xs:anyAtomicType", "true");
+  }
 }

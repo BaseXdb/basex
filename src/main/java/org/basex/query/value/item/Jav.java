@@ -30,7 +30,12 @@ public final class Jav extends Item {
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    return Str.get(val, qc, ii).val;
+    return materialize(ii).val;
+  }
+
+  @Override
+  public Str materialize(final InputInfo ii) throws QueryException {
+    return Str.get(val, qc, ii);
   }
 
   @Override
