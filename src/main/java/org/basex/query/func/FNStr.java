@@ -10,6 +10,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -66,12 +67,13 @@ public final class FNStr extends StandardFunc {
       case CODEPOINTS_TO_STRING:
         return cp2str(ctx.iter(e));
       case COMPARE:
-        if(expr.length == 3) checkColl(expr[2], ctx);
+        Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
         Item it1 = e.item(ctx, info);
         Item it2 = expr[1].item(ctx, info);
         if(it1 == null || it2 == null) return null;
-        final int d = diff(checkEStr(it1), checkEStr(it2));
-        return Int.get(Math.max(-1, Math.min(1, d)));
+        return Int.get(Math.max(-1, Math.min(1,
+            coll == null ? diff(checkEStr(it1), checkEStr(it2)) :
+            coll.compare(checkStr(it1), checkStr(it2)))));
       case CODEPOINT_EQUAL:
         it1 = e.item(ctx, info);
         it2 = expr[1].item(ctx, info);
@@ -98,32 +100,38 @@ public final class FNStr extends StandardFunc {
       case CONCAT:
         return concat(ctx);
       case CONTAINS:
-        if(expr.length == 3) checkColl(expr[2], ctx);
-        Item it = expr[1].item(ctx, info);
-        if(it == null) return Bln.TRUE;
-        return Bln.get(contains(checkEStr(e, ctx), checkEStr(it)));
+        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+        byte[] ss = checkEStr(e, ctx);
+        byte[] sb = checkEStr(expr[1], ctx);
+        return Bln.get(coll == null ? contains(ss, sb) : coll.contains(ss, sb, info));
       case STARTS_WITH:
-        if(expr.length == 3) checkColl(expr[2], ctx);
-        it = expr[1].item(ctx, info);
-        if(it == null) return Bln.TRUE;
-        return Bln.get(startsWith(checkEStr(e, ctx), checkEStr(it)));
+        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+        ss = checkEStr(e, ctx);
+        sb = checkEStr(expr[1], ctx);
+        return Bln.get(coll == null ? startsWith(ss, sb) : coll.startsWith(ss, sb, info));
       case ENDS_WITH:
-        if(expr.length == 3) checkColl(expr[2], ctx);
-        it = expr[1].item(ctx, info);
-        if(it == null) return Bln.TRUE;
-        return Bln.get(endsWith(checkEStr(e, ctx), checkEStr(it)));
+        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+        ss = checkEStr(e, ctx);
+        sb = checkEStr(expr[1], ctx);
+        return Bln.get(coll == null ? endsWith(ss, sb) : coll.endsWith(ss, sb, info));
       case SUBSTRING_AFTER:
-        if(expr.length == 3) checkColl(expr[2], ctx);
-        final byte[] str = checkEStr(e, ctx);
-        final byte[] sa = checkEStr(expr[1], ctx);
-        final int pa = indexOf(str, sa);
-        return pa != -1 ? Str.get(substring(str, pa + sa.length)) :
-          Str.ZERO;
+        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+        ss = checkEStr(e, ctx);
+        sb = checkEStr(expr[1], ctx);
+        if(coll == null) {
+          final int p = indexOf(ss, sb);
+          return p != -1 ? Str.get(substring(ss, p + sb.length)) : Str.ZERO;
+        }
+        return Str.get(coll.after(ss, sb, info));
       case SUBSTRING_BEFORE:
-        if(expr.length == 3) checkColl(expr[2], ctx);
-        final byte[] sb = checkEStr(e, ctx);
-        final int pb = indexOf(sb, checkEStr(expr[1], ctx));
-        return pb > 0 ? Str.get(substring(sb, 0, pb)) : Str.ZERO;
+        coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+        ss = checkEStr(e, ctx);
+        sb = checkEStr(expr[1], ctx);
+        if(coll == null) {
+          final int p = indexOf(ss, sb);
+          return p != -1 ? Str.get(substring(ss, 0, p)) : Str.ZERO;
+        }
+        return Str.get(coll.before(ss, sb, info));
       default:
         return super.item(ctx, ii);
     }

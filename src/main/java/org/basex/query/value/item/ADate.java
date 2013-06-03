@@ -9,6 +9,7 @@ import java.util.regex.*;
 import javax.xml.datatype.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -366,7 +367,8 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
+  public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, ii));
     final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
     final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));
@@ -379,7 +381,8 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public int diff(final InputInfo ii, final Item it) throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, ii));
     final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
     final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));

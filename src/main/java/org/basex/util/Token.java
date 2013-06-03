@@ -699,7 +699,7 @@ public final class Token {
   }
 
   /**
-   * Calculates the difference of two tokens.
+   * Compares two tokens lexicographically.
    * @param token first token
    * @param compare token to be compared
    * @return 0 if tokens are equal, negative if first token is smaller,

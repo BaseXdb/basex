@@ -4,6 +4,7 @@ import static org.basex.data.DataText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -46,13 +47,17 @@ public final class Atm extends Item {
   }
 
   @Override
-  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return it.type.isUntyped() ? Token.eq(val, it.string(ii)) : it.eq(ii, this);
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return it.type.isUntyped() ? coll == null ? Token.eq(val, it.string(ii)) :
+      coll.compare(val, it.string(ii)) == 0 : it.eq(this, coll, ii);
   }
 
   @Override
-  public int diff(final InputInfo ii, final Item it) throws QueryException {
-    return it.type.isUntyped() ? Token.diff(val, it.string(ii)) : -it.diff(ii, this);
+  public int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return it.type.isUntyped() ? coll == null ? Token.diff(val, it.string(ii)) :
+      coll.compare(val, it.string(ii)) : -it.diff(this, coll, ii);
   }
 
   @Override

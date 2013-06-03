@@ -27,7 +27,7 @@ import org.basex.util.hash.*;
  */
 public final class GroupBy extends GFLWOR.Clause {
   /** Grouping specs. */
-  final Spec[] by;
+  final Spec[] specs;
   /** Non-grouping variable expressions. */
   Expr[] preExpr;
   /** Non-grouping variables. */
@@ -37,35 +37,35 @@ public final class GroupBy extends GFLWOR.Clause {
 
   /**
    * Constructor.
-   * @param specs grouping specs
+   * @param gs grouping specs
    * @param pr references to pre-grouping variables
    * @param pst post-grouping variables
    * @param ii input info
    */
-  public GroupBy(final Spec[] specs, final VarRef[] pr, final Var[] pst,
+  public GroupBy(final Spec[] gs, final VarRef[] pr, final Var[] pst,
       final InputInfo ii) {
-    super(ii, vars(specs, pst));
-    by = specs;
+    super(ii, vars(gs, pst));
+    specs = gs;
     preExpr = new Expr[pr.length];
     System.arraycopy(pr, 0, preExpr, 0, pr.length);
     post = pst;
     int n = 0;
-    for(final Spec spec : by) if(!spec.occluded) n++;
+    for(final Spec spec : specs) if(!spec.occluded) n++;
     nonOcc = n;
   }
 
   /**
    * Copy constructor.
-   * @param specs grouping specs
+   * @param gs grouping specs
    * @param pe pre-grouping expressions
    * @param pst post-grouping variables
    * @param no number of non-occluded grouping variables
    * @param ii input info
    */
-  private GroupBy(final Spec[] specs, final Expr[] pe, final Var[] pst,
+  private GroupBy(final Spec[] gs, final Expr[] pe, final Var[] pst,
       final int no, final InputInfo ii) {
-    super(ii, vars(specs, pst));
-    by = specs;
+    super(ii, vars(gs, pst));
+    specs = gs;
     preExpr = pe;
     post = pst;
     nonOcc = no;
@@ -73,14 +73,14 @@ public final class GroupBy extends GFLWOR.Clause {
 
   /**
    * Gathers all declared variables.
-   * @param specs grouping specs
+   * @param gs grouping specs
    * @param vs non-grouping variables
    * @return declared variables
    */
-  private static Var[] vars(final Spec[] specs, final Var[] vs) {
-    final Var[] res = new Var[specs.length + vs.length];
-    for(int i = 0; i < specs.length; i++) res[i] = specs[i].var;
-    System.arraycopy(vs, 0, res, specs.length, vs.length);
+  private static Var[] vars(final Spec[] gs, final Var[] vs) {
+    final Var[] res = new Var[gs.length + vs.length];
+    for(int i = 0; i < gs.length; i++) res[i] = gs[i].var;
+    System.arraycopy(vs, 0, res, gs.length, vs.length);
     return res;
   }
 
@@ -102,7 +102,7 @@ public final class GroupBy extends GFLWOR.Clause {
         groups[pos++] = null;
 
         int p = 0;
-        for(final Spec spec : by) {
+        for(final Spec spec : specs) {
           if(!spec.occluded) {
             final Item key = curr.key[p++];
             ctx.set(spec.var, key == null ? Empty.SEQ : key, info);
@@ -119,25 +119,27 @@ public final class GroupBy extends GFLWOR.Clause {
        */
       private void init(final QueryContext ctx) throws QueryException {
         final ArrayList<Group> grps = new ArrayList<Group>();
-        final IntMap<Group> hashMap = new IntMap<Group>();
+        final IntMap<Group> map = new IntMap<Group>();
         while(sub.next(ctx)) {
           final Item[] key = new Item[nonOcc];
+          final Collation[] colls = new Collation[nonOcc];
           int p = 0, hash = 1;
-          for(int i = 0; i < by.length; i++) {
-            final Item ki = by[i].item(ctx, info),
+          for(final Spec spec : specs) {
+            final Item ki = spec.item(ctx, info),
                 atom = ki == null ? null : StandardFunc.atom(ki, info);
-            if(!by[i].occluded) {
-              key[p++] = atom;
+            if(!spec.occluded) {
+              key[p] = atom;
+              colls[p++] = spec.coll;
               hash = 31 * hash + (atom == null ? 0 : atom.hash(info));
             }
-            ctx.set(by[i].var, atom == null ? Empty.SEQ : atom, info);
+            ctx.set(spec.var, atom == null ? Empty.SEQ : atom, info);
           }
 
           // find the group for this key
-          final Group fst = hashMap.get(hash);
+          final Group fst = map.get(hash);
           Group grp = null;
           for(Group g = fst; g != null; g = g.next) {
-            if(eq(key, g.key)) {
+            if(eq(key, g.key, colls)) {
               grp = g;
               break;
             }
@@ -152,7 +154,7 @@ public final class GroupBy extends GFLWOR.Clause {
 
             // insert the group into the hash table
             if(fst == null) {
-              hashMap.add(hash, grp);
+              map.add(hash, grp);
             } else {
               final Group nxt = fst.next;
               fst.next = grp;
@@ -173,13 +175,16 @@ public final class GroupBy extends GFLWOR.Clause {
    * Checks two keys for equality.
    * @param as first key
    * @param bs second key
+   * @param coll collations
    * @return {@code true} if the compare as equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  boolean eq(final Item[] as, final Item[] bs) throws QueryException {
+  boolean eq(final Item[] as, final Item[] bs, final Collation[] coll)
+      throws QueryException {
+
     for(int i = 0; i < as.length; i++) {
       final Item a = as[i], b = bs[i];
-      if(a == null ^ b == null || a != null && !a.equiv(info, b)) return false;
+      if(a == null ^ b == null || a != null && !a.equiv(b, coll[i], info)) return false;
     }
     return true;
   }
@@ -187,28 +192,28 @@ public final class GroupBy extends GFLWOR.Clause {
   @Override
   public void plan(final FElem plan) {
     final FElem e = planElem();
-    for(final Spec spec : by) spec.plan(e);
+    for(final Spec spec : specs) spec.plan(e);
     plan.add(e);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(GROUP).append(' ').append(BY);
-    for(int i = 0; i < by.length; i++) sb.append(i == 0 ? " " : SEP).append(by[i]);
+    for(int i = 0; i < specs.length; i++) sb.append(i == 0 ? " " : SEP).append(specs[i]);
     return sb.toString();
   }
 
   @Override
   public boolean uses(final Use u) {
     if(u == Use.X30) return true;
-    for(final Spec sp : by) if(sp.uses(u)) return true;
+    for(final Spec sp : specs) if(sp.uses(u)) return true;
     return false;
   }
 
   @Override
   public GroupBy compile(final QueryContext cx, final VarScope sc) throws QueryException {
     for(final Expr e : preExpr) e.compile(cx, sc);
-    for(final Spec b : by) b.compile(cx, sc);
+    for(final Spec b : specs) b.compile(cx, sc);
     return optimize(cx, sc);
   }
 
@@ -225,19 +230,19 @@ public final class GroupBy extends GFLWOR.Clause {
 
   @Override
   public boolean removable(final Var v) {
-    for(final Spec b : by) if(!b.removable(v)) return false;
+    for(final Spec b : specs) if(!b.removable(v)) return false;
     return true;
   }
 
   @Override
   public VarUsage count(final Var v) {
-    return VarUsage.sum(v, by).plus(VarUsage.sum(v, preExpr));
+    return VarUsage.sum(v, specs).plus(VarUsage.sum(v, preExpr));
   }
 
   @Override
   public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
-    final boolean b = inlineAll(ctx, scp, by, v, e),
+    final boolean b = inlineAll(ctx, scp, specs, v, e),
         p = inlineAll(ctx, scp, preExpr, v, e);
     return b || p ? optimize(ctx, scp) : null;
   }
@@ -256,12 +261,12 @@ public final class GroupBy extends GFLWOR.Clause {
     }
 
     // done
-    return new GroupBy(Arr.copyAll(ctx, scp, vs, by), pEx, ps, nonOcc, info);
+    return new GroupBy(Arr.copyAll(ctx, scp, vs, specs), pEx, ps, nonOcc, info);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    if(!visitAll(visitor, by)) return false;
+    if(!visitAll(visitor, specs)) return false;
     for(final Expr ng : preExpr) if(!ng.accept(visitor)) return false;
     for(final Var ng : post) if(!visitor.declared(ng)) return false;
     return true;
@@ -288,7 +293,7 @@ public final class GroupBy extends GFLWOR.Clause {
   @Override
   public void checkUp() throws QueryException {
     checkNoneUp(preExpr);
-    checkNoneUp(by);
+    checkNoneUp(specs);
   }
 
   @Override
@@ -300,7 +305,7 @@ public final class GroupBy extends GFLWOR.Clause {
   public int exprSize() {
     int sz = 0;
     for(final Expr e : preExpr) sz += e.exprSize();
-    for(final Expr e : by) sz += e.exprSize();
+    for(final Expr e : specs) sz += e.exprSize();
     return sz;
   }
 
@@ -315,6 +320,8 @@ public final class GroupBy extends GFLWOR.Clause {
     public final Var var;
     /** Occlusion flag, {@code true} if another grouping variable shadows this one. */
     public boolean occluded;
+    /** Collation. */
+    public final Collation coll;
 
     /**
      * Constructor.
@@ -322,10 +329,12 @@ public final class GroupBy extends GFLWOR.Clause {
      * @param ii input info
      * @param v grouping variable
      * @param e grouping expression
+     * @param cl collation
      */
-    public Spec(final InputInfo ii, final Var v, final Expr e) {
+    public Spec(final InputInfo ii, final Var v, final Expr e, final Collation cl) {
       super(ii, e);
       var = v;
+      coll = cl;
     }
 
     @Override
@@ -338,7 +347,11 @@ public final class GroupBy extends GFLWOR.Clause {
 
     @Override
     public String toString() {
-      return var + " " + ASSIGN + ' ' + expr;
+      final StringBuilder sb = new StringBuilder().append(var).append(' ').append(ASSIGN);
+      sb.append(' ').append(expr);
+      if(coll != null) sb.append(' ').append(COLLATION).append(" \"").
+        append(coll.uri()).append('"');
+      return sb.toString();
     }
 
     @Override
@@ -350,7 +363,7 @@ public final class GroupBy extends GFLWOR.Clause {
     public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
       final Var v = scp.newCopyOf(ctx, var);
       vs.add(var.id, v);
-      final Spec spec = new Spec(info, v, expr.copy(ctx, scp, vs));
+      final Spec spec = new Spec(info, v, expr.copy(ctx, scp, vs), coll);
       spec.occluded = occluded;
       return spec;
     }

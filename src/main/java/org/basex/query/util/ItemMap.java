@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class ItemMap extends ItemSet {
+public class ItemMap extends ItemHashSet {
   /** Values. */
   private Value[] values = new Value[CAP];
 

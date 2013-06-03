@@ -293,16 +293,12 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified collation is supported.
    * @param e expression to be checked
    * @param ctx query context
+   * @return collator, or {@code null} (default collation)
    * @throws QueryException query exception
    */
-  public final void checkColl(final Expr e, final QueryContext ctx)
+  public final Collation checkColl(final Expr e, final QueryContext ctx)
       throws QueryException {
-
-    final byte[] u = checkStr(e, ctx);
-    if(eq(URLCOLL, u)) return;
-    final Uri uri = Uri.uri(u);
-    if(uri.isAbsolute() || !eq(ctx.sc.baseURI().resolve(uri, info).string(), URLCOLL))
-      IMPLCOL.thrw(info, e);
+    return Collation.get(e == null ? null : checkStr(e, ctx), ctx, info, WHICHCOLL);
   }
 
   /**

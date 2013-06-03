@@ -169,7 +169,7 @@ public final class FNSeq extends StandardFunc {
     final ArrayList<PathNode> nodes = ((AxisPath) expr[0]).nodes(ctx);
     if(nodes == null) return this;
     // loop through all nodes
-    final ItemSet is = new ItemSet();
+    final ItemHashSet is = new ItemHashSet();
     for(PathNode pn : nodes) {
       // retrieve text child if addressed node is an element
       if(pn.kind == Data.ELEM) {
@@ -231,7 +231,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter indexOf(final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[1], ctx);
-    if(expr.length == 3) checkColl(expr[2], ctx);
+    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
 
     return new Iter() {
       final Iter ir = expr[0].iter(ctx);
@@ -243,7 +243,7 @@ public final class FNSeq extends StandardFunc {
           final Item i = ir.next();
           if(i == null) return null;
           ++c;
-          if(i.comparable(it) && OpV.EQ.eval(info, i, it)) return Int.get(c);
+          if(i.comparable(it) && OpV.EQ.eval(i, it, coll, info)) return Int.get(c);
         }
       }
     };
@@ -256,11 +256,11 @@ public final class FNSeq extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter distinctValues(final QueryContext ctx) throws QueryException {
-    if(expr.length == 2) checkColl(expr[1], ctx);
+    final Collation coll = checkColl(expr.length == 2 ? expr[1] : null, ctx);
     if(expr[0] instanceof RangeSeq) return expr[0].iter(ctx);
 
     return new Iter() {
-      final ItemSet map = new ItemSet();
+      final ItemSet set = coll == null ? new ItemHashSet() : new CollationSet(coll);
       final Iter ir = expr[0].iter(ctx);
 
       @Override
@@ -270,7 +270,7 @@ public final class FNSeq extends StandardFunc {
           if(i == null) return null;
           ctx.checkStop();
           i = atom(i, info);
-          if(map.add(i, info) >= 0) return i;
+          if(set.add(i, info) >= 0) return i;
         }
       }
     };

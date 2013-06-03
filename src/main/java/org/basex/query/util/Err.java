@@ -343,9 +343,11 @@ public enum Err {
   /** FOCH0001. */
   INVCODE(FOCH, 1, "Invalid XML character '&#x%;'."),
   /** FOCH0002. */
-  IMPLCOL(FOCH, 2, "Unknown collation %."),
+  WHICHCOLL(FOCH, 2, "Unknown collation '%'."),
   /** FOCH0003. */
   NORMUNI(FOCH, 3, "Unsupported normalization form (%)."),
+  /** FOCH0004. */
+  CHARCOLL(FOCH, 4, "Collation does not support function."),
 
   /** FODC0001. */
   IDDOC(FODC, 1, "Root must be a document node."),
@@ -754,14 +756,14 @@ public enum Err {
   /** XPST0008. */
   VARUNDEF(XPST, 8, "Undefined variable %."),
   /** XPST0008. */
-  VARPRIVATE(XPST, 8, "Private variable % is not visible from this module."),
+  VARPRIVATE(XPST, 8, "Variable % is not visible from this module."),
   /** XPST0008. */
   TYPEUNDEF(XPST, 8, "Undefined type '%'."),
   /** XPST0008. */
   SCHEMAINV(XPST, 8, "Undefined schema name '%'."),
 
   /** XPST0017. */
-  FUNCPRIV(XPST, 17, "Function is private: %(...)."),
+  FUNCPRIV(XPST, 17, "Function %(...) is not visible from this module."),
   /** XPST0017. */
   FUNCARGS(XPST, 17, "%: % argument(s) were specified."),
   /** XPST0017. */
@@ -886,8 +888,8 @@ public enum Err {
   FUNCDEFINED(XQST, 34, "Duplicate declaration of function %(...)."),
   /** XQST0038. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
-  /** XQST0076. */
-  COLLWHICH(XQST, 38, "Unknown collation '%'."),
+  /** XQST0038. */
+  WHICHDEFCOLL(XQST, 38, "Unknown collation '%'."),
   /** XQST0039. */
   FUNCDUPL(XQST, 39, "Duplicate function argument %."),
   /** XQST0040. */
@@ -945,7 +947,7 @@ public enum Err {
   /** XQST0075. */
   IMPLVAL(XQST, 75, "Validation not supported."),
   /** XQST0076. */
-  WHICHCOLL(XQST, 76, "Unknown collation '%'."),
+  FLWORCOLL(XQST, 76, "Unknown collation '%'."),
   /** XQST0079. */
   NOPRAGMA(XQST, 79, "Expecting pragma expression."),
   /** XQST0085. */

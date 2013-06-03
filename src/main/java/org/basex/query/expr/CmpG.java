@@ -213,7 +213,7 @@ public final class CmpG extends Cmp {
       if(it1 == null) return Bln.FALSE;
       final Item it2 = expr[1].item(ctx, info);
       if(it2 == null) return Bln.FALSE;
-      return Bln.get(eval(it1, it2));
+      return Bln.get(eval(it1, it2, ctx.sc.collation));
     }
 
     final Iter ir1 = ctx.iter(expr[0]);
@@ -225,7 +225,7 @@ public final class CmpG extends Cmp {
 
     // evaluate single items
     if(s1 && expr[1].size() == 1)
-      return Bln.get(eval(ir1.next(), expr[1].item(ctx, info)));
+      return Bln.get(eval(ir1.next(), expr[1].item(ctx, info), ctx.sc.collation));
 
     Iter ir2 = ctx.iter(expr[1]);
     final long is2 = ir2.size();
@@ -235,13 +235,15 @@ public final class CmpG extends Cmp {
     final boolean s2 = is2 == 1;
 
     // evaluate single items
-    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next()));
+    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next(), ctx.sc.collation));
 
     // evaluate iterator and single item
     Item it1, it2;
     if(s2) {
       it2 = ir2.next();
-      while((it1 = ir1.next()) != null) if(eval(it1, it2)) return Bln.TRUE;
+      while((it1 = ir1.next()) != null) {
+        if(eval(it1, it2, ctx.sc.collation)) return Bln.TRUE;
+      }
       return Bln.FALSE;
     }
 
@@ -251,7 +253,7 @@ public final class CmpG extends Cmp {
       final ValueBuilder vb = new ValueBuilder();
       if((it1 = ir1.next()) != null) {
         while((it2 = ir2.next()) != null) {
-          if(eval(it1, it2)) return Bln.TRUE;
+          if(eval(it1, it2, ctx.sc.collation)) return Bln.TRUE;
           vb.add(it2);
         }
       }
@@ -260,7 +262,9 @@ public final class CmpG extends Cmp {
 
     while((it1 = ir1.next()) != null) {
       ir2.reset();
-      while((it2 = ir2.next()) != null) if(eval(it1, it2)) return Bln.TRUE;
+      while((it2 = ir2.next()) != null) {
+        if(eval(it1, it2, ctx.sc.collation)) return Bln.TRUE;
+      }
     }
     return Bln.FALSE;
   }
@@ -269,15 +273,17 @@ public final class CmpG extends Cmp {
    * Compares a single item.
    * @param a first item to be compared
    * @param b second item to be compared
+   * @param coll collation
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean eval(final Item a, final Item b) throws QueryException {
+  private boolean eval(final Item a, final Item b, final Collation coll)
+      throws QueryException {
     final Type ta = a.type, tb = b.type;
     if(!(a instanceof FItem || b instanceof FItem) &&
         (ta == tb || ta.isUntyped() || tb.isUntyped() ||
         a instanceof ANum && b instanceof ANum ||
-        a instanceof AStr && b instanceof AStr)) return op.op.eval(info, a, b);
+        a instanceof AStr && b instanceof AStr)) return op.op.eval(a, b, coll, info);
     throw Err.INVTYPECMP.thrw(info, ta, tb);
   }
 

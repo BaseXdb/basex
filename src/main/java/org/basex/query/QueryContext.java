@@ -15,7 +15,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.*;
+import org.basex.query.expr.Expr.Use;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
@@ -80,10 +80,16 @@ public final class QueryContext extends Proc {
   /** Optional initial context set. */
   Nodes nodes;
 
-  /** Current full-text options. */
-  private FTOpt ftOpt;
+  /** Available collations. */
+  public TokenObjMap<Collation> collations;
   /** Current full-text token. */
   public FTLexer fttoken;
+  /** Current full-text options. */
+  private FTOpt ftOpt;
+  /** Full-text position data (needed for highlighting of full-text results). */
+  public FTPosData ftpos;
+  /** Full-text token counter (needed for highlighting of full-text results). */
+  public byte ftoknum;
 
   /** Current Date. */
   public Item date;
@@ -93,11 +99,6 @@ public final class QueryContext extends Proc {
   public Item time;
   /** Current timezone. */
   public Item zone;
-
-  /** Full-text position data (needed for highlighting of full-text results). */
-  public FTPosData ftpos;
-  /** Full-text token counter (needed for highlighting of full-text results). */
-  public byte ftoknum;
 
   /** Strings to lock defined by lock:read option. */
   public StringList readLocks = new StringList(0);

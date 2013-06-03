@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -29,7 +30,9 @@ public final class FNContext extends StandardFunc {
       case CURRENT_DATETIME:  return ctx.initDateTime().dtm;
       case CURRENT_TIME:      return ctx.initDateTime().time;
       case IMPLICIT_TIMEZONE: return ctx.initDateTime().zone;
-      case DEFAULT_COLLATION: return ctx.sc.baseURI().resolve(ctx.sc.collation, info);
+      case DEFAULT_COLLATION:
+        final Collation coll = ctx.sc.collation;
+        return Uri.uri(coll == null ? QueryText.URLCOLL : coll.uri());
       case STATIC_BASE_URI:
         final Uri uri = ctx.sc.baseURI();
         return uri == Uri.EMPTY ? null : uri;

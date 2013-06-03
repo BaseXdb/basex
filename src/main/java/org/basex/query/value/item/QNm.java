@@ -140,7 +140,8 @@ public final class QNm extends Item {
   }
 
   @Override
-  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     if(it instanceof QNm) return eq((QNm) it);
     throw INVTYPECMP.thrw(ii, it.type, type);
   }
@@ -155,7 +156,8 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int diff(final InputInfo ii, final Item it) throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     throw Err.diff(ii, it, this);
   }
 

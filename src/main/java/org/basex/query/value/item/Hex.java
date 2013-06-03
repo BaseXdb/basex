@@ -3,6 +3,7 @@ package org.basex.query.value.item;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -47,7 +48,8 @@ public final class Hex extends Bin {
   }
 
   @Override
-  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     return Token.eq(binary(ii), it instanceof Bin ? ((Bin) it).binary(ii) :
       decode(it.string(ii), ii));
   }

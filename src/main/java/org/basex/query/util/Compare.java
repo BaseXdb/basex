@@ -31,6 +31,8 @@ public final class Compare {
   private final InputInfo info;
   /** Flag values. */
   private final EnumSet<Flag> flags = EnumSet.noneOf(Flag.class);
+  /** Collation. */
+  private Collation coll;
 
   /**
    * Constructor.
@@ -43,9 +45,21 @@ public final class Compare {
   /**
    * Sets the specified flag.
    * @param f flag
+   * @return self reference
    */
-  public void set(final Flag f) {
+  public Compare flag(final Flag f) {
     flags.add(f);
+    return this;
+  }
+
+  /**
+   * Sets a collation.
+   * @param c collation
+   * @return self reference
+   */
+  public Compare collation(final Collation c) {
+    coll = c;
+    return this;
   }
 
   /**
@@ -58,7 +72,7 @@ public final class Compare {
    */
   public static boolean deep(final Value val1, final Value val2, final InputInfo info)
       throws QueryException {
-    return new Compare(info).deep(val1.iter(), val2.iter());
+    return deep(val1.iter(), val2.iter(), info);
   }
 
   /**
@@ -102,7 +116,7 @@ public final class Compare {
 
       // check atomic values
       if(!(it1 instanceof ANode || it2 instanceof ANode)) {
-        if(!it1.equiv(info, it2)) return false;
+        if(!it1.equiv(it2, coll, info)) return false;
         continue;
       }
 

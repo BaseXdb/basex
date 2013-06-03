@@ -184,8 +184,8 @@ public final class FNSimple extends StandardFunc {
    * @throws QueryException query exception
    */
   private boolean deep(final QueryContext ctx) throws QueryException {
-    if(expr.length == 3) checkColl(expr[2], ctx);
-    return Compare.deep(ctx.iter(expr[0]), ctx.iter(expr[1]), info);
+    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+    return new Compare(info).collation(coll).deep(ctx.iter(expr[0]), ctx.iter(expr[1]));
   }
 
   /**
@@ -205,7 +205,7 @@ public final class FNSimple extends StandardFunc {
         for(final Flag f : flags) {
           found = eq(key, token(f.name()));
           if(found) {
-            cmp.set(f);
+            cmp.flag(f);
             break;
           }
         }

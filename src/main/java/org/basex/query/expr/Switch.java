@@ -63,7 +63,7 @@ public final class Switch extends ParseExpr {
 
           // includes check for empty sequence (null reference)
           final Item cs = sc.expr[e].item(ctx, info);
-          if(it == cs || cs != null && it != null && it.equiv(info, cs)) {
+          if(it == cs || cs != null && it != null && it.equiv(cs, null, info)) {
             ex = sc.expr[0];
             break LOOP;
           }
@@ -141,7 +141,7 @@ public final class Switch extends ParseExpr {
       for(int e = 1; e < sl; e++) {
         // includes check for empty sequence (null reference)
         final Item cs = sc.expr[e].item(ctx, info);
-        if(it == cs || it != null && cs != null && it.equiv(info, cs))
+        if(it == cs || it != null && cs != null && it.equiv(cs, null, info))
           return sc.expr[0];
       }
       if(sl == 1) return sc.expr[0];

@@ -756,8 +756,7 @@ public class QueryParser extends InputParser {
   private boolean defaultCollationDecl() throws QueryException {
     if(!wsConsumeWs(COLLATION)) return false;
     if(!decl.add(COLLATION)) error(DUPLCOLL);
-    final byte[] coll = resolvedUri(stringLiteral()).string();
-    if(!eq(URLCOLL, coll)) error(COLLWHICH, coll);
+    ctx.sc.collation = Collation.get(stringLiteral(), ctx, info(), WHICHDEFCOLL);
     return true;
   }
 
@@ -1137,17 +1136,30 @@ public class QueryParser extends InputParser {
       if(ctx.sc.xquery3() && wsConsumeWs(GROUP)) {
         wsCheck(BY);
         ap = ip;
-        GroupBy.Spec[] grp = null;
-        do grp = groupSpec(clauses, grp); while(wsConsume(COMMA));
+        GroupBy.Spec[] specs = null;
+        do {
+          final GroupBy.Spec spec = groupSpec(clauses);
+          if(specs == null) {
+            specs = new GroupBy.Spec[] { spec };
+          } else {
+            for(int i = specs.length; --i >= 0;) {
+              if(specs[i].var.name.eq(spec.var.name)) {
+                specs[i].occluded = true;
+                break;
+              }
+            }
+            specs = Array.add(specs, spec);;
+          }
+        } while(wsConsume(COMMA));
 
         // find all non-grouping variables that aren't shadowed
         final ArrayList<VarRef> ng = new ArrayList<VarRef>();
-        for(final GroupBy.Spec spec : grp) curr.add(spec.var.name.id(), spec.var);
+        for(final GroupBy.Spec spec : specs) curr.add(spec.var.name.id(), spec.var);
         vars: for(int i = 0; i < curr.size(); i++) {
           // weird quirk of TokenObjMap
           final Var v = curr.value(i + 1);
-          for(final GroupBy.Spec spec : grp) if(spec.var.is(v)) continue vars;
-          ng.add(new VarRef(grp[0].info, v));
+          for(final GroupBy.Spec spec : specs) if(spec.var.is(v)) continue vars;
+          ng.add(new VarRef(specs[0].info, v));
         }
 
         // add new copies for all non-grouping variables
@@ -1166,7 +1178,7 @@ public class QueryParser extends InputParser {
         }
 
         final VarRef[] pre = new VarRef[ng.size()];
-        clauses.add(new GroupBy(grp, ng.toArray(pre), ngrp, grp[0].info));
+        clauses.add(new GroupBy(specs, ng.toArray(pre), ngrp, specs[0].info));
         alter = GRPBY;
       }
 
@@ -1176,7 +1188,10 @@ public class QueryParser extends InputParser {
         wsCheck(BY);
         ap = ip;
         OrderBy.Key[] ob = null;
-        do ob = orderSpec(ob); while(wsConsume(COMMA));
+        do {
+          final OrderBy.Key key = orderSpec();
+          ob = ob == null ? new OrderBy.Key[] { key } : Array.add(ob, key);
+        } while(wsConsume(COMMA));
 
         final VarRef[] vs = new VarRef[curr.size()];
         for(int i = 0; i < vs.length; i++)
@@ -1327,11 +1342,10 @@ public class QueryParser extends InputParser {
    * Parses the "OrderModifier" rule.
    *
    * Empty order specs are ignored, {@code order} is then returned unchanged.
-   * @param order order array
-   * @return new order array
+   * @return new order key
    * @throws QueryException query exception
    */
-  private OrderBy.Key[] orderSpec(final OrderBy.Key[] order) throws QueryException {
+  private OrderBy.Key orderSpec() throws QueryException {
     final Expr e = check(single(), ORDERBY);
 
     boolean desc = false;
@@ -1341,25 +1355,18 @@ public class QueryParser extends InputParser {
       least = !wsConsumeWs(GREATEST);
       if(least) wsCheck(LEAST);
     }
-    if(wsConsumeWs(COLLATION)) {
-      final Uri uri = resolvedUri(stringLiteral());
-      if(!eq(URLCOLL, uri.string()))
-        error(uri.isValid() ? WHICHCOLL : INVURI, uri.string());
-    }
-    final OrderBy.Key ord = new OrderBy.Key(info(), e, desc, least);
-    return order == null ? new OrderBy.Key[] { ord } : Array.add(order, ord);
+    final Collation coll = !wsConsumeWs(COLLATION) ? ctx.sc.collation :
+      Collation.get(stringLiteral(), ctx, info(), FLWORCOLL);
+    return new OrderBy.Key(info(), e, desc, least, coll);
   }
 
   /**
    * Parses the "GroupingSpec" rule.
    * @param cl preceding clauses
-   * @param group grouping specification
-   * @return new group array
+   * @return new group specification
    * @throws QueryException query exception
    */
-  private GroupBy.Spec[] groupSpec(final LinkedList<Clause> cl,
-      final GroupBy.Spec[] group) throws QueryException {
-
+  private GroupBy.Spec groupSpec(final LinkedList<Clause> cl) throws QueryException {
     final InputInfo ii = info();
     final QNm name = varName();
     final SeqType type = optAsType();
@@ -1384,20 +1391,9 @@ public class QueryParser extends InputParser {
       by = vr;
     }
 
-    if(wsConsumeWs(COLLATION)) {
-      final byte[] coll = stringLiteral();
-      if(!eq(URLCOLL, coll)) error(WHICHCOLL, coll);
-    }
-
-    final GroupBy.Spec grp = new GroupBy.Spec(ii, addLocal(name, type, false), by);
-    if(group == null) return new GroupBy.Spec[] { grp };
-    for(int i = group.length; --i >= 0;) {
-      if(group[i].var.name.eq(name)) {
-        group[i].occluded = true;
-        break;
-      }
-    }
-    return Array.add(group, grp);
+    final Collation coll = !wsConsumeWs(COLLATION) ? ctx.sc.collation :
+      Collation.get(stringLiteral(), ctx, info(), FLWORCOLL);
+    return new GroupBy.Spec(ii, addLocal(name, type, false), by, coll);
   }
 
   /**
@@ -2312,7 +2308,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Potentially resolves a URI literal.
+   * Resolves a relative URI literal against the base uri.
    * @param string uri string
    * @return resolved URI
    * @throws QueryException query exception

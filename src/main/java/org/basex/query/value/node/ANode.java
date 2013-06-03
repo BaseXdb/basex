@@ -58,13 +58,17 @@ public abstract class ANode extends Item {
   public abstract byte[] string();
 
   @Override
-  public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return it.type.isUntyped() ? Token.eq(string(), it.string(ii)) : it.eq(ii, this);
+  public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return it.type.isUntyped() ? coll == null ? Token.eq(string(), it.string(ii)) :
+      coll.compare(string(), it.string(ii)) == 0 : it.eq(this, coll, ii);
   }
 
   @Override
-  public final int diff(final InputInfo ii, final Item it) throws QueryException {
-    return it.type.isUntyped() ? Token.diff(string(), it.string(ii)) : -it.diff(ii, this);
+  public final int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return it.type.isUntyped() ? coll == null ? Token.diff(string(), it.string(ii)) :
+      coll.compare(string(), it.string(ii)) : -it.diff(this, coll, ii);
   }
 
   /**
