@@ -430,22 +430,22 @@ public class HTTPClientTest extends HTTPTest {
 
     final HTTPRequest req = new HTTPRequest();
     req.isMultipart = true;
-    req.payloadAttrs.add(token("media-type"), token("multipart/alternative"));
-    req.payloadAttrs.add(token("boundary"), token("boundary42"));
+    req.payloadAttrs.put(token("media-type"), token("multipart/alternative"));
+    req.payloadAttrs.put(token("boundary"), token("boundary42"));
     final Part p1 = new Part();
-    p1.headers.add(token("Content-Type"), token("text/plain; "
+    p1.headers.put(token("Content-Type"), token("text/plain; "
         + "charset=us-ascii"));
-    p1.bodyAttrs.add(token("media-type"), token("text/plain"));
+    p1.bodyAttrs.put(token("media-type"), token("text/plain"));
     p1.bodyContent.add(Str.get(plain + '\n'));
 
     final Part p2 = new Part();
-    p2.headers.add(token("Content-Type"), token("text/richtext"));
-    p2.bodyAttrs.add(token("media-type"), token("text/richtext"));
+    p2.headers.put(token("Content-Type"), token("text/richtext"));
+    p2.bodyAttrs.put(token("media-type"), token("text/richtext"));
     p2.bodyContent.add(Str.get(rich));
 
     final Part p3 = new Part();
-    p3.headers.add(token("Content-Type"), token("text/x-whatever"));
-    p3.bodyAttrs.add(token("media-type"), token("text/x-whatever"));
+    p3.headers.put(token("Content-Type"), token("text/x-whatever"));
+    p3.bodyAttrs.put(token("media-type"), token("text/x-whatever"));
     p3.bodyContent.add(Str.get(fancy));
 
     req.parts.add(p1);
@@ -483,7 +483,7 @@ public class HTTPClientTest extends HTTPTest {
     final HTTPRequest req1 = new HTTPRequest();
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    req1.payloadAttrs.add(MEDIATYPE, token("text/xml"));
+    req1.payloadAttrs.put(MEDIATYPE, token("text/xml"));
     // Node child
     final FElem e1 = new FElem("a").add("a");
     req1.bodyContent.add(e1);
@@ -497,7 +497,7 @@ public class HTTPClientTest extends HTTPTest {
     final HTTPRequest req2 = new HTTPRequest();
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    req2.payloadAttrs.add(MEDIATYPE, token("text/plain"));
+    req2.payloadAttrs.put(MEDIATYPE, token("text/plain"));
     // Node child
     final FElem e2 = new FElem("a").add("a");
     req2.bodyContent.add(e2);
@@ -511,8 +511,8 @@ public class HTTPClientTest extends HTTPTest {
     final HTTPRequest req3 = new HTTPRequest();
     final FakeHttpConnection fakeConn3 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    req3.payloadAttrs.add(MEDIATYPE, token("text/xml"));
-    req3.payloadAttrs.add(token("method"), token("text"));
+    req3.payloadAttrs.put(MEDIATYPE, token("text/xml"));
+    req3.payloadAttrs.put(token("method"), token("text"));
     // Node child
     final FElem e3 = new FElem("a").add("a");
     req3.bodyContent.add(e3);
@@ -532,7 +532,7 @@ public class HTTPClientTest extends HTTPTest {
   public void writeBase64() throws IOException, QueryException {
     // Case 1: content is xs:base64Binary
     final HTTPRequest req1 = new HTTPRequest();
-    req1.payloadAttrs.add(METHOD, token("http:base64Binary"));
+    req1.payloadAttrs.put(METHOD, token("http:base64Binary"));
     req1.bodyContent.add(new B64(token("dGVzdA==")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
@@ -542,7 +542,7 @@ public class HTTPClientTest extends HTTPTest {
 
     // Case 2: content is a node
     final HTTPRequest req2 = new HTTPRequest();
-    req2.payloadAttrs.add(METHOD, token("http:base64Binary"));
+    req2.payloadAttrs.put(METHOD, token("http:base64Binary"));
     final FElem e3 = new FElem("a").add("dGVzdA==");
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
@@ -561,7 +561,7 @@ public class HTTPClientTest extends HTTPTest {
   public void writeHex() throws IOException, QueryException {
     // Case 1: content is xs:hexBinary
     final HTTPRequest req1 = new HTTPRequest();
-    req1.payloadAttrs.add(METHOD, token("http:hexBinary"));
+    req1.payloadAttrs.put(METHOD, token("http:hexBinary"));
     req1.bodyContent.add(new Hex(token("74657374")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
@@ -571,7 +571,7 @@ public class HTTPClientTest extends HTTPTest {
 
     // Case 2: content is a node
     final HTTPRequest req2 = new HTTPRequest();
-    req2.payloadAttrs.add(METHOD, token("http:base64Binary"));
+    req2.payloadAttrs.put(METHOD, token("http:base64Binary"));
     final FElem e3 = new FElem("a").add("74657374");
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
@@ -596,7 +596,7 @@ public class HTTPClientTest extends HTTPTest {
 
     // Request
     final HTTPRequest req = new HTTPRequest();
-    req.payloadAttrs.add(token("src"), token("file:" + f.getPath()));
+    req.payloadAttrs.put(token("src"), token("file:" + f.getPath()));
     // HTTP connection
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
