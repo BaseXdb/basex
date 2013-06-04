@@ -25,7 +25,7 @@ public final class TokenBoolMap extends TokenSet {
    * @param key key
    * @param val value
    */
-  public void add(final byte[] key, final boolean val) {
+  public void put(final byte[] key, final boolean val) {
     final int i = add(key);
     values[Math.abs(i)] = val;
   }

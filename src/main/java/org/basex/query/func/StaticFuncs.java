@@ -63,7 +63,7 @@ public final class StaticFuncs extends ExprInfo {
     final byte[] sig = fn.id();
     final FuncCache fc = funcs.get(sig);
     if(fc != null) fc.setFunc(fn);
-    else funcs.add(sig, new FuncCache(fn));
+    else funcs.put(sig, new FuncCache(fn));
     return fn;
   }
 
@@ -97,7 +97,7 @@ public final class StaticFuncs extends ExprInfo {
 
     if(NSGlobal.reserved(name.uri())) errorIfSimilar(name, ii);
     final byte[] sig = sig(name, args.length);
-    if(!funcs.contains(sig)) funcs.add(sig, new FuncCache(null));
+    if(!funcs.contains(sig)) funcs.put(sig, new FuncCache(null));
     return getRef(name, args, sc, ii);
   }
 

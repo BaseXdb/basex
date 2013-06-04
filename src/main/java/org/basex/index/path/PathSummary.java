@@ -92,8 +92,8 @@ public final class PathSummary implements Index {
    * @param k node kind
    * @param l current level
    */
-  public void index(final int n, final byte k, final int l) {
-    index(n, k, l, null, null);
+  public void put(final int n, final byte k, final int l) {
+    put(n, k, l, null, null);
   }
 
   /**
@@ -104,7 +104,7 @@ public final class PathSummary implements Index {
    * @param v value
    * @param md meta data
    */
-  public void index(final int n, final byte k, final int l, final byte[] v,
+  public void put(final int n, final byte k, final int l, final byte[] v,
       final MetaData md) {
 
     if(l == 0) {

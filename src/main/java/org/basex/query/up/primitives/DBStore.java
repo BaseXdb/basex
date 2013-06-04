@@ -32,14 +32,14 @@ public final class DBStore extends BasicOperation {
    */
   public DBStore(final Data d, final String path, final Object it, final InputInfo ii) {
     super(TYPE.DBSTORE, d, ii);
-    map.add(token(path), it);
+    map.put(token(path), it);
   }
 
   @Override
   public void merge(final BasicOperation o) {
     final DBStore put = (DBStore) o;
     for(final byte[] path : put.map) {
-      map.add(path, put.map.get(path));
+      map.put(path, put.map.get(path));
     }
   }
 

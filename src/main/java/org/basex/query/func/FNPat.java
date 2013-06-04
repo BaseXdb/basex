@@ -241,7 +241,7 @@ public final class FNPat extends StandardFunc {
     Pattern p = patterns.get(key);
     if(p == null) {
       p = RegExParser.parse(pat, mod, ctx.sc.xquery3(), info);
-      patterns.add(key, p);
+      patterns.put(key, p);
     }
     return p;
   }

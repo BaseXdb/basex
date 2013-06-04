@@ -63,7 +63,7 @@ final class Binaries {
     if(file == null) return;
 
     for(final IOFile f : file.children()) {
-      if(!dir ^ f.isDir()) tbm.add(token(f.name()), true);
+      if(!dir ^ f.isDir()) tbm.put(token(f.name()), true);
     }
   }
 

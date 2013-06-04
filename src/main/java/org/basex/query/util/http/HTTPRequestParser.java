@@ -79,7 +79,7 @@ public final class HTTPRequestParser {
   private static void parseAttrs(final ANode element, final TokenMap attrs) {
     final AxisIter elAttrs = element.attributes();
     for(ANode attr; (attr = elAttrs.next()) != null;) {
-      attrs.add(attr.name(), attr.string());
+      attrs.put(attr.name(), attr.string());
     }
   }
 
@@ -108,7 +108,7 @@ public final class HTTPRequestParser {
         if(eq(qn, VALUE)) value = attr.string();
 
         if(name != null && name.length != 0 && value != null && value.length != 0) {
-          hdrs.add(name, value);
+          hdrs.put(name, value);
           break;
         }
       }

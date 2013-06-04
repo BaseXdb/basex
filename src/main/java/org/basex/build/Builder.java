@@ -80,7 +80,7 @@ public abstract class Builder extends Proc {
    * @throws IOException I/O exception
    */
   public final void openDoc(final byte[] value) throws IOException {
-    path.index(0, Data.DOC, level);
+    path.put(0, Data.DOC, level);
     pstack.set(level++, meta.size);
     addDoc(value);
     ns.prepare();
@@ -270,7 +270,7 @@ public abstract class Builder extends Proc {
 
     // get tag reference
     int n = tags.index(name, null, true);
-    path.index(n, Data.ELEM, level);
+    path.put(n, Data.ELEM, level);
 
     // cache pre value
     final int pre = meta.size;
@@ -300,7 +300,7 @@ public abstract class Builder extends Proc {
       if(u == 0 && indexOf(an, ':') != -1 && !eq(prefix(an), XML))
         throw new BuildException(WHICHNS, parser.detail(), an);
 
-      path.index(n, Data.ATTR, level + 1, av, meta);
+      path.put(n, Data.ATTR, level + 1, av, meta);
       addAttr(n, av, Math.min(IO.MAXATTS, a + 1), u);
     }
 
@@ -343,7 +343,7 @@ public abstract class Builder extends Proc {
       else tags.stat(tag).setLeaf(false);
     }
 
-    path.index(0, kind, l, value, meta);
+    path.put(0, kind, l, value, meta);
     addText(value, l == 0 ? 1 : meta.size - pstack.get(l - 1), kind);
   }
 }

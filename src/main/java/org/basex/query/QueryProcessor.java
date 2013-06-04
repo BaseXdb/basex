@@ -2,7 +2,6 @@ package org.basex.query;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.regex.*;
@@ -219,7 +218,7 @@ public final class QueryProcessor extends Proc {
    * @param file file name
    */
   public void module(final String uri, final String file) {
-    ctx.modDeclared.add(token(uri), token(file));
+    ctx.modDeclared.put(uri, file);
   }
 
   /**

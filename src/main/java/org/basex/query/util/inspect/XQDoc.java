@@ -65,7 +65,7 @@ public final class XQDoc extends Inspect {
 
     // namespaces
     final FElem namespaces = elem("namespaces", xqdoc);
-    for(final byte[] pref : qp.namespaces) nsCache.add(pref, qp.namespaces.get(pref));
+    for(final byte[] pref : qp.namespaces) nsCache.put(pref, qp.namespaces.get(pref));
 
     // imports
     final FElem imports = elem("imports", xqdoc);
@@ -78,7 +78,7 @@ public final class XQDoc extends Inspect {
     for(final StaticVar sv : qp.vars) {
       final FElem variable = elem("variable", variables);
       elem("name", variable).add(sv.name.string());
-      if(sv.name.hasPrefix()) nsCache.add(sv.name.prefix(), sv.name.uri());
+      if(sv.name.hasPrefix()) nsCache.put(sv.name.prefix(), sv.name.uri());
       comment(sv, variable);
       annotations(sv.ann, variable);
       type(sv.declType, variable);
@@ -91,7 +91,7 @@ public final class XQDoc extends Inspect {
       final FElem function = elem("function", functions).add("arity", token(al));
       comment(sf, function);
       elem("name", function).add(sf.name.string());
-      if(sf.name.hasPrefix()) nsCache.add(sf.name.prefix(), sf.name.uri());
+      if(sf.name.hasPrefix()) nsCache.put(sf.name.prefix(), sf.name.uri());
       annotations(sf.ann, function);
 
       elem("signature", function).add(sf.toString().replaceAll(" \\{.*| \\w+;.*", ""));
@@ -149,7 +149,7 @@ public final class XQDoc extends Inspect {
     if(ann.size() != 0) annotation(ann, elem("annotations", parent), false);
     for(int a = 0; a < ann.size(); a++) {
       final QNm name = ann.names[a];
-      if(name.hasPrefix()) nsCache.add(name.prefix(), name.uri());
+      if(name.hasPrefix()) nsCache.put(name.prefix(), name.uri());
     }
   }
 

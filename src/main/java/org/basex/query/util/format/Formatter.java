@@ -39,8 +39,8 @@ public abstract class Formatter extends FormatUtil {
 
   // initialize hash map with English formatter as default
   static {
-    MAP.add(EN, new FormatterEN());
-    MAP.add(token("de"), new FormatterDE());
+    MAP.put(EN, new FormatterEN());
+    MAP.put(token("de"), new FormatterDE());
   }
 
   /**

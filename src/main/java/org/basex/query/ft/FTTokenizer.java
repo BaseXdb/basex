@@ -54,7 +54,7 @@ final class FTTokenizer {
           if(ftw == null) {
             ftw = new FTWildcard(qu);
             if(!ftw.parse()) FTREG.thrw(words.info, qu);
-            wcCache.add(qu, ftw);
+            wcCache.put(qu, ftw);
           }
         }
 
@@ -99,7 +99,7 @@ final class FTTokenizer {
     FTTokens tokens = cache.get(query);
     if(tokens == null) {
       tokens = new FTTokens();
-      cache.add(query, tokens);
+      cache.put(query, tokens);
 
       // cache query tokens:
       final FTIterator quLex = new FTLexer(opt).init(query);

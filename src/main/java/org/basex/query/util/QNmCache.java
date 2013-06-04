@@ -22,7 +22,7 @@ public final class QNmCache extends TokenSet {
    * @param uri namespace uri (may be {@code null)}
    * @return name
    */
-  public QNm get(final byte[] prefix, final byte[] local, final byte[] uri) {
+  public QNm index(final byte[] prefix, final byte[] local, final byte[] uri) {
     final int i = add(QNm.internal(prefix, local, uri));
     if(i < 0) return values[-i];
 

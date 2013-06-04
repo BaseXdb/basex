@@ -18,10 +18,19 @@ public class TokenMap extends TokenSet {
    * @param key key
    * @param val value
    */
-  public final void add(final byte[] key, final byte[] val) {
+  public final void put(final byte[] key, final byte[] val) {
     // array bounds are checked before array is resized..
     final int i = add(key);
     values[Math.abs(i)] = val;
+  }
+
+  /**
+   * Convenience function for adding strings, which will be returned to tokens.
+   * @param key key
+   * @param val value
+   */
+  public final void put(final String key, final String val) {
+    put(Token.token(key), Token.token(val));
   }
 
   /**

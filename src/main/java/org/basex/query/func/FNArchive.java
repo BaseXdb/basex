@@ -268,7 +268,7 @@ public final class FNArchive extends StandardFunc {
       en = entr.next();
       cn = cont.next();
       if(en == null || cn == null) break;
-      hm.add(checkElmStr(en).string(info), new Item[] { en, cn });
+      hm.put(checkElmStr(en).string(info), new Item[] { en, cn });
       e++;
       c++;
     }
@@ -311,7 +311,7 @@ public final class FNArchive extends StandardFunc {
     final TokenObjMap<Item[]> hm = new TokenObjMap<Item[]>();
     final Iter names = ctx.iter(expr[1]);
     for(Item en; (en = names.next()) != null;) {
-      hm.add(checkElmStr(en).string(info), null);
+      hm.put(checkElmStr(en).string(info), null);
     }
 
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);

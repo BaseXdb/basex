@@ -116,7 +116,7 @@ public class MemValues extends TokenSet implements Index {
    * @param id id value
    * @return index position
    */
-  public int index(final byte[] key, final int id) {
+  public int put(final byte[] key, final int id) {
     int i = add(key);
     if(i > 0) {
       ids[i] = new int[] { id };

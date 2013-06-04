@@ -233,7 +233,7 @@ public final class Map extends FItem {
       byte[] val = ((Item) v).string(ii);
       final byte[] o = tm.get(key);
       if(o != null) val = new TokenBuilder(o).add(',').add(val).finish();
-      tm.add(key, val);
+      tm.put(key, val);
     }
     return tm;
   }

@@ -118,7 +118,7 @@ public final class MAB2Parser extends SingleParser {
       MAB2Entry entry = ids.get(key);
       if(entry == null) {
         entry = new MAB2Entry();
-        ids.add(key, entry);
+        ids.put(key, entry);
       }
       if(child) entry.add(pos);
       else entry.pos(pos);
@@ -298,7 +298,7 @@ public final class MAB2Parser extends SingleParser {
             mvID = mvids.get(bibID);
             if(mvID == null) {
               mvID = token(++maxid);
-              mvids.add(bibID, mvID);
+              mvids.put(bibID, mvID);
             }
           }
         } else if(n == 29) {
@@ -547,7 +547,7 @@ public final class MAB2Parser extends SingleParser {
         final byte[] key = find(in, (byte) '\t');
         final byte[] val = find(in, (byte) '\n');
         if(key == null) break;
-        hash.add(key, val);
+        hash.put(key, val);
       }
     } catch(final IOException ex) {
       Util.debug(ex);

@@ -238,7 +238,7 @@ public class QueryParser extends InputParser {
       if(uri.length == 0) error(NSMODURI);
       module = new QNm(pref, uri);
       ctx.sc.ns.add(pref, uri, info());
-      namespaces.add(pref, uri);
+      namespaces.put(pref, uri);
       wsCheck(";");
 
       doc = xqDoc(doc);
@@ -314,7 +314,7 @@ public class QueryParser extends InputParser {
     // set default decimal format
     final byte[] empty = new QNm(EMPTY).id();
     if(ctx.sc.decFormats.get(empty) == null) {
-      ctx.sc.decFormats.add(empty, new DecFormatter());
+      ctx.sc.decFormats.put(empty, new DecFormatter());
     }
 
     if(check) {
@@ -539,7 +539,7 @@ public class QueryParser extends InputParser {
     final byte[] uri = stringLiteral();
     if(ctx.sc.ns.staticURI(pref) != null) error(DUPLNSDECL, pref);
     ctx.sc.ns.add(pref, uri, info());
-    namespaces.add(pref, uri);
+    namespaces.put(pref, uri);
   }
 
   /**
@@ -737,14 +737,14 @@ public class QueryParser extends InputParser {
         if(!eq(prop, s)) continue;
         if(map.get(s) != null) error(DECDUPLPROP, s);
         wsCheck(IS);
-        map.add(s, stringLiteral());
+        map.put(s, stringLiteral());
         break;
       }
       if(map.isEmpty()) error(NODECLFORM, prop);
     } while(n != map.size());
 
     // completes the format declaration
-    ctx.sc.decFormats.add(name.id(), new DecFormatter(info(), map));
+    ctx.sc.decFormats.put(name.id(), new DecFormatter(info(), map));
     return true;
   }
 
@@ -818,7 +818,7 @@ public class QueryParser extends InputParser {
     if(pref != EMPTY) {
       if(ctx.sc.ns.staticURI(pref) != null) error(DUPLNSDECL, pref);
       ctx.sc.ns.add(pref, uri, info());
-      namespaces.add(pref, uri);
+      namespaces.put(pref, uri);
     }
 
     // check modules at specified locations
@@ -876,7 +876,7 @@ public class QueryParser extends InputParser {
       if(!ctx.sc.xquery3() && ctx.modStack.contains(p)) error(CIRCMODULE);
       return;
     }
-    ctx.modParsed.add(p, uri);
+    ctx.modParsed.put(p, uri);
 
     // read module
     String qu = null;
@@ -1116,7 +1116,7 @@ public class QueryParser extends InputParser {
 
     final TokenObjMap<Var> curr = new TokenObjMap<Var>();
     for(final Clause fl : clauses)
-      for(final Var v : fl.vars()) curr.add(v.name.id(), v);
+      for(final Var v : fl.vars()) curr.put(v.name.id(), v);
 
     int size;
     do {
@@ -1124,7 +1124,7 @@ public class QueryParser extends InputParser {
         size = clauses.size();
         initialClause(clauses);
         for(int i = size; i < clauses.size(); i++)
-          for(final Var v : clauses.get(i).vars()) curr.add(v.name.id(), v);
+          for(final Var v : clauses.get(i).vars()) curr.put(v.name.id(), v);
       } while(size < clauses.size());
 
       if(wsConsumeWs(WHERE)) {
@@ -1154,7 +1154,7 @@ public class QueryParser extends InputParser {
 
         // find all non-grouping variables that aren't shadowed
         final ArrayList<VarRef> ng = new ArrayList<VarRef>();
-        for(final GroupBy.Spec spec : specs) curr.add(spec.var.name.id(), spec.var);
+        for(final GroupBy.Spec spec : specs) curr.put(spec.var.name.id(), spec.var);
         vars: for(int i = 0; i < curr.size(); i++) {
           // weird quirk of TokenObjMap
           final Var v = curr.value(i + 1);
@@ -1174,7 +1174,7 @@ public class QueryParser extends InputParser {
           if(v.type().one())
             nv.refineType(SeqType.get(v.type().type, Occ.ONE_MORE), ctx, info());
           ngrp[i] = nv;
-          curr.add(nv.name.id(), nv);
+          curr.put(nv.name.id(), nv);
         }
 
         final VarRef[] pre = new VarRef[ng.size()];
@@ -1202,7 +1202,7 @@ public class QueryParser extends InputParser {
 
       if(ctx.sc.xquery3() && wsConsumeWs(COUNT, DOLLAR, NOCOUNT)) {
         final Var v = addLocal(varName(), SeqType.ITR, false);
-        curr.add(v.name.id(), v);
+        curr.put(v.name.id(), v);
         clauses.add(new Count(v, info()));
       }
     } while(ctx.sc.xquery3() && size < clauses.size());

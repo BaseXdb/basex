@@ -376,7 +376,7 @@ public final class DiskData extends Data {
       final int hash = m.id(value);
       if(hash == 0) {
         ids = new IntList();
-        m.add(value, ids);
+        m.put(value, ids);
       } else {
         ids = m.value(hash);
       }
@@ -416,7 +416,7 @@ public final class DiskData extends Data {
           final int hash = m.id(key);
           if(hash == 0) {
             ids = new IntList();
-            m.add(key, ids);
+            m.put(key, ids);
           } else {
             ids = m.value(hash);
           }

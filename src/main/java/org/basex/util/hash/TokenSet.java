@@ -109,7 +109,7 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
-   * Adds a string.
+   * Convenience function for adding a string, which will be returned to a token.
    * @param e element to be added
    * @return offset of added key, negative offset otherwise
    */

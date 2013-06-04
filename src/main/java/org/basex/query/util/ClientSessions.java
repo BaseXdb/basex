@@ -27,7 +27,7 @@ public final class ClientSessions {
    */
   public Uri add(final ClientSession cs) {
     final byte[] uri = Token.token(Text.NAMELC + "://" + cs + '/' + ++lastId);
-    conns.add(uri, cs);
+    conns.put(uri, cs);
     return Uri.uri(uri);
   }
 

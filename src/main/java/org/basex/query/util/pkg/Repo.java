@@ -83,11 +83,11 @@ public final class Repo {
       if(nsDict.contains(comp.uri)) {
         nsDict.get(comp.uri).add(name);
       } else {
-        nsDict.add(comp.uri, new TokenSet(name));
+        nsDict.put(comp.uri, new TokenSet(name));
       }
     }
     // update package dictionary
-    pkgDict.add(name, token(dir));
+    pkgDict.put(name, token(dir));
   }
 
   /**
@@ -145,12 +145,12 @@ public final class Repo {
           if(ts != null) {
             ts.add(name);
           } else {
-            nsDict.add(comp.uri, new TokenSet(name));
+            nsDict.put(comp.uri, new TokenSet(name));
           }
         }
       }
       // add package to package dictionary
-      pkgDict.add(name, token(dir.name()));
+      pkgDict.put(name, token(dir.name()));
     } catch(final QueryException ex) {
       Util.errln(ex);
     }

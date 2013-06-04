@@ -20,7 +20,7 @@ public final class TokenObjMap<E> extends TokenSet {
    * @param key key
    * @param val value
    */
-  public void add(final byte[] key, final E val) {
+  public void put(final byte[] key, final E val) {
     // array bounds are checked before array is resized..
     final int i = add(key);
     values[Math.abs(i)] = val;

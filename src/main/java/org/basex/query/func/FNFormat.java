@@ -69,7 +69,7 @@ public final class FNFormat extends StandardFunc {
     FormatParser fp = formats.get(pic);
     if(fp == null) {
       fp = new IntFormat(pic, info);
-      formats.add(pic, fp);
+      formats.put(pic, fp);
     }
     return Str.get(Formatter.get(lng).formatInt(num, fp));
   }

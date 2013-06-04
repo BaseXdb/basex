@@ -150,14 +150,14 @@ public final class JsonCGConverter extends JsonXMLConverter {
           arr.add(e);
         } else {
           if(arr != null) {
-            names.add(name, null);
+            names.put(name, null);
             if(arr.type != T_STRING)
               for(int i = 0; i < arr.size; i++) arr.vals[i].add(T_TYPE, arr.type);
           }
           if(type != T_STRING) e.add(T_TYPE, type);
         }
       } else {
-        names.add(name, new TypedArray(type, e));
+        names.put(name, new TypedArray(type, e));
       }
       if(elem != null) elem.add(e);
       else elem = e;

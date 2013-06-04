@@ -50,7 +50,7 @@ public final class TokenIntMap extends TokenSet {
    * @param key key
    * @param val value
    */
-  public void add(final byte[] key, final int val) {
+  public void put(final byte[] key, final int val) {
     final int i = add(key);
     values[Math.abs(i)] = val;
   }

@@ -246,7 +246,7 @@ public final class QNm extends Item {
    * @return instance
    */
   public static QNm get(final String local) {
-    return CACHE.get(null, token(local), null);
+    return CACHE.index(null, token(local), null);
   };
 
   /**
@@ -255,7 +255,7 @@ public final class QNm extends Item {
    * @return instance
    */
   public static QNm get(final byte[] local) {
-    return CACHE.get(null, local, null);
+    return CACHE.index(null, local, null);
   };
 
   /**
@@ -265,7 +265,7 @@ public final class QNm extends Item {
    * @return instance
    */
   public static QNm get(final String local, final byte[] uri) {
-    return CACHE.get(null, token(local), uri);
+    return CACHE.index(null, token(local), uri);
   };
 
   /**
@@ -275,7 +275,7 @@ public final class QNm extends Item {
    * @return instance
    */
   public static QNm get(final byte[] local, final byte[] uri) {
-    return CACHE.get(null, local, uri);
+    return CACHE.index(null, local, uri);
   };
 
   /**
@@ -286,7 +286,7 @@ public final class QNm extends Item {
    * @return instance
    */
   public static QNm get(final String prefix, final String local, final byte[] uri) {
-    return CACHE.get(token(prefix), token(local), uri);
+    return CACHE.index(token(prefix), token(local), uri);
   };
 
   /**
@@ -297,7 +297,7 @@ public final class QNm extends Item {
    * @return instance
    */
   public static QNm get(final String prefix, final String local, final String uri) {
-    return CACHE.get(token(prefix), token(local), token(uri));
+    return CACHE.index(token(prefix), token(local), token(uri));
   };
 
   /**
@@ -308,7 +308,7 @@ public final class QNm extends Item {
    * @return instance
    */
   public static QNm get(final byte[] prefix, final byte[] local, final byte[] uri) {
-    return CACHE.get(prefix, local, uri);
+    return CACHE.index(prefix, local, uri);
   };
 
   /**

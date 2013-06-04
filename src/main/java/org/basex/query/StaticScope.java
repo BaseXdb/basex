@@ -95,7 +95,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
     TokenList tl = map.get(k);
     if(tl == null) {
       tl = new TokenList();
-      map.add(k, tl);
+      map.put(k, tl);
     }
     tl.add(val.trim().finish());
   }

@@ -94,7 +94,7 @@ public final class Collation {
       final Collator cl = get(args);
       if(cl == null) err.thrw(info, uri);
       coll = new Collation(cl, full);
-      ctx.collations.add(full, coll);
+      ctx.collations.put(full, coll);
     }
     return coll;
   }

@@ -87,7 +87,7 @@ public final class FuncParams {
       // separate multiple entries with ","
       final byte[] o = tm.get(key);
       if(o != null) val = new TokenBuilder(o).add(',').add(val).finish();
-      tm.add(key, val);
+      tm.put(key, val);
     }
     return tm;
   }

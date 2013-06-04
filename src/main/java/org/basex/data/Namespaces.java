@@ -218,7 +218,7 @@ public final class Namespaces {
     NSNode node = current;
     do {
       for(int i = 0; i < node.values.length; i += 2)
-        nsScope.add(prefix(node.values[i]), uri(node.values[i + 1]));
+        nsScope.put(prefix(node.values[i]), uri(node.values[i + 1]));
       final int pos = node.find(pre);
       if(pos < 0) break;
       node = node.children[pos];
@@ -494,7 +494,7 @@ public final class Namespaces {
       TokenList old = map.get(key);
       if(old == null) {
         old = new TokenList();
-        map.add(key, old);
+        map.put(key, old);
       }
       if(!old.contains(val)) old.add(val);
     }
