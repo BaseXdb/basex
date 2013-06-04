@@ -8,6 +8,7 @@ import java.io.*;
 
 import org.basex.build.xml.*;
 import org.basex.core.*;
+import org.basex.core.Context;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
@@ -295,7 +296,7 @@ public final class FNGen extends StandardFunc {
     if(item == null) return null;
     try {
       final IO io = new IOContent(checkStr(item), string(ctx.sc.baseURI().string()));
-      return parseXml(io, ctx, frag);
+      return parseXml(io, ctx.context, frag);
     } catch(final IOException ex) {
       throw SAXERR.thrw(info, ex);
     }
@@ -372,16 +373,15 @@ public final class FNGen extends StandardFunc {
    * @return result
    * @throws IOException I/O exception
    */
-  public static ANode parseXml(final IO input, final QueryContext ctx,
-      final boolean frag) throws IOException {
+  public static ANode parseXml(final IO input, final Context ctx, final boolean frag)
+      throws IOException {
 
-    final Prop prop = ctx.context.prop;
+    final Prop prop = ctx.prop;
     final boolean chop = prop.is(Prop.CHOP);
     try {
       prop.set(Prop.CHOP, false);
       return new DBNode(frag || prop.is(Prop.INTPARSE) ?
-        new XMLParser(input, ctx.context.prop, frag) :
-        new SAXWrapper(input, ctx.context.prop));
+        new XMLParser(input, ctx.prop, frag) : new SAXWrapper(input, ctx.prop));
     } finally {
       prop.set(Prop.CHOP, chop);
     }

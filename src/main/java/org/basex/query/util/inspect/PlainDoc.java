@@ -111,21 +111,8 @@ public final class PlainDoc extends Inspect {
         argument.add("name", name);
         if(uri.length != 0) argument.add("uri", uri);
 
-        if(doc != null) {
-          for(final byte[] key : doc) {
-            if(!eq(key, DOC_PARAM)) continue;
-            for(final byte[] val : doc.get(key)) {
-              final int vl = val.length;
-              for(int v = 0; v < vl; v++) {
-                if(!ws(val[v])) continue;
-                if(eq(replaceAll(substring(val, 0, v), "^\\$", ""), name)) {
-                  add(trim(substring(val, v + 1, vl)), ctx, argument);
-                }
-                break;
-              }
-            }
-          }
-        }
+        final byte[] pdoc = doc(doc, name);
+        if(pdoc != null) add(pdoc, ctx.context, argument);
       }
       type(types[a], argument);
     }
@@ -138,19 +125,14 @@ public final class PlainDoc extends Inspect {
         for(final byte[] value : doc.get(key)) {
           final FElem elem = eq(key, DOC_TAGS) ? elem(string(key), function) :
             elem("tag", function).add("name", key);
-          add(value, ctx, elem);
+          add(value, ctx.context, elem);
         }
       }
     }
 
     final FElem ret = type(type, elem("return", function));
-    if(doc != null) {
-      for(final byte[] key : doc) {
-        if(!eq(key, DOC_RETURN)) continue;
-        for(final byte[] value : doc.get(key)) ret.add(value);
-        break;
-      }
-    }
+    final TokenList returns = doc != null ? doc.get(DOC_RETURN) : null;
+    if(returns != null) for(final byte[] val : returns) ret.add(val);
     return function;
   }
 

@@ -665,6 +665,8 @@ public interface QueryText {
   /** Supported documentation tags. */
   byte[][] DOC_TAGS = tokens("description", "author", "version", "param",
       "return", "error", "deprecated", "see", "since");
+  /** Documentation: description tag. */
+  byte[] DOC_DESCRIPTION = token("description");
   /** Documentation: param tag. */
   byte[] DOC_PARAM = token("param");
   /** Documentation: return tag. */
