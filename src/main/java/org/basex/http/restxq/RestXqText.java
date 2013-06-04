@@ -8,7 +8,7 @@ import static org.basex.util.Token.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-interface RestXqText {
+public interface RestXqText {
   /** Token "path". */
   byte[] PATH = token("path");
   /** Token "produces". */
@@ -42,6 +42,11 @@ interface RestXqText {
   byte[] REDIRECT = token("redirect");
   /** Token "forward". */
   byte[] FORWARD = token("forward");
+
+  /** WADL namespace. */
+  String WADL_URI = "http://wadl.dev.java.net/2009/02";
+  /** XHTML namespace. */
+  String XHTML_URL = "http://www.w3.org/1999/xhtml";
 
   /** Error message. */
   String ANN_MISSING = "Annotation % is missing.";

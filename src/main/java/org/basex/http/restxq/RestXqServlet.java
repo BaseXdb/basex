@@ -22,15 +22,10 @@ public final class RestXqServlet extends BaseXServlet {
 
     // analyze input path
     final RestXqModules rxm = RestXqModules.get();
-    if(('/' + HTTPText.WADL).equals(http.req.getPathInfo())) {
-      // return application.wadl
-      rxm.wadl(http);
-    } else {
-      // select XQuery function
-      final RestXqFunction func = rxm.find(http);
-      if(func == null) HTTPErr.NO_XQUERY.thrw();
-      // process function
-      func.process(http);
-    }
+    // select XQuery function
+    final RestXqFunction func = rxm.find(http);
+    if(func == null) HTTPErr.NO_XQUERY.thrw();
+    // process function
+    func.process(http);
   }
 }

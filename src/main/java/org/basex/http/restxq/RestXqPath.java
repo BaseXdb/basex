@@ -80,7 +80,8 @@ final class RestXqPath implements Iterable<String>, Comparable<RestXqPath> {
     // returns a schematic representation of the segments
     final StringBuilder sb = new StringBuilder("/");
     for(int s = 0; s < size; s++) {
-      sb.append(isTemplate(s) ? "{...}" : segment[s]).append('/');
+      sb.append(segment[s]).append('/');
+      //sb.append(isTemplate(s) ? "{...}" : segment[s]).append('/');
     }
     return sb.toString();
   }
