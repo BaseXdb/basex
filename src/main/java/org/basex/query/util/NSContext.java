@@ -53,7 +53,7 @@ public final class NSContext {
    */
   public byte[] staticURI(final byte[] pref) {
     for(int s = ns.size() - 1; s >= 0; s--) {
-      if(eq(ns.name(s), pref)) return ns.string(s);
+      if(eq(ns.name(s), pref)) return ns.value(s);
     }
     return null;
   }
@@ -67,7 +67,7 @@ public final class NSContext {
   public byte[] uri(final byte[] pref) {
     if(stack != null) {
       for(int s = stack.size() - 1; s >= 0; s--) {
-        if(eq(stack.name(s), pref)) return stack.string(s);
+        if(eq(stack.name(s), pref)) return stack.value(s);
       }
     }
     final byte[] uri = staticURI(pref);

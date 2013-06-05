@@ -90,8 +90,8 @@ public final class MAB2Parser extends SingleParser {
     index(genres, "genres");
 
     // find maximum id
-    for(int i = 1; i <= mvids.size(); ++i) {
-      final int id = toInt(mvids.value(i));
+    for(final byte[] key : mvids) {
+      final int id = toInt(mvids.get(key));
       if(maxid < id) maxid = id;
     }
 
@@ -100,7 +100,7 @@ public final class MAB2Parser extends SingleParser {
       throw new BuildException("Invalid MAB2 input (doesn't start with ###)");
     }
 
-    builder.openElem(LIBRARY, atts.reset(), nsp);
+    builder.openElem(LIBRARY, atts.clear(), nsp);
 
     // find file offsets of all titles
     final Performance p = new Performance();
@@ -134,8 +134,8 @@ public final class MAB2Parser extends SingleParser {
         Performance.getMemory());
 
     // create all titles
-    for(i = 1; i <= ids.size(); ++i) {
-      final MAB2Entry entry = ids.value(i);
+    for(final byte[] id : ids) {
+      final MAB2Entry entry = ids.get(id);
       final long pos = entry.pos;
       // check if top entry exists...
       final byte[] l = pos != 0 ? addEntry(input, pos, entry.size, null) : null;
@@ -150,10 +150,10 @@ public final class MAB2Parser extends SingleParser {
 
     // write the mediovis ids back to disk
     final PrintOutput out = new PrintOutput("mvids.dat");
-    for(i = 1; i <= mvids.size(); ++i) {
-      out.print(mvids.key(i));
+    for(final byte[] id : mvids) {
+      out.print(id);
       out.write('\t');
-      out.println(mvids.value(i));
+      out.println(mvids.get(id));
     }
     out.close();
   }
@@ -349,7 +349,7 @@ public final class MAB2Parser extends SingleParser {
           if(nrSigs == 0) sig[nrSigs++] = string(line);
         }
       } else {
-        atts.reset();
+        atts.clear();
         atts.add(MV_ID, mvID);
         atts.add(BIB_ID, bibID);
         if(sb != 0 && !flat) atts.add(MAX, token(sb));
@@ -401,7 +401,7 @@ public final class MAB2Parser extends SingleParser {
    */
   private void add(final byte[] tag, final byte[] cont) throws IOException {
     if(cont == null) return;
-    builder.openElem(tag, atts.reset(), nsp);
+    builder.openElem(tag, atts.clear(), nsp);
     builder.text(utf8(cont, ENCODING));
     builder.closeElem();
   }

@@ -83,11 +83,11 @@ public final class FuncLit extends Single implements Scope {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope o, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope o, final IntObjMap<Var> vs) {
     final VarScope scp = new VarScope();
     final Var[] arg = new Var[args.length];
     for(int i = 0; i < arg.length; i++)
-      vs.add(args[i].id, arg[i] = scp.newCopyOf(ctx, args[i]));
+      vs.put(args[i].id, arg[i] = scp.newCopyOf(ctx, args[i]));
     final Expr call = expr.copy(ctx, scp, vs);
     return new FuncLit(name, arg, call, (FuncType) type.type, scp, sc, info);
   }

@@ -2,10 +2,12 @@ package org.basex.util.list;
 
 import java.util.*;
 
+import org.basex.util.*;
+
 /**
  * This is a simple container for native booleans.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BoolList extends ElementList {
@@ -16,44 +18,44 @@ public final class BoolList extends ElementList {
    * Default constructor.
    */
   public BoolList() {
-    this(CAP);
+    this(Array.CAPACITY);
   }
 
   /**
-   * Constructor, specifying the initial array size.
-   * @param c initial size
+   * Constructor, specifying an initial internal array size.
+   * @param capacity initial array capacity
    */
-  public BoolList(final int c) {
-    list = new boolean[c];
+  public BoolList(final int capacity) {
+    list = new boolean[capacity];
   }
 
   /**
    * Adds an element.
-   * @param e element to be added
+   * @param element element to be added
    */
-  public void add(final boolean e) {
+  public void add(final boolean element) {
     if(size == list.length) list = Arrays.copyOf(list, newSize());
-    list[size++] = e;
+    list[size++] = element;
   }
 
   /**
    * Returns the element at the specified index.
-   * @param i index
+   * @param index index of the element to return
    * @return element
    */
-  public boolean get(final int i) {
-    return list[i];
+  public boolean get(final int index) {
+    return list[index];
   }
 
   /**
-   * Sets an element at the specified index.
-   * @param i index
-   * @param e element to be set
+   * Stores an element at the specified index.
+   * @param index index of the element to replace
+   * @param element element to be stored
    */
-  public void set(final int i, final boolean e) {
-    if(i >= list.length) list = Arrays.copyOf(list, newSize(i + 1));
-    list[i] = e;
-    size = Math.max(size, i + 1);
+  public void set(final int index, final boolean element) {
+    if(index >= list.length) list = Arrays.copyOf(list, newSize(index + 1));
+    list[index] = element;
+    size = Math.max(size, index + 1);
   }
 
   /**
@@ -66,10 +68,10 @@ public final class BoolList extends ElementList {
 
   /**
    * Pushes an element onto the stack.
-   * @param val element
+   * @param element element
    */
-  public void push(final boolean val) {
-    add(val);
+  public void push(final boolean element) {
+    add(element);
   }
 
   /**

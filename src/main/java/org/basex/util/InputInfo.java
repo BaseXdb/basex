@@ -19,12 +19,12 @@ public final class InputInfo {
 
   /**
    * Constructor.
-   * @param p input parser, containing information on the current parsing state
+   * @param parser input parser, containing information on the current parsing state
    */
-  public InputInfo(final InputParser p) {
-    query = p.input;
-    file = p.file;
-    pos = p.ip;
+  public InputInfo(final InputParser parser) {
+    query = parser.input;
+    file = parser.file;
+    pos = parser.ip;
   }
 
   /**
@@ -46,23 +46,23 @@ public final class InputInfo {
 
   /**
    * Calculates the column and line number of a given offset in the string.
-   * @param qu query string
-   * @param qp offset
+   * @param query query string
+   * @param pos query position
    * @return two element array of line and column number
    */
-  public static int[] lineCol(final String qu, final int qp) {
+  public static int[] lineCol(final String query, final int pos) {
     final int[] lc = { 1, 1 };
-    for(int i = 0, ch; i < qp; i += Character.charCount(ch)) {
-      ch = qu.codePointAt(i);
+    for(int i = 0, ch; i < pos; i += Character.charCount(ch)) {
+      ch = query.codePointAt(i);
       if(ch == '\n') { lc[0]++; lc[1] = 1; } else if(ch != '\r') { lc[1]++; }
     }
     return lc;
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if(!(obj instanceof InputInfo)) return false;
-    final InputInfo ii = (InputInfo) obj;
+  public boolean equals(final Object object) {
+    if(!(object instanceof InputInfo)) return false;
+    final InputInfo ii = (InputInfo) object;
     return (file != null ? file.equals(ii.file) : query.equals(ii.query)) &&
         pos == ii.pos;
   }

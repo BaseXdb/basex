@@ -12,6 +12,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Array {
+  /** Initial default size for new arrays. */
+  public static final int CAPACITY = 1 << 3;
   /** Default factor for resizing dynamic arrays. */
   public static final double RESIZE = 1.5;
   /** Private constructor. */

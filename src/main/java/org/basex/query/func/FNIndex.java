@@ -185,9 +185,10 @@ public final class FNIndex extends StandardFunc {
    * @param root root node
    */
   private static void index(final Names names, final byte[] name, final FElem root) {
-    for(int i = 0; i < names.size(); ++i) {
-      final FElem sub = new FElem(name).add(NAME, names.key(i + 1));
-      stats(names.stat(i + 1), sub);
+    final int ns = names.size();
+    for(int n = 1; n <= ns; n++) {
+      final FElem sub = new FElem(name).add(NAME, names.key(n));
+      stats(names.stat(n), sub);
       root.add(sub);
     }
   }
@@ -220,7 +221,7 @@ public final class FNIndex extends StandardFunc {
     switch(stats.type) {
       case CATEGORY:
         for(final byte[] c : stats.cats) {
-          elem.add(new FElem(ENTRY).add(COUNT, token(stats.cats.value(c))).add(c));
+          elem.add(new FElem(ENTRY).add(COUNT, token(stats.cats.get(c))).add(c));
         }
         break;
       case DOUBLE:

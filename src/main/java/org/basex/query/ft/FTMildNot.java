@@ -104,7 +104,8 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     try {
       return new FTMildNot(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
     } catch(final QueryException e) {

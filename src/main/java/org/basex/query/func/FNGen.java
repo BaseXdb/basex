@@ -157,7 +157,7 @@ public final class FNGen extends StandardFunc {
 
     final String uri = IO.get(u.toJava()).path();
     // check if all target paths are unique
-    if(ctx.updates.putPaths.add(uri) < 0) UPURIDUP.thrw(info, uri);
+    if(!ctx.updates.putPaths.add(uri)) UPURIDUP.thrw(info, uri);
 
     ctx.updates.add(new Put(info, target.pre, target.data, uri), ctx);
     return null;

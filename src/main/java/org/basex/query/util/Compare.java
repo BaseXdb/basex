@@ -198,7 +198,7 @@ public final class Compare {
               for(int i1 = 0; i1 < ns1.size(); i1++) {
                 for(int i2 = 0; i2 < ns2.size(); i2++) {
                   if(!eq(ns1.name(i1), ns2.name(i2))) continue;
-                  if(!eq(ns1.string(i1), ns2.string(i2))) return false;
+                  if(!eq(ns1.value(i1), ns2.value(i2))) return false;
                   continue LOOP;
                 }
                 return false;

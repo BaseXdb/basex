@@ -32,9 +32,8 @@ public final class Namespaces {
   private boolean newns;
   /** Current level. Index starts at 1 (required by XQUF operations). */
   private int level = 1;
-
   /** Current namespace node. */
-  NSNode current;
+  private NSNode current;
 
   // Building Namespaces ================================================================
 
@@ -95,8 +94,8 @@ public final class Namespaces {
       current = node;
       newns = true;
     }
-    final int k = addPrefix(pref);
-    final int v = addURI(uri);
+    final int k = prefs.put(pref);
+    final int v = uris.put(uri);
     current.add(k, v);
     if(pref.length == 0) defaults.set(level, v);
     return node;
@@ -155,7 +154,7 @@ public final class Namespaces {
     // namespace has more children; skip traversal
     if(n.size != 0 || n.pre != 1 || n.values.length != 2) return null;
     // return default namespace or null
-    return prefs.key(n.values[0]).length == 0 ? uris.key(n.values[1]) : null;
+    return prefix(n.values[0]).length == 0 ? uri(n.values[1]) : null;
   }
 
   /**
@@ -365,8 +364,8 @@ public final class Namespaces {
     final NSNode nd = current.find(par, data);
     final NSNode t = new NSNode(pre);
 
-    final int k = addPrefix(pref);
-    final int v = addURI(uri);
+    final int k = prefs.put(pref);
+    final int v = uris.put(uri);
     if(nd.pre == pre) {
       nd.add(k, v);
     } else {
@@ -387,28 +386,18 @@ public final class Namespaces {
   }
 
   /**
-   * Adds the specified namespace uri.
-   * @param uri namespace uri to be added
-   * @return reference
+   * Returns the current namespaces node.
+   * @return current namespace node
    */
-  private int addURI(final byte[] uri) {
-    return Math.abs(uris.add(uri));
-  }
-
-  /**
-   * Adds the specified prefix.
-   * @param pref prefix to be added
-   * @return reference
-   */
-  private int addPrefix(final byte[] pref) {
-    return Math.abs(prefs.add(pref));
+  NSNode current() {
+    return current;
   }
 
   /**
    * Setter for namespaces root node.
    * @param node new root
    */
-  void setRoot(final NSNode node) {
+  void root(final NSNode node) {
     current = node;
   }
 
@@ -463,21 +452,21 @@ public final class Namespaces {
     final TokenObjMap<TokenList> map = new TokenObjMap<TokenList>();
     info(map, root);
     final TokenBuilder tb = new TokenBuilder();
-    for(final byte[] val : map.keys()) {
+    for(final byte[] key : map) {
       tb.add("  ");
-      final TokenList key = map.get(val);
-      key.sort(false);
-      final int ks = key.size();
-      if(ks > 1 || key.get(0).length != 0) {
-        if(key.size() != 1) tb.add("(");
+      final TokenList values = map.get(key);
+      values.sort(false);
+      final int ks = values.size();
+      if(ks > 1 || values.get(0).length != 0) {
+        if(values.size() != 1) tb.add("(");
         for(int k = 0; k < ks; ++k) {
           if(k != 0) tb.add(", ");
-          tb.add(key.get(k));
+          tb.add(values.get(k));
         }
         if(ks != 1) tb.add(")");
         tb.add(" = ");
       }
-      tb.addExt("\"%\"" + NL, val);
+      tb.addExt("\"%\"" + NL, key);
     }
     return tb.finish();
   }

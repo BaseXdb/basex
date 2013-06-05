@@ -143,7 +143,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   protected void startOpen(final byte[] n) throws IOException {
     namespaces = new NSDecl(namespaces);
-    attributes.reset();
+    attributes.clear();
   }
 
   @Override
@@ -174,7 +174,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
         final String ns = string(namespaces.get(prefix(name)));
         final String lname = string(local(name));
         final String rname = string(name);
-        final String value = string(attributes.string(a));
+        final String value = string(attributes.value(a));
         attrs.addAttribute(ns, lname, rname, null, value);
       }
 
@@ -286,7 +286,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     byte[] get(final byte[] prefix) {
       for(NSDecl c = this; c != null; c = c.parent) {
         if(c.decls != null) {
-          final byte[] ns = c.decls.string(prefix);
+          final byte[] ns = c.decls.value(prefix);
           if(ns != null) return ns;
         }
       }

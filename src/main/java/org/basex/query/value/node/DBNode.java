@@ -211,7 +211,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public Value copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Value copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return copy();
   }
 

@@ -190,7 +190,7 @@ public final class InlineFunc extends Single implements Scope {
   }
 
   @Override
-  public Expr copy(final QueryContext cx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext cx, final VarScope scp, final IntObjMap<Var> vs) {
     final VarScope v = scope.copy(cx, scp, vs);
     final Var[] a = args.clone();
     for(int i = 0; i < a.length; i++) a[i] = vs.get(a[i].id);

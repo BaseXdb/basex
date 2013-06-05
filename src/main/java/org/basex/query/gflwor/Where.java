@@ -91,7 +91,7 @@ public final class Where extends GFLWOR.Clause {
   }
 
   @Override
-  public Where copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Where copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new Where(pred.copy(ctx, scp, vs), info);
   }
 

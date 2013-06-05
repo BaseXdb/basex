@@ -144,7 +144,7 @@ public final class FTWords extends FTExpr {
             do {
               final byte[] tok = lex.nextToken();
               t += tok.length;
-              if(ftt.opt.sw != null && ftt.opt.sw.id(tok) != 0) {
+              if(ftt.opt.sw != null && ftt.opt.sw.contains(tok)) {
                 ++d;
               } else {
                 final FTIndexIterator ir = lex.get().length > data.meta.maxlen ?
@@ -365,7 +365,7 @@ public final class FTWords extends FTExpr {
       ft.init(t);
       while(ft.hasNext()) {
         final byte[] tok = ft.nextToken();
-        if(fto.sw != null && fto.sw.id(tok) != 0) continue;
+        if(fto.sw != null && fto.sw.contains(tok)) continue;
 
         if(fto.is(WC)) {
           // don't use index if one of the terms starts with a wildcard
@@ -425,7 +425,8 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     final FTWords ftw = new FTWords(info, query.copy(ctx, scp, vs), mode,
         occ == null ? null : Arr.copyAll(ctx, scp, vs, occ));
     if(data != null) ftw.data = data;

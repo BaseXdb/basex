@@ -298,7 +298,7 @@ public final class ModuleLoader {
           string(comp.file)).path();
       qp.module(token(p), comp.uri);
     }
-    if(toLoad.id(name) != 0) toLoad.delete(name);
+    if(toLoad.contains(name)) toLoad.delete(name);
     loaded.add(name);
   }
 

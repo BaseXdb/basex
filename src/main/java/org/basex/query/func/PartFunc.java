@@ -92,7 +92,7 @@ public final class PartFunc extends Arr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new PartFunc(info, expr[expr.length - 1].copy(ctx, scp, vs),
         copyAll(ctx, scp, vs, Arrays.copyOf(expr, expr.length - 1)), holes.clone());
   }

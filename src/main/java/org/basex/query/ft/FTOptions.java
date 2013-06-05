@@ -64,7 +64,8 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     return new FTOptions(info, expr[0].copy(ctx, scp, vs), new FTOpt().copy(opt));
   }
 }

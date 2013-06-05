@@ -53,8 +53,7 @@ public final class UpdatableMemValues extends MemValues {
     final TokenBuilder tb = new TokenBuilder(LI_STRUCTURE).add(SORTED_LIST).add(NL);
     final IndexStats stats = new IndexStats(data.meta.prop.num(Prop.MAXSTAT));
     for(int m = 1; m < size; ++m) {
-      final int oc = len[m];
-      if(stats.adding(oc)) stats.add(key(m));
+      if(stats.adding(len[m])) stats.add(key(m));
     }
     stats.print(tb);
     return tb.finish();

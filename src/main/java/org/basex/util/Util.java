@@ -233,7 +233,7 @@ public final class Util {
     final StackTraceElement[] st = th.getStackTrace();
     final String[] obj = new String[st.length + 1];
     obj[0] = th.toString();
-    for(int i = 0; i < st.length; i++) obj[i + 1] = "  " + st[i];
+    for(int i = 0; i < st.length; i++) obj[i + 1] = "\tat " + st[i];
     return obj;
   }
 

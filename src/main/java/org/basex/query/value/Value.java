@@ -121,7 +121,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   @Override
   public Value copy(final QueryContext ctx, final VarScope scp,
-      final IntMap<Var> vs) {
+      final IntObjMap<Var> vs) {
     return this;
   }
 

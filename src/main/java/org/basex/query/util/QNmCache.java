@@ -3,6 +3,7 @@ package org.basex.query.util;
 import java.util.*;
 
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -13,7 +14,7 @@ import org.basex.util.hash.*;
  */
 public final class QNmCache extends TokenSet {
   /** QNames. */
-  private QNm[] values = new QNm[CAP];
+  private QNm[] values = new QNm[Array.CAPACITY];
 
   /**
    * Creates a QName for the specified key, or returns an existing one.
@@ -23,13 +24,14 @@ public final class QNmCache extends TokenSet {
    * @return name
    */
   public QNm index(final byte[] prefix, final byte[] local, final byte[] uri) {
-    final int i = add(QNm.internal(prefix, local, uri));
-    if(i < 0) return values[-i];
-
-    final byte[] nm = QNm.internal(prefix, local, null);
-    final QNm qn = uri == null ? new QNm(nm) : new QNm(nm, uri);
-    values[i] = qn;
-    return qn;
+    final int i = put(QNm.internal(prefix, local, uri));
+    QNm value = values[i];
+    if(value == null) {
+      final byte[] nm = QNm.internal(prefix, local, null);
+      value = uri == null ? new QNm(nm) : new QNm(nm, uri);
+      values[i] = value;
+    }
+    return value;
   }
 
   @Override

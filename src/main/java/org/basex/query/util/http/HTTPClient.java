@@ -167,9 +167,8 @@ public final class HTTPClient {
   private void setRequestHeaders(final HttpURLConnection conn, final HTTPRequest r)
       throws QueryException {
 
-    final byte[][] headerNames = r.headers.keys();
-    for(final byte[] headerName : headerNames)
-      conn.addRequestProperty(string(headerName), string(r.headers.get(headerName)));
+    for(final byte[] headers : r.headers)
+      conn.addRequestProperty(string(headers), string(r.headers.get(headers)));
     // HTTP Basic Authentication
     final byte[] sendAuth = r.attrs.get(SEND_AUTHORIZATION);
     if(sendAuth != null && Bln.parse(sendAuth, info))
@@ -308,7 +307,7 @@ public final class HTTPClient {
     // extract serialization parameters
     final TokenBuilder tb = new TokenBuilder();
     tb.add(METHOD).add('=').add(method);
-    for(final byte[] key : attrs.keys()) {
+    for(final byte[] key : attrs) {
       if(!eq(key, SRC)) tb.add(',').add(key).add('=').add(attrs.get(key));
     }
 
@@ -376,9 +375,9 @@ public final class HTTPClient {
     out.write(boundTb.finish());
 
     // write headers
-    for(final byte[] headerName : part.headers.keys()) {
+    for(final byte[] header : part.headers) {
       final TokenBuilder hdrTb = new TokenBuilder();
-      hdrTb.add(headerName).add(": ").add(part.headers.get(headerName)).add(CRLF);
+      hdrTb.add(header).add(": ").add(part.headers.get(header)).add(CRLF);
       out.write(hdrTb.finish());
     }
     out.write(CRLF);

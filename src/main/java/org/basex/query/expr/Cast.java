@@ -60,7 +60,7 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Cast copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Cast copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new Cast(info, expr.copy(ctx, scp, vs), type);
   }
 

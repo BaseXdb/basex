@@ -65,31 +65,30 @@ public final class DecFormatter extends FormatUtil {
     // assign map values
     int z = '0';
     if(map != null) {
-      for(int m = 1; m <= map.size(); m++) {
-        final String key = string(map.key(m));
-        final byte[] val = map.value(m);
-
-        if(key.equals(DF_INF)) {
-          inf = val;
-        } else if(key.equals(DF_NAN)) {
-          nan = val;
-        } else if(val.length != 0 && cl(val, 0) == val.length) {
-          final int cp = cp(val, 0);
-          if(key.equals(DF_DEC)) decimal = cp;
-          else if(key.equals(DF_GRP)) grouping = cp;
-          else if(key.equals(DF_PAT)) pattern = cp;
-          else if(key.equals(DF_MIN)) minus = cp;
-          else if(key.equals(DF_DIG)) optional = cp;
-          else if(key.equals(DF_PC)) percent = cp;
-          else if(key.equals(DF_PM)) permille = cp;
-          else if(key.equals(DF_ZG)) {
+      for(final byte[] key : map) {
+        final String k = string(key);
+        final byte[] v = map.get(key);
+        if(k.equals(DF_INF)) {
+          inf = v;
+        } else if(k.equals(DF_NAN)) {
+          nan = v;
+        } else if(v.length != 0 && cl(v, 0) == v.length) {
+          final int cp = cp(v, 0);
+          if(k.equals(DF_DEC)) decimal = cp;
+          else if(k.equals(DF_GRP)) grouping = cp;
+          else if(k.equals(DF_PAT)) pattern = cp;
+          else if(k.equals(DF_MIN)) minus = cp;
+          else if(k.equals(DF_DIG)) optional = cp;
+          else if(k.equals(DF_PC)) percent = cp;
+          else if(k.equals(DF_PM)) permille = cp;
+          else if(k.equals(DF_ZG)) {
             z = zeroes(cp);
-            if(z == -1) INVDECFORM.thrw(ii, key, val);
+            if(z == -1) INVDECFORM.thrw(ii, k, v);
             if(z != cp) INVDECZERO.thrw(ii, (char)  cp);
           }
         } else {
           // signs must have single character
-          INVDECSINGLE.thrw(ii, key, val);
+          INVDECSINGLE.thrw(ii, k, v);
         }
       }
     }
@@ -98,7 +97,7 @@ public final class DecFormatter extends FormatUtil {
     zero = z;
     final IntSet is = new IntSet();
     final int[] ss = { decimal, grouping, percent, permille, zero, optional, pattern };
-    for(final int s : ss) if(is.add(s) < 0) DUPLDECFORM.thrw(ii, (char) s);
+    for(final int s : ss) if(!is.add(s)) DUPLDECFORM.thrw(ii, (char) s);
 
     // create auxiliary strings
     final TokenBuilder tb = new TokenBuilder();

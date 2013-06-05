@@ -69,7 +69,7 @@ public final class FNQName extends StandardFunc {
     final ValueBuilder vb = new ValueBuilder(as);
     for(int a = 0; a < as; ++a) {
       final byte[] key = ns.name(a);
-      if(key.length + ns.string(a).length != 0) vb.add(Str.get(key));
+      if(key.length + ns.value(a).length != 0) vb.add(Str.get(key));
     }
     return vb;
   }
@@ -160,7 +160,7 @@ public final class FNQName extends StandardFunc {
     final ANode an = (ANode) checkType(it2, NodeType.ELM);
     if(eq(pref, XML)) return Uri.uri(XMLURI, false);
     final Atts at = an.nsScope();
-    final byte[] s = at.string(pref);
+    final byte[] s = at.value(pref);
     return s == null || s.length == 0 ? null : Uri.uri(s, false);
   }
 

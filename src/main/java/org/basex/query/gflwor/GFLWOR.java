@@ -347,10 +347,10 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    */
   private boolean cleanDeadVars(final QueryContext ctx) {
-    final IntMap<Var> decl = new IntMap<Var>();
+    final IntObjMap<Var> decl = new IntObjMap<Var>();
     final BitArray used = new BitArray();
 
-    for(final Clause cl : clauses) for(final Var v : cl.vars()) decl.add(v.id, v);
+    for(final Clause cl : clauses) for(final Var v : cl.vars()) decl.put(v.id, v);
     final ASTVisitor marker = new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {
@@ -605,7 +605,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final LinkedList<Clause> cls = new LinkedList<Clause>();
     for(final Clause cl : clauses) cls.add(cl.copy(ctx, scp, vs));
     return copyType(new GFLWOR(info, cls, ret.copy(ctx, scp, vs)));
@@ -708,7 +708,8 @@ public final class GFLWOR extends ParseExpr {
      * @return {@code true} if something changed, {@code false} otherwise
      */
     @SuppressWarnings("unused")
-    boolean clean(final QueryContext ctx, final IntMap<Var> decl, final BitArray used) {
+    boolean clean(final QueryContext ctx, final IntObjMap<Var> decl,
+        final BitArray used) {
       return false;
     }
 
@@ -750,7 +751,7 @@ public final class GFLWOR extends ParseExpr {
     }
 
     @Override
-    public abstract GFLWOR.Clause copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
+    public abstract GFLWOR.Clause copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
     /**
      * Checks if the given clause can be slided over this clause.

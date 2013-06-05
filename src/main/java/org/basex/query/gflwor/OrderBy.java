@@ -267,7 +267,8 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public OrderBy copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public OrderBy copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     return new OrderBy(Arr.copyAll(ctx, scp, vs, refs),
         Arr.copyAll(ctx, scp, vs, keys), stable, info);
   }
@@ -278,7 +279,7 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  boolean clean(final QueryContext ctx, final IntMap<Var> decl, final BitArray used) {
+  boolean clean(final QueryContext ctx, final IntObjMap<Var> decl, final BitArray used) {
     // delete unused variables
     final int len = refs.length;
     for(int i = refs.length; --i >= 0;)
@@ -348,7 +349,7 @@ public final class OrderBy extends GFLWOR.Clause {
     }
 
     @Override
-    public Key copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    public Key copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
       return new Key(info, expr.copy(ctx, scp, vs), desc, least, coll);
     }
 

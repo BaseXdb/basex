@@ -4,10 +4,12 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
+import org.basex.util.*;
+
 /**
  * This is a simple container for byte values.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class ByteList extends ElementList {
@@ -18,59 +20,59 @@ public class ByteList extends ElementList {
    * Default constructor.
    */
   public ByteList() {
-    this(CAP);
+    this(Array.CAPACITY);
   }
 
   /**
-   * Constructor, specifying an initial array capacity.
-   * @param c array capacity
+   * Constructor, specifying an initial internal array size.
+   * @param capacity initial array capacity
    */
-  public ByteList(final int c) {
-    list = new byte[c];
+  public ByteList(final int capacity) {
+    list = new byte[capacity];
   }
 
   /**
-   * Adds an entry to the array.
-   * @param e entry to be added
+   * Adds an element to the array.
+   * @param element element to be added; will be cast to a byte
    * @return self reference
    */
-  public ByteList add(final int e) {
+  public ByteList add(final int element) {
     if(size == list.length) list = Arrays.copyOf(list, newSize());
-    list[size++] = (byte) e;
+    list[size++] = (byte) element;
     return this;
   }
 
   /**
-   * Adds a byte array to the container.
-   * @param b the entries to be added
+   * Adds elements to the container.
+   * @param elements elements to be added
    * @return self reference
    */
-  public ByteList add(final byte[] b) {
-    return add(b, 0, b.length);
+  public ByteList add(final byte[] elements) {
+    return add(elements, 0, elements.length);
   }
 
   /**
-   * Adds a partial byte array to the container.
-   * @param b the entries to be added
-   * @param s start position
-   * @param e end position
+   * Adds a part of the specified elements to the container.
+   * @param elements elements to be added
+   * @param start start position
+   * @param end end position
    * @return self reference
    */
-  public ByteList add(final byte[] b, final int s, final int e) {
-    final int l = e - s;
+  public ByteList add(final byte[] elements, final int start, final int end) {
+    final int l = end - start;
     if(size + l > list.length) list = Arrays.copyOf(list, newSize(size + l));
-    System.arraycopy(b, s, list, size, l);
+    System.arraycopy(elements, start, list, size, l);
     size += l;
     return this;
   }
 
   /**
    * Returns the element at the specified index position.
-   * @param i index
+   * @param index index of the element to return
    * @return element
    */
-  public final byte get(final int i) {
-    return list[i];
+  public final byte get(final int index) {
+    return list[index];
   }
 
   /**

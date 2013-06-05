@@ -66,7 +66,7 @@ public class IndexTree {
         if(exist) {
           values.set(n, Num.add(values.get(n), value));
         } else {
-          final int i = maps.value(Num.num(n));
+          final int i = maps.get(Num.num(n));
           if(i < 0) {
             maps.put(Num.num(n), values.size());
             values.add(Num.newNum(value));

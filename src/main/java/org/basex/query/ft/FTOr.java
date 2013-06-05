@@ -120,7 +120,8 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     return new FTOr(info, Arr.copyAll(ctx, scp, vs, expr));
   }
 

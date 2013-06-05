@@ -1155,9 +1155,8 @@ public class QueryParser extends InputParser {
         // find all non-grouping variables that aren't shadowed
         final ArrayList<VarRef> ng = new ArrayList<VarRef>();
         for(final GroupBy.Spec spec : specs) curr.put(spec.var.name.id(), spec.var);
-        vars: for(int i = 0; i < curr.size(); i++) {
-          // weird quirk of TokenObjMap
-          final Var v = curr.value(i + 1);
+        vars:
+        for(final Var v : curr.values()) {
           for(final GroupBy.Spec spec : specs) if(spec.var.is(v)) continue vars;
           ng.add(new VarRef(specs[0].info, v));
         }
@@ -1194,8 +1193,8 @@ public class QueryParser extends InputParser {
         } while(wsConsume(COMMA));
 
         final VarRef[] vs = new VarRef[curr.size()];
-        for(int i = 0; i < vs.length; i++)
-          vs[i] = new VarRef(ob[0].info, curr.value(i + 1));
+        int i = 0;
+        for(final Var v : curr.values()) vs[i++] = new VarRef(ob[0].info, v);
         clauses.add(new OrderBy(vs, ob, stable, ob[0].info));
         alter = ORDERBY;
       }

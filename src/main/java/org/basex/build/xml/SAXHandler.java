@@ -80,15 +80,15 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
       if(chop) {
         final int a = atts.get(DataText.XML_SPACE);
         if(a != -1) {
-          final byte[] s = atts.string(a);
+          final byte[] s = atts.value(a);
           if(eq(s, DataText.DEFAULT)) c = true;
           else if(eq(s, DataText.PRESERVE)) c = false;
         }
       }
       chops.push(c);
 
-      atts.reset();
-      nsp.reset();
+      atts.clear();
+      nsp.clear();
       ++nodes;
     } catch(final IOException ex) {
       error(ex);

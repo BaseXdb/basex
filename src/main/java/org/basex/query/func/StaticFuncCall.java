@@ -62,10 +62,10 @@ public abstract class StaticFuncCall extends Arr {
       // create let bindings for all variables
       final LinkedList<GFLWOR.Clause> cls = expr.length == 0 ? null :
         new LinkedList<GFLWOR.Clause>();
-      final IntMap<Var> vs = new IntMap<Var>();
+      final IntObjMap<Var> vs = new IntObjMap<Var>();
       for(int i = 0; i < func.args.length; i++) {
         final Var old = func.args[i], v = scp.newCopyOf(ctx, old);
-        vs.add(old.id, v);
+        vs.put(old.id, v);
         cls.add(new Let(v, expr[i], false, func.info).optimize(ctx, scp));
       }
 
@@ -86,7 +86,7 @@ public abstract class StaticFuncCall extends Arr {
 
   @Override
   public final BaseFuncCall copy(final QueryContext ctx, final VarScope scp,
-      final IntMap<Var> vs) {
+      final IntObjMap<Var> vs) {
     final Expr[] arg = new Expr[expr.length];
     for(int i = 0; i < arg.length; i++) arg[i] = expr[i].copy(ctx, scp, vs);
     final BaseFuncCall call = new BaseFuncCall(name, arg, sc, info);

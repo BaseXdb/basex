@@ -218,7 +218,7 @@ public final class DataBuilder {
     data.nspaces.prepare();
     final Atts ns = node.nsScope();
     final int nl = ns.size();
-    for(int n = 0; n < nl; n++) data.nspaces.add(ns.name(n), ns.string(n), ds);
+    for(int n = 0; n < nl; n++) data.nspaces.add(ns.name(n), ns.value(n), ds);
 
     // analyze node name
     final QNm name = node.qname();

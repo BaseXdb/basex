@@ -50,7 +50,7 @@ public final class RangeAccess extends IndexAccess {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new RangeAccess(info, ind, data, iterable);
   }
 

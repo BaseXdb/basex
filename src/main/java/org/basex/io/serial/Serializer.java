@@ -126,7 +126,7 @@ public abstract class Serializer {
         // serialize namespaces
         final Atts nsp = node.namespaces();
         for(int p = nsp.size() - 1; p >= 0; p--) {
-          namespace(nsp.name(p), nsp.string(p));
+          namespace(nsp.name(p), nsp.value(p));
         }
         // serialize attributes
         AxisIter ai = node.attributes();
@@ -365,7 +365,7 @@ public abstract class Serializer {
         // add namespace definitions
         if(nsp != null) {
           // add namespaces from database
-          nsp.reset();
+          nsp.clear();
           int pp = p;
 
           // check namespace of current element
@@ -380,8 +380,8 @@ public abstract class Serializer {
             final Atts atn = data.ns(pp);
             for(int n = 0; n < atn.size(); ++n) {
               key = atn.name(n);
-              val = atn.string(n);
-              if(nsp.add(key) > 0) namespace(key, val);
+              val = atn.value(n);
+              if(nsp.add(key)) namespace(key, val);
             }
             // check ancestors only on top level
             if(level != 0 || l != 0) break;
@@ -409,7 +409,7 @@ public abstract class Serializer {
    */
   private byte[] ns(final byte[] pref) {
     for(int i = ns.size() - 1; i >= 0; i--) {
-      if(eq(ns.name(i), pref)) return ns.string(i);
+      if(eq(ns.name(i), pref)) return ns.value(i);
     }
     return null;
   }

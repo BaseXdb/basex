@@ -73,7 +73,7 @@ public final class JavaModuleFunc extends JavaMapping {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new JavaModuleFunc(info, module, mth, copyAll(ctx, scp, vs, expr));
   }
 

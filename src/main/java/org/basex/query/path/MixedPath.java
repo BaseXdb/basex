@@ -120,7 +120,7 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new MixedPath(info, root == null ? null : root.copy(ctx, scp, vs),
         Arr.copyAll(ctx, scp, vs, steps));
   }

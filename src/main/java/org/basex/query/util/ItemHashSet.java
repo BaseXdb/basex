@@ -5,31 +5,71 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
- * Set for quickly indexing items.
+ * This is an efficient and memory-saving hash map for storing items.
+ * It is related to the {@link TokenSet} class.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class ItemHashSet implements ItemSet {
-  /** Initial hash capacity. */
-  protected static final int CAP = 1 << 3;
-  /** Hash values. */
-  private int[] hash = new int[CAP];
-  /** Pointers to the next token. */
-  private int[] next = new int[CAP];
-  /** Hash table buckets. */
-  private int[] bucket = new int[CAP];
-  /** Hashed items. */
-  Item[] keys = new Item[CAP];
   /** Hash entries. Actual hash size is {@code size - 1}. */
-  int size = 1;
+  protected int size = 1;
+
+  /** Hash values. */
+  private int[] hash = new int[Array.CAPACITY];
+  /** Pointers to the next token. */
+  private int[] next = new int[Array.CAPACITY];
+  /** Hash table buckets. */
+  private int[] bucket = new int[Array.CAPACITY];
+  /** Hashed items. */
+  private Item[] keys = new Item[Array.CAPACITY];
 
   @Override
-  public int add(final Item key, final InputInfo ii) throws QueryException {
-    if(size == next.length) rehash();
+  public final boolean add(final Item key, final InputInfo ii) throws QueryException {
+    return index(key, ii) > 0;
+  }
 
+  /**
+   * Stores the specified key and returns its id.
+   * @param key key to be added
+   * @param ii input info
+   * @return unique id of stored key (larger than zero)
+   * @throws QueryException query exception
+   */
+  public int put(final Item key, final InputInfo ii) throws QueryException {
+    final int i = index(key, ii);
+    return Math.abs(i);
+  }
+
+  /**
+   * Returns the id of the specified key, or {@code 0} if the key does not exist.
+   * @param key key to be looked up
+   * @param ii input info
+   * @return id, or {@code 0} if key does not exist
+   * @throws QueryException query exception
+   */
+  public final int id(final Item key, final InputInfo ii) throws QueryException {
+    final int h = key.hash(ii);
+    final int p = h & bucket.length - 1;
+    for(int id = bucket[p]; id != 0; id = next[id]) {
+      if(keys[id].equiv(key, null, ii)) return -id;
+    }
+    return 0;
+  }
+
+  /**
+   * Stores the specified key and returns its id, or returns the negative id if the
+   * key has already been stored.
+   * @param key key to be found
+   * @param ii input info
+   * @return id, or negative id if key has already been stored
+   * @throws QueryException query exception
+   */
+  private int index(final Item key, final InputInfo ii) throws QueryException {
+    if(size == next.length) rehash();
     final int h = key.hash(ii);
     final int p = h & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
@@ -43,22 +83,9 @@ public class ItemHashSet implements ItemSet {
   }
 
   /**
-   * Returns the id of the specified key or -1 if key was not found.
-   * @param key key to be found
-   * @return id or 0 if nothing was found
-   * @param ii input info
-   * @throws QueryException query exception
+   * Returns the number of entries.
+   * @return number of entries
    */
-  public final int id(final Item key, final InputInfo ii) throws QueryException {
-    final int h = key.hash(ii);
-    final int p = h & bucket.length - 1;
-    for(int id = bucket[p]; id != 0; id = next[id]) {
-      if(keys[id].equiv(key, null, ii)) return id;
-    }
-    return 0;
-  }
-
-  @Override
   public int size() {
     return size - 1;
   }
@@ -89,14 +116,6 @@ public class ItemHashSet implements ItemSet {
 
   @Override
   public Iterator<Item> iterator() {
-    return new Iterator<Item>() {
-      private int c = 1;
-      @Override
-      public boolean hasNext() { return c < size; }
-      @Override
-      public Item next() { return keys[c++]; }
-      @Override
-      public void remove() { Util.notexpected(); }
-    };
+    return new ArrayIterator<Item>(keys, 1, size);
   }
 }

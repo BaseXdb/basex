@@ -64,17 +64,17 @@ public final class StopWords extends TokenSet {
 
   /**
    * Reads a stop words file.
-   * @param fl file reference
-   * @param e except flag
-   * @return true if everything went alright
+   * @param file file reference
+   * @param exclude exclude stop words
+   * @return success flag
    */
-  public boolean read(final IO fl, final boolean e) {
+  public boolean read(final IO file, final boolean exclude) {
     try {
-      final byte[] content = norm(fl.read());
+      final byte[] content = norm(file.read());
       final int s = Token.contains(content, ' ') ? ' ' : '\n';
       for(final byte[] sl : split(content, s)) {
-        if(e) delete(sl);
-        else if(!contains(sl)) add(sl);
+        if(exclude) delete(sl);
+        else put(sl);
       }
       return true;
     } catch(final IOException ex) {

@@ -52,15 +52,15 @@ public class BuilderSerializer extends Serializer {
   @Override
   protected final void finishOpen() throws IOException {
     build.openElem(elem, atts, nsp);
-    atts.reset();
-    nsp.reset();
+    atts.clear();
+    nsp.clear();
   }
 
   @Override
   protected void finishEmpty() throws IOException {
     build.emptyElem(elem, atts, nsp);
-    atts.reset();
-    nsp.reset();
+    atts.clear();
+    nsp.clear();
   }
 
   @Override

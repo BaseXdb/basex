@@ -5,25 +5,18 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Interface for indexing and retrieving items in a set.
+ * This is an interface for indexing and retrieving items in a set.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public interface ItemSet extends Iterable<Item> {
   /**
-   * Indexes the specified key and returns the offset of the added key.
-   * If the key already exists, a negative offset is returned.
-   * @param key key
+   * Stores the specified key if it has not been stored before.
+   * @param key key to be added
    * @param ii input info
-   * @return offset of added key, negative offset otherwise
+   * @return {@Code true} if the key did not exist yet and was stored
    * @throws QueryException query exception
    */
-  int add(final Item key, final InputInfo ii) throws QueryException;
-
-  /**
-   * Returns the number of entries.
-   * @return number of entries
-   */
-  int size();
+  boolean add(final Item key, final InputInfo ii) throws QueryException;
 }

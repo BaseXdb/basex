@@ -82,7 +82,7 @@ public final class StringRangeAccess extends IndexAccess {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new StringRangeAccess(info, sr, data, iterable);
   }
 

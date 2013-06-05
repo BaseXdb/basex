@@ -133,7 +133,7 @@ public final class Constr {
         // add namespace
         final byte[] name = node.name();
         final byte[] uri = node.string();
-        final byte[] u = nspaces.string(name);
+        final byte[] u = nspaces.value(name);
         if(u == null) {
           nspaces.add(name, uri);
         } else if(!Token.eq(uri, u)) {

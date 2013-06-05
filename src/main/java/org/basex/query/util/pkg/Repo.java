@@ -80,8 +80,9 @@ public final class Repo {
     final byte[] name = pkg.uniqueName();
     // update namespace dictionary
     for(final Component comp : pkg.comps) {
-      if(nsDict.contains(comp.uri)) {
-        nsDict.get(comp.uri).add(name);
+      final TokenSet dict = nsDict.get(comp.uri);
+      if(dict != null) {
+        dict.add(name);
       } else {
         nsDict.put(comp.uri, new TokenSet(name));
       }
@@ -141,9 +142,9 @@ public final class Repo {
       for(final Component comp : pkg.comps) {
         // add component's namespace to namespace dictionary
         if(comp.uri != null) {
-          final TokenSet ts = nsDict.get(comp.uri);
-          if(ts != null) {
-            ts.add(name);
+          final TokenSet dict = nsDict.get(comp.uri);
+          if(dict != null) {
+            dict.add(name);
           } else {
             nsDict.put(comp.uri, new TokenSet(name));
           }

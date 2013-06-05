@@ -75,7 +75,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final StandardFunc copy(final QueryContext ctx, final VarScope scp,
-      final IntMap<Var> vs) {
+      final IntObjMap<Var> vs) {
     final int es = expr.length;
     final Expr[] arg = new Expr[es];
     for(int e = 0; e < es; e++) arg[e] = expr[e].copy(ctx, scp, vs);

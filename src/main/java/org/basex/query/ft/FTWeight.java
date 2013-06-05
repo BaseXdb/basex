@@ -113,7 +113,8 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     return new FTWeight(info, expr[0].copy(ctx, scp, vs), weight.copy(ctx, scp, vs));
   }
 

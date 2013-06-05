@@ -28,18 +28,13 @@ public final class CollationSet implements ItemSet {
   }
 
   @Override
-  public int add(final Item item, final InputInfo ii) throws QueryException {
-    final int is = size();
+  public boolean add(final Item item, final InputInfo ii) throws QueryException {
+    final int is = (int) items.size();
     for(int id = 0; id < is; id++) {
-      if(items.get(id).equiv(item, coll, ii)) return -id - 1;
+      if(items.get(id).equiv(item, coll, ii)) return false;
     }
     items.add(item);
-    return is + 1;
-  }
-
-  @Override
-  public int size() {
-    return (int) items.size();
+    return true;
   }
 
   @Override

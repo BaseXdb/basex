@@ -42,7 +42,8 @@ public final class FTExtensionSelection extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     final Pragma[] prag = pragmas.clone();
     for(int i = 0; i < prag.length; i++) prag[i] = prag[i].copy();
     return copyType(new FTExtensionSelection(info, prag, expr[0].copy(ctx, scp, vs)));

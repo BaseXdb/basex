@@ -684,7 +684,7 @@ public abstract class Data {
 
     // loop through all entries
     final IntList preStack = new IntList();
-    final NSNode nsRoot = nspaces.current;
+    final NSNode nsRoot = nspaces.current();
     final HashSet<NSNode> newNodes = new HashSet<NSNode>();
     final IntList flagPres = new IntList();
 
@@ -723,14 +723,14 @@ public abstract class Data {
             for(int a = 0; a < at.size(); ++a) {
               // see if prefix has been declared/ is part of current ns scope
               final byte[] old = nsScope.get(at.name(a));
-              if(old == null || !eq(old, at.string(a))) {
+              if(old == null || !eq(old, at.value(a))) {
                 // we have to keep track of all new NSNodes that are added
                 // to the Namespace structure, as their pre values must not
                 // be updated. I.e. if an NSNode N with pre value 3 existed
                 // prior to inserting and two new nodes are inserted at
                 // location pre == 3 we have to make sure N and only N gets
                 // updated.
-                newNodes.add(nspaces.add(at.name(a), at.string(a), pre));
+                newNodes.add(nspaces.add(at.name(a), at.value(a), pre));
                 ne = true;
               }
             }
@@ -767,7 +767,7 @@ public abstract class Data {
     }
     // finalize and update namespace structure
     while(!preStack.isEmpty()) nspaces.close(preStack.pop());
-    nspaces.setRoot(nsRoot);
+    nspaces.root(nsRoot);
 
     if(bp != 0) insert(ipre + c - 1 - (c - 1) % buf);
     // reset buffer to old size

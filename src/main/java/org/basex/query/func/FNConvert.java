@@ -292,7 +292,7 @@ public final class FNConvert extends StandardFunc {
 
     // check if all arguments are bytes
     final Iter ir = v.iter();
-    final ByteList bl = new ByteList(Math.max(ElementList.CAP, (int) v.size()));
+    final ByteList bl = new ByteList(Math.max(Array.CAPACITY, (int) v.size()));
     for(Item it; (it = ir.next()) != null;) {
       bl.add((int) ((Int) checkType(it, AtomType.BYT)).itr());
     }

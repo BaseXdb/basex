@@ -171,7 +171,7 @@ final class Docs {
     docs.move(-size, i);
 
     if(!found) return;
-    paths.delete(i);
+    paths.deleteAt(i);
     pathOrder = null;
   }
 

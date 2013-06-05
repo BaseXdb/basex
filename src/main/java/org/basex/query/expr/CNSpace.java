@@ -45,7 +45,7 @@ public final class CNSpace extends CName {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new CNSpace(info, name.copy(ctx, scp, vs), expr[0].copy(ctx, scp, vs));
   }
 }

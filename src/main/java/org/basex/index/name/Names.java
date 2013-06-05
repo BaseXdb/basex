@@ -32,7 +32,7 @@ public final class Names extends TokenSet implements Index {
    * @param md meta data
    */
   public Names(final MetaData md) {
-    stats = new Stats[CAP];
+    stats = new Stats[Array.CAPACITY];
     meta = md;
   }
 
@@ -62,14 +62,14 @@ public final class Names extends TokenSet implements Index {
    * @return name id
    */
   public int index(final byte[] n, final byte[] v, final boolean st) {
-    final int i = Math.abs(add(n));
+    final int id = put(n);
     if(st) {
-      if(stats[i] == null) stats[i] = new Stats();
-      final Stats stat = stats[i];
+      if(stats[id] == null) stats[id] = new Stats();
+      final Stats stat = stats[id];
       if(v != null) stat.add(v, meta);
       stat.count++;
     }
-    return i;
+    return id;
   }
 
   /**

@@ -147,7 +147,8 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     final FTAnd copy = new FTAnd(info, Arr.copyAll(ctx, scp, vs, expr));
     if(neg != null) copy.neg = neg.clone();
     return copy;

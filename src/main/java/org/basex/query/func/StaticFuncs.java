@@ -109,15 +109,14 @@ public final class StaticFuncs extends ExprInfo {
    */
   public void check(final QueryContext qc) throws QueryException {
     // initialize function calls
-    final int fs = funcs.size();
-    for(int id = 1; id <= fs; ++id) {
-      final FuncCache fc = funcs.value(id);
+    int id = 0;
+    for(final FuncCache fc : funcs.values()) {
       final StaticFuncCall call = fc.calls.isEmpty() ? null : fc.calls.get(0);
       if(fc.func == null) {
         // check if another function with same name exists
-        for(int i = 1; i <= fs; ++i) {
-          if(i == id) continue;
-          final FuncCache ofc = funcs.value(i);
+        int oid = 0;
+        for(final FuncCache ofc : funcs.values()) {
+          if(oid++ == id) continue;
           if(call.name.eq(ofc.name())) FUNCTYPE.thrw(call.info, call.name.string(),
               call.expr.length);
         }
@@ -128,6 +127,7 @@ public final class StaticFuncs extends ExprInfo {
         if(fc.func.expr == null) FUNCNOIMPL.thrw(call.info, call.name.string());
         qc.updating |= fc.func.updating;
       }
+      id++;
     }
   }
 
@@ -136,8 +136,7 @@ public final class StaticFuncs extends ExprInfo {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    final int fs = funcs.size();
-    for(int id = 1; id <= fs; ++id) funcs.value(id).func.checkUp();
+    for(final FuncCache fc : funcs.values()) fc.func.checkUp();
   }
 
   /**
@@ -147,9 +146,7 @@ public final class StaticFuncs extends ExprInfo {
    */
   public void compile(final QueryContext ctx) throws QueryException {
     // only compile those functions that are used
-    final int fs = funcs.size();
-    for(int id = 1; id <= fs; id++) {
-      final FuncCache fc = funcs.value(id);
+    for(final FuncCache fc : funcs.values()) {
       if(!fc.calls.isEmpty()) fc.func.compile(ctx);
     }
   }
@@ -182,9 +179,8 @@ public final class StaticFuncs extends ExprInfo {
     // find local functions
     final Levenshtein ls = new Levenshtein();
     final byte[] nm = lc(name.local());
-    final int fs = funcs.size();
-    for(int id = 1; id <= fs; ++id) {
-      final StaticFunc sf = funcs.value(id).func;
+    for(final FuncCache fc : funcs.values()) {
+      final StaticFunc sf = fc.func;
       if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
         FUNCSIMILAR.thrw(ii, name.string(), sf.name.string());
       }
@@ -203,16 +199,16 @@ public final class StaticFuncs extends ExprInfo {
   public StaticFunc[] funcs() {
     final int fs = funcs.size();
     final StaticFunc[] sf = new StaticFunc[fs];
-    for(int id = 1; id <= fs; ++id) sf[id - 1] = funcs.value(id).func;
+    int i = 0;
+    for(final FuncCache fc : funcs.values()) sf[i++] = fc.func;
     return sf;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    final int fs = funcs.size();
-    for(int id = 1; id <= fs; ++id) {
-      sb.append(funcs.value(id).func.toString()).append(Text.NL);
+    for(final FuncCache fc : funcs.values()) {
+      sb.append(fc.func.toString()).append(Text.NL);
     }
     return sb.toString();
   }

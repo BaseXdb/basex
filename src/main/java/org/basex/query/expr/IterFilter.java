@@ -43,7 +43,8 @@ final class IterFilter extends Filter {
   }
 
   @Override
-  public Filter copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Filter copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     final Filter f = new CachedFilter(info, root == null ? null : root.copy(ctx, scp, vs),
         Arr.copyAll(ctx, scp, vs, preds));
     return copy(new IterFilter(f));

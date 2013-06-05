@@ -246,7 +246,7 @@ public abstract class Expr extends ExprInfo {
    * @return copied expression
    */
   public final Expr copy(final QueryContext ctx, final VarScope scp) {
-    return copy(ctx, scp, new IntMap<Var>());
+    return copy(ctx, scp, new IntObjMap<Var>());
   }
 
   /**
@@ -257,7 +257,7 @@ public abstract class Expr extends ExprInfo {
    * @param vs mapping from old variable IDs to new variable copies
    * @return copied expression
    */
-  public abstract Expr copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
+  public abstract Expr copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
   /**
    * Adds the names of the databases that will be touched by the query.

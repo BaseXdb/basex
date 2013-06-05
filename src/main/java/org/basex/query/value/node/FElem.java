@@ -158,12 +158,12 @@ public final class FElem extends FNode {
     }
 
     // add all new namespaces
-    for(int i = 0; i < ns.size(); ++i) nss.put(ns.name(i), ns.string(i));
+    for(int i = 0; i < ns.size(); ++i) nss.put(ns.name(i), ns.value(i));
 
     // no parent, so we have to add all namespaces in scope
     if(p == null) {
       nsScope(elem.getParentNode(), nss);
-      for(final byte[] pref : nss.keys()) {
+      for(final byte[] pref : nss) {
         if(!ns.contains(pref)) ns.add(pref, nss.get(pref));
       }
     }
@@ -397,7 +397,7 @@ public final class FElem extends FNode {
     final FElem node = new FElem(name);
     if(ns != null) {
       node.ns = new Atts();
-      for(int n = 0; n < ns.size(); ++n) node.ns.add(ns.name(n), ns.string(n));
+      for(int n = 0; n < ns.size(); ++n) node.ns.add(ns.name(n), ns.value(n));
     }
     if(atts != null) {
       for(final ANode n : atts) node.add(n.copy());
@@ -418,7 +418,7 @@ public final class FElem extends FNode {
     final TokenBuilder tb = new TokenBuilder().add('<').add(name.string());
     if(ns != null) {
       for(int n = 0; n < ns.size(); n++) {
-        tb.add(new FNames(ns.name(n), ns.string(n)).toString());
+        tb.add(new FNames(ns.name(n), ns.value(n)).toString());
       }
     }
     if(atts != null) {

@@ -2,34 +2,36 @@ package org.basex.util.hash;
 
 import java.util.*;
 
+import org.basex.util.*;
+
 /**
- * This is an efficient hash map for generic objects, extending the
+ * This is an efficient and memory-saving hash map for storing tokens and objects.
  * {@link TokenSet hash set}.
  * @param <E> generic value type
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class TokenObjMap<E> extends TokenSet {
   /** Values. */
-  private Object[] values = new Object[CAP];
+  private Object[] values = new Object[Array.CAPACITY];
 
   /**
-   * Indexes the specified keys and values.
+   * Indexes the specified key and value.
    * If the key exists, the value is updated.
    * @param key key
    * @param val value
    */
   public void put(final byte[] key, final E val) {
     // array bounds are checked before array is resized..
-    final int i = add(key);
-    values[Math.abs(i)] = val;
+    final int i = put(key);
+    values[i] = val;
   }
 
   /**
    * Returns the value for the specified key.
-   * @param key key to be found
-   * @return value or {@code null} if nothing was found
+   * @param key key to be looked up
+   * @return value, or {@code null} if nothing was found
    */
   @SuppressWarnings("unchecked")
   public E get(final byte[] key) {
@@ -37,22 +39,11 @@ public final class TokenObjMap<E> extends TokenSet {
   }
 
   /**
-   * Returns the specified value.
-   * @param p value index
-   * @return value
+   * Returns a value iterator.
+   * @return iterator
    */
-  @SuppressWarnings("unchecked")
-  public E value(final int p) {
-    return (E) values[p];
-  }
-
-  /**
-   * Sets the specified value.
-   * @param p value index
-   * @param v value to be set
-   */
-  public void value(final int p, final E v) {
-    values[p] = v;
+  public Iterable<E> values() {
+    return new ArrayIterator<E>(values, 1, size);
   }
 
   @Override

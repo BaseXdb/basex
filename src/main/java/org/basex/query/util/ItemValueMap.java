@@ -13,23 +13,23 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class ItemMap extends ItemHashSet {
+public class ItemValueMap extends ItemHashSet {
   /** Values. */
-  private Value[] values = new Value[CAP];
+  private Value[] values = new Value[Array.CAPACITY];
 
   /**
-   * Indexes the specified keys and values.
-   * If the key exists, the value is updated.
+   * Indexes the specified key and stores the associated value.
+   * If the key already exists, the value is updated.
    * @param key key
-   * @param val value
+   * @param value value
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void add(final Item key, final Value val, final InputInfo ii)
+  public void add(final Item key, final Value value, final InputInfo ii)
       throws QueryException {
     // array bounds are checked before array is resized..
-    final int i = add(key, ii);
-    values[Math.abs(i)] = val;
+    final int i = put(key, ii);
+    values[Math.abs(i)] = value;
   }
 
   /**
@@ -41,6 +41,14 @@ public class ItemMap extends ItemHashSet {
    */
   public Value get(final Item key, final InputInfo ii) throws QueryException {
     return values[id(key, ii)];
+  }
+
+  /**
+   * Returns a value iterator.
+   * @return iterator
+   */
+  public final Iterable<Value> values() {
+    return new ArrayIterator<Value>(values, 1, size);
   }
 
   @Override

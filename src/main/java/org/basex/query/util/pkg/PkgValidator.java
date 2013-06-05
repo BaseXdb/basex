@@ -82,7 +82,7 @@ public final class PkgValidator {
   public byte[] depPkg(final Dependency dep) {
     // get installed versions of secondary package
     final TokenSet instVers = new TokenSet();
-    for(final byte[] nextPkg : repo.pkgDict().keys()) {
+    for(final byte[] nextPkg : repo.pkgDict()) {
       if(nextPkg != null && startsWith(nextPkg, dep.pkg)) instVers.add(version(nextPkg));
     }
     // check if an appropriate version is already installed
@@ -114,22 +114,22 @@ public final class PkgValidator {
   /**
    * Checks compatibility of dependency version with installed version.
    * @param dep dependency
-   * @param currentVers current versions - either currently installed versions
+   * @param versions current versions - either currently installed versions
    *        for a package or current version of BaseX
    * @return available appropriate version
    */
-  private static byte[] availVersion(final Dependency dep, final TokenSet currentVers) {
-    if(currentVers.isEmpty()) return null;
+  private static byte[] availVersion(final Dependency dep, final TokenSet versions) {
+    if(versions.isEmpty()) return null;
     if(dep.versions != null) {
       // get acceptable versions for secondary package/processor
       final TokenSet versList = new TokenSet(split(dep.versions, ' '));
       // check if any acceptable version is already installed
-      for(final byte[] v : versList) if(currentVers.contains(v)) return v;
+      for(final byte[] v : versList) if(versions.contains(v)) return v;
     } else if(dep.semver != null) {
       // version template - version of secondary package or BaseX version must
       // be compatible with the defined template
       final Version semVer = new Version(dep.semver);
-      for(final byte[] v : currentVers)
+      for(final byte[] v : versions)
         if(new Version(v).isCompatible(semVer)) return v;
     } else if(dep.semverMin != null && dep.semverMax != null) {
       // version templates for minimal and maximal acceptable version - version
@@ -137,7 +137,7 @@ public final class PkgValidator {
       // the minimal and strictly below the maximal
       final Version min = new Version(dep.semverMin);
       final Version max = new Version(dep.semverMax);
-      for(final byte[] nextVer : currentVers) {
+      for(final byte[] nextVer : versions) {
         final Version v = new Version(nextVer);
         if(v.compareTo(min) >= 0 && v.compareTo(max) < 0) return nextVer;
       }
@@ -146,7 +146,7 @@ public final class PkgValidator {
       // package or BaseX version must be either compatible with this template
       // or greater than it
       final Version semVer = new Version(dep.semverMin);
-      for(final byte[] nextVer : currentVers) {
+      for(final byte[] nextVer : versions) {
         final Version v = new Version(nextVer);
         if(v.isCompatible(semVer) || v.compareTo(semVer) >= 0) return nextVer;
       }
@@ -155,14 +155,14 @@ public final class PkgValidator {
       // package or BaseX version must be either compatible with this template
       // or smaller than it
       final Version semVer = new Version(dep.semverMax);
-      for(final byte[] nextVer : currentVers) {
+      for(final byte[] nextVer : versions) {
         final Version v = new Version(nextVer);
         if(v.isCompatible(semVer) || v.compareTo(semVer) <= 0) return nextVer;
       }
     } else {
       // no versioning attribute is specified => any version of the secondary
       // package is acceptable
-      return currentVers.keys()[0];
+      return versions.key(1);
     }
     return null;
   }

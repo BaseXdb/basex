@@ -93,7 +93,7 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public abstract FTExpr copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
+  public abstract FTExpr copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
   @Override
   public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {

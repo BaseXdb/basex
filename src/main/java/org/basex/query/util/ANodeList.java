@@ -101,14 +101,6 @@ public final class ANodeList implements Iterable<ANode> {
 
   @Override
   public Iterator<ANode> iterator() {
-    return new Iterator<ANode>() {
-      private int c;
-      @Override
-      public boolean hasNext() { return c < size; }
-      @Override
-      public ANode next() { return list[c++]; }
-      @Override
-      public void remove() { Util.notexpected(); }
-    };
+    return new ArrayIterator<ANode>(list, size);
   }
 }

@@ -169,13 +169,13 @@ public final class For extends GFLWOR.Clause {
   }
 
   @Override
-  public For copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public For copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Var v = scp.newCopyOf(ctx, var);
-    vs.add(var.id, v);
+    vs.put(var.id, v);
     final Var p = pos == null ? null : scp.newCopyOf(ctx, pos);
-    if(p != null) vs.add(pos.id, p);
+    if(p != null) vs.put(pos.id, p);
     final Var s = score == null ? null : scp.newCopyOf(ctx, score);
-    if(s != null) vs.add(score.id, s);
+    if(s != null) vs.put(score.id, s);
     return new For(v, p, s, expr.copy(ctx, scp, vs), empty, info);
   }
 

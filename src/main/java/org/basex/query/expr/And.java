@@ -83,7 +83,7 @@ public final class And extends Logical {
   }
 
   @Override
-  public And copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vars) {
+  public And copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vars) {
     final int es = expr.length;
     final Expr[] ex = new Expr[es];
     for(int i = 0; i < es; i++) ex[i] = expr[i].copy(ctx, scp, vars);

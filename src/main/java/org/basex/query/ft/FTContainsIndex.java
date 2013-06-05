@@ -69,7 +69,7 @@ final class FTContainsIndex extends FTContains {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return copyType(new FTContainsIndex(info, expr.copy(ctx, scp, vs),
         ftexpr.copy(ctx, scp, vs), not));
   }

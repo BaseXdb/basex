@@ -135,7 +135,7 @@ public final class List extends Arr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return copyType(new List(info, copyAll(ctx, scp, vs, expr)));
   }
 

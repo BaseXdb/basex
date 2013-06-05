@@ -51,7 +51,7 @@ public final class InterSect extends Set {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final InterSect is = new InterSect(info, copyAll(ctx, scp, vs, expr));
     is.iterable = iterable;
     return copyType(is);

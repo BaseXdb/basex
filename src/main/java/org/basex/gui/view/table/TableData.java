@@ -114,8 +114,7 @@ final class TableData {
 
     if(r == -1 && roots.isEmpty()) return;
     if(root == -1) root = data.tagindex.id(roots.get(0));
-    for(final byte[] k : data.paths.desc(
-        data.tagindex.key(root), true, true)) {
+    for(final byte[] k : data.paths.desc(data.tagindex.key(root), true, true)) {
       final boolean elem = !startsWith(k, '@');
       final byte[] key = delete(k, '@');
       final Names index = elem ? data.tagindex : data.atnindex;

@@ -75,15 +75,7 @@ public final class FTMatch implements Iterable<FTStringMatch> {
 
   @Override
   public Iterator<FTStringMatch> iterator() {
-    return new Iterator<FTStringMatch>() {
-      private int c = -1;
-      @Override
-      public boolean hasNext() { return ++c < size; }
-      @Override
-      public FTStringMatch next() { return match[c]; }
-      @Override
-      public void remove() { Util.notexpected(); }
-    };
+    return new ArrayIterator<FTStringMatch>(match, size);
   }
 
   @Override

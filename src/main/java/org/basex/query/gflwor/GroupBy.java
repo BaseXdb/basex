@@ -119,7 +119,7 @@ public final class GroupBy extends GFLWOR.Clause {
        */
       private void init(final QueryContext ctx) throws QueryException {
         final ArrayList<Group> grps = new ArrayList<Group>();
-        final IntMap<Group> map = new IntMap<Group>();
+        final IntObjMap<Group> map = new IntObjMap<Group>();
         while(sub.next(ctx)) {
           final Item[] key = new Item[nonOcc];
           final Collation[] colls = new Collation[nonOcc];
@@ -154,7 +154,7 @@ public final class GroupBy extends GFLWOR.Clause {
 
             // insert the group into the hash table
             if(fst == null) {
-              map.add(hash, grp);
+              map.put(hash, grp);
             } else {
               final Group nxt = fst.next;
               fst.next = grp;
@@ -248,7 +248,8 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  public GroupBy copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public GroupBy copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     // copy the pre-grouping expressions
     final Expr[] pEx = Arr.copyAll(ctx, scp, vs, preExpr);
 
@@ -257,7 +258,7 @@ public final class GroupBy extends GFLWOR.Clause {
     for(int i = 0; i < ps.length; i++) {
       final Var old = post[i];
       ps[i] = scp.newCopyOf(ctx, old);
-      vs.add(old.id, ps[i]);
+      vs.put(old.id, ps[i]);
     }
 
     // done
@@ -273,7 +274,7 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  boolean clean(final QueryContext ctx, final IntMap<Var> decl, final BitArray used) {
+  boolean clean(final QueryContext ctx, final IntObjMap<Var> decl, final BitArray used) {
     // [LW] does not fix {@link #vars}
     final int len = preExpr.length;
     for(int i = 0; i < post.length; i++) {
@@ -360,9 +361,10 @@ public final class GroupBy extends GFLWOR.Clause {
     }
 
     @Override
-    public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+    public Expr copy(final QueryContext ctx, final VarScope scp,
+        final IntObjMap<Var> vs) {
       final Var v = scp.newCopyOf(ctx, var);
-      vs.add(var.id, v);
+      vs.put(var.id, v);
       final Spec spec = new Spec(info, v, expr.copy(ctx, scp, vs), coll);
       spec.occluded = occluded;
       return spec;

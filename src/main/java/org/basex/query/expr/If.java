@@ -152,7 +152,7 @@ public final class If extends Arr {
   }
 
   @Override
-  public If copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public If copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return copyType(new If(info, cond.copy(ctx, scp, vs),
         expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs)));
   }

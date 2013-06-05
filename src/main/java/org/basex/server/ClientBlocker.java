@@ -18,7 +18,7 @@ public final class ClientBlocker {
    * @return number of seconds to wait
    */
   public synchronized int delay(final byte[] client) {
-    int delay = blocked.value(client);
+    int delay = blocked.get(client);
     delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
     blocked.put(client, delay);
     return delay;

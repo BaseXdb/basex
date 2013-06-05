@@ -51,7 +51,7 @@ public final class FTIndex implements Index {
   private static final int ENTRY = 9;
 
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  private final IntMap<byte[]> ctext = new IntMap<byte[]>();
+  private final IntObjMap<byte[]> ctext = new IntObjMap<byte[]>();
   /** Levenshtein reference. */
   private final Levenshtein ls = new Levenshtein();
   /** Data reference. */
@@ -209,7 +209,7 @@ public final class FTIndex implements Index {
       byte[] txt = ctext.get(p);
       if(txt == null) {
         txt = inY.readBytes(p, ti);
-        ctext.add(p, txt);
+        ctext.put(p, txt);
       }
       final int d = diff(txt, token);
       if(d == 0) return i + m * tl;

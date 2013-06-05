@@ -61,7 +61,7 @@ public final class Updates {
 
   /** Mapping between fragment IDs and the temporary data instances
    * to apply updates on the corresponding fragments. */
-  private final IntMap<MemData> fragmentIDs = new IntMap<MemData>();
+  private final IntObjMap<MemData> fragmentIDs = new IntObjMap<MemData>();
 
   /**
    * Adds an update primitive to the current context modifier.
@@ -102,7 +102,7 @@ public final class Updates {
     if(data == null) {
       data =  (MemData) anc.dbCopy(ctx.context.prop).data;
       // create a mapping between the fragment id and the data reference
-      fragmentIDs.add(ancID, data);
+      fragmentIDs.put(ancID, data);
     }
 
     // determine the pre value of the target node within its database

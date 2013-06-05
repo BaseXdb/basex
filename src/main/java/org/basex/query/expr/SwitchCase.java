@@ -46,7 +46,7 @@ public final class SwitchCase extends Arr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new SwitchCase(info, copyAll(ctx, scp, vs, expr));
   }
 

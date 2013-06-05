@@ -99,7 +99,7 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public abstract Step copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
+  public abstract Step copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
   /**
    * Checks if this is a simple axis without predicates.

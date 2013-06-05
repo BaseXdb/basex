@@ -3,9 +3,9 @@ package org.basex.index;
 import static org.basex.util.Token.*;
 
 import java.lang.ref.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.*;
 
-import org.basex.util.list.*;
+import org.basex.util.*;
 
 /**
  * This class caches sizes and pointers from index results.
@@ -19,7 +19,7 @@ public final class IndexCache {
   /** Read-write lock. */
   private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock(true);
   /** Hash table buckets. */
-  private BucketEntry[] buckets = new BucketEntry[ElementList.CAP];
+  private BucketEntry[] buckets = new BucketEntry[Array.CAPACITY];
   /** Number of entries in the cache. */
   private int size;
 

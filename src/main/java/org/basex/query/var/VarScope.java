@@ -25,10 +25,8 @@ public final class VarScope {
   private final VarStack current = new VarStack();
   /** Local variables in this scope. */
   private final ArrayList<Var> vars = new ArrayList<Var>();
-
   /** This scope's closure. */
   private final Map<Var, Expr> closure = new HashMap<Var, Expr>();
-
   /** This scope's parent scope, used for looking up non-local variables. */
   private final VarScope parent;
 
@@ -220,9 +218,10 @@ public final class VarScope {
    * @param vs variable mapping
    * @return copied scope
    */
-  public VarScope copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public VarScope copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     final VarScope sc = new VarScope(scp);
-    for(final Var v : vars) vs.add(v.id, sc.newCopyOf(ctx, v));
+    for(final Var v : vars) vs.put(v.id, sc.newCopyOf(ctx, v));
     for(final Entry<Var, Expr> e : closure.entrySet()) {
       final Var v = vs.get(e.getKey().id);
       final Expr ex = e.getValue().copy(ctx, scp, vs);

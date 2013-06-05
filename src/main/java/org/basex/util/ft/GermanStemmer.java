@@ -134,7 +134,7 @@ final class GermanStemmer extends InternalStemmer {
       strip(tb);
     }
     tl = tb.size();
-    if(tb.get(tl - 1) == 'z') tb.set((byte) 'x', tl - 1);
+    if(tb.get(tl - 1) == 'z') tb.set(tl - 1, (byte) 'x');
     return tb;
   }
 

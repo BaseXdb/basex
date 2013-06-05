@@ -181,7 +181,7 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new CmpR(expr.copy(ctx, scp, vs), min, mni, max, mxi, info);
   }
 

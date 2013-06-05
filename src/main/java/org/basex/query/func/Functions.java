@@ -27,7 +27,7 @@ public final class Functions extends TokenSet {
   /** Singleton instance. */
   private static final Functions INSTANCE = new Functions();
   /** Function classes. */
-  private Function[] funcs = new Function[CAP];
+  private Function[] funcs = new Function[Array.CAPACITY];
 
   /**
    * Returns the singleton instance.
@@ -44,8 +44,8 @@ public final class Functions extends TokenSet {
     for(final Function def : Function.VALUES) {
       final String dsc = def.desc;
       final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
-      final int i = add(new QNm(ln, def.uri()).id());
-      if(i < 0) Util.notexpected("Function defined twice:" + def);
+      final int i = put(new QNm(ln, def.uri()).id());
+      if(funcs[i] != null) Util.notexpected("Function defined twice:" + def);
       funcs[i] = def;
     }
   }

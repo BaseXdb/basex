@@ -62,7 +62,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     final TokenObjMap<TokenSet> nsDict = context.repo.nsDict();
     final TokenMap pkgDict = context.repo.pkgDict();
 
-    assertEquals(3, nsDict.keys().length);
+    assertEquals(3, nsDict.size());
     assertTrue(nsDict.contains(token("ns1")));
     assertTrue(nsDict.contains(token("ns2")));
     assertTrue(nsDict.contains(token("ns3")));
@@ -77,7 +77,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertEquals(ts.size(), 1);
     assertTrue(ts.contains(token(PKG2ID)));
     // check package dictionary
-    assertEquals(pkgDict.keys().length, 2);
+    assertEquals(pkgDict.size(), 2);
     assertTrue(pkgDict.contains(token(PKG1ID)));
     assertTrue(pkgDict.contains(token(PKG2ID)));
     assertEquals("pkg1", string(pkgDict.get(token(PKG1ID))));

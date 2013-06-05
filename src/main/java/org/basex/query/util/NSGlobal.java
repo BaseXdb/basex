@@ -83,7 +83,7 @@ public final class NSGlobal {
    */
   public static byte[] uri(final byte[] pref) {
     for(int s = NS.size() - 1; s >= 0; s--) {
-      if(eq(NS.name(s), pref)) return NS.string(s);
+      if(eq(NS.name(s), pref)) return NS.value(s);
     }
     return null;
   }
@@ -95,7 +95,7 @@ public final class NSGlobal {
    */
   public static byte[] prefix(final byte[] uri) {
     for(int s = NS.size() - 1; s >= 0; s--) {
-      if(eq(NS.string(s), uri)) return NS.name(s);
+      if(eq(NS.value(s), uri)) return NS.name(s);
     }
     return EMPTY;
   }
@@ -107,7 +107,7 @@ public final class NSGlobal {
    */
   public static boolean reserved(final byte[] uri) {
     for(int s = RESERVED - 1; s >= 0; s--) {
-      if(eq(NS.string(s), uri)) return true;
+      if(eq(NS.value(s), uri)) return true;
     }
     return false;
   }

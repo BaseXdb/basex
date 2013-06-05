@@ -7,7 +7,6 @@ import java.io.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This class provides a convenient access to text input.
@@ -128,7 +127,7 @@ public class TextInput extends BufferInput {
    * @throws IOException I/O exception
    */
   public final TokenBuilder cache() throws IOException {
-    final TokenBuilder tb = new TokenBuilder(Math.max(ElementList.CAP, (int) length));
+    final TokenBuilder tb = new TokenBuilder(Math.max(Array.CAPACITY, (int) length));
     try {
       for(int ch; (ch = read()) != -1;) tb.add(ch);
     } finally {

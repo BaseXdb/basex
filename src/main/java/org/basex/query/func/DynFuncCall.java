@@ -64,7 +64,7 @@ public final class DynFuncCall extends Arr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] copy = copyAll(ctx, scp, vs, expr);
     final int last = copy.length - 1;
     return copyType(new DynFuncCall(info, copy[last], Arrays.copyOf(copy, last)));

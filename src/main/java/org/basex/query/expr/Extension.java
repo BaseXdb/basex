@@ -65,7 +65,7 @@ public final class Extension extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Pragma[] prag = pragmas.clone();
     for(int i = 0; i < prag.length; i++) prag[i] = prag[i].copy();
     return copyType(new Extension(info, prag, expr.copy(ctx, scp, vs)));

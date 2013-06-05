@@ -139,7 +139,7 @@ public final class FNSeq extends StandardFunc {
     // pre-evaluate distinct values
     final SeqType st = expr[0].type();
     final Type t = st.type;
-    if(sig == Function.DISTINCT_VALUES) {
+    if(sig == Function.DISTINCT_VALUES && expr.length == 1) {
       type = t.isNode() ? SeqType.get(AtomType.ATM, st.occ) : st;
       return cmpDist(ctx);
     }
@@ -181,7 +181,7 @@ public final class FNSeq extends StandardFunc {
       // check if distinct values are available
       if(pn.stats.type != StatsType.CATEGORY) return this;
       // if yes, add them to the item set
-      for(final byte[] c : pn.stats.cats) is.add(new Atm(c), info);
+      for(final byte[] c : pn.stats.cats) is.put(new Atm(c), info);
     }
     // return resulting sequence
     final ValueBuilder vb = new ValueBuilder(is.size());
@@ -270,7 +270,7 @@ public final class FNSeq extends StandardFunc {
           if(i == null) return null;
           ctx.checkStop();
           i = atom(i, info);
-          if(set.add(i, info) >= 0) return i;
+          if(set.add(i, info)) return i;
         }
       }
     };

@@ -108,7 +108,8 @@ final class IterPath extends AxisPath {
   }
 
   @Override
-  public IterPath copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public IterPath copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     return copyType(new IterPath(info, root == null ? null : root.copy(ctx, scp, vs),
         Arr.copyAll(ctx, scp, vs, steps), type, size));
   }

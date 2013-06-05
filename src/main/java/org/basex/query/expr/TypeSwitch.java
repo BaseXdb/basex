@@ -120,7 +120,7 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final TypeCase[] cs = new TypeCase[cases.length];
     for(int i = 0; i < cs.length; i++) cs[i] = cases[i].copy(ctx, scp, vs);
     return new TypeSwitch(info, ts.copy(ctx, scp, vs), cs);

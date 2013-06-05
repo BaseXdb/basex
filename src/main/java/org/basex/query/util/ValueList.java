@@ -14,13 +14,13 @@ import org.basex.util.list.*;
  */
 public final class ValueList extends ElementList {
   /** List entries. */
-  private Value[] list = new Value[CAP];
+  private Value[] list;
 
   /**
    * Default constructor.
    */
   public ValueList() {
-    this(CAP);
+    this(Array.CAPACITY);
   }
 
   /**

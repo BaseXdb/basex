@@ -154,7 +154,7 @@ public abstract class ANode extends Item {
       if(n != null) {
         for(int a = n.size() - 1; a >= 0; a--) {
           final byte[] key = n.name(a);
-          if(!ns.contains(key)) ns.add(key, n.string(a));
+          if(!ns.contains(key)) ns.add(key, n.value(a));
         }
       }
       node = node.parent();
@@ -171,7 +171,7 @@ public abstract class ANode extends Item {
   public final byte[] uri(final byte[] pref, final QueryContext ctx) {
     final Atts at = namespaces();
     if(at != null) {
-      final byte[] s = at.string(pref);
+      final byte[] s = at.value(pref);
       if(s != null) return s;
       final ANode n = parent();
       if(n != null) return n.uri(pref, ctx);

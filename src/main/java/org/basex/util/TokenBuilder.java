@@ -27,7 +27,7 @@ public final class TokenBuilder {
   /** New line. */
   public static final byte NLINE = 0x0A;
 
-  /** Byte (code point) array. */
+  /** Byte array, storing all characters as UTF8. */
   private byte[] chars;
   /** Current token size. */
   private int size;
@@ -36,33 +36,33 @@ public final class TokenBuilder {
    * Empty constructor.
    */
   public TokenBuilder() {
-    this(ElementList.CAP);
+    this(Array.CAPACITY);
   }
 
   /**
-   * Constructor, specifying an initial array size.
-   * @param i size
+   * Constructor, specifying an initial internal array size.
+   * @param capacity initial array capacity
    */
-  public TokenBuilder(final int i) {
-    chars = new byte[i];
+  public TokenBuilder(final int capacity) {
+    chars = new byte[capacity];
   }
 
   /**
    * Constructor, specifying an initial string.
-   * @param s initial string
+   * @param string initial string
    */
-  public TokenBuilder(final String s) {
-    this(token(s));
+  public TokenBuilder(final String string) {
+    this(token(string));
   }
 
   /**
    * Constructor, specifying an initial token.
-   * @param t initial token
+   * @param token initial token
    */
-  public TokenBuilder(final byte[] t) {
-    this(t.length + ElementList.CAP);
-    size = t.length;
-    System.arraycopy(t, 0, chars, 0, size);
+  public TokenBuilder(final byte[] token) {
+    this(token.length + Array.CAPACITY);
+    size = token.length;
+    System.arraycopy(token, 0, chars, 0, size);
   }
 
   /**
@@ -74,7 +74,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Sets the number of bytes. Note that no bound check are performed by this method.
+   * Sets the number of bytes. Note that no bound check is performed by this method.
    * @param s number of bytes
    */
   public void size(final int s) {
@@ -144,39 +144,39 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds the specified UTF8 character.
-   * @param ch the character to be added
+   * Adds the specified UTF8 codepoint.
+   * @param cp the codepoint to be added
    * @return self reference
    */
-  public TokenBuilder add(final int ch) {
-    if(ch <= 0x7F) {
-      addByte((byte) ch);
-    } else if(ch <= 0x7FF) {
-      addByte((byte) (ch >>  6 & 0x1F | 0xC0));
-      addByte((byte) (ch & 0x3F | 0x80));
-    } else if(ch <= 0xFFFF) {
-      addByte((byte) (ch >> 12 & 0x0F | 0xE0));
-      addByte((byte) (ch >>  6 & 0x3F | 0x80));
-      addByte((byte) (ch & 0x3F | 0x80));
+  public TokenBuilder add(final int cp) {
+    if(cp <= 0x7F) {
+      addByte((byte) cp);
+    } else if(cp <= 0x7FF) {
+      addByte((byte) (cp >>  6 & 0x1F | 0xC0));
+      addByte((byte) (cp & 0x3F | 0x80));
+    } else if(cp <= 0xFFFF) {
+      addByte((byte) (cp >> 12 & 0x0F | 0xE0));
+      addByte((byte) (cp >>  6 & 0x3F | 0x80));
+      addByte((byte) (cp & 0x3F | 0x80));
     } else {
-      addByte((byte) (ch >> 18 & 0x07 | 0xF0));
-      addByte((byte) (ch >> 12 & 0x3F | 0x80));
-      addByte((byte) (ch >>  6 & 0x3F | 0x80));
-      addByte((byte) (ch & 0x3F | 0x80));
+      addByte((byte) (cp >> 18 & 0x07 | 0xF0));
+      addByte((byte) (cp >> 12 & 0x3F | 0x80));
+      addByte((byte) (cp >>  6 & 0x3F | 0x80));
+      addByte((byte) (cp & 0x3F | 0x80));
     }
     return this;
   }
 
   /**
    * Inserts the specified UTF8 character.
-   * @param pos insertion index
-   * @param ch the character to be added
+   * @param pos insertion position
+   * @param cp the character to be added
    * @return self reference
    */
-  public TokenBuilder insert(final int pos, final int ch) {
+  public TokenBuilder insert(final int pos, final int cp) {
     final int s = size;
     final int cl = chars.length;
-    final int l = ch <= 0x7F ? 1 : ch <= 0x7FF ? 2 : ch <= 0xFFF ? 3 : 4;
+    final int l = cp <= 0x7F ? 1 : cp <= 0x7FF ? 2 : cp <= 0xFFF ? 3 : 4;
 
     if(s + l > cl) {
       final int ns = Math.max(s + l, (int) (cl * Array.RESIZE));
@@ -184,134 +184,134 @@ public final class TokenBuilder {
     }
     Array.move(chars, pos, l, size - pos);
     size = pos;
-    add(ch);
+    add(cp);
     size = s + l;
     return this;
   }
 
   /**
-   * Returns the codepoint at the specified position.
-   * @param p position
+   * Returns the codepoint stored at the specified position.
+   * @param pos position
    * @return character
    */
-  public int cp(final int p) {
-    return Token.cp(chars, p);
+  public int cp(final int pos) {
+    return Token.cp(chars, pos);
   }
 
   /**
-   * Returns the codepoint length of the specified byte.
-   * @param p position
+   * Returns the length of the codepoints stored at the specified position.
+   * @param pos position
    * @return character
    */
-  public int cl(final int p) {
-    return Token.cl(chars, p);
+  public int cl(final int pos) {
+    return Token.cl(chars, pos);
   }
 
   /**
-   * Returns the byte at the specified position.
-   * @param p position
+   * Returns the byte stored at the specified position.
+   * @param pos position
    * @return byte
    */
-  public byte get(final int p) {
-    return chars[p];
+  public byte get(final int pos) {
+    return chars[pos];
   }
 
   /**
    * Sets a byte at the specified position.
-   * @param b byte to be set
-   * @param p position
+   * @param value byte to be set
+   * @param pos position
    */
-  public void set(final byte b, final int p) {
-    chars[p] = b;
+  public void set(final int pos, final byte value) {
+    chars[pos] = value;
   }
 
   /**
    * Deletes bytes from the token.
-   * @param p position
-   * @param s number of bytes to be removed
+   * @param pos position
+   * @param length number of bytes to be removed
    */
-  public void delete(final int p, final int s) {
-    Array.move(chars, p + s, -s, size - p - s);
-    size -= s;
+  public void delete(final int pos, final int length) {
+    Array.move(chars, pos + length, -length, size - pos - length);
+    size -= length;
   }
 
   /**
    * Adds a byte to the token. {@link ByteList} instances should be preferred
    * for the construction of pure byte arrays.
-   * @param b the byte to be added
+   * @param value the byte to be added
    * @return self reference
    */
-  public TokenBuilder addByte(final byte b) {
+  public TokenBuilder addByte(final byte value) {
     if(size == chars.length) chars = Arrays.copyOf(chars, Array.newSize(size));
-    chars[size++] = b;
+    chars[size++] = value;
     return this;
   }
 
   /**
    * Adds an integer value to the token.
-   * @param i value to be added
+   * @param value value to be added
    * @return self reference
    */
-  public TokenBuilder addInt(final int i) {
-    return add(token(i));
+  public TokenBuilder addInt(final int value) {
+    return add(token(value));
   }
 
   /**
    * Adds a number to the token.
-   * @param l value to be added
+   * @param value value to be added
    * @return self reference
    */
-  public TokenBuilder addLong(final long l) {
-    return add(token(l));
+  public TokenBuilder addLong(final long value) {
+    return add(token(value));
   }
 
   /**
    * Adds a byte array to the token.
-   * @param b the character array to be added
+   * @param value the byte array to be added
    * @return self reference
    */
-  public TokenBuilder add(final byte[] b) {
-    return add(b, 0, b.length);
+  public TokenBuilder add(final byte[] value) {
+    return add(value, 0, value.length);
   }
 
   /**
-   * Adds a partial byte array to the token.
-   * @param b the character array to be added
-   * @param s start position
-   * @param e end position
+   * Adds part of a byte array to the token.
+   * @param value the byte array to be added
+   * @param start start position
+   * @param end end position
    * @return self reference
    */
-  public TokenBuilder add(final byte[] b, final int s, final int e) {
-    final int l = e - s;
+  public TokenBuilder add(final byte[] value, final int start, final int end) {
+    final int l = end - start;
     final int cl = chars.length;
     if(size + l > cl) {
       final int ns = Math.max(size + l, (int) (cl * Array.RESIZE));
       chars = Arrays.copyOf(chars, ns);
     }
-    System.arraycopy(b, s, chars, size, l);
+    System.arraycopy(value, start, chars, size, l);
     size += l;
     return this;
   }
 
   /**
    * Adds a string to the token.
-   * @param s the string to be added
+   * @param string the string to be added
    * @return self reference
    */
-  public TokenBuilder add(final String s) {
-    return add(token(s));
+  public TokenBuilder add(final String string) {
+    return add(token(string));
   }
 
   /**
    * Adds multiple strings to the token, separated by the specified string.
-   * @param s the string to be added
-   * @param sep separator
+   * @param objects the object to be added
+   * @param sep separator string
    * @return self reference
    */
-  public TokenBuilder addSep(final Object[] s, final String sep) {
-    for(int e = 0; e != s.length; ++e) {
+  public TokenBuilder addSep(final Object[] objects, final String sep) {
+    for(int e = 0; e != objects.length; ++e) {
       if(e != 0) add(sep);
-      addExt(s[e]);
+      addExt(objects[e]);
     }
     return this;
   }
@@ -331,24 +331,24 @@ public final class TokenBuilder {
    * specified after the place holder character, it will be interpreted as insertion
    * position.
    *
-   * @param str string to be extended
+   * @param object string to be extended
    * @param ext optional extensions
    * @return self reference
    */
-  public TokenBuilder addExt(final Object str, final Object... ext) {
+  public TokenBuilder addExt(final Object object, final Object... ext) {
     final byte[] t;
-    if(str instanceof byte[]) {
-      t = (byte[]) str;
+    if(object instanceof byte[]) {
+      t = (byte[]) object;
     } else {
       final String s;
-      if(str == null) {
+      if(object == null) {
         s = "null";
-      } else if(str instanceof Throwable) {
-        s = Util.message((Throwable) str);
-      } else if(str instanceof Class<?>) {
-        s = Util.name((Class<?>) str);
+      } else if(object instanceof Throwable) {
+        s = Util.message((Throwable) object);
+      } else if(object instanceof Class<?>) {
+        s = Util.name((Class<?>) object);
       } else {
-        s = str.toString();
+        s = object.toString();
       }
       t = token(s);
     }

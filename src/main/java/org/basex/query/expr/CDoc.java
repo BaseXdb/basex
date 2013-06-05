@@ -36,7 +36,7 @@ public final class CDoc extends CFrag {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new CDoc(info, expr[0].copy(ctx, scp, vs));
   }
 

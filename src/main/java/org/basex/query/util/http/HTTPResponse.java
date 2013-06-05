@@ -92,11 +92,11 @@ public final class HTTPResponse {
     responseEl.add(STATUS, token(conn.getResponseCode()));
     responseEl.add(MESSAGE, token(conn.getResponseMessage()));
 
-    for(final String headerName : conn.getHeaderFields().keySet()) {
-      if(headerName != null) {
+    for(final String header : conn.getHeaderFields().keySet()) {
+      if(header != null) {
         final FElem hdr = new FElem(Q_HEADER);
-        hdr.add(NAME, token(headerName));
-        hdr.add(VALUE, token(conn.getHeaderField(headerName)));
+        hdr.add(NAME, token(header));
+        hdr.add(VALUE, token(conn.getHeaderField(header)));
         responseEl.add(hdr);
       }
     }

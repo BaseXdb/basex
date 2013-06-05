@@ -281,7 +281,7 @@ public abstract class Builder extends Proc {
     // parse namespaces
     ns.prepare();
     final int nl = nsp.size();
-    for(int nx = 0; nx < nl; nx++) ns.add(nsp.name(nx), nsp.string(nx), meta.size);
+    for(int nx = 0; nx < nl; nx++) ns.add(nsp.name(nx), nsp.value(nx), meta.size);
 
     // get and store element references
     final int dis = level != 0 ? pre - pstack.get(level - 1) : 1;
@@ -293,7 +293,7 @@ public abstract class Builder extends Proc {
 
     // get and store attribute references
     for(int a = 0; a < as; ++a) {
-      final byte[] av = att.string(a);
+      final byte[] av = att.value(a);
       final byte[] an = att.name(a);
       n = atts.index(an, av, true);
       u = ns.uri(an, false);

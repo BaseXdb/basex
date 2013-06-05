@@ -89,8 +89,7 @@ public final class JsonCGConverter extends JsonXMLConverter {
     final JsonCGHandler handler = new JsonCGHandler();
     JsonParser.parse(in, spec, unescape, handler, null);
     final ByteList[] types = new ByteList[TYPES.length];
-    for(int n = 0; n < handler.names.size(); n++) {
-      final TypedArray arr = handler.names.value(n + 1);
+    for(final TypedArray arr : handler.names.values()) {
       if(arr != null) {
         for(int i = 0; i < NAMES.length; i++) {
           if(arr.type == NAMES[i] && arr.type != T_STRING) {

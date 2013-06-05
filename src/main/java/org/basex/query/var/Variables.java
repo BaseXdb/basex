@@ -133,7 +133,9 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
     final Iterator<Entry<QNm, VarEntry>> iter = vars.entrySet().iterator();
     return new Iterator<StaticVar>() {
       @Override
-      public void remove() { }
+      public boolean hasNext() {
+        return iter.hasNext();
+      }
 
       @Override
       public StaticVar next() {
@@ -141,8 +143,8 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
       }
 
       @Override
-      public boolean hasNext() {
-        return iter.hasNext();
+      public void remove() {
+        Util.notexpected();
       }
     };
   }

@@ -222,7 +222,7 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new CmpV(expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs), op, info);
   }
 
