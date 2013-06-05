@@ -40,7 +40,7 @@ public abstract class XdmItem extends XdmValue {
    */
   public boolean equal(final XdmItem item) {
     try {
-      return item != null && internal().eq(null, item.internal());
+      return item != null && internal().eq(item.internal(), null, null);
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }

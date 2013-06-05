@@ -412,10 +412,10 @@ public abstract class W3CTS {
             try {
               final ValueIter vb = toIter(expect.replaceAll(
                   "^<\\?xml.*?\\?>", "").trim(), frag);
-              if(Compare.deep(iter, vb, null)) break;
+              if(Compare.deep(iter, vb, (InputInfo) null)) break;
               vb.reset();
               final ValueIter ia = toIter(actual, frag);
-              if(Compare.deep(ia, vb, null)) break;
+              if(Compare.deep(ia, vb, (InputInfo) null)) break;
             } catch(final Throwable ex) {
               Util.errln('\n' + outname + ':');
               Util.stack(ex);

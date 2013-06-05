@@ -99,9 +99,9 @@ public final class XQuery implements Iterable<XdmItem> {
     try {
       final TokenMap tm = new TokenMap();
       for(final Map.Entry<String, String> e : map.entrySet()) {
-        tm.add(Token.token(e.getKey()), Token.token(e.getValue()));
+        tm.put(Token.token(e.getKey()), Token.token(e.getValue()));
       }
-      qp.ctx.sc.decFormats.add(new QNm(name).id(), new DecFormatter(null, tm));
+      qp.ctx.sc.decFormats.put(new QNm(name).id(), new DecFormatter(null, tm));
       return this;
     } catch(final QueryException ex) {
       Util.debug(ex);
