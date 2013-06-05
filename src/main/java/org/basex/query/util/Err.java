@@ -29,7 +29,7 @@ public enum Err {
   /** BASX0002. */
   BASX_OPTIONS(BASX, 2, "Unknown database option '%'."),
   /** BASX0002. */
-  BASX_VALUE(BASX, 2, "Invalid value for database option: %."),
+  BASX_VALUE(BASX, 2, "Database option '%' has invalid value '%'."),
   /** BASX0003. */
   BASX_RESTXQ(BASX, 3, "%"),
   /** BASX0004. */
@@ -895,9 +895,9 @@ public enum Err {
   /** XQST0040. */
   ATTDUPL(XQST, 40, "Duplicate attribute '%'."),
   /** XQST0045. */
-  NAMERES(XQST, 45, "Function %(...) uses reserved namespace."),
+  NAMERES(XQST, 45, "Function %(...) is in reserved namespace."),
   /** XQST0045. */
-  ANNRES(XQST, 45, "Annotation % uses reserved namespace."),
+  ANNRES(XQST, 45, "Annotation %% is in reserved namespace."),
   /** XQST0046. */
   INVURI(XQST, 46, "URI '%' is invalid."),
   /** XQST0047. */

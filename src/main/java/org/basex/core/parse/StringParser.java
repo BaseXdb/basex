@@ -34,9 +34,7 @@ import org.basex.util.list.*;
  */
 final class StringParser extends CmdParser {
   /** Input lines. */
-  private final String input;
-  /** Input lines. */
-  private final String[] lines;
+  private final StringList lines = new StringList();
   /** Context. */
   private final Context ctx;
 
@@ -45,41 +43,27 @@ final class StringParser extends CmdParser {
 
   /**
    * Constructor.
-   * @param in input
-   * @param context context
+   * @param input input
+   * @param context database context
    */
-  StringParser(final String in, final Context context) {
-    input = (in.indexOf('\r') != -1 ? in.replaceAll("\r\n?", "\n") : in).trim();
-    lines = input.indexOf('\n') == -1 ? new String[] { input } : input.split("\n");
-    for(int l = 0; l < lines.length; l++) lines[l] = lines[l].trim();
+  StringParser(final String input, final Context context) {
     ctx = context;
+    final Scanner sc = new Scanner(input).useDelimiter(single ? "\0" : "\r\n?|\n");
+    while(sc.hasNext()) {
+      final String line = sc.next().trim();
+      if(!line.isEmpty() && !line.startsWith("#")) lines.add(line);
+    }
   }
 
   @Override
   void parse(final ArrayList<Command> cmds) throws QueryException {
-    if(single) {
-      parse(cmds, input);
-    } else {
-      for(final String line : lines) {
-        if(!line.isEmpty() && line.charAt(0) != '#') parse(cmds, line);
+    for(final String line : lines) {
+      parser = new InputParser(line);
+      while(parser.more()) {
+        final Cmd cmd = consume(Cmd.class, null);
+        if(cmd != null) cmds.add(parse(cmd));
+        if(parser.more() && !parser.consume(';')) throw help(null, cmd);
       }
-    }
-  }
-
-  /**
-   * Constructor.
-   * @param cmds list with created commands
-   * @param in current input
-   * @throws QueryException query exception
-   */
-  void parse(final ArrayList<Command> cmds, final String in) throws QueryException {
-    parser = new InputParser(in);
-    while(true) {
-      final Cmd cmd = consume(Cmd.class, null);
-      cmds.add(parse(cmd));
-      if(!parser.more()) break;
-      if(!eoc()) throw help(null, cmd);
-      parser.consume();
     }
   }
 
@@ -246,7 +230,7 @@ final class StringParser extends CmdParser {
    * @return string
    * @throws QueryException query exception
    */
-  String string(final Cmd cmd) throws QueryException {
+  private String string(final Cmd cmd) throws QueryException {
     final StringBuilder sb = new StringBuilder();
     consumeWS();
     boolean q = false;
@@ -257,7 +241,7 @@ final class StringParser extends CmdParser {
       else sb.append(c);
       parser.consume();
     }
-    return finish(cmd, sb);
+    return finish(sb, cmd);
   }
 
   /**
@@ -271,7 +255,7 @@ final class StringParser extends CmdParser {
     final StringBuilder sb = new StringBuilder();
     consumeWS();
     while(parser.more()) sb.append(parser.consume());
-    String arg = finish(cmd, sb);
+    String arg = finish(sb, cmd);
     if(arg != null) {
       // chop quotes; substrings are faster than replaces...
       if(arg.startsWith("\"")) arg = arg.substring(1);
@@ -301,7 +285,22 @@ final class StringParser extends CmdParser {
         qc.close();
       }
     }
-    return finish(cmd, sb);
+    return finish(sb, cmd);
+  }
+
+  /**
+   * Parses and returns a command. A command is limited to letters.
+   * @param cmd referring command; if specified, the result must not be empty
+   * @return name
+   * @throws QueryException query exception
+   */
+  private String command(final Cmd cmd) throws QueryException {
+    consumeWS();
+    final StringBuilder sb = new StringBuilder();
+    while(!eoc() && !ws(parser.curr())) {
+      sb.append(parser.consume());
+    }
+    return finish(sb, cmd);
   }
 
   /**
@@ -315,7 +314,7 @@ final class StringParser extends CmdParser {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     while(Databases.validChar(parser.curr())) sb.append(parser.consume());
-    return finish(cmd, eoc() || ws(parser.curr()) ? sb : null);
+    return finish(eoc() || ws(parser.curr()) ? sb : null, cmd);
   }
 
   /**
@@ -341,7 +340,7 @@ final class StringParser extends CmdParser {
     while(true) {
       final char ch = parser.curr();
       if(!Databases.validChar(ch) && ch != '*' && ch != '?' && ch != ',') {
-        return finish(cmd, eoc() || ws(ch) ? sb : null);
+        return finish(eoc() || ws(ch) ? sb : null, cmd);
       }
       sb.append(parser.consume());
     }
@@ -368,12 +367,12 @@ final class StringParser extends CmdParser {
 
   /**
    * Parses and returns a string result.
-   * @param cmd referring command; if specified, the result must not be empty
    * @param s input string, or {@code null} if invalid
+   * @param cmd referring command; if specified, the result must not be empty
    * @return string result, or {@code null}
    * @throws QueryException query exception
    */
-  private String finish(final Cmd cmd, final StringBuilder s) throws QueryException {
+  private String finish(final StringBuilder s, final Cmd cmd) throws QueryException {
     if(s != null && s.length() != 0) return s.toString();
     if(cmd != null) throw help(null, cmd);
     return null;
@@ -390,7 +389,7 @@ final class StringParser extends CmdParser {
     final StringBuilder sb = new StringBuilder();
     if(parser.curr() == '-') sb.append(parser.consume());
     while(digit(parser.curr())) sb.append(parser.consume());
-    return finish(cmd, eoc() || ws(parser.curr()) ? sb : null);
+    return finish(eoc() || ws(parser.curr()) ? sb : null, cmd);
   }
 
   /**
@@ -403,7 +402,7 @@ final class StringParser extends CmdParser {
   }
 
   /**
-   * Returns the index of the found string or throws an error.
+   * Returns the found command or throws an error.
    * @param cmp possible completions
    * @param par parent command
    * @param <E> token type
@@ -413,33 +412,35 @@ final class StringParser extends CmdParser {
   private <E extends Enum<E>> E consume(final Class<E> cmp, final Cmd par)
       throws QueryException {
 
-    final String token = name(null);
-    if(!(suggest && token != null && token.length() <= 1)) {
-    try {
-      // return command reference; allow empty strings as input ("NULL")
-      final String t = token == null ? "NULL" :
-        token.toUpperCase(Locale.ENGLISH);
-      return Enum.valueOf(cmp, t);
-    } catch(final IllegalArgumentException ex) { /* will not happen. */ }
+    final String token = command(null);
+    if(!suggest || token == null || !token.isEmpty()) {
+      try {
+        // return command reference; allow empty strings as input ("NULL")
+        final String t = token == null ? "NULL" : token.toUpperCase(Locale.ENGLISH);
+        return Enum.valueOf(cmp, t);
+      } catch(final IllegalArgumentException ignore) { }
     }
 
-    final Enum<?>[] alt = list(cmp, token);
+    final Enum<?>[] alt = startWith(cmp, token);
+    // handle empty input
     if(token == null) {
-      // show command error or available command extensions
-      throw par == null ? error(list(alt), EXPECTING_CMD) : help(list(alt), par);
+      if(par != null) throw help(alt, par);
+      if(suggest) throw error(alt, EXPECTING_CMD);
+      return null;
     }
 
     // output error for similar commands
     final byte[] name = uc(token(token));
     final Levenshtein ls = new Levenshtein();
-    for(final Enum<?> s : list(cmp, null)) {
+    for(final Enum<?> s : startWith(cmp, null)) {
       final byte[] sm = uc(token(s.name()));
-      if(ls.similar(name, sm) && Cmd.class.isInstance(s))
-        throw error(list(alt), UNKNOWN_SIMILAR_X, name, sm);
+      if(ls.similar(name, sm) && Cmd.class.isInstance(s)) {
+        throw error(alt, UNKNOWN_SIMILAR_X, name, sm);
+      }
     }
 
     // show unknown command error or available command extensions
-    throw par == null ? error(list(alt), UNKNOWN_TRY_X, token) : help(list(alt), par);
+    throw par == null ? error(alt, UNKNOWN_TRY_X, token) : help(alt, par);
   }
 
   /**
@@ -449,7 +450,7 @@ final class StringParser extends CmdParser {
    * @param cmd input completions
    * @return QueryException query exception
    */
-  private QueryException help(final StringList alt, final Cmd cmd) {
+  private QueryException help(final Enum<?>[] alt, final Cmd cmd) {
     return error(alt, SYNTAX_X, cmd.help(true));
   }
 
@@ -457,12 +458,13 @@ final class StringParser extends CmdParser {
    * Returns all commands that start with the specified user input.
    * @param <T> token type
    * @param en available commands
-   * @param i user input
+   * @param prefix user input
    * @return completions
    */
-  private static <T extends Enum<T>> Enum<?>[] list(final Class<T> en, final String i) {
+  private static <T extends Enum<T>> Enum<?>[] startWith(final Class<T> en,
+      final String prefix) {
     Enum<?>[] list = new Enum<?>[0];
-    final String t = i == null ? "" : i.toUpperCase(Locale.ENGLISH);
+    final String t = prefix == null ? "" : prefix.toUpperCase(Locale.ENGLISH);
     for(final Enum<?> e : en.getEnumConstants()) {
       if(e.name().startsWith(t)) {
         final int s = list.length;
@@ -480,7 +482,7 @@ final class StringParser extends CmdParser {
    * @return true if command has ended
    */
   private boolean eoc() {
-    return !parser.more() || lines.length == 1 && parser.curr() == ';';
+    return !parser.more() || parser.curr() == ';';
   }
 
   /**
@@ -490,8 +492,8 @@ final class StringParser extends CmdParser {
    * @param e extension
    * @return query exception
    */
-  private QueryException error(final StringList comp, final String m, final Object... e) {
-    return new QueryException(parser.info(), new QNm(), m, e).suggest(parser, comp);
+  private QueryException error(final Enum<?>[] comp, final String m, final Object... e) {
+    return new QueryException(parser.info(), new QNm(), m, e).suggest(parser, list(comp));
   }
 
   /**
@@ -501,7 +503,9 @@ final class StringParser extends CmdParser {
    */
   private static StringList list(final Enum<?>[] comp) {
     final StringList list = new StringList();
-    for(final Enum<?> c : comp) list.add(c.name().toLowerCase(Locale.ENGLISH));
+    if(comp != null) {
+      for(final Enum<?> c : comp) list.add(c.name().toLowerCase(Locale.ENGLISH));
+    }
     return list;
   }
 }

@@ -207,7 +207,13 @@ public final class QueryContext extends Proc {
   public void compile() throws QueryException {
     // set database options
     final StringList o = dbOptions;
-    for(int s = 0; s < o.size(); s += 2) context.prop.set(o.get(s), o.get(s + 1));
+    for(int s = 0; s < o.size(); s += 2) {
+      try {
+        context.prop.set(o.get(s).toUpperCase(Locale.ENGLISH), o.get(s + 1));
+      } catch(final Exception ex) {
+        BASX_VALUE.thrw(null, o.get(s), o.get(s + 1));
+      }
+    }
 
     // bind external variables
     vars.bindExternal(this, bindings);

@@ -524,7 +524,7 @@ public class QueryParser extends InputParser {
         vis = true;
       } else if(NSGlobal.reserved(name.uri())) {
         // no global namespaces allowed
-        error(ANNRES, name);
+        error(ANNRES, '%', name.string());
       }
     }
   }
@@ -654,7 +654,7 @@ public class QueryParser extends InputParser {
       if(obj == null) error(BASX_OPTIONS, ukey);
       // cache old value (to be reset after query evaluation)
       ctx.globalOpt.put(ukey, obj);
-      ctx.dbOptions.add(ukey);
+      ctx.dbOptions.add(key);
       ctx.dbOptions.add(string(val));
     } else if(eq(name.uri(), QUERYURI)) {
       // Query-specific options
