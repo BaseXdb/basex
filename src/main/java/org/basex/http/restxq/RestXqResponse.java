@@ -15,7 +15,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
-import org.basex.util.list.*;
 
 /**
  * This class creates a new HTTP response.
@@ -95,10 +94,6 @@ final class RestXqResponse {
       qc.mainModule(mod);
       qc.context(http, null);
       qc.context.register(qc);
-
-      // set database options
-      final StringList o = qc.dbOptions;
-      for(int s = 0; s < o.size(); s += 2) qc.context.prop.set(o.get(s), o.get(s + 1));
 
       // compile and evaluate query
       qc.compile();
