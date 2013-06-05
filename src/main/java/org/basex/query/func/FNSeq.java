@@ -169,7 +169,7 @@ public final class FNSeq extends StandardFunc {
     final ArrayList<PathNode> nodes = ((AxisPath) expr[0]).nodes(ctx);
     if(nodes == null) return this;
     // loop through all nodes
-    final ItemHashSet is = new ItemHashSet();
+    final HashItemSet is = new HashItemSet();
     for(PathNode pn : nodes) {
       // retrieve text child if addressed node is an element
       if(pn.kind == Data.ELEM) {
@@ -260,7 +260,7 @@ public final class FNSeq extends StandardFunc {
     if(expr[0] instanceof RangeSeq) return expr[0].iter(ctx);
 
     return new Iter() {
-      final ItemSet set = coll == null ? new ItemHashSet() : new CollationSet(coll);
+      final ItemSet set = coll == null ? new HashItemSet() : new CollationItemSet(coll);
       final Iter ir = expr[0].iter(ctx);
 
       @Override

@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class ItemHashSet implements ItemSet {
+public class HashItemSet implements ItemSet {
   /** Hash entries. Actual hash size is {@code size - 1}. */
   protected int size = 1;
 

@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class CollationSet implements ItemSet {
+public final class CollationItemSet implements ItemSet {
   /** Items. */
   private final ValueBuilder items = new ValueBuilder();
   /** Collation. */
@@ -23,7 +23,7 @@ public final class CollationSet implements ItemSet {
    * Constructor.
    * @param cl collation
    */
-  public CollationSet(final Collation cl) {
+  public CollationItemSet(final Collation cl) {
     coll = cl;
   }
 
