@@ -112,7 +112,7 @@ final class XMLScanner extends Proc {
       if(!fragment) {
         final int n = consume();
         if(!s(n)) {
-          if(n != '<') error(BEFOREROOT);
+          if(n != '<') error(DOCEMPTY);
           prev(1);
         }
       }
