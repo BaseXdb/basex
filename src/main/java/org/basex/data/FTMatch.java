@@ -3,6 +3,7 @@ package org.basex.data;
 import java.util.*;
 
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Match full-text container, referencing several {@link FTStringMatch} instances.
@@ -10,17 +11,23 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FTMatch implements Iterable<FTStringMatch> {
+public final class FTMatch extends ElementList implements Iterable<FTStringMatch> {
   /** String matches. */
-  FTStringMatch[] match = {};
-  /** Number of entries. */
-  int size;
+  FTStringMatch[] match;
 
   /**
-   * Resets the match.
+   * Constructor.
    */
-  public void reset() {
-    size = 0;
+  public FTMatch() {
+    this(0);
+  }
+
+  /**
+   * Constructor, specifying an initial internal array size.
+   * @param capacity initial array capacity
+   */
+  public FTMatch(final int capacity) {
+    match = new FTStringMatch[capacity];
   }
 
   /**
@@ -39,8 +46,7 @@ public final class FTMatch implements Iterable<FTStringMatch> {
    * @return self reference
    */
   public FTMatch add(final FTStringMatch m) {
-    if(size == match.length) match = size == 0 ?
-        new FTStringMatch[1] : Arrays.copyOf(match, size << 1);
+    if(size == match.length) match = Array.copy(match, new FTStringMatch[newSize()]);
     match[size++] = m;
     return this;
   }

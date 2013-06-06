@@ -303,11 +303,7 @@ public final class JsonCGConverter extends JsonXMLConverter {
      * @param nd element to add
      */
     protected void add(final FElem nd) {
-      if(size == vals.length) {
-        final FElem[] nVals = new FElem[size << 1];
-        System.arraycopy(vals, 0, nVals, 0, size);
-        vals = nVals;
-      }
+      if(size == vals.length) vals = Array.copy(vals, new FElem[Array.newSize(size)]);
       vals[size++] = nd;
     }
   }

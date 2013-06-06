@@ -111,7 +111,7 @@ public final class FTWords extends FTExpr {
     matches.reset(tokNum);
 
     final int c = contains(ctx);
-    if(c == 0) matches.size = 0;
+    if(c == 0) matches.size(0);
 
     // scoring: include number of tokens for calculations
     return new FTNode(matches, c == 0 ? 0 : Scoring.word(c, ctx.fttoken.count()));

@@ -11,24 +11,16 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public class IntSet {
-  /** Hash entries. Actual hash size is {@code size - 1}. */
-  protected int size = 1;
-  /** Hash keys. */
+public class IntSet extends ASet {
+  /** Hashed keys. */
   protected int[] keys;
-
-  /** Pointers to the next token. */
-  private int[] next;
-  /** Hash table buckets. */
-  private int[] bucket;
 
   /**
    * Default constructor.
    */
   public IntSet() {
     keys = new int[Array.CAPACITY];
-    next = new int[Array.CAPACITY];
-    bucket = new int[Array.CAPACITY];
+    clear();
   }
 
   /**
@@ -81,15 +73,6 @@ public class IntSet {
   }
 
   /**
-   * Returns the number of entries.
-   * The actual number of keys may be smaller if keys have been deleted.
-   * @return number of entries
-   */
-  public final int size() {
-    return size - 1;
-  }
-
-  /**
    * Deletes the specified key.
    * The deletion of keys will lead to empty entries. If {@link #size} is called after
    * deletions, the original number of entries will be returned.
@@ -97,40 +80,15 @@ public class IntSet {
    * @return deleted key or 0
    */
   public int delete(final int key) {
-    final int p = key & bucket.length - 1;
-    for(int id = bucket[p]; id != 0; id = next[id]) {
-      if(key == keys[id]) {
-        if(bucket[p] == id) bucket[p] = next[id];
-        else next[id] = next[next[id]];
-        keys[id] = 0;
-        return id;
-      }
+    final int b = key & bucket.length - 1;
+    for(int p = 0, i = bucket[b]; i != 0; p = i, i = next[i]) {
+      if(key != keys[i]) continue;
+      if(p == 0) bucket[b] = next[i];
+      else next[p] = next[next[i]];
+      keys[i] = 0;
+      return i;
     }
     return 0;
-  }
-
-  /**
-   * Resizes the hash table.
-   */
-  protected void rehash() {
-    final int s = size << 1;
-    final int[] tmp = new int[s];
-
-    for(final int b : bucket) {
-      int id = b;
-      while(id != 0) {
-        final int p = keys[id] & s - 1;
-        final int nx = next[id];
-        next[id] = tmp[p];
-        tmp[p] = id;
-        id = nx;
-      }
-    }
-    bucket = tmp;
-    next = Arrays.copyOf(next, s);
-    final int[] k = new int[s];
-    System.arraycopy(keys, 0, k, 0, size);
-    keys = k;
   }
 
   /**
@@ -140,12 +98,22 @@ public class IntSet {
    * @return id, or negative id if key has already been stored
    */
   private int index(final int key) {
-    if(size == next.length) rehash();
-    final int p = key & bucket.length - 1;
-    for(int id = bucket[p]; id != 0; id = next[id]) if(key == keys[id]) return -id;
-    next[size] = bucket[p];
+    checkSize();
+    final int b = key & bucket.length - 1;
+    for(int r = bucket[b]; r != 0; r = next[r]) if(key == keys[r]) return -r;
+    next[size] = bucket[b];
     keys[size] = key;
-    bucket[p] = size;
+    bucket[b] = size;
     return size++;
+  }
+
+  @Override
+  protected int hash(final int id) {
+    return keys[id];
+  }
+
+  @Override
+  protected void rehash(final int newSize) {
+    keys = Arrays.copyOf(keys, newSize);
   }
 }

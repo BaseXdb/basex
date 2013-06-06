@@ -32,21 +32,21 @@ public final class FTPosData {
     if(data == null) data = d;
     else if(data != d) return;
 
-    final IntList ps = new IntList();
+    final IntList il = new IntList();
     for(final FTMatch m : all) {
       for(final FTStringMatch sm : m) {
-        for(int s = sm.s; s <= sm.e; ++s) ps.add(s);
+        for(int s = sm.s; s <= sm.e; ++s) il.add(s);
       }
     }
 
     int c = find(pre);
     if(c < 0) {
       c = -c - 1;
-      if(size == pos.length) pos = Arrays.copyOf(pos, size << 1);
+      if(size == pos.length) pos = Arrays.copyOf(pos, Array.newSize(size));
       Array.move(pos, c, 1, size++ - c);
-      pos[c] = new FTPos(pre, ps.toArray());
+      pos[c] = new FTPos(pre, il);
     } else {
-      pos[c].union(ps.toArray());
+      pos[c].union(il);
     }
   }
 
@@ -82,8 +82,8 @@ public final class FTPosData {
   boolean sameAs(final FTPosData ft) {
     if(size != ft.size) return false;
     for(int i = 0; i < size; ++i) {
-      if(pos[i].pre != ft.pos[i].pre ||
-          !Arrays.equals(pos[i].pos, ft.pos[i].pos)) return false;
+      if(pos[i].pre != ft.pos[i].pre || !Arrays.equals(
+          pos[i].pos.toArray(), ft.pos[i].pos.toArray())) return false;
     }
     return true;
   }

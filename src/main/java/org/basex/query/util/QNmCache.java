@@ -1,7 +1,5 @@
 package org.basex.query.util;
 
-import java.util.*;
-
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -35,8 +33,8 @@ public final class QNmCache extends TokenSet {
   }
 
   @Override
-  protected void rehash() {
-    super.rehash();
-    values = Arrays.copyOf(values, size << 1);
+  protected void rehash(final int s) {
+    super.rehash(s);
+    values = Array.copy(values, new QNm[s]);
   }
 }

@@ -54,7 +54,7 @@ public final class FTMildNot extends FTExpr {
           if(d > 0) {
             it2 = i2.next();
           } else {
-            if(mildnot(it1, it2).all.size != 0) break;
+            if(!mildnot(it1, it2).all.isEmpty()) break;
             it1 = i1.next();
           }
         }

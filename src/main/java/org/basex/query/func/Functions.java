@@ -4,11 +4,9 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.*;
+import org.basex.query.expr.Expr.Use;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -259,8 +257,8 @@ public final class Functions extends TokenSet {
   }
 
   @Override
-  protected void rehash() {
-    super.rehash();
-    funcs = Arrays.copyOf(funcs, size << 1);
+  protected void rehash(final int s) {
+    super.rehash(s);
+    funcs = Array.copy(funcs, new Function[s]);
   }
 }

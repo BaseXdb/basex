@@ -84,7 +84,7 @@ public class StringList extends ElementList implements Iterable<String> {
    * @param element element to be set
    */
   public final void set(final int index, final String element) {
-    if(index >= list.length) list = Arrays.copyOf(list, newSize(index + 1));
+    if(index >= list.length) list = Array.copyOf(list, newSize(index + 1));
     list[index] = element;
     size = Math.max(size, index + 1);
   }
@@ -101,7 +101,7 @@ public class StringList extends ElementList implements Iterable<String> {
 
   /**
    * Check if all elements of the specified list are contained in the list.
-   * Both lists must be sorted!
+   * Both lists must be sorted.
    * @param elements sorted list
    * @return result of check
    */
@@ -158,6 +158,7 @@ public class StringList extends ElementList implements Iterable<String> {
 
   /**
    * Removes duplicates from the list.
+   * The list must be sorted.
    * @return self reference
    */
   public StringList unique() {

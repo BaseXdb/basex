@@ -71,9 +71,7 @@ final class NSNode {
   void add(final NSNode n) {
     int s = size;
     if(s == children.length) {
-      final NSNode[] tmp = new NSNode[Math.max(s << 1, 1)];
-      System.arraycopy(children, 0, tmp, 0, s);
-      children = tmp;
+      children = Array.copy(children, new NSNode[Array.newSize(s)]);
     }
     while(--s >= 0 && n.pre - children[s].pre <= 0);
     System.arraycopy(children, ++s, children, s + 1, size++ - s);

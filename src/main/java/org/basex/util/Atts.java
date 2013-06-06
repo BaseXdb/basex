@@ -41,7 +41,7 @@ public final class Atts {
    */
   public Atts add(final byte[] name, final byte[] value) {
     if(size == nm.length) {
-      final int s = size << 1;
+      final int s = Array.newSize(size);
       nm = Array.copyOf(nm, s);
       vl = Array.copyOf(vl, s);
     }

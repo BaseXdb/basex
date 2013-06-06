@@ -321,7 +321,7 @@ public final class QNm extends Item {
   public static byte[] internal(final byte[] prefix, final byte[] local,
       final byte[] uri) {
 
-    // save time by using direct array construction
+    // optimized for speed, as it is called quite frequently
     final int ul = uri == null ? 0 : uri.length;
     final int pl = prefix == null ? 0 : prefix.length;
     // return local name if no prefix and uri exist

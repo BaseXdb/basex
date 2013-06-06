@@ -1,7 +1,5 @@
 package org.basex.util.hash;
 
-import java.util.*;
-
 import org.basex.util.*;
 
 /**
@@ -47,9 +45,9 @@ public final class IntObjMap<E> extends IntSet {
   }
 
   @Override
-  protected void rehash() {
-    super.rehash();
-    values = Arrays.copyOf(values, size << 1);
+  protected void rehash(final int s) {
+    super.rehash(s);
+    values = Array.copy(values, new Object[s]);
   }
 
   @Override

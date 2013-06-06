@@ -575,7 +575,7 @@ public final class MAB2Parser extends SingleParser {
     void add(final long c) {
       if(children == null) children = new long[1];
       else if(size == children.length)
-        children = Arrays.copyOf(children, size << 1);
+        children = Arrays.copyOf(children, Array.newSize(size));
       children[size++] = c;
     }
 

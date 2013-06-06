@@ -83,7 +83,7 @@ public final class VarScope {
    * @return marker for the current bindings
    */
   public int open() {
-    return current.size;
+    return current.size();
   }
 
   /**
@@ -91,7 +91,7 @@ public final class VarScope {
    * @param marker marker for the start of the sub-scope
    */
   public void close(final int marker) {
-    current.size = marker;
+    current.size(marker);
   }
 
   /**

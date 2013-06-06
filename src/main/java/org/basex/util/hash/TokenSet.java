@@ -16,33 +16,16 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public class TokenSet implements Iterable<byte[]> {
-  /** Hash entries. The actual number of entries is {@code size - 1}. */
-  protected int size = 1;
+public class TokenSet extends ASet implements Iterable<byte[]> {
   /** Hashed keys. */
   protected byte[][] keys;
-
-  /** Pointers to the next token. */
-  private int[] next;
-  /** Hash table buckets. */
-  private int[] bucket;
 
   /**
    * Default constructor.
    */
   public TokenSet() {
     keys = new byte[Array.CAPACITY][];
-    next = new int[Array.CAPACITY];
-    bucket = new int[Array.CAPACITY];
-  }
-
-  /**
-   * Constructor, specifying an initial key.
-   * @param key initial key
-   */
-  public TokenSet(final byte[] key) {
-    this();
-    add(key);
+    clear();
   }
 
   /**
@@ -130,7 +113,7 @@ public class TokenSet implements Iterable<byte[]> {
    * @return id, or {@code 0} if key does not exist
    */
   public final int id(final byte[] key) {
-    final int p = hash(key) & bucket.length - 1;
+    final int p = Token.hash(key) & bucket.length - 1;
     for(int i = bucket[p]; i != 0; i = next[i]) if(eq(key, keys[i])) return i;
     return 0;
   }
@@ -146,32 +129,6 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
-   * Returns the number of entries.
-   * The actual number of keys may be smaller if keys have been deleted.
-   * @return number of entries
-   */
-  public final int size() {
-    return size - 1;
-  }
-
-  /**
-   * Resets the data structure.
-   */
-  public final void clear() {
-    Arrays.fill(keys, null);
-    Arrays.fill(bucket, 0);
-    size = 1;
-  }
-
-  /**
-   * Tests is the set is empty.
-   * @return result of check
-   */
-  public final boolean isEmpty() {
-    return size == 1;
-  }
-
-  /**
    * Deletes the specified key.
    * The deletion of keys will lead to empty entries. If {@link #size} is called after
    * deletions, the original number of entries will be returned.
@@ -179,43 +136,15 @@ public class TokenSet implements Iterable<byte[]> {
    * @return deleted key or 0
    */
   public int delete(final byte[] key) {
-    final int p = hash(key) & bucket.length - 1;
-    int o = 0, n;
-    for(int id = bucket[p]; id != 0; id = n) {
-      n = next[id];
-      if(eq(key, keys[id])) {
-        if(bucket[p] == id) bucket[p] = n;
-        else next[o] = next[n];
-        keys[id] = null;
-        return id;
-      }
-      o = id;
+    final int b = Token.hash(key) & bucket.length - 1;
+    for(int p = 0, i = bucket[b]; i != 0; p = i, i = next[i]) {
+      if(!eq(key, keys[i])) continue;
+      if(p == 0) bucket[b] = next[i];
+      else next[p] = next[next[i]];
+      keys[i] = null;
+      return i;
     }
     return 0;
-  }
-
-  /**
-   * Resizes the hash table.
-   */
-  protected void rehash() {
-    final int s = size << 1;
-    final int[] tmp = new int[s];
-
-    for(final int b : bucket) {
-      int id = b;
-      while(id != 0) {
-        final int p = hash(keys[id]) & s - 1;
-        final int nx = next[id];
-        next[id] = tmp[p];
-        tmp[p] = id;
-        id = nx;
-      }
-    }
-    bucket = tmp;
-    next = Arrays.copyOf(next, s);
-    final byte[][] k = new byte[s][];
-    System.arraycopy(keys, 0, k, 0, size);
-    keys = k;
   }
 
   /**
@@ -225,13 +154,29 @@ public class TokenSet implements Iterable<byte[]> {
    * @return id, or negative id if key has already been stored
    */
   private int index(final byte[] key) {
-    if(size == next.length) rehash();
-    final int p = hash(key) & bucket.length - 1;
-    for(int i = bucket[p]; i != 0; i = next[i]) if(eq(key, keys[i])) return -i;
-    next[size] = bucket[p];
+    checkSize();
+    final int b = Token.hash(key) & bucket.length - 1;
+    for(int r = bucket[b]; r != 0; r = next[r]) if(eq(key, keys[r])) return -r;
+    next[size] = bucket[b];
     keys[size] = key;
-    bucket[p] = size;
+    bucket[b] = size;
     return size++;
+  }
+
+  @Override
+  protected int hash(final int id) {
+    return Token.hash(keys[id]);
+  }
+
+  @Override
+  protected void rehash(final int newSize) {
+    keys = Array.copyOf(keys, newSize);
+  }
+
+  @Override
+  public final void clear() {
+    Arrays.fill(keys, null);
+    super.clear();
   }
 
   @Override
@@ -242,9 +187,9 @@ public class TokenSet implements Iterable<byte[]> {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 1; i < size; i++) {
+    for(final byte[] key : this) {
       if(!tb.isEmpty()) tb.add(", ");
-      if(keys[i] != null) tb.add(keys[i]);
+      if(key != null) tb.add(key);
     }
     return new TokenBuilder(Util.name(getClass())).add('[').add(tb.finish()).
         add(']').toString();

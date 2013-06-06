@@ -95,7 +95,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
     final int l = elements.length;
     if(l == 0) return;
 
-    if(size + l > list.length) list = Arrays.copyOf(list, newSize(size + l));
+    if(size + l > list.length) list = Array.copyOf(list, newSize(size + l));
     Array.move(list, index, l, size - index);
     System.arraycopy(elements, 0, list, index, l);
     size += l;

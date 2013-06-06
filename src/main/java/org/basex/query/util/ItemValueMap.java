@@ -1,7 +1,5 @@
 package org.basex.query.util;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -52,8 +50,8 @@ public class ItemValueMap extends HashItemSet {
   }
 
   @Override
-  protected void rehash() {
-    super.rehash();
-    values = Arrays.copyOf(values, size << 1);
+  protected void rehash(final int s) {
+    super.rehash(s);
+    values = Array.copy(values, new Value[s]);
   }
 }

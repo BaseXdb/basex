@@ -17,13 +17,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class ShowBackups extends ABackup {
-  /**
-   * Default constructor.
-   */
-  public ShowBackups() {
-    super();
-  }
-
   @Override
   protected boolean run() throws IOException {
     final Table table = new Table();

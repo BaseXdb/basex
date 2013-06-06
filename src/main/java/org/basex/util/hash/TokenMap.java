@@ -59,9 +59,9 @@ public class TokenMap extends TokenSet {
   }
 
   @Override
-  protected final void rehash() {
-    super.rehash();
-    values = Array.copyOf(values, size << 1);
+  protected final void rehash(final int s) {
+    super.rehash(s);
+    values = Array.copyOf(values, s);
   }
 
   @Override

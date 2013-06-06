@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -59,9 +58,9 @@ public final class Thesaurus {
      */
     void add(final ThesNode n, final byte[] r) {
       if(size == nodes.length) {
-        final int s = size << 1;
-        nodes = Arrays.copyOf(nodes, s);
-        rs = Arrays.copyOf(rs, s);
+        final int s = Array.newSize(size);
+        nodes = Array.copy(nodes, new ThesNode[s]);
+        rs = Array.copyOf(rs, s);
       }
       nodes[size] = n;
       rs[size++] = r;

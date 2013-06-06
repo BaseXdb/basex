@@ -125,7 +125,7 @@ public final class TableMemAccess extends TableAccess {
     dirty = true;
     final int l = meta.size - op;
     while(l + np >= buf1.length) {
-      final int s = buf1.length << 1;
+      final int s = Array.newSize(buf1.length);
       buf1 = Arrays.copyOf(buf1, s);
       buf2 = Arrays.copyOf(buf2, s);
     }

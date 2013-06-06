@@ -1,7 +1,5 @@
 package org.basex.query.value.node;
 
-import java.util.*;
-
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -190,7 +188,7 @@ public abstract class FNode extends ANode {
         if(node != null) {
           final AxisMoreIter ch = node.children();
           if(ch.more()) {
-            if(l + 1 == nm.length) nm = Arrays.copyOf(nm, l + 1 << 1);
+            if(l + 1 == nm.length) nm = Array.copy(nm, new AxisMoreIter[l + 1 << 1]);
             nm[++l] = ch;
           } else {
             while(!nm[l].more()) if(l-- <= 0) break;

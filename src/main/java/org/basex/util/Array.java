@@ -93,6 +93,18 @@ public final class Array {
   }
 
   /**
+   * Copies entries from one array to another.
+   * @param <T> object type
+   * @param source source array
+   * @param target target array
+   * @return object
+   */
+  public static <T> T[] copy(final Object[] source, final T[] target) {
+    System.arraycopy(source, 0, target, 0, source.length);
+    return target;
+  }
+
+  /**
    * Removes an array entry at the specified position.
    * @param ar array to be resized
    * @param p position

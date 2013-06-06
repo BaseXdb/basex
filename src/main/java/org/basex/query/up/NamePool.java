@@ -2,8 +2,6 @@ package org.basex.query.up;
 
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -16,14 +14,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class NamePool {
-  /** Names. */
-  private QNm[] names = new QNm[1];
-  /** Attribute/element flag. */
-  private boolean[] attr = new boolean[1];
-  /** Counts the number of times the name is added. */
-  private int[] add = new int[1];
-  /** States if the name is deleted. */
-  private boolean[] del = new boolean[1];
+  /** Name cache. */
+  private NameCache[] cache = new NameCache[1];
   /** Number of entries. */
   private int size;
 
@@ -35,7 +27,7 @@ public final class NamePool {
   public void add(final QNm name, final Type type) {
     if(type != NodeType.ATT && type != NodeType.ELM) return;
     final int i = index(name, type == NodeType.ATT);
-    add[i]++;
+    cache[i].add++;
   }
 
   /**
@@ -45,7 +37,7 @@ public final class NamePool {
   public void remove(final ANode node) {
     if(node.type != NodeType.ATT && node.type != NodeType.ELM) return;
     final int i = index(node.qname(), node.type == NodeType.ATT);
-    del[i] = true;
+    cache[i].del = true;
   }
 
   /**
@@ -54,7 +46,9 @@ public final class NamePool {
    */
   QNm duplicate() {
     // if node has been deleted, overall count for duplicates must be bigger 2
-    for(int i = 0; i < size; ++i) if(add[i] > (del[i] ? 2 : 1)) return names[i];
+    for(int i = 0; i < size; ++i) {
+      if(cache[i].add > (cache[i].del ? 2 : 1)) return cache[i].name;
+    }
     return null;
   }
 
@@ -65,8 +59,8 @@ public final class NamePool {
   boolean nsOK() {
     final Atts at = new Atts();
     for(int i = 0; i < size; ++i) {
-      if(add[i] <= (del[i] ? 1 : 0)) continue;
-      final QNm nm = names[i];
+      if(cache[i].add <= (cache[i].del ? 1 : 0)) continue;
+      final QNm nm = cache[i].name;
       final byte[] pref = nm.prefix();
       final byte[] uri = nm.uri();
       final byte[] u = at.value(pref);
@@ -85,16 +79,27 @@ public final class NamePool {
    */
   private int index(final QNm name, final boolean at) {
     for(int i = 0; i < size; ++i) {
-      if(names[i].eq(name) && attr[i] == at) return i;
+      final NameCache nc = cache[i];
+      if(nc.name.eq(name) && nc.attr == at) return i;
     }
-    if(size == names.length) {
-      names = Arrays.copyOf(names, size << 1);
-      attr = Arrays.copyOf(attr, size << 1);
-      add = Arrays.copyOf(add, size << 1);
-      del = Arrays.copyOf(del, size << 1);
-    }
-    names[size] = name;
-    attr[size] = at;
+    if(size == cache.length)
+      cache = Array.copy(cache, new NameCache[Array.newSize(size)]);
+    final NameCache nc = new NameCache();
+    nc.name = name;
+    nc.attr = at;
+    cache[size] = nc;
     return size++;
+  }
+
+  /** Name cache. */
+  static final class NameCache {
+    /** Name. */
+    QNm name;
+    /** Attribute/element flag. */
+    boolean attr;
+    /** Counts the number of times the name is added. */
+    int add;
+    /** States if the name is deleted. */
+    boolean del;
   }
 }

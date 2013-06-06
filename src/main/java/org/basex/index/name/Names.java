@@ -1,7 +1,6 @@
 package org.basex.index.name;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
@@ -140,9 +139,9 @@ public final class Names extends TokenSet implements Index {
   }
 
   @Override
-  protected void rehash() {
-    super.rehash();
-    stats = Arrays.copyOf(stats, size << 1);
+  protected void rehash(final int s) {
+    super.rehash(s);
+    stats = Array.copy(stats, new Stats[s]);
   }
 
   @Override

@@ -38,7 +38,7 @@ final class MapRects implements Iterable<MapRect> {
    * @param v value to be added
    */
   void add(final MapRect v) {
-    if(size == list.length) list = Arrays.copyOf(list, size << 1);
+    if(size == list.length) list = Array.copy(list, new MapRect[Array.newSize(size)]);
     list[size++] = v;
   }
 

@@ -74,7 +74,7 @@ public final class FTWeight extends FTExpr {
     if(item == null) return null;
     final double d = checkDbl(weight, ctx);
     if(Math.abs(d) > 1000) FTWEIGHT.thrw(info, d);
-    if(d == 0) item.all.size = 0;
+    if(d == 0) item.all.size(0);
     item.score(item.score() * d);
     return item;
   }

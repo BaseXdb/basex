@@ -47,6 +47,14 @@ public abstract class ElementList {
   }
 
   /**
+   * Enforces the number of elements.
+   * @param s number of elements
+   */
+  public void size(final int s) {
+    size = s;
+  }
+
+  /**
    * Tests is the container has no elements.
    * @return result of check
    */

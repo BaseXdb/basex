@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Variable stack.
@@ -12,11 +13,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public final class VarStack {
+public final class VarStack extends ElementList {
   /** Variable expressions. */
   public Var[] vars;
-  /** Number of stored variables. */
-  public int size;
 
   /**
    * Default constructor.
@@ -38,7 +37,7 @@ public final class VarStack {
    * @param v variable
    */
   public void push(final Var v) {
-    if(size == vars.length) vars = Arrays.copyOf(vars, Array.newSize(size));
+    if(size == vars.length) vars = Array.copy(vars, new Var[newSize()]);
     vars[size++] = v;
   }
 

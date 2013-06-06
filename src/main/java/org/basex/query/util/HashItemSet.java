@@ -14,18 +14,21 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class HashItemSet implements ItemSet {
-  /** Hash entries. Actual hash size is {@code size - 1}. */
-  protected int size = 1;
-
+public class HashItemSet extends ASet implements ItemSet {
   /** Hash values. */
-  private int[] hash = new int[Array.CAPACITY];
-  /** Pointers to the next token. */
-  private int[] next = new int[Array.CAPACITY];
-  /** Hash table buckets. */
-  private int[] bucket = new int[Array.CAPACITY];
+  private int[] hash;
   /** Hashed items. */
-  private Item[] keys = new Item[Array.CAPACITY];
+  private Item[] keys;
+
+  /**
+   * Default constructor.
+   */
+  public HashItemSet() {
+    hash = new int[Array.CAPACITY];
+    keys = new Item[Array.CAPACITY];
+    clear();
+  }
+
 
   @Override
   public final boolean add(final Item key, final InputInfo ii) throws QueryException {
@@ -69,53 +72,31 @@ public class HashItemSet implements ItemSet {
    * @throws QueryException query exception
    */
   private int index(final Item key, final InputInfo ii) throws QueryException {
-    if(size == next.length) rehash();
+    checkSize();
     final int h = key.hash(ii);
-    final int p = h & bucket.length - 1;
-    for(int id = bucket[p]; id != 0; id = next[id]) {
-      if(keys[id].equiv(key, null, ii)) return -id;
+    final int b = h & bucket.length - 1;
+    for(int r = bucket[b]; r != 0; r = next[r]) {
+      if(keys[r].equiv(key, null, ii)) return -r;
     }
-    next[size] = bucket[p];
-    hash[size] = h;
+    next[size] = bucket[b];
     keys[size] = key;
-    bucket[p] = size;
+    hash[size] = h;
+    bucket[b] = size;
     return size++;
-  }
-
-  /**
-   * Returns the number of entries.
-   * @return number of entries
-   */
-  public int size() {
-    return size - 1;
-  }
-
-  /**
-   * Resizes the hash table.
-   */
-  protected void rehash() {
-    final int s = size << 1;
-    final int[] tmp = new int[s];
-    for(final int b : bucket) {
-      int id = b;
-      while(id != 0) {
-        final int p = hash[id] & s - 1;
-        final int nx = next[id];
-        next[id] = tmp[p];
-        tmp[p] = id;
-        id = nx;
-      }
-    }
-    bucket = tmp;
-    next = Arrays.copyOf(next, s);
-    hash = Arrays.copyOf(hash, s);
-    final Item[] i = new Item[s];
-    System.arraycopy(keys, 0, i, 0, size);
-    keys = i;
   }
 
   @Override
   public Iterator<Item> iterator() {
     return new ArrayIterator<Item>(keys, 1, size);
+  }
+
+  @Override
+  protected int hash(final int id) {
+    return hash[id];
+  }
+
+  @Override
+  protected void rehash(final int newSize) {
+    keys = Array.copy(keys, new Item[newSize]);
   }
 }

@@ -222,13 +222,5 @@ public final class Compress {
     byte[] get() {
       return list;
     }
-
-    /**
-     * Sets the list size to a new value.
-     * @param newSize the new value for ByteList.size
-     */
-    void size(final int newSize) {
-      size = newSize;
-    }
   }
 }

@@ -102,9 +102,8 @@ public class MemValues extends TokenSet implements Index {
   public void close() { }
 
   @Override
-  public void rehash() {
-    super.rehash();
-    final int s = size << 1;
+  public void rehash(final int s) {
+    super.rehash(s);
     ids = Array.copyOf(ids, s);
     len = Arrays.copyOf(len, s);
   }
@@ -122,7 +121,7 @@ public class MemValues extends TokenSet implements Index {
       tmp = new int[] { id };
     } else {
       final int l = len[i];
-      if(l == tmp.length) tmp = Arrays.copyOf(tmp, l << 1);
+      if(l == tmp.length) tmp = Arrays.copyOf(tmp, Array.newSize(l));
       tmp[l] = id;
     }
     ids[i] = tmp;

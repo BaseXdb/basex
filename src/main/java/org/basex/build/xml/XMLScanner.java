@@ -60,7 +60,7 @@ final class XMLScanner extends Proc {
 
   /** Current scanner state. */
   private State state = State.CONTENT;
-  /** Opening tag found. */
+  /** Scanning prolog (will be invalidated when root element is parsed). */
   private boolean prolog = true;
   /** Parameter entity parsing. */
   private boolean pe;
@@ -112,7 +112,7 @@ final class XMLScanner extends Proc {
       if(!fragment) {
         final int n = consume();
         if(!s(n)) {
-          if(n != '<') error(DOCEMPTY);
+          if(n != '<') error(n == 0 ? DOCEMPTY : BEFOREROOT);
           prev(1);
         }
       }

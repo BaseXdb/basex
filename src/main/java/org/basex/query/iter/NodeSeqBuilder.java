@@ -76,11 +76,7 @@ public final class NodeSeqBuilder extends AxisIter {
    * @param n node to be added
    */
   public void add(final ANode n) {
-    if(size == nodes.length) {
-      final ANode[] tmp = new ANode[Array.newSize(size)];
-      System.arraycopy(nodes, 0, tmp, 0, size);
-      nodes = tmp;
-    }
+    if(size == nodes.length) nodes = Array.copy(nodes, new ANode[Array.newSize(size)]);
     if(check && !sort && size != 0) sort = nodes[size - 1].diff(n) > 0;
     nodes[size++] = n;
   }

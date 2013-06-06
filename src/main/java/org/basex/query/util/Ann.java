@@ -2,8 +2,6 @@ package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -38,8 +36,8 @@ public final class Ann extends ElementList {
     // create new entry
     if(size == names.length) {
       final int s = newSize();
-      names = Arrays.copyOf(names, s);
-      values = Arrays.copyOf(values, s);
+      names = Array.copy(names, new QNm[s]);
+      values = Array.copy(values, new Value[s]);
     }
     names[size] = name;
     values[size] = value;

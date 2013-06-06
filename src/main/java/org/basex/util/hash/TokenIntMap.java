@@ -68,8 +68,8 @@ public final class TokenIntMap extends TokenSet {
   }
 
   @Override
-  protected void rehash() {
-    super.rehash();
-    values = Arrays.copyOf(values, size << 1);
+  protected void rehash(final int s) {
+    super.rehash(s);
+    values = Arrays.copyOf(values, s);
   }
 }

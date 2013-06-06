@@ -468,10 +468,8 @@ final class StringParser extends CmdParser {
     for(final Enum<?> e : en.getEnumConstants()) {
       if(e.name().startsWith(t)) {
         final int s = list.length;
-        final Enum<?>[] tmp = new Enum<?>[s + 1];
-        System.arraycopy(list, 0, tmp, 0, s);
-        tmp[s] = e;
-        list = tmp;
+        list = Array.copy(list, new Enum<?>[s + 1]);
+        list[s] = e;
       }
     }
     return list;
