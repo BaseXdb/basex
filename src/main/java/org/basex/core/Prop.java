@@ -219,33 +219,36 @@ public final class Prop extends AProp {
    * <ol>
    * <li>First, the <b>system property</b> {@code "org.basex.path"} is checked.
    *   If it contains a value, it is adopted as home directory.</li>
-   * <li>If not, the <b>current user directory</b> (defined by the system
-   *   property {@code "user.dir"}) is chosen if the {@code .basex}
-   *   configuration file is found in this directory.</li>
-   * <li>Otherwise, the configuration file is searched in the <b>application
-   *   directory</b> (the folder in which the project is located).</li>
-   * <li>In all other cases, the <b>user's home directory</b> (defined in
+   * <li>If not, the <b>current working directory</b> (defined by the system
+   *   property {@code "user.dir"}) is chosen if the file {@code .basex} or
+   *   {@code .basexhome} is found in this directory.</li>
+   * <li>Otherwise, the files are searched in the <b>application directory</b>
+   *   (the folder in which the application code is located).</li>
+   * <li>Otherwise, the <b>user's home directory</b> (defined in
    *   {@code "user.home"}) is chosen.</li>
    * </ol>
    * @return home directory
    */
   private static String homePath() {
-    // check user specific property
-    String path = System.getProperty(PATH);
-    if(path != null) return path + File.separator;
+    // check for system property
+    String dir = System.getProperty(PATH);
+    if(dir != null) return dir + File.separator;
 
-    // check working directory for property file
-    path = System.getProperty("user.dir");
-    File config = new File(path, IO.BASEXSUFFIX);
-    if(config.exists()) return config.getParent() + File.separator;
+    // not found; check working directory for property file
+    final String home = IO.BASEXSUFFIX + "home";
+    dir = System.getProperty("user.dir");
+    File file = new File(dir, home);
+    if(!file.exists()) file = new File(dir, IO.BASEXSUFFIX);
+    if(file.exists()) return file.getParent() + File.separator;
 
     // not found; check application directory
-    path = applicationPath();
-    if(path != null) {
-      final File app = new File(path);
-      final String dir = app.isFile() ? app.getParent() : app.getPath();
-      config = new File(dir, IO.BASEXSUFFIX);
-      if(config.exists()) return config.getParent() + File.separator;
+    dir = applicationPath();
+    if(dir != null) {
+      file = new File(dir);
+      dir = file.isFile() ? file.getParent() : file.getPath();
+      file = new File(dir, home);
+      if(!file.exists()) file = new File(dir, IO.BASEXSUFFIX);
+      if(file.exists()) return file.getParent() + File.separator;
     }
 
     // not found; choose user home directory as default
@@ -283,7 +286,7 @@ public final class Prop extends AProp {
       // return path, using the correct encoding
       return new String(tb.finish(), ENCODING);
     } catch(final Exception ex) {
-      // use default path; not expected to occur
+      // return default path; not expected to occur
       Util.stack(ex);
       return tb.toString();
     }

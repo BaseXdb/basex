@@ -81,6 +81,8 @@ public final class BaseXGUI {
         // open specified document or database
         boolean xml = false;
         for(final String file : files) {
+          if(file.matches("^.*\\" + IO.BASEXSUFFIX + "[^.]*$")) continue;
+
           final IOFile io = new IOFile(file);
           boolean xq = file.endsWith(IO.BXSSUFFIX);
           for(final String suf : IO.XQSUFFIXES) xq |= file.endsWith(suf);
