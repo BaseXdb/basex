@@ -17,7 +17,6 @@ public final class CSVExample {
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args) throws BaseXException {
-
     System.out.println("=== CSVExample ===");
 
     // ------------------------------------------------------------------------

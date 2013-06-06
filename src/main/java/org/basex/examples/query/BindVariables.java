@@ -17,8 +17,7 @@ public final class BindVariables {
    * @throws QueryException if an error occurs while evaluating the query
    */
   public static void main(final String[] args) throws QueryException {
-
-    /** Database context. */
+    // Database context.
     Context context = new Context();
 
     System.out.println("=== BindVariable ===");

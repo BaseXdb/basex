@@ -60,7 +60,7 @@ public final class RESTGet {
    */
   public static void main(final String... args) throws Exception {
     // Start servers
-    final BaseXHTTP http = new BaseXHTTP("-Uadmin", "-Padmin");
+    final BaseXHTTP http = new BaseXHTTP();
     // Run example
     run();
     // Stop servers

@@ -12,9 +12,6 @@ import java.io.*;
  * @author BaseX Team 2005-12, BSD License
  */
 public final class QueryExample {
-  /** Hidden default constructor. */
-  private QueryExample() { }
-
   /**
    * Main method.
    * @param args command-line arguments

@@ -20,7 +20,6 @@ public final class SimpleFSExample {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-
     System.out.println("=== SimpleFSExample ===");
 
     // create database context

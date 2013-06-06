@@ -32,7 +32,6 @@ public final class Part11 extends Main {
     info("Pipeline large inputs");
 
     XQStaticContext xqsc = xqc.getStaticContext();
-    xqsc.setBindingMode(XQConstants.BINDING_MODE_DEFERRED);
     xqc.setStaticContext(xqsc);
 
     String path = new File("src/main/resources/xml").getAbsolutePath();
@@ -43,7 +42,7 @@ public final class Part11 extends Main {
     xqe2.bindSequence(new QName("orders"), xqs);
 
     XQSequence xqs2 = xqe2.executeQuery(
-        "declare variable $orders as element(*, xs:untyped) external; " +
+        "declare variable $orders as element() external; " +
         "for $order in $orders where $order/@status = 'closed' " +
         "return <closed_order id = '{$order/@id}'>{ " +
         " $order/* }</closed_order>");

@@ -41,7 +41,7 @@ public final class Part10 extends Main {
     xqe2.bindSequence(new QName("orders"), xqs);
 
     XQSequence xqs2 = xqe2.executeQuery(
-      "declare variable $orders as element(*, xs:untyped) external; " +
+      "declare variable $orders as element() external; " +
       "for $order in $orders where $order/@status = 'closed' " +
       "return <closed_order id = '{$order/@id}'>{ " +
       " $order/* }</closed_order>");

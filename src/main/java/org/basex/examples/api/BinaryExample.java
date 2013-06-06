@@ -13,9 +13,6 @@ import java.util.*;
  * @author BaseX Team 2005-12, BSD License
  */
 public final class BinaryExample {
-  /** Hidden default constructor. */
-  private BinaryExample() { }
-
   /**
    * Main method.
    * @param args command-line arguments

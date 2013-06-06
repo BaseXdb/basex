@@ -1,4 +1,4 @@
-package org.basex.examples;
+package org.basex.examples.query;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -17,8 +17,8 @@ public final class WikiExample {
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args) throws BaseXException {
-    /** Database context. */
-    final Context context = new Context();
+    // Database context.
+    Context context = new Context();
 
     System.out.println("=== WikiExample ===");
 
@@ -40,9 +40,9 @@ public final class WikiExample {
     new XQuery(
         "declare namespace xhtml='http://www.w3.org/1999/xhtml';" +
         "insert node " +
-        "  <xhtml:p>I will match the following query because I contain" +
-        "   the terms 'ARTICLE' and 'EDITABLE'. :-)</xhtml:p> " +
-        "into //xhtml:body"
+        "  <p>I will match the following query because I contain " +
+        "the terms 'ARTICLE' and 'EDITABLE'. :-)</p> " +
+        "into //body"
     ).execute(context);
 
     // ----------------------------------------------------------------------
@@ -52,7 +52,7 @@ public final class WikiExample {
 
     System.out.println(new XQuery(
         "declare namespace xhtml='http://www.w3.org/1999/xhtml';" +
-        "for $x in //xhtml:p/text()" +
+        "for $x in //p/text()" +
         "where $x contains text ('edit.*' ftand ('article' ftor 'page')) " +
         "  using wildcards distance at most 10 words " +
         "return <p>{ $x }</p>"

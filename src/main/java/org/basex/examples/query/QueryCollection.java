@@ -16,7 +16,7 @@ public final class QueryCollection {
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args) throws BaseXException {
-    /** Database context. */
+    // Database context.
     Context context = new Context();
 
     System.out.println("=== QueryCollection ===");

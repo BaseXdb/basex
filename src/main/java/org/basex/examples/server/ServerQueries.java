@@ -18,7 +18,6 @@ public final class ServerQueries {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-
     System.out.println("=== ServerQueries ===");
 
     // ------------------------------------------------------------------------

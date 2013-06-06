@@ -12,9 +12,6 @@ import java.io.*;
  * @author BaseX Team 2005-12, BSD License
  */
 public final class AddExample {
-  /** Hidden default constructor. */
-  private AddExample() { }
-
   /**
    * Main method.
    * @param args command-line arguments
@@ -30,8 +27,7 @@ public final class AddExample {
       System.out.println(session.info());
 
       // define input stream
-      InputStream bais =
-        new ByteArrayInputStream("<x>Hello World!</x>".getBytes());
+      InputStream bais = new ByteArrayInputStream("<x>Hello World!</x>".getBytes());
 
       // add document
       session.add("world/world.xml", bais);

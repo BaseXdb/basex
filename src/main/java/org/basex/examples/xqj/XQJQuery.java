@@ -11,8 +11,6 @@ import javax.xml.xquery.*;
 public final class XQJQuery {
   /** Database driver. */
   private static final String DRIVER = "net.xqj.basex.BaseXXQDataSource";
-  /** Sample query. */
-  private static final String QUERY = "doc('src/main/resources/xml/input.xml')//li";
 
   /**
    * Main method of the example class.
@@ -25,12 +23,15 @@ public final class XQJQuery {
 
     System.out.println("\n* Run query via XQJ:");
 
-    // Build a connection to the specified driver.
-    XQConnection conn = ((XQDataSource) Class.forName(DRIVER).
-        newInstance()).getConnection("admin", "admin");
+    // Create a new data source.
+    XQDataSource source = (XQDataSource) Class.forName(DRIVER).newInstance();
 
-    // Prepare the expression with the document and the query.
-    XQPreparedExpression expr = conn.prepareExpression(QUERY);
+    // Build a connection to the specified driver.
+    XQConnection conn = source.getConnection("admin", "admin");
+
+    // Prepare a query
+    String input = System.getProperty("user.dir") + "/src/main/resources/xml/input.xml";
+    XQPreparedExpression expr = conn.prepareExpression("doc('" + input + "')//li");
 
     // Execute the query.
     XQResultSequence result = expr.executeQuery();

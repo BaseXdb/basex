@@ -29,7 +29,6 @@ public final class ServerCollection {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-
     System.out.println("=== ServerCollection ===");
 
     // ------------------------------------------------------------------------

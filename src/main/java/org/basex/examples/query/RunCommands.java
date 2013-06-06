@@ -17,7 +17,7 @@ public final class RunCommands {
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args) throws BaseXException {
-    /** Database context. */
+    // Database context.
     Context context = new Context();
 
     System.out.println("=== RunCommands ===");
@@ -26,8 +26,7 @@ public final class RunCommands {
     // Create a database from a local or remote XML document or XML String
     System.out.println("\n* Create a database.");
 
-    new CreateDB("DBExample", "src/main/resources/xml/input.xml").
-      execute(context);
+    new CreateDB("DBExample", "src/main/resources/xml/input.xml").execute(context);
 
     // ------------------------------------------------------------------------
     // Close and reopen the database

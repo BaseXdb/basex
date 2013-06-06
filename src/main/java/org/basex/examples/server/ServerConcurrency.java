@@ -29,7 +29,6 @@ public final class ServerConcurrency {
    * @throws Exception on error.
    */
   void run() throws Exception {
-
     System.out.println("=== ServerConcurrency ===");
 
     // ------------------------------------------------------------------------

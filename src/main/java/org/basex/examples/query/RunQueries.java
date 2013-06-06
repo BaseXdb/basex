@@ -28,7 +28,6 @@ public final class RunQueries {
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args) throws IOException, QueryException {
-
     System.out.println("=== RunQueries ===");
 
     // ------------------------------------------------------------------------

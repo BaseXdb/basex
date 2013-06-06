@@ -79,7 +79,7 @@ public final class RESTPost {
    */
   public static void main(final String... args) throws Exception {
     // Start servers
-    final BaseXHTTP http = new BaseXHTTP("-W", "-Uadmin", "-Padmin");
+    final BaseXHTTP http = new BaseXHTTP();
     // Run example
     run();
     // Stop servers

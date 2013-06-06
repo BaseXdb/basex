@@ -11,9 +11,6 @@ import java.io.*;
  * @author BaseX Team 2005-12, BSD License
  */
 public final class EventExample {
-  /** Hidden default constructor. */
-  private EventExample() { }
-
   /**
    * Main method.
    * @param args command-line arguments

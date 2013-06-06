@@ -17,7 +17,7 @@ public final class RESTAll {
    */
   public static void main(final String[] args) throws Exception {
     // Start servers
-    final BaseXHTTP http = new BaseXHTTP("-W", "-Uadmin", "-Padmin");
+    final BaseXHTTP http = new BaseXHTTP();
 
     // Create a database
     // Run all REST examples

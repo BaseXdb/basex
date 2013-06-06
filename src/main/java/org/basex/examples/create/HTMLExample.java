@@ -18,7 +18,6 @@ public final class HTMLExample {
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args) throws BaseXException {
-
     System.out.println("=== HTMLExample ===");
 
     // ------------------------------------------------------------------------

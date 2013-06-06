@@ -1,4 +1,4 @@
-package org.basex.examples;
+package org.basex.examples.create;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -31,19 +31,19 @@ public final class UserExample {
     // Create a new user with password 'password' (MD5 encoded)
     System.out.println("\n* Create a user.");
 
-    new CreateUser("user", "5f4dcc3b5aa765d61d8327deb882cf99").execute(context);
+    new CreateUser("testuser", "5f4dcc3b5aa765d61d8327deb882cf99").execute(context);
 
     // ------------------------------------------------------------------------
     // Remove global user rights
     System.out.println("\n* Remove global user rights.");
 
-    new Grant("NONE", "user").execute(context);
+    new Grant("NONE", "testuser").execute(context);
 
     // ------------------------------------------------------------------------
     // Grant local user rights on database 'input'
     System.out.println("\n* Grant local user rights.");
 
-    new Grant("WRITE", "user", "input").execute(context);
+    new Grant("WRITE", "testuser", "input").execute(context);
 
     // ------------------------------------------------------------------------
     // Show global users
@@ -61,13 +61,13 @@ public final class UserExample {
     // Change user password to 'new' (MD5 encoded)
     System.out.println("\n* Alter a user's password.");
 
-    new AlterUser("user", "22af645d1859cb5ca6da0c484f1f37ea").execute(context);
+    new AlterUser("testuser", "22af645d1859cb5ca6da0c484f1f37ea").execute(context);
 
     // ------------------------------------------------------------------------
     // Drop the database and user
     System.out.println("\n* Drop the user and database.");
 
-    new DropUser("user").execute(context);
+    new DropUser("testuser").execute(context);
     new DropDB("input").execute(context);
 
     // ------------------------------------------------------------------------
