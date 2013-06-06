@@ -32,7 +32,7 @@ public abstract class BaseXServlet extends HttpServlet {
       HTTPContext.init(config.getServletContext());
       final Enumeration<String> en = config.getInitParameterNames();
       while(en.hasMoreElements()) {
-        String key = en.nextElement().toLowerCase();
+        String key = en.nextElement().toLowerCase(Locale.ENGLISH);
         final String val = config.getInitParameter(key);
         if(key.startsWith(Prop.DBPREFIX)) key = key.substring(Prop.DBPREFIX.length());
         if(key.equalsIgnoreCase(MainProp.USER[0].toString())) {

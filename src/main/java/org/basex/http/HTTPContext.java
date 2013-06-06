@@ -80,8 +80,8 @@ public final class HTTPContext {
     res.setCharacterEncoding(UTF8);
     segments = toSegments(req.getPathInfo());
 
-    final MainProp mprop = context().mprop;
     // adopt servlet-specific credentials or use global ones
+    final MainProp mprop = context().mprop;
     user = servlet.user != null ? servlet.user : mprop.get(MainProp.USER);
     pass = servlet.pass != null ? servlet.pass : mprop.get(MainProp.PASSWORD);
 

@@ -25,7 +25,7 @@ import org.eclipse.jetty.xml.*;
  */
 public final class BaseXHTTP {
   /** Database context. */
-  final Context context = HTTPContext.init();
+  final Context context;
   /** HTTP port. */
   int httpPort;
   /** HTTP server. */
@@ -56,6 +56,9 @@ public final class BaseXHTTP {
    */
   public BaseXHTTP(final String... args) throws Exception {
     parseArguments(args);
+
+    // context must be initialized after parsing of arguments
+    context = HTTPContext.init();
 
     // create jetty instance and set default context to HTTP path
     final MainProp mprop = context.mprop;
