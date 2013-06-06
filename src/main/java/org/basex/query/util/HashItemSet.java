@@ -98,5 +98,6 @@ public class HashItemSet extends ASet implements ItemSet {
   @Override
   protected void rehash(final int newSize) {
     keys = Array.copy(keys, new Item[newSize]);
+    hash = Arrays.copyOf(hash, newSize);
   }
 }
