@@ -291,8 +291,8 @@ public abstract class AProp implements Iterable<String> {
     }
     // assign properties
     for(final String key : sl) {
-      set(key.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH),
-          System.getProperty(key));
+      final String k = key.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
+      set(k, System.getProperty(key));
     }
   }
 
