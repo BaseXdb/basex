@@ -1,4 +1,4 @@
-package org.basex.examples.create;
+package org.basex.examples.server;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;

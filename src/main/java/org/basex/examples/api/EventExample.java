@@ -3,7 +3,7 @@ package org.basex.examples.api;
 import java.io.*;
 
 /**
- * This example shows how to use the event feature.
+ * This example demonstrates how to trigger and receive database events.
  *
  * This example required a running database server instance.
  * Documentation: http://docs.basex.org/wiki/Clients

@@ -1,4 +1,4 @@
-package org.basex.examples.query;
+package org.basex.examples.module;
 
 import org.basex.core.*;
 import org.basex.data.*;
@@ -26,7 +26,7 @@ public final class FruitsExample {
     // Specify query to be executed
     String query =
         "import module namespace fruits = " +
-        "'java:org.basex.examples.query.FruitsModule'; \n" +
+        "'java:org.basex.examples.module.FruitsModule'; \n" +
         "element convenient {\n" +
         "  for $i in 1 to 4\n" +
         "  return fruits:convenient(xs:int($i))\n" +

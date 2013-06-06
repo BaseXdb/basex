@@ -1,4 +1,4 @@
-package org.basex.examples.gui;
+package org.basex.examples.server;
 
 import static org.basex.core.Text.*;
 
@@ -18,9 +18,9 @@ import org.basex.util.*;
  *
  * @author BaseX Team 2005-12, BSD License
  */
-public final class EventGUITest extends JFrame {
+public final class ServerEventsGUI extends JFrame {
   /** Name of test database and user. */
-  static final String NAME = Util.name(EventGUITest.class);
+  static final String NAME = Util.name(ServerEventsGUI.class);
   /** Number of clients. */
   static final int CLIENTS = 2;
   /** Color. */
@@ -54,7 +54,7 @@ public final class EventGUITest extends JFrame {
     cs.execute("create db " + NAME + " <Application><Background/></Application>");
     cs.close();
 
-    for(int i = 0; i < CLIENTS; i++) new EventGUITest(i);
+    for(int i = 0; i < CLIENTS; i++) new ServerEventsGUI(i);
   }
 
   /**
@@ -62,7 +62,7 @@ public final class EventGUITest extends JFrame {
    * @param count window counter
    * @throws IOException I/O exception
    */
-  private EventGUITest(final int count) throws IOException {
+  private ServerEventsGUI(final int count) throws IOException {
     super("Window " + (count + 1));
 
     final JPanel buttons = new JPanel();

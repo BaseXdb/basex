@@ -1,4 +1,4 @@
-package org.basex.examples.query;
+package org.basex.examples.local;
 
 import org.basex.core.*;
 import org.basex.data.*;

@@ -1,4 +1,4 @@
-package org.basex.examples.query;
+package org.basex.examples.module;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -7,19 +7,19 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 
 /**
- * This is a simple XQuery demo module written in Java.
- * It is derived from the abstract {@link QueryModule} class.
+ * This is a simple XQuery demo module that demonstrates how XQuery items can be
+ * processed from Java. It is derived from the {@link QueryModule} class.
+ *
+ * If the class is in the classpath of the executed BaseX instance, it can be addressed
+ * as follows:
+ *
+ * <pre>
+ * import module namespace demo = 'http://basex.org/examples/module/module-demo';
+ * demo:name(demo:create()),
+ * ...
+ * </pre>
  */
-public class QueryModuleExamples extends QueryModule {
-  /**
-   * Returns the QName of a node.
-   * @param node input node
-   * @return qname
-   */
-  public QNm name(final ANode node) {
-    return node.qname();
-  }
-
+public class ModuleDemo extends QueryModule {
   /**
    * Creates a new example node.
    * @return node
@@ -29,6 +29,15 @@ public class QueryModuleExamples extends QueryModule {
     FElem elem = new FElem("root").add("attr", "value");
     doc.add(elem);
     return doc;
+  }
+
+  /**
+   * Returns the QName of a node.
+   * @param node input node
+   * @return qname
+   */
+  public QNm name(final ANode node) {
+    return node.qname();
   }
 
   /**

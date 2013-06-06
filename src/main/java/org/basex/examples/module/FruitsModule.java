@@ -1,12 +1,12 @@
-package org.basex.examples.query;
+package org.basex.examples.module;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * This is a simple XQuery demo module written in Java.
- * It is derived from the abstract {@link QueryModule} class.
+ * This is a simple demo module called by {link {@link FruitsExample}.
+ * It is derived from the {@link QueryModule} class.
  *
  * @author BaseX Team 2005-12, BSD License
  */

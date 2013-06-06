@@ -3,7 +3,7 @@ package org.basex.examples.api;
 import java.io.*;
 
 /**
- * This example shows how commands can be executed via the server instance.
+ * This example shows how commands can be executed on a server.
  *
  * This example required a running database server instance.
  * Documentation: http://docs.basex.org/wiki/Clients

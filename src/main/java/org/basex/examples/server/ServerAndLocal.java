@@ -5,7 +5,7 @@ import java.io.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.examples.query.*;
+import org.basex.examples.local.*;
 import org.basex.server.*;
 
 /**
