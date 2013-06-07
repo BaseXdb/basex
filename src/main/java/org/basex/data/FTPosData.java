@@ -3,6 +3,7 @@ package org.basex.data;
 import java.util.*;
 
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -32,13 +33,16 @@ public final class FTPosData {
     if(data == null) data = d;
     else if(data != d) return;
 
-    final IntList il = new IntList();
+    // cache all positions
+    final IntSet set = new IntSet();
     for(final FTMatch m : all) {
       for(final FTStringMatch sm : m) {
-        for(int s = sm.s; s <= sm.e; ++s) il.add(s);
+        for(int s = sm.s; s <= sm.e; ++s) set.add(s);
       }
     }
 
+    // sort and store all positions
+    final IntList il = new IntList(set.toArray()).sort();
     int c = find(pre);
     if(c < 0) {
       c = -c - 1;
@@ -89,9 +93,9 @@ public final class FTPosData {
   }
 
   /**
-   * Returns the position of the specified pre value.
+   * Returns the index of the specified pre value.
    * @param p int pre value
-   * @return position or negative insertion value - 1
+   * @return index, or negative index - 1 if pre value is not found
    */
   private int find(final int p) {
     // binary search

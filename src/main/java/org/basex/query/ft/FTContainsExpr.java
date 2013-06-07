@@ -51,7 +51,7 @@ public final class FTContainsExpr extends FTContains {
       }
       s = Scoring.and(s, d);
 
-      // add entry to visualization
+      // cache entry for visualizations or ft:mark/ft:extract
       if(d > 0 && ctx.ftpos != null && it instanceof DBNode) {
         final DBNode node = (DBNode) it;
         ctx.ftpos.add(node.data, node.pre, item.all);

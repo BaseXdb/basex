@@ -89,4 +89,9 @@ public final class BoolList extends ElementList {
   public boolean[] toArray() {
     return Arrays.copyOf(list, size);
   }
+
+  @Override
+  public String toString() {
+    return Arrays.toString(toArray());
+  }
 }

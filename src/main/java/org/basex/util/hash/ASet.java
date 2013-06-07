@@ -2,8 +2,6 @@ package org.basex.util.hash;
 
 import java.util.*;
 
-import org.basex.util.*;
-
 /**
  * This is the basic structure of an efficient and memory-saving hash set.
  * The first entry of the token set (offset 0) will always be kept empty.
@@ -17,18 +15,29 @@ public abstract class ASet {
   /** Pointers to the next entry. */
   protected int[] next;
   /** Hash entries. The actual number of entries is {@code size - 1}. */
-  protected int size;
+  protected int size = 1;
+
+  /**
+   * Empty constructor.
+   */
+  protected ASet() { }
+
+  /**
+   * Initializes the data structure with an initial array size.
+   * @param capacity initial array capacity (will be resized to a power of two)
+   */
+  protected ASet(final int capacity) {
+    int c = 1;
+    while(c < capacity) c <<= 1;
+    bucket = new int[c];
+    next = new int[c];
+  }
 
   /**
    * Resets the data structure. Must be called when data structure is initialized.
    */
   public void clear() {
-    if(bucket == null) {
-      bucket = new int[Array.CAPACITY];
-      next = new int[Array.CAPACITY];
-    } else {
-      Arrays.fill(bucket, 0);
-    }
+    Arrays.fill(bucket, 0);
     size = 1;
   }
 

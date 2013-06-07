@@ -1,10 +1,10 @@
 package org.basex.data;
 
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class contains full-text positions.
- * For each position, a pointer is stored.
+ * This class contains full-text positions for a single database node.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -22,7 +22,7 @@ public final class FTPos {
    */
   FTPos(final int p, final IntList ps) {
     pre = p;
-    pos = ps.sort().unique();
+    pos = ps;
   }
 
   /**
@@ -30,18 +30,10 @@ public final class FTPos {
    * @param ps sorted positions
    */
   void union(final IntList ps) {
-    // merge entries with the same pre value
-    ps.sort().unique();
-    final int psl = ps.size();
-    final int pol = pos.size();
-    final int tl = psl + pol;
-    final IntList ts = new IntList(tl);
-    final IntList pos0 = pos;
-    for(int i = 0, si = 0, oi = 0; i < tl; ++i) {
-      final boolean s = si == psl || oi < pol && pos0.get(oi) < ps.get(si);
-      ts.add(s ? pos0.get(oi++) : ps.get(si++));
-    }
-    pos = ts.unique();
+    final IntSet set = new IntSet();
+    for(int p = 0, s = pos.size(); p < s; p++) set.add(pos.get(p));
+    for(int p = 0, s = ps.size(); p < s; p++) set.add(ps.get(p));
+    pos = new IntList(set.toArray()).sort();
   }
 
   /**

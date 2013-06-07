@@ -51,7 +51,7 @@ public final class FTIndexAccess extends Simple {
       public ANode next() throws QueryException {
         final FTNode it = ir.next();
         if(it != null) {
-          // add entry to visualization
+          // cache entry for visualizations or ft:mark/ft:extract
           if(ctx.ftpos != null) ctx.ftpos.add(it.data, it.pre, it.all);
           // assign scoring, if not done yet
           it.score();

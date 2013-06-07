@@ -24,8 +24,8 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * Default constructor.
    */
   public TokenSet() {
+    super(Array.CAPACITY);
     keys = new byte[Array.CAPACITY][];
-    clear();
   }
 
   /**

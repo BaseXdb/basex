@@ -19,8 +19,16 @@ public class IntSet extends ASet {
    * Default constructor.
    */
   public IntSet() {
-    keys = new int[Array.CAPACITY];
-    clear();
+    this(Array.CAPACITY);
+  }
+
+  /**
+   * Default constructor.
+   * @param capacity initial array capacity
+   */
+  public IntSet(final int capacity) {
+    super(capacity);
+    keys = new int[bucket.length];
   }
 
   /**
@@ -115,5 +123,13 @@ public class IntSet extends ASet {
   @Override
   protected void rehash(final int newSize) {
     keys = Arrays.copyOf(keys, newSize);
+  }
+
+  /**
+   * Returns an array with all elements.
+   * @return array
+   */
+  public final int[] toArray() {
+    return Arrays.copyOfRange(keys, 1, size);
   }
 }

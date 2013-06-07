@@ -24,9 +24,9 @@ public class HashItemSet extends ASet implements ItemSet {
    * Default constructor.
    */
   public HashItemSet() {
+    super(Array.CAPACITY);
     hash = new int[Array.CAPACITY];
     keys = new Item[Array.CAPACITY];
-    clear();
   }
 
 

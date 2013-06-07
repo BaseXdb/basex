@@ -59,7 +59,7 @@ final class FTContainsIndex extends FTContains {
     // reset index iterator after all nodes have been processed
     if(n == null) fti = null;
 
-    // add entry to visualization
+    // cache entry for visualizations or ft:mark/ft:extract
     if(found && ctx.ftpos != null && !not) {
       ctx.ftpos.add(ftn.data, ftn.pre, ftn.all);
     }

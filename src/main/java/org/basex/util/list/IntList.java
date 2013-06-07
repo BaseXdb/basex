@@ -534,8 +534,6 @@ public class IntList extends ElementList {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
-    for(int i = 0; i < size; ++i) tb.add((i == 0 ? "" : ", ") + list[i]);
-    return tb.add(']').toString();
+    return Arrays.toString(toArray());
   }
 }
