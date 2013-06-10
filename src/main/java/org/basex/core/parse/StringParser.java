@@ -328,7 +328,7 @@ final class StringParser extends CmdParser {
   }
 
   /**
-   * Parses and returns a glob expression, which extends the {@link #name}
+   * Parses and returns a glob expression, which extends {@link #name(Cmd)} function
    * with asterisks, question marks and commands.
    * @param cmd referring command; if specified, the result must not be empty
    * @return glob expression
