@@ -1,7 +1,10 @@
 package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
 
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -21,6 +24,14 @@ public final class Ann extends ElementList {
   public static final QNm Q_PUBLIC = new QNm(QueryText.PUBLIC, XQURI);
   /** Annotation "updating". */
   public static final QNm Q_UPDATING = new QNm(QueryText.UPDATING, XQURI);
+
+  /** Supported REST annotations. */
+  private static final byte[][] ANN_REST = tokens("path", "produces", "consumes",
+      "query-param", "form-param", "header-param", "cookie-param", "GET", "POST", "PUT",
+      "DELETE", "HEAD", "OPTIONS");
+  /** Supported UNIT annotations. */
+  private static final byte[][] ANN_UNIT = tokens("test", "ignore", "before", "after",
+      "before-module", "after-module", "expected");
 
   /** Input Info. */
   public InputInfo[] infos = new InputInfo[1];
@@ -77,25 +88,6 @@ public final class Ann extends ElementList {
     }
   }
 
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < size; ++i) {
-      tb.add('%').add(names[i].string());
-      final long s = values[i].size();
-      if(s != 0) {
-        tb.add('(');
-        for(int a = 0; a < s; a++) {
-          if(a != 0) tb.add(',');
-          tb.add(values[i].itemAt(a).toString());
-        }
-        tb.add(')');
-      }
-      tb.add(' ');
-    }
-    return tb.toString();
-  }
-
   /**
    * Returns the union of these annotations and the given ones.
    * @param ann other annotations
@@ -148,5 +140,59 @@ public final class Ann extends ElementList {
       }
     }
     return o;
+  }
+
+  /**
+   * Checks all annotations for parsing errors.
+   * @param var variable flag
+   * @throws QueryException query exception
+   */
+  public void check(final boolean var) throws QueryException {
+    boolean up = false, vis = false;
+    for(int a = 0; a < size(); a++) {
+      final QNm name = names[a];
+      final byte[] local = name.local();
+      final byte[] uri = name.uri();
+      if(name.eq(Q_UPDATING)) {
+        if(up) DUPLUPD.thrw(infos[a]);
+        up = true;
+      } else if(name.eq(Q_PUBLIC) || name.eq(Q_PRIVATE)) {
+        // only one visibility modifier allowed
+        if(vis) (var ? DUPLVARVIS : DUPLVIS).thrw(infos[a]);
+        vis = true;
+      } else if(NSGlobal.reserved(name.uri())) {
+        // no global namespaces allowed
+        ANNRES.thrw(infos[a], '%', name.string());
+      } else if(eq(uri, RESTURI)) {
+        if(!eq(local, ANN_REST)) BASX_ANNOT.thrw(infos[a], '%', name.string());
+      } else if(eq(uri, OUTPUTURI)) {
+        if(Serializer.PROPS.get(string(local)) == null)
+          BASX_ANNOT.thrw(infos[a], '%', name.string());
+        if(values[a].size() != 1 || !values[a].itemAt(0).type.isStringOrUntyped()) {
+          BASX_ANNOTARGS.thrw(infos[a], '%', name.string());
+        }
+      } else if(eq(uri, UNITURI)) {
+        if(!eq(local, ANN_UNIT)) BASX_ANNOT.thrw(infos[a], '%', name.string());
+      }
+    }
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder();
+    for(int i = 0; i < size; ++i) {
+      tb.add('%').add(names[i].string());
+      final long s = values[i].size();
+      if(s != 0) {
+        tb.add('(');
+        for(int a = 0; a < s; a++) {
+          if(a != 0) tb.add(',');
+          tb.add(values[i].itemAt(a).toString());
+        }
+        tb.add(')');
+      }
+      tb.add(' ');
+    }
+    return tb.toString();
   }
 }

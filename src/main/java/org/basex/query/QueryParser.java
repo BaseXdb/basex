@@ -442,10 +442,10 @@ public class QueryParser extends InputParser {
         if(wsConsumeWs(VARIABLE)) {
           // variables cannot be updating
           if(ann.contains(Ann.Q_UPDATING)) error(UPDATINGVAR);
-          checkAnnotations(ann, true);
+          ann.check(true);
           varDecl(ann);
         } else if(wsConsumeWs(FUNCTION)) {
-          checkAnnotations(ann, false);
+          ann.check(false);
           functionDecl(ann);
         } else if(!ann.isEmpty()) {
           error(VARFUNC);
@@ -479,7 +479,7 @@ public class QueryParser extends InputParser {
   private Ann annotations() throws QueryException {
     final Ann ann = new Ann();
     while(wsConsume("%")) annotation(ann);
-    checkAnnotations(ann, false);
+    ann.check(false);
     skipWS();
     return ann;
   }
@@ -503,47 +503,8 @@ public class QueryParser extends InputParser {
       } while(wsConsumeWs(COMMA));
       wsCheck(PAR2);
     }
-
-    final byte[] local = name.local();
-    final byte[] uri = name.uri();
-    if(eq(uri, RESTURI)) {
-      if(!eq(local, RESTTAGS)) BASX_ANNOT.thrw(info, '%', name.string());
-    } else if(eq(uri, OUTPUTURI)) {
-      if(Serializer.PROPS.get(string(local)) == null)
-        BASX_ANNOT.thrw(info, '%', name.string());
-      if(vb.size() != 1 || !vb.get(0).type.isStringOrUntyped()) {
-        BASX_ANNOTARGS.thrw(info, '%', name.string());
-      }
-    }
-
     skipWS();
     ann.add(name, vb.value(), info);
-  }
-
-  /**
-   * Checks all annotations.
-   * @param ann annotations
-   * @param var variable flag
-   * @throws QueryException query exception
-   */
-  private void checkAnnotations(final Ann ann, final boolean var)
-      throws QueryException {
-
-    boolean up = false, vis = false;
-    for(int a = 0; a < ann.size(); a++) {
-      final QNm name = ann.names[a];
-      if(name.eq(Ann.Q_UPDATING)) {
-        if(up) DUPLUPD.thrw(ann.infos[a]);
-        up = true;
-      } else if(name.eq(Ann.Q_PUBLIC) || name.eq(Ann.Q_PRIVATE)) {
-        // only one visibility modifier allowed
-        if(vis) (var ? DUPLVARVIS : DUPLVIS).thrw(ann.infos[a]);
-        vis = true;
-      } else if(NSGlobal.reserved(name.uri())) {
-        // no global namespaces allowed
-        ANNRES.thrw(ann.infos[a], '%', name.string());
-      }
-    }
   }
 
   /**

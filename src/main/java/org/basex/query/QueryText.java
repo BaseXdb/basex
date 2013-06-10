@@ -672,11 +672,6 @@ public interface QueryText {
   /** Documentation: return tag. */
   byte[] DOC_RETURN = token("return");
 
-  /** Supported REST tags. */
-  byte[][] RESTTAGS = tokens("path", "produces", "consumes", "query-param",
-      "form-param", "header-param", "cookie-param", "GET", "POST", "PUT",
-      "DELETE", "HEAD", "OPTIONS");
-
   // QUERY PLAN ===============================================================
 
   /** Separator. */

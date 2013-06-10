@@ -9,19 +9,19 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public interface Constants {
-  /** Token: test. */
+  /** Annotation: test. */
   byte[] TEST = token("test");
-  /** Token: skipped. */
+  /** Annotation: skipped. */
   byte[] IGNORE = token("ignore");
-  /** Token: before. */
+  /** Annotation: before. */
   byte[] BEFORE = token("before");
-  /** Token: before. */
+  /** Annotation: before. */
   byte[] AFTER = token("after");
-  /** Token: before. */
+  /** Annotation: before. */
   byte[] BEFORE_MODULE = token("before-module");
-  /** Token: before. */
+  /** Annotation: before. */
   byte[] AFTER_MODULE = token("after-module");
-  /** Token: expected. */
+  /** Annotation: expected. */
   byte[] EXPECTED = token("expected");
 
   /** Name: testsuites. */
