@@ -36,6 +36,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class EditorView extends View {
+  /** Number of files in the history. */
+  private static final int HISTORY = 18;
+  /** Number of files in the compact history. */
+  private static final int HISTCOMP = 7;
   /** XQuery error pattern. */
   private static final Pattern XQERROR = Pattern.compile(
       "(.*?), ([0-9]+)/([0-9]+)" + COL);
@@ -171,7 +175,7 @@ public final class EditorView extends View {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final JPopupMenu pm = new JPopupMenu();
-        final ActionListener al = new ActionListener() {
+        ActionListener al = new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent ac) {
             // rewrite and open chosen file
@@ -183,13 +187,33 @@ public final class EditorView extends View {
         // create popup menu with of recently opened files
         final StringList opened = new StringList();
         for(final EditorArea ea : editors()) opened.add(ea.file.path());
-        final StringList files = new StringList(gui.gprop.strings(GUIProp.EDITOR));
-        for(final String en : files.sort(Prop.CASE, true)) {
+
+        final StringList files = new StringList(HISTORY);
+        final StringList all = new StringList(gui.gprop.strings(GUIProp.EDITOR));
+        final int fl = Math.min(all.size(), e == null ? HISTORY : HISTCOMP);
+        for(int f = 0; f < fl; f++) files.add(all.get(f));
+
+        Font f = null;
+        for(final String en : files.sort(Prop.CASE)) {
           // disable opened files
           final JMenuItem it = new JMenuItem(en.replaceAll("(.*)[/\\\\](.*)", "$2 [$1]"));
-          it.setEnabled(!opened.contains(en));
+          if(opened.contains(en)) {
+            if(f == null) f = it.getFont().deriveFont(Font.BOLD);
+            it.setFont(f);
+          }
           pm.add(it).addActionListener(al);
         }
+
+        al = new ActionListener() {
+          @Override
+          public void actionPerformed(final ActionEvent ac) {
+            hist.getActionListeners()[0].actionPerformed(null);
+          }
+        };
+        if(e != null && pm.getComponentCount() == HISTCOMP) {
+          pm.add(new JMenuItem("...")).addActionListener(al);
+        }
+
         pm.show(hist, 0, hist.getHeight());
       }
     });
@@ -336,28 +360,32 @@ public final class EditorView extends View {
    * Opens the specified query file.
    * @param file query file
    * @param parse parse contents
-   * @return opened editor
+   * @return opened editor, or {@code null} if file could not be opened
    */
   public EditorArea open(final IO file, final boolean parse) {
     if(!visible()) GUICommands.C_SHOWEDITOR.execute(gui);
 
     EditorArea edit = find(file, true);
-    try {
-      if(edit != null) {
-        // display open file
-        tabs.setSelectedComponent(edit);
-        edit.reopen(true);
-      } else {
+    if(edit != null) {
+      // display open file
+      tabs.setSelectedComponent(edit);
+      edit.reopen(true);
+    } else {
+      try {
+        final byte[] text = file.read();
+
         // get current editor
         edit = getEditor();
         // create new tab if current text is stored on disk or has been modified
         if(edit.opened() || edit.modified) edit = addTab();
-        edit.initText(file.read());
+        edit.initText(text);
         edit.file(file);
         if(parse) edit.release(Action.PARSE);
+      } catch(final IOException ex) {
+        refreshHistory(null);
+        BaseXDialog.error(gui, FILE_NOT_OPENED);
+        return null;
       }
-    } catch(final IOException ex) {
-      BaseXDialog.error(gui, FILE_NOT_OPENED);
     }
     return edit;
   }
@@ -367,22 +395,22 @@ public final class EditorView extends View {
    * @param file new file
    */
   void refreshHistory(final IO file) {
-    final StringList sl = new StringList();
+    final StringList paths = new StringList();
     String path = null;
     if(file != null) {
       path = file.path();
       gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
-      sl.add(path);
+      paths.add(path);
       tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
     }
-    final String[] qu = gui.gprop.strings(GUIProp.EDITOR);
-    for(int q = 0; q < qu.length && q < 19; q++) {
-      final String f = qu[q];
-      if(!f.equalsIgnoreCase(path) && IO.get(f).exists()) sl.add(f);
+    final String[] old = gui.gprop.strings(GUIProp.EDITOR);
+    for(int p = 0; paths.size() < HISTORY && p < old.length; p++) {
+      final IO fl = IO.get(old[p]);
+      if(fl.exists() && !fl.eq(file)) paths.add(fl.path());
     }
     // store sorted history
-    gui.gprop.set(GUIProp.EDITOR, sl.toArray());
-    hist.setEnabled(!sl.isEmpty());
+    gui.gprop.set(GUIProp.EDITOR, paths.toArray());
+    hist.setEnabled(!paths.isEmpty());
   }
 
   /**
@@ -529,10 +557,9 @@ public final class EditorView extends View {
     EditorArea edit = find(errFile, false);
     if(open) {
       if(edit == null) edit = open(errFile, false);
-      tabs.setSelectedComponent(edit);
-    } else {
-      if(edit == null) return;
+      if(edit != null) tabs.setSelectedComponent(edit);
     }
+    if(edit == null) return;
 
     // find approximate error position
     final int ll = edit.last.length;
@@ -573,12 +600,11 @@ public final class EditorView extends View {
 
   /**
    * Checks if the current text can be saved or reverted.
-   * @param rev revert flag
    * @return result of check
    */
-  public boolean modified(final boolean rev) {
+  public boolean modified() {
     final EditorArea edit = getEditor();
-    return edit.modified || !rev && !edit.opened();
+    return edit.modified || !edit.opened();
   }
 
   /**

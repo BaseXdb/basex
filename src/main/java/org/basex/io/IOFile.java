@@ -290,6 +290,12 @@ public final class IOFile extends IO {
   }
 
   @Override
+  public boolean eq(final IO io) {
+    if(!(io instanceof IOFile)) return false;
+    return Prop.CASE ? path.equals(io.path) : path.equalsIgnoreCase(io.path);
+  }
+
+  @Override
   public String url() {
     final TokenBuilder tb = new TokenBuilder(FILEPREF);
     // add leading slash for Windows paths

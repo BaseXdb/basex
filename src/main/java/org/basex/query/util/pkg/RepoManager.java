@@ -151,7 +151,7 @@ public final class RepoManager {
         }
       }
     }
-    return sl.sort(false, true);
+    return sl.sort(false);
   }
 
   /**

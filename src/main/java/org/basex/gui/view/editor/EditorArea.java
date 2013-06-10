@@ -73,7 +73,7 @@ final class EditorArea extends Editor {
   }
 
   /**
-   * Returns {@code true} if a file instance exists for the edited text.
+   * Returns {@code true} if the file was opened from disk, or was saved to disk.
    * @return result of check
    */
   boolean opened() {

@@ -36,7 +36,7 @@ public class Restore extends ABackup {
     // find backup file with or without date suffix
     IOFile file = mprop.dbpath(db + IO.ZIPSUFFIX);
     if(!file.exists()) {
-      final StringList list = Databases.backupPaths(db, context);
+      final StringList list = Databases.backupPaths(db, context).sort(Prop.CASE, false);
       if(!list.isEmpty()) file = new IOFile(list.get(0));
     } else {
       // db is already the name of a backup -> extract db name

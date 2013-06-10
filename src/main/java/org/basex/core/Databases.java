@@ -118,11 +118,11 @@ public final class Databases {
         list.add(add);
       }
     }
-    return list.sort(false, true);
+    return list.sort(false);
   }
 
   /**
-   * Returns the sorted paths of all backups of the specified database.
+   * Returns the paths of all backups of the specified database.
    * @param db database
    * @param ctx database context
    * @return paths of available backups
@@ -134,7 +134,7 @@ public final class Databases {
     for(final IOFile f : ctx.mprop.dbpath().children()) {
       if(f.name().matches(regex)) sl.add(f.path());
     }
-    return sl.sort(false, false);
+    return sl;
   }
 
   /**

@@ -163,6 +163,6 @@ public final class List extends Command {
       final String name = f.name();
       if(f.isDir() && !name.startsWith(".")) db.add(name);
     }
-    return db.sort(false, true);
+    return db.sort(false);
   }
 }

@@ -134,6 +134,15 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
+   * Sorts the elements in ascending order.
+   * @param cs respect case sensitivity
+   * @return self reference
+   */
+  public final StringList sort(final boolean cs) {
+    return sort(cs, true, 0);
+  }
+
+  /**
    * Sorts the elements.
    * @param cs respect case sensitivity
    * @param asc ascending/descending flag
@@ -170,6 +179,30 @@ public class StringList extends ElementList implements Iterable<String> {
       size = s + 1;
     }
     return this;
+  }
+
+  /**
+   * Returns the uppermost element from the stack.
+   * @return the uppermost element
+   */
+  public final String peek() {
+    return list[size - 1];
+  }
+
+  /**
+   * Pops the uppermost element from the stack.
+   * @return the popped element
+   */
+  public final String pop() {
+    return list[--size];
+  }
+
+  /**
+   * Pushes an element onto the stack.
+   * @param element element
+   */
+  public final void push(final String element) {
+    add(element);
   }
 
   @Override

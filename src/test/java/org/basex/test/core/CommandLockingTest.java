@@ -341,7 +341,7 @@ public class CommandLockingTest extends SandboxTest {
     // Need sorted lists for compareAll
     for (final StringList list : new StringList[]
         {reqRd, allowRd, reqWt, allowWt, lr.read, lr.write})
-      if (null != list) list.sort(false, true).unique();
+      if (null != list) list.sort(false).unique();
 
     // Test if read locking too much or less databases
     if(null == reqRd && !lr.readAll) fail("Should read lock all databases, didn't.");
