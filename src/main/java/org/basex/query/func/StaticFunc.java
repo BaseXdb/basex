@@ -171,8 +171,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final StaticContext cs = ctx.sc;
     ctx.sc = sc;
     ctx.value = null;
-    final int fp = addArgs(ctx, ii, arg);
+    final int fp = scope.enter(ctx);
     try {
+      addArgs(ctx, ii, arg);
       final Item it = expr.item(ctx, ii);
       final Value v = it == null ? Empty.SEQ : it;
       // optionally promote return value to target type
@@ -192,8 +193,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final StaticContext cs = ctx.sc;
     ctx.sc = sc;
     ctx.value = null;
-    final int fp = addArgs(ctx, ii, arg);
+    final int fp = scope.enter(ctx);
     try {
+      addArgs(ctx, ii, arg);
       final Value v = ctx.value(expr);
       // optionally promote return value to target type
       return cast ? declType.funcConvert(ctx, info, v) : v;
@@ -209,15 +211,12 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param ctx query context
    * @param ii input info
    * @param vals values to add
-   * @return old stack frame pointer
    * @throws QueryException if the arguments can't be bound
    */
-  private int addArgs(final QueryContext ctx, final InputInfo ii, final Value[] vals)
+  private void addArgs(final QueryContext ctx, final InputInfo ii, final Value[] vals)
       throws QueryException {
     // move variables to stack
-    final int fp = scope.enter(ctx);
     for(int i = 0; i < args.length; i++) ctx.set(args[i], vals[i], ii);
-    return fp;
   }
 
   /**

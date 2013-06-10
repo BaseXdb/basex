@@ -115,6 +115,8 @@ public final class SimpleTest extends QueryTest {
       { "XQuery 3.0", empty(), "xquery version '3.0'; <a/>/node()" },
       { "XQuery 1.0", empty(), "xquery version '1.0'; <a/>/node()" },
 
+      { "DeclFun 1", itr(0, 1), "declare function local:x($x as xs:integer) { $x }; " +
+          "let $a := 0, $b := 1 return try { local:x( (1 to 20) ) } catch * { ($a,$b) }" }
     };
   }
 }
