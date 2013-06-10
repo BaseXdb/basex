@@ -114,14 +114,6 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
     return new ArrayIterator<FTMatch>(match, size);
   }
 
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(Util.name(this)).append('[').append(sTokenNum).append(']');
-    for(final FTMatch m : this) sb.append("\n  ").append(m);
-    return sb.toString();
-  }
-
   /**
    * Creates a deep copy of this container.
    * @return copy
@@ -133,5 +125,13 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
     for(int i = 0; i < ftm.match.length; i++)
       if(ftm.match[i] != null) ftm.match[i] = ftm.match[i].copy();
     return ftm;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(Util.name(this)).append('[').append(sTokenNum).append(']');
+    for(final FTMatch m : this) sb.append("\n  ").append(m);
+    return sb.toString();
   }
 }

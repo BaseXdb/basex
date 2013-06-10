@@ -30,7 +30,7 @@ public final class FTPos {
    * @param ps sorted positions
    */
   void union(final IntList ps) {
-    final IntSet set = new IntSet();
+    final IntSet set = new IntSet(pos.size() + ps.size());
     for(int p = 0, s = pos.size(); p < s; p++) set.add(pos.get(p));
     for(int p = 0, s = ps.size(); p < s; p++) set.add(ps.get(p));
     pos = new IntList(set.toArray()).sort();

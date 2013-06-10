@@ -79,18 +79,6 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
     Arrays.sort(match, 0, size, null);
   }
 
-  @Override
-  public Iterator<FTStringMatch> iterator() {
-    return new ArrayIterator<FTStringMatch>(match, size);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.name(this));
-    for(final FTStringMatch s : this) sb.append(' ').append(s);
-    return sb.toString();
-  }
-
   /**
    * Creates a deep copy of this container.
    * @return copy
@@ -102,5 +90,17 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
     for(int i = 0; i < ftm.match.length; i++)
       if(ftm.match[i] != null) ftm.match[i] = ftm.match[i].copy();
     return ftm;
+  }
+
+  @Override
+  public Iterator<FTStringMatch> iterator() {
+    return new ArrayIterator<FTStringMatch>(match, size);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(Util.name(this));
+    for(final FTStringMatch s : this) sb.append(' ').append(s);
+    return sb.toString();
   }
 }
