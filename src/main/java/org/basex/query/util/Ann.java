@@ -22,6 +22,8 @@ public final class Ann extends ElementList {
   /** Annotation "updating". */
   public static final QNm Q_UPDATING = new QNm(QueryText.UPDATING, XQURI);
 
+  /** Input Info. */
+  public InputInfo[] infos = new InputInfo[1];
   /** QNames. */
   public QNm[] names = new QNm[1];
   /** Values. */
@@ -31,16 +33,19 @@ public final class Ann extends ElementList {
    * Adds a QName/value pair.
    * @param name QName
    * @param value value
+   * @param info input info
    */
-  public void add(final QNm name, final Value value) {
+  public void add(final QNm name, final Value value, final InputInfo info) {
     // create new entry
     if(size == names.length) {
       final int s = newSize();
       names = Array.copy(names, new QNm[s]);
       values = Array.copy(values, new Value[s]);
+      infos = Array.copy(infos, new InputInfo[s]);
     }
     names[size] = name;
     values[size] = value;
+    infos[size] = info;
     size++;
   }
 
@@ -103,7 +108,7 @@ public final class Ann extends ElementList {
       if(names[i].eq(Ann.Q_PUBLIC)) pub = true;
       else if(names[i].eq(Ann.Q_PRIVATE)) priv = true;
       else if(names[i].eq(Ann.Q_UPDATING)) up = true;
-      o.add(names[i], values[i]);
+      o.add(names[i], values[i], infos[i]);
     }
 
     for(int i = 0; i < ann.size; i++) {
@@ -117,7 +122,7 @@ public final class Ann extends ElementList {
       } else if(name.eq(Ann.Q_UPDATING) && up) {
         continue;
       }
-      o.add(ann.names[i], ann.values[i]);
+      o.add(ann.names[i], ann.values[i], ann.infos[i]);
     }
     return o;
   }
@@ -135,7 +140,7 @@ public final class Ann extends ElementList {
       try {
         for(int j = 0; j < ann.size; j++) {
           if(name.eq(ann.names[j]) && Compare.deep(val, ann.values[j], null))
-            o.add(name, val);
+            o.add(name, val, infos[i]);
         }
       } catch(final QueryException ex) {
         // should never happen because annotations can only contain simple literals

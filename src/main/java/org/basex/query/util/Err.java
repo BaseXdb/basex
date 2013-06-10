@@ -36,6 +36,10 @@ public enum Err {
   BASX_DBTRANSFORM(BASX, 4, "No database updates allowed within transform expression."),
   /** BASX0005. */
   BASX_STACKOVERFLOW(BASX, 5, "Stack Overflow: Try tail recursion?"),
+  /** BASX0006. */
+  BASX_ANNOT(BASX, 6, "Annotation %% is invalid or not supported."),
+  /** BASX0006. */
+  BASX_ANNOTARGS(BASX, 6, "Annotation %% has invalid arguments."),
 
   // Client module
 

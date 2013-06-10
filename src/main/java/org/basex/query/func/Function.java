@@ -1083,7 +1083,7 @@ public enum Function {
   final FuncType type(final int arity) {
     final Ann ann = new Ann();
     for(final Function up : UPDATING)
-      if(this == up) ann.add(Ann.Q_UPDATING, Empty.SEQ);
+      if(this == up) ann.add(Ann.Q_UPDATING, Empty.SEQ, null);
     final SeqType[] arg = new SeqType[arity];
     if(arity != 0 && max == Integer.MAX_VALUE) {
       System.arraycopy(args, 0, arg, 0, args.length);

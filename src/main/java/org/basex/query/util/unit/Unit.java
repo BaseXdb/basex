@@ -55,8 +55,7 @@ public final class Unit {
    * @throws QueryException query exception
    */
   public FElem test() throws QueryException {
-    final FElem tests = new FElem(TESTSUITE);
-    tests.add(NAME, ctx.sc.baseURI().string());
+    final FElem tests = new FElem(TESTSUITE).add(NAME, ctx.sc.baseURI().string());
     int t = 0, e = 0, f = 0, s = 0;
 
     final IO file = ctx.sc.baseIO();

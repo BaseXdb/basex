@@ -432,7 +432,7 @@ public class QueryParser extends InputParser {
         final Ann ann = new Ann();
         while(true) {
           if(wsConsumeWs(UPDATING)) {
-            ann.add(Ann.Q_UPDATING, Empty.SEQ);
+            ann.add(Ann.Q_UPDATING, Empty.SEQ, info());
           } else if(ctx.sc.xquery3() && consume('%')) {
             annotation(ann);
           } else {
@@ -491,7 +491,9 @@ public class QueryParser extends InputParser {
    */
   private void annotation(final Ann ann) throws QueryException {
     skipWS();
+    final InputInfo info = info();
     final QNm name = eQName(QNAMEINV, XQURI);
+
     final ValueBuilder vb = new ValueBuilder();
     if(wsConsumeWs(PAR1)) {
       do {
@@ -501,8 +503,21 @@ public class QueryParser extends InputParser {
       } while(wsConsumeWs(COMMA));
       wsCheck(PAR2);
     }
+
+    final byte[] local = name.local();
+    final byte[] uri = name.uri();
+    if(eq(uri, RESTURI)) {
+      if(!eq(local, RESTTAGS)) BASX_ANNOT.thrw(info, '%', name.string());
+    } else if(eq(uri, OUTPUTURI)) {
+      if(Serializer.PROPS.get(string(local)) == null)
+        BASX_ANNOT.thrw(info, '%', name.string());
+      if(vb.size() != 1 || !vb.get(0).type.isStringOrUntyped()) {
+        BASX_ANNOTARGS.thrw(info, '%', name.string());
+      }
+    }
+
     skipWS();
-    ann.add(name, vb.value());
+    ann.add(name, vb.value(), info);
   }
 
   /**
@@ -511,20 +526,22 @@ public class QueryParser extends InputParser {
    * @param var variable flag
    * @throws QueryException query exception
    */
-  private void checkAnnotations(final Ann ann, final boolean var) throws QueryException {
+  private void checkAnnotations(final Ann ann, final boolean var)
+      throws QueryException {
+
     boolean up = false, vis = false;
     for(int a = 0; a < ann.size(); a++) {
       final QNm name = ann.names[a];
       if(name.eq(Ann.Q_UPDATING)) {
-        if(up) error(DUPLUPD);
+        if(up) DUPLUPD.thrw(ann.infos[a]);
         up = true;
       } else if(name.eq(Ann.Q_PUBLIC) || name.eq(Ann.Q_PRIVATE)) {
         // only one visibility modifier allowed
-        if(vis) error(var ? DUPLVARVIS : DUPLVIS);
+        if(vis) (var ? DUPLVARVIS : DUPLVIS).thrw(ann.infos[a]);
         vis = true;
       } else if(NSGlobal.reserved(name.uri())) {
         // no global namespaces allowed
-        error(ANNRES, '%', name.string());
+        ANNRES.thrw(ann.infos[a], '%', name.string());
       }
     }
   }
@@ -616,7 +633,7 @@ public class QueryParser extends InputParser {
           FuncParams.serializerProp(tm, info);
           for(final byte[] sk : tm) ctx.serProp.set(string(sk), string(tm.get(sk)));
         } catch(final IOException ex) {
-          OUTDOC.thrw(info(), val);
+          error(OUTDOC, val);
         }
       }
 
@@ -2579,7 +2596,7 @@ public class QueryParser extends InputParser {
       final int as = atts.size();
       for(int a = 0; a < as - 1; a++) {
         for(int b = a + 1; b < as; b++) {
-          if(atts.get(a).eq(atts.get(b))) ATTDUPL.thrw(info(), atts.get(a));
+          if(atts.get(a).eq(atts.get(b))) error(ATTDUPL, atts.get(a));
         }
       }
     }
