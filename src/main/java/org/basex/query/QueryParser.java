@@ -1136,21 +1136,7 @@ public class QueryParser extends InputParser {
       if(ctx.sc.xquery3() && wsConsumeWs(GROUP)) {
         wsCheck(BY);
         ap = ip;
-        GroupBy.Spec[] specs = null;
-        do {
-          final GroupBy.Spec spec = groupSpec(clauses);
-          if(specs == null) {
-            specs = new GroupBy.Spec[] { spec };
-          } else {
-            for(int i = specs.length; --i >= 0;) {
-              if(specs[i].var.name.eq(spec.var.name)) {
-                specs[i].occluded = true;
-                break;
-              }
-            }
-            specs = Array.add(specs, spec);;
-          }
-        } while(wsConsume(COMMA));
+        GroupBy.Spec[] specs = groupSpecs(clauses);
 
         // find all non-grouping variables that aren't shadowed
         final ArrayList<VarRef> ng = new ArrayList<VarRef>();
@@ -1365,34 +1351,61 @@ public class QueryParser extends InputParser {
    * @return new group specification
    * @throws QueryException query exception
    */
-  private GroupBy.Spec groupSpec(final LinkedList<Clause> cl) throws QueryException {
-    final InputInfo ii = info();
-    final QNm name = varName();
-    final SeqType type = optAsType();
+  private GroupBy.Spec[] groupSpecs(final LinkedList<Clause> cl) throws QueryException {
+    GroupBy.Spec[] specs = null;
+    do {
+      final InputInfo ii = info();
+      final QNm name = varName();
+      final SeqType type = optAsType();
 
-    final Expr by;
-    if(type != null || wsConsume(ASSIGN)) {
-      if(type != null) wsCheck(ASSIGN);
-      by = check(single(), NOVARDECL);
-    } else {
-      final VarRef vr = scope.resolve(name, ctx, ii);
-      // the grouping variable has to be declared by the same FLWOR expression
-      boolean dec = false;
-      if(vr != null) {
-        for(final Clause f : cl) {
-          if(f.declares(vr.var)) {
-            dec = true;
+      final Expr by;
+      if(type != null || wsConsume(ASSIGN)) {
+        if(type != null) wsCheck(ASSIGN);
+        by = check(single(), NOVARDECL);
+      } else {
+        final VarRef vr = scope.resolve(name, ctx, ii);
+        // the grouping variable has to be declared by the same FLWOR expression
+        boolean dec = false;
+        if(vr != null) {
+          // check preceding clauses
+          for(final Clause f : cl) {
+            if(f.declares(vr.var)) {
+              dec = true;
+              break;
+            }
+          }
+
+          // check other grouping variables
+          if(!dec && specs != null) {
+            for(final GroupBy.Spec spec : specs) {
+              if(spec.var.is(vr.var)) {
+                dec = true;
+                break;
+              }
+            }
+          }
+        }
+        if(!dec) error(GVARNOTDEFINED, '$' + string(name.string()));
+        by = vr;
+      }
+
+      final Collation coll = !wsConsumeWs(COLLATION) ? ctx.sc.collation :
+        Collation.get(stringLiteral(), ctx, info(), FLWORCOLL);
+      final GroupBy.Spec spec =
+          new GroupBy.Spec(ii, addLocal(name, type, false), by, coll);
+      if(specs == null) {
+        specs = new GroupBy.Spec[] { spec };
+      } else {
+        for(int i = specs.length; --i >= 0;) {
+          if(specs[i].var.name.eq(spec.var.name)) {
+            specs[i].occluded = true;
             break;
           }
         }
+        specs = Array.add(specs, spec);
       }
-      if(!dec) error(GVARNOTDEFINED, '$' + string(name.string()));
-      by = vr;
-    }
-
-    final Collation coll = !wsConsumeWs(COLLATION) ? ctx.sc.collation :
-      Collation.get(stringLiteral(), ctx, info(), FLWORCOLL);
-    return new GroupBy.Spec(ii, addLocal(name, type, false), by, coll);
+    } while(wsConsume(COMMA));
+    return specs;
   }
 
   /**
