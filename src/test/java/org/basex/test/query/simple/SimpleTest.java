@@ -116,7 +116,13 @@ public final class SimpleTest extends QueryTest {
       { "XQuery 1.0", empty(), "xquery version '1.0'; <a/>/node()" },
 
       { "DeclFun 1", itr(0, 1), "declare function local:x($x as xs:integer) { $x }; " +
-          "let $a := 0, $b := 1 return try { local:x( (1 to 20) ) } catch * { ($a,$b) }" }
+        "let $a := 0, $b := 1 return try { local:x( (1 to 20) ) } catch * { ($a,$b) }" },
+
+      { "Catch 1", "try { 1+'' } catch XPTY0004 { 1 }" },
+      { "Catch 2", itr(1), "try { 1+'' } catch err:XPTY0004 { 1 }" },
+      { "Catch 3", itr(1), "try { 1+'' } catch *:XPTY0004 { 1 }" },
+      { "Catch 4", itr(1), "try { 1+'' } catch err:* { 1 }" },
+      { "Catch 5", itr(1), "try { 1+'' } catch * { 1 }" },
     };
   }
 }

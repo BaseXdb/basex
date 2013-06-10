@@ -86,8 +86,9 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
+      final Expr e) throws QueryException {
+
     boolean change = false;
     try {
       final Expr sub = expr.inline(ctx, scp, v, e);

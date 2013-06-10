@@ -3124,12 +3124,12 @@ public class QueryParser extends InputParser {
 
     Catch[] ct = { };
     do {
-      QNm[] codes = { };
+      NameTest[] codes = { };
       do {
         skipWS();
-        final Test test = nodeTest(false, false);
+        final NameTest test = (NameTest) nodeTest(false, false);
         if(test == null) error(NOCATCH);
-        codes = Array.add(codes, test.name);
+        codes = Array.add(codes, test);
       } while(wsConsumeWs(PIPE));
 
       final int s = scope.open();

@@ -80,15 +80,33 @@ public final class NameTest extends Test {
     if(node.type != type) return false;
 
     switch(mode) {
-      // wildcard - accept all nodes
-      case ALL:  return true;
-      // namespaces wildcard - check only name
+      // wildcard: accept all nodes
+      case ALL: return true;
+      // namespaces wildcard: only check name
       case NAME: return Token.eq(ln, Token.local(node.name()));
-      // name wildcard - check only namespace
-      case NS:   return Token.eq(name.uri(), node.qname(tmpq).uri());
+      // name wildcard: only check namespace
+      case NS: return Token.eq(name.uri(), node.qname(tmpq).uri());
       // check attributes, or check everything
-      default:   return type == NodeType.ATT && !name.hasPrefix() ?
+      default: return type == NodeType.ATT && !name.hasPrefix() ?
         Token.eq(ln, node.name()) : name.eq(node.qname(tmpq));
+    }
+  }
+
+  /**
+   * Checks if the specified name matches the test.
+   * @param nm name
+   * @return result of check
+   */
+  public boolean eq(final QNm nm) {
+    switch(mode) {
+      // wildcard: accept all nodes
+      case ALL:  return true;
+      // namespaces wildcard: only check name
+      case NAME: return Token.eq(ln, nm.local());
+      // name wildcard: only check namespace
+      case NS: return Token.eq(name.uri(), nm.uri());
+      // check everything
+      default: return name.eq(nm);
     }
   }
 

@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -21,6 +22,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Catch extends Single {
+  /** Prefix wildcard. */
+  public static final byte[] WILDCARD = token("*");
+
   /** Error QNames. */
   private static final QNm[] QNM = {
     create(ECODE), create(EDESC), create(EVALUE), create(EMODULE),
@@ -35,7 +39,7 @@ public final class Catch extends Single {
   /** Error variables. */
   private final Var[] vars = new Var[QNM.length];
   /** Supported codes. */
-  private final QNm[] codes;
+  private final NameTest[] codes;
 
   /**
    * Constructor.
@@ -44,7 +48,7 @@ public final class Catch extends Single {
    * @param ctx query context
    * @param scp variable scope
    */
-  public Catch(final InputInfo ii, final QNm[] c, final QueryContext ctx,
+  public Catch(final InputInfo ii, final NameTest[] c, final QueryContext ctx,
       final VarScope scp) {
     super(ii, null);
     codes = c;
@@ -145,17 +149,7 @@ public final class Catch extends Single {
    */
   protected boolean matches(final QueryException qe) {
     final QNm code = qe.qname();
-    for(final QNm c : codes) {
-      if(c != null) {
-        final byte[] cu = c.uri();
-        final byte[] eu = qe.err() != null ? qe.err().qname().uri() :
-          code.hasURI() ? code.uri() : EMPTY;
-        if(cu.length != 0 && !eq(eu, cu)) continue;
-        final byte[] nm = c.local();
-        if(nm.length != 0 && !eq(code.local(), nm)) continue;
-      }
-      return true;
-    }
+    for(final NameTest c : codes) if(c.eq(code)) return true;
     return false;
   }
 
