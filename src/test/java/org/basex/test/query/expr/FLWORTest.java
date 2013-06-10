@@ -2,8 +2,7 @@ package org.basex.test.query.expr;
 
 import static org.junit.Assert.*;
 
-import org.basex.core.*;
-import org.basex.core.cmd.*;
+import org.basex.query.*;
 import org.basex.test.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -21,6 +20,11 @@ public final class FLWORTest extends SandboxTest {
     query("for $a in for $a in <a>1</a> return $a/text() return <x>{ $a }</x>",
         "<x>1</x>");
   }
+  /** Tests shadowing between grouping variables. */
+  @Test
+  public void groupShadowTest() {
+    query("let $i := 1 group by $i, $i return $i", "1");
+  }
 
   /**
    * Runs an updating query and matches the result of the second query
@@ -29,12 +33,15 @@ public final class FLWORTest extends SandboxTest {
    * @param expected expected output
    */
   private static void query(final String query, final String expected) {
+    final QueryProcessor proc = new QueryProcessor(query, context);
     try {
-      final String result = new XQuery(query).execute(context);
+      final String result = proc.value().serialize().toString();
       // quotes are replaced by apostrophes to simplify comparison
       assertEquals(expected.replaceAll("\"", "'"), result.replaceAll("\"", "'"));
-    } catch(final BaseXException ex) {
-      fail(Util.message(ex));
+    } catch(final QueryException ex) {
+      throw (Error) new AssertionError(Util.message(ex)).initCause(ex);
+    } finally {
+      proc.close();
     }
   }
 }
