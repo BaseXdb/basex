@@ -88,6 +88,9 @@ public class CollationTest extends AdvancedQueryTest {
     query(PROLOG + "for $a in ('\u00c4', 'b') order by $a return $a", "\u00c4 b");
     query("for $a in ('\u00c4', 'b') order by $a collation '" + COLLATION + "'return $a",
         "\u00c4 b");
+    query("for $a in ( 'Ä', 'A' ) " +
+        "group by $b := $a collation '?lang=de;strength=primary' " +
+        "return count($a)", 2);
   }
 
   /** Tests the group by clause. */
