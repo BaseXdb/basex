@@ -109,13 +109,14 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     for(int a = 0; a < as; a++) {
       final QNm name = function.ann.names[a];
       final Value value = function.ann.values[a];
+      final InputInfo info = function.ann.infos[a];
       final byte[] local = name.local();
       final byte[] uri = name.uri();
       final boolean rexq = eq(uri, QueryText.RESTURI);
       if(rexq) {
         if(eq(PATH, local)) {
           // annotation "path"
-          if(path != null) error(ANN_TWICE, "%", name.string());
+          if(path != null) error(info, ANN_TWICE, "%", name.string());
           path = new RestXqPath(toString(value, name));
           for(final String s : path) {
             if(s.trim().startsWith("{")) checkVariable(s, AtomType.AAT, declared);
@@ -141,21 +142,21 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         } else {
           // method annotations
           final HTTPMethod m = HTTPMethod.get(string(local));
-          if(m == null) error(ANN_UNKNOWN, "%", name.string());
+          if(m == null) error(info, ANN_UNKNOWN, "%", name.string());
           if(!value.isEmpty()) {
             // remember post/put variable
-            if(requestBody != null) error(ANN_TWICE, "%", name.string());
-            if(m != POST && m != PUT) error(METHOD_VALUE, m);
+            if(requestBody != null) error(info, ANN_TWICE, "%", name.string());
+            if(m != POST && m != PUT) error(info, METHOD_VALUE, m);
             requestBody = checkVariable(toString(value, name), declared);
           }
-          if(mth.contains(m)) error(ANN_TWICE, "%", name.string());
+          if(mth.contains(m)) error(info, ANN_TWICE, "%", name.string());
           mth.add(m);
         }
       } else if(eq(uri, QueryText.OUTPUTURI)) {
         // serialization parameters
         final String key = string(local);
         final String val = toString(value, name);
-        if(output.get(key) == null) error(UNKNOWN_SER, key);
+        if(output.get(key) == null) error(info, UNKNOWN_SER, key);
         output.set(key, val);
       }
       found |= rexq;
@@ -163,9 +164,11 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(!mth.isEmpty()) methods = mth;
 
     if(found) {
-      if(path == null) error(ANN_MISSING, PATH);
-      for(int i = 0; i < declared.length; i++)
-        if(!declared[i]) error(VAR_UNDEFINED, function.args[i].name.string());
+      if(path == null) error(function.info, ANN_MISSING, PATH);
+      for(int i = 0; i < declared.length; i++) {
+        if(declared[i]) continue;
+        error(function.info, VAR_UNDEFINED, function.args[i].name.string());
+      }
     }
     return found;
   }
@@ -258,7 +261,20 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @throws QueryException query exception
    */
   QueryException error(final String msg, final Object... ext) throws QueryException {
-    throw new QueryException(function.info, Err.BASX_RESTXQ, Util.info(msg, ext));
+    throw error(function.info, msg, ext);
+  }
+
+  /**
+   * Creates an exception with the specified message.
+   * @param info input info
+   * @param msg message
+   * @param ext error extension
+   * @return exception
+   * @throws QueryException query exception
+   */
+  QueryException error(final InputInfo info, final String msg, final Object... ext)
+      throws QueryException {
+    throw new QueryException(info, Err.BASX_RESTXQ, Util.info(msg, ext));
   }
 
   @Override
@@ -403,7 +419,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @throws QueryException HTTP exception
    */
   private String toString(final Value value, final QNm name) throws QueryException {
-    if(!(value instanceof Str)) error(ANN_STRING, "%", name.string(), value);
+    if(!(value instanceof Str))
+      error(function.info, ANN_STRING, "%", name.string(), value);
     return ((Str) value).toJava();
   }
 
@@ -433,7 +450,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       throws QueryException {
     // [CG] RESTXQ: allow identical field names?
     final long vs = value.size();
-    if(vs < 2) error(ANN_PARAMS, "%", name.string(), 2);
+    if(vs < 2) error(function.info, ANN_PARAMS, "%", name.string(), 2);
     // name of parameter
     final String key = toString(value.itemAt(0), name);
     // variable template
