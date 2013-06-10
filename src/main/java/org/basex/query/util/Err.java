@@ -196,7 +196,7 @@ public enum Err {
   /** UNIT0001. */
   UNIT_MESSAGE(UNIT, 1, "%"),
   /** UNIT0002. */
-  UNIT_ARGS(UNIT, 2, "Test function '%(...)' must have no arguments."),
+  UNIT_ARGS(UNIT, 2, "Test function '%' must have no arguments."),
   /** UNIT0003. */
   UNIT_UPDATE(UNIT, 3, "Function '%' is updating."),
   /** UNIT0004. */
@@ -669,9 +669,9 @@ public enum Err {
   /** XPST0003. */
   NOFUNBODY(XPST, 3, "Expecting function body."),
   /** XPST0003. */
-  FUNCMISS(XPST, 3, "Expecting closing bracket for '%(...'."),
+  FUNCMISS(XPST, 3, "Expecting closing bracket for function '%'."),
   /** XPST0003. */
-  MAPTAAT(XPST, 3, "Expecting atomic key type for map(...), found '%'."),
+  MAPTAAT(XPST, 3, "Expecting atomic key type for map, found '%'."),
   /** XPST0003. */
   TYPEINVALID(XPST, 3, "Expecting type declaration."),
   /** XPST0003. */
@@ -763,21 +763,23 @@ public enum Err {
   SCHEMAINV(XPST, 8, "Undefined schema name '%'."),
 
   /** XPST0017. */
-  FUNCPRIV(XPST, 17, "Function %(...) is not visible from this module."),
-  /** XPST0017. */
-  FUNCARGS(XPST, 17, "%: % argument(s) were specified."),
+  FUNCPRIV(XPST, 17, "Function '%' is not visible from this module."),
   /** XPST0017. */
   FUNCSIMILAR(XPST, 17, "Unknown function '%'; similar: '%'."),
   /** XPST0017. */
-  FUNCTYPE(XPST, 17, "%(...): % argument(s) were specified."),
+  FUNCARGS(XPST, 17, "%: % argument(s) were specified."),
   /** XPST0017. */
-  FUNCUNKNOWN(XPST, 17, "Unknown function: %(...)."),
+  FUNCTYPESG(XPST, 17, "Function '%': % argument specified; expected: %."),
   /** XPST0017. */
-  FUNCNOIMPL(XPST, 17, "Function not implemented: %(...)."),
+  FUNCTYPEPL(XPST, 17, "Function '%': % arguments specified; expected: %."),
   /** XPST0017. */
-  FUNCJAVA(XPST, 17, "Java function '%(...)' not found."),
+  FUNCUNKNOWN(XPST, 17, "Unknown function '%'."),
   /** XPST0017. */
-  JAVAAMBIG(XPST, 17, "Signature is ambiguous: '%(...)'."),
+  FUNCNOIMPL(XPST, 17, "Function v not implemented."),
+  /** XPST0017. */
+  FUNCJAVA(XPST, 17, "Java function '%' not found."),
+  /** XPST0017. */
+  JAVAAMBIG(XPST, 17, "Signature '%' is ambiguous."),
   /** XPST0017. */
   JAVAINIT(XPST, 17, "Class cannot be initialized: %."),
   /** XPST0003. */
@@ -885,7 +887,7 @@ public enum Err {
   /** XQST0033. */
   DUPLNSDECL(XQST, 33, "Duplicate declaration of prefix '%'."),
   /** XQST0034. */
-  FUNCDEFINED(XQST, 34, "Duplicate declaration of function %(...)."),
+  FUNCDEFINED(XQST, 34, "Duplicate declaration of function '%'."),
   /** XQST0038. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** XQST0038. */
@@ -895,7 +897,7 @@ public enum Err {
   /** XQST0040. */
   ATTDUPL(XQST, 40, "Duplicate attribute '%'."),
   /** XQST0045. */
-  NAMERES(XQST, 45, "Function %(...) is in reserved namespace."),
+  NAMERES(XQST, 45, "Function '%' is in reserved namespace."),
   /** XQST0045. */
   ANNRES(XQST, 45, "Annotation %% is in reserved namespace."),
   /** XQST0046. */
@@ -925,7 +927,7 @@ public enum Err {
   /** XQST0059. */
   WRONGMODULE(XQST, 59, "Wrong URI '%' in imported module '%'."),
   /** XQST0060. */
-  FUNNONS(XQST, 60, "Namespace needed for function %(...)."),
+  FUNNONS(XQST, 60, "Namespace needed for function '%'."),
   /** XQST0065. */
   DUPLORD(XQST, 65, "Duplicate 'ordering' declaration."),
   /** XQST0066. */

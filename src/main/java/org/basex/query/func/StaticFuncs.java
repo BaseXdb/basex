@@ -16,6 +16,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Container for a user-defined function.
@@ -115,11 +116,22 @@ public final class StaticFuncs extends ExprInfo {
       if(fc.func == null) {
         // check if another function with same name exists
         int oid = 0;
+        IntList al = new IntList();
         for(final FuncCache ofc : funcs.values()) {
           if(oid++ == id) continue;
-          if(call.name.eq(ofc.name())) FUNCTYPE.thrw(call.info, call.name.string(),
-              call.expr.length);
+          if(call.name.eq(ofc.name())) al.add(ofc.func.arity());
         }
+        if(!al.isEmpty()) {
+          final StringBuilder exp = new StringBuilder();
+          final int as = al.size();
+          for(int a = 0; a < as; a++) {
+            if(a != 0) exp.append(a + 1 < as ? "," : " or ");
+            exp.append(al.get(a));
+          }
+          final int a = call.expr.length;
+          (a == 1 ? FUNCTYPESG : FUNCTYPEPL).thrw(call.info, call.name.string(), a, exp);
+        }
+
         // if not, indicate that function is unknown
         FUNCUNKNOWN.thrw(call.info, call.name.string());
       }
