@@ -35,7 +35,7 @@ public final class Prop extends AProp {
   public static final String ENCODING = System.getProperty("file.encoding");
 
   /** System's temporary directory. */
-  public static final String TMP = System.getProperty("java.io.tmpdir") + '/';
+  public static final String TMP = dir(System.getProperty("java.io.tmpdir"));
 
   /** OS flag (source: {@code http://lopica.sourceforge.net/os.html}). */
   private static final String OS = System.getProperty("os.name");
@@ -51,9 +51,9 @@ public final class Prop extends AProp {
   /** System property for specifying database home directory. */
   public static final String PATH = DBPREFIX + "path";
   /** User's home directory. */
-  public static final String USERHOME = System.getProperty("user.home") + File.separator;
+  public static final String USERHOME = dir(System.getProperty("user.home"));
   /** Directory for storing the property files, database directory, etc. */
-  public static final String HOME = homePath();
+  public static final String HOME = dir(homePath());
 
   /** Comment in configuration file. */
   static final String PROPHEADER = "# " + NAME + " Property File." + NL;
@@ -232,14 +232,14 @@ public final class Prop extends AProp {
   private static String homePath() {
     // check for system property
     String dir = System.getProperty(PATH);
-    if(dir != null) return dir + File.separator;
+    if(dir != null) return dir;
 
     // not found; check working directory for property file
     final String home = IO.BASEXSUFFIX + "home";
     dir = System.getProperty("user.dir");
     File file = new File(dir, home);
     if(!file.exists()) file = new File(dir, IO.BASEXSUFFIX);
-    if(file.exists()) return file.getParent() + File.separator;
+    if(file.exists()) return file.getParent();
 
     // not found; check application directory
     dir = applicationPath();
@@ -248,7 +248,7 @@ public final class Prop extends AProp {
       dir = file.isFile() ? file.getParent() : file.getPath();
       file = new File(dir, home);
       if(!file.exists()) file = new File(dir, IO.BASEXSUFFIX);
-      if(file.exists()) return file.getParent() + File.separator;
+      if(file.exists()) return file.getParent();
     }
 
     // not found; choose user home directory as default
@@ -290,5 +290,14 @@ public final class Prop extends AProp {
       Util.stack(ex);
       return tb.toString();
     }
+  }
+
+  /**
+   * Attaches a directory separator to the specified directory string.
+   * @param dir input string
+   * @return directory string
+   */
+  private static String dir(final String dir) {
+    return dir.endsWith("\\") || dir.endsWith("/") ? dir : dir + File.separator;
   }
 }

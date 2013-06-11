@@ -96,7 +96,8 @@ public final class Functions extends TokenSet {
     final Function fl = funcs[id];
     if(!eq(fl.uri(), name.uri())) return null;
     // check number of arguments
-    if(arity < fl.min || arity > fl.max) FUNCARGS.thrw(ii, fl, arity);
+    if(arity < fl.min || arity > fl.max)
+      (arity == 1 ? FUNCARGSG : FUNCARGPL).thrw(ii, fl, arity);
     return fl;
   }
 

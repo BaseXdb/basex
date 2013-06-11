@@ -53,6 +53,32 @@ public final class FNFileTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
+  public void tempDir() {
+    assertEquals(query(_FILE_TEMP_DIR.args()), Prop.TMP);
+  }
+
+  /** Test method. */
+  @Test
+  public void createTempDir() {
+    final String tmp = query(_FILE_CREATE_TEMP_DIR.args("", ""));
+    query(_FILE_EXISTS.args(tmp), "true");
+    query(_FILE_IS_DIR.args(tmp), "true");
+    query(_FILE_IS_FILE.args(tmp), "false");
+    query(_FILE_DELETE.args(tmp));
+  }
+
+  /** Test method. */
+  @Test
+  public void createTempFile() {
+    final String tmp = query(_FILE_CREATE_TEMP_FILE.args("", ""));
+    query(_FILE_EXISTS.args(tmp), "true");
+    query(_FILE_IS_DIR.args(tmp), "false");
+    query(_FILE_IS_FILE.args(tmp), "true");
+    query(_FILE_DELETE.args(tmp));
+  }
+
+  /** Test method. */
+  @Test
   public void lineSeparator() {
   }
 
@@ -121,7 +147,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_CREATE_DIR.args(PATH3));
     query(_FILE_WRITE.args(PATH4, "()"));
     contains(_FILE_LIST.args(PATH1, "true()"), "y");
-    query(_FILE_LIST.args(PATH1, "true()", "x"), "x");
+    query(_FILE_LIST.args(PATH1, "true()", "x"), "x" + File.separator);
   }
 
   /** Test method. */
@@ -380,9 +406,9 @@ public final class FNFileTest extends AdvancedQueryTest {
     assertEquals(norm(PATH),
         norm(query(_FILE_DIR_NAME.args(PATH1))).toLowerCase(Locale.ENGLISH));
     // check with an empty path
-    query(_FILE_DIR_NAME.args(""), ".");
+    query(_FILE_DIR_NAME.args(""), "." + File.separator);
     // check with a path without directory separators
-    query(_FILE_DIR_NAME.args(NAME), ".");
+    query(_FILE_DIR_NAME.args(NAME), "." + File.separator);
   }
 
   /**

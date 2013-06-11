@@ -61,7 +61,7 @@ public enum Err {
   /** BXCO0001. */
   BXCO_STRING(BXCO, 1, "String conversion: %."),
   /** BXCO0001. */
-  BXCO_BASE64(BXCO, 1, "String cannot be converted to the specified encoding."),
+  BXCO_BASE64(BXCO, 1, "String cannot be converted to the supplied encoding."),
   /** BXCO0002. */
   BXCO_ENCODING(BXCO, 2, "Encoding '%' is not supported."),
 
@@ -173,13 +173,13 @@ public enum Err {
   /** BXSQ0003. */
   BXSQ_PARAMS(BXSQ, 3, "Number of parameters differs from number of placeholders"),
   /** BXSQ0004. */
-  BXSQ_TYPE(BXSQ, 4, "No parameter type specified."),
+  BXSQ_TYPE(BXSQ, 4, "No parameter type supplied."),
   /** BXSQ0005. */
   BXSQ_ATTR(BXSQ, 5, "Not expected attribute: %"),
   /** BXSQ0006. */
   BXSQ_FORMAT(BXSQ, 6, "Illegal % format"),
   /** BXSQ0007. */
-  BXSQ_DRIVER(BXSQ, 7, "Could not initialize specified driver: '%'"),
+  BXSQ_DRIVER(BXSQ, 7, "Could not initialize supplied driver: '%'"),
 
   // Validation module
 
@@ -211,7 +211,7 @@ public enum Err {
   // EXPath modules
 
   /** ARCH0001. */
-  ARCH_DIFF(ARCH, 1, "Number of specified entries and contents differs: % vs. %."),
+  ARCH_DIFF(ARCH, 1, "Number of supplied entries and contents differs: % vs. %."),
   /** ARCH0002. */
   ARCH_UNKNOWN(ARCH, 2, "Packing format not supported."),
   /** ARCH0002. */
@@ -315,7 +315,7 @@ public enum Err {
   /** HC0004. */
   HC_REQ(HC, 4, "Invalid request element: %."),
   /** HC0005. */
-  HC_URL(HC, 5, "No URL specified."),
+  HC_URL(HC, 5, "No URL supplied."),
   /** HC0006. */
   HC_PARAMS(HC, 6, "Specify request element or HTTP URI."),
 
@@ -771,11 +771,13 @@ public enum Err {
   /** XPST0017. */
   FUNCSIMILAR(XPST, 17, "Unknown function '%'; similar: '%'."),
   /** XPST0017. */
-  FUNCARGS(XPST, 17, "%: % argument(s) were specified."),
+  FUNCARGSG(XPST, 17, "%: % argument supplied."),
   /** XPST0017. */
-  FUNCTYPESG(XPST, 17, "Function '%': % argument specified; expected: %."),
+  FUNCARGPL(XPST, 17, "%: % arguments supplied."),
   /** XPST0017. */
-  FUNCTYPEPL(XPST, 17, "Function '%': % arguments specified; expected: %."),
+  FUNCTYPESG(XPST, 17, "Function '%': % argument supplied; expected: %."),
+  /** XPST0017. */
+  FUNCTYPEPL(XPST, 17, "Function '%': % arguments supplied; expected: %."),
   /** XPST0017. */
   FUNCUNKNOWN(XPST, 17, "Unknown function '%'."),
   /** XPST0017. */
