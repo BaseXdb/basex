@@ -64,7 +64,7 @@ public class SignatureTest extends AdvancedQueryTest {
             Err.STRNODTYPE, Err.ELMMAPTYPE, Err.BINARYTYPE,
             Err.STRBINTYPE, Err.WHICHRES, Err.BXDB_NODB, Err.BXDB_INDEX);
         // wrong number of arguments: XPST0017
-        else error(query, Err.FUNCARGS);
+        else error(query, Err.FUNCARGSG, Err.FUNCARGPL);
       }
     }
   }

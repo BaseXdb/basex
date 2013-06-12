@@ -157,23 +157,26 @@ public final class DialogImport extends BaseXBack {
     final String in = input.getText().trim();
     final IO io = IO.get(in);
     gui.gprop.set(GUIProp.INPUTPATH, in);
-    final boolean dir = io.isDir();
+
+    boolean multi = io.isDir() || io.isArchive();
+    archives.setEnabled(multi);
+    multi &= archives.isSelected();
+    filter.setEnabled(multi);
 
     final String type = parser();
-    final boolean r = type.equals(DataText.M_RAW);
+    final boolean raw = type.equals(DataText.M_RAW);
+    addRaw.setEnabled(multi && !raw && !gui.context.prop.is(Prop.MAINMEM));
+    skipCorrupt.setEnabled(!raw);
+
     if(comp == parser) {
       parsing.updateType(type);
-      if(dir) filter.setText(r ? "*" : "*." + type);
+      if(multi) filter.setText(raw ? "*" : "*." + type);
     }
 
     ok &= empty ? in.isEmpty() || io.exists() : !in.isEmpty() && io.exists();
     if(ok && comp == input) setType(in);
 
     info.setText(null, null);
-    filter.setEnabled(dir);
-    addRaw.setEnabled(dir && !r && !gui.context.prop.is(Prop.MAINMEM));
-    skipCorrupt.setEnabled(!r);
-    archives.setEnabled(dir || io.isArchive());
     return ok;
   }
 

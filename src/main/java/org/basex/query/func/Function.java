@@ -638,6 +638,8 @@ public enum Function {
   /** XQuery function. */
   _FILE_LINE_SEPARATOR(FNFile.class, "line-separator()", STR),
   /** XQuery function. */
+  _FILE_TEMP_DIR(FNFile.class, "temp-dir()", STR),
+  /** XQuery function. */
   _FILE_EXISTS(FNFile.class, "exists(path)", BLN, STR),
   /** XQuery function. */
   _FILE_IS_DIR(FNFile.class, "is-dir(path)", BLN, STR),
@@ -661,6 +663,12 @@ public enum Function {
   _FILE_LIST(FNFile.class, "list(path[,recursive[,pattern]])", STR_ZM, 1, STR, BLN, STR),
   /** XQuery function. */
   _FILE_CREATE_DIR(FNFile.class, "create-dir(path)", EMP, STR),
+  /** XQuery function. */
+  _FILE_CREATE_TEMP_DIR(FNFile.class, "create-temp-dir(prefix,suffix[,dir])",
+      STR, 2, STR, STR, STR),
+  /** XQuery function. */
+  _FILE_CREATE_TEMP_FILE(FNFile.class, "create-temp-file(prefix,suffix[,dir])",
+      STR, 2, STR, STR, STR),
   /** XQuery function. */
   _FILE_DELETE(FNFile.class, "delete(path)", EMP, 1, STR, BLN),
   /** XQuery function. */
