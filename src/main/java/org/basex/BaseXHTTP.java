@@ -28,9 +28,9 @@ import org.eclipse.jetty.xml.*;
  */
 public final class BaseXHTTP {
   /** Database context. */
-  final Context context;
+  private final Context context;
   /** HTTP port. */
-  int httpPort;
+  private int httpPort;
   /** HTTP server. */
   private final Server jetty;
   /** Start as daemon. */
@@ -71,7 +71,7 @@ public final class BaseXHTTP {
     jetty.setHandler(wac);
 
     // set the first http port (can also be https) to the port provided by command line
-    if (httpPort != 0) {
+    if(httpPort != 0) {
       for(final Connector c : jetty.getConnectors()) {
         if(c instanceof SelectChannelConnector) {
           c.setPort(httpPort);
@@ -93,8 +93,7 @@ public final class BaseXHTTP {
     // start web server in a new process
     if(service) {
       Connector connector = jetty.getConnectors()[0];
-      start(connector.getPort(),
-          connector instanceof SslSelectChannelConnector ? true : false, args);
+      start(connector.getPort(), connector instanceof SslSelectChannelConnector, args);
 
       for(final Connector c : jetty.getConnectors())
         Util.outln(HTTP + ' ' + SRV_STARTED_PORT_X, c.getPort());
@@ -311,7 +310,9 @@ public final class BaseXHTTP {
    * @param args command-line arguments
    * @throws BaseXException database exception
    */
-  private static void start(final int port, final boolean ssl, final String... args) throws BaseXException {
+  private static void start(final int port, final boolean ssl, final String... args)
+      throws BaseXException {
+
     Util.start(BaseXHTTP.class, args);
     // try to connect to the new server instance
     for(int c = 1; c < 10; ++c) {
