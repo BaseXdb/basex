@@ -616,8 +616,7 @@ public final class FNFile extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.NDT && !oneOf(sig, _FILE_BASE_NAME, _FILE_DIR_NAME,
-        _FILE_DIR_SEPARATOR, _FILE_PATH_SEPARATOR, _FILE_PATH_TO_NATIVE,
-        _FILE_PATH_TO_URI, _FILE_RESOLVE_PATH) || super.uses(u);
+    return u == Use.NDT && !oneOf(sig, _FILE_BASE_NAME, _FILE_DIR_NAME, _FILE_PATH_TO_URI,
+        _FILE_DIR_SEPARATOR, _FILE_PATH_SEPARATOR, _FILE_TEMP_DIR) || super.uses(u);
   }
 }

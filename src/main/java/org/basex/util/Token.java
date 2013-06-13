@@ -19,6 +19,11 @@ public final class Token {
   /** Maximum length for hash calculation. */
   private static final byte MAXLENGTH = 96;
 
+  /** Maximum values for converting tokens to integer values. */
+  private static final int MAXINT = Integer.MAX_VALUE / 10;
+  /** Maximum values for converting tokens to long values. */
+  private static final long MAXLONG = Long.MAX_VALUE / 10;
+
   /** Empty token. */
   public static final byte[] EMPTY = {};
   /** XML token. */
@@ -563,9 +568,8 @@ public final class Token {
     for(; t < end; ++t) {
       final byte c = token[t];
       if(c < '0' || c > '9') break;
-      final long w = (v << 3) + (v << 1) + c - '0';
-      if(w < v) return Long.MIN_VALUE;
-      v = w;
+      if(v > MAXLONG) return Long.MIN_VALUE;
+      v = (v << 3) + (v << 1) + c - '0';
     }
     while(t < end && token[t] <= ' ') ++t;
     return t < end ? Long.MIN_VALUE : m ? -v : v;
@@ -610,10 +614,11 @@ public final class Token {
     for(; t < end; ++t) {
       final byte c = token[t];
       if(c < '0' || c > '9') break;
+      if(v > MAXINT) return Integer.MIN_VALUE;
       v = (v << 3) + (v << 1) + c - '0';
     }
     while(t < end && token[t] <= ' ') ++t;
-    return t < end ? Integer.MIN_VALUE : m ? -v : v;
+    return t < end || v < 0 ? Integer.MIN_VALUE : m ? -v : v;
   }
 
   /**

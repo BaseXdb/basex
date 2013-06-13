@@ -39,7 +39,7 @@ public final class Optimize extends ACreate {
 
     if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
     try {
-      optimize(data, this);
+      optimize(data, false, this);
       return info(DB_OPTIMIZED_X, m.name, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));
@@ -66,10 +66,13 @@ public final class Optimize extends ACreate {
   /**
    * Optimizes the structures of a database.
    * @param data data
-   * @param c calling command (can be null)
+   * @param rebuild rebuild all index structures
+   * @param cmd calling command instance (can be {@code null})
    * @throws IOException I/O Exception during index rebuild
    */
-  public static void optimize(final Data data, final Optimize c) throws IOException {
+  public static void optimize(final Data data, final boolean rebuild, final Optimize cmd)
+      throws IOException {
+
     // initialize structural indexes
     final MetaData md = data.meta;
     if(!md.uptodate) {
@@ -112,16 +115,16 @@ public final class Optimize extends ACreate {
           if(kind == Data.TEXT && level > 1) data.tagindex.index(tags.peek(), val);
           data.paths.put(0, kind, level, val, md);
         }
-        if(c != null) c.pre = pre;
+        if(cmd != null) cmd.pre = pre;
       }
       md.ndocs = n;
       md.uptodate = true;
     }
 
     // rebuild value indexes
-    optimize(IndexType.ATTRIBUTE, data, md.createattr, md.attrindex, c);
-    optimize(IndexType.TEXT,      data, md.createtext, md.textindex, c);
-    optimize(IndexType.FULLTEXT,  data, md.createftxt, md.ftxtindex, c);
+    optimize(IndexType.ATTRIBUTE, data, md.createattr, md.attrindex, rebuild, cmd);
+    optimize(IndexType.TEXT,      data, md.createtext, md.textindex, rebuild, cmd);
+    optimize(IndexType.FULLTEXT,  data, md.createftxt, md.ftxtindex, rebuild, cmd);
   }
 
   /**
@@ -130,18 +133,18 @@ public final class Optimize extends ACreate {
    * @param d data reference
    * @param create create flag
    * @param old old flag
-   * @param c calling command
+   * @param rebuild rebuild all index structures
+   * @param cmd calling command instance
    * @throws IOException I/O exception
-   *
    */
-  private static void optimize(final IndexType type, final Data d,
-      final boolean create, final boolean old, final Optimize c) throws IOException {
+  private static void optimize(final IndexType type, final Data d, final boolean create,
+      final boolean old, final boolean rebuild, final Optimize cmd) throws IOException {
 
     // check if flags are nothing has changed
-    if(create == old) return;
+    if(!rebuild && create == old) return;
 
     // create or drop index
-    if(create) create(type, d, c);
+    if(create) create(type, d, cmd);
     else drop(type, d);
   }
 }

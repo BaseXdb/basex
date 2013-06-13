@@ -226,6 +226,8 @@ public final class FTIndex implements Index {
     tb.addExt("- %: %" + NL, STEMMING, Util.flag(data.meta.stemming));
     tb.addExt("- %: %" + NL, CASE_SENSITIVITY, Util.flag(data.meta.casesens));
     tb.addExt("- %: %" + NL, DIACRITICS, Util.flag(data.meta.diacritics));
+    if(!data.meta.stopwords.isEmpty())
+      tb.addExt("- %: %" + NL, STOPWORD_LIST, data.meta.stopwords);
     if(data.meta.language != null)
       tb.addExt("- %: %" + NL, LANGUAGE, data.meta.language);
     final long l = inX.length() + inY.length() + inZ.length();

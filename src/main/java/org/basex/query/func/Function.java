@@ -461,7 +461,7 @@ public enum Function {
 
   /** XQuery function. */
   _ARCHIVE_CREATE(FNArchive.class, "create(entries,contents[,options])",
-      B64, 2, ITEM_ZM, ITEM_ZM, NOD),
+      B64, 2, ITEM_ZM, ITEM_ZM, ITEM),
   /** XQuery function. */
   _ARCHIVE_ENTRIES(FNArchive.class, "entries(archive)", ELM_ZM, B64),
   /** XQuery function. */
@@ -590,7 +590,8 @@ public enum Function {
   /** XQuery function. */
   _DB_DELETE(FNDb.class, "delete(database,path)", EMP, STR, STR),
   /** XQuery function. */
-  _DB_CREATE(FNDb.class, "create(name[,inputs[,paths]])", EMP, 1, STR, ITEM_ZM, STR_ZM),
+  _DB_CREATE(FNDb.class, "create(name[,inputs[,paths[,options]]])",
+      EMP, 1, STR, ITEM_ZM, STR_ZM, ITEM),
   /** XQuery function. */
   _DB_DROP(FNDb.class, "drop(database)", EMP, ITEM),
   /** XQuery function. */
@@ -598,7 +599,7 @@ public enum Function {
   /** XQuery function. */
   _DB_REPLACE(FNDb.class, "replace(database,path,item)", EMP, STR, STR, ITEM),
   /** XQuery function. */
-  _DB_OPTIMIZE(FNDb.class, "optimize(database[,all])", EMP, 1, STR, BLN),
+  _DB_OPTIMIZE(FNDb.class, "optimize(database[,all[,options]])", EMP, 1, STR, BLN, ITEM),
   /** XQuery function. */
   _DB_RETRIEVE(FNDb.class, "retrieve(database,path)", B64, STR, STR),
   /** XQuery function. */
@@ -614,7 +615,7 @@ public enum Function {
   /** XQuery function. */
   _DB_FLUSH(FNDb.class, "flush(database)", EMP, ITEM),
   /** XQuery function. */
-  _DB_EXPORT(FNDb.class, "export(database,path[,param]])", EMP, 2, STR, STR, ITEM_ZO),
+  _DB_EXPORT(FNDb.class, "export(database,path[,param]])", EMP, 2, STR, STR, ITEM),
   /** XQuery function. */
   _DB_NAME(FNDb.class, "name(node)", STR, NOD),
   /** XQuery function. */
@@ -679,7 +680,7 @@ public enum Function {
   /** XQuery function. */
   _FILE_READ_BINARY(FNFile.class, "read-binary(path)", B64, STR),
   /** XQuery function. */
-  _FILE_WRITE(FNFile.class, "write(path,data[,params])", EMP, 2, STR, ITEM_ZM, NOD),
+  _FILE_WRITE(FNFile.class, "write(path,data[,params])", EMP, 2, STR, ITEM_ZM, ITEM),
   /** XQuery function. */
   _FILE_WRITE_BINARY(FNFile.class, "write-binary(path,item)", EMP, STR, BIN),
   /** XQuery function. */
@@ -689,7 +690,7 @@ public enum Function {
   _FILE_WRITE_TEXT_LINES(FNFile.class, "write-text-lines(path,texts[,encoding])",
       EMP, 2, STR, STR_ZM, STR),
   /** XQuery function. */
-  _FILE_APPEND(FNFile.class, "append(path,data[,params])", EMP, 2, STR, ITEM_ZM, NOD),
+  _FILE_APPEND(FNFile.class, "append(path,data[,params])", EMP, 2, STR, ITEM_ZM, ITEM),
   /** XQuery function. */
   _FILE_APPEND_BINARY(FNFile.class, "append-binary(path,item)", EMP, STR, BIN),
   /** XQuery function. */
@@ -932,10 +933,10 @@ public enum Function {
   _XSLT_VERSION(FNXslt.class, "version()", STR),
   /** XQuery function. */
   _XSLT_TRANSFORM(FNXslt.class, "transform(input,stylesheet[,params])",
-      NOD, 2, ITEM, ITEM, NOD),
+      NOD, 2, ITEM, ITEM, ITEM),
   /** XQuery function. */
   _XSLT_TRANSFORM_TEXT(FNXslt.class, "transform-text(input,stylesheet[,params])",
-      STR, 2, ITEM, ITEM, NOD),
+      STR, 2, ITEM, ITEM, ITEM),
 
   /* FNZip functions (EXPath). */
 

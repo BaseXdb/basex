@@ -2,6 +2,7 @@ package org.basex.test.query.func;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.func.Function.*;
+import static org.junit.Assert.*;
 
 import java.io.*;
 import java.util.*;
@@ -377,6 +378,33 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // eventually drop database
     query(_DB_DROP.args(dbname));
+
+    // specify additional index options
+    for(final boolean b : new boolean[] { false, true }) {
+      query(_DB_CREATE.args(dbname, "()", "()", " map { 'updindex':=" + b + "() }"));
+      query(_DB_INFO.args(dbname) + "//updindex/text()", b ? "ON" : "OFF");
+    }
+    assertEquals(context.prop.is(Prop.UPDINDEX), false);
+
+    final String[] nopt = { "maxcats", "maxlen", "indexsplitsize", "ftindexsplitsize" };
+    for(final String k : nopt) {
+      query(_DB_CREATE.args(dbname, "()", "()", " map { '" + k + "':=1 }"));
+    }
+    final String[] bopt = { "textindex", "attrindex", "ftindex", "stemming",
+        "casesens", "diacritics" };
+    for(final String k : bopt) {
+      for(final boolean v : new boolean[] { true, false }) {
+        query(_DB_CREATE.args(dbname, "()", "()", " map { '" + k + "':=" + v + "() }"));
+      }
+    }
+    final String[] sopt = { "language", "stopwords" };
+    for(final String k : sopt) {
+      query(_DB_CREATE.args(dbname, "()", "()", " map { '" + k + "':='' }"));
+    }
+
+    error(_DB_CREATE.args(dbname, "()", "()", " map { 'xyz':='abc' }"), Err.BASX_OPTIONS);
+    error(_DB_CREATE.args(dbname, "()", "()", " map { 'maxlen':=-1 }"), Err.BASX_VALUE);
+    error(_DB_CREATE.args(dbname, "()", "()", " map { 'maxlen':='a' }"), Err.BASX_VALUE);
   }
 
   /**
@@ -471,6 +499,29 @@ public final class FNDbTest extends AdvancedQueryTest {
     error(_DB_OPTIMIZE.args(NAME, "true()"), Err.UPDBOPTERR);
     new Close().execute(context);
     query(_DB_OPTIMIZE.args(NAME, "true()"));
+
+    // specify additional index options
+    final String[] nopt = { "maxcats", "maxlen", "indexsplitsize", "ftindexsplitsize" };
+    for(final String k : nopt) {
+      query(_DB_OPTIMIZE.args(NAME, "false()", " map { '" + k + "':=1 }"));
+    }
+    final String[] bopt = { "textindex", "attrindex", "ftindex", "stemming",
+        "casesens", "diacritics" };
+    for(final String k : bopt) {
+      for(final boolean v : new boolean[] { true, false }) {
+        query(_DB_OPTIMIZE.args(NAME, "false()", " map { '" + k + "':=" + v + "() }"));
+      }
+    }
+    final String[] sopt = { "language", "stopwords" };
+    for(final String k : sopt) {
+      query(_DB_OPTIMIZE.args(NAME, "false()", " map { '" + k + "':='' }"));
+    }
+    assertEquals(context.prop.is(Prop.TEXTINDEX), true);
+
+    error(_DB_OPTIMIZE.args(NAME, "false()", " map { 'updindex':=1 }"), Err.BASX_OPTIONS);
+    error(_DB_OPTIMIZE.args(NAME, "false()", " map { 'xyz':='abc' }"), Err.BASX_OPTIONS);
+    error(_DB_OPTIMIZE.args(NAME, "false()", " map { 'maxlen':=-1 }"), Err.BASX_VALUE);
+    error(_DB_OPTIMIZE.args(NAME, "false()", " map { 'maxlen':='a' }"), Err.BASX_VALUE);
   }
 
   /** Test method. */
