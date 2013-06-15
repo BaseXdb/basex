@@ -164,7 +164,8 @@ final class EditorArea extends Editor {
     } else if(script || file.hasSuffix(IO.XMLSUFFIXES) ||
         file.hasSuffix(IO.XSLSUFFIXES) || file.hasSuffix(IO.HTMLSUFFIXES)) {
       try {
-        new EmptyBuilder(new IOContent(in), gui.context).build();
+        if(!script || input.trim().startsWith("<"))
+          new EmptyBuilder(new IOContent(in), gui.context).build();
         if(script) new CommandParser(input, gui.context).parse();
         view.info(OK, true, false);
       } catch(final Exception ex) {

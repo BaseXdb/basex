@@ -32,7 +32,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class StringParser extends CmdParser {
+public final class StringParser extends CmdParser {
   /** Input lines. */
   private final StringList lines = new StringList();
   /** Context. */
@@ -46,7 +46,7 @@ final class StringParser extends CmdParser {
    * @param input input
    * @param context database context
    */
-  StringParser(final String input, final Context context) {
+  public StringParser(final String input, final Context context) {
     ctx = context;
     final Scanner sc = new Scanner(input).useDelimiter(single ? "\0" : "\r\n?|\n");
     while(sc.hasNext()) {
