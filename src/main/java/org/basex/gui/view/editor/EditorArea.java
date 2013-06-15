@@ -27,22 +27,19 @@ import org.basex.util.*;
 final class EditorArea extends Editor {
   /** File label. */
   final BaseXLabel label;
-
   /** File in tab. */
   IO file;
-  /** Timestamp. */
-  long tstamp;
   /** Flag for modified content. */
   boolean modified;
   /** Last input. */
   byte[] last;
-  /** This flag indicates if the input is an XQuery main module. */
-  boolean main = true;
   /** This flag indicates if the input is a command script. */
-  boolean script = true;
+  boolean script;
 
   /** View reference. */
-  final EditorView view;
+  private final EditorView view;
+  /** Timestamp. */
+  private long tstamp;
 
   /**
    * Constructor.
@@ -136,25 +133,26 @@ final class EditorArea extends Editor {
     if(eq && action == Action.CHECK) return;
     last = in;
 
-    script = file.hasSuffix(IO.BXSSUFFIX);
-    main = !script && !opened() || file.hasSuffix(IO.XQSUFFIXES);
+    final String path = file.path();
+    final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !path.contains(".");
+    script = !xquery && file.hasSuffix(IO.BXSSUFFIX);
     String input = string(in);
     if(action == Action.EXECUTE && script) {
       // execute query if forced, or if realtime execution is activated
       gui.execute(true, new Execute(input));
-    } else if(main || action == Action.EXECUTE) {
+    } else if(xquery || action == Action.EXECUTE) {
       // check if input is/might be an xquery main module
       if(input.isEmpty()) input = "()";
-      main = !QueryProcessor.isLibrary(string(in));
-      if(main && (action == Action.EXECUTE || gui.gprop.is(GUIProp.EXECRT))) {
+      final boolean lib = QueryProcessor.isLibrary(string(in));
+      if(!lib && (action == Action.EXECUTE || gui.gprop.is(GUIProp.EXECRT))) {
         // execute query if forced, or if realtime execution is activated
         gui.execute(true, new XQuery(input));
       } else {
         // parse query
-        gui.context.prop.set(Prop.QUERYPATH, file.path());
+        gui.context.prop.set(Prop.QUERYPATH, path);
         final QueryContext qc = new QueryContext(gui.context);
         try {
-          if(!main) qc.parseLibrary(input, null);
+          if(lib) qc.parseLibrary(input, null);
           else qc.parseMain(input, null);
           view.info(OK, true, false);
         } catch(final QueryException ex) {
