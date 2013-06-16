@@ -141,10 +141,9 @@ public final class FNInfo extends StandardFunc {
   /**
    * Creates an error function instance.
    * @param ex query exception
-   * @param info input info
    * @return function
    */
-  public static FNInfo error(final QueryException ex, final InputInfo info) {
-    return new FNInfo(info, ERROR, ex.qname(), Str.get(ex.getLocalizedMessage()));
+  public static FNInfo error(final QueryException ex) {
+    return new FNInfo(ex.info(), ERROR, ex.qname(), Str.get(ex.getLocalizedMessage()));
   }
 }

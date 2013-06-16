@@ -1232,7 +1232,7 @@ public class QueryParser extends InputParser {
       }
 
       cls.add(new For(var, ps, sc, e, emp, info()));
-    } while(wsConsume(COMMA));
+    } while(wsConsumeWs(COMMA));
   }
 
   /**
@@ -1262,6 +1262,7 @@ public class QueryParser extends InputParser {
   private Window windowClause(final boolean slide) throws QueryException {
     wsCheck(slide ? SLIDING : TUMBLING);
     wsCheck(WINDOW);
+    skipWS();
 
     final QNm nm = varName();
     final SeqType tp = optAsType();
@@ -1382,7 +1383,7 @@ public class QueryParser extends InputParser {
         }
         specs = Array.add(specs, spec);
       }
-    } while(wsConsume(COMMA));
+    } while(wsConsumeWs(COMMA));
     return specs;
   }
 
@@ -1403,7 +1404,7 @@ public class QueryParser extends InputParser {
       wsCheck(IN);
       final Expr e = check(single(), NOSOME);
       fl = Array.add(fl, new For(addLocal(nm, tp, false), null, null, e, false, info()));
-    } while(wsConsume(COMMA));
+    } while(wsConsumeWs(COMMA));
 
     wsCheck(SATISFIES);
     final Expr e = check(single(), NOSOME);
@@ -1459,8 +1460,10 @@ public class QueryParser extends InputParser {
     do {
       types.clear();
       cs = wsConsumeWs(CASE);
-      if(!cs) wsCheck(DEFAULT);
-      skipWS();
+      if(!cs) {
+        wsCheck(DEFAULT);
+        skipWS();
+      }
       Var var = null;
       if(curr('$')) {
         var = addLocal(varName(), null, false);
@@ -2102,7 +2105,7 @@ public class QueryParser extends InputParser {
     skipWS();
     final char c = curr();
     // variables
-    if(c == '$') return checkVar(info(), varName());
+    if(c == '$') return checkVar(varName());
     // parentheses
     if(c == '(' && next() != '#') return parenthesized();
     // direct constructor
@@ -2250,9 +2253,7 @@ public class QueryParser extends InputParser {
     if(dec) return new Dec(tok.finish());
 
     final long l = toLong(tok.finish());
-    if(l == Long.MIN_VALUE) {
-      return FNInfo.error(new QueryException(null, RANGE, tok), info());
-    }
+    if(l == Long.MIN_VALUE) return FNInfo.error(new QueryException(info(), RANGE, tok));
     return Int.get(l);
   }
 
@@ -2329,7 +2330,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private QNm varName() throws QueryException {
-    wsCheck(DOLLAR);
+    check('$');
     skipWS();
     return eQName(NOVARNAME, null);
   }
@@ -3826,13 +3827,13 @@ public class QueryParser extends InputParser {
 
   /**
    * Checks if a referenced variable is defined and throws the specified error if not.
-   * @param ii input info
    * @param name variable name
    * @return referenced variable
    * @throws QueryException if the variable isn't defined
    */
-  private Expr checkVar(final InputInfo ii, final QNm name) throws QueryException {
+  private Expr checkVar(final QNm name) throws QueryException {
     // local variable
+    final InputInfo ii = info();
     final VarRef local = scope.resolve(name, ctx, ii);
     if(local != null) return local;
 

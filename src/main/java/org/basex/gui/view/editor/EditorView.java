@@ -564,12 +564,12 @@ public final class EditorView extends View {
     // find approximate error position
     final int ll = edit.last.length;
     int ep = ll;
-    for(int e = 1, l = 1, c = 1; e < ll; ++c, e += cl(edit.last, e)) {
+    for(int p = 0, l = 1, c = 1; p < ll; ++c, p += cl(edit.last, p)) {
       if(l > el || l == el && c == ec) {
-        ep = e;
+        ep = p;
         break;
       }
-      if(edit.last[e] == '\n') {
+      if(edit.last[p] == '\n') {
         ++l;
         c = 0;
       }

@@ -84,19 +84,16 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     int i = 0;
-    InputInfo ii = info;
     try {
       for(final Clause c : clauses) {
-        ii = c.info;
         c.compile(ctx, scp);
         // the first round of constant propagation is free
         if(c instanceof Let) ((Let) c).bindConst(ctx);
         i++;
       }
-      ii = info;
       ret = ret.compile(ctx, scp);
     } catch(final QueryException qe) {
-      clauseError(qe, i, ii);
+      clauseError(qe, i);
     }
     return optimize(ctx, scp);
   }
@@ -561,7 +558,7 @@ public final class GFLWOR extends ParseExpr {
           iter.set(c);
         }
       } catch(final QueryException qe) {
-        return clauseError(qe, iter.previousIndex() + 1, cl.info);
+        return clauseError(qe, iter.previousIndex() + 1);
       }
     }
 
@@ -572,7 +569,7 @@ public final class GFLWOR extends ParseExpr {
         ret = rt;
       }
     } catch(final QueryException qe) {
-      return clauseError(qe, clauses.size(), info);
+      return clauseError(qe, clauses.size());
     }
 
     return change;
@@ -582,12 +579,12 @@ public final class GFLWOR extends ParseExpr {
    * Tries to recover from a compile-time exception inside a FLWOR clause.
    * @param qe thrown exception
    * @param idx index of the throwing clause, size of {@link #clauses} for return clause
-   * @param ii input info
    * @return {@code true} if the GFLWOR expression has to stay
    * @throws QueryException query exception if the whole expression fails
    */
-  private boolean clauseError(final QueryException qe, final int idx, final InputInfo ii)
+  private boolean clauseError(final QueryException qe, final int idx)
       throws QueryException {
+
     final ListIterator<Clause> iter = clauses.listIterator(idx);
     while(iter.hasPrevious()) {
       final Clause b4 = iter.previous();
@@ -597,7 +594,7 @@ public final class GFLWOR extends ParseExpr {
           iter.next();
           iter.remove();
         }
-        ret = FNInfo.error(qe, ii);
+        ret = FNInfo.error(qe);
         return true;
       }
     }

@@ -61,7 +61,7 @@ public final class TypeCase extends Single {
       super.compile(ctx, scp);
     } catch(final QueryException ex) {
       // replace original expression with error
-      expr = FNInfo.error(ex, info);
+      expr = FNInfo.error(ex);
     }
     type = expr.type();
     return this;
@@ -73,7 +73,7 @@ public final class TypeCase extends Single {
     try {
       return super.inline(ctx, scp, v, e);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, info);
+      expr = FNInfo.error(qe);
       return this;
     }
   }

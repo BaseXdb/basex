@@ -55,7 +55,7 @@ public final class If extends Arr {
         expr[e] = expr[e].compile(ctx, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
-        expr[e] = FNInfo.error(ex, info);
+        expr[e] = FNInfo.error(ex);
       }
     }
 
@@ -141,7 +141,7 @@ public final class If extends Arr {
       try {
         nw = expr[i].inline(ctx, scp, v, e);
       } catch(final QueryException qe) {
-        nw = FNInfo.error(qe, info);
+        nw = FNInfo.error(qe);
       }
       if(nw != null) {
         expr[i] = nw;

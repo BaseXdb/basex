@@ -40,7 +40,7 @@ public final class InputInfo {
    * @return line and column position
    */
   public int[] lineCol() {
-    if(lineCol == null) lineCol = lineCol(query, Math.min(pos - 1, query.length()));
+    if(lineCol == null) lineCol = lineCol(query, Math.min(pos, query.length()));
     return lineCol;
   }
 
@@ -51,12 +51,12 @@ public final class InputInfo {
    * @return two element array of line and column number
    */
   public static int[] lineCol(final String query, final int pos) {
-    final int[] lc = { 1, 1 };
+    int l = 1, c = 1;
     for(int i = 0, ch; i < pos; i += Character.charCount(ch)) {
       ch = query.codePointAt(i);
-      if(ch == '\n') { lc[0]++; lc[1] = 1; } else if(ch != '\r') { lc[1]++; }
+      if(ch == '\n') { l++; c = 1; } else if(ch != '\r') { c++; }
     }
-    return lc;
+    return new int[] { l, c };
   }
 
   @Override

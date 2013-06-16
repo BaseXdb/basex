@@ -62,7 +62,7 @@ public final class Catch extends Single {
       expr = expr.compile(ctx, scp);
       type = expr.type();
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, info);
+      expr = FNInfo.error(qe);
     }
     return this;
   }
@@ -103,7 +103,7 @@ public final class Catch extends Single {
       if(sub == null) return null;
       expr = sub;
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, info);
+      expr = FNInfo.error(qe);
     }
     return this;
   }

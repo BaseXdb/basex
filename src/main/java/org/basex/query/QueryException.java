@@ -157,6 +157,14 @@ public final class QueryException extends Exception {
   }
 
   /**
+   * Returns the input info.
+   * @return input info
+   */
+  public InputInfo info() {
+    return info;
+  }
+
+  /**
    * Sets the error value.
    * @param v error value
    * @return self reference
