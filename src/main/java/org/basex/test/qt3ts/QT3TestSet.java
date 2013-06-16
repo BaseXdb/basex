@@ -12,7 +12,7 @@ import org.basex.core.cmd.Set;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.Compare.Flag;
+import org.basex.query.util.Compare.Mode;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
@@ -169,8 +169,8 @@ public abstract class QT3TestSet {
     if(expect.equals(res)) return true;
 
     // include check for comments, processing instructions and namespaces
-    String flags = "'" + Flag.ALLNODES + "'";
-    if(!ignorePref) flags += ",'" + Flag.NAMESPACES + "'";
+    String flags = "'" + Mode.ALLNODES + "'";
+    if(!ignorePref) flags += ",'" + Mode.NAMESPACES + "'";
     final String query = Function.DEEP_EQUAL_OPT.args("<X>" + expect + "</X>",
         "<X>" + res + "</X>" , "(" + flags + ")");
     return result(asBoolean(query, null), expect);

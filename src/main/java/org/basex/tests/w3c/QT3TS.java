@@ -17,7 +17,7 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.Compare.Flag;
+import org.basex.query.util.Compare.Mode;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
@@ -651,8 +651,8 @@ public final class QT3TS {
       if(exp.equals(r)) return null;
 
       // include check for comments, processing instructions and namespaces
-      String flags = "'" + Flag.ALLNODES + "'";
-      if(!pref) flags += ",'" + Flag.NAMESPACES + "'";
+      String flags = "'" + Mode.ALLNODES + "'";
+      if(!pref) flags += ",'" + Mode.NAMESPACES + "'";
       final String query = Function.DEEP_EQUAL_OPT.args("<X>" + exp + "</X>",
           "<X>" + res + "</X>" , "(" + flags + ")");
       return asBoolean(query, expect) ? null : exp;
