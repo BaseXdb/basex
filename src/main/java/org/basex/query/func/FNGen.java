@@ -326,18 +326,9 @@ public final class FNGen extends StandardFunc {
   }
 
   @Override
-  public boolean xquery3() {
-    return sig == DATA && expr.length == 0 || oneOf(sig, SERIALIZE, UNPARSED_TEXT,
-        UNPARSED_TEXT_LINES, UNPARSED_TEXT_AVAILABLE, PARSE_XML, URI_COLLECTION);
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return
-      u == Use.CNS && sig == PARSE_XML ||
-      u == Use.UPD && sig == PUT ||
-      u == Use.X30 && xquery3() ||
-      u == Use.CTX && (sig == DATA && expr.length == 0 || sig == PUT) || super.uses(u);
+  public boolean has(final Flag flag) {
+    return (flag == Flag.X30 || flag == Flag.CTX) && (sig == DATA && expr.length == 0) ||
+        super.has(flag);
   }
 
   @Override

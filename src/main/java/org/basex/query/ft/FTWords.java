@@ -396,9 +396,9 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    if(occ != null) for(final Expr o : occ) if(o.uses(u)) return true;
-    return query.uses(u);
+  public boolean has(final Flag flag) {
+    if(occ != null) for(final Expr o : occ) if(o.has(flag)) return true;
+    return query.has(flag);
   }
 
   @Override

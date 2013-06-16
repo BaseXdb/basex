@@ -163,7 +163,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public void checkNoUp(final Expr e) throws QueryException {
-    if(e != null && e.uses(Use.UPD)) UPNOT.thrw(info, description());
+    if(e != null && e.has(Flag.UPD)) UPNOT.thrw(info, description());
   }
 
   /**
@@ -188,7 +188,7 @@ public abstract class ParseExpr extends Expr {
     for(final Expr e : expr) {
       e.checkUp();
       if(e.isVacuous()) continue;
-      final boolean u = e.uses(Use.UPD);
+      final boolean u = e.has(Flag.UPD);
       if(u && s == -1 || !u && s == 1) UPALL.thrw(info, description());
       s = u ? 1 : -1;
     }

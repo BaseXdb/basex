@@ -114,7 +114,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
+  public boolean has(final Flag flag) {
     return false;
   }
 

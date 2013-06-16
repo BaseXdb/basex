@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -232,13 +231,6 @@ public final class FNIndex extends StandardFunc {
       default:
         break;
     }
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    // skip pre-evaluation, because cached results may get very large
-    return u == Use.CTX && (sig == _INDEX_TEXTS || sig == _INDEX_ATTRIBUTES) ||
-        super.uses(u);
   }
 
   @Override

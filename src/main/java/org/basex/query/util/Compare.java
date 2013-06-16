@@ -22,7 +22,7 @@ import org.basex.util.*;
  */
 public final class Compare {
   /** Flags. */
-  public enum Flag {
+  public enum Mode {
     /** Compare all node types. */ ALLNODES,
     /** Compare namespaces.     */ NAMESPACES,
   }
@@ -30,7 +30,7 @@ public final class Compare {
   /** Input info. */
   private final InputInfo info;
   /** Flag values. */
-  private final EnumSet<Flag> flags = EnumSet.noneOf(Flag.class);
+  private final EnumSet<Mode> flags = EnumSet.noneOf(Mode.class);
   /** Collation. */
   private Collation coll;
 
@@ -47,7 +47,7 @@ public final class Compare {
    * @param f flag
    * @return self reference
    */
-  public Compare flag(final Flag f) {
+  public Compare flag(final Mode f) {
     flags.add(f);
     return this;
   }
@@ -160,7 +160,7 @@ public final class Compare {
           // compare names
           QNm n1 = s1.qname(), n2 = s2.qname();
           if(n1 != null && (!n1.eq(n2) ||
-              flags.contains(Flag.NAMESPACES) && !eq(n1.prefix(), n2.prefix())))
+              flags.contains(Mode.NAMESPACES) && !eq(n1.prefix(), n2.prefix())))
             return false;
 
           if(t1 == NodeType.TXT || t1 == NodeType.ATT || t1 == NodeType.COM ||
@@ -181,7 +181,7 @@ public final class Compare {
               for(ANode a2; (a2 = ai2.next()) != null;) {
                 n2 = a2.qname();
                 if(!n1.eq(n2)) continue;
-                if(flags.contains(Flag.NAMESPACES) &&
+                if(flags.contains(Mode.NAMESPACES) &&
                     !eq(n1.prefix(), n2.prefix()) ||
                     !eq(a1.string(), a2.string())) return false;
                 continue LOOP;
@@ -190,7 +190,7 @@ public final class Compare {
             }
 
             // compare namespaces
-            if(flags.contains(Flag.NAMESPACES)) {
+            if(flags.contains(Mode.NAMESPACES)) {
               final Atts ns1 = s1.namespaces();
               final Atts ns2 = s2.namespaces();
               if(ns1.size() != ns2.size()) return false;
@@ -216,7 +216,7 @@ public final class Compare {
         // check next child
         s1 = ch1.next();
         s2 = ch2.next();
-        skip = !flags.contains(Flag.ALLNODES);
+        skip = !flags.contains(Mode.ALLNODES);
       } while(!stack.isEmpty());
     }
   }

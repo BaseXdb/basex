@@ -15,7 +15,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.CmpG.OpG;
 import org.basex.query.expr.CmpN.OpN;
 import org.basex.query.expr.CmpV.OpV;
-import org.basex.query.expr.Expr.Use;
+import org.basex.query.expr.Expr.Flag;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.List;
 import org.basex.query.ft.*;
@@ -909,7 +909,7 @@ public class QueryParser extends InputParser {
     ctx.ctxItem = new MainModule(e, scope, xqdoc.toString());
     scope = null;
     if(module != null) error(DECITEM);
-    if(e.uses(Use.UPD)) error(UPCTX, e);
+    if(e.has(Flag.UPD)) error(UPCTX, e);
   }
 
   /**

@@ -432,9 +432,4 @@ public final class FNSql extends StandardFunc {
     if(del) ctx.jdbc().remove(id);
     return (Connection) obj;
   }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT || super.uses(u);
-  }
 }

@@ -135,13 +135,13 @@ public abstract class StaticFuncCall extends Arr {
   }
 
   @Override
-  public boolean uses(final Use u) {
+  public boolean has(final Flag flag) {
     // check arguments, which will be evaluated before running the function code
-    if(super.uses(u)) return true;
+    if(super.has(flag)) return true;
     // function code: position or context references will have no effect on calling code
-    if(u == Use.POS || u == Use.CTX) return false;
+    if(flag == Flag.FCS || flag == Flag.CTX) return false;
     // pass on check to function code
-    return func == null || (u == Use.UPD ? func.updating : func.uses(u));
+    return func == null || (flag == Flag.UPD ? func.updating : func.has(flag));
   }
 
   @Override

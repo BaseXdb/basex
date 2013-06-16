@@ -88,8 +88,8 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 && types != null && types.length > 1 || super.uses(u);
+  public boolean has(final Flag flag) {
+    return flag == Flag.X30 && types != null && types.length > 1 || super.has(flag);
   }
 
   /**

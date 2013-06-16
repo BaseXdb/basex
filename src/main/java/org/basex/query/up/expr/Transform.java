@@ -41,7 +41,7 @@ public final class Transform extends Arr {
   @Override
   public void checkUp() throws QueryException {
     for(final Let c : copies) c.checkUp();
-    if(!expr[0].isVacuous() && !expr[0].uses(Use.UPD)) UPEXPECTT.thrw(info);
+    if(!expr[0].isVacuous() && !expr[0].has(Flag.UPD)) UPEXPECTT.thrw(info);
     checkNoUp(expr[1]);
   }
 
@@ -87,8 +87,8 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u != Use.UPD && super.uses(u);
+  public boolean has(final Flag flag) {
+    return flag != Flag.UPD && super.has(flag);
   }
 
   @Override

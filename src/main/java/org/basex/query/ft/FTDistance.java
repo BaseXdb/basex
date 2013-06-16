@@ -80,9 +80,9 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    for(final Expr d : dist) if(d.uses(u)) return true;
-    return super.uses(u);
+  public boolean has(final Flag flag) {
+    for(final Expr d : dist) if(d.has(flag)) return true;
+    return super.has(flag);
   }
 
   @Override

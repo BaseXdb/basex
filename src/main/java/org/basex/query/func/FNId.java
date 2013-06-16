@@ -193,12 +193,7 @@ public final class FNId extends StandardFunc {
   }
 
   @Override
-  public boolean xquery3() {
-    return sig == Function.ELEMENT_WITH_ID;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 && xquery3() || u == Use.CTX && expr.length == 1 || super.uses(u);
+  public boolean has(final Flag flag) {
+    return flag == Flag.CTX && expr.length == 1 || super.has(flag);
   }
 }

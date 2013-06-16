@@ -218,8 +218,8 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 || expr.uses(u);
+  public boolean has(final Flag flag) {
+    return flag == Flag.X30 || expr.has(flag);
   }
 
   /**

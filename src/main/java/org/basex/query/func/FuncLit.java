@@ -93,8 +93,8 @@ public final class FuncLit extends Single implements Scope {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 || u == Use.CTX || u == Use.POS;
+  public boolean has(final Flag flag) {
+    return flag == Flag.X30 || flag == Flag.CTX || flag == Flag.FCS;
   }
 
   /**

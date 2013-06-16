@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Use;
+import org.basex.query.expr.Expr.Flag;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -148,7 +148,7 @@ public final class Functions extends TokenSet {
       final Expr[] calls = ft.args(args, ctx, scp, ii);
 
       final StandardFunc f = fn.get(calls);
-      if(!f.uses(Use.CTX) && !f.uses(Use.POS))
+      if(!f.has(Flag.CTX) && !f.has(Flag.FCS))
         return new FuncItem(name, args, f, ft, scp, ctx.sc, null);
 
       return new FuncLit(name, args, f, ft, scp, ctx.sc, ii);
@@ -203,7 +203,7 @@ public final class Functions extends TokenSet {
     // pre-defined functions
     final StandardFunc fun = Functions.get().get(name, args, ii);
     if(fun != null) {
-      if(!ctx.sc.xquery3() && fun.xquery3()) FUNC30.thrw(ii);
+      if(!ctx.sc.xquery3() && fun.has(Flag.X30)) FUNC30.thrw(ii);
       for(final Function f : Function.UPDATING) {
         if(fun.sig == f) {
           ctx.updating(true);

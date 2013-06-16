@@ -101,9 +101,10 @@ public final class JavaModuleFunc extends JavaMapping {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT && mth.getAnnotation(Deterministic.class) == null ||
-      (u == Use.CTX || u == Use.POS) && mth.getAnnotation(FocusDependent.class) == null ||
-      super.uses(u);
+  public boolean has(final Flag f) {
+    return f == Flag.NDT && mth.getAnnotation(Deterministic.class) == null ||
+      (f == Flag.CTX || f == Flag.FCS) &&
+      mth.getAnnotation(FocusDependent.class) == null ||
+      super.has(f);
   }
 }

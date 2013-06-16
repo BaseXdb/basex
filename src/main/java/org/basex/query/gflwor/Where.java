@@ -55,8 +55,8 @@ public final class Where extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return pred.uses(u);
+  public boolean has(final Flag flag) {
+    return pred.has(flag);
   }
 
   @Override

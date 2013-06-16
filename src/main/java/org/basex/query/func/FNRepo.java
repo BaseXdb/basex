@@ -95,12 +95,6 @@ public final class FNRepo extends StandardFunc {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    // don't allow pre-evaluation
-    return u == Use.CTX || super.uses(u);
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitor.lock(DBLocking.REPO) && super.accept(visitor);
   }

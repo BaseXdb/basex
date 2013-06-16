@@ -144,11 +144,6 @@ public final class FNXslt extends StandardFunc {
     throw STRNODTYPE.thrw(info, this, it.type);
   }
 
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT && sig == Function._XSLT_TRANSFORM || super.uses(u);
-  }
-
   /**
    * Uses Java's XSLT implementation to perform an XSL transformation.
    * @param in input

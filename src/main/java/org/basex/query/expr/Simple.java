@@ -31,7 +31,7 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
+  public boolean has(final Flag flag) {
     return false;
   }
 

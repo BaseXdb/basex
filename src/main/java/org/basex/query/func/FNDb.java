@@ -888,18 +888,6 @@ public final class FNDb extends StandardFunc {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    final boolean up = oneOf(sig, _DB_ADD, _DB_DELETE, _DB_RENAME, _DB_REPLACE,
-        _DB_OPTIMIZE, _DB_STORE, _DB_OUTPUT, _DB_FLUSH, _DB_CREATE, _DB_DROP);
-    return
-      // skip evaluation at compile time
-      u == Use.NDT && (up || oneOf(sig, _DB_TEXT, _DB_ATTRIBUTE, _DB_TEXT_RANGE,
-          _DB_ATTRIBUTE_RANGE, _DB_FULLTEXT, _DB_EVENT)) ||
-      u == Use.UPD && up ||
-      super.uses(u);
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     if(!oneOf(sig, _DB_BACKUPS, _DB_NODE_ID, _DB_NODE_PRE, _DB_EVENT, _DB_OUTPUT,
         _DB_SYSTEM)) {

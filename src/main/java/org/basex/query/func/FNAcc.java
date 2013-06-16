@@ -90,9 +90,8 @@ public final class FNAcc extends StandardFunc {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.POS && oneOf(sig, POSITION, LAST) ||
-        u == Use.CTX && expr.length == 0 || super.uses(u);
+  public boolean has(final Flag flag) {
+    return flag == Flag.CTX && expr.length == 0 || super.has(flag);
   }
 
   @Override

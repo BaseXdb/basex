@@ -230,8 +230,8 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    for(final Key k : keys) if(k.uses(u)) return true;
+  public boolean has(final Flag flag) {
+    for(final Key k : keys) if(k.has(flag)) return true;
     return false;
   }
 

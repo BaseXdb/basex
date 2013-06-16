@@ -43,16 +43,6 @@ public final class FNFormat extends StandardFunc {
     }
   }
 
-  @Override
-  public boolean xquery3() {
-    return true;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 || super.uses(u);
-  }
-
   /**
    * Returns a formatted integer.
    * @param ctx query context

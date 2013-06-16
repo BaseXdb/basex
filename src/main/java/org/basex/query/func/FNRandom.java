@@ -136,9 +136,4 @@ public final class FNRandom extends StandardFunc {
       }
     };
   }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT || super.uses(u);
-  }
 }

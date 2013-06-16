@@ -171,9 +171,4 @@ public final class FNProf extends StandardFunc {
     Performance.sleep(checkItr(expr[0], ctx));
     return null;
   }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT || super.uses(u);
-  }
 }

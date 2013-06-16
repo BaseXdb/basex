@@ -38,8 +38,8 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return expr.uses(u);
+  public boolean has(final Flag flag) {
+    return expr.has(flag);
   }
 
   @Override

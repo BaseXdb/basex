@@ -27,8 +27,8 @@ abstract class Update extends Arr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.UPD || super.uses(u);
+  public boolean has(final Flag flag) {
+    return flag == Flag.UPD || super.has(flag);
   }
 
   /**

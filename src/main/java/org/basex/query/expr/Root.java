@@ -68,8 +68,8 @@ public final class Root extends Simple {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.CTX;
+  public boolean has(final Flag flag) {
+    return flag == Flag.CTX;
   }
 
   @Override

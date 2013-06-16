@@ -132,7 +132,7 @@ public abstract class AxisPath extends Path {
    */
   private Expr index(final QueryContext ctx, final Data data) throws QueryException {
     // disallow relative paths and numeric predicates
-    if(root == null || uses(Use.POS)) return this;
+    if(root == null || has(Flag.FCS)) return this;
 
     // cache index access costs
     IndexContext ics = null;

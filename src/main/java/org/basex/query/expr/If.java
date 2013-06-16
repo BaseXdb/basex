@@ -115,8 +115,8 @@ public final class If extends Arr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return cond.uses(u) || super.uses(u);
+  public boolean has(final Flag flag) {
+    return cond.has(flag) || super.has(flag);
   }
 
   @Override

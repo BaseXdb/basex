@@ -43,7 +43,7 @@ public abstract class Step extends Preds {
       final Expr... p) {
 
     boolean num = false;
-    for(final Expr pr : p) num |= pr.type().mayBeNumber() || pr.uses(Use.POS);
+    for(final Expr pr : p) num |= pr.type().mayBeNumber() || pr.has(Flag.FCS);
     return num ? new AxisStep(ii, a, t, p) : new IterStep(ii, a, t, p);
   }
 
@@ -92,7 +92,7 @@ public abstract class Step extends Preds {
     }
 
     // no numeric predicates.. use simple iterator
-    if(!uses(Use.POS)) return new IterStep(info, axis, test, preds);
+    if(!has(Flag.FCS)) return new IterStep(info, axis, test, preds);
 
     // use iterator for simple numeric predicate
     return this instanceof IterPosStep || !useIterator() ? this : new IterPosStep(this);

@@ -42,8 +42,8 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    for(final Expr e : expr) if(e.uses(u)) return true;
+  public boolean has(final Flag flag) {
+    for(final Expr e : expr) if(e.has(flag)) return true;
     return false;
   }
 

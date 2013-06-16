@@ -1,5 +1,6 @@
 package org.basex.test.server;
 
+import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -174,7 +175,7 @@ public final class EventTest extends SandboxTest {
       });
     }
     // fire an event
-    session.query("db:event('" + NAME + "', '" + RETURN + "')").execute();
+    session.query(_DB_EVENT.args(NAME, RETURN)).execute();
 
     // all clients unwatch the events
     for(final ClientSession cs : sessions) cs.unwatch(NAME);
@@ -254,7 +255,7 @@ public final class EventTest extends SandboxTest {
       try {
         String name = NAME;
         if(!first) name += 1;
-        cs.query("db:event('" + name + "', '" + value + "')").execute();
+        cs.query(_DB_EVENT.args(name, value)).execute();
         cs.close();
       } catch(final Exception ex) {
         Util.stack(ex);

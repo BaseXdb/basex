@@ -95,8 +95,8 @@ public abstract class CName extends CFrag {
   }
 
   @Override
-  public final boolean uses(final Use u) {
-    return name.uses(u) || super.uses(u);
+  public final boolean has(final Flag flag) {
+    return name.has(flag) || super.has(flag);
   }
 
   @Override

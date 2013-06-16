@@ -51,17 +51,6 @@ public final class FNInfo extends StandardFunc {
     return this;
   }
 
-  @Override
-  public boolean xquery3() {
-    return oneOf(sig, ENVIRONMENT_VARIABLE, AVAILABLE_ENVIRONMENT_VARIABLES);
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 && xquery3() || u == Use.NDT && oneOf(sig, ERROR, TRACE) ||
-        super.uses(u);
-  }
-
   /**
    * Performs the error function.
    * @param ctx query context

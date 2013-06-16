@@ -15,7 +15,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Use;
+import org.basex.query.expr.Expr.Flag;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
@@ -197,7 +197,7 @@ public final class QueryContext extends Proc {
    */
   public void mainModule(final MainModule rt) {
     root = rt;
-    updating = rt.expr.uses(Use.UPD);
+    updating = rt.expr.has(Flag.UPD);
   }
 
   /**

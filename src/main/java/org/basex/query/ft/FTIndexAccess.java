@@ -64,8 +64,8 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return ftexpr.uses(u);
+  public boolean has(final Flag flag) {
+    return ftexpr.has(flag);
   }
 
   @Override

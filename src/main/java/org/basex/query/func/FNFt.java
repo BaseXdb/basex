@@ -265,12 +265,6 @@ public final class FNFt extends StandardFunc {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    // skip evaluation at compile time
-    return u == Use.CTX && oneOf(sig, _FT_SEARCH, _FT_TOKENS) || super.uses(u);
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     if(oneOf(sig, _FT_SEARCH, _FT_TOKENS) && !dataLock(visitor)) return false;
     return super.accept(visitor);

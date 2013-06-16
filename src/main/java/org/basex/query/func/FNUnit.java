@@ -84,9 +84,4 @@ public final class FNUnit extends StandardFunc {
     for(Item it; (it = ir.next()) != null;) tl.add(checkStr(it));
     return new Suite(ctx, info).test(tl);
   }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT || super.uses(u);
-  }
 }

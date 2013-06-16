@@ -91,9 +91,9 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    for(final TypeCase tc : cases) if(tc.uses(u)) return true;
-    return ts.uses(u);
+  public boolean has(final Flag flag) {
+    for(final TypeCase tc : cases) if(tc.has(flag)) return true;
+    return ts.has(flag);
   }
 
   @Override

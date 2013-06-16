@@ -107,8 +107,8 @@ public final class Pos extends Simple {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.POS;
+  public boolean has(final Flag flag) {
+    return flag == Flag.FCS;
   }
 
   @Override

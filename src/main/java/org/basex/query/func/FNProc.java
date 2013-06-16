@@ -162,11 +162,6 @@ public final class FNProc extends StandardFunc {
     return delete(tb.finish(), '\r');
   }
 
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT || super.uses(u);
-  }
-
   /**
    * Error object.
    */

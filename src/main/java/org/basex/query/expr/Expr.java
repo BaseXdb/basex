@@ -25,14 +25,14 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {
-  /** Flags that influence query compilation. True is returned if property is unknown. */
-  public enum Use {
+  /** Flags that influence query compilation. */
+  public enum Flag {
     /** Creates new fragments. Example: node constructor. */ CNS,
     /** Depends on context. Example: context node. */        CTX,
-    /** Non-deterministic. Example: random(). */             NDT,
-    /** Context position. Example: position(). */            POS,
+    /** Non-deterministic. Example: random:double(). */      NDT,
+    /** Focus-dependent. Example: position(). */             FCS,
     /** Performs updates. Example: insert expression. */     UPD,
-    /** Based on XQuery 3.0. Example: group by statement. */ X30,
+    /** XQuery 3.0 expression. Example: group by. */         X30,
   }
 
   /**
@@ -157,14 +157,13 @@ public abstract class Expr extends ExprInfo {
   public abstract long size();
 
   /**
-   * Indicates if an expression uses the specified type or operation. This method is
-   * called by numerous {@link #compile} methods to test the properties of
-   * sub-expressions. It will return {@code true} as soon as at least one test is
-   * successful.
-   * @param u type/operation to be found
+   * Indicates if an expression has the specified compiler property. This method is
+   * called by numerous {@link #compile} methods to test properties of sub-expressions.
+   * It returns {@code true} if at least one test is successful.
+   * @param flag flag to be found
    * @return result of check
    */
-  public abstract boolean uses(final Use u);
+  public abstract boolean has(final Flag flag);
 
   /**
    * Checks if the given variable is used by this expression.

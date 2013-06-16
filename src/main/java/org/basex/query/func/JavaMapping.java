@@ -327,7 +327,7 @@ public abstract class JavaMapping extends Arr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT || super.uses(u);
+  public boolean has(final Flag flag) {
+    return flag == Flag.NDT || super.has(flag);
   }
 }

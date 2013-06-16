@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -612,11 +611,5 @@ public final class FNFile extends StandardFunc {
    */
   private static String dir(final String dir) {
     return dir.endsWith(File.separator) ? dir : dir + File.separator;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT && !oneOf(sig, _FILE_BASE_NAME, _FILE_DIR_NAME, _FILE_PATH_TO_URI,
-        _FILE_DIR_SEPARATOR, _FILE_PATH_SEPARATOR, _FILE_TEMP_DIR) || super.uses(u);
   }
 }

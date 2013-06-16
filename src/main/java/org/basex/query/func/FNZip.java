@@ -476,9 +476,4 @@ public final class FNZip extends StandardFunc {
       throw ZIP_FAIL.thrw(info, ex);
     }
   }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT || super.uses(u);
-  }
 }

@@ -193,9 +193,4 @@ public final class FNClient extends StandardFunc {
     if(del) ctx.sessions().remove(id);
     return cs;
   }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT || super.uses(u);
-  }
 }

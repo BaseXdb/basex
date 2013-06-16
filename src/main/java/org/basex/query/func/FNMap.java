@@ -127,14 +127,4 @@ public final class FNMap extends StandardFunc {
   private Map map(final QueryContext ctx) throws QueryException {
     return checkMap(checkItem(expr[0], ctx));
   }
-
-  @Override
-  public boolean xquery3() {
-    return true;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 || super.uses(u);
-  }
 }

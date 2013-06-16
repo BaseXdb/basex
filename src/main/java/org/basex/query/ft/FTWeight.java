@@ -86,8 +86,8 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return weight.uses(u) || super.uses(u);
+  public boolean has(final Flag flag) {
+    return weight.has(flag) || super.has(flag);
   }
 
   @Override

@@ -156,12 +156,8 @@ public final class FNNum extends StandardFunc {
   }
 
   @Override
-  public boolean xquery3() {
-    return sig == Function.ROUND && expr.length == 2;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 && xquery3() || super.uses(u);
+  public boolean has(final Flag flag) {
+    return flag == Flag.X30 && sig == Function.ROUND && expr.length == 2 ||
+        super.has(flag);
   }
 }

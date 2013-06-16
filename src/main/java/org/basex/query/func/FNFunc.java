@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
@@ -202,16 +201,5 @@ public final class FNFunc extends StandardFunc {
       if(fi.arity() == a) return fi;
     }
     throw Err.type(this, FuncType.arity(a), it);
-  }
-
-  @Override
-  public boolean xquery3() {
-    return true;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return (u == Use.CTX || u == Use.POS) && oneOf(sig, FUNCTION_LOOKUP) ||
-        u == Use.X30 || super.uses(u);
   }
 }

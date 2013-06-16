@@ -63,7 +63,7 @@ public final class FNAggr extends StandardFunc {
   protected Expr opt(final QueryContext ctx) throws QueryException {
     // skip non-deterministic and variable expressions
     final Expr e = expr[0];
-    if(e.uses(Use.NDT) || e instanceof VarRef) return this;
+    if(e.has(Flag.NDT) || e instanceof VarRef) return this;
 
     final long c = e.size();
     switch(sig) {

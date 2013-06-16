@@ -194,7 +194,7 @@ public final class GFLWOR extends ParseExpr {
     mergeWheres();
 
     size = calcSize();
-    if(size == 0 && !(uses(Use.NDT) || uses(Use.UPD))) {
+    if(size == 0 && !(has(Flag.NDT) || has(Flag.UPD))) {
       ctx.compInfo(QueryText.OPTWRITE, this);
       return Empty.SEQ;
     }
@@ -258,14 +258,14 @@ public final class GFLWOR extends ParseExpr {
         final int next = iter.nextIndex();
         if(c instanceof Let) {
           final Let lt = (Let) c;
-          if(lt.expr.uses(Use.NDT)) continue;
+          if(lt.expr.has(Flag.NDT)) continue;
           final VarUsage uses = count(lt.var, next);
           if(uses == VarUsage.NEVER) {
             ctx.compInfo(QueryText.OPTVAR, lt.var);
             iter.remove();
             change = true;
           } else if(lt.expr.isValue() || lt.expr instanceof VarRef && !lt.var.checksType()
-              || uses == VarUsage.ONCE && !lt.expr.uses(Use.CTX)
+              || uses == VarUsage.ONCE && !lt.expr.has(Flag.CTX)
               || lt.expr instanceof AxisPath && ((AxisPath) lt.expr).cheap()) {
             ctx.compInfo(QueryText.OPTINLINE, lt);
             inline(ctx, scp, lt.var, lt.inlineExpr(ctx, scp), next);
@@ -381,7 +381,7 @@ public final class GFLWOR extends ParseExpr {
     boolean change = false;
     for(int i = 1; i < clauses.size(); i++) {
       final Clause l = clauses.get(i);
-      if(!(l instanceof Let) || l.uses(Use.NDT) || l.uses(Use.CNS)) continue;
+      if(!(l instanceof Let) || l.has(Flag.NDT) || l.has(Flag.CNS)) continue;
       final Let let = (Let) l;
 
       // find insertion position
@@ -416,7 +416,7 @@ public final class GFLWOR extends ParseExpr {
     boolean change = false;
     for(int i = 0; i < clauses.size(); i++) {
       final Clause c = clauses.get(i);
-      if(!(c instanceof Where) || c.uses(Use.NDT)) continue;
+      if(!(c instanceof Where) || c.has(Flag.NDT)) continue;
       final Where wh = (Where) c;
 
       if(wh.pred.isValue()) {
@@ -497,10 +497,10 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    if(u == Use.X30 && xq30) return true;
-    for(final Clause cls : clauses) if(cls.uses(u)) return true;
-    return ret.uses(u);
+  public boolean has(final Flag flag) {
+    if(flag == Flag.X30 && xq30) return true;
+    for(final Clause cls : clauses) if(cls.has(flag)) return true;
+    return ret.has(flag);
   }
 
   @Override

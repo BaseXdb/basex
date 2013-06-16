@@ -8,7 +8,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Use;
+import org.basex.query.expr.Expr.Flag;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -29,11 +29,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public final Var[] args;
   /** Updating flag. */
   public final boolean updating;
-
-  /** Map with requested function properties. */
-  protected final EnumMap<Use, Boolean> map = new EnumMap<Expr.Use, Boolean>(Use.class);
   /** Cast flag. */
   boolean cast;
+
+  /** Map with requested function properties. */
+  private final EnumMap<Flag, Boolean> map = new EnumMap<Flag, Boolean>(Flag.class);
   /** Flag that is turned on during compilation and prevents premature inlining. */
   private boolean compiling;
 
@@ -105,7 +105,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   boolean inline(final QueryContext ctx) {
     return expr.isValue() || expr.exprSize() < ctx.context.prop.num(Prop.INLINELIMIT) &&
-        !(compiling || uses(Use.NDT) || uses(Use.CTX) || selfRecursive());
+        !(compiling || has(Flag.NDT) || has(Flag.CTX) || selfRecursive());
   }
 
   @Override
@@ -224,7 +224,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    final boolean u = expr.uses(Use.UPD);
+    final boolean u = expr.has(Flag.UPD);
     if(u) expr.checkUp();
     if(updating) {
       // updating function
@@ -241,21 +241,22 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @return result of check
    */
   public boolean isVacuous() {
-    return !uses(Use.UPD) && declType != null && declType.eq(SeqType.EMP);
+    return !has(Flag.UPD) && declType != null && declType.eq(SeqType.EMP);
   }
 
   /**
-   * Checks if the given feature is used in this function (see {@link Expr#uses(Use)}).
-   * @param u feature
+   * Indicates if an expression has the specified compiler property.
+   * @param flag feature
    * @return result of check
+   * @see Expr#has(Flag)
    */
-  public boolean uses(final Use u) {
+  public boolean has(final Flag flag) {
     // handle recursive calls: set dummy value, eventually replace it with final value
-    Boolean b = map.get(u);
+    Boolean b = map.get(flag);
     if(b == null) {
-      map.put(u, false);
-      b = expr == null || expr.uses(u);
-      map.put(u, b);
+      map.put(flag, false);
+      b = expr == null || expr.has(flag);
+      map.put(flag, b);
     }
     return b;
   }

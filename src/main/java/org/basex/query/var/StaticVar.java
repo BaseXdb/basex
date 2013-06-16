@@ -5,7 +5,7 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Use;
+import org.basex.query.expr.Expr.Flag;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -147,7 +147,7 @@ public final class StaticVar extends StaticDecl {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    if(expr != null && expr.uses(Use.UPD)) UPNOT.thrw(info, description());
+    if(expr != null && expr.has(Flag.UPD)) UPNOT.thrw(info, description());
   }
 
   /**

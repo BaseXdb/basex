@@ -58,7 +58,7 @@ public abstract class StandardFunc extends Arr {
   public final Expr optimize(final QueryContext ctx, final VarScope scp)
       throws QueryException {
     // skip context-based or non-deterministic functions, and non-values
-    return optPre(uses(Use.CTX) || uses(Use.NDT) || !allAreValues() ? opt(ctx) :
+    return optPre(has(Flag.CTX) || has(Flag.NDT) || !allAreValues() ? opt(ctx) :
       sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);
   }
 
@@ -83,14 +83,6 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns true if this is an XQuery 3.0 function.
-   * @return result of check
-   */
-  public boolean xquery3() {
-    return false;
-  }
-
-  /**
    * Atomizes the specified item.
    * @param it input item
    * @param ii input info
@@ -104,13 +96,18 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
+  public boolean has(final Flag flag) {
+    return sig.has(flag) || super.has(flag);
+  }
+
+  @Override
   public final boolean isFunction(final Function f) {
     return sig == f;
   }
 
   @Override
   public final boolean isVacuous() {
-    return !uses(Use.UPD) && type.eq(SeqType.EMP);
+    return !has(Flag.UPD) && type.eq(SeqType.EMP);
   }
 
   @Override

@@ -37,7 +37,7 @@ public final class InlineFunc extends Single implements Scope {
   private final boolean updating;
 
   /** Map with requested function properties. */
-  private final EnumMap<Use, Boolean> map = new EnumMap<Expr.Use, Boolean>(Use.class);
+  private final EnumMap<Flag, Boolean> map = new EnumMap<Expr.Flag, Boolean>(Flag.class);
   /** Static context. */
   private final StaticContext sc;
   /** Compilation flag. */
@@ -221,15 +221,15 @@ public final class InlineFunc extends Single implements Scope {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    if(u == Use.X30) return true;
+  public boolean has(final Flag flag) {
+    if(flag == Flag.X30) return true;
 
     // handle recursive calls: set dummy value, eventually replace it with final value
-    Boolean b = map.get(u);
+    Boolean b = map.get(flag);
     if(b == null) {
-      map.put(u, false);
-      b = expr == null || super.uses(u);
-      map.put(u, b);
+      map.put(flag, false);
+      b = expr == null || super.has(flag);
+      map.put(flag, b);
     }
     return b;
   }
@@ -272,7 +272,7 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public void checkUp() throws QueryException {
-    final boolean u = expr.uses(Use.UPD);
+    final boolean u = expr.has(Flag.UPD);
     if(u) expr.checkUp();
     if(updating) {
       // updating function
@@ -286,7 +286,7 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public boolean isVacuous() {
-    return !uses(Use.UPD) && ret != null && ret.eq(SeqType.EMP);
+    return !has(Flag.UPD) && ret != null && ret.eq(SeqType.EMP);
   }
 
   @Override

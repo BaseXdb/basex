@@ -97,9 +97,9 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    for(final SwitchCase sc : cases) if(sc.uses(u)) return true;
-    return cond.uses(u);
+  public boolean has(final Flag flag) {
+    for(final SwitchCase sc : cases) if(sc.has(flag)) return true;
+    return cond.has(flag);
   }
 
   @Override

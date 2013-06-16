@@ -266,8 +266,9 @@ public final class Window extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 || expr.uses(u) || start.uses(u) || end != null && end.uses(u);
+  public boolean has(final Flag flag) {
+    return flag == Flag.X30 || expr.has(flag) || start.has(flag) ||
+        end != null && end.has(flag);
   }
 
   @Override
