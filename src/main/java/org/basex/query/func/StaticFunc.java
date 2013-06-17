@@ -90,7 +90,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       // remove redundant casts
       if((declType.type == AtomType.BLN || declType.type == AtomType.FLT ||
           declType.type == AtomType.DBL || declType.type == AtomType.QNM ||
-              declType.type == AtomType.URI) && declType.eq(expr.type())) {
+          declType.type == AtomType.URI) && declType.eq(expr.type())) {
         ctx.compInfo(OPTCAST, declType);
         cast = false;
       }
@@ -265,14 +265,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public boolean visit(final ASTVisitor visitor) {
     for(final Var v : args) if(!visitor.declared(v)) return false;
     return expr.accept(visitor);
-  }
-
-  /**
-   * Returns the static return type of this function.
-   * @return return type
-   */
-  public SeqType retType() {
-    return declType != null ? declType : expr.type();
   }
 
   @Override

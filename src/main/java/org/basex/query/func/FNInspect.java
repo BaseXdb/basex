@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.inspect.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -32,6 +31,7 @@ public class FNInspect extends StandardFunc {
     switch(sig) {
       case _INSPECT_FUNCTION: return function(ctx);
       case _INSPECT_MODULE:   return module(ctx);
+      case _INSPECT_CONTEXT:  return context(ctx);
       case _INSPECT_XQDOC:    return xqdoc(ctx);
       default:                return super.item(ctx, ii);
     }
@@ -45,9 +45,18 @@ public class FNInspect extends StandardFunc {
    */
   private Item function(final QueryContext ctx) throws QueryException {
     final FItem f = checkFunc(expr[0], ctx);
-    final FuncType ftype = f.funcType();
     final StaticFunc sf = f instanceof FuncItem ? ((FuncItem) f).func : null;
-    return new PlainDoc(ctx, info).function(f.fName(), ftype.args, ftype.ret, sf, null);
+    return new PlainDoc(ctx, info).function(f.fName(), sf, f.funcType(), null);
+  }
+
+  /**
+   * Performs the context function.
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private Item context(final QueryContext ctx) throws QueryException {
+    return new PlainDoc(ctx, info).context();
   }
 
   /**

@@ -189,10 +189,10 @@ public final class QueryException extends Exception {
    * @param parser parser
    */
   void pos(final InputParser parser) {
-    markedCol = parser.im;
+    markedCol = parser.mark;
     if(info != null) return;
     // check if line/column information has already been added
-    parser.ip = Math.min(parser.im, parser.il);
+    parser.pos = Math.min(parser.mark, parser.length);
     info = new InputInfo(parser);
   }
 

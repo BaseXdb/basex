@@ -122,7 +122,7 @@ public final class FuncItem extends FItem implements Scope {
     name = n;
     vars = arg;
     expr = body;
-    cast = cst && t.ret != null ? t.ret : null;
+    cast = cst && t.type != null ? t.type : null;
     closure = cls != null ? cls : Collections.<Var, Value>emptyMap();
     stackSize = scp.stackSize();
     sc = sctx;
@@ -283,7 +283,7 @@ public final class FuncItem extends FItem implements Scope {
     final FuncType ft = (FuncType) type;
     final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
     for(final Var v : vars) tb.addExt(v).add(v == vars[vars.length - 1] ? "" : ", ");
-    return tb.add(')').add(ft.ret != null ? " as " + ft.ret : "").add(" { ").
+    return tb.add(')').add(ft.type != null ? " as " + ft.type : "").add(" { ").
         addExt(expr).add(" }").toString();
   }
 }

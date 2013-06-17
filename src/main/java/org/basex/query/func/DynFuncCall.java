@@ -42,7 +42,7 @@ public final class DynFuncCall extends Arr {
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
       if(ft.args != null && ft.args.length != ar) INVARITY.thrw(info, f, ar);
-      if(ft.ret != null) type = ft.ret;
+      if(ft.type != null) type = ft.type;
     }
     // maps can only contain fully evaluated Values, so this is safe
     return allAreValues() && f instanceof Map ? optPre(value(ctx), ctx) : this;

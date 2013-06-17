@@ -24,7 +24,7 @@ public final class InputInfo {
   public InputInfo(final InputParser parser) {
     query = parser.input;
     file = parser.file;
-    pos = parser.ip;
+    pos = parser.pos;
   }
 
   /**

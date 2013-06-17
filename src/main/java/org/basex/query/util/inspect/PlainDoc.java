@@ -32,6 +32,24 @@ public final class PlainDoc extends Inspect {
 
   /**
    * Parses a module and returns an xqdoc element.
+   * @return xqdoc element
+   * @throws QueryException query exception
+   */
+  public FElem context() throws QueryException {
+    final FElem context = elem("context", null);
+
+    for(final StaticVar sv : ctx.vars) {
+      variable(sv, context);
+    }
+    for(final StaticFunc sf : ctx.funcs.funcs()) {
+      function(sf.name, sf, sf.funcType(), context);
+    }
+
+    return context;
+  }
+
+  /**
+   * Parses a module and returns an xqdoc element.
    * @param io input reference
    * @return xqdoc element
    * @throws QueryException query exception
@@ -52,9 +70,7 @@ public final class PlainDoc extends Inspect {
       variable(sv, mod);
     }
     for(final StaticFunc sf : qp.funcs) {
-      final SeqType[] types = new SeqType[sf.args.length];
-      for(int t = 0; t < types.length; t++) types[t] = sf.args[t].declType;
-      function(sf.name, types, sf.declType, sf, mod);
+      function(sf.name, sf, sf.funcType(), mod);
     }
 
     return mod;
@@ -71,7 +87,7 @@ public final class PlainDoc extends Inspect {
     final FElem variable = elem("variable", parent);
     variable.add("name", sv.name.string());
     if(sv.name.uri().length != 0) variable.add("uri", sv.name.uri());
-    type(sv.declType, variable);
+    type(sv.type(), variable);
     comment(sv, variable);
     annotation(sv.ann, variable, true);
     return variable;
@@ -80,15 +96,14 @@ public final class PlainDoc extends Inspect {
   /**
    * Creates a description for the specified function.
    * @param fname name of function
-   * @param types types of arguments
-   * @param type return type
-   * @param sf static function
+   * @param sf function reference
+   * @param ftype function type
    * @param parent node
    * @return resulting value
    * @throws QueryException query exception
    */
-  public FElem function(final QNm fname, final SeqType[] types, final SeqType type,
-      final StaticFunc sf, final FElem parent) throws QueryException {
+  public FElem function(final QNm fname, final StaticFunc sf, final FuncType ftype,
+        final FElem parent) throws QueryException {
 
     final FElem function = elem("function", parent);
     if(fname != null) {
@@ -97,13 +112,14 @@ public final class PlainDoc extends Inspect {
     }
 
     final TokenObjMap<TokenList> doc = sf != null ? sf.doc() : null;
+    final int al = ftype.args.length;
     QNm[] names = null;
     if(sf != null) {
-      names = new QNm[sf.args.length];
-      for(int n = 0; n < names.length; n++) names[n] = sf.args[n].name;
+      names = new QNm[al];
+      for(int n = 0; n < al; n++) names[n] = sf.args[n].name;
     }
 
-    for(int a = 0; a < types.length; a++) {
+    for(int a = 0; a < al; a++) {
       final FElem argument = elem("argument", function);
       if(names != null) {
         final byte[] name = names[a].string();
@@ -114,7 +130,7 @@ public final class PlainDoc extends Inspect {
         final byte[] pdoc = doc(doc, name);
         if(pdoc != null) add(pdoc, ctx.context, argument);
       }
-      type(types[a], argument);
+      type(ftype.args[a], argument);
     }
 
     if(sf != null) annotation(sf.ann, function, true);
@@ -130,7 +146,8 @@ public final class PlainDoc extends Inspect {
       }
     }
 
-    final FElem ret = type(type, elem("return", function));
+    final SeqType rt = sf != null ? sf.type() : ftype.type;
+    final FElem ret = type(rt, elem("return", function));
     final TokenList returns = doc != null ? doc.get(DOC_RETURN) : null;
     if(returns != null) for(final byte[] val : returns) ret.add(val);
     return function;

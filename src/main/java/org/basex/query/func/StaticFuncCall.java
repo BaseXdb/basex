@@ -75,7 +75,7 @@ public abstract class StaticFuncCall extends Arr {
 
       return cls == null ? rt : new GFLWOR(func.info, cls, rt).optimize(ctx, scp);
     }
-    type = func.retType();
+    type = func.type();
     return this;
   }
 

@@ -200,7 +200,7 @@ public final class InlineFunc extends Single implements Scope {
   @Override
   public FuncItem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final FuncType ft = FuncType.get(ann, args, ret);
-    final boolean c = ft.ret != null && !expr.type().instanceOf(ft.ret);
+    final boolean c = ft.type != null && !expr.type().instanceOf(ft.type);
 
     // collect closure
     final Map<Var, Value> clos = new HashMap<Var, Value>();

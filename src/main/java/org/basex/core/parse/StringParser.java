@@ -277,10 +277,10 @@ public final class StringParser extends CmdParser {
       final QueryContext qc = new QueryContext(ctx);
       try {
         final QueryParser p = new QueryParser(parser.input, null, qc);
-        p.ip = parser.ip;
+        p.pos = parser.pos;
         p.parseMain();
-        sb.append(parser.input.substring(parser.ip, p.ip));
-        parser.ip = p.ip;
+        sb.append(parser.input.substring(parser.pos, p.pos));
+        parser.pos = p.pos;
       } finally {
         qc.close();
       }
@@ -355,11 +355,11 @@ public final class StringParser extends CmdParser {
    */
   private boolean key(final String key, final Cmd cmd) throws QueryException {
     consumeWS();
-    final int p = parser.ip;
+    final int p = parser.pos;
     final boolean ok = (parser.consume(key) || parser.consume(
         key.toLowerCase(Locale.ENGLISH))) && (parser.curr(0) || ws(parser.curr()));
     if(!ok) {
-      parser.ip = p;
+      parser.pos = p;
       if(cmd != null) throw help(null, cmd);
     }
     return ok;
@@ -397,8 +397,9 @@ public final class StringParser extends CmdParser {
    * query.
    */
   private void consumeWS() {
-    while(parser.ip < parser.il && parser.input.charAt(parser.ip) <= ' ') ++parser.ip;
-    parser.im = parser.ip - 1;
+    while(parser.pos < parser.length && parser.input.charAt(parser.pos) <= ' ')
+      ++parser.pos;
+    parser.mark = parser.pos - 1;
   }
 
   /**

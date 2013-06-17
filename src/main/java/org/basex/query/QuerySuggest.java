@@ -85,7 +85,7 @@ public final class QuerySuggest extends QueryParser {
     if(test != null) tb.add(test.toString().replaceAll("\\*:", ""));
     tag = tb.finish();
     // use inexact matching only, if the tag is at the end:
-    checkTest(ip < il);
+    checkTest(pos < length);
   }
 
   /**
