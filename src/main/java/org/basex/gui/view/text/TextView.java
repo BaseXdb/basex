@@ -191,7 +191,7 @@ public final class TextView extends View {
    */
   void save() {
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
-        gui.gprop.get(GUIProp.WORKPATH), gui);
+        gui.gprop.get(GUIProp.WORKPATH), gui).suffix(IO.XMLSUFFIX);
 
     final IO file = fc.select(Mode.FSAVE);
     if(file == null) return;

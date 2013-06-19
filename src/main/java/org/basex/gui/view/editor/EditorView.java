@@ -343,6 +343,7 @@ public final class EditorView extends View {
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
     fc.textFilters();
+    fc.suffix(IO.XQSUFFIX);
 
     final IOFile file = fc.select(Mode.FSAVE);
     return file != null && save(file);

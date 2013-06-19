@@ -35,6 +35,8 @@ public final class BaseXFileChooser {
   private JFileChooser fc;
   /** Simple file dialog. */
   private FileDialog fd;
+  /** File suffix. */
+  private String suffix;
 
   /**
    * Default constructor.
@@ -42,9 +44,7 @@ public final class BaseXFileChooser {
    * @param path initial path
    * @param main reference to main window
    */
-  public BaseXFileChooser(final String title, final String path,
-      final GUI main) {
-
+  public BaseXFileChooser(final String title, final String path, final GUI main) {
     if(main.gprop.is(GUIProp.SIMPLEFD)) {
       fd = new FileDialog(main, title);
       fd.setDirectory(new File(path).getPath());
@@ -56,7 +56,6 @@ public final class BaseXFileChooser {
       gui = main;
     }
   }
-
 
   /**
    * Convenience method for setting textual filters.
@@ -84,6 +83,16 @@ public final class BaseXFileChooser {
       fc.addChoosableFileFilter(new Filter(suf, dsc));
       fc.setFileFilter(ff);
     }
+    return this;
+  }
+
+  /**
+   * Sets a file suffix, which will be added if the typed in file has no suffix.
+   * @param suf suffix
+   * @return self reference
+   */
+  public BaseXFileChooser suffix(final String suf) {
+    suffix = suf;
     return this;
   }
 
@@ -152,7 +161,12 @@ public final class BaseXFileChooser {
     if(mode == Mode.FSAVE) {
       // add file suffix to files
       final FileFilter ff = fc.getFileFilter();
-      if(ff instanceof Filter) {
+      if(suffix != null) {
+        for(int f = 0; f < files.length; f++) {
+          final String path = files[f].path();
+          if(!path.contains(".")) files[f] = new IOFile(path + suffix);
+        }
+      } else if(ff instanceof Filter) {
         final String[] sufs = ((Filter) ff).sufs;
         for(int f = 0; f < files.length && sufs.length != 0; f++) {
           final String path = files[f].path();
