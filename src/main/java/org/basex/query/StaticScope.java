@@ -66,7 +66,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
     try {
       final NewlineInput nli = new NewlineInput(new IOContent(doc));
       while(nli.readLine(line)) {
-        String l = line.toString().replaceAll("^\\s+: ?", "");
+        String l = line.toString().replaceAll("^\\s*: ?", "");
         if(l.startsWith("@")) {
           add(key, val, map);
           key = Token.token(l.replaceAll("^@(\\w*).*", "$1"));

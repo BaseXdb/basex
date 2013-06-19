@@ -82,10 +82,12 @@ public class QueryParser extends InputParser {
   /** Query context. */
   final QueryContext ctx;
 
-  /** XQDoc cache. */
-  private final StringBuilder xqdoc = new StringBuilder();
   /** Temporary token cache. */
   private final TokenBuilder tok = new TokenBuilder();
+  /** XQDoc cache. */
+  private final StringBuilder currDoc = new StringBuilder();
+  /** Current XQDoc string. */
+  private String moduleDoc = "";
 
   /** Name of current module. */
   private QNm module;
@@ -182,15 +184,12 @@ public class QueryParser extends InputParser {
     checkValidChars();
 
     try {
-      String doc = xqDoc("");
       versionDecl();
 
-      doc = xqDoc(doc);
       final int i = pos;
       if(wsConsumeWs(MODULE, NSPACE, null)) error(MAINMOD);
       pos = i;
 
-      doc = xqDoc(doc);
       prolog1();
       prolog2();
 
@@ -201,8 +200,7 @@ public class QueryParser extends InputParser {
         else error(EXPREMPTY);
       }
 
-      if(doc.equals(xqdoc.toString())) doc = null;
-      final MainModule mm = new MainModule(e, scope, doc);
+      final MainModule mm = new MainModule(e, scope, moduleDoc);
       scope = null;
       finish(mm, true);
       return mm;
@@ -225,10 +223,8 @@ public class QueryParser extends InputParser {
     checkValidChars();
 
     try {
-      String doc = xqDoc("");
       versionDecl();
 
-      doc = xqDoc(doc);
       wsCheck(MODULE);
       wsCheck(NSPACE);
       skipWS();
@@ -241,34 +237,16 @@ public class QueryParser extends InputParser {
       namespaces.put(pref, uri);
       wsCheck(";");
 
-      doc = xqDoc(doc);
       prolog1();
       prolog2();
 
       finish(null, check);
-      if(doc.equals(xqdoc.toString())) doc = null;
-      return new LibraryModule(module, doc);
+      return new LibraryModule(module, moduleDoc);
     } catch(final QueryException ex) {
       mark();
       ex.pos(this);
       throw ex;
     }
-  }
-
-  /**
-   * Parses module documentation.
-   * @param doc old documentation string
-   * @return resulting root expression
-   * @throws QueryException query exception
-   */
-  private String xqDoc(final String doc) throws QueryException {
-    skipWS();
-    final String str = xqdoc.toString();
-    // documentation string is empty: return current string
-    if(doc.isEmpty()) return str;
-    // discard buffer if string has not changed since the last call
-    if(doc.equals(str)) xqdoc.setLength(0);
-    return doc;
   }
 
   /**
@@ -407,7 +385,7 @@ public class QueryParser extends InputParser {
       } else {
         return;
       }
-      xqdoc.setLength(0);
+      currDoc.setLength(0);
       skipWS();
       check(';');
     }
@@ -454,7 +432,7 @@ public class QueryParser extends InputParser {
           break;
         }
       }
-      xqdoc.setLength(0);
+      currDoc.setLength(0);
       skipWS();
       check(';');
     }
@@ -906,7 +884,7 @@ public class QueryParser extends InputParser {
     else if(!wsConsumeWs(ASSIGN)) return;
     scope = new VarScope();
     final Expr e = check(single(), NOVARDECL);
-    ctx.ctxItem = new MainModule(e, scope, xqdoc.toString());
+    ctx.ctxItem = new MainModule(e, scope, currDoc.toString());
     scope = null;
     if(module != null) error(DECITEM);
     if(e.has(Flag.UPD)) error(UPCTX, e);
@@ -933,7 +911,7 @@ public class QueryParser extends InputParser {
     }
 
     vars.add(ctx.vars.declare(vn, tp, ann, bind, external, ctx.sc, scope,
-        xqdoc.toString(), info()));
+        currDoc.toString(), info()));
     scope = null;
   }
 
@@ -987,7 +965,7 @@ public class QueryParser extends InputParser {
 
     final Expr body = wsConsumeWs(EXTERNAL) ? null : enclosed(NOFUNBODY);
     funcs.add(ctx.funcs.declare(ann, name, args, tp, body, ctx.sc, scope,
-        xqdoc.toString(), ii));
+        currDoc.toString(), ii));
     scope = null;
   }
 
@@ -3943,7 +3921,7 @@ public class QueryParser extends InputParser {
     ++pos;
     final boolean doc = next() == '~';
     if(doc) {
-      xqdoc.setLength(0);
+      currDoc.setLength(0);
       ++pos;
     }
     while(++pos < length) {
@@ -3954,9 +3932,13 @@ public class QueryParser extends InputParser {
       }
       if(curr == ':' && next() == ')') {
         pos += 2;
+        if(moduleDoc.isEmpty()) {
+          moduleDoc = currDoc.toString().trim();
+          currDoc.setLength(0);
+        }
         return;
       }
-      if(doc) xqdoc.append(curr);
+      if(doc) currDoc.append(curr);
     }
     error(COMCLOSE);
   }
