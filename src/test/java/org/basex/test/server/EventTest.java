@@ -170,8 +170,8 @@ public final class EventTest extends SandboxTest {
     // ignore the error that the event may already exist
     try {
       session.execute("create event " + NAME);
-    } catch (BaseXException ex) {}
-    
+    } catch(final BaseXException ignore) { }
+
     final CountDownLatch doneSignal = new CountDownLatch(sessions.length);
     // watch event
     for(final ClientSession cs : sessions) {
@@ -207,7 +207,7 @@ public final class EventTest extends SandboxTest {
     try {
       session.execute("create event " + NAME);
       session.execute("create event " + NAME + 1);
-    } catch (BaseXException ex) {}
+    } catch(final BaseXException ignore) { }
 
     final CountDownLatch doneSignal = new CountDownLatch(CLIENTS * sessions.length);
     // watch events on all clients
