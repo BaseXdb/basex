@@ -358,10 +358,6 @@ public interface QueryText {
   /** Parser token. */
   String DF_ZG = "zero-digit";
 
-  /** Option: prohibit-feature. */
-  String PROHIBIT_FEATURE = "prohibit-feature";
-  /** Option: require-feature. */
-  String REQUIRE_FEATURE = "require-feature";
   /** Option: read-lock. */
   String READ_LOCK = "read-lock";
   /** Option: write-lock. */
@@ -539,18 +535,6 @@ public interface QueryText {
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
 
-  /** Feature: schema-aware. */
-  String F_SCHEMA_AWARE = "schema-aware";
-  /** Feature: static-typing. */
-  String F_STATIC_TYPING = "static-typing";
-  /** Feature: module. */
-  String F_MODULE = "module";
-  /** Feature: higher-order-function. */
-  String F_HIGHER_ORDER_FUNCTION = "higher-order-function";
-  /** Feature: all-extensions. */
-  String F_ALL_EXTENSIONS = "all-extensions";
-  /** Feature: all-optional-features. */
-  String F_ALL_OPTIONAL_FEATURES = "all-optional-features";
 
   // URIS =====================================================================
 

@@ -1016,14 +1016,6 @@ public enum Err {
   DECLFEAT(XQST, 123, "Unknown feature: '%'."),
   /** XPST0125. */
   INVISIBLE(XQST, 125, "No visibility annotation allowed in inline function."),
-  /** XPST0126. */
-  FEATREQUALL(XQST, 126, "The '%' feature cannot be specified as required feature."),
-  /** XPST0127. */
-  FEATREQPRO(XQST, 127, "The '%' feature cannot be both required and prohibited."),
-  /** XPST0128. */
-  FEATPROH(XQST, 128, "The '%' feature cannot be deactivated."),
-  /** XPST0132. */
-  FEATMODULE(XQST, 132, "The '%' feature is not allowed in a library module."),
 
   /** XQTY0024. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),

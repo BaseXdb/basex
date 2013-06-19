@@ -436,17 +436,6 @@ public class QueryParser extends InputParser {
       skipWS();
       check(';');
     }
-
-    // check if specified features are supported or can be prohibited
-    for(final String d : decl) {
-      if(!d.endsWith("_R") && !d.endsWith("_P")) continue;
-      final boolean pf = d.charAt(d.length() - 1) == 'P';
-      final String k = d.substring(0, d.length() - 2);
-      if(eq(k, F_STATIC_TYPING, F_SCHEMA_AWARE, F_ALL_OPTIONAL_FEATURES))
-        error(pf ? FEATPROH : FEATNOTSUPP, k);
-      if(pf && eq(k, F_MODULE, F_HIGHER_ORDER_FUNCTION, F_ALL_EXTENSIONS,
-          F_ALL_OPTIONAL_FEATURES)) error(FEATPROH, k);
-    }
   }
 
   /**
@@ -578,31 +567,7 @@ public class QueryParser extends InputParser {
 
       ctx.serProp.set(key, string(val));
     } else if(ctx.sc.xquery3() && eq(name.uri(), XQURI)) {
-      // query-specific options
-      final boolean pf = key.equals(PROHIBIT_FEATURE);
-      final boolean rf = !pf && key.equals(REQUIRE_FEATURE);
-      if(!pf && !rf) error(DECLOPTION, name);
-
-      for(final byte[] vl : split(val, ' ')) {
-        if(!XMLToken.isQName(vl)) error(DECLQNAME, val);
-        final QNm qn = new QNm(vl, ctx);
-        if(!qn.hasURI()) {
-          if(qn.hasPrefix()) error(NOURI, qn.prefix());
-          qn.uri(XQURI);
-        }
-        final String k = string(qn.local());
-        if(eq(qn.uri(), XQURI) && eq(k, F_SCHEMA_AWARE, F_STATIC_TYPING, F_MODULE,
-            F_HIGHER_ORDER_FUNCTION, F_ALL_EXTENSIONS, F_ALL_OPTIONAL_FEATURES)) {
-
-          if(module != null && eq(k, F_MODULE)) error(FEATMODULE, k);
-          if(rf && eq(k, F_ALL_EXTENSIONS)) error(FEATREQUALL, k);
-          if(decl.contains(k + (pf ? "_R" : "_P"))) error(FEATREQPRO, k);
-          decl.add(k + (pf ? "_P" : "_R"));
-        } else {
-          error(DECLFEAT, vl);
-        }
-      }
-
+      error(DECLOPTION, name);
     } else if(eq(name.uri(), DBURI)) {
       // project-specific declaration
       final String ukey = key.toUpperCase(Locale.ENGLISH);
