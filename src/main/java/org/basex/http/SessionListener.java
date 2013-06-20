@@ -10,7 +10,7 @@ import javax.servlet.http.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class SessionListener implements HttpSessionListener {
+public final class SessionListener implements HttpSessionListener {
   /** Sessions. */
   private static HashMap<String, HttpSession> sessions;
 
