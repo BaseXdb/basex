@@ -1,6 +1,11 @@
 package org.basex.http.restxq;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
+import org.basex.query.func.*;
+import org.basex.query.path.*;
+import org.basex.query.value.item.*;
 
 /**
  * This class assembles texts which are used in the HTTP classes.
@@ -75,7 +80,7 @@ public interface RestXqText {
   /** Error message. */
   String UNEXP_NODE = "Unexpected node: %.";
   /** Error message. */
-  String HEAD_METHOD = "HEAD method must only return one 'restxq:response' element.";
+  String HEAD_METHOD = "HEAD method must return a single 'restxq:response' element.";
   /** Error message. */
   String METHOD_VALUE = "Method % does not allow values.";
   /** Error message. */
@@ -84,4 +89,28 @@ public interface RestXqText {
   String PATH_CONFLICT = "Several functions assigned to path \"%\":%";
   /** Error message. */
   String NO_VALUE = "'%' element has no string value.";
+
+  /** QName. */
+  QNm Q_STATUS = QNm.get(STATUS);
+  /** QName. */
+  QNm Q_REASON = QNm.get(REASON);
+  /** QName. */
+  QNm Q_MESSAGE = QNm.get(MESSAGE);
+  /** QName. */
+  QNm Q_NAME = QNm.get(NAME);
+  /** QName. */
+  QNm Q_VALUE = QNm.get(VALUE);
+
+  /** Serializer node test. */
+  NodeTest OUTPUT_SERIAL = new NodeTest(FuncParams.Q_SPARAM);
+  /** HTTP Response test. */
+  NodeTest HTTP_RESPONSE = new NodeTest(QNm.get(RESPONSE, HTTPURI));
+  /** RESTXQ Response test. */
+  NodeTest REST_RESPONSE = new NodeTest(QNm.get(RESPONSE, RESTURI));
+  /** RESTXQ Redirect test. */
+  NodeTest REST_REDIRECT = new NodeTest(QNm.get(REDIRECT, RESTURI));
+  /** RESTXQ Forward test. */
+  NodeTest REST_FORWARD = new NodeTest(QNm.get(FORWARD, RESTURI));
+  /** HTTP Header test. */
+  NodeTest HTTP_HEADER = new NodeTest(QNm.get(HEADER, HTTPURI));
 }

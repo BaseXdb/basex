@@ -216,14 +216,22 @@ public final class HTTPContext {
    * Sets a status and sends an info message.
    * @param code status code
    * @param message info message
+   * @param error treat as error (use web server standard output)
    * @throws IOException I/O exception
    */
-  public void status(final int code, final String message) throws IOException {
+  public void status(final int code, final String message, final boolean error)
+      throws IOException {
+
     log(message, code);
     res.resetBuffer();
-    res.setStatus(code);
     if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
-    if(message != null) res.getOutputStream().write(token(message));
+
+    if(error && code >= 400) {
+      res.sendError(code, message);
+    } else {
+      res.setStatus(code);
+      if(message != null) res.getOutputStream().write(token(message));
+    }
   }
 
   /**
