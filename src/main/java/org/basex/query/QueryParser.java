@@ -3004,7 +3004,7 @@ public class QueryParser extends InputParser {
       // parse optional question mark
       wsConsume(PLHOLDER);
     }
-    return new ExtTest(NodeType.ELM, name, type, ctx.sc.strip);
+    return new NodeTest(NodeType.ELM, name, type, ctx.sc.strip);
   }
 
   /**
@@ -3034,7 +3034,7 @@ public class QueryParser extends InputParser {
       if(type == null) type = AtomType.find(tn, true);
       if(type == null) error(TYPEUNDEF, tn);
     }
-    return new ExtTest(NodeType.ATT, name, type, ctx.sc.strip);
+    return new NodeTest(NodeType.ATT, name, type, ctx.sc.strip);
   }
 
   /**
@@ -3053,7 +3053,7 @@ public class QueryParser extends InputParser {
     } else {
       return null;
     }
-    return new ExtTest(NodeType.PI, new QNm(nm));
+    return new NodeTest(NodeType.PI, new QNm(nm));
   }
 
   /**

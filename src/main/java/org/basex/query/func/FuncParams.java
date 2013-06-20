@@ -30,7 +30,7 @@ public final class FuncParams {
   /** Root element. */
   private final QNm root;
   /** Root node test. */
-  private final ExtTest test;
+  private final NodeTest test;
   /** Input info. */
   private final InputInfo info;
 
@@ -40,7 +40,7 @@ public final class FuncParams {
    * @param ii input info
    */
   public FuncParams(final QNm name, final InputInfo ii) {
-    test = new ExtTest(NodeType.ELM, name);
+    test = new NodeTest(name);
     root = name;
     info = ii;
   }

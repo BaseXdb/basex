@@ -248,9 +248,7 @@ public final class StaticFuncs extends ExprInfo {
     public void setFunc(final StaticFunc fn) throws QueryException {
       if(func != null) throw FUNCDEFINED.thrw(fn.info, fn.name.string());
       func = fn;
-      for(final StaticFuncCall call : calls) {
-        call.init(fn);
-      }
+      for(final StaticFuncCall call : calls) call.init(fn);
     }
 
     /**
@@ -271,8 +269,7 @@ public final class StaticFuncs extends ExprInfo {
         // [LW] should be deferred until the actual types are known (i.e. compile time)
         return new TypedFunc(call, new Ann(), FuncType.arity(args.length));
       }
-      call.init(func);
-      return new TypedFunc(call, func.ann, func.funcType());
+      return new TypedFunc(call.init(func), func.ann, func.funcType());
     }
 
     /**

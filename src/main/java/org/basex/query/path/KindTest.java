@@ -36,7 +36,7 @@ class KindTest extends Test {
 
   @Override
   public Test intersect(final Test other) {
-    if(other instanceof ExtTest || other instanceof DocTest) {
+    if(other instanceof NodeTest || other instanceof DocTest) {
       return other.type.instanceOf(type) ? other : null;
     } else if(other instanceof KindTest) {
       return type.instanceOf(other.type) ? this :

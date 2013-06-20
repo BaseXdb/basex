@@ -41,7 +41,7 @@ public final class FNArchive extends StandardFunc {
   /** QName. */
   private static final QNm Q_ALGORITHM = QNm.get(PREFIX, "algorithm", ARCHIVEURI);
   /** Root node test. */
-  private static final ExtTest TEST = new ExtTest(NodeType.ELM, Q_ENTRY);
+  private static final NodeTest TEST = new NodeTest(Q_ENTRY);
 
   /** Level. */
   private static final String LEVEL = "compression-level";

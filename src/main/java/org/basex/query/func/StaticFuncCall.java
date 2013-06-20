@@ -113,12 +113,14 @@ public abstract class StaticFuncCall extends Arr {
   /**
    * Initializes the function and checks for visibility.
    * @param f function reference
+   * @return self reference
    * @throws QueryException query exception
    */
-  public void init(final StaticFunc f) throws QueryException {
+  public StaticFuncCall init(final StaticFunc f) throws QueryException {
     func = f;
     if(f.ann.contains(Ann.Q_PRIVATE) && !Token.eq(sc.baseURI().string(),
         f.sc.baseURI().string())) throw Err.FUNCPRIV.thrw(info, f.name.string());
+    return this;
   }
 
   /**

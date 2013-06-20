@@ -7,7 +7,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Type test.
+ * Abstract node test.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
