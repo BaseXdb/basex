@@ -132,31 +132,4 @@
     <servlet-name>RESTXQ</servlet-name>
     <url-pattern>/restxq/*</url-pattern>
   </servlet-mapping>
-
-  <!-- Direct invocation of query and script files
-    (undocumented; can be activated by removing this comment)
-  <servlet>
-    <servlet-name>Direct</servlet-name>
-    <servlet-class>org.basex.http.direct.DirectServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-    <init-param>
-      <param-name>org.basex.user</param-name>
-      <param-value/>
-    </init-param>
-    <init-param>
-      <param-name>org.basex.password</param-name>
-      <param-value/>
-    </init-param>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Direct</servlet-name>
-    <url-pattern>*.xq</url-pattern>
-    <url-pattern>*.xql</url-pattern>
-    <url-pattern>*.xqm</url-pattern>
-    <url-pattern>*.xqu</url-pattern>
-    <url-pattern>*.xquery</url-pattern>
-    <url-pattern>*.bxs</url-pattern>
-  </servlet-mapping>
-  -->
-
 </web-app>
