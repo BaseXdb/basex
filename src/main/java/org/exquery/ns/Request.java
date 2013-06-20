@@ -245,6 +245,18 @@ public final class Request extends QueryModule {
   }
 
   /**
+   * Returns the value of a specific attribute.
+   * @param key key to be requested
+   * @return attribute value
+   * @throws QueryException query exception
+   */
+  @Deterministic @Requires(Permission.NONE)
+  public Str attribute(final Str key) throws QueryException {
+    final Object query = request().getAttribute(key.toJava());
+    return query == null ? null : Str.get(query.toString());
+  }
+
+  /**
    * Returns the servlet request instance.
    * @return request
    * @throws QueryException query exception
