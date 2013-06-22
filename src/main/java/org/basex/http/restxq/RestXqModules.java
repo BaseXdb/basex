@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -41,24 +42,28 @@ public final class RestXqModules {
    * Returns a WADL description for all available URIs.
    * @param http HTTP context
    * @return WADL description
-   * @throws QueryException query exception
    */
-  public synchronized FElem wadl(final HTTPContext http) throws QueryException {
-    analyze(http);
+  public FElem wadl(final HTTPContext http) {
     return new RestXqWadl(http).create(modules);
   }
 
   /**
-   * Returns the module that matches the specified request, or {@code null}.
+   * Returns the function that matches the current request or the specified error code.
+   * Returns {@code null} if no function matches.
    * @param http HTTP context
+   * @param error error code (optional)
    * @throws QueryException query exception
-   * @return instance
+   * @return function
    */
-  synchronized RestXqFunction find(final HTTPContext http) throws QueryException {
-    analyze(http);
+  RestXqFunction find(final HTTPContext http, final QNm error) throws QueryException {
+    cache(http);
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<RestXqFunction>();
-    for(final RestXqModule mod : modules.values()) mod.add(http, list);
+    for(final RestXqModule mod : modules.values()) {
+      for(final RestXqFunction rxf : mod.functions()) {
+        if(rxf.matches(http, error)) list.add(rxf);
+      }
+    }
     // no path matches
     if(list.isEmpty()) return null;
     // choose most appropriate function
@@ -74,7 +79,8 @@ public final class RestXqModules {
           if(first.compareTo(rxf) != 0) break;
           tb.add(Prop.NL).add(rxf.function.info.toString());
         }
-        first.error(PATH_CONFLICT, first.path, tb);
+        if(first.path != null) first.error(PATH_CONFLICT, first.path, tb);
+        first.error(ERROR_CONFLICT, first.error, tb);
       }
     }
     // choose most specific function
@@ -86,7 +92,7 @@ public final class RestXqModules {
    * @param http http context
    * @throws QueryException query exception
    */
-  private void analyze(final HTTPContext http) throws QueryException {
+  private synchronized void cache(final HTTPContext http) throws QueryException {
     // initialize RESTXQ directory (may be relative against WEBPATH)
     if(restxq == null) {
       final File fl = new File(http.context().mprop.get(MainProp.RESTXQPATH));
@@ -95,23 +101,23 @@ public final class RestXqModules {
     }
     // create new cache
     final HashMap<String, RestXqModule> cache = new HashMap<String, RestXqModule>();
-    analyze(http, restxq, cache);
+    cache(http, restxq, cache);
     modules = cache;
   }
 
   /**
-   * Analyzes the specified path.
+   * Parses the specified path for RESTXQ modules and caches new entries.
    * @param root root path
    * @param http http context
    * @param cache cached modules
    * @throws QueryException query exception
    */
-  private void analyze(final HTTPContext http, final IOFile root,
+  private synchronized void cache(final HTTPContext http, final IOFile root,
       final HashMap<String, RestXqModule> cache) throws QueryException {
 
     for(final IOFile file : root.children()) {
       if(file.isDir()) {
-        analyze(http, file, cache);
+        cache(http, file, cache);
       } else if(file.path().endsWith(IO.XQMSUFFIX)) {
         // all files with .xqm suffix will be parsed for RESTXQ annotations
         final String path = file.path();
@@ -126,7 +132,7 @@ public final class RestXqModules {
           module = new RestXqModule(file);
         }
         // add module if it has been parsed, and if it contains annotations
-        if(parsed || module.analyze(http)) {
+        if(parsed || module.parse(http)) {
           module.touch();
           cache.put(path, module);
         }

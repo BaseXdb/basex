@@ -14,6 +14,8 @@ import org.basex.query.value.item.*;
  * @author Christian Gruen
  */
 public interface RestXqText {
+  /** Token "error". */
+  byte[] ERROR = token("error");
   /** Token "path". */
   byte[] PATH = token("path");
   /** Token "produces". */
@@ -28,6 +30,8 @@ public interface RestXqText {
   byte[] HEADER_PARAM = token("header-param");
   /** Token "cookie-param". */
   byte[] COOKIE_PARAM = token("cookie-param");
+  /** Token "query-param". */
+  byte[] ERROR_PARAM = token("error-param");
 
   /** Token "header". */
   byte[] HEADER = token("header");
@@ -54,19 +58,25 @@ public interface RestXqText {
   String XHTML_URL = "http://www.w3.org/1999/xhtml";
 
   /** Error message. */
-  String ANN_MISSING = "Annotation % is missing.";
+  String ANN_MISSING = "Annotation %% or %% missing.";
   /** Error message. */
   String ANN_TWICE = "Annotation %% is specified more than once.";
   /** Error message. */
   String ANN_UNKNOWN = "Annotation %% is invalid or not supported.";
   /** Error message. */
-  String ANN_PARAMS = "Annotation %% requires at least % parameter(s).";
+  String ANN_ATLEAST = "Annotation %% requires at least % parameter(s).";
+  /** Error message. */
+  String ANN_EXACTLY = "Annotation %% requires exactly % parameter(s).";
   /** Error message. */
   String ANN_STRING = "Single string expected for %%, found: %.";
   /** Error message. */
   String INV_TEMPLATE = "Invalid path template: \"%\".";
   /** Error message. */
   String INV_VARNAME = "Invalid variable name: $%.";
+  /** Error message. */
+  String INV_CODE = "Invalid error code: '%'.";
+  /** Error message. */
+  String INV_NONS = "No namespace declared for '%'.";
   /** Error message. */
   String INV_VARTYPE = "Variable $% must inherit from %.";
   /** Error message. */
@@ -87,6 +97,8 @@ public interface RestXqText {
   String INPUT_CONV = "Input could not be converted: %";
   /** Error message. */
   String PATH_CONFLICT = "Several functions assigned to path \"%\":%";
+  /** Error message. */
+  String ERROR_CONFLICT = "Several functions assigned to error \"%\":%";
   /** Error message. */
   String NO_VALUE = "'%' element has no string value.";
 

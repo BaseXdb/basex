@@ -1,6 +1,7 @@
 package org.basex.http.restxq;
 
 import org.basex.http.*;
+import org.basex.query.*;
 
 /**
  * <p>This servlet receives and processes REST requests.
@@ -23,9 +24,16 @@ public final class RestXqServlet extends BaseXServlet {
     // analyze input path
     final RestXqModules rxm = RestXqModules.get();
     // select XQuery function
-    final RestXqFunction func = rxm.find(http);
+    RestXqFunction func = rxm.find(http, null);
     if(func == null) HTTPErr.NO_XQUERY.thrw();
-    // process function
-    func.process(http);
+    try {
+      // process function that matches the current request
+      func.process(http, null);
+    } catch(final QueryException ex) {
+      // process optional error function
+      func = rxm.find(http, ex.qname());
+      if(func == null) throw ex;
+      func.process(http, ex);
+    }
   }
 }

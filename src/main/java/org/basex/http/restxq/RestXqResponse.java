@@ -24,20 +24,25 @@ final class RestXqResponse {
   /** Function to be evaluated. */
   private final RestXqFunction function;
   /** Query context. */
-  private final QueryContext qc;
+  private final QueryContext query;
   /** HTTP context. */
   private final HTTPContext http;
+  /** Optional query error. */
+  private final QueryException error;
 
   /**
    * Constructor.
    * @param rxf function to be evaluated
    * @param ctx query context
    * @param hc HTTP context
+   * @param err optional query error
    */
-  RestXqResponse(final RestXqFunction rxf, final QueryContext ctx, final HTTPContext hc) {
+  RestXqResponse(final RestXqFunction rxf, final QueryContext ctx, final HTTPContext hc,
+      final QueryException err) {
     function = rxf;
-    qc = ctx;
+    query = ctx;
     http = hc;
+    error = err;
   }
 
   /**
@@ -52,20 +57,20 @@ final class RestXqResponse {
       // bind variables
       final StaticFunc uf = function.function;
       final Expr[] args = new Expr[uf.args.length];
-      function.bind(http, args);
+      function.bind(http, args, error);
 
       // wrap function with a function call
       final StaticFuncCall sfc = new BaseFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
       final MainModule mod = new MainModule(sfc, new VarScope(), null);
 
       // assign main module and http context and register process
-      qc.mainModule(mod);
-      qc.context(http, null);
-      qc.context.register(qc);
+      query.mainModule(mod);
+      query.context(http, null);
+      query.context.register(query);
 
       // compile and evaluate query
-      qc.compile();
-      final Iter iter = qc.iter();
+      query.compile();
+      final Iter iter = query.iter();
       Item item = iter.next();
 
       // handle response element
@@ -104,8 +109,8 @@ final class RestXqResponse {
       ser.close();
 
     } finally {
-      qc.close();
-      qc.context.unregister(qc);
+      query.close();
+      query.context.unregister(query);
 
       if(redirect != null) {
         http.res.sendRedirect(redirect);

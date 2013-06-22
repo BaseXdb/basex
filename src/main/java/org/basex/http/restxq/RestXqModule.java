@@ -35,22 +35,22 @@ final class RestXqModule {
   }
 
   /**
-   * Checks the module for RESTFful annotations.
+   * Checks the module for RESTXQ annotations.
    * @param http http context
    * @return {@code true} if module contains relevant annotations
    * @throws QueryException query exception
    */
-  boolean analyze(final HTTPContext http) throws QueryException {
+  boolean parse(final HTTPContext http) throws QueryException {
     functions.clear();
 
     // loop through all functions
-    final QueryContext qc = parse(http);
+    final QueryContext qc = parseModule(http);
     try {
       for(final StaticFunc uf : qc.funcs.funcs()) {
         // consider only functions that are defined in this module
         if(!file.name().equals(new IOFile(uf.info.file()).name())) continue;
         final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-        if(rxf.analyze()) functions.add(rxf);
+        if(rxf.parse()) functions.add(rxf);
       }
     } finally {
       qc.close();
@@ -82,25 +82,17 @@ final class RestXqModule {
   }
 
   /**
-   * Adds functions that match the current request.
-   * @param http http context
-   * @param list list of functions
-   */
-  void add(final HTTPContext http, final ArrayList<RestXqFunction> list) {
-    for(final RestXqFunction rxf : functions) {
-      if(rxf.matches(http)) list.add(rxf);
-    }
-  }
-
-  /**
    * Processes the HTTP request.
    * @param http HTTP context
    * @param func function to be processed
+   * @param error optional error reference
    * @throws Exception exception
    */
-  void process(final HTTPContext http, final RestXqFunction func) throws Exception {
+  void process(final HTTPContext http, final RestXqFunction func,
+      final QueryException error) throws Exception {
+
     // create new XQuery instance
-    final QueryContext qc = parse(http);
+    final QueryContext qc = parseModule(http);
     try {
       // loop through all functions
       for(final StaticFunc uf : qc.funcs.funcs()) {
@@ -108,8 +100,8 @@ final class RestXqModule {
         if(func.function.info.equals(uf.info)) {
           // find and evaluate relevant function
           final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-          rxf.analyze();
-          new RestXqResponse(rxf, qc, http).create();
+          rxf.parse();
+          new RestXqResponse(rxf, qc, http, error).create();
           break;
         }
       }
@@ -126,7 +118,7 @@ final class RestXqModule {
    * @return query context
    * @throws QueryException query exception
    */
-  private QueryContext parse(final HTTPContext http) throws QueryException {
+  private QueryContext parseModule(final HTTPContext http) throws QueryException {
     final QueryContext qc = new QueryContext(http.context());
     try {
       qc.parseLibrary(string(file.read()), file.path());
