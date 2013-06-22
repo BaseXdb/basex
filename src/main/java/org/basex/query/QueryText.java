@@ -428,20 +428,21 @@ public interface QueryText {
   byte[] ID = token("id");
   /** IDRef token. */
   byte[] IDREF = token("idref");
+
   /** Error token. */
-  byte[] ECODE = token("code");
+  byte[] E_CODE = token("code");
   /** Error token. */
-  byte[] EVALUE = token("value");
+  byte[] E_DESCRIPTION = token("description");
   /** Error token. */
-  byte[] EDESC = token("description");
+  byte[] E_VALUE = token("value");
   /** Error token. */
-  byte[] EMODULE = token("module");
+  byte[] E_MODULE = token("module");
   /** Error token. */
-  byte[] ELINENUM = token("line-number");
+  byte[] E_LINE_NUMBER = token("line-number");
   /** Error token. */
-  byte[] ECOLNUM = token("column-number");
+  byte[] E_COLUM_NUMBER = token("column-number");
   /** Error token. */
-  byte[] EADD = token("additional");
+  byte[] E_ADDITIONAL = token("additional");
 
   /** Error prefix. */
   byte[] ERR = token("err");

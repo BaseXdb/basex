@@ -26,9 +26,9 @@ public final class Ann extends ElementList {
   public static final QNm Q_UPDATING = new QNm(QueryText.UPDATING, XQURI);
 
   /** Supported REST annotations. */
-  private static final byte[][] ANN_REST = tokens("path", "produces", "consumes",
-      "query-param", "form-param", "header-param", "cookie-param", "GET", "POST", "PUT",
-      "DELETE", "HEAD", "OPTIONS");
+  private static final byte[][] ANN_REST = tokens("error", "path", "produces", "consumes",
+      "query-param", "form-param", "header-param", "cookie-param", "error-param",
+      "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS");
   /** Supported UNIT annotations. */
   private static final byte[][] ANN_UNIT = tokens("test", "ignore", "before", "after",
       "before-module", "after-module", "expected");
@@ -163,14 +163,14 @@ public final class Ann extends ElementList {
       } else if(NSGlobal.reserved(name.uri())) {
         // no global namespaces allowed
         ANNRES.thrw(infos[a], '%', name.string());
-      } else if(eq(uri, RESTURI)) {
-        if(!eq(local, ANN_REST)) BASX_ANNOT.thrw(infos[a], '%', name.string());
       } else if(eq(uri, OUTPUTURI)) {
         if(Serializer.PROPS.get(string(local)) == null)
           BASX_ANNOT.thrw(infos[a], '%', name.string());
         if(values[a].size() != 1 || !values[a].itemAt(0).type.isStringOrUntyped()) {
           BASX_ANNOTARGS.thrw(infos[a], '%', name.string());
         }
+      } else if(eq(uri, RESTURI)) {
+        if(!eq(local, ANN_REST)) BASX_ANNOT.thrw(infos[a], '%', name.string());
       } else if(eq(uri, UNITURI)) {
         if(!eq(local, ANN_UNIT)) BASX_ANNOT.thrw(infos[a], '%', name.string());
       }

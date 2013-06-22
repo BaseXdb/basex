@@ -26,18 +26,18 @@ public final class Catch extends Single {
   public static final byte[] WILDCARD = token("*");
 
   /** Error QNames. */
-  private static final QNm[] QNM = {
-    create(ECODE), create(EDESC), create(EVALUE), create(EMODULE),
-    create(ELINENUM), create(ECOLNUM), create(EADD)
+  public static final QNm[] NAMES = {
+    create(E_CODE), create(E_DESCRIPTION), create(E_VALUE), create(E_MODULE),
+    create(E_LINE_NUMBER), create(E_COLUM_NUMBER), create(E_ADDITIONAL)
   };
   /** Error types. */
-  private static final SeqType[] TYPES = {
+  public static final SeqType[] TYPES = {
     SeqType.QNM, SeqType.STR_ZO, SeqType.ITEM_ZM, SeqType.STR_ZO,
     SeqType.ITR_ZO, SeqType.ITR_ZO, SeqType.ITEM_ZM
   };
 
   /** Error variables. */
-  private final Var[] vars = new Var[QNM.length];
+  private final Var[] vars = new Var[NAMES.length];
   /** Supported codes. */
   private final NameTest[] codes;
 
@@ -52,8 +52,8 @@ public final class Catch extends Single {
       final VarScope scp) {
     super(ii, null);
     codes = c;
-    for(int i = 0; i < QNM.length; i++)
-      vars[i] = scp.newLocal(ctx, QNM[i], TYPES[i], false);
+    for(int i = 0; i < NAMES.length; i++)
+      vars[i] = scp.newLocal(ctx, NAMES[i], TYPES[i], false);
   }
 
   @Override
@@ -118,20 +118,30 @@ public final class Catch extends Single {
    */
   protected Expr asExpr(final QueryException ex, final QueryContext ctx,
       final VarScope scp) throws QueryException {
+
     if(expr.isValue()) return expr;
     int i = 0;
-    final byte[] io = ex.file() == null ? EMPTY : token(ex.file());
-    final Value val = ex.value();
     Expr e = expr;
-    for(final Value v : new Value[] { ex.qname(),
-        Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
-        Str.get(io), Int.get(ex.line()), Int.get(ex.col()),
-        Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) }) {
+    for(final Value v : values(ex)) {
       final Expr e2 = e.inline(ctx, scp, vars[i++], v);
       if(e2 != null) e = e2;
       if(e.isValue()) break;
     }
     return e;
+  }
+
+  /**
+   * Returns all error values.
+   * @param ex exception
+   * @return values
+   */
+  public static Value[] values(final QueryException ex) {
+    final byte[] io = ex.file() == null ? EMPTY : token(ex.file());
+    final Value val = ex.value();
+    return new Value[] { ex.qname(),
+        Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
+        Str.get(io), Int.get(ex.line()), Int.get(ex.col()),
+        Str.get(ex.getMessage().replaceAll("\r\n?", "\n")) };
   }
 
   /**

@@ -627,7 +627,7 @@ public final class QueryContext extends Proc {
 
     // convert to the specified type
     final QNm nm = new QNm(token(type.replaceAll("\\(.*?\\)$", "")), this);
-    if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm);
+    if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm.string());
 
     Type t = null;
     if(type.endsWith(")")) {

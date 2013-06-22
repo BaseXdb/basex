@@ -3610,9 +3610,10 @@ public class QueryParser extends InputParser {
       }
       pos = i;
     }
+
+    // parse QName
     final byte[] nm = qName(err);
     if(nm.length == 0) return null;
-
     if(def == SKIPCHECK) return new QNm(nm);
 
     // create new EQName and set namespace
@@ -4003,7 +4004,7 @@ public class QueryParser extends InputParser {
 
       if(name.hasPrefix()) {
         name.uri(ctx.sc.ns.uri(name.prefix()));
-        if(check && !name.hasURI()) error(NOURI, name);
+        if(check && !name.hasURI()) error(NOURI, name.string());
       } else if(nsElem) {
         name.uri(ctx.sc.nsElem);
       }
