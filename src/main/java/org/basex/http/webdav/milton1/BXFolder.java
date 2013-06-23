@@ -61,7 +61,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     return new BXCode<Boolean>(this) {
       @Override
       public Boolean get() throws IOException {
-        return service.conflictingLocks(meta.db, meta.path);
+        return service.locking.conflictingLocks(meta.db, meta.path);
       }
     }.evalNoEx();
   }

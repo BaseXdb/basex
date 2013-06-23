@@ -176,7 +176,7 @@ public abstract class BXAbstractResource implements
     new BXCode<Object>(this) {
       @Override
       public void run() throws IOException {
-        service.unlock(tokenId);
+        service.locking.unlock(tokenId);
       }
     }.evalNoEx();
   }
@@ -266,7 +266,7 @@ public abstract class BXAbstractResource implements
   LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo) throws
     IOException {
 
-    final String tokenId = service.lock(meta.db, meta.path,
+    final String tokenId = service.locking.lock(meta.db, meta.path,
       lockInfo.scope.name().toLowerCase(),
       lockInfo.type.name().toLowerCase(),
       lockInfo.depth.name().toLowerCase(),
@@ -283,7 +283,7 @@ public abstract class BXAbstractResource implements
    * @throws IOException I/O exception
    */
   LockToken getCurrentActiveLock() throws IOException {
-    final String lockInfoStr = service.lock(meta.db, meta.path);
+    final String lockInfoStr = service.locking.lock(meta.db, meta.path);
     return lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
   }
 
@@ -294,8 +294,8 @@ public abstract class BXAbstractResource implements
    * @throws IOException I/O exception
    */
   LockResult refresh(final String token) throws IOException {
-    service.refreshLock(token);
-    final String lockInfoStr = service.lock(token);
+    service.locking.refreshLock(token);
+    final String lockInfoStr = service.locking.lock(token);
     LockToken lockToken = lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
     // TODO failed(failureReason);
     return success(lockToken);

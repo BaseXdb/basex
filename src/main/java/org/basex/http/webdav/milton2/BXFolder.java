@@ -65,7 +65,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   @Override
   public boolean isLockedOutRecursive(final Request request) {
     try {
-      return service.conflictingLocks(meta.db, meta.path);
+      return service.locking.conflictingLocks(meta.db, meta.path);
     } catch(IOException e) {
       Util.errln(e);
       return false;

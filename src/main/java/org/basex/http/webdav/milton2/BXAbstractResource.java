@@ -139,7 +139,7 @@ public abstract class BXAbstractResource implements
   public LockResult lock(final LockTimeout timeout, final LockInfo lockInfo) throws
     NotAuthorizedException, PreConditionFailedException, LockedException {
     try {
-      final String tokenId = service.lock(meta.db, meta.path,
+      final String tokenId = service.locking.lock(meta.db, meta.path,
         lockInfo.scope.name().toLowerCase(),
         lockInfo.type.name().toLowerCase(),
         lockInfo.depth.name().toLowerCase(),
@@ -180,7 +180,7 @@ public abstract class BXAbstractResource implements
   public void unlock(final String tokenId) throws NotAuthorizedException,
     PreConditionFailedException {
     try {
-      service.unlock(tokenId);
+      service.locking.unlock(tokenId);
     } catch(IOException e) {
       throw new PreConditionFailedException(this);
     }
@@ -266,7 +266,7 @@ public abstract class BXAbstractResource implements
    * @throws IOException I/O exception
    */
   LockToken getCurrentActiveLock() throws IOException {
-    final String lockInfoStr = service.lock(meta.db, meta.path);
+    final String lockInfoStr = service.locking.lock(meta.db, meta.path);
     return lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
   }
 
@@ -277,8 +277,8 @@ public abstract class BXAbstractResource implements
    * @throws IOException I/O exception
    */
   LockResult refresh(final String token) throws IOException {
-    service.refreshLock(token);
-    final String lockInfoStr = service.lock(token);
+    service.locking.refreshLock(token);
+    final String lockInfoStr = service.locking.lock(token);
     LockToken lockToken = lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
     // TODO failed(failureReason);
     return success(lockToken);
