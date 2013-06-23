@@ -1,18 +1,13 @@
 package org.basex.http.webdav.impl;
 
-import static org.basex.io.MimeTypes.*;
-import static org.basex.http.webdav.impl.Utils.*;
-import static org.basex.query.func.Function.*;
-
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Set;
 import org.basex.http.HTTPContext;
 import org.basex.io.in.ArrayInput;
 import org.basex.io.in.BufferInput;
-import org.basex.server.Session;
 import org.basex.server.Query;
+import org.basex.server.Session;
 import org.basex.util.DateTime;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -20,8 +15,14 @@ import org.basex.util.Util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
+
+import static org.basex.http.webdav.impl.Utils.*;
+import static org.basex.io.MimeTypes.APP_XML;
+import static org.basex.query.func.Function.*;
 
 /**
  * Service handling the various WebDAV operations.
@@ -132,7 +133,7 @@ public class WebDAVService<T> {
    * @return resource meta data
    * @throws IOException I/O exception
    */
-  public ResourceMetaData metaData(final String db, final String p) throws IOException {
+  ResourceMetaData metaData(final String db, final String p) throws IOException {
     final Query q = http.session().query(
         "let $a := " + _DB_LIST_DETAILS.args("$d", "$p") +
         "return (" +

@@ -183,7 +183,7 @@ public final class BXServletRequest extends AbstractRequest {
    * @param map parsed key-values will be stored here
    * @param qs query string
    */
-  public static void parseQueryString(final Map<String, String> map, final String qs) {
+  private static void parseQueryString(final Map<String, String> map, final String qs) {
     if(qs == null) return;
     for(final String nv : qs.split("&")) {
       final String[] parts = nv.split("=");
@@ -237,16 +237,16 @@ public final class BXServletRequest extends AbstractRequest {
  */
 class FileItemWrapper implements com.bradmcevoy.http.FileItem {
   /** Wrapped file item. */
-  final FileItem wrapped;
+  private final FileItem wrapped;
   /** File name. */
-  final String name;
+  private final String name;
 
   /**
    * Strip path information provided by IE.
    * @param s string
    * @return stripped string
    */
-  public static String fixIEFileName(final String s) {
+  private static String fixIEFileName(final String s) {
     final int pos = s.lastIndexOf('\\');
     return pos < 0 ? s : s.substring(pos + 1);
   }
