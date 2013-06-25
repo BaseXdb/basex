@@ -1184,7 +1184,7 @@ public enum Err {
     /** FORX Error type. */ FORX,
     /** FOTY Error type. */ FOTY,
     /** FOUP Error type. */ FOUP,
-    /** FOFD Error type. */ FOUT,
+    /** FOUT Error type. */ FOUT,
     /** FTDY Error type. */ FTDY,
     /** FTST Error type. */ FTST,
     /** SENR Error type. */ SENR,
