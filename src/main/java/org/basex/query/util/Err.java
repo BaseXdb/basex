@@ -862,7 +862,7 @@ public enum Err {
   /** XQDY0054. */
   CIRCVAR30(XQDY, 54, "Global variable depends on itself: %"),
   /** XQDY0054. */
-  CIRCCTX(XQDY, 54, "Circular declaration of context item."),
+  CIRCCTX(XQDY, 54, "Context item is not defined."),
   /** XQDY0064. */
   CPIXML(XQDY, 64, "Processing instruction has illegal name: '%'."),
   /** XQDY0072. */

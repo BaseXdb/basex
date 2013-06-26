@@ -12,6 +12,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -29,12 +30,23 @@ public class MainModule extends StaticScope {
    * @param rt root expression
    * @param scp variable scope
    * @param xqdoc documentation
+   */
+  public MainModule(final Expr rt, final VarScope scp, final String xqdoc) {
+    this(rt, scp, null, xqdoc, null);
+  }
+
+  /**
+   * Constructor.
+   * @param rt root expression
+   * @param scp variable scope
+   * @param xqdoc documentation
    * @param type optional type
+   * @param ii input info
    */
   public MainModule(final Expr rt, final VarScope scp, final SeqType type,
-      final String xqdoc) {
+      final String xqdoc, final InputInfo ii) {
 
-    super(scp, xqdoc, null);
+    super(scp, xqdoc, ii);
     expr = rt;
     declType = type;
   }

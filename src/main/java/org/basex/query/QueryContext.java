@@ -362,7 +362,7 @@ public final class QueryContext extends Proc {
     if(val.getClass().getName().equals("org.basex.http.HTTPContext")) {
       http = val;
     } else {
-      ctxItem = new MainModule(cast(val, type), new VarScope(), null, null);
+      ctxItem = new MainModule(cast(val, type), new VarScope(), null);
     }
   }
 

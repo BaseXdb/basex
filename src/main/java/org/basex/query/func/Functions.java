@@ -204,12 +204,7 @@ public final class Functions extends TokenSet {
     final StandardFunc fun = Functions.get().get(name, args, ii);
     if(fun != null) {
       if(!ctx.sc.xquery3() && fun.has(Flag.X30)) FUNC30.thrw(ii);
-      for(final Function f : Function.UPDATING) {
-        if(fun.sig == f) {
-          ctx.updating(true);
-          break;
-        }
-      }
+      if(fun.has(Flag.UPD)) ctx.updating(true);
       // [LW] correct annotations
       return new TypedFunc(fun, new Ann(), fun.sig.type(args.length));
     }
