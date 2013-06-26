@@ -35,9 +35,10 @@ public abstract class Serializer {
   /** Declare namespaces flag. */
   protected boolean undecl;
   /** Currently available namespaces. */
-  protected final Atts ns = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
+  protected final Atts nspaces = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
   /** Namespace stack. */
-  private final IntList nsl = new IntList();
+  private final IntList nstack = new IntList();
+
   /** Indicates if an element has not been completely opened yet. */
   private boolean opening;
 
@@ -100,7 +101,7 @@ public abstract class Serializer {
    * @param node node to be serialized
    * @throws IOException I/O exception
    */
-  public final void serialize(final ANode node) throws IOException {
+  private void serialize(final ANode node) throws IOException {
     if(node instanceof DBNode) {
       serialize((DBNode) node);
     } else {
@@ -120,15 +121,23 @@ public abstract class Serializer {
         for(final ANode n : node.children()) serialize(n);
         closeDoc();
       } else {
-        startElement(node.name());
+        final QNm name = node.qname();
+        startElement(name.string());
 
-        // serialize namespaces
+        // serialize declared namespaces
         final Atts nsp = node.namespaces();
         for(int p = nsp.size() - 1; p >= 0; p--) {
           namespace(nsp.name(p), nsp.value(p));
         }
+
+        // add new or updated namespace
+        final byte[] pref = name.prefix();
+        final byte[] uri = name.uri();
+        final byte[] old = nsUri(pref);
+        if(old == null || !eq(old, uri)) namespace(pref, uri);
+
         // serialize attributes
-        AxisIter ai = node.attributes();
+        AxisMoreIter ai = node.attributes();
         for(ANode n; (n = ai.next()) != null;) attribute(n.name(), n.string());
         // serialize children
         ai = node.children();
@@ -167,7 +176,7 @@ public abstract class Serializer {
    */
   protected final void startElement(final byte[] name) throws IOException {
     finishElement();
-    nsl.push(ns.size());
+    nstack.push(nspaces.size());
     opening = true;
     elem = name;
     startOpen(name);
@@ -178,7 +187,7 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   protected final void closeElement() throws IOException {
-    ns.size(nsl.pop());
+    nspaces.size(nstack.pop());
     if(opening) {
       finishEmpty();
       opening = false;
@@ -199,6 +208,18 @@ public abstract class Serializer {
   protected void finishText(final byte[] value, final FTPos ftp) throws IOException {
     text(value);
   }
+  /**
+   * Gets the namespace URI currently bound by the given prefix.
+   * @param pref namespace prefix
+   * @return URI if found, {@code null} otherwise
+   */
+  protected final byte[] nsUri(final byte[] pref) {
+    for(int n = nspaces.size() - 1; n >= 0; n--) {
+      if(eq(nspaces.name(n), pref)) return nspaces.value(n);
+    }
+    return null;
+  }
+
 
   /**
    * Serializes a namespace if it has not been serialized by an ancestor yet.
@@ -208,10 +229,10 @@ public abstract class Serializer {
    */
   protected void namespace(final byte[] pref, final byte[] uri) throws IOException {
     if(!undecl && pref.length != 0 && uri.length == 0) return;
-    final byte[] u = ns(pref);
+    final byte[] u = nsUri(pref);
     if(u == null || !eq(u, uri)) {
       attribute(pref.length == 0 ? XMLNS : concat(XMLNSC, pref), uri);
-      ns.add(pref, uri);
+      nspaces.add(pref, uri);
     }
   }
 
@@ -365,19 +386,18 @@ public abstract class Serializer {
           int pp = p;
 
           // check namespace of current element
-          byte[] key = prefix(name);
-          byte[] val = data.nspaces.uri(data.uri(p, k));
-          if(val == null) val = EMPTY;
-          // add new or updated namespace
-          final byte[] old = ns(key);
-          if(old == null || !eq(old, val)) namespace(key, val);
+          byte[] pref = prefix(name);
+          byte[] uri = data.nspaces.uri(data.uri(p, k));
+          if(uri == null) uri = EMPTY;
+          final byte[] old = nsUri(pref);
+          if(old == null || !eq(old, uri)) namespace(pref, uri);
 
           do {
-            final Atts atn = data.ns(pp);
-            for(int n = 0; n < atn.size(); ++n) {
-              key = atn.name(n);
-              val = atn.value(n);
-              if(nsp.add(key)) namespace(key, val);
+            final Atts ns = data.ns(pp);
+            for(int n = 0; n < ns.size(); ++n) {
+              pref = ns.name(n);
+              uri = ns.value(n);
+              if(nsp.add(pref)) namespace(pref, uri);
             }
             // check ancestors only on top level
             if(level != 0 || l != 0) break;
@@ -396,18 +416,6 @@ public abstract class Serializer {
     // process remaining elements...
     while(--l >= 0) closeElement();
     if(doc) closeDoc();
-  }
-
-  /**
-   * Gets the URI currently bound by the given prefix.
-   * @param pref namespace prefix
-   * @return URI if found, {@code null} otherwise
-   */
-  private byte[] ns(final byte[] pref) {
-    for(int i = ns.size() - 1; i >= 0; i--) {
-      if(eq(ns.name(i), pref)) return ns.value(i);
-    }
-    return null;
   }
 
   /**

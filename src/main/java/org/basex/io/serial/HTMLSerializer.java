@@ -117,14 +117,8 @@ public class HTMLSerializer extends OutputSerializer {
       if(EMPTIES5.contains(lc(elem))) return;
     } else {
       if(EMPTIES.contains(lc(elem))) {
-        boolean skip = true;
-        for(int i = ns.size() - 1; i >= 0; i--) {
-          if(ns.name(i).length == 0) {
-            skip = ns.value(i).length == 0;
-            break;
-          }
-        }
-        if(skip) return;
+        final byte[] u = nsUri(EMPTY);
+        if(u == null || u.length == 0) return;
       }
     }
     sep = false;
