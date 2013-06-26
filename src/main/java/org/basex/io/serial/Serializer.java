@@ -101,7 +101,7 @@ public abstract class Serializer {
    * @param node node to be serialized
    * @throws IOException I/O exception
    */
-  public void serialize(final ANode node) throws IOException {
+  public final void serialize(final ANode node) throws IOException {
     if(node instanceof DBNode) {
       serialize((DBNode) node);
     } else {
@@ -163,19 +163,15 @@ public abstract class Serializer {
 
   /**
    * Opens an element.
-   * @param name tag name
-   * @param atts attributes
+   * @param name element name
    * @throws IOException I/O exception
    */
-  protected final void startElement(final byte[] name, final byte[]... atts)
-      throws IOException {
-
+  protected final void startElement(final byte[] name) throws IOException {
     finishElement();
     nsl.push(ns.size());
     opening = true;
     elem = name;
     startOpen(name);
-    for(int i = 0; i < atts.length; i += 2) attribute(atts[i], atts[i + 1]);
   }
 
   /**
@@ -196,13 +192,13 @@ public abstract class Serializer {
 
   /**
    * Serializes a text.
-   * @param v value
+   * @param value value
    * @param ftp full-text positions, used for visualization highlighting
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void finishText(final byte[] v, final FTPos ftp) throws IOException {
-    text(v);
+  protected void finishText(final byte[] value, final FTPos ftp) throws IOException {
+    text(value);
   }
 
   /**
@@ -236,11 +232,11 @@ public abstract class Serializer {
 
   /**
    * Opens a document.
-   * @param n name
+   * @param name name
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void openDoc(final byte[] n) throws IOException { }
+  protected void openDoc(final byte[] name) throws IOException { }
 
   /**
    * Closes a document.
@@ -260,10 +256,10 @@ public abstract class Serializer {
 
   /**
    * Starts an element.
-   * @param n tag name
+   * @param name tag name
    * @throws IOException I/O exception
    */
-  protected abstract void startOpen(final byte[] n) throws IOException;
+  protected abstract void startOpen(final byte[] name) throws IOException;
 
   /**
    * Finishes an opening element node.
@@ -285,32 +281,33 @@ public abstract class Serializer {
 
   /**
    * Serializes a text.
-   * @param v value
+   * @param value value
    * @throws IOException I/O exception
    */
-  protected abstract void finishText(final byte[] v) throws IOException;
+  protected abstract void finishText(final byte[] value) throws IOException;
 
   /**
    * Serializes a comment.
-   * @param v value
+   * @param value value
    * @throws IOException I/O exception
    */
-  protected abstract void finishComment(final byte[] v) throws IOException;
+  protected abstract void finishComment(final byte[] value) throws IOException;
 
   /**
    * Serializes a processing instruction.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    * @throws IOException I/O exception
    */
-  protected abstract void finishPi(final byte[] n, final byte[] v) throws IOException;
+  protected abstract void finishPi(final byte[] name, final byte[] value)
+      throws IOException;
 
   /**
    * Serializes an atomic value.
-   * @param i item
+   * @param item item
    * @throws IOException I/O exception
    */
-  protected abstract void atomic(final Item i) throws IOException;
+  protected abstract void atomic(final Item item) throws IOException;
 
   // PRIVATE METHODS ==========================================================
 

@@ -200,9 +200,9 @@ public class HTMLSerializer extends OutputSerializer {
     EMPTIES5.add("source");
     EMPTIES5.add("track");
     EMPTIES5.add("wbr");
-    EMPTIES.add("basefont");
-    EMPTIES.add("frame");
-    EMPTIES.add("isindex");
+    EMPTIES5.add("basefont");
+    EMPTIES5.add("frame");
+    EMPTIES5.add("isindex");
     // URI attributes
     URIS.add("a:href");
     URIS.add("a:name");

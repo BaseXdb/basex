@@ -158,13 +158,13 @@ public abstract class OutputSerializer extends Serializer {
       }
     }
 
-    // print document declaration
-    if(this instanceof XMLSerializer || this instanceof XHTMLSerializer) {
+    // collect CData elements
+    final boolean html = this instanceof HTMLSerializer;
+    if(this instanceof XMLSerializer || this instanceof XHTMLSerializer || html) {
       final String cdse = p.get(S_CDATA_SECTION_ELEMENTS);
-      if(!cdse.isEmpty()) {
-        for(final String c : cdse.split("\\s+")) {
-          if(!c.isEmpty()) cdata.add(c);
-        }
+      for(final String c : cdse.split("\\s+")) {
+        if(c.isEmpty()) continue;
+        if(!html || c.contains(":") && (!html5 || !c.contains("html:"))) cdata.add(c);
       }
 
       if(undecl && ver.equals(V10)) SERUNDECL.thrwSerial();
