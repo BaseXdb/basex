@@ -34,9 +34,8 @@ public abstract class Serializer {
   protected byte[] elem;
   /** Declare namespaces flag. */
   protected boolean undecl;
-
   /** Currently available namespaces. */
-  private final Atts ns = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
+  protected final Atts ns = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
   /** Namespace stack. */
   private final IntList nsl = new IntList();
   /** Indicates if an element has not been completely opened yet. */

@@ -171,17 +171,17 @@ public final class SAXSerializer extends Serializer implements XMLReader {
       final int as = attributes.size();
       for(int a = 0; a < as; a++) {
         final byte[] name = attributes.name(a);
-        final String ns = string(namespaces.get(prefix(name)));
+        final String uri = string(namespaces.get(prefix(name)));
         final String lname = string(local(name));
         final String rname = string(name);
         final String value = string(attributes.value(a));
-        attrs.addAttribute(ns, lname, rname, null, value);
+        attrs.addAttribute(uri, lname, rname, null, value);
       }
 
-      final String ns = string(namespaces.get(prefix(elem)));
+      final String uri = string(namespaces.get(prefix(elem)));
       final String lname = string(local(elem));
       final String rname = string(elem);
-      contentHandler.startElement(ns, lname, rname, attrs);
+      contentHandler.startElement(uri, lname, rname, attrs);
 
     } catch(final SAXException ex) {
       throw new IOException(ex);

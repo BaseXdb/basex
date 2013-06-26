@@ -113,7 +113,20 @@ public class HTMLSerializer extends OutputSerializer {
   protected void finishEmpty() throws IOException {
     if(ct(true, true)) return;
     print(ELEM_C);
-    if((html5 ? EMPTIES5 : EMPTIES).contains(lc(elem))) return;
+    if(html5) {
+      if(EMPTIES5.contains(lc(elem))) return;
+    } else {
+      if(EMPTIES.contains(lc(elem))) {
+        boolean skip = true;
+        for(int i = ns.size() - 1; i >= 0; i--) {
+          if(ns.name(i).length == 0) {
+            skip = ns.value(i).length == 0;
+            break;
+          }
+        }
+        if(skip) return;
+      }
+    }
     sep = false;
     finishClose();
   }
