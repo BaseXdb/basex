@@ -33,8 +33,8 @@ final class QT3Env {
   /** Collations: uri, default. */
   final HashMap<String, String> collations;
   /** Decimal Formats: decimal-separator, grouping-separator,
-  digit, pattern-separator, infinity, NaN, per-mille,
-  minus-sign, name, percent, zero-digit. */
+      digit, pattern-separator, infinity, NaN, per-mille,
+      minus-sign, name, percent, zero-digit. */
   final HashMap<QName, HashMap<String, String>> decFormats;
   /** Static Base URI: uri. */
   final String baseURI;
@@ -43,6 +43,8 @@ final class QT3Env {
 
   /** Collection uri. */
   final String collURI;
+  /** Initial context item. */
+  final XdmValue context;
   /** Collection context flag. */
   final boolean collContext;
   /** Collection sources. */
@@ -90,6 +92,9 @@ final class QT3Env {
         hm.put(it2.getName().getLocalPart(), it2.getString());
       }
     }
+
+    final String c = XQuery.string("*:context-item/@select", env, ctx);
+    context = c.isEmpty() ? null : new XQuery(c, ctx).value();
   }
 
   /**

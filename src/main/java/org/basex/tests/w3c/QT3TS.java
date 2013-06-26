@@ -316,6 +316,10 @@ public final class QT3TS {
         if(e.collContext) {
           query.context(Function.COLLECTION.get(Str.get(e.collURI)));
         }
+        // bind context item
+        if(e.context != null) {
+          query.context(e.context);
+        }
         // set base uri
         if(e.baseURI != null) query.baseURI(e.baseURI);
         // bind decimal formats
