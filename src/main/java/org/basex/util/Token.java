@@ -568,7 +568,7 @@ public final class Token {
     for(; t < end; ++t) {
       final byte c = token[t];
       if(c < '0' || c > '9') break;
-      if(v > MAXLONG) return Long.MIN_VALUE;
+      if(v >= MAXLONG && (c > '7' || v > MAXLONG)) return Long.MIN_VALUE;
       v = (v << 3) + (v << 1) + c - '0';
     }
     while(t < end && token[t] <= ' ') ++t;
@@ -614,7 +614,7 @@ public final class Token {
     for(; t < end; ++t) {
       final byte c = token[t];
       if(c < '0' || c > '9') break;
-      if(v > MAXINT) return Integer.MIN_VALUE;
+      if(v >= MAXINT && (c > '7' || v > MAXINT)) return Integer.MIN_VALUE;
       v = (v << 3) + (v << 1) + c - '0';
     }
     while(t < end && token[t] <= ' ') ++t;
