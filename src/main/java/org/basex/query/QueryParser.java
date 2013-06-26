@@ -849,7 +849,8 @@ public class QueryParser extends InputParser {
     else if(!wsConsumeWs(ASSIGN)) return;
     scope = new VarScope();
     final Expr e = check(single(), NOVARDECL);
-    ctx.ctxItem = new MainModule(e, scope, ctx.sc.initType, currDoc.toString(), info());
+    final SeqType type = ctx.sc.initType == null ? SeqType.ITEM : ctx.sc.initType;
+    ctx.ctxItem = new MainModule(e, scope, type, currDoc.toString(), info());
     scope = null;
     if(module != null) error(DECITEM);
     if(e.has(Flag.UPD)) error(UPCTX, e);
