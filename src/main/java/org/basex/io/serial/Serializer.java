@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This is an interface for serializing trees.
+ * This is an interface for serializing XQuery values.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -26,20 +26,22 @@ import org.basex.util.list.*;
 public abstract class Serializer {
   /** Default serialization parameters. */
   public static final SerializerProp PROPS = new SerializerProp();
-  /** Stack of opened tags. */
+
+  /** Stack with opened tag names. */
   protected final TokenList tags = new TokenList();
   /** Current level. */
   protected int level;
   /** Current tag. */
   protected byte[] elem;
-  /** Declare namespaces flag. */
-  protected boolean undecl;
-  /** Currently available namespaces. */
-  protected final Atts nspaces = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
-  /** Namespace stack. */
+  /** Undeclare prefixes. */
+  protected boolean undeclare;
+
+  /** Stack with currently available namespaces. */
+  private final Atts nspaces = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
+  /** Stack with namespace size pointers. */
   private final IntList nstack = new IntList();
 
-  /** Indicates if an element has not been completely opened yet. */
+  /** Indicates if an element is currently being opened. */
   private boolean opening;
 
   /**
@@ -108,8 +110,6 @@ public abstract class Serializer {
       final Type type = node.type;
       if(type == NodeType.COM) {
         comment(node.string());
-      } else if(type == NodeType.ATT) {
-        attribute(node.name(), node.string());
       } else if(type == NodeType.TXT) {
         text(node.string());
       } else if(type == NodeType.PI) {
@@ -121,6 +121,7 @@ public abstract class Serializer {
         for(final ANode n : node.children()) serialize(n);
         closeDoc();
       } else {
+        // serialize elements (code will never be called for attributes)
         final QNm name = node.qname();
         startElement(name.string());
 
@@ -129,12 +130,8 @@ public abstract class Serializer {
         for(int p = nsp.size() - 1; p >= 0; p--) {
           namespace(nsp.name(p), nsp.value(p));
         }
-
         // add new or updated namespace
-        final byte[] pref = name.prefix();
-        final byte[] uri = name.uri();
-        final byte[] old = nsUri(pref);
-        if(old == null || !eq(old, uri)) namespace(pref, uri);
+        namespace(name.prefix(), name.uri());
 
         // serialize attributes
         AxisMoreIter ai = node.attributes();
@@ -228,7 +225,7 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   protected void namespace(final byte[] pref, final byte[] uri) throws IOException {
-    if(!undecl && pref.length != 0 && uri.length == 0) return;
+    if(!undeclare && pref.length != 0 && uri.length == 0) return;
     final byte[] u = nsUri(pref);
     if(u == null || !eq(u, uri)) {
       attribute(pref.length == 0 ? XMLNS : concat(XMLNSC, pref), uri);
@@ -386,18 +383,14 @@ public abstract class Serializer {
           int pp = p;
 
           // check namespace of current element
-          byte[] pref = prefix(name);
-          byte[] uri = data.nspaces.uri(data.uri(p, k));
-          if(uri == null) uri = EMPTY;
-          final byte[] old = nsUri(pref);
-          if(old == null || !eq(old, uri)) namespace(pref, uri);
+          final byte[] u = data.nspaces.uri(data.uri(p, k));
+          namespace(prefix(name), u == null ? EMPTY : u);
 
           do {
             final Atts ns = data.ns(pp);
             for(int n = 0; n < ns.size(); ++n) {
-              pref = ns.name(n);
-              uri = ns.value(n);
-              if(nsp.add(pref)) namespace(pref, uri);
+              final byte[] pref = ns.name(n);
+              if(nsp.add(pref)) namespace(pref, ns.value(n));
             }
             // check ancestors only on top level
             if(level != 0 || l != 0) break;

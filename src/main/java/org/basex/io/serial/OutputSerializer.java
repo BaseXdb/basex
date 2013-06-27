@@ -130,7 +130,7 @@ public abstract class OutputSerializer extends Serializer {
     media   = p.get(S_MEDIA_TYPE);
     escape  = p.yes(S_ESCAPE_URI_ATTRIBUTES);
     content = p.yes(S_INCLUDE_CONTENT_TYPE);
-    undecl  = p.yes(S_UNDECLARE_PREFIXES);
+    undeclare  = p.yes(S_UNDECLARE_PREFIXES);
     indent  = p.yes(S_INDENT) && format;
 
     if(!maps.isEmpty()) SERMAP.thrwSerial(maps);
@@ -168,7 +168,7 @@ public abstract class OutputSerializer extends Serializer {
         if(!html || c.contains(":") && (!html5 || !c.contains("html:"))) cdata.add(c);
       }
 
-      if(undecl && ver.equals(V10)) SERUNDECL.thrwSerial();
+      if(undeclare && ver.equals(V10)) SERUNDECL.thrwSerial();
       if(xml) {
         if(omitDecl) {
           if(!saomit || !ver.equals(V10) && docsys != null) SERSTAND.thrwSerial();
