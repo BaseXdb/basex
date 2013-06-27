@@ -97,7 +97,7 @@ public abstract class OutputSerializer extends Serializer {
     final String htmlver = p.supported(S_HTML_VERSION, V40, V401, V50);
     html5 = htmlver.equals(V50) || ver.equals(V50);
 
-    final boolean decl = !p.yes(S_OMIT_XML_DECLARATION);
+    final boolean omitDecl = p.yes(S_OMIT_XML_DECLARATION);
     final boolean bom  = p.yes(S_BYTE_ORDER_MARK);
     final String sa = p.check(S_STANDALONE, YES, NO, OMIT);
     saomit = sa.equals(OMIT);
@@ -160,7 +160,8 @@ public abstract class OutputSerializer extends Serializer {
 
     // collect CData elements
     final boolean html = this instanceof HTMLSerializer;
-    if(this instanceof XMLSerializer || this instanceof XHTMLSerializer || html) {
+    final boolean xml = this instanceof XMLSerializer || this instanceof XHTMLSerializer;
+    if(xml || html) {
       final String cdse = p.get(S_CDATA_SECTION_ELEMENTS);
       for(final String c : cdse.split("\\s+")) {
         if(c.isEmpty()) continue;
@@ -168,21 +169,23 @@ public abstract class OutputSerializer extends Serializer {
       }
 
       if(undecl && ver.equals(V10)) SERUNDECL.thrwSerial();
-      if(decl) {
-        print(PI_O);
-        print(DOCDECL1);
-        print(ver);
-        print(DOCDECL2);
-        print(p.get(S_ENCODING));
-        if(!saomit) {
-          print(DOCDECL3);
-          print(sa);
+      if(xml) {
+        if(omitDecl) {
+          if(!saomit || !ver.equals(V10) && docsys != null) SERSTAND.thrwSerial();
+        } else {
+          print(PI_O);
+          print(DOCDECL1);
+          print(ver);
+          print(DOCDECL2);
+          print(p.get(S_ENCODING));
+          if(!saomit) {
+            print(DOCDECL3);
+            print(sa);
+          }
+          print(ATT2);
+          print(PI_C);
+          sep = true;
         }
-        print(ATT2);
-        print(PI_C);
-        sep = true;
-      } else if(!saomit || !ver.equals(V10) && docsys != null) {
-        SERSTAND.thrwSerial();
       }
     }
 
