@@ -125,7 +125,7 @@ public class BufferInput extends InputStream {
    */
   public final String readString() throws IOException {
     final ByteList bl = new ByteList();
-    for(int l; (l = next()) > 0;) bl.add(l);
+    for(int l; (l = read()) > 0;) bl.add(l);
     return bl.toString();
   }
 
