@@ -2967,7 +2967,7 @@ public class QueryParser extends InputParser {
     wsCheck(PAR2);
     if(tp != null) return tp;
     tp = Test.get(t);
-    if(tp == Test.NSP && !ctx.sc.xquery3) error(NSNOTALL);
+    if(tp == Test.NSP) error(NSNOTALL);
     return tp;
   }
 

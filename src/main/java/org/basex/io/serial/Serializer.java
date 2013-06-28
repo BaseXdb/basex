@@ -34,7 +34,9 @@ public abstract class Serializer {
   /** Current tag. */
   protected byte[] elem;
   /** Undeclare prefixes. */
-  protected boolean undeclare;
+  protected boolean undecl;
+  /** Indentation flag. */
+  protected boolean indent;
 
   /** Stack with currently available namespaces. */
   private final Atts nspaces = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
@@ -96,52 +98,6 @@ public abstract class Serializer {
       atomic(item);
     }
     closeResult();
-  }
-
-  /**
-   * Serializes the specified node.
-   * @param node node to be serialized
-   * @throws IOException I/O exception
-   */
-  private void serialize(final ANode node) throws IOException {
-    if(node instanceof DBNode) {
-      serialize((DBNode) node);
-    } else {
-      final Type type = node.type;
-      if(type == NodeType.COM) {
-        comment(node.string());
-      } else if(type == NodeType.TXT) {
-        text(node.string());
-      } else if(type == NodeType.PI) {
-        pi(node.name(), node.string());
-      } else if(type == NodeType.NSP) {
-        namespace(node.name(), node.string());
-      } else if(type == NodeType.DOC) {
-        openDoc(node.baseURI());
-        for(final ANode n : node.children()) serialize(n);
-        closeDoc();
-      } else {
-        // serialize elements (code will never be called for attributes)
-        final QNm name = node.qname();
-        startElement(name.string());
-
-        // serialize declared namespaces
-        final Atts nsp = node.namespaces();
-        for(int p = nsp.size() - 1; p >= 0; p--) {
-          namespace(nsp.name(p), nsp.value(p));
-        }
-        // add new or updated namespace
-        namespace(name.prefix(), name.uri());
-
-        // serialize attributes
-        AxisMoreIter ai = node.attributes();
-        for(ANode n; (n = ai.next()) != null;) attribute(n.name(), n.string());
-        // serialize children
-        ai = node.children();
-        for(ANode n; (n = ai.next()) != null;) serialize(n);
-        closeElement();
-      }
-    }
   }
 
   /**
@@ -225,7 +181,7 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   protected void namespace(final byte[] pref, final byte[] uri) throws IOException {
-    if(!undeclare && pref.length != 0 && uri.length == 0) return;
+    if(!undecl && pref.length != 0 && uri.length == 0) return;
     final byte[] u = nsUri(pref);
     if(u == null || !eq(u, uri)) {
       attribute(pref.length == 0 ? XMLNS : concat(XMLNSC, pref), uri);
@@ -329,6 +285,59 @@ public abstract class Serializer {
   // PRIVATE METHODS ==========================================================
 
   /**
+   * Serializes the specified node.
+   * @param node node to be serialized
+   * @throws IOException I/O exception
+   */
+  private void serialize(final ANode node) throws IOException {
+    if(node instanceof DBNode) {
+      serialize((DBNode) node);
+    } else {
+      final Type type = node.type;
+      if(type == NodeType.COM) {
+        comment(node.string());
+      } else if(type == NodeType.TXT) {
+        text(node.string());
+      } else if(type == NodeType.PI) {
+        pi(node.name(), node.string());
+      } else if(type == NodeType.NSP) {
+        namespace(node.name(), node.string());
+      } else if(type == NodeType.DOC) {
+        openDoc(node.baseURI());
+        for(final ANode n : node.children()) serialize(n);
+        closeDoc();
+      } else {
+        // serialize elements (code will never be called for attributes)
+        final QNm name = node.qname();
+        startElement(name.string());
+
+        // serialize declared namespaces
+        final Atts nsp = node.namespaces();
+        for(int p = nsp.size() - 1; p >= 0; p--) {
+          namespace(nsp.name(p), nsp.value(p));
+        }
+        // add new or updated namespace
+        namespace(name.prefix(), name.uri());
+
+        // serialize attributes
+        final boolean i = indent;
+        AxisMoreIter ai = node.attributes();
+        for(ANode nd; (nd = ai.next()) != null;) {
+          final byte[] n = nd.name();
+          final byte[] v = nd.string();
+          attribute(n, v);
+          if(eq(n, XML_SPACE)) indent &= eq(v, DataText.DEFAULT);
+        }
+        // serialize children
+        ai = node.children();
+        for(ANode n; (n = ai.next()) != null;) serialize(n);
+        indent = i;
+        closeElement();
+      }
+    }
+  }
+
+  /**
    * Serializes a node of the specified data reference.
    * @param node database node
    * @throws IOException I/O exception
@@ -343,7 +352,7 @@ public abstract class Serializer {
     boolean doc = false;
     final TokenSet nsp = data.nspaces.size() != 0 ? new TokenSet() : null;
     final IntList pars = new IntList();
-    int l = 0;
+    final BoolList indt = new BoolList();
 
     // loop through all table entries
     final int s = p + data.size(p, k);
@@ -352,9 +361,10 @@ public abstract class Serializer {
       final int r = data.parent(p, k);
 
       // close opened elements...
-      while(l > 0 && pars.get(l - 1) >= r) {
+      while(!pars.isEmpty() && pars.peek() >= r) {
         closeElement();
-        --l;
+        indent = indt.pop();
+        pars.pop();
       }
 
       if(k == Data.DOC) {
@@ -367,8 +377,6 @@ public abstract class Serializer {
         else text(data.text(p++, true));
       } else if(k == Data.COMM) {
         comment(data.text(p++, true));
-      } else if(k == Data.ATTR) {
-        attribute(data.name(p, k), data.text(p++, false));
       } else if(k == Data.PI) {
         pi(data.name(p, k), data.atom(p++));
       } else {
@@ -393,21 +401,30 @@ public abstract class Serializer {
               if(nsp.add(pref)) namespace(pref, ns.value(n));
             }
             // check ancestors only on top level
-            if(level != 0 || l != 0) break;
+            if(level != 0) break;
 
             pp = data.parent(pp, data.kind(pp));
           } while(pp >= 0 && data.kind(pp) == Data.ELEM);
         }
 
         // serialize attributes
+        indt.push(indent);
         final int as = p + data.attSize(p, k);
-        while(++p != as) attribute(data.name(p, Data.ATTR), data.text(p, false));
-        pars.set(l++, r);
+        while(++p != as) {
+          final byte[] n = data.name(p, Data.ATTR);
+          final byte[] v = data.text(p, false);
+          attribute(n, v);
+          if(eq(n, XML_SPACE)) indent &= eq(v, DataText.DEFAULT);
+        }
+        pars.push(r);
       }
     }
 
     // process remaining elements...
-    while(--l >= 0) closeElement();
+    while(!pars.isEmpty()) {
+      closeElement();
+      pars.pop();
+    }
     if(doc) closeDoc();
   }
 

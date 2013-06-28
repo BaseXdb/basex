@@ -26,7 +26,7 @@ public final class ArrayInput extends BufferInput {
   }
 
   @Override
-  public int read() {
+  protected int readByte() {
     return bpos < bsize ? buffer[bpos++] & 0xFF : -1;
   }
 }

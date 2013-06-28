@@ -7,7 +7,7 @@ import java.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class serves as an efficient constructor for byte arrays.
+ * This class serves as an efficient constructor for {@link Token Tokens}.
  * It bears some resemblance to Java's {@link StringBuilder}.
  *
  * @author BaseX Team 2005-12, BSD License
