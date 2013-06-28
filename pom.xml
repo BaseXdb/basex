@@ -118,60 +118,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>io.milton</groupId>
-      <artifactId>milton-api</artifactId>
-      <version>2.4.2.4</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>slf4j-api</artifactId>
-          <groupId>org.slf4j</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>io.milton</groupId>
-      <artifactId>milton-server-ce</artifactId>
-      <version>2.4.2.4</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>slf4j-api</artifactId>
-          <groupId>org.slf4j</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>commons-logging</artifactId>
-          <groupId>commons-logging</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>milton-mail-api</artifactId>
-          <groupId>io.milton</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>milton-mail-server</artifactId>
-          <groupId>io.milton</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>ftplet-api</artifactId>
-          <groupId>org.apache.ftpserver</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>org.restlet</artifactId>
-          <groupId>org.restlet.jse</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>org.restlet.ext.fileupload</artifactId>
-          <groupId>org.restlet.jse</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>mina-core</artifactId>
-          <groupId>org.apache.mina</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>simple</artifactId>
-          <groupId>org.simpleframework</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
       <version>1.2.2</version>
