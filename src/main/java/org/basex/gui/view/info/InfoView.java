@@ -30,11 +30,9 @@ public final class InfoView extends View implements LinkListener {
   /** Old text. */
   private final TokenBuilder text = new TokenBuilder();
   /** Header label. */
-  private final BaseXLabel header;
+  private final BaseXLabel label;
   /** Timer label. */
   private final BaseXLabel timer;
-  /** North label. */
-  private final BaseXBack title;
   /** Text Area. */
   private final Editor area;
   /** Buttons. */
@@ -65,25 +63,26 @@ public final class InfoView extends View implements LinkListener {
    */
   public InfoView(final ViewNotifier man) {
     super(INFOVIEW, man);
-    border(6, 6, 6, 6).layout(new BorderLayout());
+    border(6, 6, 6, 6).layout(new BorderLayout(0, 4));
 
-    title = new BaseXBack(Fill.NONE).layout(new BorderLayout());
-    header = new BaseXLabel(QUERY_INFO);
-    title.add(header, BorderLayout.NORTH);
+    label = new BaseXLabel(QUERY_INFO);
+    label.setForeground(GUIConstants.GRAY);
+
     timer = new BaseXLabel(" ", true, false);
-    title.add(timer, BorderLayout.SOUTH);
+    timer.setForeground(GUIConstants.DGRAY);
 
     final BaseXButton srch = new BaseXButton(gui, "search", SEARCH);
     buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 1, 1, 0));
+    buttons.layout(new TableLayout(1, 2, 8, 0));
     buttons.add(srch);
+    buttons.add(timer);
 
-    final BaseXBack north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
-    north.add(buttons, BorderLayout.EAST);
-    north.add(title, BorderLayout.CENTER);
-    add(north, BorderLayout.NORTH);
+    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    b.add(buttons, BorderLayout.WEST);
+    b.add(label, BorderLayout.EAST);
+    add(b, BorderLayout.NORTH);
 
-    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
+    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     area = new Editor(false, gui);
     area.setLinkListener(this);
     search = new SearchEditor(gui, area).button(srch);
@@ -112,7 +111,7 @@ public final class InfoView extends View implements LinkListener {
 
   @Override
   public void refreshLayout() {
-    header.setFont(lfont);
+    label.setFont(lfont);
     timer.setFont(font);
     area.setFont(font);
     search.panel().refreshLayout();
@@ -307,9 +306,10 @@ public final class InfoView extends View implements LinkListener {
     final int l = stat.size();
     if(l == 0) return;
 
-    h = title.getHeight();
-    w = getWidth() - 10 - buttons.getWidth();
-    bw = gui.gprop.num(GUIProp.FONTSIZE) * 2 + w / 10;
+    int fs = gui.gprop.num(GUIProp.FONTSIZE);
+    h = label.getHeight() + 4;
+    w = (int) (getWidth() * .98 - fs / 2 - label.getWidth());
+    bw = fs * 2 + w / 10;
     bs = bw / (l - 1);
 
     // find maximum value
@@ -317,7 +317,7 @@ public final class InfoView extends View implements LinkListener {
     for(int i = 0; i < l - 1; ++i) m = Math.max(m, stat.get(i));
 
     // draw focused bar
-    final int by = 10;
+    final int by = 8;
     final int bh = h - by;
 
     for(int i = 0; i < l - 1; ++i) {

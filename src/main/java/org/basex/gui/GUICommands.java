@@ -28,7 +28,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public enum GUICommands implements GUICommand {
+public enum GUICommands implements GUICmd {
 
   /* DATABASE MENU */
 

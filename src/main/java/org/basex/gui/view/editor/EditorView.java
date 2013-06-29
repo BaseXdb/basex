@@ -80,7 +80,7 @@ public final class EditorView extends View {
   private int errPos;
 
   /** Header string. */
-  private final BaseXLabel header;
+  private final BaseXLabel label;
   /** Filter button. */
   private final BaseXButton filter;
 
@@ -90,10 +90,10 @@ public final class EditorView extends View {
    */
   public EditorView(final ViewNotifier man) {
     super(EDITORVIEW, man);
+    border(6, 6, 6, 6).layout(new BorderLayout());
 
-    border(6, 6, 6, 6).layout(new BorderLayout(0, 2)).setFocusable(false);
-
-    header = new BaseXLabel(EDITOR, true, false);
+    label = new BaseXLabel(EDITOR, true, false);
+    label.setForeground(GUIConstants.GRAY);
 
     final BaseXButton srch = new BaseXButton(gui, "search", H_REPLACE);
     final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
@@ -102,18 +102,17 @@ public final class EditorView extends View {
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 4, 1, 0));
-    buttons.add(srch);
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(hist);
+    buttons.add(srch);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout(8, 0));
-    b.add(header, BorderLayout.CENTER);
-    b.add(buttons, BorderLayout.EAST);
+    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    b.add(buttons, BorderLayout.WEST);
+    b.add(label, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     tabs = new BaseXTabs(gui);
-    tabs.setFocusable(false);
     final SearchEditor se = new SearchEditor(gui, tabs, null).button(srch);
     search = se.panel();
     addCreateTab();
@@ -276,7 +275,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshLayout() {
-    header.setFont(GUIConstants.lfont);
+    label.setFont(GUIConstants.lfont);
     for(final EditorArea edit : editors()) edit.setFont(GUIConstants.mfont);
     search.refreshLayout();
   }

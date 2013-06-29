@@ -54,8 +54,8 @@ public final class GUIMenu extends JMenuBar {
       final StringBuilder mnem = new StringBuilder();
       for(int i = 0; i < MENUITEMS[b].length; ++i) {
         // add a separator
-        final GUICommand cmd = MENUITEMS[b][i];
-        if(cmd == GUICommand.EMPTY) {
+        final GUICmd cmd = MENUITEMS[b][i];
+        if(cmd == GUIBaseCmd.SEPARATOR) {
           menu.addSeparator();
         } else if(cmd != null) {
           // add a menu entry
@@ -82,7 +82,7 @@ public final class GUIMenu extends JMenuBar {
    * @param mnem assigned mnenomics
    * @return menu item
    */
-  public static JMenuItem newItem(final GUICommand cmd, final GUI gui,
+  public static JMenuItem newItem(final GUICmd cmd, final GUI gui,
       final StringBuilder mnem) {
 
     final String desc = cmd.label();
@@ -107,8 +107,8 @@ public final class GUIMenu extends JMenuBar {
     int c = 0;
     for(int b = 0; b < MENUBAR.length; ++b) {
       for(int i = 0; i < MENUITEMS[b].length; ++i) {
-        final GUICommand item = MENUITEMS[b][i];
-        if(item != GUICommand.EMPTY && item != null) {
+        final GUICmd item = MENUITEMS[b][i];
+        if(item != GUIBaseCmd.SEPARATOR && item != null) {
           item.refresh(gui, items[c++]);
         }
       }

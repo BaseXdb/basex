@@ -13,7 +13,7 @@ import org.basex.gui.layout.*;
  */
 public final class GUIToolBar extends JToolBar {
   /** Toolbar commands. */
-  private final GUICommand[] cmd;
+  private final GUICmd[] cmd;
   /** Reference to main window. */
   private final GUI gui;
 
@@ -22,12 +22,12 @@ public final class GUIToolBar extends JToolBar {
    * @param tb toolbar commands
    * @param main reference to the main window
    */
-  public GUIToolBar(final GUICommand[] tb, final GUI main) {
+  public GUIToolBar(final GUICmd[] tb, final GUI main) {
     setFloatable(false);
     cmd = tb;
     gui = main;
 
-    for(final GUICommand c : cmd) {
+    for(final GUICmd c : cmd) {
       if(c == null) {
         addSeparator();
       } else {

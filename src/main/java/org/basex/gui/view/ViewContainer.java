@@ -19,16 +19,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class ViewContainer extends BaseXBack implements Runnable {
+public final class ViewContainer extends BaseXBack {
   /** Dragging stroke. */
   private static final BasicStroke STROKE = new BasicStroke(2);
-  /** Thread counter. */
-  private static final int[] STEPS = {
-    255, 225, 202, 180, 185, 165, 147, 130, 115, 100, 87, 75, 65, 55, 47,
-    40, 35, 30, 25, 20, 17, 15, 12, 10, 7, 5, 5, 2, 2, 2, 0, 0
-  };
-  /** Thread counter. */
-  private int count;
 
   /** Orientation enumerator. */
   private enum Target {
@@ -40,8 +33,6 @@ public final class ViewContainer extends BaseXBack implements Runnable {
 
   /** Reference to main window. */
   private final AGUI gui;
-  /** States if component was moved out of the window. */
-  private boolean out;
   /** View Layout. */
   private ViewAlignment layout;
   /** Current layout string. */
@@ -101,15 +92,6 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   }
 
   @Override
-  public void run() {
-    Performance.sleep(1000);
-    while(++count < STEPS.length - 1) {
-      Performance.sleep(50);
-      if(getComponentCount() == 0) repaint();
-    }
-  }
-
-  @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
     if(getComponentCount() != 0) return;
@@ -129,9 +111,9 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     g.drawImage(logo, (w - logo.getWidth(this)) / 2, y, this);
     if(w < 200 || h < 200) return;
 
-    g.setColor(new Color(0, 0, 0, 255 - STEPS[count]));
-    g.setFont(getFont().deriveFont(22f));
-    BaseXLayout.drawCenter(g, VERSINFO + ' ' + Prop.VERSION, w, y + 30 + lh);
+    g.setColor(GUIConstants.DGRAY);
+    g.setFont(lfont);
+    BaseXLayout.drawCenter(g, VERSINFO + ' ' + Prop.VERSION, w, y + 20 + lh);
   }
 
   /**
@@ -152,9 +134,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   void dropPanel() {
     if(source == null) return;
 
-    if(out) {
-      source.delete();
-    } else if(orient != null) {
+    if(orient != null) {
       if(layout.delete(source) && !(layout.comp[0] instanceof ViewPanel))
         layout = (ViewAlignment) layout.comp[0];
 
@@ -272,21 +252,9 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     super.paint(g);
     if(source == null) return;
 
-    out = sp.x < 0 || sp.y < 0 || sp.x > getWidth() || sp.y > getHeight();
-
-    final Point p = absLoc(source);
     ((Graphics2D) g).setStroke(STROKE);
-
-    if(!out) {
-      g.setColor(color(10));
-      g.drawRect(p.x, p.y, source.getWidth() - 1, source.getHeight() - 1);
-    }
     final int ac = AlphaComposite.SRC_OVER;
-    if(out) {
-      g.setColor(colormark3);
-      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 0.3f));
-      g.fillRect(p.x, p.y, source.getWidth(), source.getHeight());
-    } else if(orient != null) {
+    if(orient != null) {
       g.setColor(color(16));
       g.drawRect(pos[0], pos[1], pos[2] - 1, pos[3] - 1);
       ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 0.3f));

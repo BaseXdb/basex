@@ -256,7 +256,6 @@ public final class GUI extends AGUI {
     new Thread() {
       @Override
       public void run() {
-        views.run();
         checkVersion();
       }
     }.start();

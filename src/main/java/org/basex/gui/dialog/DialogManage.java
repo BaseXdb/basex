@@ -89,7 +89,7 @@ public final class DialogManage extends BaseXDialog {
     doc2.setFont(doc1.getFont());
 
     backups = new BaseXList(new String[] { }, this);
-    backups.setSize(400, 380);
+    backups.setSize(400, 400);
 
     // backup buttons
     backup = new BaseXButton(BACKUP, this);
