@@ -210,7 +210,7 @@ public abstract class AQuery extends Command {
       }
       // show XML plan
       if(prop.is(Prop.XMLPLAN)) {
-        info(NL + QUERY_PLAN_C);
+        info(NL + QUERY_PLAN + COL);
         info(qp.plan().serialize().toString());
       }
     } catch(final Exception ex) {

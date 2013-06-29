@@ -51,7 +51,7 @@ public final class TextView extends View {
     super(TEXTVIEW, man);
     border(6, 6, 6, 6).layout(new BorderLayout(0, 4));
 
-    label = new BaseXLabel(TEXT, true, false);
+    label = new BaseXLabel(RESULT, true, false);
     label.setForeground(GUIConstants.GRAY);
 
     home = BaseXButton.command(GUICommands.C_HOME, gui);
@@ -182,7 +182,7 @@ public final class TextView extends View {
       System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
     }
     text.setText(buf, size);
-    label.setText(TEXT + (out.finished() ? CHOPPED : ""));
+    label.setText((out.finished() ? CHOPPED : "") + RESULT);
     home.setEnabled(gui.context.data() != null);
   }
 

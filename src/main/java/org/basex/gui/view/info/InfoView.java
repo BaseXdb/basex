@@ -183,15 +183,15 @@ public final class InfoView extends View implements LinkListener {
         final String key = line.substring(0, s).trim();
         final String val = Performance.getTime(tm * 10000L * runs, runs);
         timings.add(LI + key + COLS + val);
-      } else if(line.startsWith(QUERY_PLAN_C)) {
+      } else if(line.startsWith(QUERY_PLAN)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) plan.add(split[i]);
-      } else if(line.startsWith(COMPILING_C)) {
+      } else if(line.startsWith(COMPILING)) {
         while(++i < split.length && !split[i].isEmpty()) comp.add(split[i]);
-      } else if(line.startsWith(QUERY_C)) {
+      } else if(line.startsWith(QUERY)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) origqu.add(split[i]);
-      } else if(line.startsWith(OPTIMIZED_QUERY_C)) {
+      } else if(line.startsWith(OPTIMIZED_QUERY)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) optqu.add(split[i]);
-      } else if(line.startsWith(EVALUATING_C)) {
+      } else if(line.startsWith(EVALUATING)) {
         while(i + 1 < split.length && split[++i].startsWith(LI)) eval.add(split[i]);
       } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
           line.startsWith(PRINTED_CC) || line.startsWith(READ_LOCKING_CC) ||
@@ -240,13 +240,13 @@ public final class InfoView extends View implements LinkListener {
     add(COMMAND + COL, command);
     add(ERROR_C, err);
     add(STACK_TRACE_C, stack);
-    add(EVALUATING_C, eval);
-    add(QUERY_C + ' ', origqu);
-    add(COMPILING_C, comp);
-    add(OPTIMIZED_QUERY_C + ' ', optqu);
-    add(RESULT_C, result);
-    add(TIMING_C, timings);
-    add(QUERY_PLAN_C, plan);
+    add(EVALUATING + COLS, eval);
+    add(COMPILING + COLS, comp);
+    add(QUERY + COLS, origqu);
+    add(OPTIMIZED_QUERY + COLS, optqu);
+    add(RESULT + COLS, result);
+    add(TIMING + COLS, timings);
+    add(QUERY_PLAN + COLS, plan);
     if(inf != null) text.add(inf).nline();
     changed = true;
     clear = reset;

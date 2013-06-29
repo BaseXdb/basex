@@ -443,7 +443,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Shows the text view. */
-  C_SHOWTEXT(TEXT, "% 1", H_TEXT, false, true) {
+  C_SHOWRESULT(RESULT, "% 1", H_RESULT, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gprop.invert(GUIProp.SHOWTEXT);

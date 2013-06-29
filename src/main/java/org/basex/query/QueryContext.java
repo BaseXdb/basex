@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -139,6 +138,8 @@ public final class QueryContext extends Proc {
   ClientSessions sessions;
   /** Root expression of the query. */
   MainModule root;
+  /** Original query. */
+  String query;
 
   /** String container for verbose query info. */
   private final TokenBuilder info = new TokenBuilder();
@@ -175,6 +176,7 @@ public final class QueryContext extends Proc {
    * @throws QueryException query exception
    */
   public MainModule parseMain(final String qu, final String path) throws QueryException {
+    query = qu;
     root = new QueryParser(qu, path, this).parseMain();
     return root;
   }
@@ -245,7 +247,11 @@ public final class QueryContext extends Proc {
     analyze();
 
     // dump resulting query
-    if(inf && compInfo) info.add(NL + OPTIMIZED_QUERY_C + NL + funcs + root + NL);
+    if(inf) {
+      info.add(NL).add(QUERY).add(COL).add(NL).add(
+          QueryProcessor.removeComments(query, Integer.MAX_VALUE)).add(NL);
+      if(compInfo) info.add(NL + OPTIMIZED_QUERY + COL + NL + funcs + root + NL);
+    }
   }
 
   /**
@@ -394,7 +400,7 @@ public final class QueryContext extends Proc {
   public void compInfo(final String string, final Object... ext) {
     if(!inf) return;
     if(!compInfo) {
-      info.add(NL).add(COMPILING_C).add(NL);
+      info.add(NL).add(COMPILING).add(COL).add(NL);
       compInfo = true;
     }
     info.add(LI).addExt(string, ext).add(NL);
@@ -407,7 +413,7 @@ public final class QueryContext extends Proc {
   public void evalInfo(final String string) {
     if(!inf) return;
     if(!evalInfo) {
-      info.add(NL).add(EVALUATING_C).add(NL);
+      info.add(NL).add(EVALUATING).add(COL).add(NL);
       evalInfo = true;
     }
     info.add(LI).add(string.replaceAll("\r?\n\\s*", " ")).add(NL);
@@ -570,7 +576,7 @@ public final class QueryContext extends Proc {
    */
   void plan(final FDoc doc) {
     // only show root node if functions or variables exist
-    final FElem e = new FElem(PLAN);
+    final FElem e = new FElem(QueryText.PLAN);
     funcs.plan(e);
     vars.plan(e);
     root.plan(e);
@@ -621,7 +627,7 @@ public final class QueryContext extends Proc {
     }
 
     // convert to json
-    if(type.equalsIgnoreCase(JSONSTR)) {
+    if(type.equalsIgnoreCase(QueryText.JSONSTR)) {
       return new JsonMapConverter(Spec.ECMA_262, true, null).convert(val.toString());
     }
 
