@@ -113,6 +113,7 @@ public final class EditorView extends View {
     add(b, BorderLayout.NORTH);
 
     tabs = new BaseXTabs(gui);
+    tabs.setFocusable(Prop.MAC);
     final SearchEditor se = new SearchEditor(gui, tabs, null).button(srch);
     search = se.panel();
     addCreateTab();
