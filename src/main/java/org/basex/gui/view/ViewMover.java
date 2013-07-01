@@ -3,6 +3,7 @@ package org.basex.gui.view;
 import java.awt.*;
 import java.awt.event.*;
 
+import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 
@@ -13,10 +14,12 @@ import org.basex.gui.layout.*;
  * @author Christian Gruen
  */
 final class ViewMover extends BaseXPanel {
-  /** Size of splitter. */
-  private static final int SIZE = 9;
+  /** Panel height. */
+  private int height;
   /** Flag if current mover is active. */
   private boolean active;
+  /** Indicates if cursor is placed inside the mover. */
+  private boolean in;
 
   /**
    * Constructor.
@@ -25,21 +28,32 @@ final class ViewMover extends BaseXPanel {
   ViewMover(final AGUI main) {
     super(main);
     setLayout(new BorderLayout());
-    BaseXLayout.setHeight(this, SIZE);
     addKeyListener(this);
     addMouseListener(this);
     addMouseMotionListener(this);
     setCursor(GUIConstants.CURSORMOVE);
-  }
+    refreshLayout();
+
+    new BaseXPopup(this, new GUICmd[] {
+      new GUIBaseCmd() {
+        @Override
+        public String label() { return Text.CLOSE; }
+        @Override
+        public void execute(final GUI g) { ((ViewPanel) getParent()).delete(); }
+      }});
+   }
 
   @Override
   public void paintComponent(final Graphics g) {
+    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+        RenderingHints.VALUE_ANTIALIAS_ON);
     final int w = getWidth();
     final int h = getHeight();
-    g.setColor(GUIConstants.color(active ? 4 : 1));
+    g.setColor(GUIConstants.color(active ? 5 : in ? 3 : 1));
     g.fillRect(0, 0, w, h);
-    g.setColor(GUIConstants.color(active ? 20 : 10));
-    for(int x = -2; x < w; x += 4) g.drawLine(x + 4, 1, x, h - 2);
+    g.setColor(GUIConstants.color(active ? 16 : in ? 13 : 10));
+    int d = height >> 1;
+    for(int x = -d >> 1; x < w; x += 2 + (height >> 2)) g.drawLine(x + d, 0, x, h - 1);
     g.drawRect(0, 0, w - 1, h - 1);
   }
 
@@ -70,5 +84,25 @@ final class ViewMover extends BaseXPanel {
     ((ViewContainer) comp).dropPanel();
     active = false;
     repaint();
+  }
+
+  @Override
+  public void mouseEntered(final MouseEvent e) {
+    in = true;
+    repaint();
+  }
+
+  @Override
+  public void mouseExited(final MouseEvent e) {
+    in = false;
+    repaint();
+  }
+
+  /**
+   * Called when GUI design has changed.
+   */
+  public void refreshLayout() {
+    height = Math.max(10, 6 + (int) (gui.gprop.num(GUIProp.FONTSIZE) * 0.333));
+    BaseXLayout.setHeight(this, height);
   }
 }

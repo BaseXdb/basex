@@ -32,7 +32,7 @@ public final class TextView extends View {
   final SearchEditor search;
 
   /** Header string. */
-  private final BaseXLabel header;
+  private final BaseXLabel label;
   /** Home button. */
   private final BaseXButton home;
   /** Text Area. */
@@ -49,26 +49,27 @@ public final class TextView extends View {
    */
   public TextView(final ViewNotifier man) {
     super(TEXTVIEW, man);
+    border(6, 6, 6, 6).layout(new BorderLayout(0, 4));
 
-    border(6, 6, 6, 6).layout(new BorderLayout(0, 4)).setFocusable(false);
-
-    header = new BaseXLabel(TEXT, true, false);
+    label = new BaseXLabel(RESULT, true, false);
+    label.setForeground(GUIConstants.GRAY);
 
     home = BaseXButton.command(GUICommands.C_HOME, gui);
     home.setEnabled(false);
 
     final BaseXButton save = new BaseXButton(gui, "save", H_SAVE_RESULT);
-    final BaseXButton srch = new BaseXButton(gui, "search", SEARCH);
+    final BaseXButton srch = new BaseXButton(gui, "search",
+        BaseXLayout.addShortcut(SEARCH, BaseXKeys.FIND.toString()));
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 3, 1, 0));
-    buttons.add(srch);
-    buttons.add(home);
     buttons.add(save);
+    buttons.add(home);
+    buttons.add(srch);
 
     final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
-    b.add(buttons, BorderLayout.EAST);
-    b.add(header, BorderLayout.CENTER);
+    b.add(buttons, BorderLayout.WEST);
+    b.add(label, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     text = new Editor(false, gui);
@@ -106,7 +107,7 @@ public final class TextView extends View {
 
   @Override
   public void refreshLayout() {
-    header.setFont(lfont);
+    label.setFont(lfont);
     text.setFont(mfont);
     search.panel().refreshLayout();
   }
@@ -182,7 +183,7 @@ public final class TextView extends View {
       System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
     }
     text.setText(buf, size);
-    header.setText(TEXT + (out.finished() ? CHOPPED : ""));
+    label.setText((out.finished() ? CHOPPED : "") + RESULT);
     home.setEnabled(gui.context.data() != null);
   }
 

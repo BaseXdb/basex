@@ -213,7 +213,12 @@ public final class ViewNotifier {
    * Notifies all views of layout changes.
    */
   public void layout() {
-    for(final View v : view) v.refreshLayout();
+    for(final View v : view) {
+      v.refreshLayout();
+      final ViewPanel vp = (ViewPanel) v.getParent();
+      final ViewMover vm = (ViewMover) vp.getComponent(0);
+      vm.refreshLayout();
+    }
   }
 
   /**
@@ -221,7 +226,7 @@ public final class ViewNotifier {
    * @param back back/forward flag
    * @return query string
    */
-  public String tooltip(final boolean back) {
+  public String query(final boolean back) {
     return back ? hist > 0 ? hist > 1 ? queries[hist - 2] : "" : null :
       hist < histsize ? queries[hist + 1] : null;
   }

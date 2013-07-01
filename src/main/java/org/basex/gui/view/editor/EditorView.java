@@ -80,7 +80,7 @@ public final class EditorView extends View {
   private int errPos;
 
   /** Header string. */
-  private final BaseXLabel header;
+  private final BaseXLabel label;
   /** Filter button. */
   private final BaseXButton filter;
 
@@ -90,30 +90,31 @@ public final class EditorView extends View {
    */
   public EditorView(final ViewNotifier man) {
     super(EDITORVIEW, man);
+    border(6, 6, 6, 6).layout(new BorderLayout());
 
-    border(6, 6, 6, 6).layout(new BorderLayout(0, 2)).setFocusable(false);
+    label = new BaseXLabel(EDITOR, true, false);
+    label.setForeground(GUIConstants.GRAY);
 
-    header = new BaseXLabel(EDITOR, true, false);
-
-    final BaseXButton srch = new BaseXButton(gui, "search", H_REPLACE);
+    final BaseXButton srch = new BaseXButton(gui, "search",
+        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.FIND.toString()));
     final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
     final BaseXButton saveB = new BaseXButton(gui, "save", H_SAVE);
     hist = new BaseXButton(gui, "hist", H_RECENTLY_OPEN);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 4, 1, 0));
-    buttons.add(srch);
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(hist);
+    buttons.add(srch);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout(8, 0));
-    b.add(header, BorderLayout.CENTER);
-    b.add(buttons, BorderLayout.EAST);
+    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    b.add(buttons, BorderLayout.WEST);
+    b.add(label, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     tabs = new BaseXTabs(gui);
-    tabs.setFocusable(false);
+    tabs.setFocusable(Prop.MAC);
     final SearchEditor se = new SearchEditor(gui, tabs, null).button(srch);
     search = se.panel();
     addCreateTab();
@@ -130,9 +131,8 @@ public final class EditorView extends View {
     stop.addKeyListener(this);
     stop.setEnabled(false);
 
-    go = new BaseXButton(gui, "go", H_EXECUTE_QUERY  + " (" +
-        KeyEvent.getKeyText(KeyEvent.VK_CONTROL) + '+' +
-        KeyEvent.getKeyText(KeyEvent.VK_ENTER) + ')');
+    go = new BaseXButton(gui, "go",
+        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.EXEC.toString()));
     go.addKeyListener(this);
 
     filter = BaseXButton.command(GUICommands.C_FILTER, gui);
@@ -276,7 +276,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshLayout() {
-    header.setFont(GUIConstants.lfont);
+    label.setFont(GUIConstants.lfont);
     for(final EditorArea edit : editors()) edit.setFont(GUIConstants.mfont);
     search.refreshLayout();
   }

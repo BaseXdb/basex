@@ -51,8 +51,7 @@ public class HTMLSerializer extends OutputSerializer {
     print(ATT1);
     for(int k = 0; k < val.length; k += cl(val, k)) {
       final int ch = cp(val, k);
-      if(ch == '<' || ch == '&' &&
-          val[Math.min(k + 1, val.length - 1)] == '{') {
+      if(ch == '<' || ch == '&' && val[Math.min(k + 1, val.length - 1)] == '{') {
         print(ch);
       } else if(ch == '"') {
         print(E_QU);

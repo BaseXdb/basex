@@ -8,22 +8,7 @@ import javax.swing.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public interface GUICommand {
-  /** Separator. */
-  GUICommand EMPTY = new GUICommand() {
-    @Override
-    public void execute(final GUI gui) { }
-    @Override
-    public void refresh(final GUI gui, final AbstractButton button) { }
-    @Override
-    public boolean checked() { return false; }
-    @Override
-    public String label() { return null; }
-    @Override
-    public String help() { return null; }
-    @Override
-    public String key() { return null; } };
-
+public interface GUICmd {
   /**
    * Executes the command.
    * @param gui reference to the main window

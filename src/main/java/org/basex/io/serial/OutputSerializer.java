@@ -44,8 +44,6 @@ public abstract class OutputSerializer extends Serializer {
   protected final boolean escape;
   /** Standalone 'omit' flag. */
   protected final boolean saomit;
-  /** Indentation flag. */
-  protected final boolean indent;
   /** Include content type flag. */
   protected final boolean content;
   /** New line. */
@@ -130,7 +128,7 @@ public abstract class OutputSerializer extends Serializer {
     media   = p.get(S_MEDIA_TYPE);
     escape  = p.yes(S_ESCAPE_URI_ATTRIBUTES);
     content = p.yes(S_INCLUDE_CONTENT_TYPE);
-    undeclare  = p.yes(S_UNDECLARE_PREFIXES);
+    undecl  = p.yes(S_UNDECLARE_PREFIXES);
     indent  = p.yes(S_INDENT) && format;
 
     if(!maps.isEmpty()) SERMAP.thrwSerial(maps);
@@ -168,7 +166,7 @@ public abstract class OutputSerializer extends Serializer {
         if(!html || c.contains(":") && (!html5 || !c.contains("html:"))) cdata.add(c);
       }
 
-      if(undeclare && ver.equals(V10)) SERUNDECL.thrwSerial();
+      if(undecl && ver.equals(V10)) SERUNDECL.thrwSerial();
       if(xml) {
         if(omitDecl) {
           if(!saomit || !ver.equals(V10) && docsys != null) SERSTAND.thrwSerial();
@@ -425,9 +423,7 @@ public abstract class OutputSerializer extends Serializer {
       item = false;
     } else if(indent) {
       if(!suppress.isEmpty() && !tags.isEmpty()) {
-        for(final byte[] t : tags) {
-          if(suppress.contains(t)) return;
-        }
+        for(final byte[] t : tags) if(suppress.contains(t)) return;
       }
       print(nl);
       final int ls = level * indents;

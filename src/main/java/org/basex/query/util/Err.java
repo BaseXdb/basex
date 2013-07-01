@@ -753,7 +753,7 @@ public enum Err {
   /** XPST0003. */
   UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
   /** XPST0003. */
-  NSNOTALL(XPST, 3, "Namespace test is not supported in XQuery 1.0."),
+  NSNOTALL(XPST, 3, "Namespace axis is not available in XQuery."),
   /** XPST0003. */
   SIMPLETYPE(XPST, 3, "Simple type expected, '%(' found."),
 

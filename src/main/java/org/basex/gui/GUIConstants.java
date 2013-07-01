@@ -1,6 +1,6 @@
 package org.basex.gui;
 
-import static org.basex.gui.GUICommand.*;
+import static org.basex.gui.GUIBaseCmd.*;
 import static org.basex.gui.GUICommands.*;
 
 import java.awt.*;
@@ -87,7 +87,7 @@ public final class GUIConstants {
   static final GUICommands[] TOOLBAR = {
     C_CREATE, C_OPEN_MANAGE, C_INFO, C_CLOSE, null,
     C_GOHOME, C_GOBACK, C_GOUP, C_GOFORWARD, null,
-    C_SHOWEDITOR, C_SHOWINFO, null, C_SHOWTEXT, C_SHOWMAP, C_SHOWTREE,
+    C_SHOWEDITOR, C_SHOWINFO, null, C_SHOWRESULT, C_SHOWMAP, C_SHOWTREE,
     C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE, C_SHOWEXPLORE
   };
 
@@ -100,31 +100,31 @@ public final class GUIConstants {
 
   /**
    * Two-dimensional menu entries, containing the menu item commands.
-   * {@link GUICommand#EMPTY} references serve as menu separators.
+   * {@link GUIBaseCmd#SEPARATOR} references serve as menu separators.
    */
-  static final GUICommand[][] MENUITEMS = { {
-    C_CREATE, C_OPEN_MANAGE, EMPTY,
-    C_INFO, C_EXPORT, C_CLOSE, EMPTY,
-    C_SERVER, Prop.MAC ? null : EMPTY,
+  static final GUICmd[][] MENUITEMS = { {
+    C_CREATE, C_OPEN_MANAGE, SEPARATOR,
+    C_INFO, C_EXPORT, C_CLOSE, SEPARATOR,
+    C_SERVER, Prop.MAC ? null : SEPARATOR,
     Prop.MAC ? null : C_EXIT
   }, {
     C_EDITNEW, C_EDITOPEN, C_EDITREOPEN, C_EDITSAVE, C_EDITSAVEAS, C_EDITCLOSE,
-    EMPTY, C_EDIT_GOTO, EMPTY, C_SHOWEDITOR, C_SHOWINFO
+    SEPARATOR, C_EDIT_GOTO, SEPARATOR, C_SHOWEDITOR, C_SHOWINFO
   }, {
-    C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS, EMPTY,
-    C_SHOWTEXT, C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE,
-    C_SHOWEXPLORE, GUIMacOSX.nativeFullscreen() ? null : EMPTY,
+    C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS, SEPARATOR,
+    C_SHOWRESULT, C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE,
+    C_SHOWEXPLORE, GUIMacOSX.nativeFullscreen() ? null : SEPARATOR,
     GUIMacOSX.nativeFullscreen() ? null : C_FULL
   }, {
-    C_COPY, C_PASTE, C_DELETE, C_INSERT, C_EDIT, EMPTY,
+    C_COPY, C_PASTE, C_DELETE, C_INSERT, C_EDIT, SEPARATOR,
     C_COPYPATH, C_FILTER
   }, {
-    C_RTEXEC, C_RTFILTER, EMPTY,
-    C_COLOR, C_FONTS, C_MAPLAYOUT, C_TREEOPTIONS, Prop.MAC ? null : EMPTY,
+    C_RTEXEC, C_RTFILTER, SEPARATOR,
+    C_COLOR, C_FONTS, C_MAPLAYOUT, C_TREEOPTIONS, Prop.MAC ? null : SEPARATOR,
     C_PACKAGES, Prop.MAC ? null : C_PREFS
   }, {
-    C_HELP, Prop.MAC ? null : EMPTY,
-    C_COMMUNITY, C_UPDATES, Prop.MAC ? null : EMPTY,
+    C_HELP, Prop.MAC ? null : SEPARATOR,
+    C_COMMUNITY, C_UPDATES, Prop.MAC ? null : SEPARATOR,
     Prop.MAC ? null : C_ABOUT
   }};
 
@@ -318,7 +318,7 @@ public final class GUIConstants {
     font  = new Font(f, type, size);
     mfont = new Font(prop.get(GUIProp.MONOFONT), type, size);
     bfont = new Font(f, Font.BOLD, size);
-    lfont = new Font(f, type, size + 10);
+    lfont = new Font(f, type, 18 + (size >> 1));
     dmfont = new Font(prop.get(GUIProp.MONOFONT), 0, TFONT.getSize() - 1);
 
     final Container comp = new Container();

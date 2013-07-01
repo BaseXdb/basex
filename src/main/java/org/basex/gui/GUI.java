@@ -256,7 +256,6 @@ public final class GUI extends AGUI {
     new Thread() {
       @Override
       public void run() {
-        views.run();
         checkVersion();
       }
     }.start();
@@ -361,8 +360,10 @@ public final class GUI extends AGUI {
   boolean exec(final Command cmd, final boolean edit) {
     // wait when command is still running
     final int thread = ++threadID;
-    while(command != null) {
-      command.stop();
+    while(true) {
+      final Command c = command;
+      if(c == null) break;
+      c.stop();
       Thread.yield();
       if(threadID != thread) return true;
     }
@@ -464,7 +465,7 @@ public final class GUI extends AGUI {
 
           if(nodes == null) {
             // make text view visible
-            if(!text.visible() && ao.size() != 0) GUICommands.C_SHOWTEXT.execute(this);
+            if(!text.visible() && ao.size() != 0) GUICommands.C_SHOWRESULT.execute(this);
             // assign textual output if no node result was created
             text.setText(ao);
           }

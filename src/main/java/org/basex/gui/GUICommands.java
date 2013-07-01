@@ -28,7 +28,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public enum GUICommands implements GUICommand {
+public enum GUICommands implements GUICmd {
 
   /* DATABASE MENU */
 
@@ -213,7 +213,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Copies the currently marked nodes. */
-  C_COPY(COPY, "", H_COPY, true, false) {
+  C_COPY(COPY, null, H_COPY, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
@@ -229,7 +229,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Pastes the copied nodes. */
-  C_PASTE(PASTE, "", H_PASTE, true, false) {
+  C_PASTE(PASTE, null, H_PASTE, true, false) {
     @Override
     public void execute(final GUI gui) {
       final StringBuilder sb = new StringBuilder();
@@ -252,7 +252,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Deletes the currently marked nodes. */
-  C_DELETE(DELETE + DOTS, "", H_DELETE, true, false) {
+  C_DELETE(DELETE + DOTS, null, H_DELETE, true, false) {
     @Override
     public void execute(final GUI gui) {
       if(!BaseXDialog.confirm(gui, DELETE_NODES)) return;
@@ -276,7 +276,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Inserts new nodes. */
-  C_INSERT(NEW + DOTS, "", H_NEW_NODE, true, false) {
+  C_INSERT(NEW + DOTS, null, H_NEW_NODE, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Nodes n = gui.context.marked;
@@ -306,7 +306,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Opens a dialog to edit the currently marked nodes. */
-  C_EDIT(EDIT + DOTS, "", H_EDIT, true, false) {
+  C_EDIT(EDIT + DOTS, null, H_EDIT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Nodes n = gui.context.marked;
@@ -336,7 +336,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Filters the currently marked nodes. */
-  C_FILTER(FILTER_SELECTED, "", H_FILTER_SELECTED, true, false) {
+  C_FILTER(FILTER_SELECTED, "alt ENTER", H_FILTER_SELECTED, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
@@ -443,7 +443,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows the text view. */
-  C_SHOWTEXT(TEXT, "% 1", H_TEXT, false, true) {
+  C_SHOWRESULT(RESULT, "% 1", H_RESULT, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.gprop.invert(GUIProp.SHOWTEXT);
@@ -705,9 +705,9 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      final String tt = gui.notify.tooltip(true);
+      final String tt = gui.notify.query(true);
       b.setEnabled(tt != null);
-      b.setToolTipText(tt != null && tt.isEmpty() ? GO_BACK : tt);
+      b.setToolTipText(tt != null && tt.isEmpty() ? C_GOBACK.help : tt);
     }
   },
 
@@ -720,9 +720,9 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      final String tt = gui.notify.tooltip(false);
+      final String tt = gui.notify.query(false);
       b.setEnabled(tt != null);
-      b.setToolTipText(tt != null && tt.isEmpty() ? GO_FORWARD : tt);
+      b.setToolTipText(tt != null && tt.isEmpty() ? C_GOFORWARD.help : tt);
     }
   },
 
@@ -803,7 +803,7 @@ public enum GUICommands implements GUICommand {
       final boolean c) {
     label = l;
     key = k;
-    help = h;
+    help = BaseXLayout.addShortcut(h, k);
     data = d;
     checked = c;
   }
