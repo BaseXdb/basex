@@ -523,10 +523,10 @@ public final class EditorView extends View {
 
   /**
    * Handles info messages resulting from a query execution.
-   * @param open open addressed file
+   * @param jump jump to error position
    * @param msg info message
    */
-  public void error(final String msg, final boolean open) {
+  public void error(final String msg, final boolean jump) {
     errMsg = msg;
     for(final String s : msg.split("\r?\n")) {
       if(XQERROR.matcher(s).matches()) {
@@ -534,14 +534,14 @@ public final class EditorView extends View {
         break;
       }
     }
-    error(open);
+    error(jump);
   }
 
   /**
    * Handles info messages resulting from a query execution.
-   * @param open open addressed file
+   * @param jump jump to error position
    */
-  private void error(final boolean open) {
+  private void error(final boolean jump) {
     Matcher m = XQERROR.matcher(errMsg);
     int el, ec = 2;
     if(m.matches()) {
@@ -556,7 +556,7 @@ public final class EditorView extends View {
     }
 
     EditorArea edit = find(errFile, false);
-    if(open) {
+    if(jump) {
       if(edit == null) edit = open(errFile, false);
       if(edit != null) tabs.setSelectedComponent(edit);
     }
@@ -581,7 +581,7 @@ public final class EditorView extends View {
     edit.error(ep);
     errPos = ep;
 
-    if(open) {
+    if(jump) {
       edit.jumpError(errPos);
       posCode.invokeLater();
     }
