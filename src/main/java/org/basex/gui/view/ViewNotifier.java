@@ -226,7 +226,7 @@ public final class ViewNotifier {
    * @param back back/forward flag
    * @return query string
    */
-  public String tooltip(final boolean back) {
+  public String query(final boolean back) {
     return back ? hist > 0 ? hist > 1 ? queries[hist - 2] : "" : null :
       hist < histsize ? queries[hist + 1] : null;
   }

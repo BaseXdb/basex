@@ -95,7 +95,8 @@ public final class EditorView extends View {
     label = new BaseXLabel(EDITOR, true, false);
     label.setForeground(GUIConstants.GRAY);
 
-    final BaseXButton srch = new BaseXButton(gui, "search", H_REPLACE);
+    final BaseXButton srch = new BaseXButton(gui, "search",
+        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.FIND.toString()));
     final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
     final BaseXButton saveB = new BaseXButton(gui, "save", H_SAVE);
     hist = new BaseXButton(gui, "hist", H_RECENTLY_OPEN);
@@ -130,9 +131,8 @@ public final class EditorView extends View {
     stop.addKeyListener(this);
     stop.setEnabled(false);
 
-    go = new BaseXButton(gui, "go", H_EXECUTE_QUERY  + " (" +
-        KeyEvent.getKeyText(KeyEvent.VK_CONTROL) + '+' +
-        KeyEvent.getKeyText(KeyEvent.VK_ENTER) + ')');
+    go = new BaseXButton(gui, "go",
+        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.EXEC.toString()));
     go.addKeyListener(this);
 
     filter = BaseXButton.command(GUICommands.C_FILTER, gui);

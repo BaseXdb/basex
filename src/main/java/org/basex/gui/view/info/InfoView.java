@@ -71,7 +71,8 @@ public final class InfoView extends View implements LinkListener {
     timer = new BaseXLabel(" ", true, false);
     timer.setForeground(GUIConstants.DGRAY);
 
-    final BaseXButton srch = new BaseXButton(gui, "search", SEARCH);
+    final BaseXButton srch = new BaseXButton(gui, "search",
+        BaseXLayout.addShortcut(SEARCH, BaseXKeys.FIND.toString()));
     buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 2, 8, 0));
     buttons.add(srch);

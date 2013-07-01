@@ -655,7 +655,7 @@ public final class EditorText {
 
   /**
    * Returns the selected string.
-   * @return token builder
+   * @return string
    */
   String copy() {
     final TokenBuilder tb = new TokenBuilder();

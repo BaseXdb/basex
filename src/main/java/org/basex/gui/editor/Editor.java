@@ -459,7 +459,7 @@ public class Editor extends BaseXPanel {
         return;
       }
       if(FIND.is(e)) {
-        search.activate(null);
+        search.activate(text.copy());
         return;
       }
       if(FINDNEXT.is(e) || FINDNEXT2.is(e) || FINDPREV.is(e) || FINDPREV2.is(e)) {
@@ -470,6 +470,7 @@ public class Editor extends BaseXPanel {
         return;
       }
     }
+
     // ignore modifier keys
     if(modifier(e)) return;
 

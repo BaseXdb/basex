@@ -58,7 +58,8 @@ public final class TextView extends View {
     home.setEnabled(false);
 
     final BaseXButton save = new BaseXButton(gui, "save", H_SAVE_RESULT);
-    final BaseXButton srch = new BaseXButton(gui, "search", SEARCH);
+    final BaseXButton srch = new BaseXButton(gui, "search",
+        BaseXLayout.addShortcut(SEARCH, BaseXKeys.FIND.toString()));
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.layout(new TableLayout(1, 3, 1, 0));

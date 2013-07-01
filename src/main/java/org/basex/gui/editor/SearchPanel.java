@@ -199,7 +199,7 @@ public final class SearchPanel extends BaseXBack {
 
   /**
    * Activates the search panel.
-   * @param string search string; triggers new search if different than old string
+   * @param string search string; triggers new search if it differs from old string
    */
   public void activate(final String string) {
     boolean action = !isVisible();

@@ -21,8 +21,8 @@ import org.basex.gui.editor.*;
 import org.basex.util.*;
 
 /**
- * This class assembles layout and paint methods which are frequently
- * used in the GUI.
+ * This class provides static layout and paint helper methods which are used all over
+ * the GUI.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -238,6 +238,25 @@ public final class BaseXLayout {
         }
       }
     });
+  }
+
+  /**
+   * Adds human readable shortcuts to the specified string.
+   * @param str text of tooltip
+   * @param sc shortcut
+   * @return tooltip
+   */
+  public static String addShortcut(final String str, final String sc) {
+    if(sc == null) return str;
+    final StringBuilder sb = new StringBuilder();
+    for(final String s : sc.split(" ")) {
+      String t = s.equals("%") ? Prop.MAC ? "meta" : "control" : s;
+      if(t.length() != 1) t = Toolkit.getProperty("AWT." + t.toLowerCase(), t);
+      sb.append('+').append(t);
+    }
+    int i = str.lastIndexOf('.');
+    if(i == -1) i = str.length();
+    return str.substring(0, i) + " (" + sb.substring(1) + ')' + str.substring(i);
   }
 
   /**
