@@ -31,6 +31,8 @@ public final class BaseXLayout {
   /** Cached images. */
   private static final HashMap<String, ImageIcon> IMAGES =
     new HashMap<String, ImageIcon>();
+  /** Key listener for global shortcuts. */
+  private static KeyAdapter keys;
 
   /** Private constructor. */
   private BaseXLayout() { }
@@ -196,48 +198,57 @@ public final class BaseXLayout {
       return;
     }
 
-    if(!(win instanceof GUI)) {
+    if(win instanceof GUI) {
+      comp.addKeyListener(globalShortcuts((GUI) win));
+    } else {
       Util.notexpected("Reference to main window expected.");
-      return;
     }
-    final GUI gui = (GUI) win;
+  }
 
-    // add default keys for main window
-    comp.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        // browse back/forward
-        if(gui.context.data() != null) {
-          if(GOBACK.is(e)) {
-            GUICommands.C_GOBACK.execute(gui);
-          } else if(GOFORWARD.is(e)) {
-            GUICommands.C_GOFORWARD.execute(gui);
-          } else if(GOUP.is(e)) {
-            GUICommands.C_GOUP.execute(gui);
-          } else if(GOHOME.is(e)) {
-            GUICommands.C_GOHOME.execute(gui);
+  /**
+   * Returns or creates a new key listener for global shortcuts.
+   * @param gui gui reference
+   * @return key listener
+   */
+  private static KeyAdapter globalShortcuts(final GUI gui) {
+    if(keys == null) {
+      keys = new KeyAdapter() {
+        @Override
+        public void keyPressed(final KeyEvent e) {
+          // browse back/forward
+          if(gui.context.data() != null) {
+            if(GOBACK.is(e)) {
+              GUICommands.C_GOBACK.execute(gui);
+            } else if(GOFORWARD.is(e)) {
+              GUICommands.C_GOFORWARD.execute(gui);
+            } else if(GOUP.is(e)) {
+              GUICommands.C_GOUP.execute(gui);
+            } else if(GOHOME.is(e)) {
+              GUICommands.C_GOHOME.execute(gui);
+            }
+          }
+
+          // jump to input bar
+          if(INPUTBAR.is(e)) gui.input.requestFocusInWindow();
+
+          // change font size
+          final int fs = gui.gprop.num(GUIProp.FONTSIZE);
+          int nfs = fs;
+          if(INCFONT1.is(e) || INCFONT2.is(e)) {
+            nfs = fs + 1;
+          } else if(DECFONT.is(e)) {
+            nfs = Math.max(1, fs - 1);
+          } else if(NORMFONT.is(e)) {
+            nfs = 13;
+          }
+          if(fs != nfs) {
+            gui.gprop.set(GUIProp.FONTSIZE, nfs);
+            gui.updateLayout();
           }
         }
-
-        // jump to input bar
-        if(INPUTBAR.is(e)) gui.input.requestFocusInWindow();
-
-        // change font size
-        final int fs = gui.gprop.num(GUIProp.FONTSIZE);
-        int nfs = fs;
-        if(INCFONT1.is(e) || INCFONT2.is(e)) {
-          nfs = fs + 1;
-        } else if(DECFONT.is(e)) {
-          nfs = Math.max(1, fs - 1);
-        } else if(NORMFONT.is(e)) {
-          nfs = 13;
-        }
-        if(fs != nfs) {
-          gui.gprop.set(GUIProp.FONTSIZE, nfs);
-          gui.updateLayout();
-        }
-      }
-    });
+      };
+    }
+    return keys;
   }
 
   /**

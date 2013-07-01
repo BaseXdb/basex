@@ -23,11 +23,11 @@ import org.basex.util.list.*;
  */
 public final class BaseXServer extends Main implements Runnable {
   /** Flag for server activity. */
-  volatile boolean running;
+  private volatile boolean running;
   /** Event server socket. */
-  ServerSocket esocket;
+  private ServerSocket esocket;
   /** Stop file. */
-  IOFile stop;
+  private IOFile stop;
 
   /** New sessions. */
   private final HashSet<ClientListener> auth = new HashSet<ClientListener>();

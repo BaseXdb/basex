@@ -42,7 +42,7 @@ public final class CElem extends CName {
 
   @Override
   public CElem compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    final int s = prepare(ctx);
+    final int s = addNS(ctx);
     super.compile(ctx, scp);
     ctx.sc.ns.size(s);
     return this;
@@ -50,7 +50,7 @@ public final class CElem extends CName {
 
   @Override
   public FElem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final int s = prepare(ctx);
+    final int s = addNS(ctx);
     try {
       // adds in-scope namespaces
       final Atts ns = new Atts();
@@ -92,14 +92,11 @@ public final class CElem extends CName {
 
       // create node
       final FElem node = new FElem(nm, constr.children, constr.atts, ns);
-      if(constr.nspaces.contains(EMPTY) && !nm.hasURI())
-        DUPLNSCONS.thrw(info, EMPTY);
+      if(constr.nspaces.contains(EMPTY) && !nm.hasURI()) DUPLNSCONS.thrw(info, EMPTY);
 
       // add namespaces from constructor
       final Atts cns = constr.nspaces;
-      for(int a = 0; a < cns.size(); ++a) {
-        addNS(cns.name(a), cns.value(a), ns);
-      }
+      for(int a = 0; a < cns.size(); ++a) addNS(cns.name(a), cns.value(a), ns);
 
       // add namespaces
       for(int a = 0; a < constr.atts.size(); ++a) {
@@ -115,8 +112,8 @@ public final class CElem extends CName {
         final byte[] auri = qnm.uri();
         final byte[] npref = addNS(apref, auri, ns);
         if(npref != null) {
-          constr.atts.set(a, new FAttr(
-              new QNm(concat(npref, COLON, qnm.local()), auri), att.string()));
+          final QNm aname = new QNm(concat(npref, COLON, qnm.local()), auri);
+          constr.atts.set(a, new FAttr(aname, att.string()));
         }
       }
 
@@ -221,9 +218,9 @@ public final class CElem extends CName {
   /**
    * Adds namespaces to the namespace stack.
    * @param ctx query context
-   * @return old stack position
+   * @return old position in namespace stack
    */
-  private int prepare(final QueryContext ctx) {
+  private int addNS(final QueryContext ctx) {
     final NSContext ns = ctx.sc.ns;
     final int s = ns.size();
     for(int n = 0; n < nspaces.size(); n++) ns.add(nspaces.name(n), nspaces.value(n));

@@ -794,11 +794,10 @@ public final class EditorText {
   }
 
   /**
-   * Sets the text cursor to the specified position. A text selection will be removed.
+   * Sets the text cursor to the specified position.
    * @param c cursor position
    */
   void setCaret(final int c) {
-    noSelect();
     pc = c;
     ps = c;
   }

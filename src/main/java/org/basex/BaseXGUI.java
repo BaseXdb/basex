@@ -23,9 +23,9 @@ import org.basex.util.list.*;
  */
 public final class BaseXGUI {
   /** Database context. */
-  final Context context = new Context();
+  private final Context context = new Context();
   /** Files, specified as arguments. */
-  final StringList files = new StringList();
+  private final StringList files = new StringList();
   /** Mac OS X GUI optimizations. */
   GUIMacOSX osxGUI;
 

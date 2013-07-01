@@ -25,7 +25,6 @@ public class BaseX extends Main {
   private IntList ops;
   /** Command arguments. */
   private StringList vals;
-
   /** Flag for writing properties to disk. */
   private boolean writeProps;
 
@@ -178,7 +177,7 @@ public class BaseX extends Main {
    * Tests if this client is stand-alone.
    * @return stand-alone flag
    */
-  boolean sa() {
+  protected boolean sa() {
     return true;
   }
 
