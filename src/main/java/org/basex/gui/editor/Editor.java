@@ -127,6 +127,8 @@ public class Editor extends BaseXPanel {
       new GUICmd[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
         new CopyCmd(), new PasteCmd(), new DelCmd(), null, new AllCmd() } :
       new GUICmd[] { new CopyCmd(), null, new AllCmd() });
+
+    text.setGUI(gui);
   }
 
   /**

@@ -2,6 +2,7 @@ package org.basex.gui.editor;
 
 import static org.basex.util.Token.*;
 
+import org.basex.gui.*;
 import org.basex.gui.editor.Editor.SearchDir;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -37,6 +38,8 @@ public final class EditorText {
   private int es = -1;
   /** Current search position. */
   private int sp;
+  /** The GUI is used to highlight selected text. */
+  private GUI gui;
 
   /**
    * Constructor.
@@ -548,6 +551,29 @@ public final class EditorText {
   // TEXT SELECTION =====================================================================
 
   /**
+   * Setter.
+   * @param gui0 Sets the GUI used for highlight selections.
+   */
+  void setGUI(final GUI gui0) {
+    gui = gui0;
+  }
+
+  /**
+   * Is called whenever the selected text changes. Updates the visible searched text.
+   */
+  private void selectionChanged() {
+    if(gui == null) return;
+    String str = copy().trim();
+    if(str.indexOf('\n') >= 0 || str.indexOf('\r') >= 0) str = "";
+    final SearchPanel tmp = new SearchPanel(gui);
+    tmp.mcase.setSelected(true);
+    tmp.word.setSelected(false);
+    tmp.regex.setSelected(false);
+    tmp.multi.setSelected(false);
+    search(new SearchContext(tmp, str));
+  }
+
+  /**
    * Jumps to the maximum/minimum position and resets the selection.
    * @param select selection flag
    * @param max maximum/minimum flag
@@ -568,6 +594,7 @@ public final class EditorText {
   void noSelect() {
     ms = -1;
     me = -1;
+    selectionChanged();
   }
 
   /**
@@ -576,6 +603,7 @@ public final class EditorText {
   void startSelect() {
     ms = ps;
     me = ps;
+    selectionChanged();
   }
 
   /**
@@ -583,6 +611,7 @@ public final class EditorText {
    */
   void extendSelect() {
     me = ps;
+    selectionChanged();
   }
 
   /**
@@ -609,6 +638,7 @@ public final class EditorText {
    */
   void checkSelect() {
     if(ms == me) noSelect();
+    else selectionChanged();
   }
 
   /**
