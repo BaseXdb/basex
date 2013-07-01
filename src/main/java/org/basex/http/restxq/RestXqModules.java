@@ -118,23 +118,26 @@ public final class RestXqModules {
     for(final IOFile file : root.children()) {
       if(file.isDir()) {
         cache(http, file, cache);
-      } else if(file.path().endsWith(IO.XQMSUFFIX)) {
-        // all files with .xqm suffix will be parsed for RESTXQ annotations
+      } else {
         final String path = file.path();
-        RestXqModule module = modules.get(path);
+        final boolean main = path.endsWith(IO.XQSUFFIX);
+        if(main || path.endsWith(IO.XQMSUFFIX)) {
+          // all files with .xqm suffix will be parsed for RESTXQ annotations
+          RestXqModule module = modules.get(path);
 
-        boolean parsed = false;
-        if(module != null) {
-          // check if module has been modified
-          parsed = module.uptodate();
-        } else {
-          // create new module
-          module = new RestXqModule(file);
-        }
-        // add module if it has been parsed, and if it contains annotations
-        if(parsed || module.parse(http)) {
-          module.touch();
-          cache.put(path, module);
+          boolean parsed = false;
+          if(module != null) {
+            // check if module has been modified
+            parsed = module.uptodate();
+          } else {
+            // create new module
+            module = new RestXqModule(file, main);
+          }
+          // add module if it has been parsed, and if it contains annotations
+          if(parsed || module.parse(http)) {
+            module.touch();
+            cache.put(path, module);
+          }
         }
       }
     }

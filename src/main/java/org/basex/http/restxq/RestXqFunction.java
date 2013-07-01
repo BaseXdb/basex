@@ -43,7 +43,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Supported methods. */
   EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
   /** Serialization parameters. */
-  final SerializerProp output = new SerializerProp();
+  final SerializerProp output;
   /** Associated function. */
   final StaticFunc function;
   /** Associated module. */
@@ -84,6 +84,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     function = uf;
     context = qc;
     module = m;
+    output = qc.serParams(false);
   }
 
   /**

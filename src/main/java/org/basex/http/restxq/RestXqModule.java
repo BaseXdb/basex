@@ -22,16 +22,20 @@ final class RestXqModule {
   private final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
   /** File reference. */
   private final IOFile file;
+  /** Main module flag. */
+  private final boolean main;
   /** Parsing timestamp. */
   private long time;
 
   /**
    * Constructor.
    * @param in xquery module
+   * @param m main module flag
    */
-  RestXqModule(final IOFile in) {
+  RestXqModule(final IOFile in, final boolean m) {
     file = in;
     time = in.timeStamp();
+    main = m;
   }
 
   /**
@@ -46,6 +50,7 @@ final class RestXqModule {
     // loop through all functions
     final QueryContext qc = parseModule(http);
     try {
+      // loop through all functions
       for(final StaticFunc uf : qc.funcs.funcs()) {
         // consider only functions that are defined in this module
         if(!file.name().equals(new IOFile(uf.info.file()).name())) continue;
@@ -97,13 +102,11 @@ final class RestXqModule {
       // loop through all functions
       for(final StaticFunc uf : qc.funcs.funcs()) {
         // compare input info
-        if(func.function.info.equals(uf.info)) {
-          // find and evaluate relevant function
-          final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
-          rxf.parse();
-          new RestXqResponse(rxf, qc, http, error).create();
-          break;
-        }
+        if(!func.function.info.equals(uf.info)) continue;
+        final RestXqFunction rxf = new RestXqFunction(uf, qc, this);
+        rxf.parse();
+        new RestXqResponse(rxf, qc, http, error).create();
+        break;
       }
     } finally {
       qc.close();
@@ -121,7 +124,10 @@ final class RestXqModule {
   private QueryContext parseModule(final HTTPContext http) throws QueryException {
     final QueryContext qc = new QueryContext(http.context());
     try {
-      qc.parseLibrary(string(file.read()), file.path());
+      final String cont = string(file.read());
+      final String path = file.path();
+      if(main) qc.parseMain(cont, path);
+      else qc.parseLibrary(cont, path);
       return qc;
     } catch(final IOException ex) {
       throw IOERR.thrw(null, ex);
