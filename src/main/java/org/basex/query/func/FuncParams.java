@@ -113,7 +113,7 @@ public final class FuncParams {
    */
   public static TokenMap serializerMap(final Item it, final InputInfo info)
       throws QueryException {
-    return it == null ? new TokenMap() : new FuncParams(Q_SPARAM, info).parse(it, true);
+    return new FuncParams(Q_SPARAM, info).parse(it, true);
   }
 
   /**
