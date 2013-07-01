@@ -3789,12 +3789,12 @@ public class QueryParser extends InputParser {
     // in XQuery 1.0 only forward declarations are allowed (except for implicit variables)
     final boolean main = module == null, implicit = main && uri.length == 0;
     if(!(ctx.sc.xquery3() || ctx.vars.declared(name) || implicit)) {
-      throw error(VARUNDEF, '$' + string(name.string()));
+      error(VARUNDEF, '$' + string(name.string()));
     }
 
     // variable has to be declared by the same or a directly imported module
     if(!(main || eq(module.uri(), uri) || modules.contains(uri)))
-      throw error(VARUNDEF, '$' + string(name.string()));
+      error(VARUNDEF, '$' + string(name.string()));
 
     return ctx.vars.newRef(name, ctx.sc, ii);
   }

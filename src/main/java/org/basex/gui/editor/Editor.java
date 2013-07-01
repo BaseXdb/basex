@@ -205,11 +205,12 @@ public class Editor extends BaseXPanel {
   }
 
   /**
-   * Sets a new text cursor position.
+   * Sets the text cursor to the specified position. A text selection will be removed.
    * @param p cursor position
    */
   public final void setCaret(final int p) {
     text.setCaret(p);
+    text.noSelect();
     showCursor(1);
     cursor(true);
   }

@@ -185,4 +185,5 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
       if(var != null) ref.init(var);
     }
   }
+
 }
