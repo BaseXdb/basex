@@ -511,7 +511,7 @@ final class XMLScanner extends Proc {
     byte[] en = ents.get(name);
     if(en == null) {
       // unknown entity: try HTML entities (lazy initialization)
-      if(HTMLENTS.size() == 0) {
+      if(HTMLENTS.isEmpty()) {
         for(int s = 0; s < HTMLENTITIES.length; s += 2) {
           HTMLENTS.put(HTMLENTITIES[s], HTMLENTITIES[s + 1]);
         }

@@ -36,7 +36,7 @@ public class DropBackup extends ABackup {
 
     // if the given argument is not a database name, it could be the name
     // of a backup file
-    if(dbs.size() == 0) drop(name, context);
+    if(dbs.isEmpty()) drop(name, context);
 
     return info(BACKUP_DROPPED_X, name + '*' + IO.ZIPSUFFIX);
   }

@@ -327,7 +327,7 @@ public final class FNGen extends StandardFunc {
 
   @Override
   public boolean has(final Flag flag) {
-    return (flag == Flag.X30 || flag == Flag.CTX) && (sig == DATA && expr.length == 0) ||
+    return (flag == Flag.X30 || flag == Flag.CTX) && sig == DATA && expr.length == 0 ||
         super.has(flag);
   }
 

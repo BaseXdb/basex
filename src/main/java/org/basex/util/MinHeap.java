@@ -34,7 +34,7 @@ public final class MinHeap<K, V> {
    * @param value value
    */
   public void insert(final K key, final V value) {
-    int s = size << 1;
+    final int s = size << 1;
     if(s == vals.length) vals = Array.copy(vals, new Object[s << 1]);
     vals[s] = key;
     vals[s + 1] = value;

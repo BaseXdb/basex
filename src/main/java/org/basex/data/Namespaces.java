@@ -118,7 +118,7 @@ public final class Namespaces {
    * @return namespace
    */
   public int uri(final byte[] name, final boolean elem) {
-    if(uris.size() == 0) return 0;
+    if(uris.isEmpty()) return 0;
     final byte[] pref = Token.prefix(name);
     int nu = elem ? defaults.get(level) : 0;
     if(pref.length != 0) nu = uri(pref, current);

@@ -1146,7 +1146,7 @@ public enum Function {
     flags = flg;
 
     // count number of minimum and maximum arguments by analyzing the function string
-    int b = dsc.indexOf('[');
+    final int b = dsc.indexOf('[');
     if(b != -1) {
       int c = b + 1 < dsc.length() && dsc.charAt(b + 1) == ',' ? 1 : 0;
       for(int i = 0; i < b; i++) if(dsc.charAt(i) == ',') c++;

@@ -30,7 +30,7 @@ public final class DropDB extends ACreate {
 
     // retrieve all databases; return true if no database is found (no error)
     final StringList dbs = context.databases.listDBs(args[0]);
-    if(dbs.size() == 0) return info(NO_DB_DROPPED, args[0]);
+    if(dbs.isEmpty()) return info(NO_DB_DROPPED, args[0]);
 
     // loop through all databases
     boolean ok = true;

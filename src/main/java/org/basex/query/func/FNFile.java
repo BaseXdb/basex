@@ -142,7 +142,7 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str dirName(final QueryContext ctx) throws QueryException {
-    String path = checkFile(0, ctx).getParent();
+    final String path = checkFile(0, ctx).getParent();
     return Str.get(dir(path == null ? "." : path));
   }
 

@@ -116,7 +116,7 @@ public final class StaticFuncs extends ExprInfo {
       if(fc.func == null) {
         // check if another function with same name exists
         int oid = 0;
-        IntList al = new IntList();
+        final IntList al = new IntList();
         for(final FuncCache ofc : funcs.values()) {
           if(oid++ == id) continue;
           if(call.name.eq(ofc.name())) al.add(ofc.func.arity());

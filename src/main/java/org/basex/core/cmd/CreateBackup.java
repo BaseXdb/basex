@@ -36,7 +36,7 @@ public final class CreateBackup extends ABackup {
 
     // retrieve all databases
     final StringList dbs = context.databases.listDBs(name);
-    if(dbs.size() == 0) return error(DB_NOT_FOUND_X, name);
+    if(dbs.isEmpty()) return error(DB_NOT_FOUND_X, name);
 
     // loop through all databases
     boolean ok = true;

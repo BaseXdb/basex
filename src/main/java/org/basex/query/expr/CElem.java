@@ -83,15 +83,18 @@ public final class CElem extends CName {
         }
       }
 
-      // create child and attribute nodes
-      final Constr constr = new Constr(ii, ctx).add(expr);
+      // create node
+      final Constr constr = new Constr(ii, ctx);
+      final FElem node = new FElem(nm, ns, constr.children, constr.atts);
+
+      // add child and attribute nodes
+      constr.add(expr);
       if(constr.errAtt) NOATTALL.thrw(info);
       if(constr.errNS) NONSALL.thrw(info);
       if(constr.duplAtt != null) CATTDUPL.thrw(info, constr.duplAtt);
       if(constr.duplNS != null) DUPLNSCONS.thrw(info, constr.duplNS);
 
-      // create node
-      final FElem node = new FElem(nm, constr.children, constr.atts, ns);
+      // check namespaces
       if(constr.nspaces.contains(EMPTY) && !nm.hasURI()) DUPLNSCONS.thrw(info, EMPTY);
 
       // add namespaces from constructor
@@ -188,9 +191,7 @@ public final class CElem extends CName {
    * @param ns namespaces
    * @return resulting prefix
    */
-  private static byte[] addNS(final byte[] pref, final byte[] uri,
-      final Atts ns) {
-
+  private static byte[] addNS(final byte[] pref, final byte[] uri, final Atts ns) {
     final byte[] u = ns.value(pref);
     if(u == null) {
       // add undeclared namespace

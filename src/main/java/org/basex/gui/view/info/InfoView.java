@@ -307,7 +307,7 @@ public final class InfoView extends View implements LinkListener {
     final int l = stat.size();
     if(l == 0) return;
 
-    int fs = gui.gprop.num(GUIProp.FONTSIZE);
+    final int fs = gui.gprop.num(GUIProp.FONTSIZE);
     h = label.getHeight() + 4;
     w = (int) (getWidth() * .98 - fs / 2 - label.getWidth());
     bw = fs * 2 + w / 10;

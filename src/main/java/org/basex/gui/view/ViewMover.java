@@ -52,7 +52,7 @@ final class ViewMover extends BaseXPanel {
     g.setColor(GUIConstants.color(active ? 5 : in ? 3 : 1));
     g.fillRect(0, 0, w, h);
     g.setColor(GUIConstants.color(active ? 16 : in ? 13 : 10));
-    int d = height >> 1;
+    final int d = height >> 1;
     for(int x = -d >> 1; x < w; x += 2 + (height >> 2)) g.drawLine(x + d, 0, x, h - 1);
     g.drawRect(0, 0, w - 1, h - 1);
   }

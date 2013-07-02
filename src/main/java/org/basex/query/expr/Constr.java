@@ -101,7 +101,7 @@ public final class Constr {
         // type: attribute node
 
         // no attribute allowed after texts or child nodes
-        if(!text.isEmpty() || children.size() != 0) {
+        if(!text.isEmpty() || !children.isEmpty()) {
           errAtt = true;
           return false;
         }
@@ -116,16 +116,14 @@ public final class Constr {
 
         // add attribute
         atts.add(new FAttr(name, node.string()));
-
-        if(name.hasURI()) {
-          ctx.sc.ns.add(name.prefix(), name.uri());
-        }
+        // add new namespace
+        if(name.hasURI()) ctx.sc.ns.add(name.prefix(), name.uri());
 
       } else if(ip == NodeType.NSP) {
         // type: namespace node
 
         // no attribute allowed after texts or child nodes
-        if(!text.isEmpty() || children.size() != 0) {
+        if(!text.isEmpty() || !children.isEmpty()) {
           errNS = true;
           return false;
         }

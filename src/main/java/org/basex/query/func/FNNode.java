@@ -146,8 +146,8 @@ public final class FNNode extends StandardFunc {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.X30 && (expr.length == 0 &&
-        oneOf(sig, DOCUMENT_URI, NODE_NAME, NILLED)) ||
+    return flag == Flag.X30 && expr.length == 0 &&
+        oneOf(sig, DOCUMENT_URI, NODE_NAME, NILLED) ||
         flag == Flag.CTX && expr.length == 0 || super.has(flag);
   }
 

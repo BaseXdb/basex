@@ -1,18 +1,18 @@
 package org.basex.util;
 
+import org.basex.util.list.*;
+
 /**
  * This is a simple container for attributes (name/value pairs).
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Atts {
+public final class Atts extends ElementList {
   /** Name array. */
   private byte[][] nm = new byte[1][];
   /** Value array. */
   private byte[][] vl = new byte[1][];
-  /** Current array size. */
-  private int size;
 
   /**
    * Default constructor.
@@ -104,22 +104,6 @@ public final class Atts {
   public byte[] value(final byte[] name) {
     final int i = get(name);
     return i == -1 ? null : vl[i];
-  }
-
-  /**
-   * Returns the number of attributes.
-   * @return number of attributes
-   */
-  public int size() {
-    return size;
-  }
-
-  /**
-   * Enforces the number of attributes.
-   * @param s number of attributes
-   */
-  public void size(final int s) {
-    size = s;
   }
 
   /**

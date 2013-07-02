@@ -1059,7 +1059,7 @@ public class QueryParser extends InputParser {
         wsCheck(BY);
         skipWS();
         alterPos = pos;
-        GroupBy.Spec[] specs = groupSpecs(clauses);
+        final GroupBy.Spec[] specs = groupSpecs(clauses);
 
         // find all non-grouping variables that aren't shadowed
         final ArrayList<VarRef> ng = new ArrayList<VarRef>();

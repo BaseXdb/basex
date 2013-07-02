@@ -754,7 +754,7 @@ public abstract class Data {
           // check if prefix of attribute has already been declared, otherwise
           // add declaration to parent node
           if(data.nsFlag(dpre) && nsScope.get(attPref) == null) {
-            nspaces.add(par, preStack.size() == 0 ? -1 : preStack.peek(),
+            nspaces.add(par, preStack.isEmpty() ? -1 : preStack.peek(),
                 attPref, data.nspaces.uri(data.uri(dpre, dkind)), this);
             // save pre value to set ns flag later for this node. can't be done
             // here as direct table access would interfere with the buffer
