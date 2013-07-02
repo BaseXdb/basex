@@ -217,11 +217,6 @@ public final class FuncItem extends FItem implements Scope {
     }
   }
 
-  @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.X30 || expr.has(flag);
-  }
-
   /**
    * Coerces a function item to the given type.
    * @param ctx query context

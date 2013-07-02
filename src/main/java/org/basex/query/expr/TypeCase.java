@@ -87,11 +87,6 @@ public final class TypeCase extends Single {
     return tc;
   }
 
-  @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.X30 && types != null && types.length > 1 || super.has(flag);
-  }
-
   /**
    * Checks if the given value matches this case.
    * @param val value to be matched

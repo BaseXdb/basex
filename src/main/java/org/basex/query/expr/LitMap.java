@@ -58,11 +58,6 @@ public final class LitMap extends Arr {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.X30 || super.has(flag);
-  }
-
-  @Override
   public String description() {
     return QueryText.MAPSTR;
   }

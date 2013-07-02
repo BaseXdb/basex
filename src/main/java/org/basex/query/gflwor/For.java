@@ -128,7 +128,7 @@ public final class For extends GFLWOR.Clause {
 
   @Override
   public boolean has(final Flag flag) {
-    return empty && flag == Flag.X30 || expr.has(flag);
+    return expr.has(flag);
   }
 
   @Override

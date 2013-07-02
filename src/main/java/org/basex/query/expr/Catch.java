@@ -164,11 +164,6 @@ public final class Catch extends Single {
   }
 
   @Override
-  public boolean has(final Flag flag) {
-    return flag == Flag.X30 || super.has(flag);
-  }
-
-  @Override
   public String toString() {
     return "catch * { " + expr + " }";
   }

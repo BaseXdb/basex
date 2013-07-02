@@ -232,7 +232,6 @@ public final class GroupBy extends GFLWOR.Clause {
 
   @Override
   public boolean has(final Flag flag) {
-    if(flag == Flag.X30) return true;
     for(final Spec sp : specs) if(sp.has(flag)) return true;
     return false;
   }

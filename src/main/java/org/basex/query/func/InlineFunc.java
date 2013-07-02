@@ -222,8 +222,6 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public boolean has(final Flag flag) {
-    if(flag == Flag.X30) return true;
-
     // handle recursive calls: set dummy value, eventually replace it with final value
     Boolean b = map.get(flag);
     if(b == null) {

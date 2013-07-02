@@ -28,8 +28,6 @@ public final class GFLWOR extends ParseExpr {
   Expr ret;
   /** FLWOR clauses. */
   private final LinkedList<Clause> clauses;
-  /** XQuery 3.0 flag. */
-  private boolean xq30;
 
   /**
    * Constructor.
@@ -495,7 +493,6 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public boolean has(final Flag flag) {
-    if(flag == Flag.X30 && xq30) return true;
     for(final Clause cls : clauses) if(cls.has(flag)) return true;
     return ret.has(flag);
   }

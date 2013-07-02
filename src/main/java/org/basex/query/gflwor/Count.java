@@ -67,7 +67,7 @@ public final class Count extends GFLWOR.Clause {
 
   @Override
   public boolean has(final Flag flag) {
-    return flag == Flag.X30;
+    return false;
   }
 
   @Override
