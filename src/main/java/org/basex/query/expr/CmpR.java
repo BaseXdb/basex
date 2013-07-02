@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.name.*;
 import org.basex.index.query.*;
@@ -120,15 +121,16 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) {
+  public boolean indexAccessible(final IndexCosts ic) {
     // accept only location path, string and equality expressions
     final Step s = CmpG.indexStep(expr);
     // sequential main memory is assumed to be faster than range index access
-    if(s == null || ic.data.inMemory()) return false;
+    final Data data = ic.ictx.data;
+    if(s == null || data.inMemory()) return false;
 
     // check which index applies
-    final boolean text = s.test.type == NodeType.TXT && ic.data.meta.textindex;
-    final boolean attr = s.test.type == NodeType.ATT && ic.data.meta.attrindex;
+    final boolean text = s.test.type == NodeType.TXT && data.meta.textindex;
+    final boolean attr = s.test.type == NodeType.ATT && data.meta.attrindex;
     if(!text && !attr || !mni || !mxi) return false;
 
     final Stats key = key(ic, text);
@@ -138,7 +140,7 @@ public final class CmpR extends Single {
     rt = new NumericRange(text ? IndexType.TEXT : IndexType.ATTRIBUTE,
         Math.max(min, key.min), Math.min(max, key.max));
     ic.costs(rt.min > rt.max || rt.max < key.min || rt.min > key.max ? 0 :
-      Math.max(1, ic.data.meta.size / 5));
+      Math.max(1, data.meta.size / 5));
 
     // use index if costs are zero, or if min/max is not infinite
     return ic.costs() == 0 || min != Double.NEGATIVE_INFINITY &&
@@ -146,10 +148,10 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public Expr indexEquivalent(final IndexContext ic) {
+  public Expr indexEquivalent(final IndexCosts ic) {
     final boolean text = rt.type() == IndexType.TEXT;
     ic.ctx.compInfo(OPTRNGINDEX);
-    return ic.invert(expr, new RangeAccess(info, rt, ic.data, ic.iterable), text);
+    return ic.invert(expr, new RangeAccess(info, rt, ic.ictx), text);
   }
 
   /**
@@ -158,9 +160,10 @@ public final class CmpR extends Single {
    * @param text text flag
    * @return key
    */
-  private Stats key(final IndexContext ic, final boolean text) {
+  private Stats key(final IndexCosts ic, final boolean text) {
     // statistics are not up-to-date
-    if(!ic.data.meta.uptodate || ic.data.nspaces.size() != 0) return null;
+    final Data data = ic.ictx.data;
+    if(!data.meta.uptodate || data.nspaces.size() != 0) return null;
 
     final AxisPath path = (AxisPath) expr;
     final int st = path.steps.length;
@@ -174,7 +177,7 @@ public final class CmpR extends Single {
       if(!step.simple(Axis.ATTR, true)) return null;
     }
 
-    final Names names = text ? ic.data.tagindex : ic.data.atnindex;
+    final Names names = text ? data.tagindex : data.atnindex;
     final Stats key = names.stat(names.id(((NameTest) step.test).ln));
     return key == null || key.type == StatsType.INTEGER ||
         key.type == StatsType.DOUBLE ? key : null;

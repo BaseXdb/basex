@@ -93,7 +93,7 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     int is = ic.costs();
     for(final FTExpr e : expr) {
       if(!e.indexAccessible(ic)) return false;

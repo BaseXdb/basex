@@ -107,7 +107,7 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     int is = 0;
     for(final FTExpr e : expr) {
       // no index access if negative operators is found

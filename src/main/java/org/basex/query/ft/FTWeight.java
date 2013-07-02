@@ -80,7 +80,7 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) {
+  public boolean indexAccessible(final IndexCosts ic) {
     // weight makes no sense as long as no index-based scoring exists
     return false;
   }

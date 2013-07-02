@@ -96,7 +96,7 @@ public abstract class FTExpr extends ParseExpr {
   public abstract FTExpr copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
   @Override
-  public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
+  public FTExpr indexEquivalent(final IndexCosts ic) throws QueryException {
     final int es = expr.length;
     for(int e = 0; e < es; e++) expr[e] = expr[e].indexEquivalent(ic);
     return this;

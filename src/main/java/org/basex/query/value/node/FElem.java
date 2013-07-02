@@ -396,19 +396,17 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public FNode copy() {
-    final FElem node = new FElem(name);
-    if(ns != null) {
-      node.ns = new Atts();
-      for(int n = 0; n < ns.size(); ++n) node.ns.add(ns.name(n), ns.value(n));
-    }
-    if(atts != null) {
-      for(final ANode n : atts) node.add(n.copy());
-    }
-    if(children != null) {
-      for(final ANode n : children) node.add(n.copy());
-    }
-    return node.parent(par);
+  public FElem copy() {
+    // nodes must be added after root constructor in order to ensure ascending node ids
+    final ANodeList ch = children != null ? new ANodeList(children.size()) : null;
+    final ANodeList at = atts != null ? new ANodeList(atts.size()) : null;
+    final Atts as = ns != null ? new Atts() : null;
+    final FElem node = new FElem(name, as, ch, at);
+    if(ns != null) for(int n = 0; n < ns.size(); ++n) as.add(ns.name(n), ns.value(n));
+    if(atts != null) for(final ANode n : atts) at.add(n.copy());
+    if(children != null) for(final ANode n : children) ch.add(n.copy());
+    node.parent(par);
+    return node.optimize();
   }
 
   @Override

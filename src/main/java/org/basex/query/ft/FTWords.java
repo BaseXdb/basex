@@ -26,13 +26,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FTWords extends FTExpr {
-  /** Full-text tokenizer. */
-  FTTokenizer ftt;
-  /** Data reference. */
-  Data data;
-  /** Single string. */
-  TokenList txt;
-
   /** All matches. */
   FTMatches matches = new FTMatches(0);
   /** Flag for first evaluation. */
@@ -43,6 +36,13 @@ public final class FTWords extends FTExpr {
   Expr query;
   /** Minimum and maximum occurrences. */
   Expr[] occ;
+
+  /** Full-text tokenizer. */
+  private FTTokenizer ftt;
+  /** Data reference. */
+  private IndexContext ictx;
+  /** Single string. */
+  private TokenList txt;
 
   /** Current token number. */
   private int tokNum;
@@ -66,19 +66,19 @@ public final class FTWords extends FTExpr {
   /**
    * Constructor for index-based evaluation.
    * @param ii input info
-   * @param d data reference
+   * @param ic index context
    * @param t query terms
    * @param m search mode
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public FTWords(final InputInfo ii, final Data d, final Value t, final FTMode m,
-      final QueryContext ctx) throws QueryException {
+  public FTWords(final InputInfo ii, final IndexContext ic, final Value t,
+      final FTMode m, final QueryContext ctx) throws QueryException {
 
     super(ii);
     query = t;
     mode = m;
-    data = d;
+    ictx = ic;
     compile(ctx, null);
   }
 
@@ -119,6 +119,7 @@ public final class FTWords extends FTExpr {
 
   @Override
   public FTIter iter(final QueryContext ctx) {
+    final Data data = ictx.data;
     return new FTIter() {
       /** Index iterator. */
       FTIndexIterator iat;
@@ -187,8 +188,10 @@ public final class FTWords extends FTExpr {
    * @throws QueryException query exception
    */
   FTIndexIterator scan(final FTLexer lex) throws QueryException {
+    final Data data = ictx.data;
     final FTLexer intok = new FTLexer(ftt.opt);
     final FTTokens qtok = ftt.cache(lex.get());
+
     return new FTIndexIterator() {
       int pre = -1;
 
@@ -331,13 +334,14 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) {
+  public boolean indexAccessible(final IndexCosts ic) {
     /* If the following conditions yield true, the index is accessed:
      * - all query terms are statically available
      * - no FTTimes option is specified
      * - explicitly set case, diacritics and stemming match options do not
      *   conflict with index options. */
-    final MetaData md = ic.data.meta;
+    final Data dt = ic.ictx.data;
+    final MetaData md = dt.meta;
     final FTOpt fto = ftt.opt;
 
     /* Index will be applied if no explicit match options have been set
@@ -351,7 +355,7 @@ public final class FTWords extends FTExpr {
 
     // estimate costs if text is not statically known
     if(txt == null) {
-      ic.costs(Math.max(1, ic.data.meta.size >> 10));
+      ic.costs(Math.max(1, dt.meta.size >> 10));
       return true;
     }
 
@@ -378,15 +382,15 @@ public final class FTWords extends FTExpr {
           }
         }
         // reduce number of expected results to favor full-text index requests
-        ic.addCosts(Math.max(1, ic.data.count(ft) >> 10));
+        ic.addCosts(Math.max(1, dt.count(ft) >> 10));
       }
     }
     return true;
   }
 
   @Override
-  public FTExpr indexEquivalent(final IndexContext ic) {
-    data = ic.data;
+  public FTExpr indexEquivalent(final IndexCosts ic) {
+    ictx = ic.ictx;
     return this;
   }
 
@@ -415,6 +419,7 @@ public final class FTWords extends FTExpr {
   @Override
   public FTExpr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
+
     boolean change = occ != null && inlineAll(ctx, scp, occ, v, e);
     final Expr q = query.inline(ctx, scp, v, e);
     if(q != null) {
@@ -427,12 +432,13 @@ public final class FTWords extends FTExpr {
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp,
       final IntObjMap<Var> vs) {
+
     final FTWords ftw = new FTWords(info, query.copy(ctx, scp, vs), mode,
         occ == null ? null : Arr.copyAll(ctx, scp, vs, occ));
-    if(data != null) ftw.data = data;
     if(ftt != null) ftw.ftt = ftt.copy(ftw);
     if(matches != null) ftw.matches = matches.copy();
     if(txt != null) ftw.txt = txt.copy();
+    ftw.ictx = ictx;
     ftw.first = first;
     ftw.tokNum = tokNum;
     ftw.fast = fast;

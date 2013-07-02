@@ -78,7 +78,7 @@ public final class Or extends Logical {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     int is = 0;
     Expr[] exprs = {};
     boolean ia = true;
@@ -98,7 +98,7 @@ public final class Or extends Logical {
   }
 
   @Override
-  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+  public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
     super.indexEquivalent(ic);
     return new Union(info, expr);
   }

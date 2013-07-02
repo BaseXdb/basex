@@ -113,8 +113,8 @@ public final class FNFt extends StandardFunc {
 
     return new Iter() {
       final FTPosData ftd = new FTPosData();
-      ValueIter vi;
       Iter ir;
+      ValueIter vi;
 
       @Override
       public Item next() throws QueryException {
@@ -125,23 +125,23 @@ public final class FNFt extends StandardFunc {
             vi = null;
           }
           final FTPosData tmp = ctx.ftpos;
-          ctx.ftpos = ftd;
-          if(ir == null) ir = ctx.iter(expr[0]);
-          final Item it = ir.next();
-          if(it != null) {
+          try {
+            ctx.ftpos = ftd;
+            if(ir == null) ir = ctx.iter(expr[0]);
+            final Item it = ir.next();
+            if(it == null) return null;
+
             // copy node to main memory data instance
             final MemData md = new MemData(ctx.context.prop);
             final DataBuilder db = new DataBuilder(md);
             db.ftpos(mark, ctx.ftpos, len).build(checkDBNode(it));
 
             final IntList il = new IntList();
-            for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) {
-              il.add(p);
-            }
+            for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) il.add(p);
             vi = DBNodeSeq.get(il, md, false, false).iter();
+          } finally {
+            ctx.ftpos = tmp;
           }
-          ctx.ftpos = tmp;
-          if(it == null) return null;
         }
       }
     };
@@ -193,7 +193,7 @@ public final class FNFt extends StandardFunc {
       final StandardFunc fun, final QueryContext ctx) throws QueryException {
 
     final InputInfo info = fun.info;
-    final IndexContext ic = new IndexContext(ctx, data, null, true);
+    final IndexContext ic = new IndexContext(data, false);
     if(!data.meta.ftxtindex) BXDB_INDEX.thrw(info, data.meta.name,
         IndexType.FULLTEXT.toString().toLowerCase(Locale.ENGLISH));
 
@@ -219,9 +219,9 @@ public final class FNFt extends StandardFunc {
     }
 
     ctx.ftOpt(opt);
-    final FTWords words = new FTWords(info, ic.data, terms, m, ctx);
+    final FTWords words = new FTWords(info, ic, terms, m, ctx);
     ctx.ftOpt(tmp);
-    return new FTIndexAccess(info, words, ic.data.meta.name, ic.iterable).iter(ctx);
+    return new FTIndexAccess(info, words, ic).iter(ctx);
   }
 
   /**

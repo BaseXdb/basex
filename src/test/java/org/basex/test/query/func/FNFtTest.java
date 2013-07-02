@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.parse.Commands.CmdIndex;
 import org.basex.index.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
@@ -28,7 +29,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   @Before
   public void initTest() throws BaseXException {
     new CreateDB(NAME, FILE).execute(context);
-    new CreateIndex("fulltext").execute(context);
+    new CreateIndex(CmdIndex.FULLTEXT).execute(context);
   }
 
   /**
@@ -47,10 +48,9 @@ public final class FNFtTest extends AdvancedQueryTest {
     // apply index options to query term
     new Set(Prop.STEMMING, true).execute(context);
     new CreateIndex("fulltext").execute(context);
-    contains(_FT_SEARCH.args(NAME, "Exercises") + "/..",
-        "<li>Exercise 1</li>");
+    contains(_FT_SEARCH.args(NAME, "Exercises") + "/..", "<li>Exercise 1</li>");
     new Set(Prop.STEMMING, false).execute(context);
-    new CreateIndex("fulltext").execute(context);
+    new CreateIndex(CmdIndex.FULLTEXT).execute(context);
 
     // check match options
     query(_FT_SEARCH.args(NAME, "Assignments", " map {}"), "Assignments");
@@ -78,7 +78,7 @@ public final class FNFtTest extends AdvancedQueryTest {
     query(_FT_COUNT.args(" //*[text() contains text '1']"), "1");
     query(_FT_COUNT.args(" //li[text() contains text 'exercise']"), "2");
     query("for $i in //li[text() contains text 'exercise'] return " +
-        _FT_COUNT.args("$i[text() contains text 'exercise']"), "1 1");
+       _FT_COUNT.args("$i[text() contains text 'exercise']"), "1 1");
   }
 
   /**

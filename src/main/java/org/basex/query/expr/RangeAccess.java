@@ -9,6 +9,7 @@ import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -28,11 +29,10 @@ public final class RangeAccess extends IndexAccess {
    * Constructor.
    * @param ii input info
    * @param t index reference
-   * @param d data reference
-   * @param it flag for iterative evaluation
+   * @param ic index context
    */
-  RangeAccess(final InputInfo ii, final NumericRange t, final Data d, final boolean it) {
-    super(d, it, ii);
+  RangeAccess(final InputInfo ii, final NumericRange t, final IndexContext ic) {
+    super(ic, ii);
     ind = t;
   }
 
@@ -41,22 +41,22 @@ public final class RangeAccess extends IndexAccess {
     final byte kind = ind.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
 
     return new AxisIter() {
-      final IndexIterator it = data.iter(ind);
+      final IndexIterator it = ictx.data.iter(ind);
       @Override
       public ANode next() {
-        return it.more() ? new DBNode(data, it.next(), kind) : null;
+        return it.more() ? new DBNode(ictx.data, it.next(), kind) : null;
       }
     };
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new RangeAccess(info, ind, data, iterable);
+    return new RangeAccess(info, ind, ictx);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DATA, data.meta.name,
+    addPlan(plan, planElem(DATA, ictx.data.meta.name,
         MIN, ind.min, MAX, ind.max, TYP, ind.type));
   }
 

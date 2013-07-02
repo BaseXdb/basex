@@ -169,7 +169,7 @@ public final class FNDb extends StandardFunc {
       throws QueryException {
 
     final IndexType it = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
-    return new ValueAccess(info, expr[1], it, checkData(ctx), true);
+    return new ValueAccess(info, expr[1], it, new IndexContext(checkData(ctx), false));
   }
 
   /**
@@ -186,7 +186,7 @@ public final class FNDb extends StandardFunc {
     final byte[] max = checkStr(expr[2], ctx);
     final IndexType it = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
     final StringRange sr = new StringRange(it, min, true, max, true);
-    return new StringRangeAccess(info, sr, checkData(ctx), true);
+    return new StringRangeAccess(info, sr, new IndexContext(checkData(ctx), false));
   }
 
   /**

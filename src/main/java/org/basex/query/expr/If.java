@@ -158,7 +158,7 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+  public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
     final int es = expr.length;
     for(int e = 0; e < es; ++e) expr[e] = expr[e].indexEquivalent(ic);
     return this;

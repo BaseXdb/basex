@@ -22,24 +22,19 @@ import org.basex.util.hash.*;
 public final class FTIndexAccess extends Simple {
   /** Full-text expression. */
   private final FTExpr ftexpr;
-  /** If the index results are ordered. */
-  private final boolean iterable;
   /** Database name. */
-  private final String db;
+  private final IndexContext ictx;
 
   /**
    * Constructor.
    * @param ii input info
    * @param ex contains, select and optional ignore expression
-   * @param nm database name
-   * @param iter iterable flag
+   * @param ic index context
    */
-  public FTIndexAccess(final InputInfo ii, final FTExpr ex, final String nm,
-      final boolean iter) {
+  public FTIndexAccess(final InputInfo ii, final FTExpr ex, final IndexContext ic) {
     super(ii);
     ftexpr = ex;
-    iterable = iter;
-    db = nm;
+    ictx = ic;
   }
 
   @Override
@@ -86,22 +81,22 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTIndexAccess(info, ftexpr.copy(ctx, scp, vs), db, iterable);
+    return new FTIndexAccess(info, ftexpr.copy(ctx, scp, vs), ictx);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(db) && ftexpr.accept(visitor);
+    return visitor.lock(ictx.data.meta.name) && ftexpr.accept(visitor);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DATA, db), ftexpr);
+    addPlan(plan, planElem(DATA, ictx.data.meta.name), ftexpr);
   }
 
   @Override
   public boolean iterable() {
-    return iterable;
+    return ictx.iterable;
   }
 
   @Override
@@ -111,7 +106,7 @@ public final class FTIndexAccess extends Simple {
       final FTWords f = (FTWords) ftexpr;
       if(f.mode == FTMode.ANY && f.occ == null) e = f.query;
     }
-    return Function._DB_FULLTEXT.get(info, Str.get(db), e).toString();
+    return Function._DB_FULLTEXT.get(info, Str.get(ictx.data.meta.name), e).toString();
   }
 
   @Override

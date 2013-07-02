@@ -102,7 +102,7 @@ public abstract class FTFilter extends FTExpr {
   }
 
   @Override
-  public final boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public final boolean indexAccessible(final IndexCosts ic) throws QueryException {
     return expr[0].indexAccessible(ic);
   }
 

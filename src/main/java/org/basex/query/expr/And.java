@@ -91,7 +91,7 @@ public final class And extends Logical {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     int is = 0;
     final int es = expr.length;
     final int[] ics = new int[es];
@@ -121,7 +121,7 @@ public final class And extends Logical {
   }
 
   @Override
-  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+  public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
     super.indexEquivalent(ic);
     return new InterSect(info, expr);
   }

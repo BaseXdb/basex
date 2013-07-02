@@ -303,24 +303,24 @@ public abstract class Expr extends ExprInfo {
   /**
    * Checks if an expression can be rewritten to an index access. If this method is
    * implemented, {@link #indexEquivalent} must be implemented as well.
-   * @param ic index context
+   * @param ic index costs analyzer
    * @return true if an index can be used
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     return false;
   }
 
   /**
    * Returns an equivalent expression which accesses an index structure. Will be called
    * if {@link #indexAccessible} is returns true for an expression.
-   * @param ic index context
+   * @param ic index costs analyzer
    * @return equivalent index-expression
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+  public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
     return null;
   }
 

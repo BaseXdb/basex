@@ -97,7 +97,7 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     final boolean ia = expr[0].indexAccessible(ic);
     ic.not ^= true;
     return ia;

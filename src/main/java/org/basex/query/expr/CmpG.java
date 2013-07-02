@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
@@ -310,15 +311,16 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     // accept only location path, string and equality expressions
     if(op != OpG.EQ) return false;
     final Step s = expr[0] instanceof Context ? ic.step : indexStep(expr[0]);
     if(s == null) return false;
 
     // check which index applies
-    final boolean text = s.test.type == NodeType.TXT && ic.data.meta.textindex;
-    final boolean attr = s.test.type == NodeType.ATT && ic.data.meta.attrindex;
+    final Data data = ic.ictx.data;
+    final boolean text = s.test.type == NodeType.TXT && data.meta.textindex;
+    final boolean attr = s.test.type == NodeType.ATT && data.meta.attrindex;
     if(!text && !attr) return false;
 
     // support expressions
@@ -335,8 +337,8 @@ public final class CmpG extends Cmp {
       if(!t.type.isStringOrUntyped() || arg.has(Flag.CTX) || arg.has(Flag.NDT))
         return false;
 
-      ic.addCosts(ic.data.meta.size / 10);
-      va = Array.add(va, new ValueAccess(info, arg, ind, ic.data, ic.iterable));
+      ic.addCosts(data.meta.size / 10);
+      va = Array.add(va, new ValueAccess(info, arg, ind, ic.ictx));
       return true;
     }
 
@@ -347,10 +349,10 @@ public final class CmpG extends Cmp {
     while((it = ir.next()) != null) {
       if(!it.type.isStringOrUntyped()) return false;
 
-      final int is = ic.data.count(new StringToken(ind, it.string(info)));
+      final int is = data.count(new StringToken(ind, it.string(info)));
       // add only expressions that yield results
       if(is != 0) {
-        va = Array.add(va, new ValueAccess(info, it, ind, ic.data, ic.iterable));
+        va = Array.add(va, new ValueAccess(info, it, ind, ic.ictx));
         ic.addCosts(is);
       }
     }
@@ -358,7 +360,7 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public Expr indexEquivalent(final IndexContext ic) {
+  public Expr indexEquivalent(final IndexCosts ic) {
     // will only be called for costs != 0
     final boolean text = va[0].itype == IndexType.TEXT;
     ic.ctx.compInfo(text ? OPTTXTINDEX : OPTATVINDEX);

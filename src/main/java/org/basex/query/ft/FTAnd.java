@@ -126,7 +126,7 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     final int es = expr.length;
     neg = new boolean[es];
 
