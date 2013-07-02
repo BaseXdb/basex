@@ -190,6 +190,7 @@ public final class QueryContext extends Proc {
    */
   public LibraryModule parseLibrary(final String qu, final String path)
       throws QueryException {
+    query = qu;
     return new QueryParser(qu, path, this).parseLibrary(true);
   }
 
