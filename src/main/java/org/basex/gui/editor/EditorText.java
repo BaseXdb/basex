@@ -440,7 +440,7 @@ public final class EditorText {
    */
   boolean indent(final StringBuilder sb, final boolean shift) {
     // no selection, shift pressed: select current character
-    if(!selected() && shift) select(ps + 1, ps);
+    if(!selected() && shift && text.length != 0) select(ps + 1, ps);
 
     // check if something is selected
     boolean i = false;
@@ -456,7 +456,7 @@ public final class EditorText {
         sb.setLength(0);
       }
     } else {
-      boolean c = true;
+      boolean c = ps > 0;
       for(int p = ps - 1; p >= 0 && c; p--) {
         final byte b = text[p];
         c = ws(b);
@@ -471,7 +471,7 @@ public final class EditorText {
   }
 
   /**
-   * Processes the enter key.
+   * Processes the enter key and checks for opening brackets.
    * @param sb typed in string
    */
   void open(final StringBuilder sb) {
