@@ -237,10 +237,18 @@ public class QueryParser extends InputParser {
       namespaces.put(pref, uri);
       wsCheck(";");
 
+      // get absolute path
+      final IO base = ctx.sc.baseIO();
+      final byte[] p = token(base == null ? "" : base.path());
+      ctx.modParsed.put(p, uri);
+
+      ctx.modStack.push(p);
       prolog1();
       prolog2();
 
       finish(null, check);
+
+      ctx.modStack.pop();
       return new LibraryModule(module, moduleDoc);
     } catch(final QueryException ex) {
       mark();
