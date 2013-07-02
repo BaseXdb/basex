@@ -97,7 +97,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public boolean has(final Flag flag) {
-    return sig.has(flag) || super.has(flag);
+    return sig.has(flag) || flag != Flag.X30 && super.has(flag);
   }
 
   @Override
