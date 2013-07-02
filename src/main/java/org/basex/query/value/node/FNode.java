@@ -29,12 +29,12 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public QNm qname(final QNm nm) {
+  public final QNm qname(final QNm nm) {
     return qname();
   }
 
   @Override
-  public ANode deepCopy() {
+  public final ANode deepCopy() {
     return copy();
   }
 
@@ -45,21 +45,11 @@ public abstract class FNode extends ANode {
 
   @Override
   public final int diff(final ANode node) {
-    if(id != node.id) {
-      ANode n = this;
-      while(n != null) {
-        final ANode p = n.parent();
-        if(p == node) return 1;
-        n = p;
-      }
-      n = node;
-      while(n != null) {
-        final ANode p = n.parent();
-        if(p == this) return -1;
-        n = p;
-      }
-    }
-    return id - node.id;
+    // compare fragment with database node
+    if(node instanceof DBNode) return diff(this, node);
+    // compare fragments: compare node ids
+    final int i = node.id;
+    return id > i ? 1 : id < i ? -1 : 0;
   }
 
   @Override
@@ -70,7 +60,6 @@ public abstract class FNode extends ANode {
   @Override
   public final AxisIter ancestor() {
     return new AxisIter() {
-      /** Temporary node. */
       private ANode node = FNode.this;
 
       @Override
@@ -84,7 +73,6 @@ public abstract class FNode extends ANode {
   @Override
   public final AxisIter ancestorOrSelf() {
     return new AxisIter() {
-      /** Temporary node. */
       private ANode node = FNode.this;
 
       @Override
