@@ -71,7 +71,7 @@ public abstract class StaticFuncCall extends Arr {
 
       // copy the function body
       final Expr cpy = func.expr.copy(ctx, scp, vs), rt = !func.cast ? cpy :
-            new TypeCheck(func.info, cpy, func.declType, true).optimize(ctx, scp);
+        new TypeCheck(func.info, cpy, func.declType, true).optimize(ctx, scp);
 
       return cls == null ? rt : new GFLWOR(func.info, cls, rt).optimize(ctx, scp);
     }
