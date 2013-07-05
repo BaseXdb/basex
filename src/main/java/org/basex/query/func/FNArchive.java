@@ -9,6 +9,7 @@ import java.nio.charset.*;
 import java.util.*;
 import java.util.zip.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -413,19 +414,21 @@ public final class FNArchive extends StandardFunc {
   /**
    * Adds the specified entry to the output stream.
    * @param entry entry descriptor
-   * @param con contents
+   * @param cont contents
    * @param out output archive
    * @param level default compression level
    * @param ctx query context
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void add(final Item entry, final Item con, final ArchiveOut out,
+  private void add(final Item entry, final Item cont, final ArchiveOut out,
       final int level, final QueryContext ctx) throws QueryException, IOException {
 
     // create new zip entry
-    final String name = string(entry.string(info));
+    String name = string(entry.string(info));
     if(name.isEmpty()) ARCH_EMPTY.thrw(info);
+    if(Prop.WIN) name = name.replace('\\', '/');
+
     final ZipEntry ze = new ZipEntry(name);
     String en = null;
 
@@ -454,8 +457,8 @@ public final class FNArchive extends StandardFunc {
     }
 
     // data to be compressed
-    byte[] val = checkStrBin(con);
-    if(con instanceof AStr && en != null && en != UTF8) val = encode(val, en, ctx);
+    byte[] val = checkStrBin(cont);
+    if(cont instanceof AStr && en != null && en != UTF8) val = encode(val, en, ctx);
 
     try {
       out.level(lvl == null ? level : toInt(lvl));
