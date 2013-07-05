@@ -253,6 +253,8 @@ public final class GUIConstants {
   public static Font mfont;
   /** Default monospace font. */
   public static Font dmfont;
+  /** Current font size. */
+  public static int fontSize;
 
   /** Default monospace font widths. */
   private static int[] dwidth;
@@ -314,11 +316,11 @@ public final class GUIConstants {
 
     final String f = prop.get(GUIProp.FONT);
     final int type = prop.num(GUIProp.FONTTYPE);
-    final int size = prop.num(GUIProp.FONTSIZE);
-    font  = new Font(f, type, size);
-    mfont = new Font(prop.get(GUIProp.MONOFONT), type, size);
-    bfont = new Font(f, Font.BOLD, size);
-    lfont = new Font(f, type, 18 + (size >> 1));
+    fontSize = prop.num(GUIProp.FONTSIZE);
+    font  = new Font(f, type, fontSize);
+    mfont = new Font(prop.get(GUIProp.MONOFONT), type, fontSize);
+    bfont = new Font(f, Font.BOLD, fontSize);
+    lfont = new Font(f, type, 18 + (fontSize >> 1));
     dmfont = new Font(prop.get(GUIProp.MONOFONT), 0, TFONT.getSize() - 1);
 
     final Container comp = new Container();

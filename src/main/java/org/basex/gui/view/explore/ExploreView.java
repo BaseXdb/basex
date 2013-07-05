@@ -32,7 +32,7 @@ public final class ExploreView extends View {
    */
   public ExploreView(final ViewNotifier man) {
     super(EXPLOREVIEW, man);
-    border(6, 6, 6, 6).layout(new BorderLayout(0, 4));
+    border(5).layout(new BorderLayout(0, 4));
 
     label = new BaseXLabel(EXPLORER, true, false);
     label.setForeground(GUIConstants.GRAY);
@@ -41,7 +41,7 @@ public final class ExploreView extends View {
     filter.addKeyListener(this);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 3, 1, 0));
+    buttons.layout(new TableLayout(1, 1, 1, 0)).border(0, 0, 4, 0);
     buttons.add(filter);
 
     final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
@@ -80,7 +80,7 @@ public final class ExploreView extends View {
 
   @Override
   public void refreshLayout() {
-    label.setFont(lfont);
+    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
     refreshMark();
   }
 

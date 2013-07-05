@@ -225,7 +225,7 @@ public final class PlotView extends View {
   private BufferedImage itemImage(final boolean focus, final boolean marked,
       final boolean markedSub) {
 
-    final int size = Math.max(1, gui.gprop.num(GUIProp.FONTSIZE) +
+    final int size = Math.max(1, fontSize +
         gui.gprop.num(GUIProp.PLOTDOTS) - (focus ? 2 : marked || markedSub ? 4 : 6));
     final BufferedImage img = new BufferedImage(size, size, Transparency.TRANSLUCENT);
 
@@ -687,7 +687,7 @@ public final class PlotView extends View {
     final int h = getHeight();
     final int w = getWidth();
     final int textH = g.getFontMetrics().getHeight();
-    final int fs = gui.gprop.num(GUIProp.FONTSIZE);
+    final int fs = fontSize;
     final int imgW = BaseXLayout.width(g, cap) + fs;
     final BufferedImage img = createCaptionImage(g, cap, false, imgW);
 
@@ -718,7 +718,7 @@ public final class PlotView extends View {
       final boolean im, final int imgW) {
 
     final int textH = g.getFontMetrics().getHeight();
-    final int fs = gui.gprop.num(GUIProp.FONTSIZE);
+    final int fs = fontSize;
 
     // caption labels are rotated, for both x and y axis. first a buffered
     // image is created which displays the rotated label ...
@@ -746,7 +746,7 @@ public final class PlotView extends View {
     final int pos = calcCoordinate(drawX, d);
     final int h = getHeight();
     final int w = getWidth();
-    final int fs = gui.gprop.num(GUIProp.FONTSIZE);
+    final int fs = fontSize;
     final int sf = sizeFactor();
     g.setColor(color2A);
 
@@ -961,7 +961,7 @@ public final class PlotView extends View {
    * @return size value
    */
   private int sizeFactor() {
-    return Math.max(2, gui.gprop.num(GUIProp.FONTSIZE) << 1);
+    return Math.max(2, fontSize << 1);
   }
 
   /**

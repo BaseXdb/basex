@@ -523,7 +523,7 @@ public final class GUI extends AGUI {
     final int n2 = top.getComponentCount();
 
     if(n == 0 && n2 == 2) {
-      views.border(0, 0, 0, 0);
+      views.border(0);
     } else {
       views.setBorder(new CompoundBorder(new EmptyBorder(3, 1, 3, 1),
           new EtchedBorder()));

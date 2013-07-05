@@ -102,7 +102,7 @@ final class ViewMover extends BaseXPanel {
    * Called when GUI design has changed.
    */
   public void refreshLayout() {
-    height = Math.max(10, 6 + (int) (gui.gprop.num(GUIProp.FONTSIZE) * 0.333));
+    height = Math.max(10, 6 + (int) (GUIConstants.fontSize * 0.333));
     BaseXLayout.setHeight(this, height);
   }
 }

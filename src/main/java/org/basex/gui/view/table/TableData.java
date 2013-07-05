@@ -335,7 +335,7 @@ final class TableData {
    * @return row height
    */
   int rowH(final double f) {
-    rowH = Math.max(1, (int) (f * gprop.num(GUIProp.FONTSIZE) * 7 / 4));
+    rowH = Math.max(1, (int) (f * GUIConstants.fontSize * 7 / 4));
     return rowH;
   }
 }

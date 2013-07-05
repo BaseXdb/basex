@@ -49,7 +49,7 @@ public final class TextView extends View {
    */
   public TextView(final ViewNotifier man) {
     super(TEXTVIEW, man);
-    border(6, 6, 6, 6).layout(new BorderLayout(0, 4));
+    border(5).layout(new BorderLayout(0, 5));
 
     label = new BaseXLabel(RESULT, true, false);
     label.setForeground(GUIConstants.GRAY);
@@ -62,7 +62,7 @@ public final class TextView extends View {
         BaseXLayout.addShortcut(SEARCH, BaseXKeys.FIND.toString()));
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 3, 1, 0));
+    buttons.layout(new TableLayout(1, 3, 1, 0)).border(0, 0, 4, 0);
     buttons.add(save);
     buttons.add(home);
     buttons.add(srch);
@@ -107,7 +107,7 @@ public final class TextView extends View {
 
   @Override
   public void refreshLayout() {
-    label.setFont(lfont);
+    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
     text.setFont(mfont);
     search.panel().refreshLayout();
   }

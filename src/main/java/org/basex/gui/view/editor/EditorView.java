@@ -90,7 +90,7 @@ public final class EditorView extends View {
    */
   public EditorView(final ViewNotifier man) {
     super(EDITORVIEW, man);
-    border(6, 6, 6, 6).layout(new BorderLayout());
+    border(5).layout(new BorderLayout());
 
     label = new BaseXLabel(EDITOR, true, false);
     label.setForeground(GUIConstants.GRAY);
@@ -114,7 +114,7 @@ public final class EditorView extends View {
     filter.setEnabled(false);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 8, 1, 0));
+    buttons.layout(new TableLayout(1, 8, 1, 0)).border(0, 0, 4, 0);
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(hist);
@@ -271,7 +271,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshLayout() {
-    label.setFont(GUIConstants.lfont);
+    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
     for(final EditorArea edit : editors()) edit.setFont(GUIConstants.mfont);
     search.refreshLayout();
   }

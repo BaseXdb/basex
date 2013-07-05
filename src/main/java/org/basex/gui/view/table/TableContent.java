@@ -54,7 +54,7 @@ final class TableContent extends BaseXBack {
 
     final int w = getWidth() - scroll.getWidth();
     final int h = getHeight();
-    final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
+    final int fsz = GUIConstants.fontSize;
 
     final Context context = tdata.context;
     final Data data = context.data();

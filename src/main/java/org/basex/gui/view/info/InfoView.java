@@ -9,8 +9,8 @@ import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.*;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
@@ -63,7 +63,7 @@ public final class InfoView extends View implements LinkListener {
    */
   public InfoView(final ViewNotifier man) {
     super(INFOVIEW, man);
-    border(6, 6, 6, 6).layout(new BorderLayout(0, 4));
+    border(5).layout(new BorderLayout(0, 5));
 
     label = new BaseXLabel(QUERY_INFO);
     label.setForeground(GUIConstants.GRAY);
@@ -74,7 +74,7 @@ public final class InfoView extends View implements LinkListener {
     final BaseXButton srch = new BaseXButton(gui, "search",
         BaseXLayout.addShortcut(SEARCH, BaseXKeys.FIND.toString()));
     buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 2, 8, 0));
+    buttons.layout(new TableLayout(1, 3, 8, 0)).border(0, 0, 4, 0);
     buttons.add(srch);
     buttons.add(timer);
 
@@ -112,7 +112,7 @@ public final class InfoView extends View implements LinkListener {
 
   @Override
   public void refreshLayout() {
-    label.setFont(lfont);
+    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
     timer.setFont(font);
     area.setFont(font);
     search.panel().refreshLayout();
@@ -307,7 +307,7 @@ public final class InfoView extends View implements LinkListener {
     final int l = stat.size();
     if(l == 0) return;
 
-    final int fs = gui.gprop.num(GUIProp.FONTSIZE);
+    final int fs = fontSize;
     h = label.getHeight() + 4;
     w = (int) (getWidth() * .98 - fs / 2 - label.getWidth());
     bw = fs * 2 + w / 10;
