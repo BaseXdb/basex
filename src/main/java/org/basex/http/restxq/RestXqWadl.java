@@ -43,10 +43,6 @@ final class RestXqWadl {
     // create root nodes
     final FElem application = new FElem(WADL + "application", WADL_URI).declareNS();
     final String base = http.req.getRequestURL().toString();
-
-    System.out.println("? " + http.req.getRequestURI().
-        replaceAll(http.req.getPathInfo(), ""));
-
     final FElem resources = elem("resources", application).add("base", base);
 
     // create children
