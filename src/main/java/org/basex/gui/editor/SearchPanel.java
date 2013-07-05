@@ -181,7 +181,7 @@ public final class SearchPanel extends BaseXBack {
       @Override
       public void actionPerformed(final ActionEvent e) {
         if(isVisible()) deactivate(true);
-        else activate(null);
+        else activate(null, true);
       }
     });
   }
@@ -198,18 +198,20 @@ public final class SearchPanel extends BaseXBack {
 
   /**
    * Activates the search panel.
-   * @param string search string; triggers new search if it differs from old string
+   * @param string search string; triggers a new search if it differs from old string.
+   * Will be ignored if set to {@code null}
+   * @param focus indicates if text field should be focused
    */
-  public void activate(final String string) {
+  public void activate(final String string, final boolean focus) {
     boolean action = !isVisible();
     if(action) {
       setVisible(true);
       if(button != null) button.setSelected(true);
     }
-    if(string == null) {
-      search.requestFocusInWindow();
-    } else if(!new SearchContext(this, search.getText()).matches(string)) {
-      // set new, different search string
+    if(focus) search.requestFocusInWindow();
+
+    // set new, different search string
+    if(string != null && !new SearchContext(this, search.getText()).matches(string)) {
       search.setText(string);
       regex.setSelected(false);
       action = true;

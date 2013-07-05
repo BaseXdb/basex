@@ -460,12 +460,12 @@ public class Editor extends BaseXPanel {
         return;
       }
       if(FIND.is(e)) {
-        search.activate(text.copy());
+        search.activate(text.copy(), true);
         return;
       }
       if(FINDNEXT.is(e) || FINDNEXT2.is(e) || FINDPREV.is(e) || FINDPREV2.is(e)) {
         final boolean vis = search.isVisible();
-        search.activate(text.copy());
+        search.activate(text.copy(), false);
         jump(vis ? FINDNEXT.is(e) || FINDNEXT2.is(e) ?
           SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT, true);
         return;
