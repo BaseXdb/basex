@@ -41,7 +41,7 @@ final class RestXqWadl {
    */
   synchronized FElem create(final HashMap<String, RestXqModule> modules) {
     // create root nodes
-    final FElem application = new FElem("application", WADL_URI).declareNS();
+    final FElem application = new FElem(WADL + "application", WADL_URI).declareNS();
     final String base = http.req.getRequestURL().toString();
 
     System.out.println("? " + http.req.getRequestURI().
@@ -58,7 +58,7 @@ final class RestXqWadl {
         final String methods = func.methods.toString().replaceAll("[^A-Z ]", "");
 
         // create resource
-        final FElem resource = new FElem("resource", WADL_URI).add("path", path);
+        final FElem resource = new FElem(WADL + "resource", WADL_URI).add("path", path);
         map.put(path + "?" + methods, resource);
 
         // add documentation for path variables
@@ -121,7 +121,7 @@ final class RestXqWadl {
    * @return element node
    */
   private FElem elem(final String name, final FElem parent) {
-    final FElem elem = new FElem(name, WADL_URI);
+    final FElem elem = new FElem(WADL + name, WADL_URI);
     if(parent != null) parent.add(elem);
     return elem;
   }

@@ -52,6 +52,8 @@ public interface RestXqText {
   /** Token "forward". */
   byte[] FORWARD = token("forward");
 
+  /** WADL prefix. */
+  String WADL = "wadl:";
   /** WADL namespace. */
   String WADL_URI = "http://wadl.dev.java.net/2009/02";
   /** XHTML namespace. */
