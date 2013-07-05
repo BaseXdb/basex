@@ -191,10 +191,9 @@ public final class SearchPanel extends BaseXBack {
    */
   public void refreshLayout() {
     if(editor == null) return;
-    final String mf = editor.getFont().getFamily();
-    final Font f = new Font(mf, 0, search.getFont().getSize());
-    search.setFont(f);
-    replace.setFont(f);
+    final Font ef = editor.getFont();
+    search.setFont(ef);
+    replace.setFont(ef);
   }
 
   /**

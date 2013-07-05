@@ -95,18 +95,34 @@ public final class EditorView extends View {
     label = new BaseXLabel(EDITOR, true, false);
     label.setForeground(GUIConstants.GRAY);
 
-    final BaseXButton srch = new BaseXButton(gui, "search",
-        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.FIND.toString()));
     final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
     final BaseXButton saveB = new BaseXButton(gui, "save", H_SAVE);
     hist = new BaseXButton(gui, "hist", H_RECENTLY_OPEN);
+    final BaseXButton srch = new BaseXButton(gui, "search",
+        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.FIND.toString()));
+
+    stop = new BaseXButton(gui, "stop", H_STOP_PROCESS);
+    stop.addKeyListener(this);
+    stop.setEnabled(false);
+
+    go = new BaseXButton(gui, "go",
+        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.EXEC.toString()));
+    go.addKeyListener(this);
+
+    filter = BaseXButton.command(GUICommands.C_FILTER, gui);
+    filter.addKeyListener(this);
+    filter.setEnabled(false);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 4, 1, 0));
+    buttons.layout(new TableLayout(1, 8, 1, 0));
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(hist);
     buttons.add(srch);
+    buttons.add(Box.createHorizontalStrut(6));
+    buttons.add(stop);
+    buttons.add(go);
+    buttons.add(filter);
 
     final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     b.add(buttons, BorderLayout.WEST);
@@ -127,31 +143,13 @@ public final class EditorView extends View {
     pos = new BaseXLabel(" ");
     posCode.invokeLater();
 
-    stop = new BaseXButton(gui, "stop", H_STOP_PROCESS);
-    stop.addKeyListener(this);
-    stop.setEnabled(false);
-
-    go = new BaseXButton(gui, "go",
-        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.EXEC.toString()));
-    go.addKeyListener(this);
-
-    filter = BaseXButton.command(GUICommands.C_FILTER, gui);
-    filter.addKeyListener(this);
-    filter.setEnabled(false);
-
     final BaseXBack status = new BaseXBack(Fill.NONE).layout(new BorderLayout(4, 0));
     status.add(info, BorderLayout.CENTER);
     status.add(pos, BorderLayout.EAST);
 
-    final BaseXBack query = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
-    query.add(stop);
-    query.add(go);
-    query.add(filter);
-
     final BaseXBack south = new BaseXBack(Fill.NONE).border(4, 0, 0, 0);
     south.layout(new BorderLayout(8, 0));
     south.add(status, BorderLayout.CENTER);
-    south.add(query, BorderLayout.EAST);
     add(south, BorderLayout.SOUTH);
 
     refreshLayout();
