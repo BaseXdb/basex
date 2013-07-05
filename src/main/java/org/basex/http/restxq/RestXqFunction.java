@@ -357,15 +357,16 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(!m.find()) error(INV_TEMPLATE, tmp);
     final byte[] vn = token(m.group(1));
     if(!XMLToken.isQName(vn)) error(INV_VARNAME, vn);
-    final QNm qnm = new QNm(vn, context);
+    final QNm name = new QNm(vn);
+    if(name.hasPrefix()) name.uri(context.sc.ns.uri(name.prefix()));
     int r = -1;
-    while(++r < args.length && !args[r].name.eq(qnm));
+    while(++r < args.length && !args[r].name.eq(name))
     if(r == args.length) error(UNKNOWN_VAR, vn);
     if(declared[r]) error(VAR_ASSIGNED, vn);
     final SeqType st = args[r].declaredType();
     if(args[r].checksType() && !st.type.instanceOf(type)) error(INV_VARTYPE, vn, type);
     declared[r] = true;
-    return qnm;
+    return name;
   }
 
   /**
