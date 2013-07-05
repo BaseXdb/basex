@@ -28,7 +28,7 @@ public final class Databases {
 
   /** Pattern to extract the database name from a backup file name. */
   private static final Pattern ZIPPATTERN =
-      Pattern.compile(DateTime.PATTERN + IO.ZIPSUFFIX + '$');
+      Pattern.compile(DateTime.PATTERN + '\\' + IO.ZIPSUFFIX + '$');
   /** Regex indicator. */
   private static final Pattern REGEX = Pattern.compile(".*[*?,].*");
 
@@ -109,7 +109,8 @@ public final class Databases {
       final String fn = f.name();
       String add = null;
       if(backup && fn.endsWith(IO.ZIPSUFFIX)) {
-        add = ZIPPATTERN.split(fn)[0];
+        final String nn = ZIPPATTERN.split(fn)[0];
+        if(!nn.equals(fn)) add = nn;
       } else if(db && f.isDir() && fn.indexOf('.') == -1) {
         add = fn;
       }
