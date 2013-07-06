@@ -1,4 +1,4 @@
-package org.basex.http.webdav;
+package org.basex.http.webdav.milton1;
 
 import java.io.*;
 
@@ -9,7 +9,7 @@ import com.bradmcevoy.http.*;
 /**
  * WebDAV servlet.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
 public final class WebDAVServlet extends BaseXServlet {

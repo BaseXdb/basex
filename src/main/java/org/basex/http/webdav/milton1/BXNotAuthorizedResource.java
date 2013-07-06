@@ -1,25 +1,40 @@
-package org.basex.http.webdav;
+package org.basex.http.webdav.milton1;
 
 import java.io.*;
 import java.util.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Request.Method;
+import org.basex.core.Prop;
 
 /**
  * Dummy resource to be returned when no authorization is provided.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXNotAuthorizedResource extends BXResource implements FolderResource {
+public final class BXNotAuthorizedResource implements FolderResource {
   /** The only instance of this class. */
   public static final Resource NOAUTH = new BXNotAuthorizedResource();
 
   /** Constructor. */
   private BXNotAuthorizedResource() {
-    super(null, null, -1, null);
+  }
+
+  @Override
+  public String getRealm() {
+    return Prop.NAME;
+  }
+
+  @Override
+  public Date getModifiedDate() {
+    return null;
+  }
+
+  @Override
+  public String getUniqueId() {
+    return null;
   }
 
   @Override
@@ -92,6 +107,11 @@ public final class BXNotAuthorizedResource extends BXResource implements FolderR
 
   @Override
   public Date getCreateDate() {
+    return null;
+  }
+
+  @Override
+  public String checkRedirect(final Request request) {
     return null;
   }
 }

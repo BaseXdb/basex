@@ -1,46 +1,46 @@
-package org.basex.http.webdav;
+package org.basex.http.webdav.milton1;
 
 import java.io.*;
 
-import org.basex.core.cmd.*;
-import org.basex.http.*;
+import org.basex.http.webdav.impl.ResourceMetaData;
+import org.basex.http.webdav.impl.WebDAVService;
 
 /**
  * WebDAV resource representing a collection database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
 public final class BXDatabase extends BXFolder {
   /**
    * Constructor.
-   * @param d database name
-   * @param m last modified date
-   * @param h http context
+   * @param d resource meta data
+   * @param s service
    */
-  public BXDatabase(final String d, final long m, final HTTPContext h) {
-    super(d, "", m, h);
+  public BXDatabase(final ResourceMetaData d, final WebDAVService<BXAbstractResource>
+    s) {
+    super(d, s);
   }
 
   @Override
   public String getName() {
-    return db;
+    return meta.db;
   }
 
   @Override
   protected void del() throws IOException {
-    http.session().execute(new DropDB(db));
+    service.dropDb(meta.db);
   }
 
   @Override
   protected void rename(final String n) throws IOException {
-    http.session().execute(new AlterDB(db, n));
+    service.renameDb(meta.db, n);
   }
 
   @Override
   protected void copyToRoot(final String n) throws IOException {
-    http.session().execute(new Copy(db, n));
+    service.copyDb(meta.db, n);
   }
 
   @Override

@@ -1,4 +1,4 @@
-package org.basex.http.webdav;
+package org.basex.http.webdav.milton1;
 
 import java.io.*;
 
@@ -10,18 +10,18 @@ import com.bradmcevoy.http.exceptions.*;
  * Code container.
  * @param <E> return type
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class BXCode<E> {
   /** Resource. */
-  private final BXResource resource;
+  private final BXAbstractResource resource;
 
   /**
    * Constructor.
    * @param res resource
    */
-  protected BXCode(final BXResource res) {
+  protected BXCode(final BXAbstractResource res) {
     resource = res;
   }
 

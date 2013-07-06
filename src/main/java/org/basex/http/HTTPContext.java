@@ -52,7 +52,7 @@ public final class HTTPContext {
   /** Current user session. */
   private LocalSession session;
   /** User name. */
-  private String user;
+  public String user;
   /** Password. */
   private String pass;
 
