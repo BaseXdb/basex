@@ -18,7 +18,7 @@ import org.basex.gui.layout.BaseXLayout.DropHandler;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class SearchPanel extends BaseXBack {
+public final class SearchBar extends BaseXBack {
   /** Escape key listener. */
   private final KeyAdapter escape = new KeyAdapter() {
     @Override
@@ -55,7 +55,7 @@ public final class SearchPanel extends BaseXBack {
    * Constructor.
    * @param main gui reference
    */
-  SearchPanel(final GUI main) {
+  SearchBar(final GUI main) {
     layout(new BorderLayout(2, 0));
     mode(Fill.NONE);
     setVisible(false);
@@ -191,13 +191,13 @@ public final class SearchPanel extends BaseXBack {
    */
   public void refreshLayout() {
     if(editor == null) return;
-    final Font ef = editor.getFont();
+    final Font ef = editor.getFont().deriveFont(7f + (GUIConstants.fontSize >> 1));
     search.setFont(ef);
     replace.setFont(ef);
   }
 
   /**
-   * Activates the search panel.
+   * Activates the search bar.
    * @param string search string; triggers a new search if it differs from old string.
    * Will be ignored if set to {@code null}
    * @param focus indicates if text field should be focused
@@ -221,8 +221,8 @@ public final class SearchPanel extends BaseXBack {
   }
 
   /**
-   * Deactivates the search panel.
-   * @param close close panel
+   * Deactivates the search bar.
+   * @param close close bar
    * @return {@code true} if panel was closed
    */
   public boolean deactivate(final boolean close) {

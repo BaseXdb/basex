@@ -185,11 +185,11 @@ public final class BaseXLayout {
           if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof Editor)) {
             d.close();
           } else if(ESCAPE.is(e)) {
-            // do not cancel dialog if search panel is opened
+            // do not cancel dialog if search bar is opened
             boolean close = true;
             if(s instanceof Editor) {
-              final SearchPanel sp = ((Editor) s).getSearch();
-              close = sp == null || !sp.deactivate(true);
+              final SearchBar bar = ((Editor) s).getSearch();
+              close = bar == null || !bar.deactivate(true);
             }
             if(close) d.cancel();
           }

@@ -16,7 +16,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This is a simple user search panel.
+ * This view provides standard GUI components to browse the currently opened database.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

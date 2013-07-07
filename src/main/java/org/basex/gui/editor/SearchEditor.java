@@ -9,14 +9,14 @@ import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
 
 /**
- * This class provides an editor with an attached search panel.
+ * This class displays editor components with an integrated search bar.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class SearchEditor extends BaseXBack {
-  /** Search panel. */
-  final SearchPanel search;
+  /** Search bar. */
+  final SearchBar search;
 
   /**
    * Constructor.
@@ -35,7 +35,7 @@ public final class SearchEditor extends BaseXBack {
    */
   public SearchEditor(final GUI gui, final JComponent center, final Editor editor) {
     super(Fill.NONE);
-    search = new SearchPanel(gui);
+    search = new SearchBar(gui);
     layout(new BorderLayout(0, 2));
     add(center, BorderLayout.CENTER);
     add(search, BorderLayout.SOUTH);
@@ -43,12 +43,13 @@ public final class SearchEditor extends BaseXBack {
   }
 
   /**
-   * Return search component.
-   * @return search panel
+   * Return search bar.
+   * @return search bar
    */
-  public SearchPanel panel() {
+  public SearchBar bar() {
     return search;
   }
+
   /**
    * Sets the search button.
    * @param b button

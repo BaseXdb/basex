@@ -54,8 +54,8 @@ public final class EditorView extends View {
   private static final Pattern ERRORTT = Pattern.compile(
       "^.*\r?\n" + STOPPED_AT + "|\r?\n" + STACK_TRACE_C + ".*", Pattern.DOTALL);
 
-  /** Search panel. */
-  final SearchPanel search;
+  /** Search bar. */
+  final SearchBar search;
   /** History Button. */
   final BaseXButton hist;
   /** Execute Button. */
@@ -132,7 +132,7 @@ public final class EditorView extends View {
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(Prop.MAC);
     final SearchEditor se = new SearchEditor(gui, tabs, null).button(srch);
-    search = se.panel();
+    search = se.bar();
     addCreateTab();
     add(se, BorderLayout.CENTER);
 

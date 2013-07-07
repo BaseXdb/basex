@@ -109,7 +109,7 @@ public final class TextView extends View {
   public void refreshLayout() {
     label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
     text.setFont(mfont);
-    search.panel().refreshLayout();
+    search.bar().refreshLayout();
   }
 
   @Override

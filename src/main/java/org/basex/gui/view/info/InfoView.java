@@ -24,10 +24,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class InfoView extends View implements LinkListener {
-  /** Search panel. */
-  final SearchEditor search;
+  /** Searchable editor. */
+  final SearchEditor editor;
 
-  /** Old text. */
+  /** Current text. */
   private final TokenBuilder text = new TokenBuilder();
   /** Header label. */
   private final BaseXLabel label;
@@ -86,11 +86,11 @@ public final class InfoView extends View implements LinkListener {
     final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     area = new Editor(false, gui);
     area.setLinkListener(this);
-    search = new SearchEditor(gui, area).button(srch);
-    add(search, BorderLayout.CENTER);
+    editor = new SearchEditor(gui, area).button(srch);
+    add(editor, BorderLayout.CENTER);
 
     center.add(area, BorderLayout.CENTER);
-    center.add(search, BorderLayout.SOUTH);
+    center.add(editor, BorderLayout.SOUTH);
     add(center, BorderLayout.CENTER);
     refreshLayout();
   }
@@ -115,7 +115,7 @@ public final class InfoView extends View implements LinkListener {
     label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
     timer.setFont(font);
     area.setFont(font);
-    search.panel().refreshLayout();
+    editor.bar().refreshLayout();
   }
 
   @Override

@@ -61,8 +61,8 @@ public class Editor extends BaseXPanel {
   final BaseXBar scroll;
   /** Editable flag. */
   final boolean editable;
-  /** Search field. */
-  private SearchPanel search;
+  /** Search bar. */
+  private SearchBar search;
   /** Link listener. */
   private LinkListener linkListener;
 
@@ -310,18 +310,18 @@ public class Editor extends BaseXPanel {
   }
 
   /**
-   * Installs a search panel.
-   * @param s search panel
+   * Installs a search bar.
+   * @param s search bar
    */
-  final void setSearch(final SearchPanel s) {
+  final void setSearch(final SearchBar s) {
     search = s;
   }
 
   /**
-   * Returns the search panel.
-   * @return search panel
+   * Returns the search bar.
+   * @return search bar
    */
-  public final SearchPanel getSearch() {
+  public final SearchBar getSearch() {
     return search;
   }
 
