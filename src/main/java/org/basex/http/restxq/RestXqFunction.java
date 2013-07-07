@@ -360,7 +360,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     final QNm name = new QNm(vn);
     if(name.hasPrefix()) name.uri(context.sc.ns.uri(name.prefix()));
     int r = -1;
-    while(++r < args.length && !args[r].name.eq(name))
+    while(++r < args.length && !args[r].name.eq(name));
     if(r == args.length) error(UNKNOWN_VAR, vn);
     if(declared[r]) error(VAR_ASSIGNED, vn);
     final SeqType st = args[r].declaredType();
