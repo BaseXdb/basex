@@ -91,12 +91,14 @@ public final class DataBuilder {
    * @return pre value of next node
    */
   private int addDoc(final ANode node, final int pre) {
-    final int ms = data.meta.size;
-    data.doc(ms, size(node, false), node.baseURI());
-    data.insert(ms);
+    final int ds = data.meta.size;
+    final int s = size(node, false);
+    data.doc(ds, s, node.baseURI());
+    data.insert(ds);
     int p = pre + 1;
     final AxisIter ai = node.children();
     for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, null);
+    if(s != p - pre) data.size(ds, Data.DOC, p - pre);
     return p;
   }
 

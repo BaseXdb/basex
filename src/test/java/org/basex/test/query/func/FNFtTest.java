@@ -100,6 +100,9 @@ public final class FNFtTest extends AdvancedQueryTest {
     query("copy $a := text { 'a b' } modify () return " +
         _FT_MARK.args("$a[. contains text 'a b'], 'b'"), "<b>a</b> <b>b</b>");
 
+    query(COUNT.args(_FT_MARK.args(" //*[text() contains text '1']/../../../../..")),
+        "1");
+
     new CreateDB(NAME, "<a:a xmlns:a='A'>C</a:a>").execute(context);
     query(_FT_MARK.args(" /descendant::*[text() contains text 'C']", 'b'),
         "<a:a xmlns:a=\"A\"><b>C</b></a:a>");
