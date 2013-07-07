@@ -540,8 +540,7 @@ public final class FNDb extends StandardFunc {
       final String[] cols = l.split(": ", 2);
       if(cols[0].isEmpty()) continue;
 
-      final String name = cols[0].replaceAll(" |-", "");
-      final FElem n = new FElem(lc(token(name)));
+      final FElem n = new FElem(token(toName(cols[0])));
       if(cols[0].startsWith(" ")) {
         if(node != null) node.add(n);
         if(!cols[1].isEmpty()) n.add(cols[1]);
@@ -551,6 +550,15 @@ public final class FNDb extends StandardFunc {
       }
     }
     return top;
+  }
+
+  /**
+   * Converts the specified info key to an element name.
+   * @param str string to be converted
+   * @return resulting name
+   */
+  public static String toName(final String str) {
+    return str.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH);
   }
 
   /**
