@@ -9,7 +9,7 @@
     <compileSource>1.6</compileSource>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <jettyVersion>8.1.6.v20120903</jettyVersion> 
+    <jettyVersion>8.1.11.v20130520</jettyVersion>
   </properties>
   <repositories>
     <repository>
@@ -54,7 +54,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
+        <version>3.1</version>
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
@@ -68,15 +68,15 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.9</version>
+        <version>2.15</version>
         <configuration>
           <forkMode>always</forkMode>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.15</version>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
         <configuration>
           <outputDirectory>target</outputDirectory>
         </configuration>
