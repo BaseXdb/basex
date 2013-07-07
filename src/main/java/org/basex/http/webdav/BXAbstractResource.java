@@ -1,9 +1,9 @@
-package org.basex.http.webdav.milton1;
+package org.basex.http.webdav;
 
 import static org.basex.http.webdav.impl.Utils.*;
 import static com.bradmcevoy.http.LockResult.*;
 import java.io.*;
-import java.util.Date;
+import java.util.*;
 
 import org.basex.core.Prop;
 import org.basex.http.webdav.impl.ResourceMetaData;
@@ -59,7 +59,7 @@ public abstract class BXAbstractResource implements
   @Override
   public boolean authorise(final Request request, final Request.Method method,
       final Auth auth) {
-    return auth != null && auth.getTag() != null && service.authorise(auth.getUser(),
+    return auth != null && auth.getTag() != null && service.authorize(auth.getUser(),
       "any", meta.db, meta.path);
   }
 
@@ -263,13 +263,13 @@ public abstract class BXAbstractResource implements
    * @return lock result
    * @throws IOException I/O exception
    */
-  LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo) throws
-    IOException {
+  LockResult lockResource(final LockTimeout timeout, final LockInfo lockInfo)
+      throws IOException {
 
     final String tokenId = service.locking.lock(meta.db, meta.path,
-      lockInfo.scope.name().toLowerCase(),
-      lockInfo.type.name().toLowerCase(),
-      lockInfo.depth.name().toLowerCase(),
+      lockInfo.scope.name().toLowerCase(Locale.ENGLISH),
+      lockInfo.type.name().toLowerCase(Locale.ENGLISH),
+      lockInfo.depth.name().toLowerCase(Locale.ENGLISH),
       lockInfo.lockedByUser,
       timeout.getSeconds());
 
@@ -296,7 +296,7 @@ public abstract class BXAbstractResource implements
   LockResult refresh(final String token) throws IOException {
     service.locking.refreshLock(token);
     final String lockInfoStr = service.locking.lock(token);
-    LockToken lockToken = lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
+    final LockToken lockToken = lockInfoStr == null ? null : parseLockInfo(lockInfoStr);
     // TODO failed(failureReason);
     return success(lockToken);
   }
@@ -309,13 +309,13 @@ public abstract class BXAbstractResource implements
    */
   private static LockToken parseLockInfo(final String lockInfo) throws IOException {
     try {
-      XMLReader reader = XMLReaderFactory.createXMLReader();
-      LockTokenSaxHandler handler = new LockTokenSaxHandler();
+      final XMLReader reader = XMLReaderFactory.createXMLReader();
+      final LockTokenSaxHandler handler = new LockTokenSaxHandler();
       reader.setContentHandler(handler);
       reader.parse(new InputSource(new StringReader(lockInfo)));
       return handler.lockToken;
-    } catch(SAXException e) {
-      Util.err("Error while parsing lock info", e);
+    } catch(final SAXException ex) {
+      Util.err("Error while parsing lock info", ex);
       return null;
     }
   }
@@ -344,19 +344,20 @@ public abstract class BXAbstractResource implements
     @Override
     public void characters(final char[] ch, final int start, final int length)
         throws SAXException {
-      String value = String.valueOf(ch, start, length);
+
+      final String v = String.valueOf(ch, start, length);
       if("token".equals(elementName))
-        lockToken.tokenId = value;
+        lockToken.tokenId = v;
       else if("scope".equals(elementName))
-        lockToken.info.scope = LockInfo.LockScope.valueOf(value.toUpperCase());
+        lockToken.info.scope = LockInfo.LockScope.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("type".equals(elementName))
-        lockToken.info.type = LockInfo.LockType.valueOf(value.toUpperCase());
+        lockToken.info.type = LockInfo.LockType.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("depth".equals(elementName))
-        lockToken.info.depth = LockInfo.LockDepth.valueOf(value.toUpperCase());
+        lockToken.info.depth = LockInfo.LockDepth.valueOf(v.toUpperCase(Locale.ENGLISH));
       else if("owner".equals(elementName))
-        lockToken.info.lockedByUser = value;
+        lockToken.info.lockedByUser = v;
       else if("timeout".equals(elementName))
-        lockToken.timeout = LockTimeout.parseTimeout(value);
+        lockToken.timeout = LockTimeout.parseTimeout(v);
     }
   }
 }

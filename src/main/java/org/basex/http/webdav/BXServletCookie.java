@@ -1,4 +1,4 @@
-package org.basex.http.webdav.milton1;
+package org.basex.http.webdav;
 
 import com.bradmcevoy.http.*;
 

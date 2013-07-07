@@ -1,6 +1,6 @@
-package org.basex.http.webdav.milton1;
+package org.basex.http.webdav;
 
-import static org.basex.http.webdav.milton1.BXServletRequest.*;
+import static org.basex.http.webdav.BXServletRequest.*;
 
 import javax.servlet.http.*;
 

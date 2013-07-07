@@ -1,4 +1,4 @@
-package org.basex.http.webdav.milton1;
+package org.basex.http.webdav;
 
 import static org.basex.http.webdav.impl.Utils.*;
 
@@ -111,12 +111,11 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   public LockToken createAndLock(final String name, final LockTimeout timeout,
       final LockInfo lockInfo) throws NotAuthorizedException {
     try {
-      final BXAbstractResource r = createNew(name, new ArrayInput(Token.EMPTY),
-          Long.valueOf(0L), null);
+      final BXAbstractResource r = createNew(name, new ArrayInput(Token.EMPTY), 0L, null);
       final LockResult lockResult = r.lock(timeout, lockInfo);
       if(lockResult.isSuccessful()) return lockResult.getLockToken();
-    } catch(Exception e) {
-      Util.debug("Cannot lock and create requested resource", e);
+    } catch(final Exception ex) {
+      Util.debug("Cannot lock and create requested resource", ex);
     }
     return null;
   }

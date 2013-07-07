@@ -9,7 +9,7 @@ import static org.basex.http.webdav.impl.Utils.stripLeadingSlash;
  * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
-public class ResourceMetaData {
+public final class ResourceMetaData {
   /** Database owning the resource. */
   public final String db;
   /** Resource path. */
@@ -77,13 +77,13 @@ public class ResourceMetaData {
    */
   public ResourceMetaData(final String d, final String p, final long m,
       final boolean r, final String c, final Long s, final boolean f) {
-    this.db = d;
-    this.path = stripLeadingSlash(p);
-    this.mod = m;
-    this.raw = r;
-    this.ctype = c;
-    this.size = s;
-    this.folder = f;
-    this.mdate = this.mod == -1 ? null : new Date(this.mod);
+    db = d;
+    path = stripLeadingSlash(p);
+    mod = m;
+    raw = r;
+    ctype = c;
+    size = s;
+    folder = f;
+    mdate = mod == -1 ? null : new Date(mod);
   }
 }

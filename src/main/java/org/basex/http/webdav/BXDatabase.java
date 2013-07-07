@@ -1,4 +1,4 @@
-package org.basex.http.webdav.milton1;
+package org.basex.http.webdav;
 
 import java.io.*;
 
@@ -18,8 +18,7 @@ public final class BXDatabase extends BXFolder {
    * @param d resource meta data
    * @param s service
    */
-  public BXDatabase(final ResourceMetaData d, final WebDAVService<BXAbstractResource>
-    s) {
+  public BXDatabase(final ResourceMetaData d, final WebDAVService<BXAbstractResource> s) {
     super(d, s);
   }
 

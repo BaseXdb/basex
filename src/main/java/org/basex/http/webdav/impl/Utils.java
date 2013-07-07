@@ -1,11 +1,12 @@
 package org.basex.http.webdav.impl;
 
-import org.basex.core.Text;
-import org.basex.io.in.BufferInput;
-import org.basex.io.in.TextInput;
+import java.io.*;
+import java.util.*;
 
-import java.io.IOException;
-import java.util.Locale;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.util.*;
 
 /**
  * WebDAV utility methods.
@@ -25,7 +26,7 @@ public final class Utils {
   private Utils() { }
 
   /**
-   * Strip leading slash if available.
+   * Strips leading slash if available.
    * @param s string to modify
    * @return string without leading slash
    */
@@ -34,7 +35,7 @@ public final class Utils {
   }
 
   /**
-   * Get the name from the given path.
+   * Gets the name from the given path.
    * @param path path
    * @return name of the resource identified by the path
    */
@@ -49,20 +50,12 @@ public final class Utils {
    * @return valid database name
    */
   public static String dbname(final String db) {
-    final int i = db.lastIndexOf('.');
-    return (i < 0 ? db : db.substring(0, i)).replaceAll("[^\\w-]", "");
+    Util.stack(5);
+    return IO.get(db).dbname();
   }
 
   /**
-   * Return the current time in milliseconds.
-   * @return now in milliseconds
-   */
-  public static long now() {
-    return System.currentTimeMillis();
-  }
-
-  /**
-   * Peek the next byte in the given buffer.
+   * Peeks the next byte in the given buffer.
    * @param bi buffer
    * @return the next byte in the buffer
    * @throws IOException I/O exception

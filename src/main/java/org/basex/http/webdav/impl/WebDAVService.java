@@ -30,7 +30,7 @@ import static org.basex.query.func.Function.*;
  * @author Dimitar Popov
  * @param <T> the type of resource
  */
-public class WebDAVService<T> {
+public final class WebDAVService<T> {
   /** HTTP context. */
   private final HTTPContext http;
   /** Resource factory. */
@@ -50,7 +50,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Authenticate the user with the given password.
+   * Authenticates the user with the given password.
    * @param user user name
    * @param pass password
    * @throws IOException if the login is invalid
@@ -61,19 +61,17 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Check if the user is authorised to perform the given action.
+   * Checks if the user is authorized to perform the given action.
    * @param user user name
    * @param action action
    * @param db database
    * @param p path
-   * @return {@code true} if the user is authorised
+   * @return {@code true} if the user is authorized
    */
   @SuppressWarnings("unused")
-  public boolean authorise(final String user, final String action, final String db,
+  public boolean authorize(final String user, final String action, final String db,
       final String p) {
-    if(WEBDAV_LOCKS_DB.equals(db)) return false;
-    // TODO
-    return true;
+    return !WEBDAV_LOCKS_DB.equals(db);
   }
 
   /**
@@ -109,7 +107,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Retrieve the last modified timestamp of a database.
+   * Retrieves the last modified timestamp of a database.
    * @param db database
    * @return timestamp in milliseconds.
    * @throws IOException I/O exception
@@ -128,7 +126,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Retrieve meta data about the resource at the given path.
+   * Retrieves meta data about the resource at the given path.
    * @param db database
    * @param p resource path
    * @return resource meta data
@@ -159,7 +157,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Delete a document or folder.
+   * Deletes a document or folder.
    * @param db database
    * @param p path
    * @throws IOException I/O exception
@@ -175,14 +173,13 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Rename a document or folder.
+   * Renames a document or folder.
    * @param db database
    * @param p path
    * @param n new name
    * @throws IOException I/O exception
    */
-  public void rename(final String db, final String p, final String n) throws
-    IOException {
+  public void rename(final String db, final String p, final String n) throws IOException {
     final Session session = http.session();
     session.execute(new Open(db));
     session.execute(new Rename(p, n));
@@ -197,7 +194,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Copy a document to the specified target.
+   * Copies a document to the specified target.
    * @param sdb source database
    * @param spath source path
    * @param tdb target database
@@ -219,7 +216,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Copy all documents in a folder to another folder.
+   * Copies all documents in a folder to another folder.
    * @param sdb source database
    * @param spath source path
    * @param tdb target database
@@ -243,7 +240,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Write a file to the specified output stream.
+   * Writes a file to the specified output stream.
    * @param db database
    * @param p path
    * @param raw is the file a raw file
@@ -263,7 +260,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Create an empty database with the given name.
+   * Creates an empty database with the given name.
    * @param db database name
    * @return object representing the newly created database
    * @throws IOException I/O exception
@@ -274,7 +271,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Drop the database with the given name.
+   * Drops the database with the given name.
    * @param db database name
    * @throws IOException I/O exception
    */
@@ -283,7 +280,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Rename the database with the given name.
+   * Renames the database with the given name.
    * @param db database name
    * @param n new name
    * @throws IOException I/O exception
@@ -293,7 +290,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Copy the database with the given name.
+   * Copies the database with the given name.
    * @param db database name
    * @param n new database name
    * @throws IOException I/O exception
@@ -303,7 +300,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * List the direct children of a path.
+   * Lists the direct children of a path.
    * @param db database
    * @param path path
    * @return children
@@ -344,7 +341,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * List all databases.
+   * Lists all databases.
    * @return a list of database resources.
    * @throws IOException I/O exception
    */
@@ -369,15 +366,16 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Create a folder at the given path.
+   * Creates a folder at the given path.
    * @param db database
    * @param p path
    * @param n new folder name
    * @return new folder resource
    * @throws IOException I/O exception
    */
-  public T createFolder(final String db, final String p, final String n) throws
-    IOException {
+  public T createFolder(final String db, final String p, final String n)
+      throws IOException {
+
     deleteDummy(db, p);
     final String newFolder = p + SEP + n;
     createDummy(db, newFolder);
@@ -385,7 +383,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Get the resource at the given path.
+   * Gets the resource at the given path.
    * @param db database
    * @param p path
    * @return resource
@@ -400,7 +398,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Add the given file to the specified path.
+   * Adds the given file to the specified path.
    * @param db database
    * @param p path
    * @param n file name
@@ -421,7 +419,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Create a new database from the given file.
+   * Creates a new database from the given file.
    * @param n file name
    * @param in file content
    * @return object representing the newly created database
@@ -460,7 +458,7 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Create a database with the given name and add the given document.
+   * Creates a database with the given name and add the given document.
    * @param db database name
    * @param in data stream
    * @return object representing the newly created database
@@ -472,15 +470,16 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Add a document with the specified name to the given path.
+   * Adds a document with the specified name to the given path.
    * @param db database
    * @param p path where the document will be added
    * @param in data stream
    * @return object representing the newly added XML
    * @throws IOException I/O exception
    */
-  private T addXML(final String db, final String p, final InputStream in) throws
-    IOException {
+  private T addXML(final String db, final String p, final InputStream in)
+      throws IOException {
+
     final Session session = http.session();
     session.execute(new Set(Prop.CHOP, false));
     session.add(p, in);
@@ -489,15 +488,16 @@ public class WebDAVService<T> {
   }
 
   /**
-   * Add a binary file with the specified name to the given path.
+   * Adds a binary file with the specified name to the given path.
    * @param db database
    * @param p path where the file will be stored
    * @param in data stream
    * @return object representing the newly added file
    * @throws IOException I/O exception
    */
-  private T store(final String db, final String p, final InputStream in) throws
-    IOException {
+  private T store(final String db, final String p, final InputStream in)
+      throws IOException {
+
     http.session().store(p, in);
     return factory.file(this, metaData(db, p));
   }
@@ -510,15 +510,14 @@ public class WebDAVService<T> {
    * @return object representing the newly added file
    * @throws IOException I/O exception
    */
-  private T addFile(final String db, final String p, final InputStream in) throws
-    IOException {
+  private T addFile(final String db, final String p, final InputStream in)
+      throws IOException {
+
     // use 4MB as buffer input
     final BufferInput bi = new BufferInput(in, 1 << 22);
     try {
       // guess the content type from the first character
-      final boolean xml = peek(bi) == '<';
-
-      if(xml) {
+      if(peek(bi) == '<') {
         try {
           // add input as XML document
           return db == null ? createDb(dbname(p), bi) : addXML(db, p, bi);

@@ -1,38 +1,53 @@
-(: Copyright BaseX Team 2005-13, BSD License :)
-module namespace w = 'http://basex.org/webdav';
+(:~
+ : This module contains helper functions for locking documents in WebDAV.
+ :
+ : @author BaseX Team 2005-13, BSD License
+ :)
+module namespace w = 'http://basex.org/modules/webdav';
 
 (: Lock database name. :)
-declare variable $w:locks-db := 'webdav-locks';
+declare variable $w:locks-db := 'WEBDAV-LOCKS';
 
-declare variable $w:err-locked := QName('http://basex.org/webdav/errors', 'w:locked_423');
+(: Lock error. :)
+declare variable $w:err-locked := QName('http://basex.org/modules/webdav', 'w:locked_423');
 
-
-
-(: Decomposes a path into segments :)
+(:~
+ : Decomposes a path into segments.
+ : @param  $path path
+ : @return segments
+ :)
 declare function w:path-segments(
   $path as xs:string
 ) as xs:string* {
-  tokenize($path, '/')[string-length(.) gt 0]
+  tokenize($path, '/')[.]
 };
 
-
-
+(:~
+ : Checks if the specified strings are equal.
+ : @param  $x first strings
+ : @param  $y second strings
+ : @return result of check
+ :)
 declare function w:is-prefix(
   $x as xs:string*,
   $y as xs:string*
 ) as xs:boolean {
-  every $r in
-    for-each-pair($x,  $y, function($a, $b) { $a eq $b })
+  every $r in for-each-pair($x, $y, function($a, $b) { $a eq $b })
   satisfies $r
 };
 
-
-
-(: Check if a lock with the given path has locked (possibly indirectly) another resource. :)
+(:~
+ : Checks if a lock with the given path has locked
+ : (possibly indirectly) another resource.
+ : @param  $ancestor   ancestor resource
+ : @param  $descendant descendant resource
+ : @param  $depth      depth
+ : @return result of check
+ :)
 declare function w:has-locked(
-  $ancestor as xs:string,
+  $ancestor   as xs:string,
   $descendant as xs:string,
-  $depth as xs:string
+  $depth      as xs:string
 ) as xs:boolean {
   let $ancestor-segments := w:path-segments($ancestor),
       $descendant-segments := w:path-segments($descendant)
@@ -41,7 +56,7 @@ declare function w:has-locked(
     case '0'
     case '1'
       return
-        count($ancestor-segments) + $depth cast as xs:integer eq count($descendant-segments)
+        count($ancestor-segments) + $depth eq count($descendant-segments)
         and
         w:is-prefix($ancestor-segments, $descendant-segments)
     case 'infinite'
@@ -51,150 +66,171 @@ declare function w:has-locked(
      return false()
 };
 
-
-
-(: Calculates the lock expiration date-time given its timeout in seconds. :)
-declare function w:get-expiry-dateTime(
+(:~
+ : Calculates the lock expiration date-time given its timeout in seconds.
+ : @param  $timeout time out
+ : @return lock expiration
+ :)
+declare function w:expiry-dateTime(
   $timeout as xs:integer
 ) as xs:dateTime {
   current-dateTime() + xs:dayTimeDuration('PT' || $timeout || 'S')
 };
 
-
-
-(: Check if the lock database exists. :)
+(:~
+ : Checks if the lock database exists.
+ : @return result of check
+ :)
 declare function w:lock-db-exists() as xs:boolean {
   db:exists($w:locks-db)
 };
 
-
-
-(: Create the database for the WebDAV locks, if it does not exist. :)
-declare updating function w:init-lock-db() {
+(:~
+ : Creates the database for the WebDAV locks, if it does not exist.
+ :)
+declare %updating function w:init-lock-db() {
   if (w:lock-db-exists()) then
     ()
   else
     db:create($w:locks-db, <w:locks/>, $w:locks-db)
 };
 
-
-
-(: Open the lock database, if it exists; else empty sequence. :)
-declare function w:open-lock-db() {
+(:~
+ : Opens the lock database, if it exists; otherwise, returns an empty sequence.
+ : @return database or empty sequence
+ :)
+declare function w:open-lock-db() as document-node()? {
   if(w:lock-db-exists()) then
     db:open($w:locks-db)
   else
     ()
 };
 
-
-
-(: Find all active locks of the given resource :)
-declare function w:get-locks-on(
-  $resource as xs:string
+(:~
+ : Finds all active locks of the given path.
+ : @param  $path path to check
+ : @return active lock info elements
+ :)
+declare function w:locks-on(
+  $path as xs:string
 ) as element(w:lockinfo)* {
   w:open-lock-db()/w:locks/w:lockinfo[
-    w:has-locked(w:path, $resource, 'infinite')
+    w:has-locked(w:path, $path, 'infinite')
     and
-    w:expiry cast as xs:dateTime gt current-dateTime()
+    xs:dateTime(w:expiry) gt current-dateTime()
   ]
 };
 
-
-
-(: Check if two locks are in conflict. :)
+(:~
+ : Checks if two locks are in conflict.
+ : @param  $lock1 first lock
+ : @param  $lock2 second lock
+ : @return result of check
+ :)
 declare function w:in-conflict(
   $lock1 as element(w:lockinfo),
   $lock2 as element(w:lockinfo)
 ) as xs:boolean {
-  (w:has-locked($lock1/w:path, $lock2/w:path, $lock1/w:depth) or w:has-locked($lock2/w:path, $lock1/w:path, $lock2/w:depth))
+  (w:has-locked($lock1/w:path, $lock2/w:path, $lock1/w:depth) or
+   w:has-locked($lock2/w:path, $lock1/w:path, $lock2/w:depth))
   and
   (w:is-exclusive($lock1) or w:is-exclusive($lock2))
   and
   $lock1/w:owner ne $lock2/w:owner
 };
 
-
-
-(: Check if a lock is exclusive. :)
+(:~
+ : Checks if a lock is exclusive.
+ : @param  $lock lock to check
+ : @return result of check
+ :)
 declare function w:is-exclusive(
   $lock as element(w:lockinfo)
 ) as xs:boolean {
   $lock/w:scope eq 'exclusive'
 };
 
-
-
-(: Get all locks which are in conflict with the given one. :)
-declare function w:get-conflicting-locks(
+(:~
+ : Gets all locks which are in conflict with the given one.
+ : @param  $requested-lock requested lock
+ : @return elements with conflicting locks
+ :)
+declare function w:conflicting-locks(
   $requested-lock as element(w:lockinfo)
 ) as element(w:lockinfo)* {
-  for $existing-lock in w:get-locks-on($requested-lock/w:path)
+  for $existing-lock in w:locks-on($requested-lock/w:path)
   where w:in-conflict($requested-lock, $existing-lock)
   return $existing-lock
 };
 
-
-
-(: Renew a lock with the given token. :)
-declare updating function w:refresh-lock(
-  $lock-token as xs:string
+(:~
+ : Renews a lock with the given token.
+ : @param $token lock token
+ :)
+declare %updating function w:refresh-lock(
+  $token as xs:string
 ) {
-  let $lock := w:get-lock($lock-token)
+  for $lock in w:lock($token)
   return
-    if($lock) then
-      replace value of node $lock/w:expiry
-      with w:get-expiry-dateTime($lock/w:timeout)
-    else
-      ()
+    replace value of node $lock/w:expiry
+    with w:expiry-dateTime($lock/w:timeout)
 };
 
-
-
-(: Return the lock with the given token. :)
-declare function w:get-lock(
-  $lock-token as xs:string
+(:~
+ : Returns the lock with the given token.
+ : @param $token lock token
+ : @return lock element
+ :)
+declare function w:lock(
+  $token as xs:string
 ) as element(w:lockinfo)* {
-  w:open-lock-db()/w:locks/w:lockinfo[w:token eq $lock-token]
+  w:open-lock-db()/w:locks/w:lockinfo[w:token eq $token]
 };
 
-
-
-(: Create a new lock for a given resource. :)
-declare updating function w:create-lock(
-  $resource as xs:string,
-  $lock-token as xs:string,
-  $lock-scope as xs:string,
-  $lock-type as xs:string,
-  $lock-depth as xs:string,
-  $lock-owner as xs:string,
-  $lock-timeout as xs:integer
+(:~
+ : Creates a new lock for a given path.
+ : @param $path     path
+ : @param $token    token
+ : @param $scope    scope
+ : @param $type     type
+ : @param $depth    depth
+ : @param $owner    owner
+ : @param $timeout  timeout
+ :)
+declare %updating function w:create-lock(
+  $path     as xs:string,
+  $token    as xs:string,
+  $scope    as xs:string,
+  $type     as xs:string,
+  $depth    as xs:string,
+  $owner    as xs:string,
+  $timeout  as xs:integer
 ) {
-  let $lock-expiry := w:get-expiry-dateTime($lock-timeout),
+  let $expiry := w:expiry-dateTime($timeout),
       $requested-lock :=
-        <w:lockinfo>
-          <w:path>{ $resource }</w:path>
-          <w:token>{ $lock-token }</w:token>
-          <w:scope>{ $lock-scope }</w:scope>
-          <w:type>{ $lock-type }</w:type>
-          <w:depth>{ $lock-depth }</w:depth>
-          <w:owner>{ $lock-owner }</w:owner>
-          <w:timeout>{ $lock-timeout }</w:timeout>
-          <w:expiry>{ $lock-expiry }</w:expiry>
-        </w:lockinfo>,
-      $conflicting-locks := w:get-conflicting-locks($requested-lock)
+        element w:lockinfo {
+          element w:path    { $path },
+          element w:token   { $token },
+          element w:scope   { $scope },
+          element w:type    { $type },
+          element w:depth   { $depth },
+          element w:owner   { $owner },
+          element w:timeout { $timeout },
+          element w:expiry  { $expiry }
+        }
   return
-    if(empty($conflicting-locks)) then
-      insert node $requested-lock as last into w:open-lock-db()/w:locks
+    if(w:conflicting-locks($requested-lock)) then
+      error($w:err-locked, 'Resource has a conflicting lock', $path)
     else
-      error($w:err-locked, 'Resource has a conflicting lock', $resource)
+      insert node $requested-lock as last into w:open-lock-db()/w:locks
 };
 
-
-
-(: Remove a lock given its token. :)
-declare updating function w:delete-lock(
-  $lock-token as xs:string
+(:~
+ : Removes a lock given its token.
+ : @param $token lock token
+ :)
+declare %updating function w:delete-lock(
+  $token as xs:string
 ) {
-  delete node w:get-lock($lock-token)
+  delete node w:lock($token)
 };

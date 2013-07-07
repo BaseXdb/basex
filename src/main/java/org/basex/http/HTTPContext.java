@@ -28,31 +28,31 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class HTTPContext {
-  /** Singleton database context. */
-  private static Context context;
-  /** Initialization flag. */
-  private static boolean init;
-
   /** Servlet request. */
   public final HttpServletRequest req;
   /** Servlet response. */
   public final HttpServletResponse res;
   /** Request method. */
   public final HTTPMethod method;
-  /** Performance. */
-  private final Performance perf = new Performance();
 
   /** Serialization parameters. */
   public String serialization = "";
   /** Result wrapping. */
   public boolean wrapping;
+  /** User name. */
+  public String user;
 
+  /** Singleton database context. */
+  private static Context context;
+  /** Initialization flag. */
+  private static boolean init;
+
+  /** Performance. */
+  private final Performance perf = new Performance();
   /** Segments. */
   private final String[] segments;
   /** Current user session. */
   private LocalSession session;
-  /** User name. */
-  public String user;
   /** Password. */
   private String pass;
 

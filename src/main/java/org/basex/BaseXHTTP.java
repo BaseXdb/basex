@@ -92,7 +92,7 @@ public final class BaseXHTTP {
 
     // start web server in a new process
     if(service) {
-      Connector connector = jetty.getConnectors()[0];
+      final Connector connector = jetty.getConnectors()[0];
       start(connector.getPort(), connector instanceof SslSelectChannelConnector, args);
 
       for(final Connector c : jetty.getConnectors())

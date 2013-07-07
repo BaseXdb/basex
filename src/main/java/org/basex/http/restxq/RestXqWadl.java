@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  */
 final class RestXqWadl {
   /** HTTP context. */
-  private HTTPContext http;
+  private final HTTPContext http;
 
   /**
    * Constructor.

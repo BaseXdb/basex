@@ -8,7 +8,7 @@ package org.basex.http.webdav.impl;
  */
 public interface ResourceMetaDataFactory<T> {
   /**
-   * Create a new resource representing a file.
+   * Creates a new resource representing a file.
    * @param s service instance
    * @param d file meta data
    * @return object representing the file
@@ -16,7 +16,7 @@ public interface ResourceMetaDataFactory<T> {
   T file(final WebDAVService<T> s, final ResourceMetaData d);
 
   /**
-   * Create a new resource representing a folder.
+   * Creates a new resource representing a folder.
    * @param s service instance
    * @param d folder meta data
    * @return object representing the folder
@@ -24,7 +24,7 @@ public interface ResourceMetaDataFactory<T> {
   T folder(final WebDAVService<T> s, final ResourceMetaData d);
 
   /**
-   * Create a new resource representing a database.
+   * Creates a new resource representing a database.
    * @param s service instance
    * @param d database meta data
    * @return object representing the database
