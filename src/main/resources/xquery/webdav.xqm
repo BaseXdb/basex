@@ -6,7 +6,7 @@
 module namespace w = 'http://basex.org/modules/webdav';
 
 (: Lock database name. :)
-declare variable $w:locks-db := 'WEBDAV-LOCKS';
+declare variable $w:locks-db := '~webdav';
 
 (: Lock error. :)
 declare variable $w:err-locked := QName('http://basex.org/modules/webdav', 'w:locked_423');
