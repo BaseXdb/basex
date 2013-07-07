@@ -144,14 +144,6 @@ public final class RestXqTest extends HTTPTest {
    * {@code %path} segments.
    * @throws Exception exception
    */
-  @Test public void x() throws Exception {
-    getE("declare %R:path('{ $a }') function m:f() {()};", "a");
-  }
-
-  /**
-   * {@code %path} segments.
-   * @throws Exception exception
-   */
   @Test public void pathVar() throws Exception {
     // correct syntax
     get("declare %R:path('{$x}') function m:f($x) {$x};", "1", "1");
