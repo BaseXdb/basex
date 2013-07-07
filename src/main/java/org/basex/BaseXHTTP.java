@@ -81,10 +81,13 @@ public final class BaseXHTTP {
     }
 
     // stop server
+    final String startX = HTTP + ' ' + SRV_STARTED_PORT_X;
+    final String stopX = HTTP + ' ' + SRV_STOPPED_PORT_X;
+
     if(stopped) {
       stop();
       for(final Connector c : jetty.getConnectors())
-        Util.outln(HTTP + ' ' + SRV_STOPPED_PORT_X, c.getPort());
+        Util.outln(stopX, c.getPort());
       // temporary console windows: keep the message visible for a while
       Performance.sleep(1000);
       return;
@@ -95,8 +98,9 @@ public final class BaseXHTTP {
       final Connector connector = jetty.getConnectors()[0];
       start(connector.getPort(), connector instanceof SslSelectChannelConnector, args);
 
-      for(final Connector c : jetty.getConnectors())
-        Util.outln(HTTP + ' ' + SRV_STARTED_PORT_X, c.getPort());
+      for(final Connector c : jetty.getConnectors()) {
+        Util.outln(startX, c.getPort());
+      }
       // temporary console windows: keep the message visible for a while
       Performance.sleep(1000);
       return;
@@ -112,8 +116,9 @@ public final class BaseXHTTP {
 
     // start web server
     jetty.start();
-    for(final Connector c : jetty.getConnectors())
-      Util.outln(HTTP + ' ' + SRV_STARTED_PORT_X, c.getPort());
+    for(final Connector c : jetty.getConnectors()) {
+      Util.outln(startX, c.getPort());
+    }
 
     // initialize web.xml settings, assign system properties and run database server
     // if not done so already. this must be called after starting jetty
@@ -127,20 +132,23 @@ public final class BaseXHTTP {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        for(final Connector c : jetty.getConnectors())
-          Util.outln(HTTP + ' ' + SRV_STOPPED_PORT_X, c.getPort());
+        for(final Connector c : jetty.getConnectors()) {
+          Util.outln(stopX, c.getPort());
+        }
         final Log l = context.log;
         if(l != null) {
-          for(final Connector c : jetty.getConnectors())
-            l.writeServer(OK, HTTP + ' ' + SRV_STOPPED_PORT_X, c.getPort());
+          for(final Connector c : jetty.getConnectors()) {
+            l.writeServer(OK, Util.info(stopX, c.getPort()));
+          }
         }
         context.close();
       }
     });
 
     // log server start at very end (logging flag could have been updated by web.xml)
-    for(final Connector c : jetty.getConnectors())
-      context.log.writeServer(OK, HTTP + ' ' + SRV_STARTED_PORT_X, c.getPort());
+    for(final Connector c : jetty.getConnectors()) {
+      context.log.writeServer(OK, Util.info(startX, c.getPort()));
+    }
   }
 
   /**
