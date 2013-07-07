@@ -6,6 +6,7 @@ import org.basex.core.cmd.*;
 import org.basex.http.HTTPContext;
 import org.basex.io.in.ArrayInput;
 import org.basex.io.in.BufferInput;
+import org.basex.query.func.*;
 import org.basex.server.Query;
 import org.basex.server.Session;
 import org.basex.util.DateTime;
@@ -113,7 +114,8 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public long timestamp(final String db) throws IOException {
-    final String s = DATA.args(_DB_INFO.args("$p") + "/descendant::" + TIME + "[1]");
+    final String s = DATA.args(_DB_INFO.args("$p") +
+        "/descendant::" + FNDb.toName(Text.TIMESTAMP) + "[1]");
     final Query q = http.session().query(s);
     q.bind("p", db);
     try {

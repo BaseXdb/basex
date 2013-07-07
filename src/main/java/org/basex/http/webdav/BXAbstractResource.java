@@ -187,8 +187,7 @@ public abstract class BXAbstractResource implements
    */
   @Override
   public LockToken getCurrentLock() {
-    return new BXCode<LockToken>(this)
-    {
+    return new BXCode<LockToken>(this) {
       @Override
       public LockToken get() throws IOException {
         return getCurrentActiveLock();
@@ -321,7 +320,7 @@ public abstract class BXAbstractResource implements
   }
 
   /** SAX handler for lock token. */
-  public static final class LockTokenSaxHandler extends DefaultHandler {
+  private static final class LockTokenSaxHandler extends DefaultHandler {
     /** Parsed lock token. */
     public final LockToken lockToken = new LockToken(null, new LockInfo(), null);
     /** Current element name. */

@@ -70,22 +70,22 @@ public final class BXRoot extends BXFolder {
   }
 
   @Override
-  public BXDatabase createCollection(final String newName) throws BadRequestException {
+  public BXDatabase createCollection(final String name) throws BadRequestException {
     return new BXCode<BXDatabase>(this) {
       @Override
       public BXDatabase get() throws IOException {
-        return (BXDatabase) service.createDb(dbname(newName));
+        return (BXDatabase) service.createDb(dbname(name));
       }
     }.eval();
   }
 
   @Override
-  public BXAbstractResource createNew(final String newName, final InputStream input,
+  public BXAbstractResource createNew(final String name, final InputStream input,
       final Long length, final String contentType) throws BadRequestException {
     return new BXCode<BXAbstractResource>(this) {
       @Override
       public BXAbstractResource get() throws IOException {
-        return service.createFile(newName, input);
+        return service.createFile(name, input);
       }
     }.eval();
   }

@@ -67,17 +67,17 @@ public final class BXFile extends BXAbstractResource implements FileResource {
   }
 
   @Override
-  protected void copyToRoot(final String n) throws IOException {
+  protected void copyToRoot(final String name) throws IOException {
     // document is copied to the root: create new database with it
-    final String nm = dbname(n);
+    final String nm = dbname(name);
     service.createDb(nm);
-    service.copyDoc(meta.db, meta.path, nm, n);
+    service.copyDoc(meta.db, meta.path, nm, name);
   }
 
   @Override
-  protected void copyTo(final BXFolder f, final String n) throws IOException {
+  protected void copyTo(final BXFolder folder, final String name) throws IOException {
     // folder is copied to a folder in a database
-    service.copyDoc(meta.db, meta.path, f.meta.db, f.meta.path + SEP + n);
-    service.deleteDummy(f.meta.db, f.meta.path);
+    service.copyDoc(meta.db, meta.path, folder.meta.db, folder.meta.path + SEP + name);
+    service.deleteDummy(folder.meta.db, folder.meta.path);
   }
 }

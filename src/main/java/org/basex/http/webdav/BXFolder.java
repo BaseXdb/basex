@@ -121,17 +121,17 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   @Override
-  protected void copyToRoot(final String n) throws IOException {
+  protected void copyToRoot(final String name) throws IOException {
     // folder is copied to the root: create new database with it
-    final String dbname = dbname(n);
+    final String dbname = dbname(name);
     service.createDb(dbname);
     service.copyAll(meta.db, meta.path, dbname, "");
   }
 
   @Override
-  protected void copyTo(final BXFolder f, final String n) throws IOException {
+  protected void copyTo(final BXFolder folder, final String name) throws IOException {
     // folder is copied to a folder in a database
-    service.copyAll(meta.db, meta.path, f.meta.db, f.meta.path + SEP + n);
-    service.deleteDummy(f.meta.db, f.meta.path);
+    service.copyAll(meta.db, meta.path, folder.meta.db, folder.meta.path + SEP + name);
+    service.deleteDummy(folder.meta.db, folder.meta.path);
   }
 }

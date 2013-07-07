@@ -1,12 +1,9 @@
 package org.basex.http.webdav.impl;
 
 import java.io.*;
-import java.util.*;
 
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.util.*;
 
 /**
  * WebDAV utility methods.
@@ -14,9 +11,6 @@ import org.basex.util.*;
  * @author Dimitar Popov
  */
 public final class Utils {
-  /** Time string. */
-  public static final String TIME = Text.TIMESTAMP.replaceAll(" |-",
-    "").toLowerCase(Locale.ENGLISH);
   /** File path separator. */
   public static final char SEP = '/';
   /** Dummy file for empty folder.*/
@@ -40,8 +34,7 @@ public final class Utils {
    * @return name of the resource identified by the path
    */
   public static String name(final String path) {
-    final int idx = path.lastIndexOf(SEP);
-    return idx < 0 ? path : path.substring(idx + 1, path.length());
+    return IO.get(path).name();
   }
 
   /**
@@ -50,7 +43,6 @@ public final class Utils {
    * @return valid database name
    */
   public static String dbname(final String db) {
-    Util.stack(5);
     return IO.get(db).dbname();
   }
 
