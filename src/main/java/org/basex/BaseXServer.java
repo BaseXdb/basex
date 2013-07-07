@@ -110,11 +110,11 @@ public final class BaseXServer extends Main implements Runnable {
       stop = stopFile(port);
 
       // show info when server is aborted
-      context.log.writeServer(OK, SRV_STARTED_PORT_X, port);
+      context.log.writeServer(OK, Util.info(SRV_STARTED_PORT_X, port));
       Runtime.getRuntime().addShutdownHook(new Thread() {
         @Override
         public void run() {
-          context.log.writeServer(OK, SRV_STOPPED_PORT_X, port);
+          context.log.writeServer(OK, Util.info(SRV_STOPPED_PORT_X, port));
           Util.outln(SRV_STOPPED_PORT_X, port);
         }
       });
