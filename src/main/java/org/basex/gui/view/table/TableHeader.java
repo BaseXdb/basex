@@ -50,7 +50,7 @@ final class TableHeader extends BaseXPanel {
     mode(Fill.NONE).setFocusable(true);
     tdata = v.tdata;
     view = v;
-    BaseXLayout.setHeight(this, gui.gprop.num(GUIProp.FONTSIZE) + 8 << 1);
+    BaseXLayout.setHeight(this, fontSize + 8 << 1);
     addMouseListener(this);
     addMouseMotionListener(this);
     addKeyListener(this);
@@ -84,7 +84,7 @@ final class TableHeader extends BaseXPanel {
       return;
     }
 
-    final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
+    final int fsz = fontSize;
     final int bs = BaseXBar.SIZE;
     int w = getWidth();
     final int h = getHeight();

@@ -28,8 +28,6 @@ public final class GFLWOR extends ParseExpr {
   Expr ret;
   /** FLWOR clauses. */
   private final LinkedList<Clause> clauses;
-  /** XQuery 3.0 flag. */
-  private boolean xq30;
 
   /**
    * Constructor.
@@ -84,19 +82,16 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     int i = 0;
-    InputInfo ii = info;
     try {
       for(final Clause c : clauses) {
-        ii = c.info;
         c.compile(ctx, scp);
         // the first round of constant propagation is free
         if(c instanceof Let) ((Let) c).bindConst(ctx);
         i++;
       }
-      ii = info;
       ret = ret.compile(ctx, scp);
     } catch(final QueryException qe) {
-      clauseError(qe, i, ii);
+      clauseError(qe, i);
     }
     return optimize(ctx, scp);
   }
@@ -194,7 +189,7 @@ public final class GFLWOR extends ParseExpr {
     mergeWheres();
 
     size = calcSize();
-    if(size == 0 && !(uses(Use.NDT) || uses(Use.UPD))) {
+    if(size == 0 && !(has(Flag.NDT) || has(Flag.UPD))) {
       ctx.compInfo(QueryText.OPTWRITE, this);
       return Empty.SEQ;
     }
@@ -258,14 +253,14 @@ public final class GFLWOR extends ParseExpr {
         final int next = iter.nextIndex();
         if(c instanceof Let) {
           final Let lt = (Let) c;
-          if(lt.expr.uses(Use.NDT)) continue;
+          if(lt.expr.has(Flag.NDT)) continue;
           final VarUsage uses = count(lt.var, next);
           if(uses == VarUsage.NEVER) {
             ctx.compInfo(QueryText.OPTVAR, lt.var);
             iter.remove();
             change = true;
           } else if(lt.expr.isValue() || lt.expr instanceof VarRef && !lt.var.checksType()
-              || uses == VarUsage.ONCE && !lt.expr.uses(Use.CTX)
+              || uses == VarUsage.ONCE && !lt.expr.has(Flag.CTX)
               || lt.expr instanceof AxisPath && ((AxisPath) lt.expr).cheap()) {
             ctx.compInfo(QueryText.OPTINLINE, lt);
             inline(ctx, scp, lt.var, lt.inlineExpr(ctx, scp), next);
@@ -347,10 +342,10 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    */
   private boolean cleanDeadVars(final QueryContext ctx) {
-    final IntMap<Var> decl = new IntMap<Var>();
+    final IntObjMap<Var> decl = new IntObjMap<Var>();
     final BitArray used = new BitArray();
 
-    for(final Clause cl : clauses) for(final Var v : cl.vars()) decl.add(v.id, v);
+    for(final Clause cl : clauses) for(final Var v : cl.vars()) decl.put(v.id, v);
     final ASTVisitor marker = new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {
@@ -381,7 +376,7 @@ public final class GFLWOR extends ParseExpr {
     boolean change = false;
     for(int i = 1; i < clauses.size(); i++) {
       final Clause l = clauses.get(i);
-      if(!(l instanceof Let) || l.uses(Use.NDT) || l.uses(Use.CNS)) continue;
+      if(!(l instanceof Let) || l.has(Flag.NDT) || l.has(Flag.CNS)) continue;
       final Let let = (Let) l;
 
       // find insertion position
@@ -416,7 +411,7 @@ public final class GFLWOR extends ParseExpr {
     boolean change = false;
     for(int i = 0; i < clauses.size(); i++) {
       final Clause c = clauses.get(i);
-      if(!(c instanceof Where) || c.uses(Use.NDT)) continue;
+      if(!(c instanceof Where) || c.has(Flag.NDT)) continue;
       final Where wh = (Where) c;
 
       if(wh.pred.isValue()) {
@@ -497,10 +492,9 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    if(u == Use.X30 && xq30) return true;
-    for(final Clause cls : clauses) if(cls.uses(u)) return true;
-    return ret.uses(u);
+  public boolean has(final Flag flag) {
+    for(final Clause cls : clauses) if(cls.has(flag)) return true;
+    return ret.has(flag);
   }
 
   @Override
@@ -561,7 +555,7 @@ public final class GFLWOR extends ParseExpr {
           iter.set(c);
         }
       } catch(final QueryException qe) {
-        return clauseError(qe, iter.previousIndex() + 1, cl.info);
+        return clauseError(qe, iter.previousIndex() + 1);
       }
     }
 
@@ -572,7 +566,7 @@ public final class GFLWOR extends ParseExpr {
         ret = rt;
       }
     } catch(final QueryException qe) {
-      return clauseError(qe, clauses.size(), info);
+      return clauseError(qe, clauses.size());
     }
 
     return change;
@@ -582,12 +576,12 @@ public final class GFLWOR extends ParseExpr {
    * Tries to recover from a compile-time exception inside a FLWOR clause.
    * @param qe thrown exception
    * @param idx index of the throwing clause, size of {@link #clauses} for return clause
-   * @param ii input info
    * @return {@code true} if the GFLWOR expression has to stay
    * @throws QueryException query exception if the whole expression fails
    */
-  private boolean clauseError(final QueryException qe, final int idx, final InputInfo ii)
+  private boolean clauseError(final QueryException qe, final int idx)
       throws QueryException {
+
     final ListIterator<Clause> iter = clauses.listIterator(idx);
     while(iter.hasPrevious()) {
       final Clause b4 = iter.previous();
@@ -597,7 +591,7 @@ public final class GFLWOR extends ParseExpr {
           iter.next();
           iter.remove();
         }
-        ret = FNInfo.error(qe, ii);
+        ret = FNInfo.error(qe);
         return true;
       }
     }
@@ -605,7 +599,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final LinkedList<Clause> cls = new LinkedList<Clause>();
     for(final Clause cl : clauses) cls.add(cl.copy(ctx, scp, vs));
     return copyType(new GFLWOR(info, cls, ret.copy(ctx, scp, vs)));
@@ -708,7 +702,8 @@ public final class GFLWOR extends ParseExpr {
      * @return {@code true} if something changed, {@code false} otherwise
      */
     @SuppressWarnings("unused")
-    boolean clean(final QueryContext ctx, final IntMap<Var> decl, final BitArray used) {
+    boolean clean(final QueryContext ctx, final IntObjMap<Var> decl,
+        final BitArray used) {
       return false;
     }
 
@@ -750,7 +745,7 @@ public final class GFLWOR extends ParseExpr {
     }
 
     @Override
-    public abstract GFLWOR.Clause copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
+    public abstract GFLWOR.Clause copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
     /**
      * Checks if the given clause can be slided over this clause.

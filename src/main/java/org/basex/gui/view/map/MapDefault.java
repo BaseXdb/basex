@@ -33,7 +33,7 @@ final class MapDefault extends MapPainter {
     final int hh = view.getWidth();
 
     final Data data = view.gui.context.data();
-    final int fsz = prop.num(GUIProp.FONTSIZE);
+    final int fsz = GUIConstants.fontSize;
 
     final int off = prop.num(GUIProp.MAPOFFSETS);
     final int rs = rects.size;
@@ -76,7 +76,7 @@ final class MapDefault extends MapPainter {
       }
 
       // skip drawing of string if there is no space
-      if(r.w <= 3 || r.h < prop.num(GUIProp.FONTSIZE)) continue;
+      if(r.w <= 3 || r.h < GUIConstants.fontSize) continue;
 
       r.x += 3;
       r.w -= 3;

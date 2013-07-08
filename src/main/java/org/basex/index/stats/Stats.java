@@ -126,7 +126,7 @@ public final class Stats {
         t = StatsType.TEXT;
         cats = null;
       } else {
-        cats.add(val, Math.max(1, cats.value(val) + 1));
+        cats.put(val, Math.max(1, cats.get(val) + 1));
       }
     }
     if(t == StatsType.INTEGER) {

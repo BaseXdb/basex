@@ -89,14 +89,4 @@ public final class FNMath extends StandardFunc {
     for(int i = r.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8) r[i] = (byte) c;
     return new Hex(r);
   }
-
-  @Override
-  public boolean xquery3() {
-    return true;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 || super.uses(u);
-  }
 }

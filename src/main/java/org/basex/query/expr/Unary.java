@@ -58,12 +58,15 @@ public final class Unary extends Single {
       case DBL: return Dbl.get(-d);
       case FLT: return Flt.get(-it.flt(info));
       case DEC: return Dec.get(it.dec(info).negate());
-      default:  return Int.get(-it.itr(info));
+      default:
+        final long l = it.itr(info);
+        if(l == Long.MIN_VALUE) Err.RANGE.thrw(info, l);
+        return Int.get(-l);
     }
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return copyType(new Unary(info, expr.copy(ctx, scp, vs), minus));
   }
 

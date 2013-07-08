@@ -36,7 +36,7 @@ public class DiskValues implements Index {
   /** Cached tokens. */
   protected final IndexCache cache = new IndexCache();
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  protected final IntMap<byte[]> ctext = new IntMap<byte[]>();
+  protected final IntObjMap<byte[]> ctext = new IntObjMap<byte[]>();
 
   /** Synchronization object. */
   protected final Object monitor = new Object();

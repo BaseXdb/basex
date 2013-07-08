@@ -171,7 +171,7 @@ final class Docs {
     docs.move(-size, i);
 
     if(!found) return;
-    paths.delete(i);
+    paths.deleteAt(i);
     pathOrder = null;
   }
 
@@ -300,8 +300,8 @@ final class Docs {
         final byte[] toAdd = substring(to, tp.length, to.length);
         final int i = indexOf(toAdd, SLASH);
         // no more slashes means this must be a leaf
-        if(!dir && i == -1) tbm.add(toAdd, false);
-        else if(dir && i >= 0) tbm.add(substring(toAdd, 0, i), false);
+        if(!dir && i == -1) tbm.put(toAdd, false);
+        else if(dir && i >= 0) tbm.put(substring(toAdd, 0, i), false);
       }
     }
   }

@@ -63,7 +63,7 @@ public final class Rename extends Update {
       final Atts at = targ.nsScope();
       final int as = at.size();
       for(int a = 0; a < as; a++) {
-        if(eq(at.name(a), rp) && !eq(at.string(a), ru)) UPNSCONFL.thrw(info);
+        if(eq(at.name(a), rp) && !eq(at.value(a), ru)) UPNSCONFL.thrw(info);
       }
     }
 
@@ -73,7 +73,7 @@ public final class Rename extends Update {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new Rename(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
   }
 

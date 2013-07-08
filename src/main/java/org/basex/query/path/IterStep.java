@@ -53,7 +53,7 @@ final class IterStep extends Step {
 
   @Override
   public IterStep copy(final QueryContext ctx, final VarScope scp,
-      final IntMap<Var> vs) {
+      final IntObjMap<Var> vs) {
     final Expr[] pred = new Expr[preds.length];
     for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(ctx, scp, vs);
     return copy(new IterStep(info, axis, test.copy(), pred));

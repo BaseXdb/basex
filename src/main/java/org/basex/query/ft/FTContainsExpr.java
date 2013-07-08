@@ -51,7 +51,7 @@ public final class FTContainsExpr extends FTContains {
       }
       s = Scoring.and(s, d);
 
-      // add entry to visualization
+      // cache entry for visualizations or ft:mark/ft:extract
       if(d > 0 && ctx.ftpos != null && it instanceof DBNode) {
         final DBNode node = (DBNode) it;
         ctx.ftpos.add(node.data, node.pre, item.all);
@@ -63,17 +63,17 @@ public final class FTContainsExpr extends FTContains {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     // return if step is no text node, or if no index is available
     final Step s = expr instanceof Context ? ic.step : CmpG.indexStep(expr);
-    final boolean ok = s != null && ic.data.meta.ftxtindex &&
+    final boolean ok = s != null && ic.ictx.data.meta.ftxtindex &&
       s.test.type == NodeType.TXT && ftexpr.indexAccessible(ic);
     ic.seq |= ic.not;
     return ok;
   }
 
   @Override
-  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+  public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
     ic.ctx.compInfo(OPTFTXINDEX);
 
     // sequential evaluation with index access
@@ -81,12 +81,12 @@ public final class FTContainsExpr extends FTContains {
     if(ic.seq) return new FTContainsIndex(info, expr, ie, ic.not);
 
     // standard index evaluation; first expression will always be an axis path
-    final FTIndexAccess rt = new FTIndexAccess(info, ie, ic.data.meta.name, ic.iterable);
+    final FTIndexAccess rt = new FTIndexAccess(info, ie, ic.ictx);
     return expr instanceof Context ? rt : ((AxisPath) expr).invertPath(rt, ic.step);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final FTContains ftc =  new FTContainsExpr(expr.copy(ctx, scp, vs),
         ftexpr.copy(ctx, scp, vs), info);
     if(lex != null) ftc.lex = new FTLexer(new FTOpt());

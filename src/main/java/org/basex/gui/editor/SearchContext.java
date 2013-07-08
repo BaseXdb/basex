@@ -15,8 +15,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class SearchContext {
-  /** Search panel reference. */
-  final SearchPanel panel;
+  /** Search bar. */
+  final SearchBar bar;
   /** Mode: match case. */
   final boolean mcase;
   /** Mode: regular expression. */
@@ -32,16 +32,16 @@ final class SearchContext {
 
   /**
    * Constructor.
-   * @param sp search panel
-   * @param srch search text
+   * @param sb search bar
+   * @param text search string
    */
-  SearchContext(final SearchPanel sp, final String srch) {
-    panel = sp;
-    mcase = sp.mcase.isSelected();
-    word = sp.word.isSelected();
-    regex = sp.regex.isSelected();
-    multi = sp.multi.isSelected();
-    String s = mcase ? srch : srch.toLowerCase(Locale.ENGLISH);
+  SearchContext(final SearchBar sb, final String text) {
+    bar = sb;
+    mcase = sb.mcase.isSelected();
+    word = sb.word.isSelected();
+    regex = sb.regex.isSelected();
+    multi = sb.multi.isSelected();
+    String s = mcase ? text : text.toLowerCase(Locale.ENGLISH);
     // speed up regular expressions starting with wildcards
     if(regex && (s.startsWith(".*") || s.startsWith("(.*") ||
         s.startsWith(".+") || s.startsWith("(.+"))) s = '^' + s;
@@ -61,7 +61,7 @@ final class SearchContext {
       else searchSimple(start, end, txt);
     }
     nr = start.size();
-    panel.refresh(this);
+    bar.refresh(this);
     return new IntList[] { start, end };
   }
 

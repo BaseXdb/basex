@@ -32,7 +32,7 @@ public final class ArrayOutput extends PrintOutput {
   public void write(final int b) {
     final int s = (int) size;
     if(s == max) return;
-    if(s == buf.length) buf = Arrays.copyOf(buf, s << 1);
+    if(s == buf.length) buf = Arrays.copyOf(buf, Array.newSize(s));
     buf[s] = (byte) b;
     size = s + 1;
   }

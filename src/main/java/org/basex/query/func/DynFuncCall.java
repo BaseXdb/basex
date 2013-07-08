@@ -41,9 +41,8 @@ public final class DynFuncCall extends Arr {
     final Type t = f.type().type;
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
-      if(ft.args != null && ft.args.length != ar)
-        throw INVARITY.thrw(info, f, ar);
-      if(ft.ret != null) type = ft.ret;
+      if(ft.args != null && ft.args.length != ar) INVARITY.thrw(info, f, ar);
+      if(ft.type != null) type = ft.type;
     }
     // maps can only contain fully evaluated Values, so this is safe
     return allAreValues() && f instanceof Map ? optPre(value(ctx), ctx) : this;
@@ -65,7 +64,7 @@ public final class DynFuncCall extends Arr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] copy = copyAll(ctx, scp, vs, expr);
     final int last = copy.length - 1;
     return copyType(new DynFuncCall(info, copy[last], Arrays.copyOf(copy, last)));
@@ -94,7 +93,7 @@ public final class DynFuncCall extends Arr {
     final Item it = checkItem(expr[ar], ctx);
     if(!(it instanceof FItem)) INVCAST.thrw(info, it.type, "function item");
     final FItem fit = (FItem) it;
-    if(fit.arity() != ar) throw INVARITY.thrw(info, fit, ar);
+    if(fit.arity() != ar) INVARITY.thrw(info, fit, ar);
     return fit;
   }
 

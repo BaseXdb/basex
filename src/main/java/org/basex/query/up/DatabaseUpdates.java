@@ -33,12 +33,12 @@ final class DatabaseUpdates {
   private IntList nodes = new IntList(0);
   /** Mapping between pre values of the target nodes and all update primitives
    * which operate on this target. */
-  private IntMap<NodeUpdates> updatePrimitives = new IntMap<NodeUpdates>();
+  private IntObjMap<NodeUpdates> updatePrimitives = new IntObjMap<NodeUpdates>();
   /** Database operations which are applied after all updates have been executed. */
   private final List<BasicOperation> dbops = new LinkedList<BasicOperation>();
   /** Put operations which reflect all changes made during the snapshot, hence executed
    * after updates have been carried out. */
-  private final IntMap<Put> puts = new IntMap<Put>();
+  private final IntObjMap<Put> puts = new IntObjMap<Put>();
   /** Number of updates. */
   private int size;
 
@@ -63,7 +63,7 @@ final class DatabaseUpdates {
         NodeUpdates pc = updatePrimitives.get(pre);
         if(pc == null) {
           pc = new NodeUpdates();
-          updatePrimitives.add(pre, pc);
+          updatePrimitives.put(pre, pc);
         }
         pc.add(subp);
       }
@@ -73,7 +73,7 @@ final class DatabaseUpdates {
       final int id = p.nodeid;
       final Put old = puts.get(id);
       if(old == null)
-        puts.add(id, p);
+        puts.put(id, p);
       else
         old.merge(p);
 
@@ -185,12 +185,10 @@ final class DatabaseUpdates {
 
     // execute database operations
     Collections.sort(dbops);
-    for(final BasicOperation d : dbops)
-      d.apply();
+    for(final BasicOperation d : dbops) d.apply();
 
     // execute fn:put operations
-    final int s = puts.size();
-    for(int i = 1; i <= s; i++) puts.value(i).apply();
+    for(final Put p : puts.values()) p.apply();
 
     if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
       try {
@@ -273,7 +271,7 @@ final class DatabaseUpdates {
       if(data.kind(pre) == Data.ATTR) {
         final byte[] nm = data.name(pre, Data.ATTR);
         final QNm name = new QNm(nm);
-        final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, pre));
+        final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, pre, data));
         if(uri != null) name.uri(uri);
         pool.add(name, NodeType.ATT);
         il.add(pre);
@@ -283,7 +281,7 @@ final class DatabaseUpdates {
           final byte[] nm = data.name(p, Data.ATTR);
           if(!il.contains(p)) {
             final QNm name = new QNm(nm);
-            final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, p));
+            final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, p, data));
             if(uri != null) name.uri(uri);
             pool.add(name, NodeType.ATT);
           }

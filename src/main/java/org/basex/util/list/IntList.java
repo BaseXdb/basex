@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This is a simple container for native integers.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class IntList extends ElementList {
@@ -18,115 +18,116 @@ public class IntList extends ElementList {
    * Default constructor.
    */
   public IntList() {
-    this(CAP);
+    this(Array.CAPACITY);
   }
 
   /**
-   * Constructor, specifying an initial array capacity.
-   * @param c array capacity
+   * Constructor, specifying an initial internal array size.
+   * @param capacity initial array capacity
    */
-  public IntList(final int c) {
-    list = new int[c];
+  public IntList(final int capacity) {
+    list = new int[capacity];
   }
 
   /**
-   * Constructor.
-   * @param f resize factor
+   * Constructor, specifying a resize factor. Smaller values are more memory-saving,
+   * while larger will provide better performance.
+   * @param resize resize factor
    */
-  public IntList(final double f) {
+  public IntList(final double resize) {
     this();
-    factor = f;
+    factor = resize;
   }
 
   /**
-   * Lightweight constructor, assigning the specified array.
-   * @param a initial array
+   * Lightweight constructor, adopting the specified elements.
+   * @param elements initial array
    */
-  public IntList(final int[] a) {
-    list = a;
-    size = a.length;
+  public IntList(final int[] elements) {
+    list = elements;
+    size = elements.length;
   }
 
   /**
-   * Adds an entry to the array.
-   * @param e entry to be added
+   * Adds an element to the array.
+   * @param element element to be added
    */
-  public final void add(final int e) {
+  public final void add(final int element) {
     if(size == list.length) list = Arrays.copyOf(list, newSize());
-    list[size++] = e;
+    list[size++] = element;
   }
 
   /**
-   * Returns the element at the specified index position.
-   * @param i index
+   * Returns the element at the specified position.
+   * @param index index of the element to return
    * @return element
    */
-  public final int get(final int i) {
-    return list[i];
+  public final int get(final int index) {
+    return list[index];
   }
 
   /**
-   * Sets an element at the specified index position.
-   * @param i index
-   * @param e element to be set
+   * Stores an element at the specified position.
+   * @param index index of the element to replace
+   * @param element element to be stored
    */
-  public final void set(final int i, final int e) {
-    if(i >= list.length) list = Arrays.copyOf(list, newSize(i + 1));
-    list[i] = e;
-    size = Math.max(size, i + 1);
+  public final void set(final int index, final int element) {
+    if(index >= list.length) list = Arrays.copyOf(list, newSize(index + 1));
+    list[index] = element;
+    size = Math.max(size, index + 1);
   }
 
   /**
    * Checks if the specified element is found in the list.
-   * @param e element to be found
+   * @param element element to be found
    * @return result of check
    */
-  public final boolean contains(final int e) {
-    for(int i = 0; i < size; ++i) if(list[i] == e) return true;
+  public final boolean contains(final int element) {
+    for(int i = 0; i < size; ++i) if(list[i] == element) return true;
     return false;
   }
 
   /**
    * Inserts elements at the specified index position.
-   * @param i index
-   * @param e elements to be inserted
+   * @param index inserting position
+   * @param element elements to be inserted
    */
-  public final void insert(final int i, final int[] e) {
-    final int l = e.length;
+  public final void insert(final int index, final int[] element) {
+    final int l = element.length;
     if(l == 0) return;
     if(size + l > list.length) list = Arrays.copyOf(list, newSize(size + l));
-    Array.move(list, i, l, size - i);
-    System.arraycopy(e, 0, list, i, l);
+    Array.move(list, index, l, size - index);
+    System.arraycopy(element, 0, list, index, l);
     size += l;
   }
 
   /**
-   * Removes the specified element from the list.
-   * @param e element to be removed
+   * Removes all occurrences of the specified element from the list.
+   * @param element element to be removed
    */
-  public final void delete(final int e) {
+  public final void delete(final int element) {
     int s = 0;
     for(int i = 0; i < size; ++i) {
-      if(list[i] != e) list[s++] = list[i];
+      if(list[i] != element) list[s++] = list[i];
     }
     size = s;
   }
 
   /**
    * Deletes the element at the specified position.
-   * @param i position to delete
+   * @param index index of the element to delete
    */
-  public final void deleteAt(final int i) {
-    Array.move(list, i + 1, -1, --size - i);
+  public final void deleteAt(final int index) {
+    Array.move(list, index + 1, -1, --size - index);
   }
 
   /**
    * Adds a difference to all elements starting from the specified index.
-   * @param d difference
-   * @param i index
+   * @param diff difference
+   * @param index index of the first element
    */
-  public final void move(final int d, final int i) {
-    for(int a = i; a < size; a++) list[a] += d;
+  public final void move(final int diff, final int index) {
+    for(int a = index; a < size; a++) list[a] += diff;
   }
 
   /**
@@ -147,20 +148,20 @@ public class IntList extends ElementList {
 
   /**
    * Pushes an element onto the stack.
-   * @param val element
+   * @param element element
    */
-  public final void push(final int val) {
-    add(val);
+  public final void push(final int element) {
+    add(element);
   }
 
   /**
    * Searches the specified element via binary search.
    * Note that all elements must be sorted.
-   * @param e element to be found
+   * @param element element to be found
    * @return index of the search key, or the negative insertion point - 1
    */
-  public final int sortedIndexOf(final int e) {
-    return Arrays.binarySearch(list, 0, size, e);
+  public final int sortedIndexOf(final int element) {
+    return Arrays.binarySearch(list, 0, size, element);
   }
 
   /**
@@ -170,6 +171,22 @@ public class IntList extends ElementList {
   public final int[] toArray() {
     return Arrays.copyOf(list, size);
   }
+
+  /**
+   * Removes duplicates from a sorted list.
+   * @return self reference
+   */
+  public IntList unique() {
+    if(size != 0) {
+      int s = 0;
+      for(int l = 1; l < size; l++) {
+        if(list[l] != list[s]) list[++s] = list[l];
+      }
+      size = s + 1;
+    }
+    return this;
+  }
+
 
   /**
    * Sorts the data.
@@ -517,8 +534,6 @@ public class IntList extends ElementList {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
-    for(int i = 0; i < size; ++i) tb.add((i == 0 ? "" : ", ") + list[i]);
-    return tb.add(']').toString();
+    return Arrays.toString(toArray());
   }
 }

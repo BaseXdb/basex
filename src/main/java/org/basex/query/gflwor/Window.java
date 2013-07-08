@@ -266,8 +266,8 @@ public final class Window extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 || expr.uses(u) || start.uses(u) || end != null && end.uses(u);
+  public boolean has(final Flag flag) {
+    return expr.has(flag) || start.has(flag) || end != null && end.has(flag);
   }
 
   @Override
@@ -295,9 +295,9 @@ public final class Window extends GFLWOR.Clause {
 
   @Override
   public Window copy(final QueryContext ctx, final VarScope scp,
-      final IntMap<Var> vs) {
+      final IntObjMap<Var> vs) {
     final Var v = scp.newCopyOf(ctx, var);
-    vs.add(var.id, v);
+    vs.put(var.id, v);
     try {
       return new Window(info, sliding, v, expr.copy(ctx, scp, vs),
           start.copy(ctx, scp, vs), only, end != null ? end.copy(ctx, scp, vs) : null);
@@ -408,15 +408,15 @@ public final class Window extends GFLWOR.Clause {
 
     @Override
     public Condition copy(final QueryContext ctx, final VarScope scp,
-        final IntMap<Var> vs) {
+        final IntObjMap<Var> vs) {
       final Var it = item == null ? null : scp.newCopyOf(ctx, item),
                 ps = pos  == null ? null : scp.newCopyOf(ctx, pos),
                 pr = prev == null ? null : scp.newCopyOf(ctx, prev),
                 nx = next == null ? null : scp.newCopyOf(ctx, next);
-      if(it != null) vs.add(item.id, it);
-      if(ps != null) vs.add(pos.id,  ps);
-      if(pr != null) vs.add(prev.id, pr);
-      if(nx != null) vs.add(next.id, nx);
+      if(it != null) vs.put(item.id, it);
+      if(ps != null) vs.put(pos.id,  ps);
+      if(pr != null) vs.put(prev.id, pr);
+      if(nx != null) vs.put(next.id, nx);
       return new Condition(start, it, ps, pr, nx, expr.copy(ctx, scp, vs), info);
     }
 
@@ -504,7 +504,7 @@ public final class Window extends GFLWOR.Clause {
 
     @Override
     public void plan(final FElem plan) {
-      final FElem e = new FElem(token(start ? START : END));
+      final FElem e = new FElem(start ? START : END);
 
       // mapping variable names to roles
       if(item != null) e.add(planAttr(VAR, token(item.toString())));

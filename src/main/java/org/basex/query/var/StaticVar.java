@@ -5,7 +5,7 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.*;
+import org.basex.query.expr.Expr.Flag;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -30,8 +30,6 @@ public final class StaticVar extends StaticDecl {
   private final boolean implicit;
   /** Bound value. */
   Value value;
-  /** Inferred type. */
-  private final SeqType type;
   /** Flag for lazy evaluation. */
   private final boolean lazy;
 
@@ -39,17 +37,18 @@ public final class StaticVar extends StaticDecl {
    * Constructor for a variable declared in a query.
    * @param sctx static context
    * @param scp variable scope
-   * @param ii input info
    * @param a annotations
    * @param n variable name
    * @param t variable type
    * @param e expression to be bound
    * @param ext external flag
+   * @param xqdoc current xqdoc cache
+   * @param ii input info
    */
-  StaticVar(final StaticContext sctx, final VarScope scp, final InputInfo ii, final Ann a,
-      final QNm n, final SeqType t, final Expr e, final boolean ext) {
-    super(sctx, a, n, t, scp, ii);
-    type = t == null ? SeqType.ITEM_ZM : t;
+  StaticVar(final StaticContext sctx, final VarScope scp, final Ann a, final QNm n,
+      final SeqType t, final Expr e, final boolean ext,
+      final String xqdoc, final InputInfo ii) {
+    super(sctx, a, n, t, scp, xqdoc, ii);
     expr = e;
     external = ext;
     lazy = ann.contains(LAZY);
@@ -63,8 +62,7 @@ public final class StaticVar extends StaticDecl {
    * @param ii input info
    */
   public StaticVar(final QueryContext ctx, final QNm nm, final InputInfo ii) {
-    super(ctx.sc, null, nm, null, new VarScope(), ii);
-    type = SeqType.ITEM_ZM;
+    super(ctx.sc, null, nm, null, new VarScope(), null, ii);
     expr = null;
     external = true;
     lazy = false;
@@ -87,7 +85,7 @@ public final class StaticVar extends StaticDecl {
       } catch(final QueryException qe) {
         compiled = true;
         if(lazy) {
-          expr = FNInfo.error(qe, info);
+          expr = FNInfo.error(qe);
           return;
         }
         throw qe.notCatchable();
@@ -149,7 +147,7 @@ public final class StaticVar extends StaticDecl {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    if(expr != null && expr.uses(Use.UPD)) UPNOT.thrw(info, description());
+    if(expr != null && expr.has(Flag.UPD)) UPNOT.thrw(info, description());
   }
 
   /**
@@ -220,14 +218,6 @@ public final class StaticVar extends StaticDecl {
     final FElem e = planElem(NAM, name.string());
     if(expr != null) expr.plan(e);
     plan.add(e);
-  }
-
-  /**
-   * returns this variable's inferred type.
-   * @return inferred type
-   */
-  public SeqType type() {
-    return type != null ? type : SeqType.ITEM_ZM;
   }
 
   @Override

@@ -1,7 +1,5 @@
 package org.basex.query.value.node;
 
-import java.util.*;
-
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -31,12 +29,12 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public QNm qname(final QNm nm) {
+  public final QNm qname(final QNm nm) {
     return qname();
   }
 
   @Override
-  public ANode deepCopy() {
+  public final ANode deepCopy() {
     return copy();
   }
 
@@ -47,21 +45,11 @@ public abstract class FNode extends ANode {
 
   @Override
   public final int diff(final ANode node) {
-    if(id != node.id) {
-      ANode n = this;
-      while(n != null) {
-        final ANode p = n.parent();
-        if(p == node) return 1;
-        n = p;
-      }
-      n = node;
-      while(n != null) {
-        final ANode p = n.parent();
-        if(p == this) return -1;
-        n = p;
-      }
-    }
-    return id - node.id;
+    // compare fragment with database node
+    if(node instanceof DBNode) return diff(this, node);
+    // compare fragments: compare node ids
+    final int i = node.id;
+    return id > i ? 1 : id < i ? -1 : 0;
   }
 
   @Override
@@ -72,7 +60,6 @@ public abstract class FNode extends ANode {
   @Override
   public final AxisIter ancestor() {
     return new AxisIter() {
-      /** Temporary node. */
       private ANode node = FNode.this;
 
       @Override
@@ -86,7 +73,6 @@ public abstract class FNode extends ANode {
   @Override
   public final AxisIter ancestorOrSelf() {
     return new AxisIter() {
-      /** Temporary node. */
       private ANode node = FNode.this;
 
       @Override
@@ -190,7 +176,7 @@ public abstract class FNode extends ANode {
         if(node != null) {
           final AxisMoreIter ch = node.children();
           if(ch.more()) {
-            if(l + 1 == nm.length) nm = Arrays.copyOf(nm, l + 1 << 1);
+            if(l + 1 == nm.length) nm = Array.copy(nm, new AxisMoreIter[l + 1 << 1]);
             nm[++l] = ch;
           } else {
             while(!nm[l].more()) if(l-- <= 0) break;

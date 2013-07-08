@@ -60,7 +60,7 @@ final class XMLScanner extends Proc {
 
   /** Current scanner state. */
   private State state = State.CONTENT;
-  /** Opening tag found. */
+  /** Scanning prolog (will be invalidated when root element is parsed). */
   private boolean prolog = true;
   /** Parameter entity parsing. */
   private boolean pe;
@@ -83,9 +83,7 @@ final class XMLScanner extends Proc {
     fragment = frag;
 
     try {
-      for(int e = 0; e < ENTITIES.length; e += 2) {
-        ents.add(token(ENTITIES[e]), token(ENTITIES[e + 1]));
-      }
+      for(int e = 0; e < ENTITIES.length; e += 2) ents.put(ENTITIES[e], ENTITIES[e + 1]);
       dtd = pr.is(Prop.DTD);
 
       String enc = null;
@@ -114,7 +112,7 @@ final class XMLScanner extends Proc {
       if(!fragment) {
         final int n = consume();
         if(!s(n)) {
-          if(n != '<') error(BEFOREROOT);
+          if(n != '<') error(n == 0 ? DOCEMPTY : BEFOREROOT);
           prev(1);
         }
       }
@@ -513,9 +511,9 @@ final class XMLScanner extends Proc {
     byte[] en = ents.get(name);
     if(en == null) {
       // unknown entity: try HTML entities (lazy initialization)
-      if(HTMLENTS.size() == 0) {
+      if(HTMLENTS.isEmpty()) {
         for(int s = 0; s < HTMLENTITIES.length; s += 2) {
-          HTMLENTS.add(token(HTMLENTITIES[s]), token(HTMLENTITIES[s + 1]));
+          HTMLENTS.put(HTMLENTITIES[s], HTMLENTITIES[s + 1]);
         }
       }
       en = HTMLENTS.get(name);
@@ -792,7 +790,7 @@ final class XMLScanner extends Proc {
           if(val == null) error(INVEND);
         }
         s();
-        pents.add(key, val);
+        pents.put(key, val);
       } else { // [71] GEDecl
         final byte[] key = name(true);
         checkS();
@@ -807,7 +805,7 @@ final class XMLScanner extends Proc {
           }
         }
         s();
-        ents.add(key, val);
+        ents.put(key, val);
       }
       check('>');
       pe = true;

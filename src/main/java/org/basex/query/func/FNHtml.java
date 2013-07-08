@@ -20,8 +20,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FNHtml extends StandardFunc {
-  /** Element: options. */
-  private static final QNm E_OPTIONS = new QNm("options", HTMLURI);
+  /** QName. */
+  private static final QNm Q_OPTIONS = QNm.get("options", HTMLURI);
 
   /**
    * Constructor.
@@ -54,7 +54,7 @@ public final class FNHtml extends StandardFunc {
 
     // bind parameters
     final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(E_OPTIONS, info).parse(opt);
+    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] key : map) tb.add(key).add('=').add(map.get(key)).add(',');
 

@@ -5,116 +5,137 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This is a simple container for tokens (byte arrays).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class TokenList extends ElementList implements Iterable<byte[]> {
   /** Element container. */
-  byte[][] list;
+  private byte[][] list;
 
   /**
    * Default constructor.
    */
   public TokenList() {
-    this(8);
+    this(Array.CAPACITY);
   }
 
   /**
-   * Constructor.
-   * @param is initial size of the list
+   * Constructor, specifying an initial internal array size
+   * (default is {@link Array#CAPACITY}).
+   * @param capacity initial array capacity
    */
-  public TokenList(final int is) {
-    list = new byte[is][];
+  public TokenList(final int capacity) {
+    list = new byte[capacity][];
   }
 
   /**
-   * Constructor.
-   * @param f resize factor
+   * Constructor, specifying a resize factor. Smaller values are more memory-saving,
+   * while larger will provide better performance.
+   * @param resize resize factor
    */
-  public TokenList(final double f) {
-    this(8);
-    factor = f;
+  public TokenList(final double resize) {
+    this();
+    factor = resize;
   }
 
   /**
-   * Lightweight constructor, assigning the specified array.
-   * @param a initial array
+   * Lightweight constructor, adopting the specified array.
+   * @param tokens initial array
    */
-  public TokenList(final byte[][] a) {
-    list = a;
+  public TokenList(final byte[][] tokens) {
+    list = tokens;
     size = list.length;
   }
 
   /**
-   * Adds an element.
-   * @param e element to be added
+   * Constructor, adopting the elements from the specified array.
+   * @param strings initial array
    */
-  public void add(final byte[] e) {
+  public TokenList(final String[] strings) {
+    this(strings.length);
+    for(final String s : strings) add(s);
+  }
+
+  /**
+   * Constructor, adopting the elements from the specified set.
+   * @param set set to be added
+   */
+  public TokenList(final TokenSet set) {
+    this(set.size());
+    for(final byte[] e : set) add(e);
+  }
+
+  /**
+   * Adds an element.
+   * @param element element to be added
+   */
+  public void add(final byte[] element) {
     if(size == list.length) list = Array.copyOf(list, newSize());
-    list[size++] = e;
+    list[size++] = element;
   }
 
   /**
    * Adds a long value.
-   * @param e element to be added
+   * @param element element to be added
    */
-  public void add(final long e) {
-    add(token(e));
+  public void add(final long element) {
+    add(token(element));
   }
 
   /**
    * Adds a string.
-   * @param e element to be added
+   * @param element element to be added
    */
-  public void add(final String e) {
-    add(token(e));
+  public void add(final String element) {
+    add(token(element));
   }
 
   /**
    * Inserts the given elements at the specified position.
-   * @param i insert position
-   * @param e elements to insert
+   * @param index inserting position
+   * @param elements elements to insert
    */
-  public void insert(final int i, final byte[][] e) {
-    final int l = e.length;
+  public void insert(final int index, final byte[][] elements) {
+    final int l = elements.length;
     if(l == 0) return;
 
-    if(size + l > list.length) list = Arrays.copyOf(list, newSize(size + l));
-    Array.move(list, i, l, size - i);
-    System.arraycopy(e, 0, list, i, l);
+    if(size + l > list.length) list = Array.copyOf(list, newSize(size + l));
+    Array.move(list, index, l, size - index);
+    System.arraycopy(elements, 0, list, index, l);
     size += l;
   }
 
   /**
    * Deletes the element at the specified position.
-   * @param i position to delete
+   * @param index index of the element to delete
    */
-  public void delete(final int i) {
-    Array.move(list, i + 1, -1, --size - i);
+  public void deleteAt(final int index) {
+    Array.move(list, index + 1, -1, --size - index);
   }
 
   /**
-   * Returns the element at the specified index.
-   * @param i index
+   * Returns the element at the specified position.
+   * @param index index of the element to return
    * @return element
    */
-  public byte[] get(final int i) {
-    return i < list.length ? list[i] : null;
+  public byte[] get(final int index) {
+    return index < list.length ? list[index] : null;
   }
 
   /**
-   * Sets an element at the specified index.
-   * @param i index
-   * @param e element to be set
+   * Stores an element to the specified position.
+   * @param index index of the element to replace
+   * @param element element to be stored
    */
-  public void set(final int i, final byte[] e) {
-    if(i >= list.length) list = Array.copyOf(list, newSize(i + 1));
-    list[i] = e;
-    size = Math.max(size, i + 1);
+  public void set(final int index, final byte[] element) {
+    if(index >= list.length) list = Array.copyOf(list, newSize(index + 1));
+    list[index] = element;
+    size = Math.max(size, index + 1);
   }
 
   /**
@@ -127,10 +148,10 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   /**
    * Pushes an element onto the stack.
-   * @param val element
+   * @param element element
    */
-  public void push(final byte[] val) {
-    add(val);
+  public void push(final byte[] element) {
+    add(element);
   }
 
   /**
@@ -143,11 +164,11 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   /**
    * Checks if the specified element is found in the list.
-   * @param e element to be found
+   * @param element element to be found
    * @return result of check
    */
-  public boolean contains(final byte[] e) {
-    for(int i = 0; i < size; ++i) if(eq(list[i], e)) return true;
+  public boolean contains(final byte[] element) {
+    for(int i = 0; i < size; ++i) if(eq(list[i], element)) return true;
     return false;
   }
 
@@ -183,15 +204,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   @Override
   public Iterator<byte[]> iterator() {
-    return new Iterator<byte[]>() {
-      private int c;
-      @Override
-      public boolean hasNext() { return c < size; }
-      @Override
-      public byte[] next() { return list[c++]; }
-      @Override
-      public void remove() { Util.notexpected(); }
-    };
+    return new ArrayIterator<byte[]>(list, size);
   }
 
   @Override

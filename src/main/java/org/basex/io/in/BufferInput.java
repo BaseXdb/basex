@@ -81,26 +81,27 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Returns the next byte (see {@link InputStream#read}.
+   * Returns the next byte. By default, this method calls {@link #readByte()};
    * {@code -1} is returned if all bytes have been read.
    * @return next byte
    * @throws IOException I/O exception
+   * @see InputStream#read()
    */
   @Override
   public int read() throws IOException {
-    return next();
+    return readByte();
   }
 
   /**
-   * Returns the next unsigned byte (see {@link InputStream#read}.
+   * Returns the next unsigned byte.
    * {@code -1} is returned if all bytes have been read.
    * @return next unsigned byte
    * @throws IOException I/O exception
+   * @see InputStream#read()
    */
-  protected int next() throws IOException {
+  protected int readByte() throws IOException {
     final int blen = buffer.length;
     final byte[] buf = buffer;
-    // will not occur if {@link ArrayInput} is used
     if(bpos >= bsize) {
       if(bsize == 0 || bsize == blen) {
         // reset mark if buffer is full
@@ -125,7 +126,7 @@ public class BufferInput extends InputStream {
    */
   public final String readString() throws IOException {
     final ByteList bl = new ByteList();
-    for(int l; (l = next()) > 0;) bl.add(l);
+    for(int l; (l = read()) > 0;) bl.add(l);
     return bl.toString();
   }
 
@@ -136,7 +137,7 @@ public class BufferInput extends InputStream {
    */
   public final byte[] readBytes() throws IOException {
     final ByteList bl = new ByteList();
-    for(int l; (l = next()) > 0;) bl.add(l);
+    for(int l; (l = readByte()) > 0;) bl.add(l);
     return bl.toArray();
   }
 
@@ -188,12 +189,12 @@ public class BufferInput extends InputStream {
         // input length is known in advance
         final int sl = (int) Math.min(Integer.MAX_VALUE, length);
         final byte[] bytes = new byte[sl];
-        for(int c = 0; c < sl; c++) bytes[c] = (byte) next();
+        for(int c = 0; c < sl; c++) bytes[c] = (byte) readByte();
         return bytes;
       }
       // parse until end of stream
       final ByteList bl = new ByteList();
-      for(int ch; (ch = next()) != -1;) bl.add(ch);
+      for(int ch; (ch = readByte()) != -1;) bl.add(ch);
       return bl.toArray();
     } finally {
       close();

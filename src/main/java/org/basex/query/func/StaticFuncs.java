@@ -16,6 +16,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Container for a user-defined function.
@@ -45,22 +46,26 @@ public final class StaticFuncs extends ExprInfo {
    * @param ret return type
    * @param body function body
    * @param sc static context
-   * @param ii input info
    * @param scp variable scope
+   * @param xqdoc current xqdoc cache
+   * @param ii input info
+   * @return static function reference
    * @throws QueryException query exception
    */
-  public void declare(final Ann ann, final QNm nm, final Var[] args, final SeqType ret,
-      final Expr body, final StaticContext sc, final InputInfo ii, final VarScope scp)
-          throws QueryException {
+  public StaticFunc declare(final Ann ann, final QNm nm, final Var[] args,
+      final SeqType ret, final Expr body, final StaticContext sc, final VarScope scp,
+      final String xqdoc, final InputInfo ii) throws QueryException {
+
     final byte[] uri = nm.uri();
     if(uri.length == 0) FUNNONS.thrw(ii, nm.string());
     if(NSGlobal.reserved(uri)) NAMERES.thrw(ii, nm.string());
 
-    final StaticFunc fn = new StaticFunc(ann, nm, args, ret, body, sc, scp, ii);
+    final StaticFunc fn = new StaticFunc(ann, nm, args, ret, body, sc, scp, xqdoc, ii);
     final byte[] sig = fn.id();
     final FuncCache fc = funcs.get(sig);
     if(fc != null) fc.setFunc(fn);
-    else funcs.add(sig, new FuncCache(fn));
+    else funcs.put(sig, new FuncCache(fn));
+    return fn;
   }
 
   /**
@@ -93,7 +98,7 @@ public final class StaticFuncs extends ExprInfo {
 
     if(NSGlobal.reserved(name.uri())) errorIfSimilar(name, ii);
     final byte[] sig = sig(name, args.length);
-    if(!funcs.contains(sig)) funcs.add(sig, new FuncCache(null));
+    if(!funcs.contains(sig)) funcs.put(sig, new FuncCache(null));
     return getRef(name, args, sc, ii);
   }
 
@@ -105,21 +110,36 @@ public final class StaticFuncs extends ExprInfo {
    */
   public void check(final QueryContext qc) throws QueryException {
     // initialize function calls
-    final int fs = funcs.size();
-    for(int id = 1; id <= fs; ++id) {
-      final FuncCache fc = funcs.value(id);
+    int id = 0;
+    for(final FuncCache fc : funcs.values()) {
+      final StaticFuncCall call = fc.calls.isEmpty() ? null : fc.calls.get(0);
       if(fc.func == null) {
-        final StaticFuncCall call = fc.calls.get(0);
         // check if another function with same name exists
-        for(int i = 1; i <= fs; ++i) {
-          if(i == id) continue;
-          final FuncCache ofc = funcs.value(i);
-          if(call.name.eq(ofc.name())) FUNCTYPE.thrw(call.info, call.name.string());
+        int oid = 0;
+        final IntList al = new IntList();
+        for(final FuncCache ofc : funcs.values()) {
+          if(oid++ == id) continue;
+          if(call.name.eq(ofc.name())) al.add(ofc.func.arity());
         }
+        if(!al.isEmpty()) {
+          final StringBuilder exp = new StringBuilder();
+          final int as = al.size();
+          for(int a = 0; a < as; a++) {
+            if(a != 0) exp.append(a + 1 < as ? "," : " or ");
+            exp.append(al.get(a));
+          }
+          final int a = call.expr.length;
+          (a == 1 ? FUNCTYPESG : FUNCTYPEPL).thrw(call.info, call.name.string(), a, exp);
+        }
+
         // if not, indicate that function is unknown
         FUNCUNKNOWN.thrw(call.info, call.name.string());
       }
-      if(!fc.calls.isEmpty()) qc.updating |= fc.func.updating;
+      if(call != null) {
+        if(fc.func.expr == null) FUNCNOIMPL.thrw(call.info, call.name.string());
+        qc.updating |= fc.func.updating;
+      }
+      id++;
     }
   }
 
@@ -128,8 +148,7 @@ public final class StaticFuncs extends ExprInfo {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    final int fs = funcs.size();
-    for(int id = 1; id <= fs; ++id) funcs.value(id).func.checkUp();
+    for(final FuncCache fc : funcs.values()) fc.func.checkUp();
   }
 
   /**
@@ -139,9 +158,7 @@ public final class StaticFuncs extends ExprInfo {
    */
   public void compile(final QueryContext ctx) throws QueryException {
     // only compile those functions that are used
-    final int fs = funcs.size();
-    for(int id = 1; id <= fs; id++) {
-      final FuncCache fc = funcs.value(id);
+    for(final FuncCache fc : funcs.values()) {
       if(!fc.calls.isEmpty()) fc.func.compile(ctx);
     }
   }
@@ -174,10 +191,9 @@ public final class StaticFuncs extends ExprInfo {
     // find local functions
     final Levenshtein ls = new Levenshtein();
     final byte[] nm = lc(name.local());
-    final int fs = funcs.size();
-    for(int id = 1; id <= fs; ++id) {
-      final StaticFunc sf = funcs.value(id).func;
-      if(sf != null && ls.similar(nm, lc(sf.name.local()))) {
+    for(final FuncCache fc : funcs.values()) {
+      final StaticFunc sf = fc.func;
+      if(sf != null && sf.expr != null && ls.similar(nm, lc(sf.name.local()))) {
         FUNCSIMILAR.thrw(ii, name.string(), sf.name.string());
       }
     }
@@ -195,16 +211,16 @@ public final class StaticFuncs extends ExprInfo {
   public StaticFunc[] funcs() {
     final int fs = funcs.size();
     final StaticFunc[] sf = new StaticFunc[fs];
-    for(int id = 1; id <= fs; ++id) sf[id - 1] = funcs.value(id).func;
+    int i = 0;
+    for(final FuncCache fc : funcs.values()) sf[i++] = fc.func;
     return sf;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    final int fs = funcs.size();
-    for(int id = 1; id <= fs; ++id) {
-      sb.append(funcs.value(id).func.toString()).append(Text.NL);
+    for(final FuncCache fc : funcs.values()) {
+      sb.append(fc.func.toString()).append(Text.NL);
     }
     return sb.toString();
   }
@@ -232,9 +248,7 @@ public final class StaticFuncs extends ExprInfo {
     public void setFunc(final StaticFunc fn) throws QueryException {
       if(func != null) throw FUNCDEFINED.thrw(fn.info, fn.name.string());
       func = fn;
-      for(final StaticFuncCall call : calls) {
-        call.init(fn);
-      }
+      for(final StaticFuncCall call : calls) call.init(fn);
     }
 
     /**
@@ -255,8 +269,7 @@ public final class StaticFuncs extends ExprInfo {
         // [LW] should be deferred until the actual types are known (i.e. compile time)
         return new TypedFunc(call, new Ann(), FuncType.arity(args.length));
       }
-      call.init(func);
-      return new TypedFunc(call, func.ann, func.funcType());
+      return new TypedFunc(call.init(func), func.ann, func.funcType());
     }
 
     /**

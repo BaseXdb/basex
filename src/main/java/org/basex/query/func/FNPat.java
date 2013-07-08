@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -34,16 +33,19 @@ public final class FNPat extends StandardFunc {
   /** Slash pattern. */
   private static final Pattern BSLASH = Pattern.compile("\\\\");
 
-  /** Root element for the analyze-string-result function. */
-  private static final QNm Q_ANALYZE = new QNm("fn:analyze-string-result", FNURI);
-  /** Element for the analyze-string-result function. */
-  private static final QNm Q_MATCH = new QNm("fn:match", FNURI);
-  /** Element for the analyze-string-result function. */
-  private static final QNm Q_NONMATCH = new QNm("fn:non-match", FNURI);
-  /** Element for the analyze-string-result function. */
-  private static final QNm Q_MGROUP = new QNm("fn:group", FNURI);
+  /** Module prefix. */
+  private static final String PREFIX = "fn";
+  /** QName. */
+  private static final QNm Q_ANALYZE = QNm.get(PREFIX, "analyze-string-result", FNURI);
+  /** QName. */
+  private static final QNm Q_MATCH = QNm.get(PREFIX, "match", FNURI);
+  /** QName. */
+  private static final QNm Q_NONMATCH = QNm.get(PREFIX, "non-match", FNURI);
+  /** QName. */
+  private static final QNm Q_MGROUP = QNm.get(PREFIX, "group", FNURI);
+
   /** Attribute for the analyze-string-result function. */
-  private static final QNm Q_NR = new QNm("nr");
+  private static final String NR = "nr";
 
   /**
    * Constructor.
@@ -108,7 +110,7 @@ public final class FNPat extends StandardFunc {
     final String str = string(val);
     final Matcher m = p.matcher(str);
 
-    final FElem root = new FElem(Q_ANALYZE, new Atts(FN, FNURI));
+    final FElem root = new FElem(Q_ANALYZE).declareNS();
     int s = 0;
     while(m.find()) {
       if(s != m.start()) nonmatch(str.substring(s, m.start()), root);
@@ -130,8 +132,8 @@ public final class FNPat extends StandardFunc {
   private static int[] match(final Matcher m, final String str, final FElem par,
       final int g) {
 
-    final FElem nd = new FElem(g == 0 ? Q_MATCH : Q_MGROUP, new Atts(FN, FNURI));
-    if(g > 0) nd.add(Q_NR, token(g));
+    final FElem nd = new FElem(g == 0 ? Q_MATCH : Q_MGROUP);
+    if(g > 0) nd.add(NR, token(g));
 
     final int start = m.start(g), end = m.end(g), gc = m.groupCount();
     int[] pos = { g + 1, start }; // group and position in string
@@ -156,7 +158,7 @@ public final class FNPat extends StandardFunc {
    * @param par root node
    */
   private static void nonmatch(final String text, final FElem par) {
-    par.add(new FElem(Q_NONMATCH, new Atts(FN, FNURI)).add(text));
+    par.add(new FElem(Q_NONMATCH).add(text));
   }
 
   /**
@@ -238,19 +240,8 @@ public final class FNPat extends StandardFunc {
     Pattern p = patterns.get(key);
     if(p == null) {
       p = RegExParser.parse(pat, mod, ctx.sc.xquery3(), info);
-      patterns.add(key, p);
+      patterns.put(key, p);
     }
     return p;
-  }
-
-  @Override
-  public boolean xquery3() {
-    return sig == ANALYZE_STRING;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 && xquery3() || u == Use.CNS && sig == ANALYZE_STRING ||
-        super.uses(u);
   }
 }

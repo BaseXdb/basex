@@ -97,12 +97,13 @@ public interface Text {
   String SERVERMODE = "Server";
   /** Server start information. */
   String SERVERINFO =
-    " [-cdeipSz] [stop]" + NL +
+    " [-cdeinpSz] [stop]" + NL +
     "  stop      Stop running server" + NL +
     "  -c<cmds>  Execute initial database commands" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -e<port>  Set event port" + NL +
     "  -i        Enter interactive mode" + NL +
+    "  -n<name>  Set host the server is bound to" + NL +
     "  -p<port>  Set server port" + NL +
     "  -S        Start as service" + NL +
     "  -z        Suppress logging";
@@ -600,19 +601,19 @@ public interface Text {
   // XQUERY COMMAND ===========================================================
 
   /** Query info: query. */
-  String QUERY_C = lang("query") + COL;
+  String QUERY = lang("query");
   /** Query info: optimized query. */
-  String OPTIMIZED_QUERY_C = lang("optimized_query") + COL;
+  String OPTIMIZED_QUERY = lang("optimized_query");
   /** Query info: compiling. */
-  String COMPILING_C = lang("compiling") + COL;
+  String COMPILING = lang("compiling");
   /** Query info: evaluating. */
-  String EVALUATING_C = lang("evaluating") + COL;
+  String EVALUATING = lang("evaluating");
   /** Query info: querying. */
-  String TIMING_C = lang("timing") + COL;
+  String TIMING = lang("timing");
   /** Query info: result . */
-  String RESULT_C = lang("result") + COLS;
+  String RESULT = lang("result");
   /** Query info: plan. */
-  String QUERY_PLAN_C = lang("query_plan") + COLS;
+  String QUERY_PLAN = lang("query_plan");
 
   /** "Query: ". */
   String QUERY_CC = lang("query") + COLS;
@@ -813,7 +814,7 @@ public interface Text {
   String MAIN_OPTIONS = lang("main_options");
 
   /** "(chopped)". */
-  String CHOPPED = " (" + lang("chopped") + ')';
+  String CHOPPED = "(" + lang("chopped") + ") ";
   /** "(% entries)". */
   String ENTRIES = '(' + lang("entries_%") + ')';
   /** "Error". */
@@ -919,8 +920,6 @@ public interface Text {
   /** Command info. */
   String TABLE = lang("table");
   /** Command info. */
-  String TEXT = lang("text");
-  /** Command info. */
   String TREE = lang("tree");
   /** Command info. */
   String UNDO = lang("undo");
@@ -934,6 +933,8 @@ public interface Text {
   String SAVE_AS = lang("save_as");
   /** Command info. */
   String PACKAGES = lang("packages");
+  /** Command info. */
+  String TEXT = lang("text");
 
   /** Command info. */
   String FONTS_D = lang("fonts") + DOTS;
@@ -1374,7 +1375,7 @@ public interface Text {
   /** Command info. */
   String H_TABLE = lang("h_table");
   /** Command info. */
-  String H_TEXT = lang("h_text");
+  String H_RESULT = lang("h_result");
   /** Command info. */
   String H_TREE = lang("h_tree");
   /** Command info. */

@@ -1,7 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.query.func.Function.*;
-
 import java.util.*;
 
 import org.basex.data.*;
@@ -139,7 +137,7 @@ public final class FNSeq extends StandardFunc {
     // pre-evaluate distinct values
     final SeqType st = expr[0].type();
     final Type t = st.type;
-    if(sig == Function.DISTINCT_VALUES) {
+    if(sig == Function.DISTINCT_VALUES && expr.length == 1) {
       type = t.isNode() ? SeqType.get(AtomType.ATM, st.occ) : st;
       return cmpDist(ctx);
     }
@@ -169,7 +167,7 @@ public final class FNSeq extends StandardFunc {
     final ArrayList<PathNode> nodes = ((AxisPath) expr[0]).nodes(ctx);
     if(nodes == null) return this;
     // loop through all nodes
-    final ItemSet is = new ItemSet();
+    final HashItemSet is = new HashItemSet();
     for(PathNode pn : nodes) {
       // retrieve text child if addressed node is an element
       if(pn.kind == Data.ELEM) {
@@ -181,7 +179,7 @@ public final class FNSeq extends StandardFunc {
       // check if distinct values are available
       if(pn.stats.type != StatsType.CATEGORY) return this;
       // if yes, add them to the item set
-      for(final byte[] c : pn.stats.cats) is.add(new Atm(c), info);
+      for(final byte[] c : pn.stats.cats) is.put(new Atm(c), info);
     }
     // return resulting sequence
     final ValueBuilder vb = new ValueBuilder(is.size());
@@ -231,7 +229,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter indexOf(final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[1], ctx);
-    if(expr.length == 3) checkColl(expr[2], ctx);
+    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
 
     return new Iter() {
       final Iter ir = expr[0].iter(ctx);
@@ -243,7 +241,7 @@ public final class FNSeq extends StandardFunc {
           final Item i = ir.next();
           if(i == null) return null;
           ++c;
-          if(i.comparable(it) && OpV.EQ.eval(info, i, it)) return Int.get(c);
+          if(i.comparable(it) && OpV.EQ.eval(i, it, coll, info)) return Int.get(c);
         }
       }
     };
@@ -256,11 +254,11 @@ public final class FNSeq extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter distinctValues(final QueryContext ctx) throws QueryException {
-    if(expr.length == 2) checkColl(expr[1], ctx);
+    final Collation coll = checkColl(expr.length == 2 ? expr[1] : null, ctx);
     if(expr[0] instanceof RangeSeq) return expr[0].iter(ctx);
 
     return new Iter() {
-      final ItemSet map = new ItemSet();
+      final ItemSet set = coll == null ? new HashItemSet() : new CollationItemSet(coll);
       final Iter ir = expr[0].iter(ctx);
 
       @Override
@@ -270,7 +268,7 @@ public final class FNSeq extends StandardFunc {
           if(i == null) return null;
           ctx.checkStop();
           i = atom(i, info);
-          if(map.add(i, info) >= 0) return i;
+          if(set.add(i, info)) return i;
         }
       }
     };
@@ -440,15 +438,5 @@ public final class FNSeq extends StandardFunc {
         return iter.reset();
       }
     };
-  }
-
-  @Override
-  public boolean xquery3() {
-    return oneOf(sig, HEAD, TAIL);
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 && xquery3() || super.uses(u);
   }
 }

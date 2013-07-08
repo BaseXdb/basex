@@ -46,9 +46,4 @@ public final class FNHttp extends StandardFunc {
     // send HTTP request
     return new HTTPClient(info, ctx.context.prop).sendRequest(href, request, cache);
   }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT || super.uses(u);
-  }
 }

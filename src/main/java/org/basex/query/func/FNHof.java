@@ -141,7 +141,7 @@ public final class FNHof extends StandardFunc {
       @Override
       public int compare(final Item it1, final Item it2) {
         try {
-          return CmpV.OpV.LT.eval(info, it1, it2) ? -1 : 1;
+          return CmpV.OpV.LT.eval(it1, it2, ctx.sc.collation, info) ? -1 : 1;
         } catch(final QueryException qe) {
           throw new QueryRTException(qe);
         }
@@ -226,15 +226,5 @@ public final class FNHof extends StandardFunc {
       Err.type(this, FuncType.arity(a), f);
 
     return (FItem) f;
-  }
-
-  @Override
-  public boolean xquery3() {
-    return true;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 || super.uses(u);
   }
 }

@@ -7,12 +7,12 @@ import java.io.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
- * This class provides a convenient access to text input.
- * The input encoding will be guessed by analyzing the first bytes.
- * UTF-8 will be used as fallback.
+ * This class provides buffered access to textual input.
+ * The input encoding will initially be guessed by analyzing the first bytes;
+ * it can also be explicitly set by calling {@link #encoding()}.
+ * UTF-8 will be used as default encoding.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 public class TextInput extends BufferInput {
   /** Decoder. */
   private TextDecoder decoder;
-  /** Indicates if input is checked for valid XML 1.0. */
+  /** Indicates if the input is to be checked for valid XML 1.0.5 characters. */
   private boolean valid;
 
   /**
@@ -44,15 +44,15 @@ public class TextInput extends BufferInput {
   }
 
   /**
-   * Tries to guess the character encoding, based on the first bytes.
+   * Reads the first bytes of the input stream to guess the text encoding.
    * @throws IOException I/O exception
    */
   private void guess() throws IOException {
     try {
-      final int a = next();
-      final int b = next();
-      final int c = next();
-      final int d = next();
+      final int a = readByte();
+      final int b = readByte();
+      final int c = readByte();
+      final int d = readByte();
       String e = null;
       int skip = 0;
       if(a == 0xFF && b == 0xFE) { // BOM: FF FE
@@ -69,7 +69,7 @@ public class TextInput extends BufferInput {
         e = UTF16BE;
       }
       reset();
-      for(int s = 0; s < skip; s++) next();
+      for(int s = 0; s < skip; s++) readByte();
       decoder = TextDecoder.get(normEncoding(e));
     } catch(final IOException ex) {
       close();
@@ -86,7 +86,8 @@ public class TextInput extends BufferInput {
   }
 
   /**
-   * Checks input for valid XML 1.0 and throws exception if invalid characters are found.
+   * Checks the input for valid XML characters and throws an exception if invalid
+   * characters are found.
    * @param v flag to be set
    * @return self reference
    */
@@ -97,7 +98,7 @@ public class TextInput extends BufferInput {
   }
 
   /**
-   * Sets a new encoding if none has been set yet, or if specified encoding is not UTF-8.
+   * Sets a new encoding.
    * @param enc encoding
    * @return self reference
    * @throws IOException I/O Exception
@@ -110,6 +111,11 @@ public class TextInput extends BufferInput {
     return this;
   }
 
+  /**
+   * Returns the next character.
+   * @return next codepoint
+   * @throws IOException I/O exception
+   */
   @Override
   public int read() throws IOException {
     final int ch = decoder.read(this);
@@ -128,7 +134,7 @@ public class TextInput extends BufferInput {
    * @throws IOException I/O exception
    */
   public final TokenBuilder cache() throws IOException {
-    final TokenBuilder tb = new TokenBuilder(Math.max(ElementList.CAP, (int) length));
+    final TokenBuilder tb = new TokenBuilder(Math.max(Array.CAPACITY, (int) length));
     try {
       for(int ch; (ch = read()) != -1;) tb.add(ch);
     } finally {

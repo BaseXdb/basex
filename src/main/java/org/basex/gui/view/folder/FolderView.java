@@ -228,7 +228,7 @@ public final class FolderView extends View {
       g.fillRect(0, y - boxW - boxMargin, totalW, lineH + 1);
     }
 
-    final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
+    final int fsz = fontSize;
     if(elem) {
       final int yy = y - boxW - (fsz > 20 ? 6 : 3);
       final Image marker = opened[pre] ? openedMarker : closedMarker;
@@ -257,7 +257,7 @@ public final class FolderView extends View {
   private boolean focus(final int x, final int y) {
     if(opened == null) return false;
 
-    final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
+    final int fsz = fontSize;
     final FolderIterator it = new FolderIterator(this, startY + 3, getHeight());
     final Data data = gui.context.data();
     while(it.more()) {
@@ -312,7 +312,7 @@ public final class FolderView extends View {
    * Creates click boxes.
    */
   private void createBoxes() {
-    final int s = gui.gprop.num(GUIProp.FONTSIZE);
+    final int s = fontSize;
     boxMargin = s >> 2;
     lineH = s + boxMargin;
     boxW = s - boxMargin;

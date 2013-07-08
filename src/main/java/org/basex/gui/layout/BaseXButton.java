@@ -86,7 +86,7 @@ public class BaseXButton extends JButton {
    * @param gui reference to main window
    * @return button
    */
-  public static BaseXButton command(final GUICommand cmd, final GUI gui) {
+  public static BaseXButton command(final GUICmd cmd, final GUI gui) {
     final BaseXButton button = new BaseXButton(gui,
         cmd.toString().toLowerCase(Locale.ENGLISH), cmd.help());
     button.addActionListener(new ActionListener() {

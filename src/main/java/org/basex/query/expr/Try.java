@@ -86,8 +86,9 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
+      final Expr e) throws QueryException {
+
     boolean change = false;
     try {
       final Expr sub = expr.inline(ctx, scp, v, e);
@@ -112,14 +113,14 @@ public final class Try extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new Try(info, expr.copy(ctx, scp, vs), Arr.copyAll(ctx, scp, vs, ctch));
   }
 
   @Override
-  public boolean uses(final Use u) {
-    for(final Catch c : ctch) if(c.uses(u)) return true;
-    return super.uses(u);
+  public boolean has(final Flag flag) {
+    for(final Catch c : ctch) if(c.has(flag)) return true;
+    return super.has(flag);
   }
 
   @Override

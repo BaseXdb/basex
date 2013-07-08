@@ -52,7 +52,7 @@ public final class Union extends Set {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Union un = new Union(info, copyAll(ctx, scp, vs, expr));
     un.iterable = iterable;
     return copyType(un);

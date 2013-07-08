@@ -18,7 +18,7 @@ import org.basex.gui.layout.BaseXLayout.DropHandler;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class SearchPanel extends BaseXBack {
+public final class SearchBar extends BaseXBack {
   /** Escape key listener. */
   private final KeyAdapter escape = new KeyAdapter() {
     @Override
@@ -55,7 +55,7 @@ public final class SearchPanel extends BaseXBack {
    * Constructor.
    * @param main gui reference
    */
-  SearchPanel(final GUI main) {
+  SearchBar(final GUI main) {
     layout(new BorderLayout(2, 0));
     mode(Fill.NONE);
     setVisible(false);
@@ -181,7 +181,7 @@ public final class SearchPanel extends BaseXBack {
       @Override
       public void actionPerformed(final ActionEvent e) {
         if(isVisible()) deactivate(true);
-        else activate(null);
+        else activate(null, true);
       }
     });
   }
@@ -191,26 +191,27 @@ public final class SearchPanel extends BaseXBack {
    */
   public void refreshLayout() {
     if(editor == null) return;
-    final String mf = editor.getFont().getFamily();
-    final Font f = new Font(mf, 0, search.getFont().getSize());
-    search.setFont(f);
-    replace.setFont(f);
+    final Font ef = editor.getFont().deriveFont(7f + (GUIConstants.fontSize >> 1));
+    search.setFont(ef);
+    replace.setFont(ef);
   }
 
   /**
-   * Activates the search panel.
-   * @param string search string; triggers new search if different than old string
+   * Activates the search bar.
+   * @param string search string; triggers a new search if it differs from old string.
+   * Will be ignored if set to {@code null}
+   * @param focus indicates if text field should be focused
    */
-  public void activate(final String string) {
+  public void activate(final String string, final boolean focus) {
     boolean action = !isVisible();
     if(action) {
       setVisible(true);
       if(button != null) button.setSelected(true);
     }
-    if(string == null) {
-      search.requestFocusInWindow();
-    } else if(!new SearchContext(this, search.getText()).matches(string)) {
-      // set new, different search string
+    if(focus) search.requestFocusInWindow();
+
+    // set new, different search string
+    if(string != null && !new SearchContext(this, search.getText()).matches(string)) {
       search.setText(string);
       regex.setSelected(false);
       action = true;
@@ -220,8 +221,8 @@ public final class SearchPanel extends BaseXBack {
   }
 
   /**
-   * Deactivates the search panel.
-   * @param close close panel
+   * Deactivates the search bar.
+   * @param close close bar
    * @return {@code true} if panel was closed
    */
   public boolean deactivate(final boolean close) {

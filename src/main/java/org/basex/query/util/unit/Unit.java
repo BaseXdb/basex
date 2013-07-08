@@ -55,8 +55,7 @@ public final class Unit {
    * @throws QueryException query exception
    */
   public FElem test() throws QueryException {
-    final FElem tests = new FElem(Q_TESTSUITE);
-    tests.add(Q_NAME, ctx.sc.baseURI().string());
+    final FElem tests = new FElem(TESTSUITE).add(NAME, ctx.sc.baseURI().string());
     int t = 0, e = 0, f = 0, s = 0;
 
     final IO file = ctx.sc.baseIO();
@@ -67,16 +66,16 @@ public final class Unit {
       // consider only functions that are defined in the same file
       if(!file.eq(new IOFile(uf.info.file()))) continue;
 
-      // find XQUnit annotations
+      // find Unit annotations
       final Ann ann = uf.ann;
       final int as = ann.size();
       boolean xq = false;
       for(int a = 0; !xq && a < as; a++) {
-        xq |= eq(ann.names[a].uri(), QueryText.XQUNITURI);
+        xq |= eq(ann.names[a].uri(), QueryText.UNITURI);
       }
       if(!xq) continue;
 
-      // XQUnit function:
+      // Unit function:
       if(uf.updating) UNIT_UPDATE.thrw(info, uf.name.local());
       if(uf.args.length > 0) UNIT_ARGS.thrw(info, uf.name.local());
 
@@ -111,16 +110,16 @@ public final class Unit {
           }
         }
 
-        final FElem test = new FElem(Q_TESTCASE).add(Q_NAME, uf.name.local());
+        final FElem test = new FElem(TESTCASE).add(NAME, uf.name.local());
         t++;
 
         final Performance pt = new Performance();
         final int skip = indexOf(uf, IGNORE);
         if(skip != -1) {
           // skip test
-          final FElem skipped = new FElem(Q_SKIPPED);
+          final FElem skipped = new FElem(SKIPPED);
           final Value sv = uf.ann.values[skip];
-          if(sv.size() > 0) skipped.add(Q_MESSAGE, sv.itemAt(0).string(info));
+          if(sv.size() > 0) skipped.add(MESSAGE, sv.itemAt(0).string(info));
           test.add(skipped);
           s++;
         } else {
@@ -134,27 +133,26 @@ public final class Unit {
 
             if(code != null) {
               f++;
-              final FElem error = new FElem(Q_FAILURE);
-              error.add(Q_MESSAGE, "Error expected.");
-              error.add(Q_TYPE, code);
+              final FElem error = new FElem(FAILURE);
+              error.add(MESSAGE, "Error expected.");
+              error.add(TYPE, code);
               test.add(error);
             }
           } catch(final QueryException ex) {
             final QNm name = ex.qname();
             if(code == null || !eq(code, name.local())) {
-              final boolean failure = eq(name.uri(), QueryText.XQUNITURI);
+              final boolean failure = eq(name.uri(), QueryText.UNITURI);
               if(failure) f++;
               else e++;
 
-              final QNm nm = failure ? Q_FAILURE : Q_ERROR;
-              final FElem error = new FElem(nm);
-              error.add(Q_MESSAGE, ex.getLocalizedMessage());
-              error.add(Q_TYPE, ex.qname().local());
+              final FElem error = new FElem(failure ? FAILURE : ERROR);
+              error.add(MESSAGE, ex.getLocalizedMessage());
+              error.add(TYPE, ex.qname().local());
               test.add(error);
             }
           }
         }
-        test.add(Q_TIME, time(pt));
+        test.add(TIME, time(pt));
         tests.add(test);
       }
 
@@ -163,16 +161,16 @@ public final class Unit {
 
     } catch(final QueryException ex) {
       // handle initializers
-      final FElem test = new FElem(Q_TESTCASE).add(Q_NAME, current.name.local());
-      test.add(Q_TIME, time(p));
+      final FElem test = new FElem(TESTCASE).add(NAME, current.name.local());
+      test.add(TIME, time(p));
       tests.add(test);
     }
 
-    tests.add(Q_TIME, time(p));
-    tests.add(Q_TESTS, token(t));
-    tests.add(Q_FAILURES, token(f));
-    tests.add(Q_ERRORS, token(e));
-    tests.add(Q_SKIPPED, token(s));
+    tests.add(TIME, time(p));
+    tests.add(TESTS, token(t));
+    tests.add(FAILURES, token(f));
+    tests.add(ERRORS, token(e));
+    tests.add(SKIPPED, token(s));
     return tests;
   }
 
@@ -188,7 +186,7 @@ public final class Unit {
   }
 
   /**
-   * Checks if an XQUnit annotation has been specified.
+   * Checks if a unit annotation has been specified.
    * If positive, returns its offset in the annotation array.
    *
    * @param func user function
@@ -202,7 +200,7 @@ public final class Unit {
     int pos = -1;
     for(int a = 0; a < as; a++) {
       final QNm nm = ann.names[a];
-      if(eq(nm.uri(), QueryText.XQUNITURI) && eq(nm.local(), name)) {
+      if(eq(nm.uri(), QueryText.UNITURI) && eq(nm.local(), name)) {
         if(pos != -1) UNIT_TWICE.thrw(info, '%', nm.local());
         pos = a;
       }

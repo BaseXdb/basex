@@ -73,7 +73,7 @@ public abstract class Preds extends ParseExpr {
         }
         ctx.compInfo(OPTREMOVE, this, pr);
         preds = Array.delete(preds, p--);
-      } else if(pr instanceof And && !pr.uses(Use.POS)) {
+      } else if(pr instanceof And && !pr.has(Flag.FCS)) {
         // replace AND expression with predicates (don't swap position tests)
         ctx.compInfo(OPTPRED, pr);
         final Expr[] and = ((And) pr).expr;
@@ -107,7 +107,7 @@ public abstract class Preds extends ParseExpr {
     boolean np1 = true;
     boolean np2 = true;
     for(int p = 0; p < preds.length; p++) {
-      final boolean np = !preds[p].type().mayBeNumber() && !preds[p].uses(Use.POS);
+      final boolean np = !preds[p].type().mayBeNumber() && !preds[p].has(Flag.FCS);
       np1 &= np;
       if(p > 0) np2 &= np;
     }
@@ -142,9 +142,9 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
+  public boolean has(final Flag flag) {
     for(final Expr p : preds) {
-      if(u == Use.POS && p.type().mayBeNumber() || p.uses(u)) return true;
+      if(flag == Flag.FCS && p.type().mayBeNumber() || p.has(flag)) return true;
     }
     return false;
   }

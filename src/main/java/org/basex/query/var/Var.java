@@ -22,18 +22,18 @@ public final class Var extends ExprInfo {
   public final QNm name;
   /** Variable ID. */
   public final int id;
+  /** Declared type, {@code null} if not specified. */
+  public SeqType declType;
 
   /** Stack slot number. */
   public int slot = -1;
   /** Expected result size. */
   public long size = -1;
 
-  /** Declared type of this variable, {@code null} if not specified. */
-  private SeqType declared;
+  /** Flag for function parameters. */
+  private final boolean param;
   /** Actual return type (by type inference). */
   private SeqType inType;
-  /** Flag for function parameters. */
-  protected final boolean param;
   /** Flag for function conversion. */
   private boolean promote;
 
@@ -46,7 +46,7 @@ public final class Var extends ExprInfo {
    */
   Var(final QueryContext ctx, final QNm n, final SeqType typ, final boolean fun) {
     name = n;
-    declared = typ;
+    declType = typ;
     inType = SeqType.ITEM_ZM;
     id = ctx.varIDs++;
     param = fun;
@@ -70,7 +70,7 @@ public final class Var extends ExprInfo {
    * @param var variable to copy
    */
   Var(final QueryContext ctx, final Var var) {
-    this(ctx, var.name, var.declared, var.param);
+    this(ctx, var.name, var.declType, var.param);
     promote = var.promote;
     inType = var.inType;
     size = var.size;
@@ -81,8 +81,8 @@ public final class Var extends ExprInfo {
    * @return (non-{@code null}) type
    */
   public SeqType type() {
-    final SeqType intersect = declared != null ? declared.intersect(inType) : null;
-    return intersect != null ? intersect : declared != null ? declared : inType;
+    final SeqType intersect = declType != null ? declType.intersect(inType) : null;
+    return intersect != null ? intersect : declType != null ? declType : inType;
   }
 
   /**
@@ -90,7 +90,7 @@ public final class Var extends ExprInfo {
    * @return declared type, possibly {@code null}
    */
   public SeqType declaredType() {
-    return declared == null ? SeqType.ITEM_ZM : declared;
+    return declType == null ? SeqType.ITEM_ZM : declType;
   }
 
   /**
@@ -105,18 +105,18 @@ public final class Var extends ExprInfo {
       throws QueryException {
 
     if(t == null) return;
-    if(declared != null) {
-      if(declared.occ.intersect(t.occ) == null) Err.INVCAST.thrw(ii, t, declared);
-      if(!t.convertibleTo(declared)) return;
+    if(declType != null) {
+      if(declType.occ.intersect(t.occ) == null) Err.INVCAST.thrw(ii, t, declType);
+      if(!t.convertibleTo(declType)) return;
     }
 
     if(!inType.eq(t) && !inType.instanceOf(t)) {
       final SeqType is = inType.intersect(t);
       if(is != null) {
         inType = is;
-        if(declared != null && inType.instanceOf(declared)) {
+        if(declType != null && inType.instanceOf(declType)) {
           ctx.compInfo(QueryText.OPTCAST, this);
-          declared = null;
+          declType = null;
         }
       }
     }
@@ -127,7 +127,7 @@ public final class Var extends ExprInfo {
    * @return {@code true} if the type is checked or promoted, {@code false} otherwise
    */
   public boolean checksType() {
-    return declared != null;
+    return declType != null;
   }
 
   /**
@@ -142,7 +142,7 @@ public final class Var extends ExprInfo {
   public Expr checked(final Expr e, final QueryContext ctx, final VarScope scp,
       final InputInfo ii) throws QueryException {
     return checksType()
-        ? new TypeCheck(ii, e, declared, promotes()).optimize(ctx, scp) : e;
+        ? new TypeCheck(ii, e, declType, promotes()).optimize(ctx, scp) : e;
   }
 
   /**
@@ -155,9 +155,9 @@ public final class Var extends ExprInfo {
    */
   public Value checkType(final Value val, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(!checksType() || declared.instance(val)) return val;
-    if(promote) return declared.funcConvert(ctx, ii, val);
-    throw Err.INVCAST.thrw(ii, val.type(), declared);
+    if(!checksType() || declType.instance(val)) return val;
+    if(promote) return declType.funcConvert(ctx, ii, val);
+    throw Err.INVCAST.thrw(ii, val.type(), declType);
   }
 
   /**
@@ -182,7 +182,7 @@ public final class Var extends ExprInfo {
   public void plan(final FElem plan) {
     final FElem e = planElem(QueryText.NAM, '$' + Token.string(name.string()),
         QueryText.ID, Token.token(id));
-    if(declared != null) e.add(planAttr(QueryText.AS, declared.toString()));
+    if(declType != null) e.add(planAttr(QueryText.AS, declType.toString()));
     addPlan(plan, e);
   }
 
@@ -191,9 +191,9 @@ public final class Var extends ExprInfo {
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) {
       tb.add(QueryText.DOLLAR).add(name.string());
-      if(declared != null) tb.add(' ' + QueryText.AS);
+      if(declType != null) tb.add(' ' + QueryText.AS);
     }
-    if(declared != null) tb.add(" " + declared);
+    if(declType != null) tb.add(" " + declType);
     return tb.toString();
   }
 
@@ -214,9 +214,9 @@ public final class Var extends ExprInfo {
    * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
   public boolean adoptCheck(final SeqType t, final boolean prom) {
-    if(declared == null || t.instanceOf(declared)) {
-      declared = t;
-    } else if(!declared.instanceOf(t)) {
+    if(declType == null || t.instanceOf(declType)) {
+      declType = t;
+    } else if(!declType.instanceOf(t)) {
       return false;
     }
 

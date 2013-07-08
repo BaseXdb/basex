@@ -143,11 +143,11 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final boolean uses(final Use use) {
+  public final boolean has(final Flag flag) {
     // first step or root expression will be used as context
-    if(use == Use.CTX) return root == null || root.uses(use);
-    for(final Expr s : steps) if(s.uses(use)) return true;
-    return root != null && root.uses(use);
+    if(flag == Flag.CTX) return root == null || root.has(flag);
+    for(final Expr s : steps) if(s.has(flag)) return true;
+    return root != null && root.has(flag);
   }
 
   /**
@@ -164,7 +164,7 @@ public abstract class Path extends ParseExpr {
       final Step curr = (Step) st[l];
       if(!prev.simple(DESCORSELF, false)) continue;
 
-      if(curr.axis == CHILD && !curr.uses(Use.POS)) {
+      if(curr.axis == CHILD && !curr.has(Flag.FCS)) {
         // descendant-or-self::node()/child::X -> descendant::X
         final int sl = st.length;
         final Expr[] tmp = new Expr[sl - 1];
@@ -173,7 +173,7 @@ public abstract class Path extends ParseExpr {
         st = tmp;
         curr.axis = DESC;
         opt = true;
-      } else if(curr.axis == ATTR && !curr.uses(Use.POS)) {
+      } else if(curr.axis == ATTR && !curr.has(Flag.FCS)) {
         // descendant-or-self::node()/@X -> descendant-or-self::*/@X
         prev.test = new NameTest(false);
         opt = true;
@@ -307,7 +307,7 @@ public abstract class Path extends ParseExpr {
 
       // ignore axes other than descendant, or numeric predicates
       final Step curr = axisStep(s);
-      if(curr == null || curr.axis != DESC || curr.uses(Use.POS)) continue;
+      if(curr == null || curr.axis != DESC || curr.has(Flag.FCS)) continue;
 
       // check if child steps can be retrieved for current step
       ArrayList<PathNode> pn = pathNodes(data, s);

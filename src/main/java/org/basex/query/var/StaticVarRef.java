@@ -57,8 +57,8 @@ public class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return var != null && var.expr != null && var.expr.uses(u);
+  public boolean has(final Flag flag) {
+    return var != null && var.expr != null && var.expr.has(flag);
   }
 
   @Override
@@ -67,7 +67,7 @@ public class StaticVarRef extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final StaticVarRef ref = new StaticVarRef(info, name, sc);
     ref.var = var;
     return ref;
@@ -111,8 +111,8 @@ public class StaticVarRef extends ParseExpr {
    * @throws QueryException query exception
    */
   public void init(final StaticVar vr) throws QueryException {
-    if(vr.ann.contains(Ann.Q_PRIVATE) && !sc.baseURI().eq(info, vr.sc.baseURI()))
-      throw Err.VARPRIVATE.thrw(info, vr);
+    if(vr.ann.contains(Ann.Q_PRIVATE) && !Token.eq(sc.baseURI().string(),
+       vr.sc.baseURI().string())) throw Err.VARPRIVATE.thrw(info, vr);
     var = vr;
   }
 }

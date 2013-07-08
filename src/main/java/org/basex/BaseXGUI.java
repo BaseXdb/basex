@@ -23,9 +23,9 @@ import org.basex.util.list.*;
  */
 public final class BaseXGUI {
   /** Database context. */
-  final Context context = new Context();
+  private final Context context = new Context();
   /** Files, specified as arguments. */
-  final StringList files = new StringList();
+  private final StringList files = new StringList();
   /** Mac OS X GUI optimizations. */
   GUIMacOSX osxGUI;
 
@@ -81,6 +81,8 @@ public final class BaseXGUI {
         // open specified document or database
         boolean xml = false;
         for(final String file : files) {
+          if(file.matches("^.*\\" + IO.BASEXSUFFIX + "[^.]*$")) continue;
+
           final IOFile io = new IOFile(file);
           boolean xq = file.endsWith(IO.BXSSUFFIX);
           for(final String suf : IO.XQSUFFIXES) xq |= file.endsWith(suf);

@@ -14,7 +14,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -27,29 +26,29 @@ import org.basex.util.*;
  */
 public final class FNAdmin extends StandardFunc {
   /** QName: user. */
-  private static final QNm Q_USER = new QNm("user");
+  private static final String USER = "user";
   /** QName: user. */
-  private static final QNm Q_DATABASE = new QNm("database");
+  private static final String DATABASE = "database";
   /** QName: user. */
-  private static final QNm Q_SESSION = new QNm("session");
+  private static final String SESSION = "session";
   /** QName: permission. */
-  private static final QNm Q_PERMISSION = new QNm("permission");
+  private static final String PERMISSION = "permission";
   /** QName: entry. */
-  private static final QNm Q_ENTRY = new QNm("entry");
+  private static final String ENTRY = "entry";
   /** Size element name. */
-  private static final QNm Q_SIZE = new QNm("size");
+  private static final String SIZE = "size";
   /** QName: date. */
-  private static final QNm Q_DATE = new QNm("date");
+  private static final String DATE = "date";
   /** QName: time. */
-  private static final QNm Q_TIME = new QNm("time");
+  private static final String TIME = "time";
   /** QName: address. */
-  private static final QNm Q_ADDRESS = new QNm("address");
+  private static final String ADDRESS = "address";
   /** QName: file. */
-  private static final QNm Q_FILE = new QNm("file");
+  private static final String FILE = "file";
   /** QName: type. */
-  private static final QNm Q_TYPE = new QNm("type");
+  private static final String TYPE = "type";
   /** QName: ms. */
-  private static final QNm Q_MS = new QNm("ms");
+  private static final String MS = "ms";
 
   /**
    * Constructor.
@@ -84,7 +83,7 @@ public final class FNAdmin extends StandardFunc {
       // return list of all log files
       for(final IOFile f : ctx.context.log.files()) {
         final String date = f.name().replace(IO.LOGSUFFIX, "");
-        vb.add(new FElem(Q_FILE).add(Q_DATE, date).add(Q_SIZE, Token.token(f.length())));
+        vb.add(new FElem(FILE).add(DATE, date).add(SIZE, Token.token(f.length())));
       }
     } else {
       // return log file contents
@@ -95,15 +94,15 @@ public final class FNAdmin extends StandardFunc {
           final NewlineInput nli = new NewlineInput(file);
           try {
             for(String l; (l = nli.readLine()) != null;) {
-              final FElem elem = new FElem(Q_ENTRY);
+              final FElem elem = new FElem(ENTRY);
               final String[] cols = l.split("\t");
               if(cols.length > 2 && (cols[1].matches(".*:\\d+") ||
                   cols[1].equals(Log.SERVER))) {
                 // new format (more specific)
-                elem.add(Q_TIME, cols[0]).add(Q_ADDRESS, cols[1]).add(Q_USER, cols[2]);
-                if(cols.length > 3) elem.add(Q_TYPE, cols[3].toLowerCase(Locale.ENGLISH));
+                elem.add(TIME, cols[0]).add(ADDRESS, cols[1]).add(USER, cols[2]);
+                if(cols.length > 3) elem.add(TYPE, cols[3].toLowerCase(Locale.ENGLISH));
                 if(cols.length > 4) elem.add(cols[4]);
-                if(cols.length > 5) elem.add(Q_MS, cols[5].replace(" ms", ""));
+                if(cols.length > 5) elem.add(MS, cols[5].replace(" ms", ""));
               } else {
                 elem.add(l);
               }
@@ -129,8 +128,8 @@ public final class FNAdmin extends StandardFunc {
   private Iter users(final QueryContext ctx) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
     for(final User u : expr.length == 0 ? ctx.context.users.users(null) :
-      data(ctx).meta.users.users(ctx.context.users)) {
-      vb.add(new FElem(Q_USER).add(u.name).add(Q_PERMISSION,
+      checkData(ctx).meta.users.users(ctx.context.users)) {
+      vb.add(new FElem(USER).add(u.name).add(PERMISSION,
           u.perm.toString().toLowerCase(Locale.ENGLISH)));
     }
     return vb;
@@ -148,8 +147,8 @@ public final class FNAdmin extends StandardFunc {
         final String user = sp.context().user.name;
         final String addr = sp.address();
         final Data data = sp.context().data();
-        final FElem elem = new FElem(Q_SESSION).add(Q_USER, user).add(Q_ADDRESS, addr);
-        if(data != null) elem.add(Q_DATABASE, data.meta.name);
+        final FElem elem = new FElem(SESSION).add(USER, user).add(ADDRESS, addr);
+        if(data != null) elem.add(DATABASE, data.meta.name);
         vb.add(elem);
       }
     }

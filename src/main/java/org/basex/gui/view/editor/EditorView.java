@@ -36,6 +36,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class EditorView extends View {
+  /** Number of files in the history. */
+  private static final int HISTORY = 18;
+  /** Number of files in the compact history. */
+  private static final int HISTCOMP = 7;
   /** XQuery error pattern. */
   private static final Pattern XQERROR = Pattern.compile(
       "(.*?), ([0-9]+)/([0-9]+)" + COL);
@@ -50,8 +54,8 @@ public final class EditorView extends View {
   private static final Pattern ERRORTT = Pattern.compile(
       "^.*\r?\n" + STOPPED_AT + "|\r?\n" + STACK_TRACE_C + ".*", Pattern.DOTALL);
 
-  /** Search panel. */
-  final SearchPanel search;
+  /** Search bar. */
+  final SearchBar search;
   /** History Button. */
   final BaseXButton hist;
   /** Execute Button. */
@@ -76,7 +80,7 @@ public final class EditorView extends View {
   private int errPos;
 
   /** Header string. */
-  private final BaseXLabel header;
+  private final BaseXLabel label;
   /** Filter button. */
   private final BaseXButton filter;
 
@@ -86,32 +90,49 @@ public final class EditorView extends View {
    */
   public EditorView(final ViewNotifier man) {
     super(EDITORVIEW, man);
+    border(5).layout(new BorderLayout());
 
-    border(6, 6, 6, 6).layout(new BorderLayout(0, 2)).setFocusable(false);
+    label = new BaseXLabel(EDITOR, true, false);
+    label.setForeground(GUIConstants.GRAY);
 
-    header = new BaseXLabel(EDITOR, true, false);
-
-    final BaseXButton srch = new BaseXButton(gui, "search", H_REPLACE);
     final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
     final BaseXButton saveB = new BaseXButton(gui, "save", H_SAVE);
     hist = new BaseXButton(gui, "hist", H_RECENTLY_OPEN);
+    final BaseXButton srch = new BaseXButton(gui, "search",
+        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.FIND.toString()));
+
+    stop = new BaseXButton(gui, "stop", H_STOP_PROCESS);
+    stop.addKeyListener(this);
+    stop.setEnabled(false);
+
+    go = new BaseXButton(gui, "go",
+        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.EXEC.toString()));
+    go.addKeyListener(this);
+
+    filter = BaseXButton.command(GUICommands.C_FILTER, gui);
+    filter.addKeyListener(this);
+    filter.setEnabled(false);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 4, 1, 0));
-    buttons.add(srch);
+    buttons.layout(new TableLayout(1, 8, 1, 0)).border(0, 0, 4, 0);
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(hist);
+    buttons.add(srch);
+    buttons.add(Box.createHorizontalStrut(6));
+    buttons.add(stop);
+    buttons.add(go);
+    buttons.add(filter);
 
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout(8, 0));
-    b.add(header, BorderLayout.CENTER);
-    b.add(buttons, BorderLayout.EAST);
+    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    b.add(buttons, BorderLayout.WEST);
+    b.add(label, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     tabs = new BaseXTabs(gui);
-    tabs.setFocusable(false);
+    tabs.setFocusable(Prop.MAC);
     final SearchEditor se = new SearchEditor(gui, tabs, null).button(srch);
-    search = se.panel();
+    search = se.bar();
     addCreateTab();
     add(se, BorderLayout.CENTER);
 
@@ -122,32 +143,10 @@ public final class EditorView extends View {
     pos = new BaseXLabel(" ");
     posCode.invokeLater();
 
-    stop = new BaseXButton(gui, "stop", H_STOP_PROCESS);
-    stop.addKeyListener(this);
-    stop.setEnabled(false);
-
-    go = new BaseXButton(gui, "go", H_EXECUTE_QUERY  + " (" +
-        KeyEvent.getKeyText(KeyEvent.VK_CONTROL) + '+' +
-        KeyEvent.getKeyText(KeyEvent.VK_ENTER) + ')');
-    go.addKeyListener(this);
-
-    filter = BaseXButton.command(GUICommands.C_FILTER, gui);
-    filter.addKeyListener(this);
-    filter.setEnabled(false);
-
-    final BaseXBack status = new BaseXBack(Fill.NONE).layout(new BorderLayout(4, 0));
-    status.add(info, BorderLayout.CENTER);
-    status.add(pos, BorderLayout.EAST);
-
-    final BaseXBack query = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3, 1, 0));
-    query.add(stop);
-    query.add(go);
-    query.add(filter);
-
-    final BaseXBack south = new BaseXBack(Fill.NONE).border(4, 0, 0, 0);
-    south.layout(new BorderLayout(8, 0));
-    south.add(status, BorderLayout.CENTER);
-    south.add(query, BorderLayout.EAST);
+    final BaseXBack south = new BaseXBack(Fill.NONE).border(10, 0, 2, 0);
+    south.layout(new BorderLayout(4, 0));
+    south.add(info, BorderLayout.CENTER);
+    south.add(pos, BorderLayout.EAST);
     add(south, BorderLayout.SOUTH);
 
     refreshLayout();
@@ -171,7 +170,7 @@ public final class EditorView extends View {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final JPopupMenu pm = new JPopupMenu();
-        final ActionListener al = new ActionListener() {
+        ActionListener al = new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent ac) {
             // rewrite and open chosen file
@@ -183,13 +182,33 @@ public final class EditorView extends View {
         // create popup menu with of recently opened files
         final StringList opened = new StringList();
         for(final EditorArea ea : editors()) opened.add(ea.file.path());
-        final StringList files = new StringList(gui.gprop.strings(GUIProp.EDITOR));
-        for(final String en : files.sort(Prop.CASE, true)) {
+
+        final StringList files = new StringList(HISTORY);
+        final StringList all = new StringList(gui.gprop.strings(GUIProp.EDITOR));
+        final int fl = Math.min(all.size(), e == null ? HISTORY : HISTCOMP);
+        for(int f = 0; f < fl; f++) files.add(all.get(f));
+
+        Font f = null;
+        for(final String en : files.sort(Prop.CASE)) {
           // disable opened files
           final JMenuItem it = new JMenuItem(en.replaceAll("(.*)[/\\\\](.*)", "$2 [$1]"));
-          it.setEnabled(!opened.contains(en));
+          if(opened.contains(en)) {
+            if(f == null) f = it.getFont().deriveFont(Font.BOLD);
+            it.setFont(f);
+          }
           pm.add(it).addActionListener(al);
         }
+
+        al = new ActionListener() {
+          @Override
+          public void actionPerformed(final ActionEvent ac) {
+            hist.getActionListeners()[0].actionPerformed(null);
+          }
+        };
+        if(e != null && pm.getComponentCount() == HISTCOMP) {
+          pm.add(new JMenuItem("...")).addActionListener(al);
+        }
+
         pm.show(hist, 0, hist.getHeight());
       }
     });
@@ -252,7 +271,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshLayout() {
-    header.setFont(GUIConstants.lfont);
+    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
     for(final EditorArea edit : editors()) edit.setFont(GUIConstants.mfont);
     search.refreshLayout();
   }
@@ -319,6 +338,7 @@ public final class EditorView extends View {
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
     fc.textFilters();
+    fc.suffix(IO.XQSUFFIX);
 
     final IOFile file = fc.select(Mode.FSAVE);
     return file != null && save(file);
@@ -336,28 +356,32 @@ public final class EditorView extends View {
    * Opens the specified query file.
    * @param file query file
    * @param parse parse contents
-   * @return opened editor
+   * @return opened editor, or {@code null} if file could not be opened
    */
   public EditorArea open(final IO file, final boolean parse) {
     if(!visible()) GUICommands.C_SHOWEDITOR.execute(gui);
 
     EditorArea edit = find(file, true);
-    try {
-      if(edit != null) {
-        // display open file
-        tabs.setSelectedComponent(edit);
-        edit.reopen(true);
-      } else {
+    if(edit != null) {
+      // display open file
+      tabs.setSelectedComponent(edit);
+      edit.reopen(true);
+    } else {
+      try {
+        final byte[] text = file.read();
+
         // get current editor
         edit = getEditor();
         // create new tab if current text is stored on disk or has been modified
         if(edit.opened() || edit.modified) edit = addTab();
-        edit.initText(file.read());
+        edit.initText(text);
         edit.file(file);
         if(parse) edit.release(Action.PARSE);
+      } catch(final IOException ex) {
+        refreshHistory(null);
+        BaseXDialog.error(gui, FILE_NOT_OPENED);
+        return null;
       }
-    } catch(final IOException ex) {
-      BaseXDialog.error(gui, FILE_NOT_OPENED);
     }
     return edit;
   }
@@ -367,22 +391,22 @@ public final class EditorView extends View {
    * @param file new file
    */
   void refreshHistory(final IO file) {
-    final StringList sl = new StringList();
+    final StringList paths = new StringList();
     String path = null;
     if(file != null) {
       path = file.path();
       gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
-      sl.add(path);
+      paths.add(path);
       tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
     }
-    final String[] qu = gui.gprop.strings(GUIProp.EDITOR);
-    for(int q = 0; q < qu.length && q < 19; q++) {
-      final String f = qu[q];
-      if(!f.equalsIgnoreCase(path) && IO.get(f).exists()) sl.add(f);
+    final String[] old = gui.gprop.strings(GUIProp.EDITOR);
+    for(int p = 0; paths.size() < HISTORY && p < old.length; p++) {
+      final IO fl = IO.get(old[p]);
+      if(fl.exists() && !fl.eq(file)) paths.add(fl.path());
     }
     // store sorted history
-    gui.gprop.set(GUIProp.EDITOR, sl.toArray());
-    hist.setEnabled(!sl.isEmpty());
+    gui.gprop.set(GUIProp.EDITOR, paths.toArray());
+    hist.setEnabled(!paths.isEmpty());
   }
 
   /**
@@ -494,10 +518,10 @@ public final class EditorView extends View {
 
   /**
    * Handles info messages resulting from a query execution.
-   * @param open open addressed file
+   * @param jump jump to error position
    * @param msg info message
    */
-  public void error(final String msg, final boolean open) {
+  public void error(final String msg, final boolean jump) {
     errMsg = msg;
     for(final String s : msg.split("\r?\n")) {
       if(XQERROR.matcher(s).matches()) {
@@ -505,14 +529,14 @@ public final class EditorView extends View {
         break;
       }
     }
-    error(open);
+    error(jump);
   }
 
   /**
    * Handles info messages resulting from a query execution.
-   * @param open open addressed file
+   * @param jump jump to error position
    */
-  private void error(final boolean open) {
+  private void error(final boolean jump) {
     Matcher m = XQERROR.matcher(errMsg);
     int el, ec = 2;
     if(m.matches()) {
@@ -527,22 +551,21 @@ public final class EditorView extends View {
     }
 
     EditorArea edit = find(errFile, false);
-    if(open) {
+    if(jump) {
       if(edit == null) edit = open(errFile, false);
-      tabs.setSelectedComponent(edit);
-    } else {
-      if(edit == null) return;
+      if(edit != null) tabs.setSelectedComponent(edit);
     }
+    if(edit == null) return;
 
     // find approximate error position
     final int ll = edit.last.length;
     int ep = ll;
-    for(int e = 1, l = 1, c = 1; e < ll; ++c, e += cl(edit.last, e)) {
+    for(int p = 0, l = 1, c = 1; p < ll; ++c, p += cl(edit.last, p)) {
       if(l > el || l == el && c == ec) {
-        ep = e;
+        ep = p;
         break;
       }
-      if(edit.last[e] == '\n') {
+      if(edit.last[p] == '\n') {
         ++l;
         c = 0;
       }
@@ -553,7 +576,7 @@ public final class EditorView extends View {
     edit.error(ep);
     errPos = ep;
 
-    if(open) {
+    if(jump) {
       edit.jumpError(errPos);
       posCode.invokeLater();
     }
@@ -573,12 +596,11 @@ public final class EditorView extends View {
 
   /**
    * Checks if the current text can be saved or reverted.
-   * @param rev revert flag
    * @return result of check
    */
-  public boolean modified(final boolean rev) {
+  public boolean modified() {
     final EditorArea edit = getEditor();
-    return edit.modified || !rev && !edit.opened();
+    return edit.modified || !edit.opened();
   }
 
   /**

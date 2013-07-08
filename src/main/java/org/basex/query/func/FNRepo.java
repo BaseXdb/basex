@@ -21,13 +21,13 @@ import org.basex.util.*;
  */
 public final class FNRepo extends StandardFunc {
   /** Element name. */
-  private static final QNm Q_PACKAGE = new QNm("package");
+  private static final String PACKAGE = "package";
   /** Header attribute: name. */
-  private static final QNm Q_NAME = new QNm("name");
+  private static final String NAME = "name";
   /** Header attribute: type. */
-  private static final QNm Q_TYPE = new QNm("type");
+  private static final String TYPE = "type";
   /** Header attribute: version. */
-  private static final QNm Q_VERSION = new QNm("version");
+  private static final String VERSION = "version";
 
   /**
    * Constructor.
@@ -75,29 +75,23 @@ public final class FNRepo extends StandardFunc {
     final NodeSeqBuilder cache = new NodeSeqBuilder();
     for(final byte[] p : ctx.context.repo.pkgDict()) {
       if(p == null) continue;
-      final FElem elem = new FElem(Q_PACKAGE);
-      elem.add(Q_NAME, Package.name(p));
-      elem.add(Q_VERSION, Package.version(p));
-      elem.add(Q_TYPE, PkgText.EXPATH);
+      final FElem elem = new FElem(PACKAGE);
+      elem.add(NAME, Package.name(p));
+      elem.add(VERSION, Package.version(p));
+      elem.add(TYPE, PkgText.EXPATH);
       cache.add(elem);
     }
     // traverse all directories, ignore root entries with dashes
     for(final IOFile dir : ctx.context.repo.path().children()) {
       if(dir.name().indexOf('-') != -1) continue;
       for(final String s : dir.descendants()) {
-        final FElem elem = new FElem(Q_PACKAGE);
-        elem.add(Q_NAME, dir.name() + '.' + s.replaceAll("\\..*", "").replace('/', '.'));
-        elem.add(Q_TYPE, PkgText.INTERNAL);
+        final FElem elem = new FElem(PACKAGE);
+        elem.add(NAME, dir.name() + '.' + s.replaceAll("\\..*", "").replace('/', '.'));
+        elem.add(TYPE, PkgText.INTERNAL);
         cache.add(elem);
       }
     }
     return cache;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    // don't allow pre-evaluation
-    return u == Use.CTX || super.uses(u);
   }
 
   @Override

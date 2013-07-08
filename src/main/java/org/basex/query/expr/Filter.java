@@ -58,7 +58,7 @@ public abstract class Filter extends Preds {
       // return empty root
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
-      if(root instanceof AxisPath && !super.uses(Use.POS))
+      if(root instanceof AxisPath && !super.has(Flag.FCS))
         return ((AxisPath) root.copy(ctx,
             scp)).addPreds(ctx, scp, preds).compile(ctx, scp);
 
@@ -99,7 +99,7 @@ public abstract class Filter extends Preds {
     }
 
     // no numeric predicates.. use simple iterator
-    if(!super.uses(Use.POS)) return new IterFilter(this);
+    if(!super.has(Flag.FCS)) return new IterFilter(this);
 
     // one single position() or last() function specified: return single value
     if(preds.length == 1 && (last || pos != null) && root.isValue() && t.one() &&
@@ -111,7 +111,7 @@ public abstract class Filter extends Preds {
     if(preds.length == 1) {
       final Expr p = preds[0];
       final SeqType st = p.type();
-      off = st.type.isNumber() && st.zeroOrOne() && !p.uses(Use.CTX) && !p.uses(Use.NDT);
+      off = st.type.isNumber() && st.zeroOrOne() && !p.has(Flag.CTX) && !p.has(Flag.NDT);
       if(off) type = SeqType.get(type.type, Occ.ZERO_ONE);
     }
 
@@ -139,7 +139,7 @@ public abstract class Filter extends Preds {
       // return empty root
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
-      if(root instanceof AxisPath && !super.uses(Use.POS))
+      if(root instanceof AxisPath && !super.has(Flag.FCS))
         return ((AxisPath) root.copy(ctx, scp)).addPreds(ctx, scp, preds);
 
       // no predicates.. return root; otherwise, do some advanced compilations
@@ -150,8 +150,8 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final boolean uses(final Use u) {
-    return root.uses(u) || u != Use.CTX && super.uses(u);
+  public final boolean has(final Flag flag) {
+    return root.has(flag) || flag != Flag.CTX && super.has(flag);
   }
 
   @Override

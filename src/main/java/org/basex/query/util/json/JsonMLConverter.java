@@ -7,10 +7,8 @@ import java.util.Stack;
 import org.basex.query.QueryException;
 import org.basex.query.util.*;
 import org.basex.query.util.json.JsonParser.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.TokenObjMap;
 
 
 /**
@@ -24,8 +22,6 @@ import org.basex.util.hash.TokenObjMap;
  * @author Leo Woerteler
  */
 public class JsonMLConverter extends JsonXMLConverter {
-  /** Cached names. */
-  private final TokenObjMap<QNm> qnames = new TokenObjMap<QNm>();
   /** Element stack. */
   final Stack<FElem> stack = new Stack<FElem>();
 
@@ -56,20 +52,15 @@ public class JsonMLConverter extends JsonXMLConverter {
   }
 
   /**
-   * Returns a cached {@link QNm} instance for the specified name.
+   * Returns the specified name.
    * @param name name
    * @return cached QName
    * @throws QueryException query exception
    */
-  QNm qname(final byte[] name) throws QueryException {
+  byte[] check(final byte[] name) throws QueryException {
     // retrieve name from cache, or create new instance
-    QNm qname = qnames.get(name);
-    if(qname == null) {
-      if(!XMLToken.isNCName(name)) error("Invalid name: \"%\"", name);
-      qname = new QNm(name);
-      qnames.add(name, qname);
-    }
-    return qname;
+    if(!XMLToken.isNCName(name)) error("Invalid name: \"%\"", name);
+    return name;
   }
 
   /** JSON handler. */
@@ -77,7 +68,7 @@ public class JsonMLConverter extends JsonXMLConverter {
     /** Current element. */
     private FElem curr;
     /** Current attribute name. */
-    private QNm attName;
+    private byte[] attName;
 
     /** Constructor for visibility. */
     protected JsonMLHandler() { }
@@ -90,7 +81,7 @@ public class JsonMLConverter extends JsonXMLConverter {
 
     @Override
     public void openEntry(final byte[] key) throws QueryException {
-      attName = qname(key);
+      attName = check(key);
     }
 
     @Override
@@ -148,7 +139,7 @@ public class JsonMLConverter extends JsonXMLConverter {
 
       if(curr == null) {
         final FElem elem = stack.peek();
-        if(elem == null) curr = new FElem(qname(val));
+        if(elem == null) curr = new FElem(check(val));
         else elem.add(new FTxt(val));
       } else if(attName != null) {
         curr.add(attName, val);

@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This is a simple container for strings.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class StringList extends ElementList implements Iterable<String> {
@@ -18,24 +18,24 @@ public class StringList extends ElementList implements Iterable<String> {
    * Default constructor.
    */
   public StringList() {
-    this(CAP);
+    this(Array.CAPACITY);
   }
 
   /**
-   * Constructor, specifying an initial array capacity.
-   * @param c array capacity
+   * Constructor, specifying an initial internal array size.
+   * @param capacity initial array capacity
    */
-  public StringList(final int c) {
-    list = new String[c];
+  public StringList(final int capacity) {
+    list = new String[capacity];
   }
 
   /**
    * Lightweight constructor, assigning the specified array.
-   * @param l initial array
+   * @param elements initial array
    */
-  public StringList(final String... l) {
-    list = l;
-    size = l.length;
+  public StringList(final String... elements) {
+    list = elements;
+    size = elements.length;
   }
 
   /**
@@ -51,63 +51,64 @@ public class StringList extends ElementList implements Iterable<String> {
 
   /**
    * Adds elements to the array.
-   * @param e element to be added
+   * @param elements elements to be added
    * @return self reference
    */
-  public final StringList add(final String... e) {
-    for(final String s : e) add(s);
+  public final StringList add(final String... elements) {
+    for(final String s : elements) add(s);
     return this;
   }
 
   /**
    * Adds elements from a string list to the array.
-   * @param sl string list to be added
+   * @param elements string list to be added
    * @return self reference
    */
-  public final StringList add(final StringList sl) {
-    for(final String s : sl) add(s);
+  public final StringList add(final StringList elements) {
+    for(final String s : elements) add(s);
     return this;
   }
 
   /**
-   * Returns the specified element.
-   * @param p position
-   * @return value
+   * Returns the element at the specified position.
+   * @param index element index
+   * @return element
    */
-  public final String get(final int p) {
-    return list[p];
+  public final String get(final int index) {
+    return list[index];
   }
 
   /**
    * Sets an element at the specified index position.
-   * @param i index
-   * @param e element to be set
+   * @param index index
+   * @param element element to be set
    */
-  public final void set(final int i, final String e) {
-    if(i >= list.length) list = Arrays.copyOf(list, newSize(i + 1));
-    list[i] = e;
-    size = Math.max(size, i + 1);
+  public final void set(final int index, final String element) {
+    if(index >= list.length) list = Array.copyOf(list, newSize(index + 1));
+    list[index] = element;
+    size = Math.max(size, index + 1);
   }
 
   /**
    * Checks if the specified element is found in the list.
-   * @param e element to be found
+   * @param element element to be found
    * @return result of check
    */
-  public final boolean contains(final String e) {
-    for(int i = 0; i < size; ++i) if(list[i].equals(e)) return true;
+  public final boolean contains(final String element) {
+    for(int i = 0; i < size; ++i) if(list[i].equals(element)) return true;
     return false;
   }
 
   /**
-   * Check if other list is fully contained in this list. Both lists must be sorted!
-   * @param l sorted list
-   * @return is l contained in this list?
+   * Check if all elements of the specified list are contained in the list.
+   * Both lists must be sorted.
+   * @param elements sorted list
+   * @return result of check
    */
-  public final boolean containsAll(final StringList l) {
-    if(isEmpty() && !l.isEmpty()) return false;
+  public final boolean containsAll(final StringList elements) {
+    if(isEmpty() && !elements.isEmpty()) return false;
     int i = 0;
-    for(final String e : l) {
+    for(final String e : elements) {
       int result;
       while(0 != (result = list[i].compareTo(e))) {
         if(++i >= size() || result > 0) return false;
@@ -118,10 +119,10 @@ public class StringList extends ElementList implements Iterable<String> {
 
   /**
    * Deletes the specified element.
-   * @param i element to be deleted
+   * @param index index of element to be deleted
    */
-  public final void deleteAt(final int i) {
-    Array.move(list, i + 1, -1, --size - i);
+  public final void deleteAt(final int index) {
+    Array.move(list, index + 1, -1, --size - index);
   }
 
   /**
@@ -130,6 +131,15 @@ public class StringList extends ElementList implements Iterable<String> {
    */
   public final String[] toArray() {
     return Array.copyOf(list, size);
+  }
+
+  /**
+   * Sorts the elements in ascending order.
+   * @param cs respect case sensitivity
+   * @return self reference
+   */
+  public final StringList sort(final boolean cs) {
+    return sort(cs, true, 0);
   }
 
   /**
@@ -146,17 +156,18 @@ public class StringList extends ElementList implements Iterable<String> {
    * Sorts the elements.
    * @param cs respect case sensitivity
    * @param asc ascending (true)/descending (false) flag
-   * @param pos position where sorting starts
+   * @param index index of element from which sorting starts
    * @return self reference
    */
-  public final StringList sort(final boolean cs, final boolean asc, final int pos) {
+  public final StringList sort(final boolean cs, final boolean asc, final int index) {
     final Comparator<String> comp = cs ? null : String.CASE_INSENSITIVE_ORDER;
-    Arrays.sort(list, pos, size, asc ? comp : Collections.reverseOrder(comp));
+    Arrays.sort(list, index, size, asc ? comp : Collections.reverseOrder(comp));
     return this;
   }
 
   /**
    * Removes duplicates from the list.
+   * The list must be sorted.
    * @return self reference
    */
   public StringList unique() {
@@ -170,17 +181,33 @@ public class StringList extends ElementList implements Iterable<String> {
     return this;
   }
 
+  /**
+   * Returns the uppermost element from the stack.
+   * @return the uppermost element
+   */
+  public final String peek() {
+    return list[size - 1];
+  }
+
+  /**
+   * Pops the uppermost element from the stack.
+   * @return the popped element
+   */
+  public final String pop() {
+    return list[--size];
+  }
+
+  /**
+   * Pushes an element onto the stack.
+   * @param element element
+   */
+  public final void push(final String element) {
+    add(element);
+  }
+
   @Override
   public final Iterator<String> iterator() {
-    return new Iterator<String>() {
-      private int c;
-      @Override
-      public boolean hasNext() { return c < size; }
-      @Override
-      public String next() { return list[c++]; }
-      @Override
-      public void remove() { Util.notexpected(); }
-    };
+    return new ArrayIterator<String>(list, size);
   }
 
   @Override

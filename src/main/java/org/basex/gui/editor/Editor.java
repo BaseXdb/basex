@@ -61,8 +61,8 @@ public class Editor extends BaseXPanel {
   final BaseXBar scroll;
   /** Editable flag. */
   final boolean editable;
-  /** Search field. */
-  private SearchPanel search;
+  /** Search bar. */
+  private SearchBar search;
   /** Link listener. */
   private LinkListener linkListener;
 
@@ -124,9 +124,9 @@ public class Editor extends BaseXPanel {
     }
 
     new BaseXPopup(this, edit ?
-      new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
+      new GUICmd[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
         new CopyCmd(), new PasteCmd(), new DelCmd(), null, new AllCmd() } :
-      new GUICommand[] { new CopyCmd(), null, new AllCmd() });
+      new GUICmd[] { new CopyCmd(), null, new AllCmd() });
   }
 
   /**
@@ -205,11 +205,12 @@ public class Editor extends BaseXPanel {
   }
 
   /**
-   * Sets a new text cursor position.
+   * Sets the text cursor to the specified position. A text selection will be removed.
    * @param p cursor position
    */
   public final void setCaret(final int p) {
     text.setCaret(p);
+    text.noSelect();
     showCursor(1);
     cursor(true);
   }
@@ -309,18 +310,18 @@ public class Editor extends BaseXPanel {
   }
 
   /**
-   * Installs a search panel.
-   * @param s search panel
+   * Installs a search bar.
+   * @param s search bar
    */
-  final void setSearch(final SearchPanel s) {
+  final void setSearch(final SearchBar s) {
     search = s;
   }
 
   /**
-   * Returns the search panel.
-   * @return search panel
+   * Returns the search bar.
+   * @return search bar
    */
-  public final SearchPanel getSearch() {
+  public final SearchBar getSearch() {
     return search;
   }
 
@@ -459,17 +460,18 @@ public class Editor extends BaseXPanel {
         return;
       }
       if(FIND.is(e)) {
-        search.activate(null);
+        search.activate(text.copy(), true);
         return;
       }
       if(FINDNEXT.is(e) || FINDNEXT2.is(e) || FINDPREV.is(e) || FINDPREV2.is(e)) {
         final boolean vis = search.isVisible();
-        search.activate(text.copy());
+        search.activate(text.copy(), false);
         jump(vis ? FINDNEXT.is(e) || FINDNEXT2.is(e) ?
           SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT, true);
         return;
       }
     }
+
     // ignore modifier keys
     if(modifier(e)) return;
 
@@ -825,24 +827,8 @@ public class Editor extends BaseXPanel {
     resizeCode.invokeLater();
   }
 
-  /** Text command. */
-  abstract static class TextCmd implements GUICommand {
-    @Override
-    public boolean checked() {
-      return false;
-    }
-    @Override
-    public String help() {
-      return null;
-    }
-    @Override
-    public String key() {
-      return null;
-    }
-  }
-
   /** Undo command. */
-  class UndoCmd extends TextCmd {
+  class UndoCmd extends GUIBaseCmd {
     @Override
     public void execute(final GUI main) {
       if(!hist.active()) return;
@@ -863,7 +849,7 @@ public class Editor extends BaseXPanel {
   }
 
   /** Redo command. */
-  class RedoCmd extends TextCmd {
+  class RedoCmd extends GUIBaseCmd {
     @Override
     public void execute(final GUI main) {
       if(!hist.active()) return;
@@ -884,7 +870,7 @@ public class Editor extends BaseXPanel {
   }
 
   /** Cut command. */
-  class CutCmd extends TextCmd {
+  class CutCmd extends GUIBaseCmd {
     @Override
     public void execute(final GUI main) {
       if(!hist.active()) return;
@@ -906,7 +892,7 @@ public class Editor extends BaseXPanel {
   }
 
   /** Copy command. */
-  class CopyCmd extends TextCmd {
+  class CopyCmd extends GUIBaseCmd {
     @Override
     public void execute(final GUI main) {
       copy();
@@ -922,7 +908,7 @@ public class Editor extends BaseXPanel {
   }
 
   /** Paste command. */
-  class PasteCmd extends TextCmd {
+  class PasteCmd extends GUIBaseCmd {
     @Override
     public void execute(final GUI main) {
       if(!hist.active()) return;
@@ -945,7 +931,7 @@ public class Editor extends BaseXPanel {
   }
 
   /** Delete command. */
-  class DelCmd extends TextCmd {
+  class DelCmd extends GUIBaseCmd {
     @Override
     public void execute(final GUI main) {
       if(!hist.active()) return;
@@ -965,7 +951,7 @@ public class Editor extends BaseXPanel {
   }
 
   /** Select all command. */
-  class AllCmd extends TextCmd {
+  class AllCmd extends GUIBaseCmd {
     @Override
     public void execute(final GUI main) {
       selectAll();

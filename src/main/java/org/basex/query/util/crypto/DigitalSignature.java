@@ -35,7 +35,6 @@ import org.xml.sax.*;
  * @author Lukas Kircher
  */
 public final class DigitalSignature {
-
   /** Canonicalization algorithms. */
   private static final TokenMap CANONICALIZATIONS = new TokenMap();
   /** Signature digest algorithms. */
@@ -54,30 +53,27 @@ public final class DigitalSignature {
   private static final byte[] DEFT = token("enveloped");
   /** Signature type enveloping. */
   private static final byte[] ENVT = token("enveloping");
-//  /** Signature type detached. */
-//  private static final byte[] DETT = token("detached");
 
   // initializations
   static {
-    CANONICALIZATIONS.add(DEFC, token(
-        CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS));
-    CANONICALIZATIONS.add(token("exclusive-with-comments"), token(
-        CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS));
-    CANONICALIZATIONS.add(token("inclusive"), token(
-        CanonicalizationMethod.INCLUSIVE));
-    CANONICALIZATIONS.add(token("exclusive"), token(
-        CanonicalizationMethod.EXCLUSIVE));
+    CANONICALIZATIONS.put("inclusive-with-comments",
+        CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS);
+    CANONICALIZATIONS.put("exclusive-with-comments",
+        CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS);
+    CANONICALIZATIONS.put("inclusive",
+        CanonicalizationMethod.INCLUSIVE);
+    CANONICALIZATIONS.put("exclusive",
+        CanonicalizationMethod.EXCLUSIVE);
 
-    DIGESTS.add(DEFD, token(DigestMethod.SHA1));
-    DIGESTS.add(token("sha256"), token(DigestMethod.SHA256));
-    DIGESTS.add(token("sha512"), token(DigestMethod.SHA512));
+    DIGESTS.put("sha1", DigestMethod.SHA1);
+    DIGESTS.put("sha256", DigestMethod.SHA256);
+    DIGESTS.put("sha512", DigestMethod.SHA512);
 
-    SIGNATURES.add(DEFS, token(SignatureMethod.RSA_SHA1));
-    SIGNATURES.add(token("dsa_sha1"), token(SignatureMethod.DSA_SHA1));
+    SIGNATURES.put("rsa_sha1", SignatureMethod.RSA_SHA1);
+    SIGNATURES.put("dsa_sha1", SignatureMethod.DSA_SHA1);
 
     TYPES.add(DEFT);
     TYPES.add(ENVT);
-//    TYPES.add(DETT);
   }
 
   /** Input info. */

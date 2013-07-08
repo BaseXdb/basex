@@ -124,10 +124,9 @@ public final class MemData extends Data {
   }
 
   @Override
-  protected long index(final int pre, final int id, final byte[] txt,
-      final int kind) {
+  protected long index(final int pre, final int id, final byte[] txt, final int kind) {
     return ((MemValues) (kind == ATTR ? atvindex : txtindex)).
-        index(txt, meta.updindex ? id : pre);
+        put(txt, meta.updindex ? id : pre);
   }
 
   @Override

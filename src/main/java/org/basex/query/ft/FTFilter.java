@@ -64,10 +64,10 @@ public abstract class FTFilter extends FTExpr {
       final FTLexer lex) throws QueryException {
 
     final FTMatches all = item.all;
-    for(int a = 0; a < all.size; ++a) {
+    for(int a = 0; a < all.size(); a++) {
       if(!filter(ctx, all.match[a], lex)) all.delete(a--);
     }
-    return all.size != 0;
+    return !all.isEmpty();
   }
 
   /**
@@ -102,7 +102,7 @@ public abstract class FTFilter extends FTExpr {
   }
 
   @Override
-  public final boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public final boolean indexAccessible(final IndexCosts ic) throws QueryException {
     return expr[0].indexAccessible(ic);
   }
 

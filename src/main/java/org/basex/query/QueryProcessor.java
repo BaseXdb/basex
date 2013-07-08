@@ -2,9 +2,9 @@ package org.basex.query;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.Context;
@@ -23,6 +23,10 @@ import org.basex.query.value.node.*;
  * @author Christian Gruen
  */
 public final class QueryProcessor extends Proc {
+  /** Pattern for detecting library modules. */
+  private static final Pattern LIBMOD_PATTERN = Pattern.compile(
+  "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module namespace.*");
+
   /** Expression context. */
   public final QueryContext ctx;
   /** Query. */
@@ -50,7 +54,7 @@ public final class QueryProcessor extends Proc {
   public void parse() throws QueryException {
     if(parsed) return;
     parsed = true;
-    ctx.parse(query, null);
+    ctx.parseMain(query, null);
     updating = ctx.updating;
   }
 
@@ -214,7 +218,7 @@ public final class QueryProcessor extends Proc {
    * @param file file name
    */
   public void module(final String uri, final String file) {
-    ctx.modDeclared.add(token(uri), token(file));
+    ctx.modDeclared.put(uri, file);
   }
 
   /**
@@ -254,9 +258,19 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
-   * Removes comments from the specified string.
+   * Checks if the specified XQuery string is a library module.
    * @param qu query string
-   * @param max maximum string length
+   * @return result of check
+   */
+  public static boolean isLibrary(final String qu) {
+    return LIBMOD_PATTERN.matcher(removeComments(qu, 80)).matches();
+  }
+
+  /**
+   * Removes comments from the specified string and returns the first characters
+   * of a query.
+   * @param qu query string
+   * @param max maximum length of string to return
    * @return result
    */
   public static String removeComments(final String qu, final int max) {

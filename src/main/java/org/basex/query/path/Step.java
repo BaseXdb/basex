@@ -32,15 +32,6 @@ public abstract class Step extends Preds {
   public Test test;
 
   /**
-   * This method creates a copy from the specified step.
-   * @param s step to be copied
-   * @return step
-   */
-  public static Step get(final Step s) {
-    return get(s.info, s.axis, s.test, s.preds);
-  }
-
-  /**
    * This method creates a step instance.
    * @param ii input info
    * @param a axis
@@ -52,7 +43,7 @@ public abstract class Step extends Preds {
       final Expr... p) {
 
     boolean num = false;
-    for(final Expr pr : p) num |= pr.type().mayBeNumber() || pr.uses(Use.POS);
+    for(final Expr pr : p) num |= pr.type().mayBeNumber() || pr.has(Flag.FCS);
     return num ? new AxisStep(ii, a, t, p) : new IterStep(ii, a, t, p);
   }
 
@@ -101,14 +92,14 @@ public abstract class Step extends Preds {
     }
 
     // no numeric predicates.. use simple iterator
-    if(!uses(Use.POS)) return new IterStep(info, axis, test, preds);
+    if(!has(Flag.FCS)) return new IterStep(info, axis, test, preds);
 
     // use iterator for simple numeric predicate
     return this instanceof IterPosStep || !useIterator() ? this : new IterPosStep(this);
   }
 
   @Override
-  public abstract Step copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
+  public abstract Step copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
   /**
    * Checks if this is a simple axis without predicates.

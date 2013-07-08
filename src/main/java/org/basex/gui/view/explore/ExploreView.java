@@ -20,7 +20,7 @@ import org.basex.gui.view.*;
  */
 public final class ExploreView extends View {
   /** Header string. */
-  private final BaseXLabel header;
+  private final BaseXLabel label;
   /** Current search panel. */
   private final ExploreArea search;
   /** Filter button. */
@@ -32,20 +32,21 @@ public final class ExploreView extends View {
    */
   public ExploreView(final ViewNotifier man) {
     super(EXPLOREVIEW, man);
+    border(5).layout(new BorderLayout(0, 4));
 
-    layout(new BorderLayout(0, 4)).border(6, 6, 6, 6).setFocusable(false);
-
-    header = new BaseXLabel(EXPLORER, true, false);
-
-    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
-    b.add(header, BorderLayout.CENTER);
+    label = new BaseXLabel(EXPLORER, true, false);
+    label.setForeground(GUIConstants.GRAY);
 
     filter = BaseXButton.command(GUICommands.C_FILTER, gui);
     filter.addKeyListener(this);
 
-    final BaseXBack back = new BaseXBack(Fill.NONE);
-    back.add(filter);
-    b.add(back, BorderLayout.EAST);
+    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    buttons.layout(new TableLayout(1, 1, 1, 0)).border(0, 0, 4, 0);
+    buttons.add(filter);
+
+    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    b.add(buttons, BorderLayout.WEST);
+    b.add(label, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     search = new ExploreArea(this);
@@ -79,7 +80,7 @@ public final class ExploreView extends View {
 
   @Override
   public void refreshLayout() {
-    header.setFont(lfont);
+    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
     refreshMark();
   }
 

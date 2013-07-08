@@ -115,7 +115,8 @@ public final class Zip extends Proc {
         curr++;
         final FileInputStream in = new FileInputStream(new File(root.file(), file));
         try {
-          out.putNextEntry(new ZipEntry(root.name() + '/' + file));
+          final String fl = Prop.WIN ? file.replace('\\', '/') : file;
+          out.putNextEntry(new ZipEntry(root.name() + '/' + fl));
           for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
           out.closeEntry();
         } finally {

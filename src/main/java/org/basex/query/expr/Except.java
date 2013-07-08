@@ -50,7 +50,7 @@ public final class Except extends Set {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Except ex = new Except(info, copyAll(ctx, scp, vs, expr));
     ex.iterable = iterable;
     return copyType(ex);

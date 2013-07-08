@@ -97,7 +97,7 @@ public final class JsonParser extends InputParser {
    * @throws QueryException query exception
    */
   private void value(final JsonHandler h) throws QueryException {
-    if(ip >= il) throw eof(", expected JSON value.");
+    if(pos >= length) throw eof(", expected JSON value.");
     switch(curr()) {
       case '[':
         array(h);
@@ -181,12 +181,12 @@ public final class JsonParser extends InputParser {
    */
   private void constr(final JsonHandler h) throws QueryException {
     skipWs();
-    if(!input.substring(ip).matches("^[a-zA-Z0-9_-]+\\(.*"))
+    if(!input.substring(pos).matches("^[a-zA-Z0-9_-]+\\(.*"))
       throw error("Wrong constructor syntax: '%'", rest());
 
-    final int p = input.indexOf('(', ip);
-    h.openConstr(token(input.substring(ip, p)));
-    ip = p + 1;
+    final int p = input.indexOf('(', pos);
+    h.openConstr(token(input.substring(pos, p)));
+    pos = p + 1;
     skipWs();
     if(!consumeWs(')', false)) {
       do {
@@ -205,13 +205,13 @@ public final class JsonParser extends InputParser {
    * @throws QueryException query exception
    */
   private byte[] unquoted() throws QueryException {
-    int cp = more() ? input.codePointAt(ip) : -1;
+    int cp = more() ? input.codePointAt(pos) : -1;
     if(cp < 0 || !Character.isJavaIdentifierStart(cp))
       throw error("Expected unquoted string, found %.", rest());
     tb.reset();
     do {
       tb.add(cp);
-      cp = input.codePointAt(ip += cp < 0x10000 ? 1 : 2);
+      cp = input.codePointAt(pos += cp < 0x10000 ? 1 : 2);
     } while(Character.isJavaIdentifierPart(cp));
     skipWs();
     return tb.finish();
@@ -250,7 +250,7 @@ public final class JsonParser extends InputParser {
         case '8':
         case '9':
           tb.addByte((byte) c);
-          ip++;
+          pos++;
           c = curr();
           break;
         case '.':
@@ -269,7 +269,7 @@ public final class JsonParser extends InputParser {
       if(c < '0' || c > '9') throw error("Number expected after '.'.");
       do {
         tb.addByte((byte) c);
-        ip++;
+        pos++;
         c = curr();
       } while(c >= '0' && c <= '9');
       if(c != 'e' && c != 'E') {
@@ -302,7 +302,7 @@ public final class JsonParser extends InputParser {
     if(!consume('"')) throw error("Expected string, found '%'", curr());
     tb.reset();
     char hi = 0; // cached high surrogate
-    while(ip < il) {
+    while(pos < length) {
       int cp = consume();
       if(cp == '"') {
         if(hi != 0) tb.add(hi);
@@ -342,7 +342,7 @@ public final class JsonParser extends InputParser {
             cp = unescape ? '\n' : 'n';
             break;
           case 'u':
-            if(ip + 4 >= il) throw eof(", expected four-digit hex value");
+            if(pos + 4 >= length) throw eof(", expected four-digit hex value");
             if(unescape) {
               cp = 0;
               for(int i = 0; i < 4; i++) {
@@ -385,14 +385,14 @@ public final class JsonParser extends InputParser {
 
   /** Consumes all whitespace characters from the remaining query. */
   private void skipWs() {
-    while(ip < il) {
-      switch(input.charAt(ip)) {
+    while(pos < length) {
+      switch(input.charAt(pos)) {
         case ' ':
         case '\t':
         case '\r':
         case '\n':
         case '\u00A0': // non-breaking space
-          ip++;
+          pos++;
           break;
         default:
           return;
@@ -410,7 +410,7 @@ public final class JsonParser extends InputParser {
    */
   private boolean consumeWs(final char c, final boolean err) throws QueryException {
     if(consume() != c) {
-      ip--;
+      pos--;
       if(err) throw error("Expected '%', found '%'", c, curr());
       return false;
     }

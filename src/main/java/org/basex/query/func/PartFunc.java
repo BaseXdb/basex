@@ -51,10 +51,10 @@ public final class PartFunc extends Arr {
     if(t.instanceOf(SeqType.FUN_O) && t.type != FuncType.ANY_FUN) {
       final FuncType ft = (FuncType) t.type;
       final int arity = expr.length + holes.length - 1;
-      if(ft.args.length != arity) throw Err.INVARITY.thrw(info, f, arity);
+      if(ft.args.length != arity) Err.INVARITY.thrw(info, f, arity);
       final SeqType[] ar = new SeqType[holes.length];
       for(int i = 0; i < holes.length; i++) ar[i] = ft.args[holes[i]];
-      type = FuncType.get(ft.ret, ar).seqType();
+      type = FuncType.get(ft.type, ar).seqType();
     }
 
     return this;
@@ -67,7 +67,7 @@ public final class PartFunc extends Arr {
     final FuncType ft = (FuncType) f.type;
 
     final int arity = expr.length + holes.length - 1;
-    if(f.arity() != arity) throw Err.INVARITY.thrw(ii, f, arity);
+    if(f.arity() != arity) Err.INVARITY.thrw(ii, f, arity);
     final Expr[] args = new Expr[arity];
 
     final VarScope scp = new VarScope();
@@ -82,8 +82,9 @@ public final class PartFunc extends Arr {
 
     final Expr call = new DynFuncCall(info, f, args).optimize(ctx, scp);
     // [LW] introduce annotations
-    final InlineFunc i = new InlineFunc(info, ft.ret, vars, call, new Ann(), ctx.sc, scp);
-    return i.optimize(ctx, null).item(ctx, ii);
+    final InlineFunc func = new InlineFunc(
+        info, ft.type, vars, call, new Ann(), ctx.sc, scp);
+    return func.optimize(ctx, null).item(ctx, ii);
   }
 
   @Override
@@ -92,7 +93,7 @@ public final class PartFunc extends Arr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new PartFunc(info, expr[expr.length - 1].copy(ctx, scp, vs),
         copyAll(ctx, scp, vs, Arrays.copyOf(expr, expr.length - 1)), holes.clone());
   }
@@ -105,7 +106,7 @@ public final class PartFunc extends Arr {
     int p = -1;
     for(int i = 0; i < hs; i++) {
       while(++p < holes[i]) expr[p - i].plan(e);
-      final FElem a = new FElem(Token.token(QueryText.ARG));
+      final FElem a = new FElem(QueryText.ARG);
       e.add(a.add(planAttr(QueryText.POS, Token.token(i))));
     }
     while(++p < es + hs - 1) expr[p - hs].plan(e);

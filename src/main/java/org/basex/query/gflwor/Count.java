@@ -66,8 +66,8 @@ public final class Count extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30;
+  public boolean has(final Flag flag) {
+    return false;
   }
 
   @Override
@@ -99,9 +99,9 @@ public final class Count extends GFLWOR.Clause {
   }
 
   @Override
-  public Count copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Count copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Var v = scp.newCopyOf(ctx, count);
-    vs.add(count.id, v);
+    vs.put(count.id, v);
     return new Count(v, info);
   }
 

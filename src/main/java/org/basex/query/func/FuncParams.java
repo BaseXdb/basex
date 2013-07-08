@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -21,16 +22,15 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FuncParams {
-  /** Element: output:serialization-parameters. */
-  public static final QNm Q_SPARAM = new QNm("serialization-parameters",
-      QueryText.OUTPUTURI);
-  /** Attribute: value. */
-  private static final QNm A_VALUE = new QNm("value");
+  /** QName. */
+  public static final QNm Q_SPARAM = QNm.get("serialization-parameters", OUTPUTURI);
+  /** Value. */
+  private static final String VALUE = "value";
 
   /** Root element. */
   private final QNm root;
   /** Root node test. */
-  private final ExtTest test;
+  private final NodeTest test;
   /** Input info. */
   private final InputInfo info;
 
@@ -40,7 +40,7 @@ public final class FuncParams {
    * @param ii input info
    */
   public FuncParams(final QNm name, final InputInfo ii) {
-    test = new ExtTest(NodeType.ELM, name);
+    test = new NodeTest(name);
     root = name;
     info = ii;
   }
@@ -82,12 +82,12 @@ public final class FuncParams {
       }
       // retrieve key from element name and value from "value" attribute or text node
       final byte[] key = qn.local();
-      byte[] val = n.attribute(A_VALUE);
+      byte[] val = n.attribute(VALUE);
       if(val == null) val = n.string();
       // separate multiple entries with ","
       final byte[] o = tm.get(key);
       if(o != null) val = new TokenBuilder(o).add(',').add(val).finish();
-      tm.add(key, val);
+      tm.put(key, val);
     }
     return tm;
   }
@@ -113,7 +113,7 @@ public final class FuncParams {
    */
   public static TokenMap serializerMap(final Item it, final InputInfo info)
       throws QueryException {
-    return it == null ? new TokenMap() : new FuncParams(Q_SPARAM, info).parse(it, true);
+    return new FuncParams(Q_SPARAM, info).parse(it, true);
   }
 
   /**

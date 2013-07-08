@@ -280,7 +280,7 @@ public final class ModuleLoader {
 
     // package has dependencies -> they have to be loaded first => put package
     // in list with packages to be loaded
-    if(pkg.dep.size() != 0) toLoad.add(name);
+    if(!pkg.dep.isEmpty()) toLoad.add(name);
     for(final Dependency d : pkg.dep) {
       if(d.pkg != null) {
       // we consider only package dependencies here
@@ -298,7 +298,7 @@ public final class ModuleLoader {
           string(comp.file)).path();
       qp.module(token(p), comp.uri);
     }
-    if(toLoad.id(name) != 0) toLoad.delete(name);
+    if(toLoad.contains(name)) toLoad.delete(name);
     loaded.add(name);
   }
 

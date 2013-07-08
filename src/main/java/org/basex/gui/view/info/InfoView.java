@@ -9,8 +9,8 @@ import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.*;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.editor.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
@@ -24,17 +24,15 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class InfoView extends View implements LinkListener {
-  /** Search panel. */
-  final SearchEditor search;
+  /** Searchable editor. */
+  final SearchEditor editor;
 
-  /** Old text. */
+  /** Current text. */
   private final TokenBuilder text = new TokenBuilder();
   /** Header label. */
-  private final BaseXLabel header;
+  private final BaseXLabel label;
   /** Timer label. */
   private final BaseXLabel timer;
-  /** North label. */
-  private final BaseXBack title;
   /** Text Area. */
   private final Editor area;
   /** Buttons. */
@@ -65,32 +63,34 @@ public final class InfoView extends View implements LinkListener {
    */
   public InfoView(final ViewNotifier man) {
     super(INFOVIEW, man);
-    border(6, 6, 6, 6).layout(new BorderLayout());
+    border(5).layout(new BorderLayout(0, 5));
 
-    title = new BaseXBack(Fill.NONE).layout(new BorderLayout());
-    header = new BaseXLabel(QUERY_INFO);
-    title.add(header, BorderLayout.NORTH);
+    label = new BaseXLabel(QUERY_INFO);
+    label.setForeground(GUIConstants.GRAY);
+
     timer = new BaseXLabel(" ", true, false);
-    title.add(timer, BorderLayout.SOUTH);
+    timer.setForeground(GUIConstants.DGRAY);
 
-    final BaseXButton srch = new BaseXButton(gui, "search", SEARCH);
+    final BaseXButton srch = new BaseXButton(gui, "search",
+        BaseXLayout.addShortcut(SEARCH, BaseXKeys.FIND.toString()));
     buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 1, 1, 0));
+    buttons.layout(new TableLayout(1, 3, 8, 0)).border(0, 0, 4, 0);
     buttons.add(srch);
+    buttons.add(timer);
 
-    final BaseXBack north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
-    north.add(buttons, BorderLayout.EAST);
-    north.add(title, BorderLayout.CENTER);
-    add(north, BorderLayout.NORTH);
+    final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    b.add(buttons, BorderLayout.WEST);
+    b.add(label, BorderLayout.EAST);
+    add(b, BorderLayout.NORTH);
 
-    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout(0, 2));
+    final BaseXBack center = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     area = new Editor(false, gui);
     area.setLinkListener(this);
-    search = new SearchEditor(gui, area).button(srch);
-    add(search, BorderLayout.CENTER);
+    editor = new SearchEditor(gui, area).button(srch);
+    add(editor, BorderLayout.CENTER);
 
     center.add(area, BorderLayout.CENTER);
-    center.add(search, BorderLayout.SOUTH);
+    center.add(editor, BorderLayout.SOUTH);
     add(center, BorderLayout.CENTER);
     refreshLayout();
   }
@@ -112,10 +112,10 @@ public final class InfoView extends View implements LinkListener {
 
   @Override
   public void refreshLayout() {
-    header.setFont(lfont);
+    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
     timer.setFont(font);
     area.setFont(font);
-    search.panel().refreshLayout();
+    editor.bar().refreshLayout();
   }
 
   @Override
@@ -184,15 +184,15 @@ public final class InfoView extends View implements LinkListener {
         final String key = line.substring(0, s).trim();
         final String val = Performance.getTime(tm * 10000L * runs, runs);
         timings.add(LI + key + COLS + val);
-      } else if(line.startsWith(QUERY_PLAN_C)) {
+      } else if(line.startsWith(QUERY_PLAN)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) plan.add(split[i]);
-      } else if(line.startsWith(COMPILING_C)) {
+      } else if(line.startsWith(COMPILING)) {
         while(++i < split.length && !split[i].isEmpty()) comp.add(split[i]);
-      } else if(line.startsWith(QUERY_C)) {
+      } else if(line.startsWith(QUERY)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) origqu.add(split[i]);
-      } else if(line.startsWith(OPTIMIZED_QUERY_C)) {
+      } else if(line.startsWith(OPTIMIZED_QUERY)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) optqu.add(split[i]);
-      } else if(line.startsWith(EVALUATING_C)) {
+      } else if(line.startsWith(EVALUATING)) {
         while(i + 1 < split.length && split[++i].startsWith(LI)) eval.add(split[i]);
       } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
           line.startsWith(PRINTED_CC) || line.startsWith(READ_LOCKING_CC) ||
@@ -241,13 +241,13 @@ public final class InfoView extends View implements LinkListener {
     add(COMMAND + COL, command);
     add(ERROR_C, err);
     add(STACK_TRACE_C, stack);
-    add(EVALUATING_C, eval);
-    add(QUERY_C + ' ', origqu);
-    add(COMPILING_C, comp);
-    add(OPTIMIZED_QUERY_C + ' ', optqu);
-    add(RESULT_C, result);
-    add(TIMING_C, timings);
-    add(QUERY_PLAN_C, plan);
+    add(EVALUATING + COLS, eval);
+    add(COMPILING + COLS, comp);
+    add(QUERY + COLS, origqu);
+    add(OPTIMIZED_QUERY + COLS, optqu);
+    add(RESULT + COLS, result);
+    add(TIMING + COLS, timings);
+    add(QUERY_PLAN + COLS, plan);
     if(inf != null) text.add(inf).nline();
     changed = true;
     clear = reset;
@@ -307,9 +307,10 @@ public final class InfoView extends View implements LinkListener {
     final int l = stat.size();
     if(l == 0) return;
 
-    h = title.getHeight();
-    w = getWidth() - 10 - buttons.getWidth();
-    bw = gui.gprop.num(GUIProp.FONTSIZE) * 2 + w / 10;
+    final int fs = fontSize;
+    h = label.getHeight() + 4;
+    w = (int) (getWidth() * .98 - fs / 2 - label.getWidth());
+    bw = fs * 2 + w / 10;
     bs = bw / (l - 1);
 
     // find maximum value
@@ -317,7 +318,7 @@ public final class InfoView extends View implements LinkListener {
     for(int i = 0; i < l - 1; ++i) m = Math.max(m, stat.get(i));
 
     // draw focused bar
-    final int by = 10;
+    final int by = 8;
     final int bh = h - by;
 
     for(int i = 0; i < l - 1; ++i) {

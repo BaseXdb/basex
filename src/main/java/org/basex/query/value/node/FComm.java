@@ -22,18 +22,26 @@ public final class FComm extends FNode {
    * Constructor.
    * @param t text value
    */
+  public FComm(final String t) {
+    this(token(t));
+  }
+
+  /**
+   * Constructor.
+   * @param t text value
+   */
   public FComm(final byte[] t) {
     super(NodeType.COM);
     val = t;
   }
 
   /**
-   * Constructor for DOM nodes.
+   * Constructor for creating a comment from a DOM node.
    * Originally provided by Erdal Karaca.
    * @param com DOM node
    */
   public FComm(final Comment com) {
-    this(token(com.getData()));
+    this(com.getData());
   }
 
   @Override

@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.awt.event.*;
 import java.io.*;
-import java.util.regex.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -26,28 +25,21 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class EditorArea extends Editor {
-  /** Pattern for detecting library modules. */
-  private static final Pattern LIBMOD_PATTERN = Pattern.compile(
-  "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module namespace.*");
-
   /** File label. */
   final BaseXLabel label;
-
   /** File in tab. */
   IO file;
-  /** Timestamp. */
-  long tstamp;
   /** Flag for modified content. */
   boolean modified;
   /** Last input. */
   byte[] last;
-  /** This flag indicates if the input is an XQuery main module. */
-  boolean xquery = true;
   /** This flag indicates if the input is a command script. */
-  boolean script = true;
+  boolean script;
 
   /** View reference. */
-  final EditorView view;
+  private final EditorView view;
+  /** Timestamp. */
+  private long tstamp;
 
   /**
    * Constructor.
@@ -78,7 +70,7 @@ final class EditorArea extends Editor {
   }
 
   /**
-   * Returns {@code true} if a file instance exists for the edited text.
+   * Returns {@code true} if the file was opened from disk, or was saved to disk.
    * @return result of check
    */
   boolean opened() {
@@ -141,8 +133,9 @@ final class EditorArea extends Editor {
     if(eq && action == Action.CHECK) return;
     last = in;
 
-    script = file.hasSuffix(IO.BXSSUFFIX);
-    xquery = !script && !opened() || file.hasSuffix(IO.XQSUFFIXES);
+    final String path = file.path();
+    final boolean xquery = file.hasSuffix(IO.XQSUFFIXES) || !path.contains(".");
+    script = !xquery && file.hasSuffix(IO.BXSSUFFIX);
     String input = string(in);
     if(action == Action.EXECUTE && script) {
       // execute query if forced, or if realtime execution is activated
@@ -150,17 +143,17 @@ final class EditorArea extends Editor {
     } else if(xquery || action == Action.EXECUTE) {
       // check if input is/might be an xquery main module
       if(input.isEmpty()) input = "()";
-      xquery = !module(in);
-      if(xquery && (action == Action.EXECUTE || gui.gprop.is(GUIProp.EXECRT))) {
+      final boolean lib = QueryProcessor.isLibrary(string(in));
+      if(!lib && (action == Action.EXECUTE || gui.gprop.is(GUIProp.EXECRT))) {
         // execute query if forced, or if realtime execution is activated
         gui.execute(true, new XQuery(input));
       } else {
         // parse query
-        gui.context.prop.set(Prop.QUERYPATH, file.path());
+        gui.context.prop.set(Prop.QUERYPATH, path);
         final QueryContext qc = new QueryContext(gui.context);
         try {
-          if(!xquery) qc.module(input, null);
-          else qc.parse(input, null);
+          if(lib) qc.parseLibrary(input, null);
+          else qc.parseMain(input, null);
           view.info(OK, true, false);
         } catch(final QueryException ex) {
           view.info(Util.message(ex), false, false);
@@ -171,7 +164,8 @@ final class EditorArea extends Editor {
     } else if(script || file.hasSuffix(IO.XMLSUFFIXES) ||
         file.hasSuffix(IO.XSLSUFFIXES) || file.hasSuffix(IO.HTMLSUFFIXES)) {
       try {
-        new EmptyBuilder(new IOContent(in), gui.context).build();
+        if(!script || input.trim().startsWith("<"))
+          new EmptyBuilder(new IOContent(in), gui.context).build();
         if(script) new CommandParser(input, gui.context).parse();
         view.info(OK, true, false);
       } catch(final Exception ex) {
@@ -226,15 +220,5 @@ final class EditorArea extends Editor {
   void jumpError(final int pos) {
     requestFocusInWindow();
     setCaret(pos);
-  }
-
-  /**
-   * Analyzes the first 80 characters to decide if the query is a module.
-   * @param qu query to check
-   * @return result of check
-   */
-  private static boolean module(final byte[] qu) {
-    final String start = QueryProcessor.removeComments(string(qu), 80);
-    return LIBMOD_PATTERN.matcher(start).matches();
   }
 }

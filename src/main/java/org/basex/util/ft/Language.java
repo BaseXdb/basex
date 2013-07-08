@@ -23,11 +23,9 @@ import org.basex.core.*;
  */
 public final class Language implements Comparable<Language> {
   /** Available languages, indexed by language code. */
-  public static final HashMap<String, Language> ALL =
-      new HashMap<String, Language>();
+  static final HashMap<String, Language> ALL = new HashMap<String, Language>();
   /** Available languages, indexed by their display. */
-  private static final HashMap<String, Language> DISP =
-      new HashMap<String, Language>();
+  private static final HashMap<String, Language> DISP = new HashMap<String, Language>();
 
   static {
     for(final Locale l : Locale.getAvailableLocales()) {
@@ -39,7 +37,7 @@ public final class Language implements Comparable<Language> {
   private final Locale locale;
 
   /**
-   * Constructor.
+   * Private Constructor.
    * @param loc locale
    */
   private Language(final Locale loc) {

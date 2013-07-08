@@ -52,7 +52,7 @@ abstract class AUser extends Command {
     StringList dbs = null;
     if(d != null) {
       dbs = context.databases.listDBs(d);
-      if(dbs.size() == 0) return info(DB_NOT_FOUND_X, d) && opt;
+      if(dbs.isEmpty()) return info(DB_NOT_FOUND_X, d) && opt;
     }
 
     // loop through all users

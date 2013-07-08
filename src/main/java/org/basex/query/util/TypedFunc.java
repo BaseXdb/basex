@@ -42,14 +42,6 @@ public final class TypedFunc {
   }
 
   /**
-   * Gets the function's return type.
-   * @return return type
-   */
-  public SeqType ret() {
-    return type.ret;
-  }
-
-  /**
    * Creates a type constructor function.
    * @param cast cast expression
    * @param to type to cast to

@@ -1,11 +1,14 @@
 package org.basex.test.server;
 
+import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.server.*;
 import org.basex.test.*;
 import org.basex.util.*;
@@ -159,22 +162,32 @@ public final class EventTest extends SandboxTest {
   /**
    * Runs event test with specified second query and without.
    * @throws IOException I/O exception
+   * @throws InterruptedException waiting interrupted
    */
   @Test
-  public void event() throws IOException {
+  public void event() throws IOException, InterruptedException {
     // create the event
-    session.execute("create event " + NAME);
+    // ignore the error that the event may already exist
+    try {
+      session.execute("create event " + NAME);
+    } catch(final BaseXException ignore) { }
+
+    final CountDownLatch doneSignal = new CountDownLatch(sessions.length);
     // watch event
     for(final ClientSession cs : sessions) {
       cs.watch(NAME, new EventNotifier() {
         @Override
         public void notify(final String data) {
+          doneSignal.countDown();
           assertEquals(RETURN, data);
         }
       });
     }
     // fire an event
-    session.query("db:event('" + NAME + "', '" + RETURN + "')").execute();
+    session.query(_DB_EVENT.args(NAME, RETURN)).execute();
+
+    // wait for half a second that the event is fired
+    assertTrue(doneSignal.await(500, TimeUnit.MILLISECONDS));
 
     // all clients unwatch the events
     for(final ClientSession cs : sessions) cs.unwatch(NAME);
@@ -190,20 +203,26 @@ public final class EventTest extends SandboxTest {
   @Test
   public void concurrent() throws Exception {
     // create events
-    session.execute("create event " + NAME);
-    session.execute("create event " + NAME + 1);
+    // ignore the error that the event may already exist
+    try {
+      session.execute("create event " + NAME);
+      session.execute("create event " + NAME + 1);
+    } catch(final BaseXException ignore) { }
 
+    final CountDownLatch doneSignal = new CountDownLatch(CLIENTS * sessions.length);
     // watch events on all clients
     for(final ClientSession cs : sessions) {
       cs.watch(NAME, new EventNotifier() {
         @Override
         public void notify(final String data) {
+          doneSignal.countDown();
           assertEquals(RETURN, data);
         }
       });
       cs.watch(NAME + 1, new EventNotifier() {
         @Override
         public void notify(final String data) {
+          doneSignal.countDown();
           assertEquals(RETURN, data);
         }
       });
@@ -216,6 +235,9 @@ public final class EventTest extends SandboxTest {
     }
     for(final Client c : clients) c.start();
     for(final Client c : clients) c.join();
+
+    // wait for half a second that the event is fired
+    assertTrue(doneSignal.await(500, TimeUnit.MILLISECONDS));
 
     // unwatch events
     for(final ClientSession cs : sessions) {
@@ -254,7 +276,7 @@ public final class EventTest extends SandboxTest {
       try {
         String name = NAME;
         if(!first) name += 1;
-        cs.query("db:event('" + name + "', '" + value + "')").execute();
+        cs.query(_DB_EVENT.args(name, value)).execute();
         cs.close();
       } catch(final Exception ex) {
         Util.stack(ex);

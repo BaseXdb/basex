@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -62,7 +63,7 @@ public final class FNAggr extends StandardFunc {
   protected Expr opt(final QueryContext ctx) throws QueryException {
     // skip non-deterministic and variable expressions
     final Expr e = expr[0];
-    if(e.uses(Use.NDT) || e instanceof VarRef) return this;
+    if(e.has(Flag.NDT) || e instanceof VarRef) return this;
 
     final long c = e.size();
     switch(sig) {
@@ -115,19 +116,19 @@ public final class FNAggr extends StandardFunc {
   private Item minmax(final Iter iter, final OpV cmp, final QueryContext ctx)
       throws QueryException {
 
-    if(expr.length == 2) checkColl(expr[1], ctx);
+    final Collation coll = checkColl(expr.length == 2 ? expr[1] : null, ctx);
 
     Item rs = iter.next();
     if(rs == null) return null;
 
     // check if first item is comparable
-    cmp.eval(info, rs, rs);
+    cmp.eval(rs, rs, coll, info);
 
     // strings
     if(rs instanceof AStr) {
       for(Item it; (it = iter.next()) != null;) {
         if(!(it instanceof AStr)) FUNCMP.thrw(info, this, rs.type, it.type);
-        if(cmp.eval(info, rs, it)) rs = it;
+        if(cmp.eval(rs, it, coll, info)) rs = it;
       }
       return rs;
     }
@@ -135,7 +136,7 @@ public final class FNAggr extends StandardFunc {
     if(rs instanceof ADate || rs instanceof Dur || rs.type == AtomType.BLN) {
       for(Item it; (it = iter.next()) != null;) {
         if(rs.type != it.type) FUNCMP.thrw(info, this, rs.type, it.type);
-        if(cmp.eval(info, rs, it)) rs = it;
+        if(cmp.eval(rs, it, coll, info)) rs = it;
       }
       return rs;
     }
@@ -143,7 +144,7 @@ public final class FNAggr extends StandardFunc {
     if(rs.type.isUntyped()) rs = DBL.cast(rs, ctx, info);
     for(Item it; (it = iter.next()) != null;) {
       final Type t = numType(rs, it);
-      if(cmp.eval(info, rs, it) || Double.isNaN(it.dbl(info))) rs = it;
+      if(cmp.eval(rs, it, coll, info) || Double.isNaN(it.dbl(info))) rs = it;
       if(rs.type != t) rs = (Item) t.cast(rs, ctx, info);
     }
     return rs;

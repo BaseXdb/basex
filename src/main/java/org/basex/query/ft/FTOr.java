@@ -107,7 +107,7 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     int is = 0;
     for(final FTExpr e : expr) {
       // no index access if negative operators is found
@@ -120,7 +120,8 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     return new FTOr(info, Arr.copyAll(ctx, scp, vs, expr));
   }
 

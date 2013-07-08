@@ -18,10 +18,10 @@ import org.basex.io.*;
  * @author Dimitar Popov
  */
 public abstract class ConsoleReader {
+  /** Password prompt. */
+  protected static final String PASSWORD_PROMPT = PASSWORD + COLS;
   /** Default prompt. */
   private static final String DEFAULT_PROMPT = "> ";
-  /** Password prompt. */
-  static final String PASSWORD_PROMPT = PASSWORD + COLS;
 
   /** Password reader. */
   private final PasswordReader pwReader = new PasswordReader() {

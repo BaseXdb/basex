@@ -1,10 +1,10 @@
 package org.basex.data;
 
-import java.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
- * This class contains full-text positions.
- * For each position, a pointer is stored.
+ * This class contains full-text positions for a single database node.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -13,49 +13,27 @@ public final class FTPos {
   /** Pre value. */
   final int pre;
   /** Positions. */
-  int[] pos;
-  /** Sorted flag. */
-  private boolean sorted = true;
+  IntList pos;
 
   /**
    * Constructor.
    * @param p pre value
-   * @param ps positions
+   * @param ps sorted positions
    */
-  FTPos(final int p, final int[] ps) {
+  FTPos(final int p, final IntList ps) {
     pre = p;
     pos = ps;
-    int x = -1;
-    for(final int i : ps) {
-      sorted = sorted && i >= x;
-      x = i;
-      if(!sorted) break;
-    }
   }
 
   /**
    * Merges the specified position arrays.
-   * @param ps positions
+   * @param ps sorted positions
    */
-  void union(final int[] ps) {
-    // skip existing values
-    if(Arrays.equals(pos, ps)) return;
-
-    // merge entries with the same pre value
-    final int psl = ps.length;
-    final int pol = pos.length;
-    final int[] ts = new int[psl + pol];
-    for(int i = 0, si = 0, oi = 0; i < ts.length; ++i) {
-      final boolean s = si == psl || oi < pol && pos[oi] < ps[si];
-      ts[i] = s ? pos[oi++] : ps[si++];
-    }
-    pos = ts;
-    int x = -1;
-    for(final int i : pos) {
-      sorted = sorted && i >= x;
-      x = i;
-      if(!sorted) break;
-    }
+  void union(final IntList ps) {
+    final IntSet set = new IntSet(pos.size() + ps.size());
+    for(int p = 0, s = pos.size(); p < s; p++) set.add(pos.get(p));
+    for(int p = 0, s = ps.size(); p < s; p++) set.add(ps.get(p));
+    pos = new IntList(set.toArray()).sort();
   }
 
   /**
@@ -64,9 +42,7 @@ public final class FTPos {
    * @return result of check
    */
   public boolean contains(final int p) {
-    if(sorted) return Arrays.binarySearch(pos, p) >= 0;
-    for(final int i : pos) if(i == p) return true;
-    return false;
+    return pos.sortedIndexOf(p) >= 0;
   }
 
   /**
@@ -74,7 +50,7 @@ public final class FTPos {
    * @return number of positions
    */
   public int size() {
-    return pos.length;
+    return pos.size();
   }
 
   /**
@@ -82,8 +58,6 @@ public final class FTPos {
    * @return the copy
    */
   public FTPos copy() {
-    final FTPos ftp = new FTPos(pre, pos.clone());
-    ftp.sorted = sorted;
-    return ftp;
+    return new FTPos(pre, new IntList(pos.toArray()));
   }
 }

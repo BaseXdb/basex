@@ -29,14 +29,19 @@ public final class CDoc extends CFrag {
 
   @Override
   public FDoc item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Constr c = new Constr(ii, ctx).add(expr);
-    if(c.errAtt || c.atts.size() != 0) DOCATTS.thrw(ii);
-    if(c.errNS || c.nspaces.size() != 0) DOCNS.thrw(ii);
-    return new FDoc(c.children, Token.EMPTY);
+    // create node
+    final Constr c = new Constr(ii, ctx);
+    final FDoc doc = new FDoc(c.children, Token.EMPTY);
+
+    // add child nodes
+    c.add(expr);
+    if(c.errAtt || !c.atts.isEmpty()) DOCATTS.thrw(ii);
+    if(c.errNS || !c.nspaces.isEmpty()) DOCNS.thrw(ii);
+    return doc.optimize();
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new CDoc(info, expr[0].copy(ctx, scp, vs));
   }
 

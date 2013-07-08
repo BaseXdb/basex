@@ -9,6 +9,8 @@ import java.nio.charset.*;
 import java.util.*;
 import java.util.zip.*;
 
+import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -29,31 +31,31 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FNArchive extends StandardFunc {
-  /** Archive namespace. */
-  private static final Atts NS = new Atts(ARCHIVE, ARCHIVEURI);
-  /** Element: Entry. */
-  private static final QNm Q_ENTRY = new QNm("archive:entry", ARCHIVEURI);
-  /** Element: options. */
-  private static final QNm Q_OPTIONS = new QNm("archive:options", ARCHIVEURI);
-  /** Option: algorithm. */
-  private static final QNm Q_FORMAT = new QNm("archive:format", ARCHIVEURI);
-  /** Option: algorithm. */
-  private static final QNm Q_ALGORITHM = new QNm("archive:algorithm", ARCHIVEURI);
+  /** Module prefix. */
+  private static final String PREFIX = "archive";
+  /** QName. */
+  private static final QNm Q_ENTRY = QNm.get(PREFIX, "entry", ARCHIVEURI);
+  /** QName. */
+  private static final QNm Q_OPTIONS = QNm.get(PREFIX, "options", ARCHIVEURI);
+  /** QName. */
+  private static final QNm Q_FORMAT = QNm.get(PREFIX, "format", ARCHIVEURI);
+  /** QName. */
+  private static final QNm Q_ALGORITHM = QNm.get(PREFIX, "algorithm", ARCHIVEURI);
   /** Root node test. */
-  private static final ExtTest TEST = new ExtTest(NodeType.ELM, Q_ENTRY);
+  private static final NodeTest TEST = new NodeTest(Q_ENTRY);
 
   /** Level. */
-  private static final QNm Q_LEVEL = new QNm("compression-level");
+  private static final String LEVEL = "compression-level";
   /** Encoding. */
-  private static final QNm Q_ENCODING = new QNm("encoding");
+  private static final String ENCODING = "encoding";
   /** Last modified. */
-  private static final QNm Q_LAST_MOD = new QNm("last-modified");
+  private static final String LAST_MOD = "last-modified";
   /** Compressed size. */
-  private static final QNm Q_COMP_SIZE = new QNm("compressed-size");
+  private static final String COMP_SIZE = "compressed-size";
   /** Uncompressed size. */
-  private static final QNm Q_SIZE = new QNm("size");
+  private static final String SIZE = "size";
   /** Value. */
-  private static final QNm Q_VALUE = new QNm("value");
+  private static final String VALUE = "value";
 
   /** Option: format. */
   private static final byte[] FORMAT = token("format");
@@ -94,6 +96,7 @@ public final class FNArchive extends StandardFunc {
       case _ARCHIVE_UPDATE:  return update(ctx);
       case _ARCHIVE_DELETE:  return delete(ctx);
       case _ARCHIVE_OPTIONS: return options(ctx);
+      case _ARCHIVE_WRITE:   return write(ctx);
       default:               return super.item(ctx, ii);
     }
   }
@@ -179,11 +182,11 @@ public final class FNArchive extends StandardFunc {
     }
 
     // create result element
-    final FElem e = new FElem(Q_OPTIONS, NS);
-    if(format != null) e.add(new FElem(Q_FORMAT).add(Q_VALUE, format));
+    final FElem e = new FElem(Q_OPTIONS).declareNS();
+    if(format != null) e.add(new FElem(Q_FORMAT).add(VALUE, format));
     if(level >= 0) {
       final byte[] lvl = level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN;
-      e.add(new FElem(Q_ALGORITHM).add(Q_VALUE, lvl));
+      e.add(new FElem(Q_ALGORITHM).add(VALUE, lvl));
     }
     return e;
   }
@@ -203,13 +206,13 @@ public final class FNArchive extends StandardFunc {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         if(ze.isDirectory()) continue;
-        final FElem e = new FElem(Q_ENTRY, NS);
+        final FElem e = new FElem(Q_ENTRY).declareNS();
         long s = ze.getSize();
-        if(s != -1) e.add(Q_SIZE, token(s));
+        if(s != -1) e.add(SIZE, token(s));
         s = ze.getTime();
-        if(s != -1) e.add(Q_LAST_MOD, new Dtm(s, info).string(info));
+        if(s != -1) e.add(LAST_MOD, new Dtm(s, info).string(info));
         s = ze.getCompressedSize();
-        if(s != -1) e.add(Q_COMP_SIZE, token(s));
+        if(s != -1) e.add(COMP_SIZE, token(s));
         e.add(ze.getName());
         vb.add(e);
       }
@@ -266,7 +269,7 @@ public final class FNArchive extends StandardFunc {
       en = entr.next();
       cn = cont.next();
       if(en == null || cn == null) break;
-      hm.add(checkElmStr(en).string(info), new Item[] { en, cn });
+      hm.put(checkElmStr(en).string(info), new Item[] { en, cn });
       e++;
       c++;
     }
@@ -309,7 +312,7 @@ public final class FNArchive extends StandardFunc {
     final TokenObjMap<Item[]> hm = new TokenObjMap<Item[]>();
     final Iter names = ctx.iter(expr[1]);
     for(Item en; (en = names.next()) != null;) {
-      hm.add(checkElmStr(en).string(info), null);
+      hm.put(checkElmStr(en).string(info), null);
     }
 
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
@@ -335,23 +338,15 @@ public final class FNArchive extends StandardFunc {
    */
   private TokenList extract(final QueryContext ctx) throws QueryException {
     final B64 archive = (B64) checkType(checkItem(expr[0], ctx), AtomType.B64);
-    TokenSet hs = null;
-    if(expr.length > 1) {
-      // filter result to specified entries
-      hs = new TokenSet();
-      final Iter names = ctx.iter(expr[1]);
-      for(Item en; (en = names.next()) != null;) {
-        hs.add(checkElmStr(en).string(info));
-      }
-    }
+    final TokenSet hs = entries(1, ctx);
 
     final TokenList tl = new TokenList();
     final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
     try {
       while(in.more()) {
         final ZipEntry ze = in.entry();
-        if(ze.isDirectory()) continue;
-        if(hs == null || hs.delete(token(ze.getName())) != 0) tl.add(in.read());
+        if(!ze.isDirectory() && (hs == null || hs.delete(token(ze.getName())) != 0))
+          tl.add(in.read());
       }
     } catch(final IOException ex) {
       ARCH_FAIL.thrw(info, ex);
@@ -362,21 +357,78 @@ public final class FNArchive extends StandardFunc {
   }
 
   /**
+   * Writes entries from an archive to disk.
+   * @param ctx query context
+   * @return text entries
+   * @throws QueryException query exception
+   */
+  private Item write(final QueryContext ctx) throws QueryException {
+    final File path = checkFile(0, ctx);
+    final B64 archive = (B64) checkType(checkItem(expr[1], ctx), AtomType.B64);
+    final TokenSet hs = entries(2, ctx);
+
+    final ArchiveIn in = ArchiveIn.get(archive.input(info), info);
+    try {
+      while(in.more()) {
+        final ZipEntry ze = in.entry();
+        final String name = ze.getName();
+        if(hs == null || hs.delete(token(name)) != 0) {
+          final IOFile file = new IOFile(path.getPath(), name);
+          if(ze.isDirectory()) {
+            file.md();
+          } else {
+            file.dir().md();
+            file.write(in.read());
+          }
+        }
+      }
+    } catch(final IOException ex) {
+      ARCH_FAIL.thrw(info, ex);
+    } finally {
+      in.close();
+    }
+    return null;
+  }
+
+  /**
+   * Returns all archive entries from the specified argument.
+   * A {@code null} reference is returned if no entries are specified.
+   * @param e argument index
+   * @param ctx query context
+   * @return set with all entries
+   * @throws QueryException query exception
+   */
+  private TokenSet entries(final int e, final QueryContext ctx) throws QueryException {
+    TokenSet hs = null;
+    if(e < expr.length) {
+      // filter result to specified entries
+      hs = new TokenSet();
+      final Iter names = ctx.iter(expr[e]);
+      for(Item en; (en = names.next()) != null;) {
+        hs.add(checkElmStr(en).string(info));
+      }
+    }
+    return hs;
+  }
+
+  /**
    * Adds the specified entry to the output stream.
    * @param entry entry descriptor
-   * @param con contents
+   * @param cont contents
    * @param out output archive
    * @param level default compression level
    * @param ctx query context
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void add(final Item entry, final Item con, final ArchiveOut out,
+  private void add(final Item entry, final Item cont, final ArchiveOut out,
       final int level, final QueryContext ctx) throws QueryException, IOException {
 
     // create new zip entry
-    final String name = string(entry.string(info));
+    String name = string(entry.string(info));
     if(name.isEmpty()) ARCH_EMPTY.thrw(info);
+    if(Prop.WIN) name = name.replace('\\', '/');
+
     final ZipEntry ze = new ZipEntry(name);
     String en = null;
 
@@ -384,10 +436,10 @@ public final class FNArchive extends StandardFunc {
     byte[] lvl = null;
     if(entry instanceof ANode) {
       final ANode el = (ANode) entry;
-      lvl = el.attribute(Q_LEVEL);
+      lvl = el.attribute(LEVEL);
 
       // last modified
-      final byte[] mod = el.attribute(Q_LAST_MOD);
+      final byte[] mod = el.attribute(LAST_MOD);
       if(mod != null) {
         try {
           ze.setTime(dateTimeToMs(new Dtm(mod, info), ctx));
@@ -397,7 +449,7 @@ public final class FNArchive extends StandardFunc {
       }
 
       // encoding
-      final byte[] enc = el.attribute(Q_ENCODING);
+      final byte[] enc = el.attribute(ENCODING);
       if(enc != null) {
         en = string(enc);
         if(!Charset.isSupported(en)) ARCH_ENCODING.thrw(info, enc);
@@ -405,8 +457,8 @@ public final class FNArchive extends StandardFunc {
     }
 
     // data to be compressed
-    byte[] val = checkStrBin(con);
-    if(con instanceof AStr && en != null && en != UTF8) val = encode(val, en, ctx);
+    byte[] val = checkStrBin(cont);
+    if(cont instanceof AStr && en != null && en != UTF8) val = encode(val, en, ctx);
 
     try {
       out.level(lvl == null ? level : toInt(lvl));

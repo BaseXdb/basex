@@ -25,14 +25,14 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {
-  /** Flags that influence query compilation. True is returned if property is unknown. */
-  public enum Use {
+  /** Flags that influence query compilation. */
+  public enum Flag {
     /** Creates new fragments. Example: node constructor. */ CNS,
     /** Depends on context. Example: context node. */        CTX,
-    /** Non-deterministic. Example: random(). */             NDT,
-    /** Context position. Example: position(). */            POS,
+    /** Non-deterministic. Example: random:double(). */      NDT,
+    /** Focus-dependent. Example: position(). */             FCS,
     /** Performs updates. Example: insert expression. */     UPD,
-    /** Based on XQuery 3.0. Example: group by statement. */ X30,
+    /** XQuery 3.0 function. Example: has-children(). */     X30,
   }
 
   /**
@@ -157,14 +157,13 @@ public abstract class Expr extends ExprInfo {
   public abstract long size();
 
   /**
-   * Indicates if an expression uses the specified type or operation. This method is
-   * called by numerous {@link #compile} methods to test the properties of
-   * sub-expressions. It will return {@code true} as soon as at least one test is
-   * successful.
-   * @param u type/operation to be found
+   * Indicates if an expression has the specified compiler property. This method is
+   * called by numerous {@link #compile} methods to test properties of sub-expressions.
+   * It returns {@code true} if at least one test is successful.
+   * @param flag flag to be found
    * @return result of check
    */
-  public abstract boolean uses(final Use u);
+  public abstract boolean has(final Flag flag);
 
   /**
    * Checks if the given variable is used by this expression.
@@ -246,7 +245,7 @@ public abstract class Expr extends ExprInfo {
    * @return copied expression
    */
   public final Expr copy(final QueryContext ctx, final VarScope scp) {
-    return copy(ctx, scp, new IntMap<Var>());
+    return copy(ctx, scp, new IntObjMap<Var>());
   }
 
   /**
@@ -257,7 +256,7 @@ public abstract class Expr extends ExprInfo {
    * @param vs mapping from old variable IDs to new variable copies
    * @return copied expression
    */
-  public abstract Expr copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
+  public abstract Expr copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
   /**
    * Adds the names of the databases that will be touched by the query.
@@ -304,24 +303,24 @@ public abstract class Expr extends ExprInfo {
   /**
    * Checks if an expression can be rewritten to an index access. If this method is
    * implemented, {@link #indexEquivalent} must be implemented as well.
-   * @param ic index context
+   * @param ic index costs analyzer
    * @return true if an index can be used
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     return false;
   }
 
   /**
    * Returns an equivalent expression which accesses an index structure. Will be called
    * if {@link #indexAccessible} is returns true for an expression.
-   * @param ic index context
+   * @param ic index costs analyzer
    * @return equivalent index-expression
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+  public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
     return null;
   }
 

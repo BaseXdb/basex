@@ -14,13 +14,13 @@ import org.basex.util.list.*;
  */
 public final class ValueList extends ElementList {
   /** List entries. */
-  private Value[] list = new Value[CAP];
+  private Value[] list;
 
   /**
    * Default constructor.
    */
   public ValueList() {
-    this(CAP);
+    this(Array.CAPACITY);
   }
 
   /**
@@ -36,11 +36,7 @@ public final class ValueList extends ElementList {
    * @param e element be added
    */
   public void add(final Value e) {
-    if(size == list.length) {
-      final Value[] tmp = new Value[newSize()];
-      System.arraycopy(list, 0, tmp, 0, size);
-      list = tmp;
-    }
+    if(size == list.length) list = Array.copy(list, new Value[newSize()]);
     list[size++] = e;
   }
 

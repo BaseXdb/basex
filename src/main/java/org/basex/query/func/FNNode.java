@@ -145,14 +145,10 @@ public final class FNNode extends StandardFunc {
   }
 
   @Override
-  public boolean xquery3() {
-    return oneOf(sig, GENERATE_ID, PATH, HAS_CHILDREN) ||
-        expr.length == 0 && oneOf(sig, DOCUMENT_URI, NODE_NAME, NILLED);
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 && xquery3() || u == Use.CTX && expr.length == 0 || super.uses(u);
+  public boolean has(final Flag flag) {
+    return flag == Flag.X30 && expr.length == 0 &&
+        oneOf(sig, DOCUMENT_URI, NODE_NAME, NILLED) ||
+        flag == Flag.CTX && expr.length == 0 || super.has(flag);
   }
 
   @Override

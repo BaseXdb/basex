@@ -23,7 +23,7 @@ public abstract class Iter {
   /**
    * Returns the specified item, or an arbitrary item if the index is invalid.
    * This method needs to be implemented - and should only be called - if
-   * {@link Iter#size} returns the correct number of results. A calling method
+   * {@link Iter#size()} returns the correct number of results. A calling method
    * should call {@link #reset} after the last items has been retrieved.
    * @param i value offset
    * @return specified item
@@ -82,9 +82,6 @@ public abstract class Iter {
    * @return resulting array
    */
   static Item[] extend(final Item[] it) {
-    final int s = it.length;
-    final Item[] tmp = new Item[Array.newSize(s)];
-    System.arraycopy(it, 0, tmp, 0, s);
-    return tmp;
+    return Array.copy(it, new Item[Array.newSize(it.length)]);
   }
 }

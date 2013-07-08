@@ -235,7 +235,7 @@ abstract class TrieNode {
    */
   static boolean eq(final Item a, final Item b, final InputInfo ii)
       throws QueryException {
-    return a.comparable(b) && a.eq(ii, b);
+    return a.comparable(b) && a.eq(b, null, ii);
   }
 
   /**

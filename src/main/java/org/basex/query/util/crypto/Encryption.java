@@ -38,21 +38,17 @@ public final class Encryption {
   private static final byte[] DEFA = token("md5");
   /** DES encryption token. */
   private static final byte[] DES = token("des");
-  /** AES encryption token. */
-  private static final byte[] AES = token("aes");
 
   static {
-    ALGE.add(DES, token("8"));
-    ALGE.add(AES, token("16"));
-    ALGN.add(DES, token("DES/CBC/PKCS5Padding"));
-    ALGN.add(AES, token("AES/CBC/PKCS5Padding"));
-    ALGHMAC.add(DEFA, token("hmacmd5"));
-    ALGHMAC.add(token("sha1"), token("hmacsha1"));
-    ALGHMAC.add(token("sha256"), token("hmacsha256"));
-    ALGHMAC.add(token("sha384"), token("hmacsha1"));
-    ALGHMAC.add(token("sha512"), token("hmacsha512"));
-    /*
-    */
+    ALGE.put("des", "8");
+    ALGE.put("aes", "16");
+    ALGN.put("des", "DES/CBC/PKCS5Padding");
+    ALGN.put("aes", "AES/CBC/PKCS5Padding");
+    ALGHMAC.put("md5", "hmacmd5");
+    ALGHMAC.put("sha1", "hmacsha1");
+    ALGHMAC.put("sha256", "hmacsha256");
+    ALGHMAC.put("sha384", "hmacsha1");
+    ALGHMAC.put("sha512", "hmacsha512");
   }
 
   /**

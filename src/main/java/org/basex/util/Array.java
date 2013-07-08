@@ -12,6 +12,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Array {
+  /** Initial default size for new arrays. */
+  public static final int CAPACITY = 1 << 3;
   /** Default factor for resizing dynamic arrays. */
   public static final double RESIZE = 1.5;
   /** Private constructor. */
@@ -88,6 +90,18 @@ public final class Array {
    */
   public static void move(final Object ar, final int pos, final int off, final int l) {
     System.arraycopy(ar, pos, ar, pos + off, l);
+  }
+
+  /**
+   * Copies entries from one array to another.
+   * @param <T> object type
+   * @param source source array
+   * @param target target array
+   * @return object
+   */
+  public static <T> T[] copy(final Object[] source, final T[] target) {
+    System.arraycopy(source, 0, target, 0, source.length);
+    return target;
   }
 
   /**

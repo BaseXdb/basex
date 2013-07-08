@@ -45,6 +45,20 @@ public final class AnnotationsTest extends AdvancedQueryTest {
         "{ insert node <a/> into <b/> }; local:x()", Err.DUPLUPD);
   }
 
+  /** Parsing errors and conflicts. */
+  @Test
+  public void unknown() {
+    // ignore prefixes with no annotation definitions
+    query("declare %db:xx function local:x() { 1 }; 1");
+    // check unit annotations
+    error("declare %unit:xyz function local:x() { 1 }; 1", Err.BASX_ANNOT);
+    // check restxq annotations
+    error("declare %rest:xx function local:x() { 1 }; 1", Err.BASX_ANNOT);
+    // check output annotations
+    error("declare %output:xx function local:x() { 1 }; 1", Err.BASX_ANNOT);
+    error("declare %output:method function local:x() { 1 }; 1", Err.BASX_ANNOTARGS);
+  }
+
   /**  Test for empty-sequence() as function item. */
   @Test
   public void emptyFunTest() {

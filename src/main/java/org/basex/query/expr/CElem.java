@@ -42,7 +42,7 @@ public final class CElem extends CName {
 
   @Override
   public CElem compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    final int s = prepare(ctx);
+    final int s = addNS(ctx);
     super.compile(ctx, scp);
     ctx.sc.ns.size(s);
     return this;
@@ -50,12 +50,12 @@ public final class CElem extends CName {
 
   @Override
   public FElem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final int s = prepare(ctx);
+    final int s = addNS(ctx);
     try {
       // adds in-scope namespaces
       final Atts ns = new Atts();
       for(int i = 0; i < nspaces.size(); ++i) {
-        ns.add(nspaces.name(i), nspaces.string(i));
+        ns.add(nspaces.name(i), nspaces.value(i));
       }
 
       // create and check QName
@@ -83,23 +83,23 @@ public final class CElem extends CName {
         }
       }
 
-      // create child and attribute nodes
-      final Constr constr = new Constr(ii, ctx).add(expr);
+      // create node
+      final Constr constr = new Constr(ii, ctx);
+      final FElem node = new FElem(nm, ns, constr.children, constr.atts);
+
+      // add child and attribute nodes
+      constr.add(expr);
       if(constr.errAtt) NOATTALL.thrw(info);
       if(constr.errNS) NONSALL.thrw(info);
       if(constr.duplAtt != null) CATTDUPL.thrw(info, constr.duplAtt);
       if(constr.duplNS != null) DUPLNSCONS.thrw(info, constr.duplNS);
 
-      // create node
-      final FElem node = new FElem(nm, constr.children, constr.atts, ns);
-      if(constr.nspaces.contains(EMPTY) && !nm.hasURI())
-        DUPLNSCONS.thrw(info, EMPTY);
+      // check namespaces
+      if(constr.nspaces.contains(EMPTY) && !nm.hasURI()) DUPLNSCONS.thrw(info, EMPTY);
 
       // add namespaces from constructor
       final Atts cns = constr.nspaces;
-      for(int a = 0; a < cns.size(); ++a) {
-        addNS(cns.name(a), cns.string(a), ns);
-      }
+      for(int a = 0; a < cns.size(); ++a) addNS(cns.name(a), cns.value(a), ns);
 
       // add namespaces
       for(int a = 0; a < constr.atts.size(); ++a) {
@@ -115,8 +115,8 @@ public final class CElem extends CName {
         final byte[] auri = qnm.uri();
         final byte[] npref = addNS(apref, auri, ns);
         if(npref != null) {
-          constr.atts.set(a, new FAttr(
-              new QNm(concat(npref, COLON, qnm.local()), auri), att.string()));
+          final QNm aname = new QNm(concat(npref, COLON, qnm.local()), auri);
+          constr.atts.set(a, new FAttr(aname, att.string()));
         }
       }
 
@@ -124,7 +124,7 @@ public final class CElem extends CName {
       final Atts stack = ctx.sc.ns.stack();
       for(int a = stack.size() - 1; a >= 0; a--) {
         final byte[] pref = stack.name(a);
-        if(!ns.contains(pref)) ns.add(pref, stack.string(a));
+        if(!ns.contains(pref)) ns.add(pref, stack.value(a));
       }
 
       // update parent references of children
@@ -147,7 +147,7 @@ public final class CElem extends CName {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new CElem(info, name.copy(ctx, scp, vs), comp ? null : nspaces.copy(),
         copyAll(ctx, scp, vs, expr));
   }
@@ -178,7 +178,7 @@ public final class CElem extends CName {
     final Atts ns = node.namespaces();
     for(int a = nsp.size() - 1; a >= 0; a--) {
       final byte[] pref = nsp.name(a);
-      if(!ns.contains(pref)) ns.add(pref, nsp.string(a));
+      if(!ns.contains(pref)) ns.add(pref, nsp.value(a));
     }
   }
 
@@ -191,10 +191,8 @@ public final class CElem extends CName {
    * @param ns namespaces
    * @return resulting prefix
    */
-  private static byte[] addNS(final byte[] pref, final byte[] uri,
-      final Atts ns) {
-
-    final byte[] u = ns.string(pref);
+  private static byte[] addNS(final byte[] pref, final byte[] uri, final Atts ns) {
+    final byte[] u = ns.value(pref);
     if(u == null) {
       // add undeclared namespace
       ns.add(pref, uri);
@@ -203,7 +201,7 @@ public final class CElem extends CName {
       byte[] apref = null;
       // check if one of the existing prefixes can be adopted
       for(int c = 0; c < ns.size(); c++) {
-        if(eq(ns.string(c), uri)) apref = ns.name(c);
+        if(eq(ns.value(c), uri)) apref = ns.name(c);
       }
       // if negative, generate a new one that is not used yet
       if(apref == null) {
@@ -221,12 +219,12 @@ public final class CElem extends CName {
   /**
    * Adds namespaces to the namespace stack.
    * @param ctx query context
-   * @return old stack position
+   * @return old position in namespace stack
    */
-  private int prepare(final QueryContext ctx) {
+  private int addNS(final QueryContext ctx) {
     final NSContext ns = ctx.sc.ns;
     final int s = ns.size();
-    for(int n = 0; n < nspaces.size(); n++) ns.add(nspaces.name(n), nspaces.string(n));
+    for(int n = 0; n < nspaces.size(); n++) ns.add(nspaces.name(n), nspaces.value(n));
     return s;
   }
 }

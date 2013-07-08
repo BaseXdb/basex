@@ -8,7 +8,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.Use;
+import org.basex.query.expr.Expr.Flag;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -29,11 +29,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public final Var[] args;
   /** Updating flag. */
   public final boolean updating;
-
-  /** Map with requested function properties. */
-  protected final EnumMap<Use, Boolean> map = new EnumMap<Expr.Use, Boolean>(Use.class);
   /** Cast flag. */
   boolean cast;
+
+  /** Map with requested function properties. */
+  private final EnumMap<Flag, Boolean> map = new EnumMap<Flag, Boolean>(Flag.class);
   /** Flag that is turned on during compilation and prevents premature inlining. */
   private boolean compiling;
 
@@ -46,11 +46,14 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param e function body
    * @param stc static context
    * @param scp variable scope
+   * @param xqdoc current xqdoc cache
    * @param ii input info
    */
   public StaticFunc(final Ann a, final QNm n, final Var[] v, final SeqType r,
-      final Expr e, final StaticContext stc, final VarScope scp, final InputInfo ii) {
-    super(stc, a, n, r, scp, ii);
+      final Expr e, final StaticContext stc, final VarScope scp,
+      final String xqdoc, final InputInfo ii) {
+
+    super(stc, a, n, r, scp, xqdoc, ii);
     args = v;
     expr = e;
     cast = r != null;
@@ -71,7 +74,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     try {
       expr = expr.compile(ctx, scope);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, info);
+      expr = FNInfo.error(qe);
     } finally {
       scope.cleanUp(this);
       scope.exit(ctx, fp);
@@ -87,7 +90,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       // remove redundant casts
       if((declType.type == AtomType.BLN || declType.type == AtomType.FLT ||
           declType.type == AtomType.DBL || declType.type == AtomType.QNM ||
-              declType.type == AtomType.URI) && declType.eq(expr.type())) {
+          declType.type == AtomType.URI) && declType.eq(expr.type())) {
         ctx.compInfo(OPTCAST, declType);
         cast = false;
       }
@@ -102,7 +105,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   boolean inline(final QueryContext ctx) {
     return expr.isValue() || expr.exprSize() < ctx.context.prop.num(Prop.INLINELIMIT) &&
-        !(compiling || uses(Use.NDT) || uses(Use.CTX) || selfRecursive());
+        !(compiling || has(Flag.NDT) || has(Flag.CTX) || selfRecursive());
   }
 
   @Override
@@ -121,7 +124,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     tb.add(FUNCTION).add(' ').add(name.string());
     tb.add(PAR1).addSep(args, SEP).add(PAR2);
     if(declType != null) tb.add(' ' + AS + ' ' + declType);
-    if(expr != null) tb.add(" { " + expr + " }; ");
+    if(expr != null) tb.add(" { ").addExt(expr).add(" }; ");
+    else tb.add(" external; ");
     return tb.toString();
   }
 
@@ -167,8 +171,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final StaticContext cs = ctx.sc;
     ctx.sc = sc;
     ctx.value = null;
-    final int fp = addArgs(ctx, ii, arg);
+    final int fp = scope.enter(ctx);
     try {
+      addArgs(ctx, ii, arg);
       final Item it = expr.item(ctx, ii);
       final Value v = it == null ? Empty.SEQ : it;
       // optionally promote return value to target type
@@ -188,8 +193,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final StaticContext cs = ctx.sc;
     ctx.sc = sc;
     ctx.value = null;
-    final int fp = addArgs(ctx, ii, arg);
+    final int fp = scope.enter(ctx);
     try {
+      addArgs(ctx, ii, arg);
       final Value v = ctx.value(expr);
       // optionally promote return value to target type
       return cast ? declType.funcConvert(ctx, info, v) : v;
@@ -205,15 +211,12 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param ctx query context
    * @param ii input info
    * @param vals values to add
-   * @return old stack frame pointer
    * @throws QueryException if the arguments can't be bound
    */
-  private int addArgs(final QueryContext ctx, final InputInfo ii, final Value[] vals)
+  private void addArgs(final QueryContext ctx, final InputInfo ii, final Value[] vals)
       throws QueryException {
     // move variables to stack
-    final int fp = scope.enter(ctx);
     for(int i = 0; i < args.length; i++) ctx.set(args[i], vals[i], ii);
-    return fp;
   }
 
   /**
@@ -221,7 +224,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    final boolean u = expr.uses(Use.UPD);
+    final boolean u = expr.has(Flag.UPD);
     if(u) expr.checkUp();
     if(updating) {
       // updating function
@@ -238,21 +241,22 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @return result of check
    */
   public boolean isVacuous() {
-    return !uses(Use.UPD) && declType != null && declType.eq(SeqType.EMP);
+    return !has(Flag.UPD) && declType != null && declType.eq(SeqType.EMP);
   }
 
   /**
-   * Checks if the given feature is used in this function (see {@link Expr#uses(Use)}).
-   * @param u feature
+   * Indicates if an expression has the specified compiler property.
+   * @param flag feature
    * @return result of check
+   * @see Expr#has(Flag)
    */
-  public boolean uses(final Use u) {
+  public boolean has(final Flag flag) {
     // handle recursive calls: set dummy value, eventually replace it with final value
-    Boolean b = map.get(u);
+    Boolean b = map.get(flag);
     if(b == null) {
-      map.put(u, false);
-      b = expr == null || expr.uses(u);
-      map.put(u, b);
+      map.put(flag, false);
+      b = expr == null || expr.has(flag);
+      map.put(flag, b);
     }
     return b;
   }
@@ -261,14 +265,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public boolean visit(final ASTVisitor visitor) {
     for(final Var v : args) if(!visitor.declared(v)) return false;
     return expr.accept(visitor);
-  }
-
-  /**
-   * Returns the static return type of this function.
-   * @return return type
-   */
-  public SeqType retType() {
-    return declType != null ? declType : expr.type();
   }
 
   @Override

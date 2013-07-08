@@ -61,7 +61,7 @@ public final class TypeCase extends Single {
       super.compile(ctx, scp);
     } catch(final QueryException ex) {
       // replace original expression with error
-      expr = FNInfo.error(ex, info);
+      expr = FNInfo.error(ex);
     }
     type = expr.type();
     return this;
@@ -73,22 +73,18 @@ public final class TypeCase extends Single {
     try {
       return super.inline(ctx, scp, v, e);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, info);
+      expr = FNInfo.error(qe);
       return this;
     }
   }
 
   @Override
-  public TypeCase copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public TypeCase copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     final Var v = var == null ? null : scp.newCopyOf(ctx, var);
-    if(var != null) vs.add(var.id, v);
+    if(var != null) vs.put(var.id, v);
     final TypeCase tc = new TypeCase(info, v, types.clone(), expr.copy(ctx, scp, vs));
     return tc;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 && types != null && types.length > 1 || super.uses(u);
   }
 
   /**

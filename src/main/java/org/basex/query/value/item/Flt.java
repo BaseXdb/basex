@@ -6,6 +6,7 @@ import java.math.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -75,12 +76,14 @@ public final class Flt extends ANum {
   }
 
   @Override
-  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return it.type == AtomType.DBL ? it.eq(ii, this) : val == it.flt(ii);
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return it.type == AtomType.DBL ? it.eq(this, coll, ii) : val == it.flt(ii);
   }
 
   @Override
-  public int diff(final InputInfo ii, final Item it) throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     final double n = it.flt(ii);
     if(isNaN(n) || isNaN(val)) return UNDEF;
     return val < n ? -1 : val > n ? 1 : 0;

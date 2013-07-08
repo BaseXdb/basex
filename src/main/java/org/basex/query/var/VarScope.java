@@ -25,10 +25,8 @@ public final class VarScope {
   private final VarStack current = new VarStack();
   /** Local variables in this scope. */
   private final ArrayList<Var> vars = new ArrayList<Var>();
-
   /** This scope's closure. */
   private final Map<Var, Expr> closure = new HashMap<Var, Expr>();
-
   /** This scope's parent scope, used for looking up non-local variables. */
   private final VarScope parent;
 
@@ -85,7 +83,7 @@ public final class VarScope {
    * @return marker for the current bindings
    */
   public int open() {
-    return current.size;
+    return current.size();
   }
 
   /**
@@ -93,7 +91,7 @@ public final class VarScope {
    * @param marker marker for the start of the sub-scope
    */
   public void close(final int marker) {
-    current.size = marker;
+    current.size(marker);
   }
 
   /**
@@ -206,18 +204,6 @@ public final class VarScope {
   }
 
   /**
-   * Gathers all parameters in this scope.
-   * @return array of parameters
-   */
-  public Var[] params() {
-    int n = 0;
-    for(final Var v : vars) if(v.param) n++;
-    final Var[] arr = new Var[n];
-    for(final Var v : vars) if(v.param) arr[arr.length - n--] = v;
-    return arr;
-  }
-
-  /**
    * Stack-frame size needed for this scope.
    * @return stack-frame size
    */
@@ -232,9 +218,10 @@ public final class VarScope {
    * @param vs variable mapping
    * @return copied scope
    */
-  public VarScope copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public VarScope copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     final VarScope sc = new VarScope(scp);
-    for(final Var v : vars) vs.add(v.id, sc.newCopyOf(ctx, v));
+    for(final Var v : vars) vs.put(v.id, sc.newCopyOf(ctx, v));
     for(final Entry<Var, Expr> e : closure.entrySet()) {
       final Var v = vs.get(e.getKey().id);
       final Expr ex = e.getValue().copy(ctx, scp, vs);

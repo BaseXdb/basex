@@ -153,14 +153,14 @@ public final class DBLocking implements Locking {
     // Local locking
     final StringList writeObjects;
     if(null != write) {
-      writeObjects = write.sort(true, true).unique();
+      writeObjects = write.sort(true).unique();
       writeLocked.put(thread, writeObjects);
     } else {
       writeObjects = new StringList(0);
     }
     final StringList readObjects;
     if(null != read) {
-      readObjects = read.sort(true, true).unique();
+      readObjects = read.sort(true).unique();
       readLocked.put(thread, readObjects);
     } else {
       readObjects = new StringList(0);
@@ -195,7 +195,7 @@ public final class DBLocking implements Locking {
     final Long thread = Thread.currentThread().getId();
     if(null == write)
       throw new IllegalMonitorStateException("Cannot downgrade to global write lock.");
-    write.sort(true, true).unique();
+    write.sort(true).unique();
 
     // Fetch current locking status
     final StringList writeObjects = writeLocked.remove(thread);

@@ -89,7 +89,7 @@ public final class DialogManage extends BaseXDialog {
     doc2.setFont(doc1.getFont());
 
     backups = new BaseXList(new String[] { }, this);
-    backups.setSize(400, 380);
+    backups.setSize(400, 400);
 
     // backup buttons
     backup = new BaseXButton(BACKUP, this);
@@ -217,14 +217,14 @@ public final class DialogManage extends BaseXDialog {
       backup.setEnabled(active);
 
       // enable/disable backup buttons
-      final String[] back = Databases.backupPaths(db, ctx).toArray();
-      for(int b = 0; b < back.length; b++) {
-        final String n = new IOFile(back[b]).name();
-        back[b] = n.substring(0, n.lastIndexOf('.'));
+      final StringList back = Databases.backupPaths(db, ctx).sort(Prop.CASE, false);
+      for(int b = 0; b < back.size(); b++) {
+        final String n = new IOFile(back.get(b)).name();
+        back.set(b, n.substring(0, n.lastIndexOf('.')));
       }
 
-      active = back.length > 0;
-      backups.setData(back);
+      active = !back.isEmpty();
+      backups.setData(back.toArray());
       backups.setEnabled(active);
 
       restore.setEnabled(active);

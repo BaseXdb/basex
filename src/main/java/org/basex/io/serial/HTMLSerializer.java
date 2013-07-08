@@ -51,8 +51,7 @@ public class HTMLSerializer extends OutputSerializer {
     print(ATT1);
     for(int k = 0; k < val.length; k += cl(val, k)) {
       final int ch = cp(val, k);
-      if(ch == '<' || ch == '&' &&
-          val[Math.min(k + 1, val.length - 1)] == '{') {
+      if(ch == '<' || ch == '&' && val[Math.min(k + 1, val.length - 1)] == '{') {
         print(ch);
       } else if(ch == '"') {
         print(E_QU);
@@ -113,7 +112,14 @@ public class HTMLSerializer extends OutputSerializer {
   protected void finishEmpty() throws IOException {
     if(ct(true, true)) return;
     print(ELEM_C);
-    if((html5 ? EMPTIES5 : EMPTIES).contains(lc(elem))) return;
+    if(html5) {
+      if(EMPTIES5.contains(lc(elem))) return;
+    } else {
+      if(EMPTIES.contains(lc(elem))) {
+        final byte[] u = nsUri(EMPTY);
+        if(u == null || u.length == 0) return;
+      }
+    }
     sep = false;
     finishClose();
   }
@@ -200,9 +206,9 @@ public class HTMLSerializer extends OutputSerializer {
     EMPTIES5.add("source");
     EMPTIES5.add("track");
     EMPTIES5.add("wbr");
-    EMPTIES.add("basefont");
-    EMPTIES.add("frame");
-    EMPTIES.add("isindex");
+    EMPTIES5.add("basefont");
+    EMPTIES5.add("frame");
+    EMPTIES5.add("isindex");
     // URI attributes
     URIS.add("a:href");
     URIS.add("a:name");

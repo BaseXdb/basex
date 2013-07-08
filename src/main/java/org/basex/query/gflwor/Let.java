@@ -106,8 +106,8 @@ public final class Let extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return expr.uses(u);
+  public boolean has(final Flag flag) {
+    return expr.has(flag);
   }
 
   @Override
@@ -168,9 +168,9 @@ public final class Let extends GFLWOR.Clause {
   }
 
   @Override
-  public Let copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Let copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Var v = scp.newCopyOf(ctx, var);
-    vs.add(var.id, v);
+    vs.put(var.id, v);
     return new Let(v, expr.copy(ctx, scp, vs), score, info);
   }
 

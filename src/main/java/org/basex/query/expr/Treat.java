@@ -105,7 +105,7 @@ public final class Treat extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new Treat(info, expr.copy(ctx, scp, vs), type);
   }
 

@@ -312,7 +312,7 @@ public abstract class IO {
    * @param io io reference
    * @return result of check
    */
-  public final boolean eq(final IO io) {
+  public boolean eq(final IO io) {
     return path.equals(io.path);
   }
 

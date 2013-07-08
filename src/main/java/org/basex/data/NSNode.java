@@ -8,7 +8,6 @@ import java.util.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This class stores a single namespace node.
@@ -68,20 +67,16 @@ final class NSNode {
   /**
    * Sorts the specified node into the child array.
    * @param n child node
-   * @return node
    */
-  NSNode add(final NSNode n) {
+  void add(final NSNode n) {
     int s = size;
     if(s == children.length) {
-      final NSNode[] tmp = new NSNode[Math.max(s << 1, 1)];
-      System.arraycopy(children, 0, tmp, 0, s);
-      children = tmp;
+      children = Array.copy(children, new NSNode[Array.newSize(s)]);
     }
     while(--s >= 0 && n.pre - children[s].pre <= 0);
     System.arraycopy(children, ++s, children, s + 1, size++ - s);
     children[s] = n;
     n.parent = this;
-    return n;
   }
 
   /**
@@ -102,14 +97,16 @@ final class NSNode {
    */
   void delete(final int uri) {
     for(int c = 0; c < size; ++c) children[c].delete(uri);
-    final IntList il = new IntList(values.length);
-    for(int v = 0; v < values.length; v += 2) {
-      if(values[v + 1] != uri) {
-        il.add(values[v]);
-        il.add(values[v + 1]);
-      }
+
+    final int vl = values.length;
+    for(int v = 0; v < vl; v += 2) {
+      if(values[v + 1] != uri) continue;
+      final int[] vals = new int[vl - 2];
+      System.arraycopy(values, 0, vals, 0, v);
+      System.arraycopy(values, v + 2, vals, v, vl - v - 2);
+      values = vals;
+      break;
     }
-    if(il.size() != values.length) values = il.toArray();
   }
 
   // Requesting Namespaces ====================================================
@@ -117,11 +114,21 @@ final class NSNode {
   /**
    * Finds the closest namespace node for the specified pre value.
    * @param p pre value
+   * @param d data reference
    * @return node
    */
-  NSNode find(final int p) {
-    final int s = fnd(p);
-    return s == -1 ? this : children[s].pre == p ? children[s] : children[s].find(p);
+  NSNode find(final int p, final Data d) {
+    final int s = find(p);
+    // no match found: return current nod
+    if(s == -1) return this;
+    final NSNode ch = children[s];
+    final int cp = ch.pre;
+    // return exact hit
+    if(cp == p) return ch;
+    // found node is preceding sibling
+    if(cp + d.size(cp, Data.ELEM) <= p) return this;
+    // continue recursive search
+    return children[s].find(p, d);
   }
 
   /**
@@ -143,7 +150,7 @@ final class NSNode {
    */
   void delete(final int p, final int sz) {
     // find the pre value which must be deleted
-    int s = fnd(p);
+    int s = find(p);
     /* if the node is not directly contained as a child, either start at array
      * index 0 or proceed with the next node in the child array to search for
      * descendants of pre
@@ -171,7 +178,7 @@ final class NSNode {
    * @param p pre value
    * @return node
    */
-  int fnd(final int p) {
+  int find(final int p) {
     int l = 0, h = size - 1;
     while(l <= h) { // binary search
       final int m = l + h >>> 1;

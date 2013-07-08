@@ -39,8 +39,8 @@ public abstract class Formatter extends FormatUtil {
 
   // initialize hash map with English formatter as default
   static {
-    MAP.add(EN, new FormatterEN());
-    MAP.add(token("de"), new FormatterDE());
+    MAP.put(EN, new FormatterEN());
+    MAP.put(token("de"), new FormatterDE());
   }
 
   /**
@@ -134,7 +134,8 @@ public abstract class Formatter extends FormatUtil {
     if(cal.length != 0) {
       final Matcher m = CALENDAR.matcher(string(cal));
       if(!m.matches()) CALQNAME.thrw(ii, cal);
-      final QNm qnm = new QNm(m.group(3), m.group(1) == null ? null : m.group(2));
+      final QNm qnm = new QNm(m.group(3), m.group(1) == null ||
+          m.group(2).isEmpty() ? null : m.group(2));
       if(!qnm.hasURI()) {
         int c = -1;
         final byte[] ln = qnm.local();
@@ -262,7 +263,7 @@ public abstract class Formatter extends FormatUtil {
 
         if(compSpec == 'z' || compSpec == 'Z') {
           // output timezone
-          tb.add(formatTZ((int) num, fp, marker));
+          tb.add(formatZone((int) num, fp, marker));
         } else if(fp.first == 'n') {
           // output name representation
           byte[] in = null;
@@ -341,7 +342,7 @@ public abstract class Formatter extends FormatUtil {
     } else if(ch == KANJI[1]) {
       japanese(tb, n);
     } else if(ch == 'i') {
-      roman(tb, n);
+      roman(tb, n, fp.min);
     } else if(ch == '\u2460' || ch == '\u2474' || ch == '\u2488') {
       if(num < 1 || num > 20) tb.addLong(num);
       else tb.add((int) (ch + num - 1));
@@ -366,7 +367,7 @@ public abstract class Formatter extends FormatUtil {
    * @return string representation
    * @throws QueryException query exception
    */
-  public final byte[] formatTZ(final int num, final FormatParser fp,
+  public final byte[] formatZone(final int num, final FormatParser fp,
       final byte[] marker) throws QueryException {
 
     final boolean uc = ch(marker, 0) == 'Z';
@@ -376,7 +377,7 @@ public abstract class Formatter extends FormatUtil {
     if(num == Short.MAX_VALUE) return mil ? new byte[] { 'J' } : EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
-    if(!mil || !addMilTZ(num, tb)) {
+    if(!mil || !addMilZone(num, tb)) {
       if(!uc) tb.add("GMT");
 
       final boolean minus = num < 0;
@@ -389,33 +390,33 @@ public abstract class Formatter extends FormatUtil {
         final int c1 = tp.next(), c2 = tp.next(), c3 = tp.next(), c4 = tp.next();
         final int z1 = zeroes(c1), z2 = zeroes(c2), z3 = zeroes(c3), z4 = zeroes(c4);
         if(z1 == -1) {
-          tb.add(addTZ(num, 0, new TokenBuilder("00"))).add(':');
-          tb.add(addTZ(num, 1, new TokenBuilder("00")));
+          tb.add(addZone(num, 0, new TokenBuilder("00"))).add(':');
+          tb.add(addZone(num, 1, new TokenBuilder("00")));
         } else if(z2 == -1) {
-          tb.add(addTZ(num, 0, new TokenBuilder().add(c1)));
+          tb.add(addZone(num, 0, new TokenBuilder().add(c1)));
           if(c2 == -1) {
-            if(num % 60 != 0) tb.add(':').add(addTZ(num, 1, new TokenBuilder("00")));
+            if(num % 60 != 0) tb.add(':').add(addZone(num, 1, new TokenBuilder("00")));
           } else {
             final TokenBuilder t = new TokenBuilder().add(z3 == -1 ? '0' : z3);
             if(z3 != -1 && z4 != -1) t.add(z4);
-            tb.add(c2).add(addTZ(num, 1, t));
+            tb.add(c2).add(addZone(num, 1, t));
           }
         } else if(z3 == -1) {
-          tb.add(addTZ(num, 0, new TokenBuilder().add(c1).add(c2)));
+          tb.add(addZone(num, 0, new TokenBuilder().add(c1).add(c2)));
           if(c3 == -1) {
-            if(num % 60 != 0) tb.add(':').add(addTZ(num, 1, new TokenBuilder("00")));
+            if(num % 60 != 0) tb.add(':').add(addZone(num, 1, new TokenBuilder("00")));
           } else {
             final int c5 = tp.next(), z5 = zeroes(c5);
             final TokenBuilder t = new TokenBuilder().add(z4 == -1 ? '0' : z4);
             if(z4 != -1 && z5 != -1) t.add(z5);
-            tb.add(c3).add(addTZ(num % 60, 1, t));
+            tb.add(c3).add(addZone(num % 60, 1, t));
           }
         } else if (z4 == -1) {
-          tb.add(addTZ(num, 0, new TokenBuilder().add(c1)));
-          tb.add(addTZ(num, 1, new TokenBuilder().add(c2).add(c3)));
+          tb.add(addZone(num, 0, new TokenBuilder().add(c1)));
+          tb.add(addZone(num, 1, new TokenBuilder().add(c2).add(c3)));
         } else {
-          tb.add(addTZ(num, 0, new TokenBuilder().add(c1).add(c2)));
-          tb.add(addTZ(num, 1, new TokenBuilder().add(c3).add(c4)));
+          tb.add(addZone(num, 0, new TokenBuilder().add(c1).add(c2)));
+          tb.add(addZone(num, 1, new TokenBuilder().add(c3).add(c4)));
         }
       }
     }
@@ -430,7 +431,7 @@ public abstract class Formatter extends FormatUtil {
    * @return timezone component
    * @throws QueryException query exception
    */
-  private byte[] addTZ(final int num, final int c, final TokenBuilder format)
+  private byte[] addZone(final int num, final int c, final TokenBuilder format)
       throws QueryException {
 
     int n = c == 0 ? num / 60 : num % 60;
@@ -444,7 +445,7 @@ public abstract class Formatter extends FormatUtil {
    * @param tb token builder
    * @return {@code true} if timezone was added
    */
-  private boolean addMilTZ(final int num, final TokenBuilder tb) {
+  private boolean addMilZone(final int num, final TokenBuilder tb) {
     final int n = num / 60;
     if(num % 60 != 0 || n < -12 || n > 12) return false;
     tb.add(MIL[n + 12]);
@@ -468,8 +469,10 @@ public abstract class Formatter extends FormatUtil {
    * Adds a Roman character sequence.
    * @param tb token builder
    * @param n number to be formatted
+   * @param min minimum width
    */
-  private static void roman(final TokenBuilder tb, final long n) {
+  private static void roman(final TokenBuilder tb, final long n, final int min) {
+    final int s = tb.size();
     if(n > 0 && n < 4000) {
       final int v = (int) n;
       tb.add(ROMANM[v / 1000]);
@@ -479,6 +482,7 @@ public abstract class Formatter extends FormatUtil {
     } else {
       tb.addLong(n);
     }
+    while(tb.size() - s < min) tb.add(' ');
   }
 
   /**

@@ -37,7 +37,7 @@ public interface BuildText {
   String AFTERROOT = "No text allowed after closed root element.";
 
   /** Scanner error. */
-  String DOCEMPTY = "Document is empty.";
+  String DOCEMPTY = "No input found.";
   /** Scanner error. */
   String UNCLOSED = "Unclosed tokens found.";
   /** Scanner error. */
@@ -186,7 +186,7 @@ public interface BuildText {
     /** Empty bracket.          */ L_BR_CLOSE("'</'"),
     /** Closing end bracket.    */ CLOSE_R_BR("'/>'"),
     /** Equal sign.             */ EQ("'='"),
-    /** End of file.            */ EOF("end of file"),
+    /** End of input.           */ EOF("end of input"),
     /** Quote.                  */ QUOTE("quote");
 
     /** String representation of token type. */

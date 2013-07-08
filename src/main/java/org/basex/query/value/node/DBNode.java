@@ -142,18 +142,14 @@ public class DBNode extends ANode {
 
   @Override
   public final byte[] name() {
-    final NodeType t = nodeType();
-    switch(t) {
-      case ELM: case ATT: case PI:
-        return data.name(pre, kind(t));
-      default:
-        return Token.EMPTY;
-    }
+    return type == NodeType.ELM || type == NodeType.ATT || type == NodeType.PI ?
+      data.name(pre, kind(nodeType())) : Token.EMPTY;
   }
 
   @Override
   public final QNm qname() {
-    return qname(new QNm());
+    return type == NodeType.ELM || type == NodeType.ATT || type == NodeType.PI ?
+      qname(new QNm()) : null;
   }
 
   @Override
@@ -163,12 +159,13 @@ public class DBNode extends ANode {
     byte[] uri = Token.EMPTY;
     final boolean pref = Token.indexOf(nm, ':') != -1;
     if(pref || data.nspaces.size() != 0) {
-      final int n = pref ? data.nspaces.uri(nm, pre) : data.uri(pre, data.kind(pre));
+      final int n = pref ? data.nspaces.uri(nm, pre, data) :
+        data.uri(pre, data.kind(pre));
       final byte[] u = n > 0 ? data.nspaces.uri(n) : pref ?
           NSGlobal.uri(Token.prefix(nm)) : null;
       if(u != null) uri = u;
     }
-    name.update(nm, uri);
+    name.set(nm, uri);
     return name;
   }
 
@@ -202,8 +199,15 @@ public class DBNode extends ANode {
 
   @Override
   public final int diff(final ANode node) {
-    return !(node instanceof DBNode) || data != node.data() ?
-        id - node.id : pre - ((DBNode) node).pre;
+    // compare fragment with database node; specify fragment first to save time
+    if(node instanceof FNode) return -diff(node, this);
+    // same database instance: compare pre values
+    if(data == node.data()) {
+      final int p = ((DBNode) node).pre;
+      return pre > p ? 1 : pre < p ? -1 : 0;
+    }
+    // check order via lowest common ancestor
+    return diff(this, node);
   }
 
   @Override
@@ -214,19 +218,20 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public Value copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public final Value copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     return copy();
   }
 
   @Override
-  public DBNode dbCopy(final Prop prop) {
+  public final DBNode dbCopy(final Prop prop) {
     final MemData md = data.inMemory() ? new MemData(data) : new MemData(prop);
     new DataBuilder(md).build(this);
-    return new DBNode(md);
+    return new DBNode(md).parent(par);
   }
 
   @Override
-  public final ANode deepCopy() {
+  public final DBNode deepCopy() {
     return dbCopy(data.meta.prop);
   }
 
@@ -248,7 +253,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public DBNode parent(final ANode p) {
+  public final DBNode parent(final ANode p) {
     par = p;
     return this;
   }
@@ -331,7 +336,7 @@ public class DBNode extends ANode {
 
       @Override
       public boolean more() {
-        return p != s;
+        return p < s;
       }
 
       @Override
@@ -451,7 +456,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public byte[] xdmInfo() {
+  public final byte[] xdmInfo() {
     final ByteList bl = new ByteList().add(typeId().asByte());
     if(type == NodeType.DOC) bl.add(baseURI()).add(0);
     else if(type == NodeType.ATT) bl.add(qname().uri()).add(0);
@@ -459,7 +464,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public ID typeId() {
+  public final ID typeId() {
     // check if a document has a single element as child
     Type.ID t = type.id();
     if(type == NodeType.DOC) {

@@ -63,8 +63,8 @@ public final class SyntaxXQuery extends Syntax {
    */
   private static void addProps(final Class<? extends AProp> props) throws Exception {
     for(final Object[] arr : AProp.props(props)) {
-      if(arr.length > 1)
-        Collections.addAll(FUNC, arr[0].toString().toLowerCase().split("-"));
+      if(arr.length < 2) continue;
+      Collections.addAll(FUNC, arr[0].toString().toLowerCase(Locale.ENGLISH).split("-"));
     }
   }
 

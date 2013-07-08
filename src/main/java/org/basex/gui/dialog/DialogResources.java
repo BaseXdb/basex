@@ -265,24 +265,8 @@ public class DialogResources extends BaseXBack {
     }
   }
 
-  /** GUI commands for popup menu. */
-  abstract static class BaseCmd implements GUICommand {
-    @Override
-    public boolean checked() {
-      return false;
-    }
-    @Override
-    public String help() {
-      return null;
-    }
-    @Override
-    public String key() {
-      return null;
-    }
-  }
-
   /** Delete command. */
-  final class DeleteCmd extends BaseCmd {
+  final class DeleteCmd extends GUIBaseCmd {
     @Override
     public void execute(final GUI g) {
       final TreeNode n = selection();
@@ -312,7 +296,7 @@ public class DialogResources extends BaseXBack {
   }
 
   /** Rename command. */
-  final class RenameCmd extends BaseCmd {
+  final class RenameCmd extends GUIBaseCmd {
     @Override
     public void execute(final GUI g) {
       final TreeNode n = selection();
@@ -339,8 +323,7 @@ public class DialogResources extends BaseXBack {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       final TreeNode n = selection();
-      if(n instanceof TreeLeaf)
-        button.setEnabled(!((TreeLeaf) n).abbr);
+      if(n instanceof TreeLeaf) button.setEnabled(!((TreeLeaf) n).abbr);
       else button.setEnabled(n != null && !n.equals(root));
     }
   }

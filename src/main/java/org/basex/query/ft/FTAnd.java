@@ -118,7 +118,7 @@ public final class FTAnd extends FTExpr {
 
     for(final FTMatch s1 : i1.all) {
       for(final FTMatch s2 : i2.all) {
-        all.add(new FTMatch().add(s1).add(s2));
+        all.add(new FTMatch(s1.size() + s2.size()).add(s1).add(s2));
       }
     }
     i1.score(Scoring.and(i1.score(), i2.score()));
@@ -126,7 +126,7 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     final int es = expr.length;
     neg = new boolean[es];
 
@@ -147,7 +147,8 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     final FTAnd copy = new FTAnd(info, Arr.copyAll(ctx, scp, vs, expr));
     if(neg != null) copy.neg = neg.clone();
     return copy;

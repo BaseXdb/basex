@@ -118,6 +118,7 @@ public final class OptimizeAll extends ACreate {
     ctx.prop.set(Prop.CASESENS,   m.casesens);
     ctx.prop.set(Prop.DIACRITICS, m.diacritics);
     ctx.prop.set(Prop.LANGUAGE,   m.language.toString());
+    ctx.prop.set(Prop.STOPWORDS,  m.stopwords);
 
     // build database and index structures
     final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx);

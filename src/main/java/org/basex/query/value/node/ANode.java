@@ -58,13 +58,17 @@ public abstract class ANode extends Item {
   public abstract byte[] string();
 
   @Override
-  public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return it.type.isUntyped() ? Token.eq(string(), it.string(ii)) : it.eq(ii, this);
+  public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return it.type.isUntyped() ? coll == null ? Token.eq(string(), it.string(ii)) :
+      coll.compare(string(), it.string(ii)) == 0 : it.eq(this, coll, ii);
   }
 
   @Override
-  public final int diff(final InputInfo ii, final Item it) throws QueryException {
-    return it.type.isUntyped() ? Token.diff(string(), it.string(ii)) : -it.diff(ii, this);
+  public final int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return it.type.isUntyped() ? coll == null ? Token.diff(string(), it.string(ii)) :
+      coll.compare(string(), it.string(ii)) : -it.diff(this, coll, ii);
   }
 
   /**
@@ -150,7 +154,7 @@ public abstract class ANode extends Item {
       if(n != null) {
         for(int a = n.size() - 1; a >= 0; a--) {
           final byte[] key = n.name(a);
-          if(!ns.contains(key)) ns.add(key, n.string(a));
+          if(!ns.contains(key)) ns.add(key, n.value(a));
         }
       }
       node = node.parent();
@@ -167,7 +171,7 @@ public abstract class ANode extends Item {
   public final byte[] uri(final byte[] pref, final QueryContext ctx) {
     final Atts at = namespaces();
     if(at != null) {
-      final byte[] s = at.string(pref);
+      final byte[] s = at.value(pref);
       if(s != null) return s;
       final ANode n = parent();
       if(n != null) return n.uri(pref, ctx);
@@ -184,19 +188,55 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Compares the identity of two nodes.
+   * Checks if two nodes are identical.
    * @param node node to be compared
    * @return result of check
    */
   public abstract boolean is(final ANode node);
 
   /**
-   * Compares two nodes for their unique order.
+   * Checks the document order of two nodes.
    * @param node node to be compared
-   * @return 0 if the nodes are equal or a positive/negative value
+   * @return {@code 0} if the nodes are identical, or {@code 1}/{@code -1}
    * if the node appears after/before the argument
    */
   public abstract int diff(final ANode node);
+
+  /**
+   * Compares two nodes for their unique order.
+   * @param node1 first node
+   * @param node2 node to be compared
+   * @return {@code 0} if the nodes are identical, or {@code 1}/{@code -1}
+   * if the first node appears after/before the second
+   */
+  protected static int diff(final ANode node1, final ANode node2) {
+    // cache parents of first node
+    final ANodeList nl = new ANodeList();
+    for(ANode n = node1; n != null; n = n.parent()) {
+      if(n == node2) return 1;
+      nl.add(n);
+    }
+    // find lowest common ancestor
+    ANode c2 = node2;
+    LOOP:
+    for(ANode n = node2; (n = n.parent()) != null;) {
+      final int is = nl.size();
+      for(int i = 1; i < is; i++) {
+        if(n == node1) return -1;
+        if(!nl.get(i).is(n)) continue;
+        // check which node appears as first LCA child
+        final ANode c1 = nl.get(i - 1);
+        final AxisMoreIter ir = n.children();
+        for(ANode c; (c = ir.next()) != null;) {
+          if(c.is(c1)) return -1;
+          if(c.is(c2)) return 1;
+        }
+        break LOOP;
+      }
+      c2 = n;
+    }
+    return node1.id < node2.id ? -1 : 1;
+  }
 
   /**
    * Returns a final node representation. This method is called by the
@@ -225,6 +265,24 @@ public abstract class ANode extends Item {
    * @return result of test
    */
   public abstract boolean hasChildren();
+
+  /**
+   * Returns the value of the specified attribute, or {@code null}.
+   * @param name attribute to be found
+   * @return attribute value
+   */
+  public byte[] attribute(final String name) {
+    return attribute(new QNm(name));
+  }
+
+  /**
+   * Returns the value of the specified attribute, or {@code null}.
+   * @param name attribute to be found
+   * @return attribute value
+   */
+  public byte[] attribute(final byte[] name) {
+    return attribute(new QNm(name));
+  }
 
   /**
    * Returns the value of the specified attribute, or {@code null}.

@@ -55,7 +55,7 @@ public final class If extends Arr {
         expr[e] = expr[e].compile(ctx, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
-        expr[e] = FNInfo.error(ex, info);
+        expr[e] = FNInfo.error(ex);
       }
     }
 
@@ -115,8 +115,8 @@ public final class If extends Arr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return cond.uses(u) || super.uses(u);
+  public boolean has(final Flag flag) {
+    return cond.has(flag) || super.has(flag);
   }
 
   @Override
@@ -141,7 +141,7 @@ public final class If extends Arr {
       try {
         nw = expr[i].inline(ctx, scp, v, e);
       } catch(final QueryException qe) {
-        nw = FNInfo.error(qe, info);
+        nw = FNInfo.error(qe);
       }
       if(nw != null) {
         expr[i] = nw;
@@ -152,13 +152,13 @@ public final class If extends Arr {
   }
 
   @Override
-  public If copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public If copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return copyType(new If(info, cond.copy(ctx, scp, vs),
         expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs)));
   }
 
   @Override
-  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+  public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
     final int es = expr.length;
     for(int e = 0; e < es; ++e) expr[e] = expr[e].indexEquivalent(ic);
     return this;

@@ -17,18 +17,26 @@ public final class FTxt extends FNode {
    * Constructor.
    * @param t text value
    */
+  public FTxt(final String t) {
+    this(Token.token(t));
+  }
+
+  /**
+   * Constructor.
+   * @param t text value
+   */
   public FTxt(final byte[] t) {
     super(NodeType.TXT);
     val = t;
   }
 
   /**
-   * Constructor for DOM nodes.
+   * Constructor for creating a text from a DOM node.
    * Originally provided by Erdal Karaca.
    * @param txt DOM node
    */
   public FTxt(final Text txt) {
-    this(Token.token(txt.getData()));
+    this(txt.getData());
   }
 
   @Override

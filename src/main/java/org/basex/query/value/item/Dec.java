@@ -103,17 +103,18 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     return it.type == AtomType.DBL || it.type == AtomType.FLT ?
-        it.eq(ii, this) : val.compareTo(it.dec(ii)) == 0;
+        it.eq(this, coll, ii) : val.compareTo(it.dec(ii)) == 0;
   }
 
   @Override
-  public int diff(final InputInfo ii, final Item it) throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     final double d = it.dbl(ii);
-    return d == Double.NEGATIVE_INFINITY ? -1 :
-           d == Double.POSITIVE_INFINITY ? 1 :
-           Double.isNaN(d) ? UNDEF : val.compareTo(it.dec(ii));
+    return d == Double.NEGATIVE_INFINITY ? -1 : d == Double.POSITIVE_INFINITY ? 1 :
+      Double.isNaN(d) ? UNDEF : val.compareTo(it.dec(ii));
   }
 
   @Override

@@ -10,7 +10,9 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -20,14 +22,33 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public class MainModule extends StaticScope {
+  /** Declared type, {@code null} if not specified. */
+  public final SeqType declType;
+
   /**
    * Constructor.
    * @param rt root expression
    * @param scp variable scope
+   * @param xqdoc documentation
    */
-  public MainModule(final Expr rt, final VarScope scp) {
-    super(scp, null);
+  public MainModule(final Expr rt, final VarScope scp, final String xqdoc) {
+    this(rt, scp, null, xqdoc, null);
+  }
+
+  /**
+   * Constructor.
+   * @param rt root expression
+   * @param scp variable scope
+   * @param xqdoc documentation
+   * @param type optional type
+   * @param ii input info
+   */
+  public MainModule(final Expr rt, final VarScope scp, final SeqType type,
+      final String xqdoc, final InputInfo ii) {
+
+    super(scp, xqdoc, ii);
     expr = rt;
+    declType = type;
   }
 
   @Override
@@ -52,7 +73,8 @@ public class MainModule extends StaticScope {
   public Value value(final QueryContext ctx) throws QueryException {
     try {
       scope.enter(ctx);
-      return ctx.value(expr);
+      final Value v = ctx.value(expr);
+      return declType != null ? declType.treat(v, info) : v;
     } finally {
       scope.exit(ctx, 0);
     }
@@ -65,6 +87,8 @@ public class MainModule extends StaticScope {
    * @throws QueryException query exception
    */
   public Iter iter(final QueryContext ctx) throws QueryException {
+    if(declType != null) return value(ctx).iter();
+
     scope.enter(ctx);
     final Iter iter = expr.iter(ctx);
     return new Iter() {

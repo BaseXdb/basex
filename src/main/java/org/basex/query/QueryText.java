@@ -358,10 +358,6 @@ public interface QueryText {
   /** Parser token. */
   String DF_ZG = "zero-digit";
 
-  /** Option: prohibit-feature. */
-  String PROHIBIT_FEATURE = "prohibit-feature";
-  /** Option: require-feature. */
-  String REQUIRE_FEATURE = "require-feature";
   /** Option: read-lock. */
   String READ_LOCK = "read-lock";
   /** Option: write-lock. */
@@ -432,20 +428,21 @@ public interface QueryText {
   byte[] ID = token("id");
   /** IDRef token. */
   byte[] IDREF = token("idref");
+
   /** Error token. */
-  byte[] ECODE = token("code");
+  byte[] E_CODE = token("code");
   /** Error token. */
-  byte[] EVALUE = token("value");
+  byte[] E_DESCRIPTION = token("description");
   /** Error token. */
-  byte[] EDESC = token("description");
+  byte[] E_VALUE = token("value");
   /** Error token. */
-  byte[] EMODULE = token("module");
+  byte[] E_MODULE = token("module");
   /** Error token. */
-  byte[] ELINENUM = token("line-number");
+  byte[] E_LINE_NUMBER = token("line-number");
   /** Error token. */
-  byte[] ECOLNUM = token("column-number");
+  byte[] E_COLUM_NUMBER = token("column-number");
   /** Error token. */
-  byte[] EADD = token("additional");
+  byte[] E_ADDITIONAL = token("additional");
 
   /** Error prefix. */
   byte[] ERR = token("err");
@@ -523,10 +520,14 @@ public interface QueryText {
   byte[] REPO = token("repo");
   /** Validate token. */
   byte[] VLDT = token("validate");
+  /** XQDoc token. */
+  byte[] INSPECT = token("inspect");
   /** XQuery token. */
   byte[] XQRY = token(XQUERY);
-  /** XQUnit token. */
-  byte[] XQUNIT = token("xqunit");
+  /** Unit token. */
+  byte[] UNIT = token("unit");
+  /** Rest token. */
+  byte[] REST = token("rest");
   /** RestXQ token. */
   byte[] RESTXQ = token("restxq");
   /** EXErr token. */
@@ -535,18 +536,6 @@ public interface QueryText {
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
 
-  /** Feature: schema-aware. */
-  String F_SCHEMA_AWARE = "schema-aware";
-  /** Feature: static-typing. */
-  String F_STATIC_TYPING = "static-typing";
-  /** Feature: module. */
-  String F_MODULE = "module";
-  /** Feature: higher-order-function. */
-  String F_HIGHER_ORDER_FUNCTION = "higher-order-function";
-  /** Feature: all-extensions. */
-  String F_ALL_EXTENSIONS = "all-extensions";
-  /** Feature: all-optional-features. */
-  String F_ALL_OPTIONAL_FEATURES = "all-optional-features";
 
   // URIS =====================================================================
 
@@ -578,7 +567,7 @@ public interface QueryText {
   /** EXQuery URI. */
   String EXQUERY = "http://exquery.org/ns/";
   /** RESTXQ URI. */
-  byte[] RESTXQURI = token(EXQUERY + "restxq");
+  byte[] RESTURI = token(EXQUERY + "restxq");
 
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns/";
@@ -624,6 +613,8 @@ public interface QueryText {
   byte[] HTMLURI = token(BXMODULES + "html");
   /** Index module URI. */
   byte[] INDEXURI = token(BXMODULES + "index");
+  /** Inspect module URI. */
+  byte[] INSPECTURI = token(BXMODULES + "inspect");
   /** JSON module URI. */
   byte[] JSONURI = token(BXMODULES + "json");
   /** Output module URI. */
@@ -642,19 +633,29 @@ public interface QueryText {
   byte[] SQLURI = token(BXMODULES + "sql");
   /** Streaming module URI. */
   byte[] STREAMURI = token(BXMODULES + "stream");
+  /** Unit module URI. */
+  byte[] UNITURI = token(BXMODULES + "unit");
   /** Validate module URI. */
   byte[] VALIDATEURI = token(BXMODULES + "validate");
-  /** XSLT module URI. */
-  byte[] XSLTURI = token(BXMODULES + "xslt");
   /** XQuery module URI. */
   byte[] XQUERYURI = token(BXMODULES + "xquery");
-  /** XQUnit module URI. */
-  byte[] XQUNITURI = token(BXMODULES + "xqunit");
+  /** XSLT module URI. */
+  byte[] XSLTURI = token(BXMODULES + "xslt");
 
   /** Java prefix. */
   byte[] JAVAPREF = token("java:");
   /** Default collation. */
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
+
+  /** Supported documentation tags. */
+  byte[][] DOC_TAGS = tokens("description", "author", "version", "param",
+      "return", "error", "deprecated", "see", "since");
+  /** Documentation: description tag. */
+  byte[] DOC_DESCRIPTION = token("description");
+  /** Documentation: param tag. */
+  byte[] DOC_PARAM = token("param");
+  /** Documentation: return tag. */
+  byte[] DOC_RETURN = token("return");
 
   // QUERY PLAN ===============================================================
 

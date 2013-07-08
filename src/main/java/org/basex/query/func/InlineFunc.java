@@ -37,7 +37,7 @@ public final class InlineFunc extends Single implements Scope {
   private final boolean updating;
 
   /** Map with requested function properties. */
-  private final EnumMap<Use, Boolean> map = new EnumMap<Expr.Use, Boolean>(Use.class);
+  private final EnumMap<Flag, Boolean> map = new EnumMap<Expr.Flag, Boolean>(Flag.class);
   /** Static context. */
   private final StaticContext sc;
   /** Compilation flag. */
@@ -127,7 +127,7 @@ public final class InlineFunc extends Single implements Scope {
 
       expr = expr.compile(ctx, scope);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe, info);
+      expr = FNInfo.error(qe);
     } finally {
       scope.cleanUp(this);
       scope.exit(ctx, fp);
@@ -178,7 +178,7 @@ public final class InlineFunc extends Single implements Scope {
           if(inl != null) expr = inl;
         }
       } catch(final QueryException qe) {
-        expr = FNInfo.error(qe, info);
+        expr = FNInfo.error(qe);
       } finally {
         scope.cleanUp(this);
         scope.exit(ctx, fp);
@@ -190,7 +190,7 @@ public final class InlineFunc extends Single implements Scope {
   }
 
   @Override
-  public Expr copy(final QueryContext cx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext cx, final VarScope scp, final IntObjMap<Var> vs) {
     final VarScope v = scope.copy(cx, scp, vs);
     final Var[] a = args.clone();
     for(int i = 0; i < a.length; i++) a[i] = vs.get(a[i].id);
@@ -200,7 +200,7 @@ public final class InlineFunc extends Single implements Scope {
   @Override
   public FuncItem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final FuncType ft = FuncType.get(ann, args, ret);
-    final boolean c = ft.ret != null && !expr.type().instanceOf(ft.ret);
+    final boolean c = ft.type != null && !expr.type().instanceOf(ft.type);
 
     // collect closure
     final Map<Var, Value> clos = new HashMap<Var, Value>();
@@ -221,15 +221,13 @@ public final class InlineFunc extends Single implements Scope {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    if(u == Use.X30) return true;
-
+  public boolean has(final Flag flag) {
     // handle recursive calls: set dummy value, eventually replace it with final value
-    Boolean b = map.get(u);
+    Boolean b = map.get(flag);
     if(b == null) {
-      map.put(u, false);
-      b = expr == null || super.uses(u);
-      map.put(u, b);
+      map.put(flag, false);
+      b = expr == null || super.has(flag);
+      map.put(flag, b);
     }
     return b;
   }
@@ -272,7 +270,7 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public void checkUp() throws QueryException {
-    final boolean u = expr.uses(Use.UPD);
+    final boolean u = expr.has(Flag.UPD);
     if(u) expr.checkUp();
     if(updating) {
       // updating function
@@ -286,7 +284,7 @@ public final class InlineFunc extends Single implements Scope {
 
   @Override
   public boolean isVacuous() {
-    return !uses(Use.UPD) && ret != null && ret.eq(SeqType.EMP);
+    return !has(Flag.UPD) && ret != null && ret.eq(SeqType.EMP);
   }
 
   @Override

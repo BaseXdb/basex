@@ -3,6 +3,7 @@ package org.basex.data;
 import java.util.*;
 
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -32,21 +33,24 @@ public final class FTPosData {
     if(data == null) data = d;
     else if(data != d) return;
 
-    final IntList ps = new IntList();
+    // cache all positions
+    final IntSet set = new IntSet();
     for(final FTMatch m : all) {
       for(final FTStringMatch sm : m) {
-        for(int s = sm.s; s <= sm.e; ++s) ps.add(s);
+        for(int s = sm.s; s <= sm.e; ++s) set.add(s);
       }
     }
 
+    // sort and store all positions
+    final IntList il = new IntList(set.toArray()).sort();
     int c = find(pre);
     if(c < 0) {
       c = -c - 1;
-      if(size == pos.length) pos = Arrays.copyOf(pos, size << 1);
+      if(size == pos.length) pos = Arrays.copyOf(pos, Array.newSize(size));
       Array.move(pos, c, 1, size++ - c);
-      pos[c] = new FTPos(pre, ps.toArray());
+      pos[c] = new FTPos(pre, il);
     } else {
-      pos[c].union(ps.toArray());
+      pos[c].union(il);
     }
   }
 
@@ -82,16 +86,16 @@ public final class FTPosData {
   boolean sameAs(final FTPosData ft) {
     if(size != ft.size) return false;
     for(int i = 0; i < size; ++i) {
-      if(pos[i].pre != ft.pos[i].pre ||
-          !Arrays.equals(pos[i].pos, ft.pos[i].pos)) return false;
+      if(pos[i].pre != ft.pos[i].pre || !Arrays.equals(
+          pos[i].pos.toArray(), ft.pos[i].pos.toArray())) return false;
     }
     return true;
   }
 
   /**
-   * Returns the position of the specified pre value.
+   * Returns the index of the specified pre value.
    * @param p int pre value
-   * @return position or negative insertion value - 1
+   * @return index, or negative index - 1 if pre value is not found
    */
   private int find(final int p) {
     // binary search

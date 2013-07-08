@@ -6,14 +6,12 @@ import org.basex.util.*;
  * This is an abstract class for storing elements of any kind in an array-based
  * list.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class ElementList {
-  /** Initial hash capacity. */
-  public static final int CAP = 1 << 3;
   /** Resize factor for extending the arrays. */
-  double factor = Array.RESIZE;
+  protected double factor = Array.RESIZE;
   /** Number of elements. */
   protected int size;
 
@@ -46,6 +44,14 @@ public abstract class ElementList {
    */
   public final int size() {
     return size;
+  }
+
+  /**
+   * Enforces the number of elements.
+   * @param s number of elements
+   */
+  public final void size(final int s) {
+    size = s;
   }
 
   /**

@@ -314,11 +314,7 @@ public final class QueryResources {
    * @param d data reference to be added
    */
   public void addData(final Data d) {
-    if(datas == data.length) {
-      final Data[] tmp = new Data[Array.newSize(datas)];
-      System.arraycopy(data, 0, tmp, 0, datas);
-      data = tmp;
-    }
+    if(datas == data.length) data = Array.copy(data, new Data[Array.newSize(datas)]);
     data[datas++] = d;
   }
 
@@ -344,8 +340,9 @@ public final class QueryResources {
    */
   private void addCollection(final Value nodes, final String name) {
     if(colls == coll.length) {
-      coll = Arrays.copyOf(coll, colls << 1);
-      collName = Array.copyOf(collName, colls << 1);
+      final int s = Array.newSize(colls);
+      coll = Array.copy(coll, new Value[s]);
+      collName = Array.copyOf(collName, s);
     }
     coll[colls] = nodes;
     collName[colls++] = name;

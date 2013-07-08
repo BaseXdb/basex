@@ -3,6 +3,7 @@ package org.basex.data;
 import java.util.*;
 
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * AllMatches full-text container, referencing several {@link FTMatch} instances.
@@ -10,11 +11,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FTMatches implements Iterable<FTMatch> {
+public final class FTMatches extends ElementList implements Iterable<FTMatch> {
   /** Full-text matches. */
   public FTMatch[] match = {};
-  /** Number of entries. */
-  public int size;
   /** Current number of tokens. */
   public int sTokenNum;
 
@@ -49,7 +48,7 @@ public final class FTMatches implements Iterable<FTMatch> {
    * @param e end position
    */
   public void or(final int s, final int e) {
-    add(new FTMatch().add(new FTStringMatch(s, e, sTokenNum)));
+    add(new FTMatch(1).add(new FTStringMatch(s, e, sTokenNum)));
   }
 
   /**
@@ -67,8 +66,7 @@ public final class FTMatches implements Iterable<FTMatch> {
    * @param m match to be added
    */
   public void add(final FTMatch m) {
-    if(size == match.length) match = size == 0 ?
-        new FTMatch[1] : Arrays.copyOf(match, size << 1);
+    if(size == match.length) match = Array.copy(match, new FTMatch[Array.newSize(size)]);
     match[size++] = m;
   }
 
@@ -113,23 +111,7 @@ public final class FTMatches implements Iterable<FTMatch> {
 
   @Override
   public Iterator<FTMatch> iterator() {
-    return new Iterator<FTMatch>() {
-      private int c = -1;
-      @Override
-      public boolean hasNext() { return ++c < size; }
-      @Override
-      public FTMatch next() { return match[c]; }
-      @Override
-      public void remove() { Util.notexpected(); }
-    };
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(Util.name(this)).append('[').append(sTokenNum).append(']');
-    for(final FTMatch m : this) sb.append("\n  ").append(m);
-    return sb.toString();
+    return new ArrayIterator<FTMatch>(match, size);
   }
 
   /**
@@ -143,5 +125,13 @@ public final class FTMatches implements Iterable<FTMatch> {
     for(int i = 0; i < ftm.match.length; i++)
       if(ftm.match[i] != null) ftm.match[i] = ftm.match[i].copy();
     return ftm;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(Util.name(this)).append('[').append(sTokenNum).append(']');
+    for(final FTMatch m : this) sb.append("\n  ").append(m);
+    return sb.toString();
   }
 }

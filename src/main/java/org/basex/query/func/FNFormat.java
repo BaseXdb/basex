@@ -43,16 +43,6 @@ public final class FNFormat extends StandardFunc {
     }
   }
 
-  @Override
-  public boolean xquery3() {
-    return true;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.X30 || super.uses(u);
-  }
-
   /**
    * Returns a formatted integer.
    * @param ctx query context
@@ -69,7 +59,7 @@ public final class FNFormat extends StandardFunc {
     FormatParser fp = formats.get(pic);
     if(fp == null) {
       fp = new IntFormat(pic, info);
-      formats.add(pic, fp);
+      formats.put(pic, fp);
     }
     return Str.get(Formatter.get(lng).formatInt(num, fp));
   }

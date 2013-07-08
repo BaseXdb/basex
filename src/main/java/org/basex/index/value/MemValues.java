@@ -22,9 +22,9 @@ import org.basex.util.hash.*;
  */
 public class MemValues extends TokenSet implements Index {
   /** IDs. */
-  int[][] ids = new int[CAP][];
+  int[][] ids = new int[Array.CAPACITY][];
   /** ID array lengths. */
-  int[] len = new int[CAP];
+  int[] len = new int[Array.CAPACITY];
   /** Data instance. */
   final Data data;
 
@@ -91,9 +91,8 @@ public class MemValues extends TokenSet implements Index {
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder(LI_STRUCTURE).add(SORTED_LIST).add(NL);
     final IndexStats stats = new IndexStats(data.meta.prop.num(Prop.MAXSTAT));
-    for(int m = 1; m < size; ++m) {
-      final int oc = len[m];
-      if(stats.adding(oc)) stats.add(key(m));
+    for(int m = 1; m < size; m++) {
+      if(stats.adding(len[m])) stats.add(key(m));
     }
     stats.print(tb);
     return tb.finish();
@@ -103,29 +102,29 @@ public class MemValues extends TokenSet implements Index {
   public void close() { }
 
   @Override
-  public void rehash() {
-    super.rehash();
-    final int s = size << 1;
+  public void rehash(final int s) {
+    super.rehash(s);
     ids = Array.copyOf(ids, s);
     len = Arrays.copyOf(len, s);
   }
 
   /**
-   * Indexes the specified keys and values.
+   * Stores the specified key and id.
    * @param key key
    * @param id id value
-   * @return index position
+   * @return index id
    */
-  public int index(final byte[] key, final int id) {
-    int i = add(key);
-    if(i > 0) {
-      ids[i] = new int[] { id };
+  public final int put(final byte[] key, final int id) {
+    final int i = put(key);
+    int[] tmp = ids[i];
+    if(tmp == null) {
+      tmp = new int[] { id };
     } else {
-      i = -i;
       final int l = len[i];
-      if(l == ids[i].length) ids[i] = Arrays.copyOf(ids[i], l << 1);
-      ids[i][l] = id;
+      if(l == tmp.length) tmp = Arrays.copyOf(tmp, Array.newSize(l));
+      tmp[l] = id;
     }
+    ids[i] = tmp;
     len[i]++;
     return i;
   }

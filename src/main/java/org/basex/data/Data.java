@@ -3,7 +3,6 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 
 import java.util.*;
-import java.util.List;
 
 import org.basex.core.cmd.*;
 import org.basex.data.atomic.*;
@@ -406,7 +405,7 @@ public abstract class Data {
   public final Atts ns(final int pre) {
     final Atts as = new Atts();
     if(nsFlag(pre)) {
-      final int[] nsp = nspaces.get(pre);
+      final int[] nsp = nspaces.get(pre, this);
       for(int n = 0; n < nsp.length; n += 2)
         as.add(nspaces.prefix(nsp[n]), nspaces.uri(nsp[n + 1]));
     }
@@ -472,10 +471,10 @@ public abstract class Data {
       updateText(pre, trim(concat(name, SPACE, atom(pre))), kind);
     } else {
       // update/set namespace reference
-      final int ouri = nspaces.uri(name, pre);
+      final int ouri = nspaces.uri(name, pre, this);
       final boolean ne = ouri == 0 && uri.length != 0;
       final int npre = kind == ATTR ? parent(pre, kind) : pre;
-      final int nuri = ne ? nspaces.add(npre, npre, prefix(name), uri) :
+      final int nuri = ne ? nspaces.add(npre, npre, prefix(name), uri, this) :
         ouri != 0 && eq(nspaces.uri(ouri), uri) ? ouri : 0;
 
       // write namespace uri reference
@@ -647,7 +646,7 @@ public abstract class Data {
     if(!cache) updateDist(pre, -s);
 
     // propagate PRE value shifts to namespaces
-    nspaces.delete(pre, s);
+    nspaces.delete(pre, s, this);
   }
 
   /**
@@ -681,19 +680,11 @@ public abstract class Data {
     buffer(buf);
 
     // find all namespaces in scope to avoid duplicate declarations
-    final TokenMap nsScope = new TokenMap();
-    NSNode n = nspaces.current;
-    do {
-      for(int i = 0; i < n.values.length; i += 2)
-        nsScope.add(nspaces.prefix(n.values[i]), nspaces.uri(n.values[i + 1]));
-      final int pos = n.fnd(ipar);
-      if(pos < 0) break;
-      n = n.children[pos];
-    } while(n.pre <= ipar && ipar < n.pre + size(n.pre, ELEM));
+    final TokenMap nsScope = nspaces.scope(ipar, this);
 
     // loop through all entries
     final IntList preStack = new IntList();
-    final NSNode t = nspaces.current;
+    final NSNode nsRoot = nspaces.current();
     final HashSet<NSNode> newNodes = new HashSet<NSNode>();
     final IntList flagPres = new IntList();
 
@@ -710,46 +701,7 @@ public abstract class Data {
       final int dis = dpar >= 0 ? dpre - dpar : ipar >= 0 ? pre - ipar : 0;
       final int par = dis == 0 ? -1 : pre - dis;
 
-      // find nearest namespace node on the ancestor axis of the insert
-      // location. possible candidates for this node are collected and
-      // the match with the highest pre value between ancestors and candidates
-      // is determined.
-      if(c == 0) {
-        // collect possible candidates for namespace root
-        final List<NSNode> cand = new LinkedList<NSNode>();
-        NSNode cn = nspaces.root;
-        cand.add(cn);
-        for(int cI; (cI = cn.fnd(par)) > -1;) {
-          // add candidate to stack
-          cn = cn.children[cI];
-          cand.add(0, cn);
-        }
-
-        cn = nspaces.root;
-        if(cand.size() > 1) {
-          // compare candidates to ancestors of par
-          int ancPre = par;
-          // take first candidate from stack
-          NSNode curr = cand.remove(0);
-          while(ancPre > -1 && cn == nspaces.root) {
-            // this is the new root
-            if(curr.pre == ancPre) cn = curr;
-            // if the current candidate's pre value is lower than the current
-            // ancestor of par or par itself we have to look for a potential
-            // match for this candidate. therefore we iterate through ancestors
-            // till we find one with a lower than or the same pre value as the
-            // current candidate.
-            else if(curr.pre < ancPre) {
-              while((ancPre = parent(ancPre, kind(ancPre))) > curr.pre);
-              if(curr.pre == ancPre) cn = curr;
-            }
-            // no potential for infinite loop, cause dummy root always a match,
-            // in this case ancPre ends iteration
-            if(!cand.isEmpty()) curr = cand.remove(0);
-          }
-        }
-        nspaces.setNearestRoot(cn, par);
-      }
+      if(c == 0) nspaces.root(par, this);
 
       while(!preStack.isEmpty() && preStack.peek() > par) nspaces.close(preStack.pop());
 
@@ -765,25 +717,27 @@ public abstract class Data {
         case ELEM:
           // add element
           nspaces.prepare();
+          boolean ne = false;
           if(data.nsFlag(dpre)) {
             final Atts at = data.ns(dpre);
             for(int a = 0; a < at.size(); ++a) {
               // see if prefix has been declared/ is part of current ns scope
               final byte[] old = nsScope.get(at.name(a));
-              if(old == null || !eq(old, at.string(a))) {
+              if(old == null || !eq(old, at.value(a))) {
                 // we have to keep track of all new NSNodes that are added
                 // to the Namespace structure, as their pre values must not
                 // be updated. I.e. if an NSNode N with pre value 3 existed
                 // prior to inserting and two new nodes are inserted at
                 // location pre == 3 we have to make sure N and only N gets
                 // updated.
-                newNodes.add(nspaces.add(at.name(a), at.string(a), pre));
+                newNodes.add(nspaces.add(at.name(a), at.value(a), pre));
+                ne = true;
               }
             }
           }
           byte[] nm = data.name(dpre, dkind);
           elem(dis, tagindex.index(nm, null, false), data.attSize(dpre, dkind),
-              data.size(dpre, dkind), nspaces.uri(nm, true), nspaces.finish());
+              data.size(dpre, dkind), nspaces.uri(nm, true), ne);
           preStack.push(pre);
           break;
         case TEXT:
@@ -800,8 +754,8 @@ public abstract class Data {
           // check if prefix of attribute has already been declared, otherwise
           // add declaration to parent node
           if(data.nsFlag(dpre) && nsScope.get(attPref) == null) {
-            nspaces.add(par, preStack.size() == 0 ? -1 : preStack.peek(),
-                attPref, data.nspaces.uri(data.uri(dpre, dkind)));
+            nspaces.add(par, preStack.isEmpty() ? -1 : preStack.peek(),
+                attPref, data.nspaces.uri(data.uri(dpre, dkind)), this);
             // save pre value to set ns flag later for this node. can't be done
             // here as direct table access would interfere with the buffer
             flagPres.add(par);
@@ -813,7 +767,7 @@ public abstract class Data {
     }
     // finalize and update namespace structure
     while(!preStack.isEmpty()) nspaces.close(preStack.pop());
-    nspaces.setRoot(t);
+    nspaces.root(nsRoot);
 
     if(bp != 0) insert(ipre + c - 1 - (c - 1) % buf);
     // reset buffer to old size

@@ -1,9 +1,10 @@
 package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
 
-import java.util.*;
-
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -24,6 +25,16 @@ public final class Ann extends ElementList {
   /** Annotation "updating". */
   public static final QNm Q_UPDATING = new QNm(QueryText.UPDATING, XQURI);
 
+  /** Supported REST annotations. */
+  private static final byte[][] ANN_REST = tokens("error", "path", "produces", "consumes",
+      "query-param", "form-param", "header-param", "cookie-param", "error-param",
+      "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS");
+  /** Supported UNIT annotations. */
+  private static final byte[][] ANN_UNIT = tokens("test", "ignore", "before", "after",
+      "before-module", "after-module", "expected");
+
+  /** Input Info. */
+  public InputInfo[] infos = new InputInfo[1];
   /** QNames. */
   public QNm[] names = new QNm[1];
   /** Values. */
@@ -33,16 +44,19 @@ public final class Ann extends ElementList {
    * Adds a QName/value pair.
    * @param name QName
    * @param value value
+   * @param info input info
    */
-  public void add(final QNm name, final Value value) {
+  public void add(final QNm name, final Value value, final InputInfo info) {
     // create new entry
     if(size == names.length) {
       final int s = newSize();
-      names = Arrays.copyOf(names, s);
-      values = Arrays.copyOf(values, s);
+      names = Array.copy(names, new QNm[s]);
+      values = Array.copy(values, new Value[s]);
+      infos = Array.copy(infos, new InputInfo[s]);
     }
     names[size] = name;
     values[size] = value;
+    infos[size] = info;
     size++;
   }
 
@@ -74,25 +88,6 @@ public final class Ann extends ElementList {
     }
   }
 
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < size; ++i) {
-      tb.add('%').add(names[i].string());
-      final long s = values[i].size();
-      if(s != 0) {
-        tb.add('(');
-        for(int a = 0; a < s; a++) {
-          if(a != 0) tb.add(',');
-          tb.add(values[i].itemAt(a).toString());
-        }
-        tb.add(')');
-      }
-      tb.add(' ');
-    }
-    return tb.toString();
-  }
-
   /**
    * Returns the union of these annotations and the given ones.
    * @param ann other annotations
@@ -105,7 +100,7 @@ public final class Ann extends ElementList {
       if(names[i].eq(Ann.Q_PUBLIC)) pub = true;
       else if(names[i].eq(Ann.Q_PRIVATE)) priv = true;
       else if(names[i].eq(Ann.Q_UPDATING)) up = true;
-      o.add(names[i], values[i]);
+      o.add(names[i], values[i], infos[i]);
     }
 
     for(int i = 0; i < ann.size; i++) {
@@ -119,7 +114,7 @@ public final class Ann extends ElementList {
       } else if(name.eq(Ann.Q_UPDATING) && up) {
         continue;
       }
-      o.add(ann.names[i], ann.values[i]);
+      o.add(ann.names[i], ann.values[i], ann.infos[i]);
     }
     return o;
   }
@@ -137,7 +132,7 @@ public final class Ann extends ElementList {
       try {
         for(int j = 0; j < ann.size; j++) {
           if(name.eq(ann.names[j]) && Compare.deep(val, ann.values[j], null))
-            o.add(name, val);
+            o.add(name, val, infos[i]);
         }
       } catch(final QueryException ex) {
         // should never happen because annotations can only contain simple literals
@@ -145,5 +140,59 @@ public final class Ann extends ElementList {
       }
     }
     return o;
+  }
+
+  /**
+   * Checks all annotations for parsing errors.
+   * @param var variable flag
+   * @throws QueryException query exception
+   */
+  public void check(final boolean var) throws QueryException {
+    boolean up = false, vis = false;
+    for(int a = 0; a < size(); a++) {
+      final QNm name = names[a];
+      final byte[] local = name.local();
+      final byte[] uri = name.uri();
+      if(name.eq(Q_UPDATING)) {
+        if(up) DUPLUPD.thrw(infos[a]);
+        up = true;
+      } else if(name.eq(Q_PUBLIC) || name.eq(Q_PRIVATE)) {
+        // only one visibility modifier allowed
+        if(vis) (var ? DUPLVARVIS : DUPLVIS).thrw(infos[a]);
+        vis = true;
+      } else if(NSGlobal.reserved(name.uri())) {
+        // no global namespaces allowed
+        ANNRES.thrw(infos[a], '%', name.string());
+      } else if(eq(uri, OUTPUTURI)) {
+        if(Serializer.PROPS.get(string(local)) == null)
+          BASX_ANNOT.thrw(infos[a], '%', name.string());
+        if(values[a].size() != 1 || !values[a].itemAt(0).type.isStringOrUntyped()) {
+          BASX_ANNOTARGS.thrw(infos[a], '%', name.string());
+        }
+      } else if(eq(uri, RESTURI)) {
+        if(!eq(local, ANN_REST)) BASX_ANNOT.thrw(infos[a], '%', name.string());
+      } else if(eq(uri, UNITURI)) {
+        if(!eq(local, ANN_UNIT)) BASX_ANNOT.thrw(infos[a], '%', name.string());
+      }
+    }
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder();
+    for(int i = 0; i < size; ++i) {
+      tb.add('%').add(names[i].string());
+      final long s = values[i].size();
+      if(s != 0) {
+        tb.add('(');
+        for(int a = 0; a < s; a++) {
+          if(a != 0) tb.add(',');
+          tb.add(values[i].itemAt(a).toString());
+        }
+        tb.add(')');
+      }
+      tb.add(' ');
+    }
+    return tb.toString();
   }
 }

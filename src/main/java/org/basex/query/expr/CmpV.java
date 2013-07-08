@@ -25,9 +25,9 @@ public final class CmpV extends Cmp {
     /** Item comparison:less or equal. */
     LE("le") {
       @Override
-      public boolean eval(final InputInfo ii, final Item a, final Item b)
-          throws QueryException {
-        final int v = a.diff(ii, b);
+      public boolean eval(final Item a, final Item b, final Collation coll,
+          final InputInfo ii) throws QueryException {
+        final int v = a.diff(b, coll, ii);
         return v != Item.UNDEF && v <= 0;
       }
       @Override
@@ -39,9 +39,9 @@ public final class CmpV extends Cmp {
     /** Item comparison:less. */
     LT("lt") {
       @Override
-      public boolean eval(final InputInfo ii, final Item a, final Item b)
-          throws QueryException {
-        final int v = a.diff(ii, b);
+      public boolean eval(final Item a, final Item b, final Collation coll,
+          final InputInfo ii) throws QueryException {
+        final int v = a.diff(b, coll, ii);
         return v != Item.UNDEF && v < 0;
       }
       @Override
@@ -53,9 +53,9 @@ public final class CmpV extends Cmp {
     /** Item comparison:greater of equal. */
     GE("ge") {
       @Override
-      public boolean eval(final InputInfo ii, final Item a, final Item b)
-          throws QueryException {
-        final int v = a.diff(ii, b);
+      public boolean eval(final Item a, final Item b, final Collation coll,
+          final InputInfo ii) throws QueryException {
+        final int v = a.diff(b, coll, ii);
         return v != Item.UNDEF && v >= 0;
       }
       @Override
@@ -67,9 +67,9 @@ public final class CmpV extends Cmp {
     /** Item comparison:greater. */
     GT("gt") {
       @Override
-      public boolean eval(final InputInfo ii, final Item a, final Item b)
-          throws QueryException {
-        final int v = a.diff(ii, b);
+      public boolean eval(final Item a, final Item b, final Collation coll,
+          final InputInfo ii) throws QueryException {
+        final int v = a.diff(b, coll, ii);
         return v != Item.UNDEF && v > 0;
       }
       @Override
@@ -81,9 +81,9 @@ public final class CmpV extends Cmp {
     /** Item comparison:equal. */
     EQ("eq") {
       @Override
-      public boolean eval(final InputInfo ii, final Item a, final Item b)
-          throws QueryException {
-        return a.eq(ii, b);
+      public boolean eval(final Item a, final Item b, final Collation coll,
+          final InputInfo ii) throws QueryException {
+        return a.eq(b, coll, ii);
       }
       @Override
       public OpV swap() { return EQ; }
@@ -94,9 +94,9 @@ public final class CmpV extends Cmp {
     /** Item comparison:not equal. */
     NE("ne") {
       @Override
-      public boolean eval(final InputInfo ii, final Item a, final Item b)
-          throws QueryException {
-        return !a.eq(ii, b);
+      public boolean eval(final Item a, final Item b, final Collation coll,
+          final InputInfo ii) throws QueryException {
+        return !a.eq(b, coll, ii);
       }
       @Override
       public OpV swap() { return NE; }
@@ -117,14 +117,15 @@ public final class CmpV extends Cmp {
 
     /**
      * Evaluates the expression.
-     * @param ii input info
      * @param a first item
      * @param b second item
+     * @param coll query context
+     * @param ii input info
      * @return result
      * @throws QueryException query exception
      */
-    public abstract boolean eval(final InputInfo ii, final Item a, final Item b)
-        throws QueryException;
+    public abstract boolean eval(final Item a, final Item b, final Collation coll,
+        final InputInfo ii) throws QueryException;
 
     /**
      * Swaps the comparator.
@@ -207,7 +208,7 @@ public final class CmpV extends Cmp {
     if(a == null) return null;
     final Item b = expr[1].item(ctx, info);
     if(b == null) return null;
-    if(a.comparable(b)) return Bln.get(op.eval(info, a, b));
+    if(a.comparable(b)) return Bln.get(op.eval(a, b, ctx.sc.collation, info));
 
     if(a instanceof FItem) Err.FIEQ.thrw(info, a);
     if(b instanceof FItem) Err.FIEQ.thrw(info, b);
@@ -221,7 +222,7 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new CmpV(expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs), op, info);
   }
 

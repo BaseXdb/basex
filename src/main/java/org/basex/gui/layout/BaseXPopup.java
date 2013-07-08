@@ -21,14 +21,14 @@ public final class BaseXPopup extends JPopupMenu {
   final GUI gui;
 
   /** Popup reference. */
-  private final GUICommand[] popup;
+  private final GUICmd[] popup;
 
   /**
    * Constructor.
    * @param comp component reference
    * @param pop popup reference
    */
-  public BaseXPopup(final BaseXPanel comp, final GUICommand... pop) {
+  public BaseXPopup(final BaseXPanel comp, final GUICmd... pop) {
     this(comp, comp.gui, pop);
   }
 
@@ -38,7 +38,7 @@ public final class BaseXPopup extends JPopupMenu {
    * @param g gui reference
    * @param pop popup reference
    */
-  public BaseXPopup(final JComponent comp, final GUI g, final GUICommand... pop) {
+  public BaseXPopup(final JComponent comp, final GUI g, final GUICmd... pop) {
     popup = pop;
     gui = g;
 
@@ -61,7 +61,7 @@ public final class BaseXPopup extends JPopupMenu {
       }
     });
 
-    for(final GUICommand c : pop) {
+    for(final GUICmd c : pop) {
       if(c == null) {
         addSeparator();
       } else {

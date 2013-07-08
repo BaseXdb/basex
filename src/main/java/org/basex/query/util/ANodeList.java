@@ -7,6 +7,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This is a light-weight container for XML nodes.
@@ -14,11 +15,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class ANodeList implements Iterable<ANode> {
+public final class ANodeList extends ElementList implements Iterable<ANode> {
   /** Element container. */
   ANode[] list;
-  /** Number of elements. */
-  int size;
 
   /**
    * Constructor.
@@ -49,7 +48,7 @@ public final class ANodeList implements Iterable<ANode> {
    * @param e element to be added
    */
   public void add(final ANode e) {
-    if(size == list.length) resize(Array.newSize(size));
+    if(size == list.length) copyOf(newSize());
     list[size++] = e;
   }
 
@@ -59,7 +58,7 @@ public final class ANodeList implements Iterable<ANode> {
    * @param e element to be set
    */
   public void set(final int i, final ANode e) {
-    if(i >= list.length) resize(Array.newSize(i + 1));
+    if(i >= list.length) copyOf(newSize(i + 1));
     list[i] = e;
     size = Math.max(size, i + 1);
   }
@@ -74,14 +73,6 @@ public final class ANodeList implements Iterable<ANode> {
   }
 
   /**
-   * Returns the number of elements.
-   * @return number of elements
-   */
-  public int size() {
-    return size;
-  }
-
-  /**
    * Returns an array with all elements.
    * @return array
    */
@@ -93,7 +84,7 @@ public final class ANodeList implements Iterable<ANode> {
    * Resizes the array.
    * @param s new size
    */
-  private void resize(final int s) {
+  private void copyOf(final int s) {
     final ANode[] tmp = new ANode[s];
     System.arraycopy(list, 0, tmp, 0, size);
     list = tmp;
@@ -101,14 +92,6 @@ public final class ANodeList implements Iterable<ANode> {
 
   @Override
   public Iterator<ANode> iterator() {
-    return new Iterator<ANode>() {
-      private int c;
-      @Override
-      public boolean hasNext() { return c < size; }
-      @Override
-      public ANode next() { return list[c++]; }
-      @Override
-      public void remove() { Util.notexpected(); }
-    };
+    return new ArrayIterator<ANode>(list, size);
   }
 }

@@ -58,7 +58,7 @@ public final class OrderBy extends GFLWOR.Clause {
       int pos;
       @Override
       public boolean next(final QueryContext ctx) throws QueryException {
-        if(tpls == null) init(ctx);
+        if(tpls == null) sort(ctx);
         if(pos == tpls.length) return false;
         final int p = perm[pos++];
         final Value[] tuple = tpls[p];
@@ -73,7 +73,7 @@ public final class OrderBy extends GFLWOR.Clause {
        * @param ctx query context
        * @throws QueryException evaluation exception
        */
-      private void init(final QueryContext ctx) throws QueryException {
+      private void sort(final QueryContext ctx) throws QueryException {
         // keys are stored at odd positions, values at even ones
         List<Value[]> tuples = new ArrayList<Value[]>();
         while(sub.next(ctx)) {
@@ -104,17 +104,21 @@ public final class OrderBy extends GFLWOR.Clause {
       /**
        * Recursively sorts the specified items.
        * The algorithm is derived from {@link Arrays#sort(int[])}.
+       * @param ks sort keys
        * @param start start position
        * @param len end position
        * @throws QueryException query exception
        */
       private void sort(final Item[][] ks, final int start, final int len)
           throws QueryException {
+
         if(len < 7) {
           // use insertion sort of small arrays
-          for(int i = start; i < len + start; i++)
-            for(int j = i; j > start && cmp(ks, perm[j - 1], perm[j]) > 0; j--)
+          for(int i = start; i < len + start; i++) {
+            for(int j = i; j > start && cmp(ks, perm[j - 1], perm[j]) > 0; j--) {
               swap(perm, j, j - 1);
+            }
+          }
           return;
         }
 
@@ -167,6 +171,9 @@ public final class OrderBy extends GFLWOR.Clause {
 
       /**
        * Returns the difference of two entries (part of QuickSort).
+       * @param ks sort keys
+       * @param x first position
+       * @param y second position
        * @return result
        * @throws QueryException query exception
        */
@@ -174,12 +181,13 @@ public final class OrderBy extends GFLWOR.Clause {
         final Item[] a = ks[x], b = ks[y];
         for(int k = 0; k < keys.length; k++) {
           final Key or = keys[k];
-          final Item m = a[k] == Dbl.NAN || a[k] == Flt.NAN ? null : a[k],
-              n = b[k] == Dbl.NAN || b[k] == Flt.NAN ? null : b[k];
-
+          Item m = a[k], n = b[k];
+          if(m == Dbl.NAN || m == Flt.NAN) m = null;
+          if(n == Dbl.NAN || n == Flt.NAN) n = null;
           if(m != null && n != null && !m.comparable(n)) Err.cast(or.info, m.type, n);
-          final int c = m == null ? n == null ? 0 : or.least ? -1 : 1 :
-            n == null ? or.least ? 1 : -1 : m.diff(or.info, n);
+
+          final int c = m == null ? n == null ? 0 : or.least ? -1 : 1 : n == null ?
+            or.least ? 1 : -1 : m.diff(n, or.coll, or.info);
           if(c != 0) return or.desc ? -c : c;
         }
 
@@ -200,8 +208,8 @@ public final class OrderBy extends GFLWOR.Clause {
           throws QueryException {
         final int ka = perm[a], kb = perm[b], kc = perm[c];
         return cmp(ks, ka, kb) < 0
-            ? cmp(ks, kb, kc) < 0 ? b : cmp(ks, ka, kc) < 0 ? c : a
-            : cmp(ks, kb, kc) > 0 ? b : cmp(ks, ka, kc) > 0 ? c : a;
+             ? cmp(ks, kb, kc) < 0 ? b : cmp(ks, ka, kc) < 0 ? c : a
+             : cmp(ks, kb, kc) > 0 ? b : cmp(ks, ka, kc) > 0 ? c : a;
       }
     };
   }
@@ -222,8 +230,8 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    for(final Key k : keys) if(k.uses(u)) return true;
+  public boolean has(final Flag flag) {
+    for(final Key k : keys) if(k.has(flag)) return true;
     return false;
   }
 
@@ -259,7 +267,8 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public OrderBy copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public OrderBy copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     return new OrderBy(Arr.copyAll(ctx, scp, vs, refs),
         Arr.copyAll(ctx, scp, vs, keys), stable, info);
   }
@@ -270,7 +279,7 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  boolean clean(final QueryContext ctx, final IntMap<Var> decl, final BitArray used) {
+  boolean clean(final QueryContext ctx, final IntObjMap<Var> decl, final BitArray used) {
     // delete unused variables
     final int len = refs.length;
     for(int i = refs.length; --i >= 0;)
@@ -320,6 +329,8 @@ public final class OrderBy extends GFLWOR.Clause {
     final boolean desc;
     /** Position of empty sort keys. */
     final boolean least;
+    /** Collation. */
+    final Collation coll;
 
     /**
      * Constructor.
@@ -327,16 +338,19 @@ public final class OrderBy extends GFLWOR.Clause {
      * @param k sort key expression
      * @param dsc descending order
      * @param lst empty least
+     * @param cl collation
      */
-    public Key(final InputInfo ii, final Expr k, final boolean dsc, final boolean lst) {
+    public Key(final InputInfo ii, final Expr k, final boolean dsc, final boolean lst,
+        final Collation cl) {
       super(ii, k);
       desc = dsc;
       least = lst;
+      coll = cl;
     }
 
     @Override
-    public Key copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
-      return new Key(info, expr.copy(ctx, scp, vs), desc, least);
+    public Key copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
+      return new Key(info, expr.copy(ctx, scp, vs), desc, least, coll);
     }
 
     @Override
@@ -352,6 +366,8 @@ public final class OrderBy extends GFLWOR.Clause {
       final StringBuilder sb = new StringBuilder(expr.toString());
       if(desc) sb.append(' ').append(DESCENDING);
       sb.append(' ').append(EMPTYORD).append(' ').append(least ? LEAST : GREATEST);
+      if(coll != null) sb.append(' ').append(COLLATION).append(" \"").
+        append(coll.uri()).append('"');
       return sb.toString();
     }
 

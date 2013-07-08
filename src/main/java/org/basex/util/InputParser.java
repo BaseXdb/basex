@@ -19,14 +19,14 @@ public class InputParser {
   /** Input to be parsed. */
   public final String input;
   /** Query length. */
-  public final int il;
+  public final int length;
 
   /** File reference. */
   public String file;
   /** Current input position. */
-  public int ip;
+  public int pos;
   /** Marked input position. */
-  public int im;
+  public int mark;
 
   /**
    * Constructor.
@@ -34,7 +34,7 @@ public class InputParser {
    */
   public InputParser(final String in) {
     input = in;
-    il = input.length();
+    length = input.length();
   }
 
   /**
@@ -51,7 +51,7 @@ public class InputParser {
    * @return current character
    */
   public final boolean more() {
-    return ip < il;
+    return pos < length;
   }
 
   /**
@@ -59,8 +59,8 @@ public class InputParser {
    * @return current character
    */
   public final char curr() {
-    final int i = ip;
-    return i < il ? input.charAt(i) : 0;
+    final int i = pos;
+    return i < length ? input.charAt(i) : 0;
   }
 
   /**
@@ -69,15 +69,15 @@ public class InputParser {
    * @return result of check
    */
   public final boolean curr(final int ch) {
-    final int i = ip;
-    return i < il && ch == input.charAt(i);
+    final int i = pos;
+    return i < length && ch == input.charAt(i);
   }
 
   /**
    * Remembers the current position.
    */
   protected final void mark() {
-    im = ip;
+    mark = pos;
   }
 
   /**
@@ -85,8 +85,8 @@ public class InputParser {
    * @return result of check
    */
   protected final char next() {
-    final int i = ip + 1;
-    return i < il ? input.charAt(i) : 0;
+    final int i = pos + 1;
+    return i < length ? input.charAt(i) : 0;
   }
 
   /**
@@ -94,7 +94,7 @@ public class InputParser {
    * @return next character
    */
   public final char consume() {
-    return ip < il ? input.charAt(ip++) : 0;
+    return pos < length ? input.charAt(pos++) : 0;
   }
 
   /**
@@ -103,9 +103,9 @@ public class InputParser {
    * @return true if character was found
    */
   public final boolean consume(final int ch) {
-    final int i = ip;
-    if(i >= il || ch != input.charAt(i)) return false;
-    ++ip;
+    final int i = pos;
+    if(i >= length || ch != input.charAt(i)) return false;
+    ++pos;
     return true;
   }
 
@@ -124,13 +124,13 @@ public class InputParser {
    * @return true if string was found
    */
   public final boolean consume(final String str) {
-    int i = ip;
+    int i = pos;
     final int l = str.length();
-    if(i + l > il) return false;
+    if(i + l > length) return false;
     for(int s = 0; s < l; ++s) {
       if(input.charAt(i++) != str.charAt(s)) return false;
     }
-    ip = i;
+    pos = i;
     return true;
   }
 
@@ -147,8 +147,8 @@ public class InputParser {
    * @return query substring
    */
   protected final String rest() {
-    final int ie = Math.min(il, ip + 15);
-    return input.substring(ip, ie) + (ie == il ? "" : DOTS);
+    final int ie = Math.min(length, pos + 15);
+    return input.substring(pos, ie) + (ie == length ? "" : DOTS);
   }
 
   /**

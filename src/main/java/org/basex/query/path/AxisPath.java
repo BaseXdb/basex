@@ -132,10 +132,10 @@ public abstract class AxisPath extends Path {
    */
   private Expr index(final QueryContext ctx, final Data data) throws QueryException {
     // disallow relative paths and numeric predicates
-    if(root == null || uses(Use.POS)) return this;
+    if(root == null || has(Flag.FCS)) return this;
 
     // cache index access costs
-    IndexContext ics = null;
+    IndexCosts ics = null;
     // cheapest predicate and step
     int pmin = 0;
     int smin = 0;
@@ -148,10 +148,11 @@ public abstract class AxisPath extends Path {
 
       // check if resulting index path will be duplicate free
       final boolean i = pathNodes(data, s) != null;
+      final IndexContext ictx = new IndexContext(data, i);
 
       // choose cheapest index access
       for(int p = 0; p < stp.preds.length; ++p) {
-        final IndexContext ic = new IndexContext(ctx, data, stp, i);
+        final IndexCosts ic = new IndexCosts(ictx, ctx, stp);
         if(!stp.preds[p].indexAccessible(ic)) continue;
 
         if(ic.costs() == 0) {

@@ -14,13 +14,6 @@ import org.basex.core.parse.Commands.*;
  * @author Andreas Weiler
  */
 public final class ShowEvents extends AEvent {
-  /**
-   * Default constructor.
-   */
-  public ShowEvents() {
-    super();
-  }
-
   @Override
   protected boolean run() throws IOException {
     out.println(context.events.info());

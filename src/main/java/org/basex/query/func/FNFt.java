@@ -32,7 +32,7 @@ import org.basex.util.list.*;
  */
 public final class FNFt extends StandardFunc {
   /** Element: options. */
-  private static final QNm Q_FTOPTIONS = new QNm("options");
+  private static final QNm Q_OPTIONS = QNm.get("options");
   /** Marker element. */
   private static final byte[] MARK = token("mark");
   /** Fuzzy option. */
@@ -113,8 +113,8 @@ public final class FNFt extends StandardFunc {
 
     return new Iter() {
       final FTPosData ftd = new FTPosData();
-      ValueIter vi;
       Iter ir;
+      ValueIter vi;
 
       @Override
       public Item next() throws QueryException {
@@ -125,23 +125,23 @@ public final class FNFt extends StandardFunc {
             vi = null;
           }
           final FTPosData tmp = ctx.ftpos;
-          ctx.ftpos = ftd;
-          if(ir == null) ir = ctx.iter(expr[0]);
-          final Item it = ir.next();
-          if(it != null) {
+          try {
+            ctx.ftpos = ftd;
+            if(ir == null) ir = ctx.iter(expr[0]);
+            final Item it = ir.next();
+            if(it == null) return null;
+
             // copy node to main memory data instance
             final MemData md = new MemData(ctx.context.prop);
             final DataBuilder db = new DataBuilder(md);
             db.ftpos(mark, ctx.ftpos, len).build(checkDBNode(it));
 
             final IntList il = new IntList();
-            for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) {
-              il.add(p);
-            }
+            for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) il.add(p);
             vi = DBNodeSeq.get(il, md, false, false).iter();
+          } finally {
+            ctx.ftpos = tmp;
           }
-          ctx.ftpos = tmp;
-          if(it == null) return null;
         }
       }
     };
@@ -172,10 +172,10 @@ public final class FNFt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter search(final QueryContext ctx) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     final Value terms = ctx.value(expr[1]);
     final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final TokenMap tm = new FuncParams(Q_FTOPTIONS, info).parse(opt);
+    final TokenMap tm = new FuncParams(Q_OPTIONS, info).parse(opt);
     return search(data, terms, tm, this, ctx);
   }
 
@@ -193,7 +193,7 @@ public final class FNFt extends StandardFunc {
       final StandardFunc fun, final QueryContext ctx) throws QueryException {
 
     final InputInfo info = fun.info;
-    final IndexContext ic = new IndexContext(ctx, data, null, true);
+    final IndexContext ic = new IndexContext(data, false);
     if(!data.meta.ftxtindex) BXDB_INDEX.thrw(info, data.meta.name,
         IndexType.FULLTEXT.toString().toLowerCase(Locale.ENGLISH));
 
@@ -219,9 +219,9 @@ public final class FNFt extends StandardFunc {
     }
 
     ctx.ftOpt(opt);
-    final FTWords words = new FTWords(info, ic.data, terms, m, ctx);
+    final FTWords words = new FTWords(info, ic, terms, m, ctx);
     ctx.ftOpt(tmp);
-    return new FTIndexAccess(info, words, ic.data.meta.name, ic.iterable).iter(ctx);
+    return new FTIndexAccess(info, words, ic).iter(ctx);
   }
 
   /**
@@ -231,7 +231,7 @@ public final class FNFt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter tokens(final QueryContext ctx) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     byte[] entry = expr.length < 2 ? Token.EMPTY : checkStr(expr[1], ctx);
     if(entry.length != 0) {
       final FTLexer ftl = new FTLexer(new FTOpt().copy(data.meta));
@@ -262,12 +262,6 @@ public final class FNFt extends StandardFunc {
   public boolean iterable() {
     // index functions will always yield ordered and duplicate-free results
     return sig == Function._FT_SEARCH || super.iterable();
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    // skip evaluation at compile time
-    return u == Use.CTX && oneOf(sig, _FT_SEARCH, _FT_TOKENS) || super.uses(u);
   }
 
   @Override

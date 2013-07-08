@@ -28,8 +28,8 @@ public abstract class CFrag extends Arr {
       throws QueryException;
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.CNS || super.uses(u);
+  public boolean has(final Flag flag) {
+    return flag == Flag.CNS || super.has(flag);
   }
 
   /**

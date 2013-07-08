@@ -50,6 +50,7 @@ public final class CreateIndex extends ACreate {
         data.meta.casesens = prop.is(Prop.CASESENS);
         data.meta.diacritics = prop.is(Prop.DIACRITICS);
         data.meta.language = Language.get(prop);
+        data.meta.stopwords = prop.get(Prop.STOPWORDS);
         index = IndexType.FULLTEXT;
         break;
       default:

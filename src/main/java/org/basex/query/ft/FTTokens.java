@@ -1,7 +1,6 @@
 package org.basex.query.ft;
 
-import java.util.*;
-
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -12,21 +11,14 @@ import org.basex.util.list.*;
  */
 public final class FTTokens extends ElementList {
   /** Element container. */
-  private TokenList[] list;
-
-  /**
-   * Constructor.
-   */
-  public FTTokens() {
-    list = new TokenList[1];
-  }
+  private TokenList[] list = new TokenList[1];
 
   /**
    * Adds an element.
    * @param e element to be added
    */
   public void add(final TokenList e) {
-    if(size == list.length) list = Arrays.copyOf(list, newSize());
+    if(size == list.length) list = Array.copy(list, new TokenList[newSize()]);
     list[size++] = e;
   }
 

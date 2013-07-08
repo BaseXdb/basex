@@ -116,7 +116,7 @@ public final class FNSimple extends StandardFunc {
       case EMPTY:
       case EXISTS:
         // ignore non-deterministic expressions (e.g.: error())
-        return e.size() == -1 || e.uses(Use.NDT) || e.uses(Use.CNS) ? this :
+        return e.size() == -1 || e.has(Flag.NDT) || e.has(Flag.CNS) ? this :
           Bln.get(sig == Function.EMPTY ^ e.size() != 0);
       case BOOLEAN:
         // simplify, e.g.: if(boolean(A)) -> if(A)
@@ -184,8 +184,8 @@ public final class FNSimple extends StandardFunc {
    * @throws QueryException query exception
    */
   private boolean deep(final QueryContext ctx) throws QueryException {
-    if(expr.length == 3) checkColl(expr[2], ctx);
-    return Compare.deep(ctx.iter(expr[0]), ctx.iter(expr[1]), info);
+    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+    return new Compare(info).collation(coll).deep(ctx.iter(expr[0]), ctx.iter(expr[1]));
   }
 
   /**
@@ -196,16 +196,16 @@ public final class FNSimple extends StandardFunc {
    */
   private boolean deepOpt(final QueryContext ctx) throws QueryException {
     final Compare cmp = new Compare(info);
-    final Flag[] flags = Flag.values();
+    final Mode[] modes = Mode.values();
     if(expr.length == 3) {
       final Iter ir = expr[2].iter(ctx);
       for(Item it; (it = ir.next()) != null;) {
         final byte[] key = uc(checkEStr(it));
         boolean found = false;
-        for(final Flag f : flags) {
-          found = eq(key, token(f.name()));
+        for(final Mode m : modes) {
+          found = eq(key, token(m.name()));
           if(found) {
-            cmp.set(f);
+            cmp.flag(m);
             break;
           }
         }

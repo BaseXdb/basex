@@ -8,57 +8,37 @@ import java.util.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
- * This is an efficient hash set, storing keys in byte arrays.
- * The {@link TokenMap} class extends it to a hash map.
+ * This is an efficient and memory-saving hash set for storing tokens.
+ * The first entry of the token set (offset 0) is always empty.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public class TokenSet implements Iterable<byte[]> {
-  /** Initial hash capacity. */
-  protected static final int CAP = ElementList.CAP;
-  /** Hash entries. Note: actual number of entries is {@code size - 1}. */
-  public int size = 1;
+public class TokenSet extends ASet implements Iterable<byte[]> {
   /** Hashed keys. */
-  public byte[][] keys;
-
-  /** Pointers to the next token. */
-  private int[] next;
-  /** Hash table buckets. */
-  private int[] bucket;
+  protected byte[][] keys;
 
   /**
-   * Constructor.
+   * Default constructor.
    */
   public TokenSet() {
-    keys = new byte[CAP][];
-    next = new int[CAP];
-    bucket = new int[CAP];
+    super(Array.CAPACITY);
+    keys = new byte[Array.CAPACITY][];
   }
 
   /**
-   * Constructor.
-   * @param token initial token
+   * Constructor, specifying initial keys.
+   * @param key initial keys
    */
-  public TokenSet(final byte[] token) {
+  public TokenSet(final byte[]... key) {
     this();
-    add(token);
+    for(final byte[] i : key) add(i);
   }
 
   /**
-   * Constructor.
-   * @param init initial tokens
-   */
-  public TokenSet(final byte[]... init) {
-    this();
-    for(final byte[] i : init) add(i);
-  }
-
-  /**
-   * Constructor.
+   * Constructor, specifying some initial input.
    * @param in input stream
    * @throws IOException I/O exception
    */
@@ -67,7 +47,7 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
-   * Reads the token set from the specified input.
+   * Reads the data structure from the specified input.
    * @param in input stream
    * @throws IOException I/O exception
    */
@@ -79,7 +59,7 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
-   * Writes the token set to the specified output.
+   * Writes the data structure to the specified output.
    * @param out output stream
    * @throws IOException I/O exception
    */
@@ -91,153 +71,127 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
-   * Indexes the specified key and returns the offset of the added key.
-   * If the key already exists, a negative offset is returned.
-   * @param key key
-   * @return offset of added key, negative offset otherwise
+   * Stores the specified key if it has not been stored before.
+   * @param key key to be added
+   * @return {@Code true} if the key did not exist yet and was stored
    */
-  public final int add(final byte[] key) {
-    if(size == next.length) rehash();
-    final int p = hash(key) & bucket.length - 1;
-    for(int id = bucket[p]; id != 0; id = next[id]) {
-      if(eq(key, keys[id])) return -id;
-    }
-    next[size] = bucket[p];
-    keys[size] = key;
-    bucket[p] = size;
-    return size++;
+  public final boolean add(final byte[] key) {
+    return index(key) > 0;
   }
 
   /**
-   * Adds a string.
-   * @param e element to be added
-   * @return offset of added key, negative offset otherwise
+   * Stores the specified string as key if it has not been stored before.
+   * @param key string to be added
+   * @return {@Code true} if the key did not exist yet and was stored
    */
-  public int add(final String e) {
-    return add(token(e));
+  public boolean add(final String key) {
+    return add(token(key));
   }
 
   /**
-   * Deletes the specified key.
-   * <b>Warning</b>: After a deletion, the key array will have {@code null}
-   * entries, and the total number of entries will not reflect the number
-   * of valid entries anymore.
-   * @param key key
-   * @return deleted key or 0
+   * Stores the specified key and returns its id.
+   * @param key key to be added
+   * @return unique id of stored key (larger than zero)
    */
-  public int delete(final byte[] key) {
-    final int p = hash(key) & bucket.length - 1;
-    int o = 0, n;
-    for(int id = bucket[p]; id != 0; id = n) {
-      n = next[id];
-      if(eq(key, keys[id])) {
-        if(bucket[p] == id) bucket[p] = n;
-        else next[o] = next[n];
-        keys[id] = null;
-        return id;
-      }
-      o = id;
-    }
-    return 0;
+  public final int put(final byte[] key) {
+    final int i = index(key);
+    return Math.abs(i);
   }
 
   /**
    * Checks if the set contains the specified key.
-   * @param key key to be found
+   * @param key key to be looked up
    * @return result of check
    */
   public final boolean contains(final byte[] key) {
-    return id(key) != 0;
+    return id(key) > 0;
   }
 
   /**
-   * Returns the id of the specified key or 0 if the key does not exist.
-   * @param key key to be found
-   * @return id or 0 if nothing was found
+   * Returns the id of the specified key, or {@code 0} if the key does not exist.
+   * @param key key to be looked up
+   * @return id, or {@code 0} if key does not exist
    */
   public final int id(final byte[] key) {
-    final int p = hash(key) & bucket.length - 1;
-    for(int id = bucket[p]; id != 0; id = next[id]) {
-      if(eq(key, keys[id])) return id;
+    final int p = Token.hash(key) & bucket.length - 1;
+    for(int i = bucket[p]; i != 0; i = next[i]) if(eq(key, keys[i])) return i;
+    return 0;
+  }
+
+  /**
+   * Returns the key with the specified id.
+   * All ids starts with {@code 1} instead of {@code 0}.
+   * @param id id of the key to return
+   * @return key
+   */
+  public final byte[] key(final int id) {
+    return keys[id];
+  }
+
+  /**
+   * Deletes the specified key.
+   * The deletion of keys will lead to empty entries. If {@link #size} is called after
+   * deletions, the original number of entries will be returned.
+   * @param key key
+   * @return deleted key or 0
+   */
+  public int delete(final byte[] key) {
+    final int b = Token.hash(key) & bucket.length - 1;
+    for(int p = 0, i = bucket[b]; i != 0; p = i, i = next[i]) {
+      if(!eq(key, keys[i])) continue;
+      if(p == 0) bucket[b] = next[i];
+      else next[p] = next[next[i]];
+      keys[i] = null;
+      return i;
     }
     return 0;
   }
 
   /**
-   * Returns the specified key.
-   * @param i key index
-   * @return key
+   * Stores the specified key and returns its id, or returns the negative id if the
+   * key has already been stored.
+   * @param key key to be found
+   * @return id, or negative id if key has already been stored
    */
-  public final byte[] key(final int i) {
-    return keys[i];
+  private int index(final byte[] key) {
+    checkSize();
+    final int b = Token.hash(key) & bucket.length - 1;
+    for(int r = bucket[b]; r != 0; r = next[r]) if(eq(key, keys[r])) return -r;
+    next[size] = bucket[b];
+    keys[size] = key;
+    bucket[b] = size;
+    return size++;
   }
 
-  /**
-   * Returns the hash keys.
-   * @return keys
-   */
-  public final byte[][] keys() {
-    final byte[][] tmp = new byte[size()][];
-    System.arraycopy(keys, 1, tmp, 0, size - 1);
-    return tmp;
+  @Override
+  protected int hash(final int id) {
+    return Token.hash(keys[id]);
   }
 
-  /**
-   * Returns the number of entries.
-   * @return number of entries
-   */
-  public final int size() {
-    return size - 1;
+  @Override
+  protected void rehash(final int newSize) {
+    keys = Array.copyOf(keys, newSize);
   }
 
-  /**
-   * Tests is the container has no elements.
-   * @return result of check
-   */
-  public final boolean isEmpty() {
-    return size == 1;
-  }
-
-  /**
-   * Resizes the hash table.
-   */
-  protected void rehash() {
-    final int s = size << 1;
-    final int[] tmp = new int[s];
-
-    for(final int b : bucket) {
-      int id = b;
-      while(id != 0) {
-        final int p = hash(keys[id]) & s - 1;
-        final int nx = next[id];
-        next[id] = tmp[p];
-        tmp[p] = id;
-        id = nx;
-      }
-    }
-    bucket = tmp;
-    next = Arrays.copyOf(next, s);
-    final byte[][] k = new byte[s][];
-    System.arraycopy(keys, 0, k, 0, size);
-    keys = k;
+  @Override
+  public final void clear() {
+    Arrays.fill(keys, null);
+    super.clear();
   }
 
   @Override
   public final Iterator<byte[]> iterator() {
-    return new Iterator<byte[]>() {
-      private int c = 1;
-      @Override
-      public boolean hasNext() { return c < size; }
-      @Override
-      public byte[] next() { return keys[c++]; }
-      @Override
-      public void remove() { Util.notexpected(); }
-    };
+    return new ArrayIterator<byte[]>(keys, 1, size);
   }
 
   @Override
   public String toString() {
-    return new TokenBuilder(Util.name(this)).add('[').addSep(keys(),
-        ", ").add(']').toString();
+    final TokenBuilder tb = new TokenBuilder();
+    for(final byte[] key : this) {
+      if(!tb.isEmpty()) tb.add(", ");
+      if(key != null) tb.add(key);
+    }
+    return new TokenBuilder(Util.name(getClass())).add('[').add(tb.finish()).
+        add(']').toString();
   }
 }

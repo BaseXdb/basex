@@ -2,10 +2,12 @@ package org.basex.util.hash;
 
 import java.util.*;
 
+import org.basex.util.*;
+
 /**
- * This is an efficient hash map for booleans, extending the {@link TokenSet hash set}.
+ * This is an efficient and memory-saving hash map for storing tokens and booleans.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class TokenBoolMap extends TokenSet {
@@ -16,32 +18,33 @@ public final class TokenBoolMap extends TokenSet {
    * Constructor.
    */
   public TokenBoolMap() {
-    values = new boolean[CAP];
+    values = new boolean[Array.CAPACITY];
   }
 
   /**
-   * Indexes the specified keys and values.
-   * If the entry exists, the old value is replaced.
+   * Indexes the specified key and stores the associated value.
+   * If the key already exists, the value is updated.
    * @param key key
-   * @param val value
+   * @param value value
    */
-  public void add(final byte[] key, final boolean val) {
-    final int i = add(key);
-    values[Math.abs(i)] = val;
+  public void put(final byte[] key, final boolean value) {
+    // array bounds are checked before array is resized..
+    final int i = put(key);
+    values[i] = value;
   }
 
   /**
-   * Returns the specified value.
-   * @param i index
-   * @return value
+   * Returns the value for the specified key.
+   * @param key key to be looked up
+   * @return value, or {@code -1} if the key was not found
    */
-  public boolean value(final int i) {
-    return values[i];
+  public boolean get(final byte[] key) {
+    return values[id(key)];
   }
 
   @Override
-  protected void rehash() {
-    super.rehash();
-    values = Arrays.copyOf(values, size << 1);
+  protected void rehash(final int s) {
+    super.rehash(s);
+    values = Arrays.copyOf(values, s);
   }
 }

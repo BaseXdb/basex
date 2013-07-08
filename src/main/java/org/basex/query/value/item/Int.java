@@ -4,6 +4,7 @@ import java.math.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -98,12 +99,14 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     return it instanceof Int ? val == ((Int) it).val : val == it.dbl(ii);
   }
 
   @Override
-  public int diff(final InputInfo ii, final Item it) throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     if(it instanceof Int) {
       final long i = ((Int) it).val;
       return val < i ? -1 : val > i ? 1 : 0;

@@ -70,8 +70,8 @@ public abstract class FTExpr extends ParseExpr {
   public abstract FTIter iter(final QueryContext ctx) throws QueryException;
 
   @Override
-  public boolean uses(final Use u) {
-    for(final FTExpr e : expr) if(e.uses(u)) return true;
+  public boolean has(final Flag flag) {
+    for(final FTExpr e : expr) if(e.has(flag)) return true;
     return false;
   }
 
@@ -93,10 +93,10 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public abstract FTExpr copy(QueryContext ctx, VarScope scp, IntMap<Var> vs);
+  public abstract FTExpr copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
   @Override
-  public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
+  public FTExpr indexEquivalent(final IndexCosts ic) throws QueryException {
     final int es = expr.length;
     for(int e = 0; e < es; e++) expr[e] = expr[e].indexEquivalent(ic);
     return this;

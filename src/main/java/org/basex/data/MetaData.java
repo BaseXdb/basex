@@ -66,6 +66,8 @@ public final class MetaData {
   public volatile boolean casesens;
   /** Flag for full-text diacritics removal. */
   public volatile boolean diacritics;
+  /** Full-text stopword file. */
+  public volatile String stopwords = "";
 
   /** Maximum number of categories. */
   public volatile int maxcats;
@@ -132,6 +134,7 @@ public final class MetaData {
     updindex = prop.is(Prop.UPDINDEX);
     maxlen = prop.num(Prop.MAXLEN);
     maxcats = prop.num(Prop.MAXCATS);
+    stopwords = prop.get(Prop.STOPWORDS);
     language = Language.get(prop);
     users = new Users(null);
   }
@@ -288,6 +291,8 @@ public final class MetaData {
         else if(k.equals(IDBSTR))     istorage   = v;
         else if(k.equals(DBFNAME))    original   = v;
         else if(k.equals(DBENC))      encoding   = v;
+        else if(k.equals(DBFTSW))     stopwords  = v;
+        else if(k.equals(DBFTLN))     language   = Language.get(v);
         else if(k.equals(DBSIZE))     size       = toInt(v);
         else if(k.equals(DBNDOCS))    ndocs      = toInt(v);
         else if(k.equals(DBSCTYPE))   scoring    = toInt(v);
@@ -308,8 +313,6 @@ public final class MetaData {
         else if(k.equals(DBWCIDX))    wcindex    = toBool(v);
         else if(k.equals(DBFTST))     stemming   = toBool(v);
         else if(k.equals(DBFTCS))     casesens   = toBool(v);
-        else if(k.equals(DBFTDC))     diacritics = toBool(v);
-        else if(k.equals(DBFTLN))     language   = Language.get(v);
         else if(k.equals(DBUPTODATE)) uptodate   = toBool(v);
         // legacy: set up-to-date flag to false if path index does not exist
         else if(k.equals(DBPTHIDX) && !toBool(v)) uptodate = false;
@@ -352,6 +355,7 @@ public final class MetaData {
     writeInfo(out, DBFTST,     stemming);
     writeInfo(out, DBFTCS,     casesens);
     writeInfo(out, DBFTDC,     diacritics);
+    writeInfo(out, DBFTSW,     stopwords);
     writeInfo(out, DBMAXLEN,   maxlen);
     writeInfo(out, DBMAXCATS,  maxcats);
     writeInfo(out, DBUPTODATE, uptodate);

@@ -57,7 +57,7 @@ public final class QuerySuggest extends QueryParser {
         final String nm = string(n.token(data));
         if(!nm.isEmpty() && !sl.contains(nm)) sl.add(nm);
       }
-      sl.sort(true, true);
+      sl.sort(true);
     }
     return sl;
   }
@@ -85,7 +85,7 @@ public final class QuerySuggest extends QueryParser {
     if(test != null) tb.add(test.toString().replaceAll("\\*:", ""));
     tag = tb.finish();
     // use inexact matching only, if the tag is at the end:
-    checkTest(ip < il);
+    checkTest(pos < length);
   }
 
   /**

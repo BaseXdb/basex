@@ -3,13 +3,12 @@ package org.basex.query.value.item;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
 import java.math.*;
 
 import org.basex.io.in.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -151,34 +150,41 @@ public abstract class Item extends Value {
 
   /**
    * Checks the items for equality.
-   * @param ii input info
    * @param it item to be compared
+   * @param coll collation
+   * @param ii input info
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean eq(final InputInfo ii, final Item it) throws QueryException;
+  public abstract boolean eq(final Item it, final Collation coll,
+      final InputInfo ii) throws QueryException;
 
   /**
    * Checks the items for equivalence.
-   * @param ii input info
    * @param it item to be compared
+   * @param coll collation
+   * @param ii input info
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean equiv(final InputInfo ii, final Item it) throws QueryException {
+  public final boolean equiv(final Item it, final Collation coll,
+      final InputInfo ii) throws QueryException {
     // check if both values are NaN, or if values are equal..
     return (this == Dbl.NAN || this == Flt.NAN) && it instanceof ANum &&
-        Double.isNaN(it.dbl(ii)) || comparable(it) && eq(ii, it);
+        Double.isNaN(it.dbl(ii)) || comparable(it) && eq(it, coll, ii);
   }
 
   /**
    * Returns the difference between the current and the specified item.
-   * @param ii input info
    * @param it item to be compared
+   * @param coll query context
+   * @param ii input info
    * @return difference
    * @throws QueryException query exception
    */
-  public int diff(final InputInfo ii, final Item it) throws QueryException {
+  @SuppressWarnings("unused")
+  public int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     throw (this == it ? TYPECMP : INVTYPECMP).thrw(ii, type, it.type);
   }
 
@@ -232,15 +238,6 @@ public abstract class Item extends Value {
    */
   public final void score(final double s) {
     if(score != null || s != 0) score = s;
-  }
-
-  /**
-   * Serializes the item. This method calls {@link Serializer#serialize(Item)}.
-   * @param ser serializer
-   * @throws IOException I/O exception
-   */
-  public final void serialize(final Serializer ser) throws IOException {
-    ser.serialize(this);
   }
 
   /**

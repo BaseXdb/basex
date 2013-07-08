@@ -44,7 +44,7 @@ public final class Instance extends Single {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new Instance(info, expr.copy(ctx, scp, vs), seq);
   }
 

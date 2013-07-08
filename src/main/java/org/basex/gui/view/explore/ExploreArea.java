@@ -16,7 +16,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This is a simple user search panel.
+ * This view provides standard GUI components to browse the currently opened database.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -120,12 +120,11 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       if(!elem.startsWith("@")) tl.add(Token.token(elem));
     }
 
-    final TokenList tmp = data.paths.desc(tl, true, false);
-    final String[] keys = entries(tmp.toArray());
+    final String[] keys = entries(data.paths.desc(tl, true, false));
     final BaseXCombo cm = new BaseXCombo(gui, keys);
     cm.addActionListener(this);
     cm.addKeyListener(main);
-    if(tmp.isEmpty()) cm.setEnabled(false);
+    if(keys.length == 1) cm.setEnabled(false);
     panel.add(cm);
     panel.add(new BaseXLabel(""));
   }
@@ -190,7 +189,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
               addSlider(stat.min, stat.max, cp + 1, false);
               break;
             case CATEGORY:
-              addCombo(entries(stat.cats.keys()), cp + 1);
+              addCombo(entries(new TokenList(stat.cats)), cp + 1);
               break;
             case TEXT:
               addInput(cp + 1);
@@ -294,13 +293,13 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
   /**
    * Returns the combo box selections
    * and the keys of the specified set.
-   * @param key keys
+   * @param keys keys
    * @return key array
    */
-  private static String[] entries(final byte[][] key) {
+  private static String[] entries(final TokenList keys) {
     final StringList sl = new StringList();
-    sl.add(Util.info(ENTRIES, key.length));
-    for(final byte[] k : key) sl.add(Token.string(k));
+    sl.add(Util.info(ENTRIES, keys.size()));
+    for(final byte[] k : keys) sl.add(Token.string(k));
     return sl.sort(true, true, 1).toArray();
   }
 }

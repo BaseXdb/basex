@@ -55,8 +55,8 @@ public final class Where extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return pred.uses(u);
+  public boolean has(final Flag flag) {
+    return pred.has(flag);
   }
 
   @Override
@@ -91,7 +91,7 @@ public final class Where extends GFLWOR.Clause {
   }
 
   @Override
-  public Where copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Where copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new Where(pred.copy(ctx, scp, vs), info);
   }
 

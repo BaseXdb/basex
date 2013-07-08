@@ -21,8 +21,8 @@ import org.basex.gui.editor.*;
 import org.basex.util.*;
 
 /**
- * This class assembles layout and paint methods which are frequently
- * used in the GUI.
+ * This class provides static layout and paint helper methods which are used all over
+ * the GUI.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -31,6 +31,8 @@ public final class BaseXLayout {
   /** Cached images. */
   private static final HashMap<String, ImageIcon> IMAGES =
     new HashMap<String, ImageIcon>();
+  /** Key listener for global shortcuts. */
+  private static KeyAdapter keys;
 
   /** Private constructor. */
   private BaseXLayout() { }
@@ -183,11 +185,11 @@ public final class BaseXLayout {
           if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof Editor)) {
             d.close();
           } else if(ESCAPE.is(e)) {
-            // do not cancel dialog if search panel is opened
+            // do not cancel dialog if search bar is opened
             boolean close = true;
             if(s instanceof Editor) {
-              final SearchPanel sp = ((Editor) s).getSearch();
-              close = sp == null || !sp.deactivate(true);
+              final SearchBar bar = ((Editor) s).getSearch();
+              close = bar == null || !bar.deactivate(true);
             }
             if(close) d.cancel();
           }
@@ -196,48 +198,76 @@ public final class BaseXLayout {
       return;
     }
 
-    if(!(win instanceof GUI)) {
+    if(win instanceof GUI) {
+      comp.addKeyListener(globalShortcuts((GUI) win));
+    } else {
       Util.notexpected("Reference to main window expected.");
-      return;
     }
-    final GUI gui = (GUI) win;
+  }
 
-    // add default keys for main window
-    comp.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        // browse back/forward
-        if(gui.context.data() != null) {
-          if(GOBACK.is(e)) {
-            GUICommands.C_GOBACK.execute(gui);
-          } else if(GOFORWARD.is(e)) {
-            GUICommands.C_GOFORWARD.execute(gui);
-          } else if(GOUP.is(e)) {
-            GUICommands.C_GOUP.execute(gui);
-          } else if(GOHOME.is(e)) {
-            GUICommands.C_GOHOME.execute(gui);
+  /**
+   * Returns or creates a new key listener for global shortcuts.
+   * @param gui gui reference
+   * @return key listener
+   */
+  private static KeyAdapter globalShortcuts(final GUI gui) {
+    if(keys == null) {
+      keys = new KeyAdapter() {
+        @Override
+        public void keyPressed(final KeyEvent e) {
+          // browse back/forward
+          if(gui.context.data() != null) {
+            if(GOBACK.is(e)) {
+              GUICommands.C_GOBACK.execute(gui);
+            } else if(GOFORWARD.is(e)) {
+              GUICommands.C_GOFORWARD.execute(gui);
+            } else if(GOUP.is(e)) {
+              GUICommands.C_GOUP.execute(gui);
+            } else if(GOHOME.is(e)) {
+              GUICommands.C_GOHOME.execute(gui);
+            }
+          }
+
+          // jump to input bar
+          if(INPUTBAR.is(e)) gui.input.requestFocusInWindow();
+
+          // change font size
+          final int fs = gui.gprop.num(GUIProp.FONTSIZE);
+          int nfs = fs;
+          if(INCFONT1.is(e) || INCFONT2.is(e)) {
+            nfs = fs + 1;
+          } else if(DECFONT.is(e)) {
+            nfs = Math.max(1, fs - 1);
+          } else if(NORMFONT.is(e)) {
+            nfs = 13;
+          }
+          if(fs != nfs) {
+            gui.gprop.set(GUIProp.FONTSIZE, nfs);
+            gui.updateLayout();
           }
         }
+      };
+    }
+    return keys;
+  }
 
-        // jump to input bar
-        if(INPUTBAR.is(e)) gui.input.requestFocusInWindow();
-
-        // change font size
-        final int fs = gui.gprop.num(GUIProp.FONTSIZE);
-        int nfs = fs;
-        if(INCFONT1.is(e) || INCFONT2.is(e)) {
-          nfs = fs + 1;
-        } else if(DECFONT.is(e)) {
-          nfs = Math.max(1, fs - 1);
-        } else if(NORMFONT.is(e)) {
-          nfs = 13;
-        }
-        if(fs != nfs) {
-          gui.gprop.set(GUIProp.FONTSIZE, nfs);
-          gui.updateLayout();
-        }
-      }
-    });
+  /**
+   * Adds human readable shortcuts to the specified string.
+   * @param str text of tooltip
+   * @param sc shortcut
+   * @return tooltip
+   */
+  public static String addShortcut(final String str, final String sc) {
+    if(sc == null) return str;
+    final StringBuilder sb = new StringBuilder();
+    for(final String s : sc.split(" ")) {
+      String t = s.equals("%") ? Prop.MAC ? "meta" : "control" : s;
+      if(t.length() != 1) t = Toolkit.getProperty("AWT." + t.toLowerCase(), t);
+      sb.append('+').append(t);
+    }
+    int i = str.lastIndexOf('.');
+    if(i == -1) i = str.length();
+    return str.substring(0, i) + " (" + sb.substring(1) + ')' + str.substring(i);
   }
 
   /**

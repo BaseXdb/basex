@@ -37,7 +37,7 @@ final class MapLayout {
     data = d;
     textLen = tl;
     prop = pr;
-    off = prop.num(GUIProp.FONTSIZE) + 4;
+    off = GUIConstants.fontSize + 4;
 
     switch(prop.num(GUIProp.MAPOFFSETS)) {
       // no title, small border

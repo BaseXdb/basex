@@ -30,6 +30,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -40,26 +41,29 @@ import org.basex.util.list.*;
  * @author Dimitar Popov
  */
 public final class FNDb extends StandardFunc {
+  /** Element: parameters. */
+  private static final QNm Q_OPTIONS = QNm.get("options");
+
   /** Resource element name. */
-  static final QNm Q_SYSTEM = new QNm("system");
+  static final String SYSTEM = "system";
   /** Resource element name. */
-  static final QNm Q_DATABASE = new QNm("database");
+  static final String DATABASE = "database";
   /** Backup element name. */
-  static final QNm Q_BACKUP = new QNm("backup");
+  static final String BACKUP = "backup";
   /** Resource element name. */
-  static final QNm Q_RESOURCE = new QNm("resource");
+  static final String RESOURCE = "resource";
   /** Resource element name. */
-  static final QNm Q_RESOURCES = new QNm("resources");
+  static final String RESOURCES = "resources";
   /** Path element name. */
-  static final QNm Q_PATH = new QNm("path");
+  static final String PATH = "path";
   /** Raw element name. */
-  static final QNm Q_RAW = new QNm("raw");
+  static final String RAW = "raw";
   /** Size element name. */
-  static final QNm Q_SIZE = new QNm("size");
+  static final String SIZE = "size";
   /** Content type element name. */
-  static final QNm Q_CTYPE = new QNm("content-type");
+  static final String CTYPE = "content-type";
   /** Modified date element name. */
-  static final QNm Q_MDATE = new QNm("modified-date");
+  static final String MDATE = "modified-date";
 
   /**
    * Constructor.
@@ -134,7 +138,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value open(final QueryContext ctx) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     final String path = expr.length < 2 ? "" : path(1, ctx);
     return DBNodeSeq.get(data.resources.docs(path), data, true, path.isEmpty());
   }
@@ -147,7 +151,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private DBNode open(final QueryContext ctx, final boolean id) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     final int v = (int) checkItr(expr[1], ctx);
     final int pre = id ? data.pre(v) : v;
     if(pre < 0 || pre >= data.meta.size) BXDB_RANGE.thrw(info, this, v);
@@ -165,7 +169,7 @@ public final class FNDb extends StandardFunc {
       throws QueryException {
 
     final IndexType it = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
-    return new ValueAccess(info, expr[1], it, data(ctx), true);
+    return new ValueAccess(info, expr[1], it, new IndexContext(checkData(ctx), false));
   }
 
   /**
@@ -182,7 +186,7 @@ public final class FNDb extends StandardFunc {
     final byte[] max = checkStr(expr[2], ctx);
     final IndexType it = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
     final StringRange sr = new StringRange(it, min, true, max, true);
-    return new StringRangeAccess(info, sr, data(ctx), true);
+    return new StringRangeAccess(info, sr, new IndexContext(checkData(ctx), false));
   }
 
   /**
@@ -226,7 +230,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter fulltext(final QueryContext ctx) throws QueryException {
-    return FNFt.search(data(ctx), ctx.value(expr[1]), null, this, ctx);
+    return FNFt.search(checkData(ctx), ctx.value(expr[1]), null, this, ctx);
   }
 
   /**
@@ -241,7 +245,7 @@ public final class FNDb extends StandardFunc {
     if(el == 0) {
       for(final String s : ctx.context.databases.listDBs()) tl.add(s);
     } else {
-      final Data data = data(ctx);
+      final Data data = checkData(ctx);
       final String path = string(el == 1 ? Token.EMPTY : checkStr(expr[1], ctx));
       // add xml resources
       final Resources res = data.resources;
@@ -286,7 +290,7 @@ public final class FNDb extends StandardFunc {
         if(++up >= list.size()) return null;
         final String name = list.get(up);
         final long length = new IOFile(dbpath, name).length();
-        return new FElem(Q_BACKUP).add(name).add(Q_SIZE, token(length));
+        return new FElem(BACKUP).add(name).add(SIZE, token(length));
       }
     };
   }
@@ -300,7 +304,7 @@ public final class FNDb extends StandardFunc {
   private Iter listDetails(final QueryContext ctx) throws QueryException {
     if(expr.length == 0) return listDBs(ctx);
 
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     final String path = string(expr.length == 1 ? Token.EMPTY : checkStr(expr[1], ctx));
     final IntList il = data.resources.docs(path);
     final TokenList tl = data.resources.binaries(path);
@@ -352,10 +356,10 @@ public final class FNDb extends StandardFunc {
           BXDB_OPEN.thrw(info, ex);
         }
 
-        final FElem res = new FElem(Q_DATABASE);
-        res.add(Q_RESOURCES, token(meta.ndocs));
-        res.add(Q_MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
-        if(ctx.context.perm(Perm.CREATE, meta)) res.add(Q_PATH, meta.original);
+        final FElem res = new FElem(DATABASE);
+        res.add(RESOURCES, token(meta.ndocs));
+        res.add(MDATE, DateTime.format(new Date(meta.dbtime()), DateTime.FULL));
+        if(ctx.context.perm(Perm.CREATE, meta)) res.add(PATH, meta.original);
         res.add(name);
         return res;
       }
@@ -377,7 +381,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Bln isRaw(final QueryContext ctx) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     final String path = path(1, ctx);
     if(data.inMemory()) return Bln.FALSE;
     final IOFile io = data.meta.binary(path);
@@ -392,7 +396,7 @@ public final class FNDb extends StandardFunc {
    */
   private Bln exists(final QueryContext ctx) throws QueryException {
     try {
-      final Data data = data(ctx);
+      final Data data = checkData(ctx);
       if(expr.length == 1) return Bln.TRUE;
       // check if raw file or XML document exists
       final String path = path(1, ctx);
@@ -415,7 +419,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Bln isXML(final QueryContext ctx) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     final String path = path(1, ctx);
     return Bln.get(data.resources.doc(path) != -1);
   }
@@ -427,7 +431,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str contentType(final QueryContext ctx) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     final String path = path(1, ctx);
     if(data.resources.doc(path) != -1) return Str.get(MimeTypes.APP_XML);
     if(!data.inMemory()) {
@@ -444,7 +448,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item export(final QueryContext ctx) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     final String path = string(checkStr(expr[1], ctx));
     final Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
     final SerializerProp sp = FuncParams.serializerProp(it, info);
@@ -497,9 +501,9 @@ public final class FNDb extends StandardFunc {
       final byte[] ctype, final long mdate) {
 
     final String tstamp = DateTime.format(new Date(mdate), DateTime.FULL);
-    final FElem res = new FElem(Q_RESOURCE).add(path).
-        add(Q_RAW, token(raw)).add(Q_CTYPE, ctype).add(Q_MDATE, tstamp);
-    return raw ? res.add(Q_SIZE, token(size)) : res;
+    final FElem res = new FElem(RESOURCE).add(path).
+        add(RAW, token(raw)).add(CTYPE, ctype).add(MDATE, tstamp);
+    return raw ? res.add(SIZE, token(size)) : res;
   }
 
   /**
@@ -508,7 +512,7 @@ public final class FNDb extends StandardFunc {
    * @return node
    */
   private static ANode system(final QueryContext ctx) {
-    return toNode(Info.info(ctx.context), Q_SYSTEM);
+    return toNode(Info.info(ctx.context), SYSTEM);
   }
 
   /**
@@ -518,9 +522,9 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private ANode info(final QueryContext ctx) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     final boolean create = ctx.context.user.has(Perm.CREATE);
-    return toNode(InfoDB.db(data.meta, false, true, create), Q_DATABASE);
+    return toNode(InfoDB.db(data.meta, false, true, create), DATABASE);
   }
 
   /**
@@ -529,15 +533,14 @@ public final class FNDb extends StandardFunc {
    * @param str string to be converted
    * @return node
    */
-  private static ANode toNode(final String str, final QNm root) {
+  private static ANode toNode(final String str, final String root) {
     final FElem top = new FElem(root);
     FElem node = null;
     for(final String l : str.split("\r\n?|\n")) {
       final String[] cols = l.split(": ", 2);
       if(cols[0].isEmpty()) continue;
 
-      final String name = cols[0].replaceAll(" |-", "");
-      final FElem n = new FElem(new QNm(lc(token(name))));
+      final FElem n = new FElem(token(toName(cols[0])));
       if(cols[0].startsWith(" ")) {
         if(node != null) node.add(n);
         if(!cols[1].isEmpty()) n.add(cols[1]);
@@ -550,13 +553,22 @@ public final class FNDb extends StandardFunc {
   }
 
   /**
+   * Converts the specified info key to an element name.
+   * @param str string to be converted
+   * @return resulting name
+   */
+  public static String toName(final String str) {
+    return str.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH);
+  }
+
+  /**
    * Performs the add function.
    * @param ctx query context
    * @return {@code null}
    * @throws QueryException query exception
    */
   private Item add(final QueryContext ctx) throws QueryException {
-    final Data data = checkWrite(data(ctx), ctx);
+    final Data data = checkWrite(checkData(ctx), ctx);
     final byte[] path = expr.length < 3 ? Token.EMPTY : token(path(2, ctx));
     final NewInput input = checkInput(checkItem(expr[1], ctx), path);
     ctx.updates.add(new DBAdd(data, input, ctx, info), ctx);
@@ -570,7 +582,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item replace(final QueryContext ctx) throws QueryException {
-    final Data data = checkWrite(data(ctx), ctx);
+    final Data data = checkWrite(checkData(ctx), ctx);
     final String path = path(1, ctx);
     final NewInput input = checkInput(checkItem(expr[2], ctx), token(path));
 
@@ -601,7 +613,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item delete(final QueryContext ctx) throws QueryException {
-    final Data data = checkWrite(data(ctx), ctx);
+    final Data data = checkWrite(checkData(ctx), ctx);
     final String path = path(1, ctx);
 
     // delete XML resources
@@ -654,7 +666,9 @@ public final class FNDb extends StandardFunc {
       }
     }
 
-    ctx.updates.add(new DBCreate(info, name, inputs, ctx), ctx);
+    final Item opt = expr.length > 3 ? expr[3].item(ctx, info) : null;
+    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
+    ctx.updates.add(new DBCreate(info, name, inputs, map, ctx), ctx);
     return null;
   }
 
@@ -666,7 +680,7 @@ public final class FNDb extends StandardFunc {
    */
   private Item drop(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
-    final Data data = checkWrite(data(ctx), ctx);
+    final Data data = checkWrite(checkData(ctx), ctx);
     ctx.updates.add(new DBDrop(data, info, ctx), ctx);
     return null;
   }
@@ -678,7 +692,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item rename(final QueryContext ctx) throws QueryException {
-    final Data data = checkWrite(data(ctx), ctx);
+    final Data data = checkWrite(checkData(ctx), ctx);
     final String source = path(1, ctx);
     final String target = path(2, ctx);
 
@@ -709,9 +723,13 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item optimize(final QueryContext ctx) throws QueryException {
-    final Data data = checkWrite(data(ctx), ctx);
-    final boolean all = expr.length == 2 && checkBln(expr[1], ctx);
-    ctx.updates.add(new DBOptimize(data, ctx, all, info), ctx);
+    final Data data = checkWrite(checkData(ctx), ctx);
+    final boolean all = expr.length > 1 && checkBln(expr[1], ctx);
+
+    final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
+    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
+    // check database options
+    ctx.updates.add(new DBOptimize(data, ctx, all, map, info), ctx);
     return null;
   }
 
@@ -722,7 +740,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item store(final QueryContext ctx) throws QueryException {
-    final Data data = checkWrite(data(ctx), ctx);
+    final Data data = checkWrite(checkData(ctx), ctx);
     final String path = path(1, ctx);
     if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
     final IOFile file = data.meta.binary(path);
@@ -740,7 +758,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item flush(final QueryContext ctx) throws QueryException {
-    ctx.updates.add(new DBFlush(checkWrite(data(ctx), ctx), info), ctx);
+    ctx.updates.add(new DBFlush(checkWrite(checkData(ctx), ctx), info), ctx);
     return null;
   }
 
@@ -751,7 +769,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64Stream retrieve(final QueryContext ctx) throws QueryException {
-    final Data data = data(ctx);
+    final Data data = checkData(ctx);
     final String path = path(1, ctx);
     if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
 
@@ -875,18 +893,6 @@ public final class FNDb extends StandardFunc {
     ni.dbname = token(name);
     ni.path = token(target);
     return ni;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    final boolean up = oneOf(sig, _DB_ADD, _DB_DELETE, _DB_RENAME, _DB_REPLACE,
-        _DB_OPTIMIZE, _DB_STORE, _DB_OUTPUT, _DB_FLUSH, _DB_CREATE, _DB_DROP);
-    return
-      // skip evaluation at compile time
-      u == Use.NDT && (up || oneOf(sig, _DB_TEXT, _DB_ATTRIBUTE, _DB_TEXT_RANGE,
-          _DB_ATTRIBUTE_RANGE, _DB_FULLTEXT, _DB_EVENT)) ||
-      u == Use.UPD && up ||
-      super.uses(u);
   }
 
   @Override

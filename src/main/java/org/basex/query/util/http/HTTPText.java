@@ -17,10 +17,22 @@ public interface HTTPText {
   /** HTTP basic authentication. */
   String BASIC = "Basic";
 
-  /** Multipart string. */
-  String MULTIPART = "multipart";
   /** Payload string. */
   String PAYLOAD = "payload";
+
+  /** Multipart string. */
+  byte[] MULTIPART = token("multipart");
+
+  /** Module prefix. */
+  String PREFIX = "http";
+  /** QName. */
+  QNm Q_BODY = QNm.get(PREFIX, "body", HTTPURI);
+  /** QName. */
+  QNm Q_RESPONSE = QNm.get(PREFIX, "response", HTTPURI);
+  /** QName. */
+  QNm Q_HEADER = QNm.get(PREFIX, "header", HTTPURI);
+  /** QName. */
+  QNm Q_MULTIPART = QNm.get(PREFIX, "multipart", HTTPURI);
 
   /** Request attribute: HTTP method. */
   byte[] METHOD = token("method");
@@ -72,25 +84,8 @@ public interface HTTPText {
   /** Method http:hexBinary. */
   byte[] HEXBIN = token("http:hexBinary");
 
-  /** http:multipart element. */
-  QNm Q_HTTP_MULTIPART = new QNm("http:multipart", HTTPURI);
-  /** http:body element. */
-  QNm Q_HTTP_BODY = new QNm("http:body", HTTPURI);
-  /** http:response element. */
-  QNm Q_HTTP_RESPONSE = new QNm("http:response", HTTPURI);
-  /** http:header element. */
-  QNm Q_HTTP_HEADER = new QNm("http:header", HTTPURI);
-
   /** Header attribute: name. */
-  QNm Q_NAME = new QNm("name");
+  byte[] NAME = token("name");
   /** Header attribute: value. */
-  QNm Q_VALUE = new QNm("value");
-  /** Body attribute: media-type. */
-  QNm Q_MEDIA_TYPE = new QNm(MEDIA_TYPE);
-  /** boundary marker. */
-  QNm Q_BOUNDARY = new QNm(BOUNDARY);
-  /** Header attribute: name. */
-  QNm Q_STATUS = new QNm(STATUS);
-  /** Header attribute: name. */
-  QNm Q_MESSAGE = new QNm(MESSAGE);
+  byte[] VALUE = token("value");
 }

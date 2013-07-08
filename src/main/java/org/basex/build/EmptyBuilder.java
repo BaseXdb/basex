@@ -31,35 +31,39 @@ public final class EmptyBuilder extends Builder {
 
   @Override
   public Data build() throws IOException {
-    meta = new MetaData(name, context);
+    meta = new MetaData(dbname, context);
     tags = new Names(meta);
     atts = new Names(meta);
-    parse();
-    close();
+    try { parse(); } finally { close(); }
     return null;
   }
 
   @Override
   public void close() throws IOException {
+    parser.close();
   }
 
   @Override
   protected void addDoc(final byte[] value) throws IOException {
+    meta.size++;
   }
 
   @Override
   protected void addElem(final int dist, final int nm, final int asize,
       final int uri, final boolean ne) throws IOException {
+    meta.size++;
   }
 
   @Override
   protected void addAttr(final int nm, final byte[] value, final int dist, final int uri)
       throws IOException {
+    meta.size++;
   }
 
   @Override
   protected void addText(final byte[] value, final int dist, final byte kind)
       throws IOException {
+    meta.size++;
   }
 
   @Override

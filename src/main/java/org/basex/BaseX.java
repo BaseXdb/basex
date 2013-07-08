@@ -25,7 +25,6 @@ public class BaseX extends Main {
   private IntList ops;
   /** Command arguments. */
   private StringList vals;
-
   /** Flag for writing properties to disk. */
   private boolean writeProps;
 
@@ -75,11 +74,13 @@ public class BaseX extends Main {
         } else if(c == 'c') {
           // evaluate commands
           final IO io = IO.get(val);
+          String base = ".";
           if(io.exists() && !io.isDir()) {
-            execute(io.string());
-          } else {
-            execute(val);
+            val = io.string();
+            base = io.path();
           }
+          execute(new Set(Prop.QUERYPATH, base), false);
+          execute(val);
           console = false;
         } else if(c == 'd') {
           // toggle debug mode
@@ -106,16 +107,19 @@ public class BaseX extends Main {
           session().setOutputStream(out);
         } else if(c == 'q') {
           // evaluate query
+          execute(new Set(Prop.QUERYPATH, "."), false);
           execute(new XQuery(val), verbose);
           console = false;
         } else if(c == 'Q') {
           // evaluate file contents or string as query
           final IO io = IO.get(val);
+          String base = ".";
           if(io.exists() && !io.isDir()) {
-            query(io);
-          } else {
-            execute(new XQuery(val), verbose);
+            val = io.string();
+            base = io.path();
           }
+          execute(new Set(Prop.QUERYPATH, base), false);
+          execute(new XQuery(val), verbose);
           console = false;
         } else if(c == 'r') {
           // hidden option: parse number of runs
@@ -170,20 +174,10 @@ public class BaseX extends Main {
   }
 
   /**
-   * Runs a query file.
-   * @param io input file
-   * @throws IOException I/O exception
-   */
-  private void query(final IO io) throws IOException {
-    execute(new Set(Prop.QUERYPATH, io.path()), false);
-    execute(new XQuery(io.string()), verbose);
-  }
-
-  /**
    * Tests if this client is stand-alone.
    * @return stand-alone flag
    */
-  boolean sa() {
+  protected boolean sa() {
     return true;
   }
 

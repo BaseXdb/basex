@@ -379,7 +379,7 @@ public final class MapView extends View implements Runnable {
             getWidth(), g);
         final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());
         // draw calculated tooltip
-        MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl, gprop.num(GUIProp.FONTSIZE));
+        MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl, fontSize);
         f.x -= 3;
         f.w += 3;
       }
@@ -544,7 +544,7 @@ public final class MapView extends View implements Runnable {
 
     if(focused == null) focused = mainRects.get(0);
 
-    final int fs = gui.gprop.num(GUIProp.FONTSIZE);
+    final int fs = fontSize;
     int o = fs + 4;
     final boolean shift = e.isShiftDown();
     if(PREVLINE.is(e)) {

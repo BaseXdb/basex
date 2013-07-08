@@ -42,8 +42,8 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    for(final Expr e : expr) if(e.uses(u)) return true;
+  public boolean has(final Flag flag) {
+    for(final Expr e : expr) if(e.has(flag)) return true;
     return false;
   }
 
@@ -75,14 +75,14 @@ public abstract class Arr extends ParseExpr {
    */
   @SuppressWarnings("unchecked")
   public static final <T extends Expr> T[] copyAll(final QueryContext ctx,
-      final VarScope scp, final IntMap<Var> vs, final T[] arr) {
+      final VarScope scp, final IntObjMap<Var> vs, final T[] arr) {
     final T[] copy = arr.clone();
     for(int i = 0; i < copy.length; i++) copy[i] = (T) copy[i].copy(ctx, scp, vs);
     return copy;
   }
 
   @Override
-  public Expr indexEquivalent(final IndexContext ic) throws QueryException {
+  public Expr indexEquivalent(final IndexCosts ic) throws QueryException {
     final int es = expr.length;
     for(int e = 0; e < es; ++e) expr[e] = expr[e].indexEquivalent(ic);
     return this;

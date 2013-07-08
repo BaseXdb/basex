@@ -54,8 +54,8 @@ public abstract class FTContains extends ParseExpr {
   }
 
   @Override
-  public final boolean uses(final Use u) {
-    return expr.uses(u) || ftexpr.uses(u);
+  public final boolean has(final Flag flag) {
+    return expr.has(flag) || ftexpr.has(flag);
   }
 
   @Override

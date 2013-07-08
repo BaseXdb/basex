@@ -27,7 +27,8 @@ public final class DBAdd extends DBNew {
   public DBAdd(final Data d, final NewInput it, final QueryContext c,
       final InputInfo ii) {
 
-    super(TYPE.DBADD, d, new ArrayList<NewInput>(), c, ii);
+    super(TYPE.DBADD, d, c, ii);
+    inputs = new ArrayList<NewInput>();
     inputs.add(it);
   }
 

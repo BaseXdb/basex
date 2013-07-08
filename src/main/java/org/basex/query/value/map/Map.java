@@ -147,7 +147,7 @@ public final class Map extends FItem {
    */
   public boolean hasType(final MapType t) {
     return root.hasType(t.keyType == AtomType.AAT ? null : t.keyType,
-        t.ret.eq(SeqType.ITEM_ZM) ? null : t.ret);
+        t.type.eq(SeqType.ITEM_ZM) ? null : t.type);
   }
 
   @Override
@@ -233,7 +233,7 @@ public final class Map extends FItem {
       byte[] val = ((Item) v).string(ii);
       final byte[] o = tm.get(key);
       if(o != null) val = new TokenBuilder(o).add(',').add(val).finish();
-      tm.add(key, val);
+      tm.put(key, val);
     }
     return tm;
   }

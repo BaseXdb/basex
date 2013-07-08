@@ -4,11 +4,9 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.*;
+import org.basex.query.expr.Expr.Flag;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -27,7 +25,7 @@ public final class Functions extends TokenSet {
   /** Singleton instance. */
   private static final Functions INSTANCE = new Functions();
   /** Function classes. */
-  private Function[] funcs = new Function[CAP];
+  private Function[] funcs = new Function[Array.CAPACITY];
 
   /**
    * Returns the singleton instance.
@@ -44,8 +42,8 @@ public final class Functions extends TokenSet {
     for(final Function def : Function.VALUES) {
       final String dsc = def.desc;
       final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
-      final int i = add(new QNm(ln, def.uri()).id());
-      if(i < 0) Util.notexpected("Function defined twice:" + def);
+      final int i = put(new QNm(ln, def.uri()).id());
+      if(funcs[i] != null) Util.notexpected("Function defined twice:" + def);
       funcs[i] = def;
     }
   }
@@ -67,8 +65,8 @@ public final class Functions extends TokenSet {
 
     // no constructor function found, or abstract type specified
     if(type != null && type != AtomType.NOT && type != AtomType.AAT) {
-      if(arity != 1) FUNCTYPE.thrw(ii, name.string());
-      return type;
+      if(arity == 1) return type;
+      (arity == 1 ? FUNCTYPESG : FUNCTYPEPL).thrw(ii, name.string(), arity, 1);
     }
 
     // include similar function name in error message
@@ -98,7 +96,8 @@ public final class Functions extends TokenSet {
     final Function fl = funcs[id];
     if(!eq(fl.uri(), name.uri())) return null;
     // check number of arguments
-    if(arity < fl.min || arity > fl.max) throw FUNCARGS.thrw(ii, fl);
+    if(arity < fl.min || arity > fl.max)
+      (arity == 1 ? FUNCARGSG : FUNCARGPL).thrw(ii, fl, arity);
     return fl;
   }
 
@@ -132,10 +131,10 @@ public final class Functions extends TokenSet {
     if(eq(name.uri(), XSURI)) {
       final Type type = getCast(name, arity, ii);
       final VarScope scp = new VarScope();
-      final Var arg = scp.uniqueVar(ctx, SeqType.AAT_ZO, true);
-      final Expr e = new Cast(ii, new VarRef(ii, arg), type.seqType());
+      final Var[] args = { scp.uniqueVar(ctx, SeqType.AAT_ZO, true) };
+      final Expr e = new Cast(ii, new VarRef(ii, args[0]), type.seqType());
       final FuncType tp = FuncType.get(e.type(), SeqType.AAT_ZO);
-      return new FuncItem(name, new Var[] { arg }, e, tp, scp, ctx.sc);
+      return new FuncItem(name, args, e, tp, scp, ctx.sc, null);
     }
 
     // pre-defined functions
@@ -143,12 +142,14 @@ public final class Functions extends TokenSet {
     if(fn != null) {
       final VarScope scp = new VarScope();
       final FuncType ft = fn.type(arity);
+      final QNm[] names = new QNm[arity];
+      for(int a = 0; a < arity; a++) names[a] = new QNm("value" + (a + 1));
       final Var[] args = new Var[arity];
       final Expr[] calls = ft.args(args, ctx, scp, ii);
 
       final StandardFunc f = fn.get(calls);
-      if(!f.uses(Use.CTX) && !f.uses(Use.POS))
-        return new FuncItem(name, args, f, ft, scp, ctx.sc);
+      if(!f.has(Flag.CTX) && !f.has(Flag.FCS))
+        return new FuncItem(name, args, f, ft, scp, ctx.sc, null);
 
       return new FuncLit(name, args, f, ft, scp, ctx.sc, ii);
     }
@@ -158,10 +159,12 @@ public final class Functions extends TokenSet {
     if(sf != null) {
       final FuncType ft = sf.funcType();
       final VarScope scp = new VarScope();
+      final QNm[] names = new QNm[arity];
+      for(int a = 0; a < arity; a++) names[a] = sf.args[a].name;
       final Var[] args = new Var[arity];
       final Expr[] calls = ft.args(args, ctx, scp, ii);
       final TypedFunc tf = ctx.funcs.getFuncRef(name, calls, ctx.sc, ii);
-      return new FuncItem(name, args, tf.fun, ft, scp, ctx.sc);
+      return new FuncItem(name, args, tf.fun, ft, scp, ctx.sc, sf);
     }
 
     // Java function (only allowed with administrator permissions)
@@ -200,13 +203,8 @@ public final class Functions extends TokenSet {
     // pre-defined functions
     final StandardFunc fun = Functions.get().get(name, args, ii);
     if(fun != null) {
-      if(!ctx.sc.xquery3() && fun.xquery3()) FUNC30.thrw(ii);
-      for(final Function f : Function.UPDATING) {
-        if(fun.sig == f) {
-          ctx.updating(true);
-          break;
-        }
-      }
+      if(!ctx.sc.xquery3() && fun.has(Flag.X30)) FUNC30.thrw(ii);
+      if(fun.sig.has(Flag.UPD)) ctx.updating(true);
       // [LW] correct annotations
       return new TypedFunc(fun, new Ann(), fun.sig.type(args.length));
     }
@@ -255,8 +253,8 @@ public final class Functions extends TokenSet {
   }
 
   @Override
-  protected void rehash() {
-    super.rehash();
-    funcs = Arrays.copyOf(funcs, size << 1);
+  protected void rehash(final int s) {
+    super.rehash(s);
+    funcs = Array.copy(funcs, new Function[s]);
   }
 }

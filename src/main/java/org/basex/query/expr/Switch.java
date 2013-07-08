@@ -63,7 +63,7 @@ public final class Switch extends ParseExpr {
 
           // includes check for empty sequence (null reference)
           final Item cs = sc.expr[e].item(ctx, info);
-          if(it == cs || cs != null && it != null && it.equiv(info, cs)) {
+          if(it == cs || cs != null && it != null && it.equiv(cs, null, info)) {
             ex = sc.expr[0];
             break LOOP;
           }
@@ -97,9 +97,9 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    for(final SwitchCase sc : cases) if(sc.uses(u)) return true;
-    return cond.uses(u);
+  public boolean has(final Flag flag) {
+    for(final SwitchCase sc : cases) if(sc.has(flag)) return true;
+    return cond.has(flag);
   }
 
   @Override
@@ -141,7 +141,7 @@ public final class Switch extends ParseExpr {
       for(int e = 1; e < sl; e++) {
         // includes check for empty sequence (null reference)
         final Item cs = sc.expr[e].item(ctx, info);
-        if(it == cs || it != null && cs != null && it.equiv(info, cs))
+        if(it == cs || it != null && cs != null && it.equiv(cs, null, info))
           return sc.expr[0];
       }
       if(sl == 1) return sc.expr[0];
@@ -151,7 +151,7 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new Switch(info, cond.copy(ctx, scp, vs), Arr.copyAll(ctx, scp, vs, cases));
   }
 

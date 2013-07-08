@@ -33,8 +33,9 @@ public final class Users {
     if(ctx == null) return;
 
     // try to find permission file in database and home directory
-    file = new IOFile(ctx.mprop.dbpath(), IO.BASEXSUFFIX + "perm");
-    if(!file.exists()) file = new IOFile(Prop.HOME, IO.BASEXSUFFIX + "perm");
+    final String perm = IO.BASEXSUFFIX + "perm";
+    file = new IOFile(ctx.mprop.dbpath(), perm);
+    if(!file.exists()) file = new IOFile(Prop.HOME, perm);
 
     if(!file.exists()) {
       // define default admin user with all rights

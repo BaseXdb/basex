@@ -59,7 +59,7 @@ public final class JavaFunc extends JavaMapping {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new JavaFunc(info, cls, mth, copyAll(ctx, scp, vs, expr));
   }
 
@@ -166,7 +166,7 @@ public final class JavaFunc extends JavaMapping {
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, cls + "." + mth), expr);
+    addPlan(plan, planElem(NAM, cls.getName() + "." + mth), expr);
   }
 
   @Override

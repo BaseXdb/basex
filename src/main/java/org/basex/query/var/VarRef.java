@@ -77,7 +77,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public VarRef copy(final QueryContext ctx, final VarScope scp,
-      final IntMap<Var> vs) {
+      final IntObjMap<Var> vs) {
     final Var nw = vs.get(var.id);
     return new VarRef(info, nw != null ? nw : var);
   }
@@ -114,7 +114,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u) {
+  public boolean has(final Flag flag) {
     return false;
   }
 

@@ -54,7 +54,7 @@ public final class FTMildNot extends FTExpr {
           if(d > 0) {
             it2 = i2.next();
           } else {
-            if(mildnot(it1, it2).all.size != 0) break;
+            if(!mildnot(it1, it2).all.isEmpty()) break;
             it1 = i1.next();
           }
         }
@@ -93,7 +93,7 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     int is = ic.costs();
     for(final FTExpr e : expr) {
       if(!e.indexAccessible(ic)) return false;
@@ -104,7 +104,8 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     try {
       return new FTMildNot(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
     } catch(final QueryException e) {

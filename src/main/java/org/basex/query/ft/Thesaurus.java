@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -30,15 +29,15 @@ public final class Thesaurus {
   private final Context ctx;
 
   static {
-    RSHIPS.add(token("NT"), token("BT"));
-    RSHIPS.add(token("BT"), token("BT"));
-    RSHIPS.add(token("BTG"), token("NTG"));
-    RSHIPS.add(token("NTG"), token("BTG"));
-    RSHIPS.add(token("BTP"), token("NTP"));
-    RSHIPS.add(token("NTP"), token("BTP"));
-    RSHIPS.add(token("USE"), token("UF"));
-    RSHIPS.add(token("UF"), token("USE"));
-    RSHIPS.add(token("RT"), token("RT"));
+    RSHIPS.put("NT", "BT");
+    RSHIPS.put("BT", "BT");
+    RSHIPS.put("BTG", "NTG");
+    RSHIPS.put("NTG", "BTG");
+    RSHIPS.put("BTP", "NTP");
+    RSHIPS.put("NTP", "BTP");
+    RSHIPS.put("USE", "UF");
+    RSHIPS.put("UF", "USE");
+    RSHIPS.put("RT", "RT");
   }
 
   /** Thesaurus node. */
@@ -59,9 +58,9 @@ public final class Thesaurus {
      */
     void add(final ThesNode n, final byte[] r) {
       if(size == nodes.length) {
-        final int s = size << 1;
-        nodes = Arrays.copyOf(nodes, s);
-        rs = Arrays.copyOf(rs, s);
+        final int s = Array.newSize(size);
+        nodes = Array.copy(nodes, new ThesNode[s]);
+        rs = Array.copyOf(rs, s);
       }
       nodes[size] = n;
       rs[size++] = r;
@@ -152,7 +151,7 @@ public final class Thesaurus {
     if(node == null) {
       node = new ThesNode();
       node.term = term;
-      nodes.add(term, node);
+      nodes.put(term, node);
     }
     return node;
   }

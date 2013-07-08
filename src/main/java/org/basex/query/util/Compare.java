@@ -22,7 +22,7 @@ import org.basex.util.*;
  */
 public final class Compare {
   /** Flags. */
-  public enum Flag {
+  public enum Mode {
     /** Compare all node types. */ ALLNODES,
     /** Compare namespaces.     */ NAMESPACES,
   }
@@ -30,7 +30,9 @@ public final class Compare {
   /** Input info. */
   private final InputInfo info;
   /** Flag values. */
-  private final EnumSet<Flag> flags = EnumSet.noneOf(Flag.class);
+  private final EnumSet<Mode> flags = EnumSet.noneOf(Mode.class);
+  /** Collation. */
+  private Collation coll;
 
   /**
    * Constructor.
@@ -43,9 +45,21 @@ public final class Compare {
   /**
    * Sets the specified flag.
    * @param f flag
+   * @return self reference
    */
-  public void set(final Flag f) {
+  public Compare flag(final Mode f) {
     flags.add(f);
+    return this;
+  }
+
+  /**
+   * Sets a collation.
+   * @param c collation
+   * @return self reference
+   */
+  public Compare collation(final Collation c) {
+    coll = c;
+    return this;
   }
 
   /**
@@ -58,7 +72,7 @@ public final class Compare {
    */
   public static boolean deep(final Value val1, final Value val2, final InputInfo info)
       throws QueryException {
-    return new Compare(info).deep(val1.iter(), val2.iter());
+    return deep(val1.iter(), val2.iter(), info);
   }
 
   /**
@@ -102,7 +116,7 @@ public final class Compare {
 
       // check atomic values
       if(!(it1 instanceof ANode || it2 instanceof ANode)) {
-        if(!it1.equiv(info, it2)) return false;
+        if(!it1.equiv(it2, coll, info)) return false;
         continue;
       }
 
@@ -146,7 +160,7 @@ public final class Compare {
           // compare names
           QNm n1 = s1.qname(), n2 = s2.qname();
           if(n1 != null && (!n1.eq(n2) ||
-              flags.contains(Flag.NAMESPACES) && !eq(n1.prefix(), n2.prefix())))
+              flags.contains(Mode.NAMESPACES) && !eq(n1.prefix(), n2.prefix())))
             return false;
 
           if(t1 == NodeType.TXT || t1 == NodeType.ATT || t1 == NodeType.COM ||
@@ -167,7 +181,7 @@ public final class Compare {
               for(ANode a2; (a2 = ai2.next()) != null;) {
                 n2 = a2.qname();
                 if(!n1.eq(n2)) continue;
-                if(flags.contains(Flag.NAMESPACES) &&
+                if(flags.contains(Mode.NAMESPACES) &&
                     !eq(n1.prefix(), n2.prefix()) ||
                     !eq(a1.string(), a2.string())) return false;
                 continue LOOP;
@@ -176,7 +190,7 @@ public final class Compare {
             }
 
             // compare namespaces
-            if(flags.contains(Flag.NAMESPACES)) {
+            if(flags.contains(Mode.NAMESPACES)) {
               final Atts ns1 = s1.namespaces();
               final Atts ns2 = s2.namespaces();
               if(ns1.size() != ns2.size()) return false;
@@ -184,7 +198,7 @@ public final class Compare {
               for(int i1 = 0; i1 < ns1.size(); i1++) {
                 for(int i2 = 0; i2 < ns2.size(); i2++) {
                   if(!eq(ns1.name(i1), ns2.name(i2))) continue;
-                  if(!eq(ns1.string(i1), ns2.string(i2))) return false;
+                  if(!eq(ns1.value(i1), ns2.value(i2))) return false;
                   continue LOOP;
                 }
                 return false;
@@ -202,7 +216,7 @@ public final class Compare {
         // check next child
         s1 = ch1.next();
         s2 = ch2.next();
-        skip = !flags.contains(Flag.ALLNODES);
+        skip = !flags.contains(Mode.ALLNODES);
       } while(!stack.isEmpty());
     }
   }

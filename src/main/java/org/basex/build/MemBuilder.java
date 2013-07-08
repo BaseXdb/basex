@@ -14,7 +14,7 @@ import org.basex.io.*;
  */
 public final class MemBuilder extends Builder {
   /** Data reference. */
-  public MemData data;
+  private MemData data;
 
   /**
    * Constructor.
@@ -64,7 +64,7 @@ public final class MemBuilder extends Builder {
     data = new MemData(path, ns, parser.prop);
 
     final MetaData md = data.meta;
-    md.name = name;
+    md.name = dbname;
     // all contents will be indexed in main memory mode
     md.createtext = true;
     md.createattr = true;
@@ -80,6 +80,14 @@ public final class MemBuilder extends Builder {
     path.data(data);
   }
 
+  /**
+   * Returns the data reference.
+   * @return data reference
+   */
+  public Data data() {
+    return data;
+  }
+
   @Override
   public void close() throws IOException {
     parser.close();
@@ -92,8 +100,8 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  protected void addElem(final int dist, final int nm, final int asize,
-      final int uri, final boolean ne) {
+  protected void addElem(final int dist, final int nm, final int asize, final int uri,
+      final boolean ne) {
     data.elem(dist, nm, asize, asize, uri, ne);
     data.insert(meta.size);
   }

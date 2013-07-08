@@ -89,9 +89,4 @@ public final class FNFetch extends StandardFunc {
     if(mt == null) throw BXFE_IO.thrw(info, new FileNotFoundException(path));
     return Str.get(mt);
   }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT || super.uses(u);
-  }
 }

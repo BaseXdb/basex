@@ -94,7 +94,7 @@ public final class FNXQuery extends StandardFunc {
     }
     // evaluate query
     try {
-      qc.parse(string(qu), path);
+      qc.parseMain(string(qu), path);
       if(qc.updating) BXXQ_UPDATING.thrw(info);
       qc.compile();
       final ValueBuilder vb = new ValueBuilder();
@@ -121,11 +121,6 @@ public final class FNXQuery extends StandardFunc {
     } catch(final IOException ex) {
       throw IOERR.thrw(info, ex);
     }
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.NDT && oneOf(sig, _XQUERY_EVAL, _XQUERY_INVOKE) || super.uses(u);
   }
 
   @Override

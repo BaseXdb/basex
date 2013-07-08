@@ -52,9 +52,7 @@ public class IndexTree {
    * @param exist flag for using existing index
    * @return int node
    */
-  protected final int index(final byte[] key, final int value,
-      final boolean exist) {
-
+  protected final int index(final byte[] key, final int value, final boolean exist) {
     // index is empty.. create root node
     if(root == -1) {
       root = n(key, value, -1, exist);
@@ -68,9 +66,9 @@ public class IndexTree {
         if(exist) {
           values.set(n, Num.add(values.get(n), value));
         } else {
-          final int i = maps.value(Num.num(n));
+          final int i = maps.get(Num.num(n));
           if(i < 0) {
-            maps.add(Num.num(n), values.size());
+            maps.put(Num.num(n), values.size());
             values.add(Num.newNum(value));
           } else {
             values.set(i, Num.add(values.get(i), value));
@@ -159,7 +157,7 @@ public class IndexTree {
     mod.add(false);
     keys.add(key);
     values.add(Num.newNum(value));
-    if(!exist) maps.add(Num.num(keys.size() - 1), values.size() - 1);
+    if(!exist) maps.put(Num.num(keys.size() - 1), values.size() - 1);
     return mod.size() - 1;
   }
 

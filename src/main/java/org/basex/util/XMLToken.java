@@ -105,21 +105,6 @@ public final class XMLToken {
   }
 
   /**
-   * Checks if the specified token is a valid EQName.
-   * @param val value to be checked
-   * @return result of check
-   */
-  public static boolean isEQName(final byte[] val) {
-    final int l = val.length;
-    if(l == 0) return false;
-    if(l < 2 || val[0] != 'Q' || val[1] != '{') return isQName(val);
-    final int i = indexOf(val, '}');
-    if(i == -1 || i == l) return false;
-    final int j = ncName(val, i + 1);
-    return j == l && j != i + 1;
-  }
-
-  /**
    * Checks if the specified token is a valid QName.
    * @param val value to be checked
    * @return result of check

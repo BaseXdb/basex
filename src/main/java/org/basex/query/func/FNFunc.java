@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.query.func.Function.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
@@ -45,14 +44,10 @@ public final class FNFunc extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case FUNCTION_ARITY:
-        return Int.get(getFun(0, FuncType.ANY_FUN, ctx).arity());
-      case FUNCTION_NAME:
-        return getFun(0, FuncType.ANY_FUN, ctx).fName();
-      case FUNCTION_LOOKUP:
-        return lookup(ctx, ii);
-      default:
-        return super.item(ctx, ii);
+      case FUNCTION_ARITY:  return Int.get(checkFunc(expr[0], ctx).arity());
+      case FUNCTION_NAME:   return checkFunc(expr[0], ctx).fName();
+      case FUNCTION_LOOKUP: return lookup(ctx, ii);
+      default:              return super.item(ctx, ii);
     }
   }
 
@@ -64,7 +59,7 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item lookup(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final QNm name = checkQNm(expr[0].item(ctx, ii), ctx);
+    final QNm name = checkQNm(expr[0], ctx);
     final long arity = checkItr(expr[1], ctx);
     if(arity < 0 || arity > Integer.MAX_VALUE) FUNCUNKNOWN.thrw(ii, name);
 
@@ -190,19 +185,6 @@ public final class FNFunc extends StandardFunc {
   }
 
   /**
-   * Checks the type of the given function item.
-   * @param p position
-   * @param t type
-   * @param ctx query context
-   * @return function item
-   * @throws QueryException query exception
-   */
-  private FItem getFun(final int p, final FuncType t, final QueryContext ctx)
-      throws QueryException {
-    return (FItem) checkType(checkItem(expr[p], ctx), t);
-  }
-
-  /**
    * Casts and checks the function item for its arity.
    * @param p position of the function
    * @param a arity
@@ -219,16 +201,5 @@ public final class FNFunc extends StandardFunc {
       if(fi.arity() == a) return fi;
     }
     throw Err.type(this, FuncType.arity(a), it);
-  }
-
-  @Override
-  public boolean xquery3() {
-    return true;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return (u == Use.CTX || u == Use.POS) && oneOf(sig, FUNCTION_LOOKUP) ||
-        u == Use.X30 || super.uses(u);
   }
 }

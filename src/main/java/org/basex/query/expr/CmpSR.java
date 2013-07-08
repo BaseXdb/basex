@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
+import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
@@ -132,32 +133,33 @@ public final class CmpSR extends Single {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) {
+  public boolean indexAccessible(final IndexCosts ic) {
     // accept only location path, string and equality expressions
     final Step s = CmpG.indexStep(expr);
     // no range index support in main-memory index structures
-    if(s == null || ic.data.inMemory()) return false;
+    final Data data = ic.ictx.data;
+    if(s == null || data.inMemory()) return false;
 
     // check which index applies
-    final boolean text = s.test.type == NodeType.TXT && ic.data.meta.textindex;
-    final boolean attr = s.test.type == NodeType.ATT && ic.data.meta.attrindex;
+    final boolean text = s.test.type == NodeType.TXT && data.meta.textindex;
+    final boolean attr = s.test.type == NodeType.ATT && data.meta.attrindex;
     if(!text && !attr || min == null || max == null) return false;
 
     // create range access
     rt = new StringRange(text ? IndexType.TEXT : IndexType.ATTRIBUTE, min, mni, max, mxi);
-    ic.costs(Math.max(1, ic.data.meta.size / 10));
+    ic.costs(Math.max(1, data.meta.size / 10));
     return true;
   }
 
   @Override
-  public Expr indexEquivalent(final IndexContext ic) {
+  public Expr indexEquivalent(final IndexCosts ic) {
     final boolean text = rt.type() == IndexType.TEXT;
     ic.ctx.compInfo(OPTSRNGINDEX);
-    return ic.invert(expr, new StringRangeAccess(info, rt, ic.data, ic.iterable), text);
+    return ic.invert(expr, new StringRangeAccess(info, rt, ic.ictx), text);
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final CmpSR res = new CmpSR(expr.copy(ctx, scp, vs), min, mni, max, mxi, info);
     res.rt = rt;
     return res;

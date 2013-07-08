@@ -83,13 +83,13 @@ public final class FTNot extends FTExpr {
    */
   private static FTMatches not(final FTMatches m, final int i) {
     final FTMatches all = new FTMatches(m.sTokenNum);
-    if(i == m.size) {
+    if(i == m.size()) {
       all.add(new FTMatch());
     } else {
       for(final FTStringMatch s : m.match[i]) {
         s.ex ^= true;
         for(final FTMatch tmp : not(m, i + 1)) {
-          all.add(new FTMatch().add(s).add(tmp));
+          all.add(new FTMatch(1 + tmp.size()).add(s).add(tmp));
         }
       }
     }
@@ -97,14 +97,15 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public boolean indexAccessible(final IndexContext ic) throws QueryException {
+  public boolean indexAccessible(final IndexCosts ic) throws QueryException {
     final boolean ia = expr[0].indexAccessible(ic);
     ic.not ^= true;
     return ia;
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     return new FTNot(info, expr[0].copy(ctx, scp, vs));
   }
 

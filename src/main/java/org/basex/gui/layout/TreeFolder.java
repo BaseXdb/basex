@@ -42,17 +42,16 @@ public class TreeFolder extends TreeNode {
     int cmax = MAXC;
     // add folders
     final byte[] sub = subfolder();
-    final byte[][] folders = new TokenList(data.resources.children(subfolder(), true).
-        keys()).sort(Prop.CASE).toArray();
-    int i = 0;
-    while(i < folders.length && cmax-- > 0)
-      add(new TreeFolder(folders[i++], sub, tree, data));
-
+    final TokenSet set = data.resources.children(subfolder(), true);
+    for(final byte[] f : new TokenList(set).sort(Prop.CASE)) {
+      add(new TreeFolder(f, sub, tree, data));
+      if(--cmax == 0) break;
+    }
     // add leaves
     cmax = addLeaves(EMPTY, cmax, this);
     // add dummy node if not all nodes are displayed
     if(cmax <= 0)
-      add(new TreeLeaf(token("..."), sub, false, true, tree, data));
+      add(new TreeLeaf(token(Text.DOTS), sub, false, true, tree, data));
 
     loaded = true;
     ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(this);
@@ -72,9 +71,9 @@ public class TreeFolder extends TreeNode {
     final List<byte[]> keys = new ArrayList<byte[]>();
 
     // get desired leaves, depending on the given filter
-    for(final byte[] b : tbm.keys())
-      if(filter.length == 0 || eq(b, filter))
-        keys.add(b);
+    for(final byte[] b : tbm) {
+      if(filter.length == 0 || eq(b, filter)) keys.add(b);
+    }
     Collections.sort(keys, new Comparator<byte[]>() {
       @Override
       public int compare(final byte[] o1, final byte[] o2) {
@@ -84,11 +83,10 @@ public class TreeFolder extends TreeNode {
 
     // finally add the necessary leaves
     final byte[] sub = subfolder();
-    int i = 0;
-    int m = cmax;
+    int i = 0, m = cmax;
     while(i < keys.size() && m-- > 0) {
       final byte[] nm = keys.get(i++);
-      target.add(new TreeLeaf(nm, sub, tbm.value(tbm.id(nm)), false, tree, data));
+      target.add(new TreeLeaf(nm, sub, tbm.get(nm), false, tree, data));
     }
 
     return m;

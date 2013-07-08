@@ -1,8 +1,10 @@
 package org.basex.query.var;
 
 import java.util.*;
+
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Variable stack.
@@ -11,11 +13,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public final class VarStack {
+public final class VarStack extends ElementList {
   /** Variable expressions. */
   public Var[] vars;
-  /** Number of stored variables. */
-  public int size;
 
   /**
    * Default constructor.
@@ -37,7 +37,7 @@ public final class VarStack {
    * @param v variable
    */
   public void push(final Var v) {
-    if(size == vars.length) vars = Arrays.copyOf(vars, Array.newSize(size));
+    if(size == vars.length) vars = Array.copy(vars, new Var[newSize()]);
     vars[size++] = v;
   }
 
@@ -50,25 +50,6 @@ public final class VarStack {
   public Var get(final QNm name) {
     for(int i = size; i-- > 0;) if(name.eq(vars[i].name)) return vars[i];
     return null;
-  }
-
-  /**
-   * Returns the index of a variable with the same id, or {@code -1}.
-   * @param v variable
-   * @return index
-   */
-  private int indexOf(final Var v) {
-    for(int s = size - 1; s >= 0; s--) if(v.is(vars[s])) return s;
-    return -1;
-  }
-
-  /**
-   * Checks if the given variable is in this list.
-   * @param v variable
-   * @return {@code true} if the variable was found, {@code false} otherwise
-   */
-  public boolean contains(final Var v) {
-    return indexOf(v) != -1;
   }
 
   /** Empties this stack. */

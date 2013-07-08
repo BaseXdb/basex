@@ -39,14 +39,14 @@ public final class SwitchCase extends Arr {
         expr[e] = expr[e].compile(ctx, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
-        expr[e] = FNInfo.error(ex, info);
+        expr[e] = FNInfo.error(ex);
       }
     }
     return this;
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new SwitchCase(info, copyAll(ctx, scp, vs, expr));
   }
 
@@ -60,7 +60,7 @@ public final class SwitchCase extends Arr {
       try {
         nw = expr[i].inline(ctx, scp, v, e);
       } catch(final QueryException qe) {
-        nw = FNInfo.error(qe, info);
+        nw = FNInfo.error(qe);
       }
       if(nw != null) {
         expr[i] = nw;

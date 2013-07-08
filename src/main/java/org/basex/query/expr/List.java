@@ -60,7 +60,7 @@ public final class List extends Arr {
     }
 
     if(size >= 0) {
-      if(size == 0 && !uses(Use.NDT) && !uses(Use.UPD)) return optPre(null, ctx);
+      if(size == 0 && !has(Flag.NDT) && !has(Flag.UPD)) return optPre(null, ctx);
       if(allAreValues() && size <= MAX_MAT_SIZE) {
         Type all = null;
         final Value[] vs = new Value[expr.length];
@@ -135,7 +135,7 @@ public final class List extends Arr {
   }
 
   @Override
-  public Expr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return copyType(new List(info, copyAll(ctx, scp, vs, expr)));
   }
 

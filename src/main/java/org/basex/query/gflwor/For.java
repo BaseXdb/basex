@@ -102,13 +102,13 @@ public final class For extends GFLWOR.Clause {
     if(empty) e.add(planAttr(Token.token(EMPTYORD), Token.TRUE));
     var.plan(e);
     if(pos != null) {
-      final FElem e2 = new FElem(Token.token(QueryText.AT));
+      final FElem e2 = new FElem(QueryText.AT);
       pos.plan(e2);
       e.add(e2);
     }
 
     if(score != null) {
-      final FElem e2 = new FElem(Token.token(QueryText.SCORE));
+      final FElem e2 = new FElem(QueryText.SCORE);
       score.plan(e2);
       e.add(e2);
     }
@@ -127,8 +127,8 @@ public final class For extends GFLWOR.Clause {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return empty && u == Use.X30 || expr.uses(u);
+  public boolean has(final Flag flag) {
+    return expr.has(flag);
   }
 
   @Override
@@ -169,13 +169,13 @@ public final class For extends GFLWOR.Clause {
   }
 
   @Override
-  public For copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public For copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Var v = scp.newCopyOf(ctx, var);
-    vs.add(var.id, v);
+    vs.put(var.id, v);
     final Var p = pos == null ? null : scp.newCopyOf(ctx, pos);
-    if(p != null) vs.add(pos.id, p);
+    if(p != null) vs.put(pos.id, p);
     final Var s = score == null ? null : scp.newCopyOf(ctx, score);
-    if(s != null) vs.add(score.id, s);
+    if(s != null) vs.put(score.id, s);
     return new For(v, p, s, expr.copy(ctx, scp, vs), empty, info);
   }
 
@@ -184,14 +184,6 @@ public final class For extends GFLWOR.Clause {
     return expr.accept(visitor) && visitor.declared(var)
         && (pos == null || visitor.declared(pos))
         && (score == null || visitor.declared(score));
-  }
-
-  /**
-   * Tests if this for clause binds only one variable and does not check types.
-   * @return {@code true} if the clause is a simple loop, {@code false} otherwise
-   */
-  protected boolean simple() {
-    return !empty && !var.checksType() && pos == null && score == null;
   }
 
   /**

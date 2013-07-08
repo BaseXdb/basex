@@ -81,8 +81,8 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return win.uses(u) || super.uses(u);
+  public boolean has(final Flag flag) {
+    return win.has(flag) || super.has(flag);
   }
 
   @Override
@@ -105,7 +105,8 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp,
+      final IntObjMap<Var> vs) {
     return new FTWindow(info, expr[0].copy(ctx, scp, vs), win.copy(ctx, scp, vs), unit);
   }
 

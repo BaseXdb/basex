@@ -42,7 +42,7 @@ public final class Suite {
    * @throws QueryException query exception
    */
   public Item test(final TokenList libs) throws QueryException {
-    final FElem suites = new FElem(Q_TESTSUITES);
+    final FElem suites = new FElem(TESTSUITES);
     for(final byte[] path : libs) {
       final IO io = IO.get(string(path));
       if(!io.exists()) WHICHRES.thrw(info, path);
@@ -50,7 +50,7 @@ public final class Suite {
       try {
         final QueryContext qc = new QueryContext(ctx.context);
         try {
-          qc.module(string(io.read()), io.path());
+          qc.parseLibrary(string(io.read()), io.path());
           qc.compile();
           suites.add(new Unit(qc, info).test());
         } finally {

@@ -1,55 +1,53 @@
 package org.basex.util.hash;
 
-import java.util.*;
-
 import org.basex.util.*;
 
 /**
- * This is an efficient hash map, extending the {@link IntSet hash set}.
+ * This is an efficient and memory-saving hash map for storing primitive integers
+ * and objects. It extends the {@link IntSet} class.
  * @param <E> generic value type
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class IntMap<E> extends IntSet {
+public final class IntObjMap<E> extends IntSet {
   /** Values. */
-  private Object[] values = new Object[CAP];
+  private Object[] values = new Object[Array.CAPACITY];
 
   /**
-   * Indexes the specified keys and values.
-   * If the key exists, the value is updated.
+   * Indexes the specified key and stores the associated value.
+   * If the key already exists, the value is updated.
    * @param key key
-   * @param val value
+   * @param value value
    */
-  public void add(final int key, final E val) {
+  public void put(final int key, final E value) {
     // array bounds are checked before array is resized..
-    final int i = add(key);
-    values[Math.abs(i)] = val;
+    final int i = put(key);
+    values[i] = value;
   }
 
   /**
    * Returns the value for the specified key.
-   * @param key key to be found
-   * @return value or {@code null} if nothing was found
+   * @param key key to be looked up
+   * @return value, or {@code null} if the key was not found
    */
   @SuppressWarnings("unchecked")
   public E get(final int key) {
     return (E) values[id(key)];
   }
+
   /**
-   * Returns the specified value.
-   * @param p value index
-   * @return value
+   * Returns a value iterator.
+   * @return iterator
    */
-  @SuppressWarnings("unchecked")
-  public E value(final int p) {
-    return (E) values[p];
+  public Iterable<E> values() {
+    return new ArrayIterator<E>(values, 1, size);
   }
 
   @Override
-  protected void rehash() {
-    super.rehash();
-    values = Arrays.copyOf(values, size << 1);
+  protected void rehash(final int s) {
+    super.rehash(s);
+    values = Array.copy(values, new Object[s]);
   }
 
   @Override

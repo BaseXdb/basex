@@ -37,7 +37,7 @@ final class FTIndexTree extends IndexTree {
     final int os = keys.size();
     final int n = index(tok, pre, cf == 0);
     if(os == keys.size()) {
-      final int i = cf > 0 ? maps.value(Num.num(n)) : n;
+      final int i = cf > 0 ? maps.get(Num.num(n)) : n;
       if(poss.size() > i && poss.get(i) != null) {
         poss.set(i, Num.add(poss.get(i), pos));
         numpre.set(i, numpre.get(i) + 1);
@@ -67,7 +67,7 @@ final class FTIndexTree extends IndexTree {
     while(more()) {
       lcn = cn;
       // write compressed representation if the index has already been split
-      pft = cf > 0 ? maps.value(Num.num(lcn)) : lcn;
+      pft = cf > 0 ? maps.get(Num.num(lcn)) : lcn;
       if(pft > -1) return true;
       next();
     }

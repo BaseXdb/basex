@@ -98,7 +98,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract Object toJava() throws QueryException;
 
   @Override
-  public boolean uses(final Use u) {
+  public boolean has(final Flag flag) {
     return false;
   }
 
@@ -121,7 +121,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   @Override
   public Value copy(final QueryContext ctx, final VarScope scp,
-      final IntMap<Var> vs) {
+      final IntObjMap<Var> vs) {
     return this;
   }
 

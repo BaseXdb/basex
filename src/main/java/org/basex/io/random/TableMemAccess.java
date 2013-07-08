@@ -5,7 +5,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.util.list.*;
+import org.basex.util.*;
 
 /**
  * This class allows main memory access to the database table representation.
@@ -17,9 +17,9 @@ import org.basex.util.list.*;
  */
 public final class TableMemAccess extends TableAccess {
   /** Long buffer array. */
-  private long[] buf1 = new long[ElementList.CAP];
+  private long[] buf1 = new long[Array.CAPACITY];
   /** Long buffer array. */
-  private long[] buf2 = new long[ElementList.CAP];
+  private long[] buf2 = new long[Array.CAPACITY];
 
   /**
    * Stores the table in long arrays.
@@ -125,7 +125,7 @@ public final class TableMemAccess extends TableAccess {
     dirty = true;
     final int l = meta.size - op;
     while(l + np >= buf1.length) {
-      final int s = buf1.length << 1;
+      final int s = Array.newSize(buf1.length);
       buf1 = Arrays.copyOf(buf1, s);
       buf2 = Arrays.copyOf(buf2, s);
     }

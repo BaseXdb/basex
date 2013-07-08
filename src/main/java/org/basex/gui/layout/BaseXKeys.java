@@ -1,7 +1,7 @@
 package org.basex.gui.layout;
 
 import static java.awt.event.KeyEvent.*;
-import static org.basex.core.Prop.*;
+import static org.basex.core.Prop.MAC;
 import static org.basex.gui.GUIConstants.*;
 
 import java.awt.event.*;
@@ -168,7 +168,7 @@ public enum BaseXKeys {
    * @return result of check
    */
   public static boolean control(final KeyEvent e) {
-    // Mac offers special characters via ALT, Windows/Linux don't..
+    // With Mac, special characters are available via ALT
     return e.isControlDown() || e.isMetaDown() || !MAC && e.isAltDown();
   }
 
@@ -183,5 +183,12 @@ public enum BaseXKeys {
     return c == VK_ALT || c == VK_SHIFT || c == VK_META || c == VK_CONTROL ||
         c == VK_PAUSE || c == VK_CAPS_LOCK || c == VK_ESCAPE ||
         c == VK_TAB && e.isAltDown();
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(KeyEvent.getKeyModifiersText(mod));
+    if(sb.length() != 0) sb.append('+');
+    return sb.append(KeyEvent.getKeyText(key)).toString();
   }
 }

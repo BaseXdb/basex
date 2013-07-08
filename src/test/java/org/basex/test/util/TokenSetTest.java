@@ -14,9 +14,9 @@ import org.junit.*;
  */
 public class TokenSetTest {
   /** Number of tests. */
-  private static final int SIZE = 65536;
+  private static final int SIZE = 100000;
   /** Token list. */
-  private static final TokenList LIST = new TokenList();
+  private static final TokenList LIST = new TokenList(SIZE);
   /** Token set. */
   private final TokenSet set = new TokenSet();
 

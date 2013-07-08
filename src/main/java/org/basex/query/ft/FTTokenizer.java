@@ -54,14 +54,14 @@ final class FTTokenizer {
           if(ftw == null) {
             ftw = new FTWildcard(qu);
             if(!ftw.parse()) FTREG.thrw(words.info, qu);
-            wcCache.add(qu, ftw);
+            wcCache.put(qu, ftw);
           }
         }
 
         return
           // skip stop words, i. e. if the current query token is a stop word,
           // it is always equal to the corresponding input token:
-          opt.sw != null && opt.sw.id(qu) != 0 ||
+          opt.sw != null && opt.sw.contains(qu) ||
           // fuzzy search:
           (opt.is(FZ) ? ls.similar(in, qu, lserr) :
           // wild-card search:
@@ -99,7 +99,7 @@ final class FTTokenizer {
     FTTokens tokens = cache.get(query);
     if(tokens == null) {
       tokens = new FTTokens();
-      cache.add(query, tokens);
+      cache.put(query, tokens);
 
       // cache query tokens:
       final FTIterator quLex = new FTLexer(opt).init(query);

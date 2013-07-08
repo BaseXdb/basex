@@ -100,7 +100,8 @@ public final class GDt extends ADate {
   }
 
   @Override
-  public int diff(final InputInfo ii, final Item it) throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     throw Err.diff(ii, it, this);
   }
 

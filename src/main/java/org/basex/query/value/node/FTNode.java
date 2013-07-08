@@ -50,13 +50,13 @@ public final class FTNode extends DBNode {
   public double score() {
     if(score == null) {
       if(all == null) return 0;
-      score = Scoring.textNode(all.size, is, tl, data.textLen(pre, true));
+      score = Scoring.textNode(all.size(), is, tl, data.textLen(pre, true));
     }
     return score;
   }
 
   @Override
   public String toString() {
-    return super.toString() + (all != null ? " (" + all.size + ')' : "");
+    return super.toString() + (all != null ? " (" + all.size() + ')' : "");
   }
 }

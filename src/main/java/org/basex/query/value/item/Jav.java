@@ -1,6 +1,7 @@
 package org.basex.query.value.item;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -29,7 +30,12 @@ public final class Jav extends Item {
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    return Str.get(val, qc, ii).val;
+    return materialize(ii).val;
+  }
+
+  @Override
+  public Str materialize(final InputInfo ii) throws QueryException {
+    return Str.get(val, qc, ii);
   }
 
   @Override
@@ -38,12 +44,14 @@ public final class Jav extends Item {
   }
 
   @Override
-  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
+  public boolean eq(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     return Token.eq(string(ii), it.string(ii));
   }
 
   @Override
-  public int diff(final InputInfo ii, final Item it) throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     return Token.diff(string(ii), it.string(ii));
   }
 

@@ -22,9 +22,9 @@ public final class StaticContext {
   public final TokenObjMap<DecFormatter> decFormats = new TokenObjMap<DecFormatter>();
   /** Static and dynamic namespaces. */
   public final NSContext ns = new NSContext();
-  /** Default collation. */
-  public final Uri collation = Uri.uri(URLCOLL, false);
 
+  /** Default collation. */
+  public Collation collation;
   /** Default element/type namespace. */
   public byte[] nsElem;
   /** Default function namespace. */

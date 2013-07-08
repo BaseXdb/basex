@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -26,14 +28,14 @@ public final class DBPragma extends Pragma {
    */
   public DBPragma(final QNm n, final byte[] v) {
    super(n, v);
-    key = string(uc(n.local()));
+    key = string(n.local());
   }
 
   @Override
   void init(final QueryContext ctx, final InputInfo info) throws QueryException {
     old = ctx.context.prop.get(key);
     try {
-      ctx.context.prop.set(key, string(value));
+      ctx.context.prop.set(key.toUpperCase(Locale.ENGLISH), string(value));
     } catch(final Exception ex) {
       BASX_VALUE.thrw(info, ex.getMessage());
     }

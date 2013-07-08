@@ -1,52 +1,52 @@
 package org.basex.util;
 
+import org.basex.util.list.*;
+
 /**
- * This is a simple container for attributes (name/string pairs).
+ * This is a simple container for attributes (name/value pairs).
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Atts {
+public final class Atts extends ElementList {
   /** Name array. */
   private byte[][] nm = new byte[1][];
-  /** String array. */
-  private byte[][] st = new byte[1][];
-  /** Current array size. */
-  private int size;
+  /** Value array. */
+  private byte[][] vl = new byte[1][];
 
   /**
    * Default constructor.
    */
   public Atts() {
     nm = new byte[1][];
-    st = new byte[1][];
+    vl = new byte[1][];
   }
 
   /**
    * Constructor, specifying an initial entry.
    * @param name name to be added
-   * @param string string to be added
+   * @param value value to be added
    */
-  public Atts(final byte[] name, final byte[] string) {
+  public Atts(final byte[] name, final byte[] value) {
     nm = new byte[][] { name };
-    st = new byte[][] { string };
+    vl = new byte[][] { value };
     size = 1;
   }
 
   /**
-   * Adds the next name/string pair.
+   * Adds the next name/value pair.
    * @param name name to be added
-   * @param string string to be added
+   * @param value value to be added
    * @return self reference
    */
-  public Atts add(final byte[] name, final byte[] string) {
+  public Atts add(final byte[] name, final byte[] value) {
     if(size == nm.length) {
-      final int s = size << 1;
+      final int s = Array.newSize(size);
       nm = Array.copyOf(nm, s);
-      st = Array.copyOf(st, s);
+      vl = Array.copyOf(vl, s);
     }
     nm[size] = name;
-    st[size++] = string;
+    vl[size++] = value;
     return this;
   }
 
@@ -56,7 +56,7 @@ public final class Atts {
    */
   public void delete(final int i) {
     Array.move(nm, i + 1, -1, --size - i);
-    Array.move(st, i + 1, -1, size - i);
+    Array.move(vl, i + 1, -1, size - i);
   }
 
   /**
@@ -88,45 +88,29 @@ public final class Atts {
   }
 
   /**
-   * Returns the string at the specified index position.
+   * Returns the value at the specified index position.
    * @param i index
-   * @return string
+   * @return value
    */
-  public byte[] string(final int i) {
-    return st[i];
+  public byte[] value(final int i) {
+    return vl[i];
   }
 
   /**
-   * Returns the string for the specified name, or {@code null}.
+   * Returns the value for the specified name, or {@code null}.
    * @param name name to be found
    * @return offset or -1
    */
-  public byte[] string(final byte[] name) {
+  public byte[] value(final byte[] name) {
     final int i = get(name);
-    return i == -1 ? null : st[i];
+    return i == -1 ? null : vl[i];
   }
 
   /**
-   * Returns the number of attributes.
-   * @return number of attributes
-   */
-  public int size() {
-    return size;
-  }
-
-  /**
-   * Sets the number of attributes.
-   * @param s number of attributes
-   */
-  public void size(final int s) {
-    size = s;
-  }
-
-  /**
-   * Resets the container.
+   * Clears the container.
    * @return self reference
    */
-  public Atts reset() {
+  public Atts clear() {
     size = 0;
     return this;
   }
@@ -136,7 +120,7 @@ public final class Atts {
     final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
     for(int i = 0; i < size; ++i) {
       if(i > 0) tb.add(", ");
-      tb.add(nm[i]).add("=\"").add(st[i]).add("\"");
+      tb.add(nm[i]).add("=\"").add(vl[i]).add("\"");
     }
     return tb.add("]").toString();
   }
@@ -148,7 +132,7 @@ public final class Atts {
   public Atts copy() {
     final Atts copy = new Atts();
     copy.nm = nm.clone();
-    copy.st = st.clone();
+    copy.vl = vl.clone();
     copy.size = size;
     return copy;
   }

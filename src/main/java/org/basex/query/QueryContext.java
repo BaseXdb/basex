@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -15,7 +14,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.Expr.*;
+import org.basex.query.expr.Expr.Flag;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
@@ -80,10 +79,16 @@ public final class QueryContext extends Proc {
   /** Optional initial context set. */
   Nodes nodes;
 
-  /** Current full-text options. */
-  private FTOpt ftOpt;
+  /** Available collations. */
+  public TokenObjMap<Collation> collations;
   /** Current full-text token. */
   public FTLexer fttoken;
+  /** Current full-text options. */
+  private FTOpt ftOpt;
+  /** Full-text position data (needed for highlighting of full-text results). */
+  public FTPosData ftpos;
+  /** Full-text token counter (needed for highlighting of full-text results). */
+  public byte ftoknum;
 
   /** Current Date. */
   public Item date;
@@ -93,11 +98,6 @@ public final class QueryContext extends Proc {
   public Item time;
   /** Current timezone. */
   public Item zone;
-
-  /** Full-text position data (needed for highlighting of full-text results). */
-  public FTPosData ftpos;
-  /** Full-text token counter (needed for highlighting of full-text results). */
-  public byte ftoknum;
 
   /** Strings to lock defined by lock:read option. */
   public StringList readLocks = new StringList(0);
@@ -138,6 +138,8 @@ public final class QueryContext extends Proc {
   ClientSessions sessions;
   /** Root expression of the query. */
   MainModule root;
+  /** Original query. */
+  String query;
 
   /** String container for verbose query info. */
   private final TokenBuilder info = new TokenBuilder();
@@ -170,10 +172,13 @@ public final class QueryContext extends Proc {
    * Parses the specified query.
    * @param qu input query
    * @param path file path (may be {@code null})
+   * @return main module
    * @throws QueryException query exception
    */
-  public void parse(final String qu, final String path) throws QueryException {
+  public MainModule parseMain(final String qu, final String path) throws QueryException {
+    query = qu;
     root = new QueryParser(qu, path, this).parseMain();
+    return root;
   }
 
   /**
@@ -183,8 +188,10 @@ public final class QueryContext extends Proc {
    * @return name of module
    * @throws QueryException query exception
    */
-  public QNm module(final String qu, final String path) throws QueryException {
-    return new QueryParser(qu, path, this).parseModule(true);
+  public LibraryModule parseLibrary(final String qu, final String path)
+      throws QueryException {
+    query = qu;
+    return new QueryParser(qu, path, this).parseLibrary(true);
   }
 
   /**
@@ -193,7 +200,7 @@ public final class QueryContext extends Proc {
    */
   public void mainModule(final MainModule rt) {
     root = rt;
-    updating = rt.expr.uses(Use.UPD);
+    updating = rt.expr.has(Flag.UPD);
   }
 
   /**
@@ -203,7 +210,13 @@ public final class QueryContext extends Proc {
   public void compile() throws QueryException {
     // set database options
     final StringList o = dbOptions;
-    for(int s = 0; s < o.size(); s += 2) context.prop.set(o.get(s), o.get(s + 1));
+    for(int s = 0; s < o.size(); s += 2) {
+      try {
+        context.prop.set(o.get(s).toUpperCase(Locale.ENGLISH), o.get(s + 1));
+      } catch(final Exception ex) {
+        BASX_VALUE.thrw(null, o.get(s), o.get(s + 1));
+      }
+    }
 
     // bind external variables
     vars.bindExternal(this, bindings);
@@ -235,7 +248,11 @@ public final class QueryContext extends Proc {
     analyze();
 
     // dump resulting query
-    if(inf && compInfo) info.add(NL + OPTIMIZED_QUERY_C + NL + funcs + root + NL);
+    if(inf) {
+      info.add(NL).add(QUERY).add(COL).add(NL).add(
+          QueryProcessor.removeComments(query, Integer.MAX_VALUE)).add(NL);
+      if(compInfo) info.add(NL + OPTIMIZED_QUERY + COL + NL + funcs + root + NL);
+    }
   }
 
   /**
@@ -352,7 +369,7 @@ public final class QueryContext extends Proc {
     if(val.getClass().getName().equals("org.basex.http.HTTPContext")) {
       http = val;
     } else {
-      ctxItem = new MainModule(cast(val, type), new VarScope());
+      ctxItem = new MainModule(cast(val, type), new VarScope(), null);
     }
   }
 
@@ -384,7 +401,7 @@ public final class QueryContext extends Proc {
   public void compInfo(final String string, final Object... ext) {
     if(!inf) return;
     if(!compInfo) {
-      info.add(NL).add(COMPILING_C).add(NL);
+      info.add(NL).add(COMPILING).add(COL).add(NL);
       compInfo = true;
     }
     info.add(LI).addExt(string, ext).add(NL);
@@ -397,7 +414,7 @@ public final class QueryContext extends Proc {
   public void evalInfo(final String string) {
     if(!inf) return;
     if(!evalInfo) {
-      info.add(NL).add(EVALUATING_C).add(NL);
+      info.add(NL).add(EVALUATING).add(COL).add(NL);
       evalInfo = true;
     }
     info.add(LI).add(string.replaceAll("\r?\n\\s*", " ")).add(NL);
@@ -560,7 +577,7 @@ public final class QueryContext extends Proc {
    */
   void plan(final FDoc doc) {
     // only show root node if functions or variables exist
-    final FElem e = new FElem(PLAN);
+    final FElem e = new FElem(QueryText.PLAN);
     funcs.plan(e);
     vars.plan(e);
     root.plan(e);
@@ -611,13 +628,13 @@ public final class QueryContext extends Proc {
     }
 
     // convert to json
-    if(type.equalsIgnoreCase(JSONSTR)) {
+    if(type.equalsIgnoreCase(QueryText.JSONSTR)) {
       return new JsonMapConverter(Spec.ECMA_262, true, null).convert(val.toString());
     }
 
     // convert to the specified type
     final QNm nm = new QNm(token(type.replaceAll("\\(.*?\\)$", "")), this);
-    if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm);
+    if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm.string());
 
     Type t = null;
     if(type.endsWith(")")) {
@@ -649,5 +666,25 @@ public final class QueryContext extends Proc {
   public void set(final Var vr, final Value vl, final InputInfo ii)
       throws QueryException {
     stack.set(vr, vl, this, ii);
+  }
+
+  /**
+   * Initializes the static date and time context of a query if not done yet.
+   * @return self reference
+   * @throws QueryException query exception
+   */
+  public QueryContext initDateTime() throws QueryException {
+    if(time == null) {
+      final Date d = Calendar.getInstance().getTime();
+      final String zon = DateTime.format(d, DateTime.ZONE);
+      final String ymd = DateTime.format(d, DateTime.DATE);
+      final String hms = DateTime.format(d, DateTime.TIME);
+      final String zn = zon.substring(0, 3) + ':' + zon.substring(3);
+      time = new Tim(Token.token(hms + zn), null);
+      date = new Dat(Token.token(ymd + zn), null);
+      dtm = new Dtm(Token.token(ymd + 'T' + hms + zn), null);
+      zone = new DTDur(toInt(zon.substring(0, 3)), toInt(zon.substring(3)));
+    }
+    return this;
   }
 }

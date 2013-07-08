@@ -1,7 +1,6 @@
 package org.basex.io.in;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.io.*;
 import org.basex.util.*;
@@ -93,7 +92,8 @@ public class XMLInput extends InputStream {
    * @param ti buffer to be added
    */
   private void add(final NewlineInput ti) {
-    if(++ip == inputs.length) inputs = Arrays.copyOf(inputs, ip << 1);
+    if(++ip == inputs.length)
+      inputs = Array.copy(inputs, new NewlineInput[Array.newSize(ip)]);
     inputs[ip] = ti;
   }
 

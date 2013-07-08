@@ -33,6 +33,14 @@ public final class FDoc extends FNode {
    * Constructor.
    * @param b base uri
    */
+  public FDoc(final String b) {
+    this(Token.token(b));
+  }
+
+  /**
+   * Constructor.
+   * @param b base uri
+   */
   public FDoc(final byte[] b) {
     this(new ANodeList(), b);
   }
@@ -50,6 +58,13 @@ public final class FDoc extends FNode {
     for(final ANode n : ch) n.parent(this);
   }
 
+  @Override
+  public FDoc optimize() {
+    // update parent references
+    for(final ANode n : children) n.parent(this);
+    return this;
+  }
+
   /**
    * Adds a node and updates its parent reference.
    * @param node node to be added
@@ -65,10 +80,10 @@ public final class FDoc extends FNode {
    * Constructor for DOM nodes.
    * Originally provided by Erdal Karaca.
    * @param doc DOM node
-   * @param b base uri
+   * @param bu base uri
    */
-  public FDoc(final DocumentFragment doc, final byte[] b) {
-    this(b);
+  public FDoc(final DocumentFragment doc, final byte[] bu) {
+    this(bu);
     final Node elem = doc.getFirstChild();
     if(elem instanceof Element)
       children.add(new FElem((Element) elem, this, new TokenMap()));
@@ -86,7 +101,7 @@ public final class FDoc extends FNode {
 
   @Override
   public boolean hasChildren() {
-    return children.size() != 0;
+    return !children.isEmpty();
   }
 
   @Override
@@ -96,7 +111,7 @@ public final class FDoc extends FNode {
 
   @Override
   public FDoc copy() {
-    return new FDoc(children, base);
+    return new FDoc(children, base).optimize();
   }
 
   @Override

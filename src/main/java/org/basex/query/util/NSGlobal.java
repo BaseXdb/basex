@@ -40,7 +40,8 @@ public final class NSGlobal {
     NS.add(PKG, PKGURI);
     NS.add(ZIP, ZIPURI);
     // EXQuery namespaces
-    NS.add(RESTXQ, RESTXQURI);
+    NS.add(REST, RESTURI);
+    NS.add(RESTXQ, RESTURI);
     // BaseX namespaces
     NS.add(BXERR, BXERRORS);
     NS.add(BASEX, BASEXURI);
@@ -56,6 +57,7 @@ public final class NSGlobal {
     NS.add(HOF, HOFURI);
     NS.add(HTML, HTMLURI);
     NS.add(INDEX, INDEXURI);
+    NS.add(INSPECT, INSPECTURI);
     NS.add(JSON, JSONURI);
     NS.add(OUT, OUTURI);
     NS.add(PROC, PROCURI);
@@ -65,10 +67,10 @@ public final class NSGlobal {
     NS.add(REPO, REPOURI);
     NS.add(SQL, SQLURI);
     NS.add(STREAM, STREAMURI);
+    NS.add(UNIT, UNITURI);
     NS.add(VLDT, VALIDATEURI);
     NS.add(XSLT, XSLTURI);
     NS.add(XQRY, XQUERYURI);
-    NS.add(XQUNIT, XQUNITURI);
   }
 
   /** Private constructor. */
@@ -81,7 +83,7 @@ public final class NSGlobal {
    */
   public static byte[] uri(final byte[] pref) {
     for(int s = NS.size() - 1; s >= 0; s--) {
-      if(eq(NS.name(s), pref)) return NS.string(s);
+      if(eq(NS.name(s), pref)) return NS.value(s);
     }
     return null;
   }
@@ -93,7 +95,7 @@ public final class NSGlobal {
    */
   public static byte[] prefix(final byte[] uri) {
     for(int s = NS.size() - 1; s >= 0; s--) {
-      if(eq(NS.string(s), uri)) return NS.name(s);
+      if(eq(NS.value(s), uri)) return NS.name(s);
     }
     return EMPTY;
   }
@@ -105,7 +107,7 @@ public final class NSGlobal {
    */
   public static boolean reserved(final byte[] uri) {
     for(int s = RESERVED - 1; s >= 0; s--) {
-      if(eq(NS.string(s), uri)) return true;
+      if(eq(NS.value(s), uri)) return true;
     }
     return false;
   }

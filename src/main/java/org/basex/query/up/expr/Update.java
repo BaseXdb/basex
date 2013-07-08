@@ -8,6 +8,7 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -24,11 +25,12 @@ abstract class Update extends Arr {
    */
   Update(final InputInfo ii, final Expr... e) {
     super(ii, e);
+    type = SeqType.EMP;
   }
 
   @Override
-  public boolean uses(final Use u) {
-    return u == Use.UPD || super.uses(u);
+  public boolean has(final Flag flag) {
+    return flag == Flag.UPD || super.has(flag);
   }
 
   /**

@@ -56,7 +56,7 @@ public final class UpdatableDiskValues extends DiskValues {
     final int last = s - 1;
 
     // create a sorted list of all keys: allows faster binary search
-    final TokenList allkeys = new TokenList(m.keys()).sort(true);
+    final TokenList allkeys = new TokenList(m).sort(true);
 
     // create a sorted list of the new keys and update the old keys
     final TokenList nkeys = new TokenList(m.size());
@@ -81,12 +81,12 @@ public final class UpdatableDiskValues extends DiskValues {
       // shift all bigger keys to the right
       while(i >= ins) {
         idxr.write5(pos * 5L, idxr.read5(i * 5L));
-        ctext.add(pos--, ctext.get(i--));
+        ctext.put(pos--, ctext.get(i--));
       }
 
       // add the new key and its ids
       idxr.write5(pos * 5L, idxl.appendNums(diffs(m.get(key))));
-      ctext.add(pos--, key);
+      ctext.put(pos--, key);
       // [DP] should the entry be added to the cache?
     }
 
@@ -125,7 +125,7 @@ public final class UpdatableDiskValues extends DiskValues {
   @Override
   public synchronized void delete(final TokenObjMap<IntList> m) {
     // create a sorted list of all keys: allows faster binary search
-    final TokenList allkeys = new TokenList(m.keys()).sort(true);
+    final TokenList allkeys = new TokenList(m).sort(true);
 
     // delete ids and create a list of the key positions which should be deleted
     final IntList empty = new IntList(m.size());
@@ -190,7 +190,7 @@ public final class UpdatableDiskValues extends DiskValues {
       if(j < keys.length && i == keys[j]) ++j;
       else {
         idxr.write5(pos * 5L, idxr.read5(i * 5L));
-        ctext.add(pos++, ctext.get(i));
+        ctext.put(pos++, ctext.get(i));
       }
     }
     // reduce the size of the index
@@ -231,7 +231,7 @@ public final class UpdatableDiskValues extends DiskValues {
 
       // add the key and the id
       idxr.write5(ix * 5L, idxl.appendNums(new int[] { id}));
-      ctext.add(ix, key);
+      ctext.put(ix, key);
       // [DP] should the entry be added to the cache?
 
       size.set(s + 1);

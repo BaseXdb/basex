@@ -5,11 +5,12 @@ import java.util.*;
 
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
+import org.basex.util.*;
 
 /**
- * This is an efficient hash map for integers, extending the {@link TokenSet hash set}.
+ * This is an efficient and memory-saving hash map for storing tokens and integers.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class TokenIntMap extends TokenSet {
@@ -20,7 +21,7 @@ public final class TokenIntMap extends TokenSet {
    * Constructor.
    */
   public TokenIntMap() {
-    values = new int[CAP];
+    values = new int[Array.CAPACITY];
   }
 
   /**
@@ -45,29 +46,30 @@ public final class TokenIntMap extends TokenSet {
   }
 
   /**
-   * Indexes the specified keys and values.
-   * If the entry exists, the old value is replaced.
+   * Indexes the specified key and stores the associated value.
+   * If the key already exists, the value is updated.
    * @param key key
-   * @param val value
+   * @param value value
    */
-  public void add(final byte[] key, final int val) {
-    final int i = add(key);
-    values[Math.abs(i)] = val;
+  public void put(final byte[] key, final int value) {
+    // array bounds are checked before array is resized..
+    final int i = put(key);
+    values[i] = value;
   }
 
   /**
    * Returns the value for the specified key.
-   * @param key key to be found
-   * @return value, or {@code -1} if nothing was found
+   * @param key key to be looked up
+   * @return value, or {@code -1} if the key was not found
    */
-  public int value(final byte[] key) {
-    final int id = id(key);
-    return id == 0 ? -1 : values[id];
+  public int get(final byte[] key) {
+    final int i = id(key);
+    return i == 0 ? -1 : values[i];
   }
 
   @Override
-  protected void rehash() {
-    super.rehash();
-    values = Arrays.copyOf(values, size << 1);
+  protected void rehash(final int s) {
+    super.rehash(s);
+    values = Arrays.copyOf(values, s);
   }
 }

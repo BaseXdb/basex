@@ -80,19 +80,33 @@ public final class NameTest extends Test {
     if(node.type != type) return false;
 
     switch(mode) {
-      // wildcard - accept all nodes
-      case ALL:
-        return true;
-      // namespaces wildcard - check only name
-      case NAME:
-        return Token.eq(ln, Token.local(node.name()));
-      // name wildcard - check only namespace
-      case NS:
-        return Token.eq(name.uri(), node.qname(tmpq).uri());
-      default:
-        // check attributes, or check everything
-        return type == NodeType.ATT && !name.hasPrefix() ?
-            Token.eq(ln, node.name()) : name.eq(node.qname(tmpq));
+      // wildcard: accept all nodes
+      case ALL: return true;
+      // namespaces wildcard: only check name
+      case NAME: return Token.eq(ln, Token.local(node.name()));
+      // name wildcard: only check namespace
+      case NS: return Token.eq(name.uri(), node.qname(tmpq).uri());
+      // check attributes, or check everything
+      default: return type == NodeType.ATT && !name.hasPrefix() ?
+        Token.eq(ln, node.name()) : name.eq(node.qname(tmpq));
+    }
+  }
+
+  /**
+   * Checks if the specified name matches the test.
+   * @param nm name
+   * @return result of check
+   */
+  public boolean eq(final QNm nm) {
+    switch(mode) {
+      // wildcard: accept all nodes
+      case ALL:  return true;
+      // namespaces wildcard: only check name
+      case NAME: return Token.eq(ln, nm.local());
+      // name wildcard: only check namespace
+      case NS: return Token.eq(name.uri(), nm.uri());
+      // check everything
+      default: return name.eq(nm);
     }
   }
 
@@ -101,7 +115,7 @@ public final class NameTest extends Test {
     if(mode == Mode.ALL) return "*";
     if(mode == Mode.NAME) return "*:" + Token.string(name.string());
     final String uri = name.uri().length == 0 || name.hasPrefix() ? "" :
-            '{' + Token.string(name.uri()) + '}';
+      '{' + Token.string(name.uri()) + '}';
     return uri + (mode == Mode.NS ? "*" : Token.string(name.string()));
   }
 

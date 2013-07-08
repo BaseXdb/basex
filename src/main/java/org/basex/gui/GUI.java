@@ -256,7 +256,6 @@ public final class GUI extends AGUI {
     new Thread() {
       @Override
       public void run() {
-        views.run();
         checkVersion();
       }
     }.start();
@@ -316,9 +315,10 @@ public final class GUI extends AGUI {
    */
   public void xquery(final String qu, final boolean edit) {
     // check and add default namespace
-    final Namespaces ns = context.data().nspaces;
+    final Data data = context.data();
+    final Namespaces ns = data.nspaces;
     String in = qu.trim().isEmpty() ? "()" : qu;
-    final int u = ns.uri(Token.EMPTY, 0);
+    final int u = ns.uri(Token.EMPTY, 0, data);
     if(u != 0) in = Util.info("declare default element namespace \"%\"; %",
         ns.uri(u), in);
     execute(edit, new XQuery(in));
@@ -360,8 +360,10 @@ public final class GUI extends AGUI {
   boolean exec(final Command cmd, final boolean edit) {
     // wait when command is still running
     final int thread = ++threadID;
-    while(command != null) {
-      command.stop();
+    while(true) {
+      final Command c = command;
+      if(c == null) break;
+      c.stop();
       Thread.yield();
       if(threadID != thread) return true;
     }
@@ -463,7 +465,7 @@ public final class GUI extends AGUI {
 
           if(nodes == null) {
             // make text view visible
-            if(!text.visible() && ao.size() != 0) GUICommands.C_SHOWTEXT.execute(this);
+            if(!text.visible() && ao.size() != 0) GUICommands.C_SHOWRESULT.execute(this);
             // assign textual output if no node result was created
             text.setText(ao);
           }
@@ -521,7 +523,7 @@ public final class GUI extends AGUI {
     final int n2 = top.getComponentCount();
 
     if(n == 0 && n2 == 2) {
-      views.border(0, 0, 0, 0);
+      views.border(0);
     } else {
       views.setBorder(new CompoundBorder(new EmptyBorder(3, 1, 3, 1),
           new EtchedBorder()));

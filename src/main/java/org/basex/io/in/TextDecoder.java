@@ -65,13 +65,13 @@ abstract class TextDecoder {
 
     @Override
     int read(final TextInput ti) throws IOException {
-      int ch = ti.next();
+      int ch = ti.readByte();
       if(ch < 0x80) return ch;
       if(ch < 0xC0) return invalid();
       cache[0] = (byte) ch;
       final int cl = cl((byte) ch);
       for(int c = 1; c < cl; ++c) {
-        ch = ti.next();
+        ch = ti.readByte();
         if(ch < 0x80) return invalid();
         cache[c] = (byte) ch;
       }
@@ -83,9 +83,9 @@ abstract class TextDecoder {
   static class UTF16LE extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
-      final int a = ti.next();
+      final int a = ti.readByte();
       if(a < 0) return a;
-      final int b = ti.next();
+      final int b = ti.readByte();
       if(b < 0) return invalid();
       return a | b << 8;
     }
@@ -95,9 +95,9 @@ abstract class TextDecoder {
   static class UTF16BE extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
-      final int a = ti.next();
+      final int a = ti.readByte();
       if(a < 0) return a;
-      final int b = ti.next();
+      final int b = ti.readByte();
       if(b < 0) return invalid();
       return a << 8 | b;
     }
@@ -107,13 +107,13 @@ abstract class TextDecoder {
   static class UTF32 extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
-      final int a = ti.next();
+      final int a = ti.readByte();
       if(a < 0) return a;
-      final int b = ti.next();
+      final int b = ti.readByte();
       if(b < 0) return invalid();
-      final int c = ti.next();
+      final int c = ti.readByte();
       if(c < 0) return invalid();
-      final int d = ti.next();
+      final int d = ti.readByte();
       if(d < 0) return invalid();
       return a << 24 | b << 16 | c << 8 | d;
     }
@@ -147,7 +147,7 @@ abstract class TextDecoder {
     int read(final TextInput ti) throws IOException {
       int c = -1;
       while(++c < 4) {
-        final int ch = ti.next();
+        final int ch = ti.readByte();
         if(ch < 0) break;
         cache[c] = (byte) ch;
         outc.position(0);

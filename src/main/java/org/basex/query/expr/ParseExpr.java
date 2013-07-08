@@ -163,7 +163,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public void checkNoUp(final Expr e) throws QueryException {
-    if(e != null && e.uses(Use.UPD)) UPNOT.thrw(info, description());
+    if(e != null && e.has(Flag.UPD)) UPNOT.thrw(info, description());
   }
 
   /**
@@ -188,7 +188,7 @@ public abstract class ParseExpr extends Expr {
     for(final Expr e : expr) {
       e.checkUp();
       if(e.isVacuous()) continue;
-      final boolean u = e.uses(Use.UPD);
+      final boolean u = e.has(Flag.UPD);
       if(u && s == -1 || !u && s == 1) UPALL.thrw(info, description());
       s = u ? 1 : -1;
     }
@@ -293,16 +293,12 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified collation is supported.
    * @param e expression to be checked
    * @param ctx query context
+   * @return collator, or {@code null} (default collation)
    * @throws QueryException query exception
    */
-  public final void checkColl(final Expr e, final QueryContext ctx)
+  public final Collation checkColl(final Expr e, final QueryContext ctx)
       throws QueryException {
-
-    final byte[] u = checkStr(e, ctx);
-    if(eq(URLCOLL, u)) return;
-    final Uri uri = Uri.uri(u);
-    if(uri.isAbsolute() || !eq(ctx.sc.baseURI().resolve(uri, info).string(), URLCOLL))
-      IMPLCOL.thrw(info, e);
+    return Collation.get(e == null ? null : checkStr(e, ctx), ctx, info, WHICHCOLL);
   }
 
   /**
@@ -413,17 +409,31 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the specified expression has the specified type; if no, throws
    * an exception.
-   * @param it item to be checked
+   * @param e expression to be checked
    * @param ctx query context
    * @return specified item
    * @throws QueryException query exception
    */
-  public final QNm checkQNm(final Item it, final QueryContext ctx)
+  public final QNm checkQNm(final Expr e, final QueryContext ctx)
       throws QueryException {
 
-    if(checkNoEmpty(it, AtomType.QNM).type == AtomType.QNM) return (QNm) it;
+    final Item it = checkItem(e, ctx);
+    if(it.type == AtomType.QNM) return (QNm) it;
     if(it.type.isUntyped() && ctx.sc.xquery3()) NSSENS.thrw(info, it.type, AtomType.QNM);
     throw Err.INVCAST.thrw(info, it.type, AtomType.QNM);
+  }
+
+  /**
+   * Checks if the specified expression yields a string or binary item.
+   * Checks the type of the given function item.
+   * @param e expression to be evaluated
+   * @param ctx query context
+   * @return function item
+   * @throws QueryException query exception
+   */
+  public FItem checkFunc(final Expr e, final QueryContext ctx)
+      throws QueryException {
+    return (FItem) checkType(checkItem(e, ctx), FuncType.ANY_FUN);
   }
 
   /**
