@@ -297,8 +297,8 @@ public final class DecFormatter extends FormatUtil {
       num = FNNum.abs(FNNum.round(num, num.dbl(ii), pic.maxFrac, true, ii), ii);
 
       // convert positive number to string, chop leading zero
-      String s = (num instanceof Dbl || num instanceof Flt ? Dec.get(d) : num).toString();
-      if(s.startsWith("0.")) s = s.substring(1);
+      final String s = (num instanceof Dbl || num instanceof Flt ?
+          Dec.get(num.dbl(ii)) : num).toString();
 
       // integer/fractional separator
       final int sep = s.indexOf('.');
@@ -349,17 +349,17 @@ public final class DecFormatter extends FormatUtil {
 
   /** Picture variables. */
   static final class Picture {
-    /** prefix/suffix. */
+    /** Prefix/suffix. */
     final TokenBuilder[] fix = { new TokenBuilder(), new TokenBuilder() };
-    /** integer/fractional-part-grouping-positions. */
+    /** Integer/fractional-part-grouping-positions. */
     final int[][] group = { {}, {} };
-    /** minimum-integer/fractional-part-size. */
+    /** Minimum-integer/fractional-part-size. */
     final int[] min = { 0, 0 };
-    /** maximum-fractional-part-size. */
+    /** Maximum-fractional-part-size. */
     int maxFrac;
-    /** percent flag. */
+    /** Percent flag. */
     boolean pc;
-    /** per-mille flag. */
+    /** Per-mille flag. */
     boolean pm;
   }
 }
