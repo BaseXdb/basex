@@ -281,66 +281,69 @@ public final class DecFormatter extends FormatUtil {
     if(Double.isNaN(d)) return nan;
 
     // return infinite results
-    final Picture pic = pics[d < 0 && pics.length == 2 ? 1 : 0];
-    if(d == Double.POSITIVE_INFINITY) return new TokenBuilder().add(
-        pic.fix[0].finish()).add(inf).add(pic.fix[1].finish()).finish();
-    if(d == Double.NEGATIVE_INFINITY) return new TokenBuilder().add(
-        pic.fix[0].finish()).add(minus).add(inf).add(pic.fix[1].finish()).finish();
+    final boolean neg = d < 0 || d == 0 && Double.doubleToLongBits(d) == Long.MIN_VALUE;
+    final Picture pic = pics[neg && pics.length == 2 ? 1 : 0];
+    final TokenBuilder res = new TokenBuilder();
+    final TokenBuilder intgr = new TokenBuilder();
+    final TokenBuilder fract = new TokenBuilder();
 
-    // convert and round number
-    Item num = it;
-    if(pic.pc) num = Calc.MULT.ev(ii, num, Int.get(100));
-    if(pic.pm) num = Calc.MULT.ev(ii, num, Int.get(1000));
-    num = FNNum.round(num, num.dbl(ii), pic.maxFrac, true, ii);
-    if(pics.length == 2) num = FNNum.abs(num, ii);
-
-    // convert to string representation
-    String str = (num instanceof Dbl || num instanceof Flt ? Dec.get(d) : num).toString();
-    if(str.startsWith("0.")) str = str.substring(1);
-    else if(str.startsWith("-0.")) str = '-' + str.substring(2);
-    if(str.startsWith("-")) str = (char) minus + str.substring(1);
-
-    // integer/fractional separator
-    final int sep = str.indexOf('.');
-
-    // create integer part
-    final TokenBuilder pre = new TokenBuilder();
-    final int sl = str.length();
-    final int il = sep == -1 ? sl : sep;
-    for(int i = il; i < pic.min[0]; ++i) pre.add(zero);
-    for(int i = 0; i < il; i++) pre.add(zero + str.charAt(i) - '0');
-
-    // squeeze in grouping separators
-    if(pic.group[0].length == 1) {
-      // regular pattern with repeating separators
-      final int pos = pic.group[0][0];
-      for(int p = pre.size() - (d < 0 ? 2 : 1); p > 0; --p) {
-        if(p % pos == 0) pre.insert(pre.size() - p, grouping);
-      }
+    if(d == Double.POSITIVE_INFINITY || d == Double.NEGATIVE_INFINITY) {
+      intgr.add(inf);
     } else {
-      // irregular pattern, or no separators at all
-      for(int i = 0; i < pic.group[0].length; ++i) {
-        final int pos = pre.size() - pic.group[0][i];
-        if(pos > 0) pre.insert(pos, grouping);
+      // convert and round number
+      Item num = it;
+      if(pic.pc) num = Calc.MULT.ev(ii, num, Int.get(100));
+      if(pic.pm) num = Calc.MULT.ev(ii, num, Int.get(1000));
+      num = FNNum.abs(FNNum.round(num, num.dbl(ii), pic.maxFrac, true, ii), ii);
+
+      // convert positive number to string, chop leading zero
+      String s = (num instanceof Dbl || num instanceof Flt ? Dec.get(d) : num).toString();
+      if(s.startsWith("0.")) s = s.substring(1);
+
+      // integer/fractional separator
+      final int sep = s.indexOf('.');
+
+      // create integer part
+      final int sl = s.length();
+      final int il = sep == -1 ? sl : sep;
+      for(int i = il; i < pic.min[0]; ++i) intgr.add(zero);
+      for(int i = 0; i < il; i++) intgr.add(zero + s.charAt(i) - '0');
+
+      // squeeze in grouping separators
+      if(pic.group[0].length == 1) {
+        // regular pattern with repeating separators
+        final int pos = pic.group[0][0];
+        for(int p = intgr.size() - (neg ? 2 : 1); p > 0; --p) {
+          if(p % pos == 0) intgr.insert(intgr.size() - p, grouping);
+        }
+      } else {
+        // irregular pattern, or no separators at all
+        for(int i = 0; i < pic.group[0].length; ++i) {
+          final int pos = intgr.size() - pic.group[0][i];
+          if(pos > 0) intgr.insert(pos, grouping);
+        }
+      }
+
+      // create fractional part
+      final int fl = sep == -1 ? 0 : sl - il - 1;
+      if(fl != 0) for(int i = sep + 1; i < sl; i++) fract.add(zero + s.charAt(i) - '0');
+      for(int i = fl; i < pic.min[1]; ++i) fract.add(zero);
+
+      // squeeze in grouping separators in a reverse manner
+      final int ul = fract.size();
+      for(int p = pic.group[1].length - 1; p >= 0; p--) {
+        final int pos = pic.group[1][p];
+        if(pos < ul) fract.insert(pos, grouping);
       }
     }
 
-    // create fractional part
-    final TokenBuilder suf = new TokenBuilder();
-    final int fl = sep == -1 ? 0 : sl - il - 1;
-    if(fl != 0) for(int i = sep + 1; i < sl; i++) suf.add(zero + str.charAt(i) - '0');
-    for(int i = fl; i < pic.min[1]; ++i) suf.add(zero);
-
-    // squeeze in grouping separators in a reverse manner
-    final int ul = suf.size();
-    for(int p = pic.group[1].length - 1; p >= 0; p--) {
-      final int pos = pic.group[1][p];
-      if(pos < ul) suf.insert(pos, grouping);
-    }
-
-    final TokenBuilder res = new TokenBuilder(pic.fix[0].finish());
-    res.add(pre.finish());
-    if(!suf.isEmpty()) res.add(decimal).add(suf.finish());
+    // add minus sign
+    if(neg && pics.length != 2) res.add(minus);
+    // add prefix and integer part
+    res.add(pic.fix[0].finish()).add(intgr.finish());
+    // add fractional part
+    if(!fract.isEmpty()) res.add(decimal).add(fract.finish());
+    // add suffix
     return res.add(pic.fix[1].finish()).finish();
   }
 
