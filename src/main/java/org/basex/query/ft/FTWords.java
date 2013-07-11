@@ -295,9 +295,7 @@ public final class FTWords extends FTExpr {
         break;
       case ALL_WORDS:
       case ANY_WORD:
-        final FTOpt opt = ftt.opt.copy(ftt.opt);
-        opt.set(FTFlag.WC, ftt.opt.is(FTFlag.WC));
-        final FTLexer l = new FTLexer(opt);
+        final FTLexer l = new FTLexer(ftt.opt);
         for(final byte[] t : list) {
           l.init(t);
           while(l.hasNext()) ts.add(l.nextToken());
