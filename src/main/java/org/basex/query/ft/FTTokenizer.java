@@ -77,7 +77,7 @@ final class FTTokenizer {
    * @param lex input lexer
    * @return lexer
    */
-  FTLexer copy(final FTLexer lex) {
+  FTLexer lexer(final FTLexer lex) {
     // assign options to text:
     final FTOpt to = lex.ftOpt();
     to.set(ST, opt.is(ST));

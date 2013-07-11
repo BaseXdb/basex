@@ -21,7 +21,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
   /** Tokenizer. */
   private final Tokenizer tok;
   /** Full-text options. */
-  private final FTOpt fto;
+  private final FTOpt ftopt;
   /** Text to be tokenized. */
   private byte[] text = Token.EMPTY;
 
@@ -45,7 +45,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
    * @param opt full-text options
    */
   public FTLexer(final FTOpt opt) {
-    fto = opt;
+    ftopt = opt;
 
     // check if language option is provided:
     Language lang = opt != null ? opt.ln : null;
@@ -155,7 +155,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
    * @return full-text options
    */
   public FTOpt ftOpt() {
-    return fto;
+    return ftopt;
   }
 
   /**

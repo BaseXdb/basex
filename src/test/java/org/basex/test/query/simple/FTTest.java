@@ -202,6 +202,9 @@ public final class FTTest extends QueryTest {
       { "FTWildCard 27", "'a' <- 'a.{1}' using wildcards" },
       { "FTWildCard 28", "'a' <- 'a.{1-5}' using wildcards" },
       { "FTWildCard 29", bool(true), "'hi' <- '\\h\\i' using wildcards" },
+      // #660: combination of FTAnyAllOption and wildcards
+      { "FTWildCard 30", bool(true),
+        "'a' contains text '.*' all words using wildcards" },
 
       { "FTFuzzy 1", node(7, 9, 11), "//* [text() <- 'Database' using fuzzy]" },
       { "FTFuzzy 2", node(7, 9, 11), "//* [text() <- 'Databaze' using fuzzy]" },
