@@ -7,6 +7,8 @@ import static org.basex.util.Token.*;
 import java.awt.event.*;
 import java.io.*;
 
+import javax.swing.*;
+
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -60,11 +62,16 @@ final class EditorArea extends Editor {
         final String path = file.path();
         gui.context.prop.set(Prop.QUERYPATH, path);
         gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
+
         // reload file if it has been changed
-        if(!reopen(false)) {
-          // skip parsing if editor contains file that is currently marked as erroneous
-          if(view.errFile == null || file.eq(view.errFile)) release(Action.PARSE);
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            if(reopen(false)) return;
+            // skip parsing if editor contains file marked as erroneous
+            if(view.errFile == null || file.eq(view.errFile)) release(Action.PARSE);
+          }
+        });
       }
     });
   }
