@@ -244,6 +244,7 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean inlineLets(final QueryContext ctx, final VarScope scp)
       throws QueryException {
+
     boolean change = false, thisRound;
     do {
       thisRound = false;
@@ -253,15 +254,24 @@ public final class GFLWOR extends ParseExpr {
         final int next = iter.nextIndex();
         if(c instanceof Let) {
           final Let lt = (Let) c;
-          if(lt.expr.has(Flag.NDT)) continue;
-          final VarUsage uses = count(lt.var, next);
-          if(uses == VarUsage.NEVER) {
+          final Expr expr = lt.expr;
+          if(expr.has(Flag.NDT)) continue;
+          final VarUsage use = count(lt.var, next);
+          if(use == VarUsage.NEVER) {
             ctx.compInfo(QueryText.OPTVAR, lt.var);
             iter.remove();
             change = true;
-          } else if(lt.expr.isValue() || lt.expr instanceof VarRef && !lt.var.checksType()
-              || uses == VarUsage.ONCE && !lt.expr.has(Flag.CTX)
-              || lt.expr instanceof AxisPath && ((AxisPath) lt.expr).cheap()) {
+          } else if(
+            // inline simple values
+            expr.isValue()
+            // inline variable references without type checks
+            || expr instanceof VarRef && !lt.var.checksType()
+            // inline expressions that occur once, but don't...
+            // - access context (e.g. let $x:=. return <a/>[$x=1]), or
+            // - construct nodes (e.g. let $x:=<X/> return <X xmlns='xx'>{$x/self::X}</X>)
+            || use == VarUsage.ONCE && !expr.has(Flag.CTX) && !expr.has(Flag.CNS)
+            // inline only cheap axis paths
+            || expr instanceof AxisPath && ((AxisPath) expr).cheap()) {
             ctx.compInfo(QueryText.OPTINLINE, lt);
             inline(ctx, scp, lt.var, lt.inlineExpr(ctx, scp), next);
             thisRound = change = true;
