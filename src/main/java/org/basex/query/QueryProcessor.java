@@ -43,8 +43,7 @@ public final class QueryProcessor extends Proc {
    */
   public QueryProcessor(final String qu, final Context cx) {
     query = qu;
-    ctx = new QueryContext(cx);
-    proc(ctx);
+    ctx = proc(new QueryContext(cx));
   }
 
   /**
@@ -319,16 +318,6 @@ public final class QueryProcessor extends Proc {
   @Override
   public String det() {
     return PLEASE_WAIT_D;
-  }
-
-  @Override
-  public boolean registered() {
-    return ctx.registered();
-  }
-
-  @Override
-  public void registered(final boolean reg) {
-    ctx.registered(reg);
   }
 
   @Override
