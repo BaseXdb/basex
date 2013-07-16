@@ -29,22 +29,17 @@ public final class OrderBy extends GFLWOR.Clause {
   VarRef[] refs;
   /** Sort keys. */
   final Key[] keys;
-  /** Stable sort flag. */
-  final boolean stable;
 
   /**
    * Constructor.
    * @param vs variables to sort
    * @param ks sort keys
-   * @param stbl stable sort
    * @param ii input info
    */
-  public OrderBy(final VarRef[] vs, final Key[] ks, final boolean stbl,
-      final InputInfo ii) {
+  public OrderBy(final VarRef[] vs, final Key[] ks, final InputInfo ii) {
     super(ii);
     refs = vs;
     keys = ks;
-    stable = stbl;
   }
 
   @Override
@@ -191,8 +186,8 @@ public final class OrderBy extends GFLWOR.Clause {
           if(c != 0) return or.desc ? -c : c;
         }
 
-        // optional stable sorting
-        return stable ? x - y : 0;
+        // compare positions in the input array last, this ensures stable sorting
+        return x - y;
       }
 
       /**
@@ -216,7 +211,7 @@ public final class OrderBy extends GFLWOR.Clause {
 
   @Override
   public void plan(final FElem plan) {
-    final FElem e = planElem(Token.token(STABLE), Token.token(stable));
+    final FElem e = planElem();
     for(final Key k : keys) k.plan(e);
     plan.add(e);
   }
@@ -225,7 +220,6 @@ public final class OrderBy extends GFLWOR.Clause {
   public String toString() {
     final StringBuilder sb = new StringBuilder(ORDER).append(' ').append(BY);
     for(int i = 0; i < keys.length; i++) sb.append(i == 0 ? " " : SEP).append(keys[i]);
-    if(stable) sb.append(' ').append(STABLE);
     return sb.toString();
   }
 
@@ -270,7 +264,7 @@ public final class OrderBy extends GFLWOR.Clause {
   public OrderBy copy(final QueryContext ctx, final VarScope scp,
       final IntObjMap<Var> vs) {
     return new OrderBy(Arr.copyAll(ctx, scp, vs, refs),
-        Arr.copyAll(ctx, scp, vs, keys), stable, info);
+        Arr.copyAll(ctx, scp, vs, keys), info);
   }
 
   @Override
