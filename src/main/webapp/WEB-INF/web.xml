@@ -56,62 +56,6 @@
     <listener-class>org.basex.http.SessionListener</listener-class>
   </listener>
 
-  <!-- Mapping for static resources (may be restricted to a sub path) -->
-  <servlet>
-    <servlet-name>default</servlet-name>
-    <init-param>
-      <param-name>useFileMappedBuffer</param-name>
-      <param-value>false</param-value>
-    </init-param>
-    <load-on-startup>0</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>default</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
-
-  <!-- WebDAV Service (can be deactivated by removing this entry) -->
-  <servlet>
-    <servlet-name>WebDAV</servlet-name>
-    <servlet-class>org.basex.http.webdav.WebDAVServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-    <!-- service-specific credentials
-    <init-param>
-      <param-name>org.basex.user</param-name>
-      <param-value/>
-    </init-param>
-    <init-param>
-      <param-name>org.basex.password</param-name>
-      <param-value/>
-    </init-param>
-    -->
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>WebDAV</servlet-name>
-    <url-pattern>/webdav/*</url-pattern>
-  </servlet-mapping>
-
-  <!-- REST Service (can be deactivated by removing this entry) -->
-  <servlet>
-    <servlet-name>REST</servlet-name>
-    <servlet-class>org.basex.http.rest.RESTServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-    <!-- service-specific credentials
-    <init-param>
-      <param-name>org.basex.user</param-name>
-      <param-value/>
-    </init-param>
-    <init-param>
-      <param-name>org.basex.password</param-name>
-      <param-value/>
-    </init-param>
-    -->
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>REST</servlet-name>
-    <url-pattern>/rest/*</url-pattern>
-  </servlet-mapping>
-
   <!-- RESTXQ Service (can be deactivated by removing this entry) -->
   <servlet>
     <servlet-name>RESTXQ</servlet-name>
@@ -130,6 +74,60 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>RESTXQ</servlet-name>
-    <url-pattern>/restxq/*</url-pattern>
+    <url-pattern>/*</url-pattern>
   </servlet-mapping>
+
+  <!-- REST Service (can be deactivated by removing this entry) -->
+  <servlet>
+    <servlet-name>REST</servlet-name>
+    <servlet-class>org.basex.http.rest.RESTServlet</servlet-class>
+    <!-- service-specific credentials
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value/>
+    </init-param>
+    <init-param>
+      <param-name>org.basex.password</param-name>
+      <param-value/>
+    </init-param>
+    -->
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>REST</servlet-name>
+    <url-pattern>/rest/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- WebDAV Service (can be deactivated by removing this entry) -->
+  <servlet>
+    <servlet-name>WebDAV</servlet-name>
+    <servlet-class>org.basex.http.webdav.WebDAVServlet</servlet-class>
+    <!-- service-specific credentials
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value/>
+    </init-param>
+    <init-param>
+      <param-name>org.basex.password</param-name>
+      <param-value/>
+    </init-param>
+    -->
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WebDAV</servlet-name>
+    <url-pattern>/webdav/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Mapping for static resources (may be restricted to a sub path) -->
+  <servlet>
+    <servlet-name>default</servlet-name>
+    <init-param>
+      <param-name>useFileMappedBuffer</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/static/*</url-pattern>
+  </servlet-mapping>
+
 </web-app>

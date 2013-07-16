@@ -53,6 +53,7 @@ final class RestXqResponse {
     String redirect = null, forward = null;
     RestXqRespBuilder resp = null;
 
+    query.context.register(query);
     try {
       // bind variables
       final StaticFunc uf = function.function;
@@ -61,12 +62,11 @@ final class RestXqResponse {
 
       // wrap function with a function call
       final StaticFuncCall sfc = new BaseFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
-      final MainModule mod = new MainModule(sfc, new VarScope(), null);
+      final MainModule mm = new MainModule(sfc, new VarScope(), null);
 
       // assign main module and http context and register process
-      query.mainModule(mod);
+      query.mainModule(mm);
       query.context(http, null);
-      query.context.register(query);
 
       // compile and evaluate query
       query.compile();
