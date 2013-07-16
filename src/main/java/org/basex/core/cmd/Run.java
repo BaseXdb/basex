@@ -41,11 +41,11 @@ public final class Run extends Execute {
       } else {
         try {
           // retrieve file contents
-          args[0] = file.string();
+          final String input = file.string();
           // interpret as commands if input ends with command script suffix
-          if(file.hasSuffix(IO.BXSSUFFIX)) return super.init(ctx);
+          if(file.hasSuffix(IO.BXSSUFFIX)) return super.init(input, ctx);
           // otherwise, interpret input as xquery
-          list.add(new XQuery(args[0]));
+          list.add(new XQuery(input));
         } catch(final IOException ex) {
           error = Util.message(ex);
         }
