@@ -1112,7 +1112,7 @@ public class QueryParser extends InputParser {
         final VarRef[] vs = new VarRef[curr.size()];
         int i = 0;
         for(final Var v : curr.values()) vs[i++] = new VarRef(ob[0].info, v);
-        clauses.add(new OrderBy(vs, ob, stable, ob[0].info));
+        clauses.add(new OrderBy(vs, ob, ob[0].info));
         alter = ORDERBY;
       }
 
