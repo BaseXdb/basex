@@ -19,7 +19,7 @@ import org.junit.*;
  */
 public final class RestXqTest extends HTTPTest {
   /** Root path. */
-  private static final String ROOT = "http://" + LOCALHOST + ":9998/restxq/";
+  private static final String ROOT = "http://" + LOCALHOST + ":9998/";
   /** Query header. */
   private static final String HEADER =
     "module  namespace m = 'http://basex.org/modules/restxq/test';" + Prop.NL +
