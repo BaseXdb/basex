@@ -59,7 +59,6 @@ public class XMLInput extends InputStream {
    */
   public void prev(final int p) {
     pp -= p;
-    pos();
   }
 
   @Override
@@ -107,7 +106,7 @@ public class XMLInput extends InputStream {
    * @return file position
    */
   public int pos() {
-    return Math.max(0, inputs[0].size() + pp);
+    return Math.max(ip, inputs[ip].size() + pp);
   }
 
   /**
