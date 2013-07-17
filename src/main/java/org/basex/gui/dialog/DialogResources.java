@@ -195,8 +195,7 @@ public class DialogResources extends BaseXBack {
     cmax = f.addLeaves(name, cmax, root);
 
     // add dummy node if maximum number of nodes is exceeded
-    if(cmax <= 0)
-      root.add(new TreeLeaf(token("..."), sub, false, true, tree, data));
+    if(cmax <= 0) root.add(new TreeLeaf(token(DOTS), sub, false, true, tree, data));
 
     ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(root);
   }

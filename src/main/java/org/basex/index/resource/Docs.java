@@ -279,8 +279,7 @@ final class Docs {
   }
 
   /**
-   * Adds the database paths for the child documents of the given path to
-   * the given map.
+   * Adds the database paths for the child documents of the given path to the given map.
    * @param path path
    * @param dir returns directories instead of files
    * @param tbm map; values will be {@code false} to indicate documents
@@ -291,17 +290,20 @@ final class Docs {
     final String pth = MetaData.normPath(string(path));
     if(pth == null) return;
 
-    // normalize path to one leading + one trailing slash!
-    byte[] tp = concat(SLASH, token(pth));
-    // if the given path is the root, don't add a trailing slash
-    if(!pth.isEmpty()) tp = concat(tp, SLASH);
-    for(final byte[] to : paths()) {
-      if(startsWith(to, tp)) {
-        final byte[] toAdd = substring(to, tp.length, to.length);
-        final int i = indexOf(toAdd, SLASH);
+    // normalize root path
+    byte[] root = token(pth);
+    if(root.length != 0) root = concat(root, SLASH);
+
+    final IntList docs = docs();
+    final int ds = docs.size();
+    for(int d = 0; d < ds; d++) {
+      byte[] np = data.text(docs.get(d), true);
+      if(startsWith(np, root)) {
+        np = substring(np, root.length, np.length);
+        final int i = indexOf(np, SLASH);
         // no more slashes means this must be a leaf
-        if(!dir && i == -1) tbm.put(toAdd, false);
-        else if(dir && i >= 0) tbm.put(substring(toAdd, 0, i), false);
+        if(!dir && i == -1) tbm.put(np, false);
+        else if(dir && i >= 0) tbm.put(substring(np, 0, i), false);
       }
     }
   }
