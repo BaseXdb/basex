@@ -1,7 +1,6 @@
 package org.basex.query.gflwor;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Array.*;
 
 import java.util.*;
 import java.util.List;
@@ -48,7 +47,7 @@ public final class OrderBy extends GFLWOR.Clause {
       /** Sorted output tuples. */
       private Value[][] tpls;
       /** Permutation of the values. */
-      private int[] perm;
+      private Integer[] perm;
       /** Current position. */
       int pos;
       @Override
@@ -84,7 +83,7 @@ public final class OrderBy extends GFLWOR.Clause {
 
         final int len = tuples.size() >>> 1;
         final Item[][] ks = new Item[len][];
-        perm = new int[len];
+        perm = new Integer[len];
         tpls = new Value[len][];
         for(int i = 0; i < len; i++) {
           perm[i] = i;
@@ -93,118 +92,34 @@ public final class OrderBy extends GFLWOR.Clause {
         }
         // be nice to the garbage collector
         tuples = null;
-        sort(ks, 0, len);
-      }
+        try {
+          Arrays.sort(perm, new Comparator<Integer>() {
+            @Override
+            public int compare(final Integer x, final Integer y) {
+              try {
+                final Item[] a = ks[x], b = ks[y];
+                for(int k = 0; k < keys.length; k++) {
+                  final Key or = keys[k];
+                  Item m = a[k], n = b[k];
+                  if(m == Dbl.NAN || m == Flt.NAN) m = null;
+                  if(n == Dbl.NAN || n == Flt.NAN) n = null;
+                  if(m != null && n != null && !m.comparable(n))
+                    Err.cast(or.info, m.type, n);
 
-      /**
-       * Recursively sorts the specified items.
-       * The algorithm is derived from {@link Arrays#sort(int[])}.
-       * @param ks sort keys
-       * @param start start position
-       * @param len end position
-       * @throws QueryException query exception
-       */
-      private void sort(final Item[][] ks, final int start, final int len)
-          throws QueryException {
-
-        if(len < 7) {
-          // use insertion sort of small arrays
-          for(int i = start; i < len + start; i++) {
-            for(int j = i; j > start && cmp(ks, perm[j - 1], perm[j]) > 0; j--) {
-              swap(perm, j, j - 1);
+                  final int c = m == null
+                      ? n == null ? 0                 : or.least ? -1 : 1
+                      : n == null ? or.least ? 1 : -1 : m.diff(n, or.coll, or.info);
+                  if(c != 0) return or.desc ? -c : c;
+                }
+                return 0;
+              } catch(final QueryException e) {
+                throw new QueryRTException(e);
+              }
             }
-          }
-          return;
+          });
+        } catch(QueryRTException e) {
+          throw e.wrapped();
         }
-
-        // find a good pivot element
-        int mid = start + (len >> 1);
-        if(len > 7) {
-          int left = start, right = start + len - 1;
-          if(len > 40) {
-            final int k = len >>> 3;
-            left = median(ks, left, left + k, left + (k << 1));
-            mid = median(ks, mid - k, mid, mid + k);
-            right = median(ks, right - (k << 1), right - k, right);
-          }
-          mid = median(ks, left, mid, right);
-        }
-
-        final int pivot = perm[mid];
-
-        // partition the values
-        int a = start, b = a, c = start + len - 1, d = c;
-        while(true) {
-          while(b <= c) {
-            final int h = cmp(ks, perm[b], pivot);
-            if(h > 0) break;
-            if(h == 0) swap(perm, a++, b);
-            ++b;
-          }
-          while(c >= b) {
-            final int h = cmp(ks, perm[c], pivot);
-            if(h < 0) break;
-            if(h == 0) swap(perm, c, d--);
-            --c;
-          }
-          if(b > c) break;
-          swap(perm, b++, c--);
-        }
-
-        // Swap pivot elements back to middle
-        int k;
-        final int n = start + len;
-        k = Math.min(a - start, b - a);
-        swap(perm, start, b - k, k);
-        k = Math.min(d - c, n - d - 1);
-        swap(perm, b, n - k, k);
-
-        // recursively sort non-pivot elements
-        if((k = b - a) > 1) sort(ks, start, k);
-        if((k = d - c) > 1) sort(ks, n - k, k);
-      }
-
-      /**
-       * Returns the difference of two entries (part of QuickSort).
-       * @param ks sort keys
-       * @param x first position
-       * @param y second position
-       * @return result
-       * @throws QueryException query exception
-       */
-      private int cmp(final Item[][] ks, final int x, final int y) throws QueryException {
-        final Item[] a = ks[x], b = ks[y];
-        for(int k = 0; k < keys.length; k++) {
-          final Key or = keys[k];
-          Item m = a[k], n = b[k];
-          if(m == Dbl.NAN || m == Flt.NAN) m = null;
-          if(n == Dbl.NAN || n == Flt.NAN) n = null;
-          if(m != null && n != null && !m.comparable(n)) Err.cast(or.info, m.type, n);
-
-          final int c = m == null ? n == null ? 0 : or.least ? -1 : 1 : n == null ?
-            or.least ? 1 : -1 : m.diff(n, or.coll, or.info);
-          if(c != 0) return or.desc ? -c : c;
-        }
-
-        // compare positions in the input array last, this ensures stable sorting
-        return x - y;
-      }
-
-      /**
-       * Returns the index of the median of the three indexed integers.
-       * @param ks key array
-       * @param a first offset
-       * @param b second offset
-       * @param c thirst offset
-       * @return median
-       * @throws QueryException query exception
-       */
-      private int median(final Item[][] ks, final int a, final int b, final int c)
-          throws QueryException {
-        final int ka = perm[a], kb = perm[b], kc = perm[c];
-        return cmp(ks, ka, kb) < 0
-             ? cmp(ks, kb, kc) < 0 ? b : cmp(ks, ka, kc) < 0 ? c : a
-             : cmp(ks, kb, kc) > 0 ? b : cmp(ks, ka, kc) > 0 ? c : a;
       }
     };
   }
