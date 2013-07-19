@@ -65,16 +65,18 @@ final class NSNode {
   }
 
   /**
-   * Sorts the specified node into the child array.
+   * Adds the specified node into the child array, which is sorted by pre values.
    * @param n child node
    */
   void add(final NSNode n) {
-    int s = size;
-    if(s == children.length) {
-      children = Array.copy(children, new NSNode[Array.newSize(s)]);
-    }
-    while(--s >= 0 && n.pre - children[s].pre <= 0);
-    System.arraycopy(children, ++s, children, s + 1, size++ - s);
+    if(size == children.length)
+      children = Array.copy(children, new NSNode[Array.newSize(size)]);
+
+    // find inserting position
+    int s = find(n.pre);
+    if(s < 0 || n.pre != children[s].pre) s++;
+
+    System.arraycopy(children, s, children, s + 1, size++ - s);
     children[s] = n;
     n.parent = this;
   }
@@ -119,7 +121,7 @@ final class NSNode {
    */
   NSNode find(final int p, final Data d) {
     final int s = find(p);
-    // no match found: return current nod
+    // no match found: return current node
     if(s == -1) return this;
     final NSNode ch = children[s];
     final int cp = ch.pre;
