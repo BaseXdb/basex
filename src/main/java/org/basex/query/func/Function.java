@@ -842,8 +842,7 @@ public enum Function {
   /* FNIndex functions. */
 
   /** XQuery function. */
-  _INDEX_FACETS(FNIndex.class, "facets(database[,type])",
-      arg(STR, STR), DOC_O),
+  _INDEX_FACETS(FNIndex.class, "facets(database[,type])", arg(STR, STR), DOC_O),
   /** XQuery function. */
   _INDEX_TEXTS(FNIndex.class, "texts(database[,prefix[,ascending]])",
       arg(STR, STR, BLN), NOD_ZM, flag(NDT)),
@@ -851,11 +850,9 @@ public enum Function {
   _INDEX_ATTRIBUTES(FNIndex.class, "attributes(database[,prefix[,ascending]])",
       arg(STR, STR, BLN), NOD_ZM, flag(NDT)),
   /** XQuery function. */
-  _INDEX_ELEMENT_NAMES(FNIndex.class, "element-names(database)",
-      arg(STR), NOD_ZM),
+  _INDEX_ELEMENT_NAMES(FNIndex.class, "element-names(database)", arg(STR), NOD_ZM),
   /** XQuery function. */
-  _INDEX_ATTRIBUTE_NAMES(FNIndex.class, "attribute-names(database)",
-      arg(STR), NOD_ZM),
+  _INDEX_ATTRIBUTE_NAMES(FNIndex.class, "attribute-names(database)", arg(STR), NOD_ZM),
 
   /* FNInspect functions. */
 
@@ -866,13 +863,14 @@ public enum Function {
   /** XQuery function. */
   _INSPECT_CONTEXT(FNInspect.class, "context()", arg(), ELM),
   /** XQuery function. */
+  _INSPECT_FUNCTIONS(FNInspect.class, "functions()", arg(), FUN_ZM),
+  /** XQuery function. */
   _INSPECT_XQDOC(FNInspect.class, "xqdoc(path)", arg(STR), ELM),
 
   /* FNJson functions. */
 
   /** XQuery function. */
-  _JSON_PARSE(FNJson.class, "parse(string[,config])",
-      arg(STR, MAP_O), ITEM_ZO),
+  _JSON_PARSE(FNJson.class, "parse(string[,config])", arg(STR, MAP_O), ITEM_ZO),
   /** XQuery function. */
   _JSON_PARSE_ML(FNJson.class, "parse-ml(string)", arg(STR), NOD),
   /** XQuery function. */

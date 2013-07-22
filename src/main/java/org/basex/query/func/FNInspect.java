@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.inspect.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -24,6 +25,14 @@ public class FNInspect extends StandardFunc {
    */
   public FNInspect(final InputInfo ii, final Function f, final Expr... e) {
     super(ii, f, e);
+  }
+
+  @Override
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    switch(sig) {
+      case _INSPECT_FUNCTIONS: return contextFunctions(ctx);
+      default:                         return super.iter(ctx);
+    }
   }
 
   @Override
@@ -79,5 +88,17 @@ public class FNInspect extends StandardFunc {
   private Item xqdoc(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
     return new XQDoc(ctx, info).parse(IO.get(string(checkStr(expr[0], ctx))));
+  }
+
+  /**
+   * Performs the context-functions function.
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private ValueBuilder contextFunctions(final QueryContext ctx) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder();
+    for(final StaticFunc sf : ctx.funcs.funcs()) vb.add(Functions.getUser(sf, ctx, info));
+    return vb;
   }
 }

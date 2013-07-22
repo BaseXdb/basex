@@ -156,16 +156,7 @@ public final class Functions extends TokenSet {
 
     // user-defined function
     final StaticFunc sf = ctx.funcs.get(name, arity, ii);
-    if(sf != null) {
-      final FuncType ft = sf.funcType();
-      final VarScope scp = new VarScope();
-      final QNm[] names = new QNm[arity];
-      for(int a = 0; a < arity; a++) names[a] = sf.args[a].name;
-      final Var[] args = new Var[arity];
-      final Expr[] calls = ft.args(args, ctx, scp, ii);
-      final TypedFunc tf = ctx.funcs.getFuncRef(name, calls, ctx.sc, ii);
-      return new FuncItem(name, args, tf.fun, ft, scp, ctx.sc, sf);
-    }
+    if(sf != null) return getUser(sf, ctx, ii);
 
     // Java function (only allowed with administrator permissions)
     final VarScope scp = new VarScope();
@@ -176,6 +167,29 @@ public final class Functions extends TokenSet {
     if(jm != null) return new FuncLit(name, vs, jm, jt, scp, ctx.sc, ii);
 
     return null;
+  }
+
+
+  /**
+   * Returns a function item for a user-defined function.
+   * @param sf static function
+   * @param ctx query context
+   * @param info input info
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  public static FuncItem getUser(final StaticFunc sf, final QueryContext ctx,
+      final InputInfo info) throws QueryException {
+
+    final FuncType ft = sf.funcType();
+    final VarScope scp = new VarScope();
+    final int arity = sf.args.length;
+    final QNm[] names = new QNm[arity];
+    for(int a = 0; a < arity; a++) names[a] = sf.args[a].name;
+    final Var[] args = new Var[arity];
+    final Expr[] calls = ft.args(args, ctx, scp, info);
+    final TypedFunc tf = ctx.funcs.getFuncRef(sf.name, calls, ctx.sc, info);
+    return new FuncItem(sf.name, args, tf.fun, ft, scp, ctx.sc, sf);
   }
 
   /**

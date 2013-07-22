@@ -32,19 +32,14 @@ public final class XQDoc extends Inspect {
 
   /**
    * Constructor.
-   * @param ii input info
    * @param qc query context
+   * @param ii input info
    */
   public XQDoc(final QueryContext qc, final InputInfo ii) {
     super(qc, ii);
   }
 
-  /**
-   * Parses a module and returns an xqdoc element.
-   * @param io input reference
-   * @return xqdoc element
-   * @throws QueryException query exception
-   */
+  @Override
   public FElem parse(final IO io) throws QueryException {
     final QueryParser qp = parseQuery(io);
     final FElem xqdoc = new FElem(PREFIX, PREFIX, URI).declareNS();
@@ -123,6 +118,12 @@ public final class XQDoc extends Inspect {
     return elem;
   }
 
+  @Override
+  protected FElem tag(final byte[] tag, final FElem parent) {
+    return eq(tag, DOC_TAGS) ? elem(string(tag), parent) :
+      elem("custom", parent).add("tag", tag);
+  }
+
   /**
    * Creates a comment element.
    * @param scope scope
@@ -131,12 +132,6 @@ public final class XQDoc extends Inspect {
   private void comment(final StaticScope scope, final FElem parent) {
     final TokenObjMap<TokenList> map = scope.doc();
     if(map != null) comment(map, elem("comment", parent));
-  }
-
-  @Override
-  protected FElem tag(final byte[] tag, final FElem parent) {
-    return eq(tag, DOC_TAGS) ? elem(string(tag), parent) :
-      elem("custom", parent).add("tag", tag);
   }
 
   /**

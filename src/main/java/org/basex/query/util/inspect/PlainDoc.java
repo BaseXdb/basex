@@ -31,8 +31,8 @@ public final class PlainDoc extends Inspect {
   }
 
   /**
-   * Parses a module and returns an xqdoc element.
-   * @return xqdoc element
+   * Parses a module and returns an inspection element.
+   * @return inspection element
    * @throws QueryException query exception
    */
   public FElem context() throws QueryException {
@@ -48,12 +48,7 @@ public final class PlainDoc extends Inspect {
     return context;
   }
 
-  /**
-   * Parses a module and returns an xqdoc element.
-   * @param io input reference
-   * @return xqdoc element
-   * @throws QueryException query exception
-   */
+  @Override
   public FElem parse(final IO io) throws QueryException {
     final QueryParser qp = parseQuery(io);
     final FElem mod = elem("module", null);
@@ -66,13 +61,8 @@ public final class PlainDoc extends Inspect {
     final TokenObjMap<TokenList> doc = module.doc();
     if(doc != null) comment(doc, mod);
 
-    for(final StaticVar sv : qp.vars) {
-      variable(sv, mod);
-    }
-    for(final StaticFunc sf : qp.funcs) {
-      function(sf.name, sf, sf.funcType(), mod);
-    }
-
+    for(final StaticVar sv : qp.vars) variable(sv, mod);
+    for(final StaticFunc sf : qp.funcs) function(sf.name, sf, sf.funcType(), mod);
     return mod;
   }
 

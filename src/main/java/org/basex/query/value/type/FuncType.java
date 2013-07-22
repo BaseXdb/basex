@@ -242,8 +242,9 @@ public class FuncType implements Type {
    * @param ii input info
    * @return calls to the variables
    */
-  public Expr[] args(final Var[] vs, final QueryContext ctx,
-      final VarScope scp, final InputInfo ii) {
+  public Expr[] args(final Var[] vs, final QueryContext ctx, final VarScope scp,
+      final InputInfo ii) {
+
     final Expr[] refs = new Expr[vs.length];
     for(int i = 0; i < vs.length; i++)
       refs[i] = new VarRef(ii, vs[i] = scp.uniqueVar(ctx, args[i], true));

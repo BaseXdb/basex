@@ -54,7 +54,8 @@ public final class FNInspectTest extends AdvancedQueryTest {
   public void module() {
     error(_INSPECT_MODULE.args("src/test/resources/non-existent.xqm"), Err.WHICHRES);
 
-    final String result = query(_INSPECT_MODULE.args("src/test/resources/hello.xqm"));
+    final String module = "src/test/resources/hello.xqm";
+    final String result = query(_INSPECT_MODULE.args(module));
     final String var = query(result + "/variable[@name = 'hello:lazy']");
     query(var + "/@uri/data()", "world");
     query(var + "/annotation/@name/data()", "basex:lazy");
@@ -76,5 +77,24 @@ public final class FNInspectTest extends AdvancedQueryTest {
     // validate against xqDoc schema
     final String result = query(_INSPECT_XQDOC.args("src/test/resources/hello.xqm"));
     query(_VALIDATE_XSD.args(result, "src/test/resources/xqdoc.xsd"));
+  }
+
+  /** Test method. */
+  @Test
+  public void context() {
+    final String func = query("declare function local:x() { 1 }; " +
+        _INSPECT_CONTEXT.args());
+    query(func + "/name()", "context");
+    query(COUNT.args(func + "/function"), "1");
+    query(func + "/function/@name/string()", "local:x");
+  }
+
+  /** Test method. */
+  @Test
+  public void contextFunctions() {
+    query("declare function local:x() { 1 }; " +
+        COUNT.args(_INSPECT_FUNCTIONS.args()), "1");
+    query("declare function local:x() { 2 }; " +
+        _INSPECT_FUNCTIONS.args() + "()", "2");
   }
 }
