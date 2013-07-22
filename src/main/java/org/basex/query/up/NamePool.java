@@ -41,8 +41,8 @@ public final class NamePool {
   }
 
   /**
-   * Finds duplicate attributes.
-   * @return name of duplicate attribute, or {@code null}
+   * Returns the name of a duplicate attribute, or {@code null}.
+   * @return name of duplicate attribute
    */
   QNm duplicate() {
     // if node has been deleted, overall count for duplicates must be bigger 2
