@@ -27,15 +27,6 @@ public final class Unit {
   private final QueryContext ctx;
   /** Input info. */
   private final InputInfo info;
-
-  /** Tests performed before a function. */
-  private final ArrayList<StaticFunc> before = new ArrayList<StaticFunc>(1);
-  /** Tests performed after a function. */
-  private final ArrayList<StaticFunc> after = new ArrayList<StaticFunc>(1);
-  /** Tests performed before a module. */
-  private final ArrayList<StaticFunc> beforeModule = new ArrayList<StaticFunc>(1);
-  /** Tests performed after a module. */
-  private final ArrayList<StaticFunc> afterModule = new ArrayList<StaticFunc>(1);
   /** Currently processed function. */
   private StaticFunc current;
 
@@ -50,22 +41,39 @@ public final class Unit {
   }
 
   /**
-   * Performs the run function.
+   * Performs the test function.
    * @return resulting value
    * @throws QueryException query exception
    */
   public FElem test() throws QueryException {
-    final FElem tests = new FElem(TESTSUITE).add(NAME, ctx.sc.baseURI().string());
-    int t = 0, e = 0, f = 0, s = 0;
-
     final IO file = ctx.sc.baseIO();
-    final Performance p = new Performance();
-
-    // loop through all functions
+    final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
     for(final StaticFunc uf : ctx.funcs.funcs()) {
       // consider only functions that are defined in the same file
-      if(!file.eq(new IOFile(uf.info.file()))) continue;
+      if(file.eq(new IOFile(uf.info.file()))) funcs.add(uf);
+    }
+    return test(funcs);
+  }
 
+  /**
+   * Performs the test function.
+   * @param funcs functions to test
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  public FElem test(final ArrayList<StaticFunc> funcs) throws QueryException {
+    final FElem testsuite = new FElem(TESTSUITE).add(NAME, ctx.sc.baseURI().string());
+    int t = 0, e = 0, f = 0, s = 0;
+
+    final ArrayList<StaticFunc> before = new ArrayList<StaticFunc>(1);
+    final ArrayList<StaticFunc> after = new ArrayList<StaticFunc>(1);
+    final ArrayList<StaticFunc> beforeModule = new ArrayList<StaticFunc>(1);
+    final ArrayList<StaticFunc> afterModule = new ArrayList<StaticFunc>(1);
+    final ArrayList<StaticFunc> tests = new ArrayList<StaticFunc>(1);
+
+    // loop through all functions
+    final Performance p = new Performance();
+    for(final StaticFunc uf : funcs) {
       // find Unit annotations
       final Ann ann = uf.ann;
       final int as = ann.size();
@@ -83,21 +91,16 @@ public final class Unit {
       if(indexOf(uf, AFTER) != -1) after.add(uf);
       if(indexOf(uf, BEFORE_MODULE) != -1) beforeModule.add(uf);
       if(indexOf(uf, AFTER_MODULE) != -1) afterModule.add(uf);
+      if(indexOf(uf, TEST) != -1) tests.add(uf);
     }
 
     try {
       // call initializing functions before first test
       for(final StaticFunc uf : beforeModule) eval(uf);
 
-      for(final StaticFunc uf : ctx.funcs.funcs()) {
-        // consider only test functions that are defined in the same file
-        if(!file.eq(new IOFile(uf.info.file()))) continue;
-        // find test annotation
-        final int pos = indexOf(uf, TEST);
-        if(pos == -1) continue;
-
+      for(final StaticFunc uf : tests) {
         // check arguments
-        final Value values = uf.ann.values[pos];
+        final Value values = uf.ann.values[indexOf(uf, TEST)];
         final long vs = values.size();
 
         // expected error code
@@ -110,7 +113,7 @@ public final class Unit {
           }
         }
 
-        final FElem test = new FElem(TESTCASE).add(NAME, uf.name.local());
+        final FElem testcase = new FElem(TESTCASE).add(NAME, uf.name.local());
         t++;
 
         final Performance pt = new Performance();
@@ -120,7 +123,7 @@ public final class Unit {
           final FElem skipped = new FElem(SKIPPED);
           final Value sv = uf.ann.values[skip];
           if(sv.size() > 0) skipped.add(MESSAGE, sv.itemAt(0).string(info));
-          test.add(skipped);
+          testcase.add(skipped);
           s++;
         } else {
           try {
@@ -136,7 +139,7 @@ public final class Unit {
               final FElem error = new FElem(FAILURE);
               error.add(MESSAGE, "Error expected.");
               error.add(TYPE, code);
-              test.add(error);
+              testcase.add(error);
             }
           } catch(final QueryException ex) {
             final QNm name = ex.qname();
@@ -148,12 +151,12 @@ public final class Unit {
               final FElem error = new FElem(failure ? FAILURE : ERROR);
               error.add(MESSAGE, ex.getLocalizedMessage());
               error.add(TYPE, ex.qname().local());
-              test.add(error);
+              testcase.add(error);
             }
           }
         }
-        test.add(TIME, time(pt));
-        tests.add(test);
+        testcase.add(TIME, time(pt));
+        testsuite.add(testcase);
       }
 
       // run finalizing tests
@@ -163,15 +166,15 @@ public final class Unit {
       // handle initializers
       final FElem test = new FElem(TESTCASE).add(NAME, current.name.local());
       test.add(TIME, time(p));
-      tests.add(test);
+      testsuite.add(test);
     }
 
-    tests.add(TIME, time(p));
-    tests.add(TESTS, token(t));
-    tests.add(FAILURES, token(f));
-    tests.add(ERRORS, token(e));
-    tests.add(SKIPPED, token(s));
-    return tests;
+    testsuite.add(TIME, time(p));
+    testsuite.add(TESTS, token(t));
+    testsuite.add(FAILURES, token(f));
+    testsuite.add(ERRORS, token(e));
+    testsuite.add(SKIPPED, token(s));
+    return testsuite;
   }
 
   /**

@@ -2,6 +2,8 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -67,8 +69,16 @@ public final class FNUnit extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item test(final QueryContext ctx) throws QueryException {
-    checkCreate(ctx);
-    return new Unit(ctx, info).test();
+    final Unit unit = new Unit(ctx, info);
+    if(expr.length == 0) return unit.test();
+
+    final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
+    final Iter ir = ctx.iter(expr[0]);
+    for(Item it; (it = ir.next()) != null;) {
+      final FItem fi = checkFunc(it, ctx);
+      if(fi instanceof FuncItem) funcs.add(((FuncItem) fi).func);
+    }
+    return unit.test(funcs);
   }
 
   /**

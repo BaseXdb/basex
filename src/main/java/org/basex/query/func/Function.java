@@ -979,7 +979,7 @@ public enum Function {
   /** XQuery function. */
   _UNIT_FAIL(FNUnit.class, "fail(message)", arg(STR), EMP, flag(NDT)),
   /** XQuery function. */
-  _UNIT_TEST(FNUnit.class, "test()", arg(), ELM, flag(NDT)),
+  _UNIT_TEST(FNUnit.class, "test([functions])", arg(FUN_ZM), ELM, flag(NDT)),
   /** XQuery function. */
   _UNIT_TEST_LIBRARIES(FNUnit.class, "test-libraries(uris)", arg(STR_ZM), ELM, flag(NDT)),
 
