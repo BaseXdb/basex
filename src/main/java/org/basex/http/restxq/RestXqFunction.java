@@ -11,7 +11,6 @@ import java.util.regex.*;
 
 import javax.servlet.http.*;
 
-import org.basex.build.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -21,6 +20,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.http.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -233,7 +233,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       try {
         // bind request body in the correct format
         body.name(http.method + IO.XMLSUFFIX);
-        bind(requestBody, arg, Parser.item(body, context.context.prop, ct));
+        new IOFile("c:/temp/cache").write(body.read());
+        bind(requestBody, arg, HTTPResponse.item(body, context.context.prop, ct));
       } catch(final IOException ex) {
         error(INPUT_CONV, ex);
       }
@@ -437,6 +438,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   private void bind(final QNm name, final Expr[] args, final Value value)
       throws QueryException {
+
     // skip nulled values
     if(value == null) return;
 
