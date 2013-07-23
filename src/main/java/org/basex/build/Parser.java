@@ -1,8 +1,6 @@
 package org.basex.build;
 
 import static org.basex.core.Text.*;
-import static org.basex.io.MimeTypes.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
@@ -12,9 +10,6 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -144,34 +139,5 @@ public abstract class Parser extends Proc {
     }
     p.target(target);
     return p;
-  }
-
-  /**
-   * Returns an XQuery item for the specified content type.
-   * @param in input source
-   * @param prop database properties
-   * @param type content type (media type)
-   * @return xml parser
-   * @throws IOException I/O exception
-   */
-  public static Item item(final IO in, final Prop prop, final String type)
-      throws IOException {
-
-    Item it = null;
-    if(type != null) {
-      if(Token.eq(type, APP_JSON, APP_JSONML)) {
-        final String options = ParserProp.JSONML[0] + "=" + eq(type, APP_JSONML);
-        it = new DBNode(new JSONParser(in, prop, options));
-      } else if(TEXT_CSV.equals(type)) {
-        it = new DBNode(new CSVParser(in, prop));
-      } else if(TEXT_HTML.equals(type)) {
-        it = new DBNode(new HTMLParser(in, prop));
-      } else if(MimeTypes.isXML(type)) {
-        it = new DBNode(in, prop);
-      } else if(MimeTypes.isText(type)) {
-        it = Str.get(new TextInput(in).content());
-      }
-    }
-    return it == null ? new B64(in.read()) : it;
   }
 }

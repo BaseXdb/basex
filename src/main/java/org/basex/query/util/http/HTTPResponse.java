@@ -1,5 +1,6 @@
 package org.basex.query.util.http;
 
+import static org.basex.io.MimeTypes.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.query.util.http.HTTPText.*;
 import static org.basex.util.Token.*;
@@ -8,7 +9,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.basex.build.*;
+import org.basex.build.file.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -16,6 +17,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -161,7 +163,7 @@ public final class HTTPResponse {
     try {
       final IOContent io = new IOContent(p);
       io.name(PAYLOAD + IO.XMLSUFFIX);
-      return Parser.item(io, prop, string(ct));
+      return item(io, prop, string(ct));
     } catch(final IOException ex) {
       throw HC_PARSE.thrw(info, ex);
     }
@@ -351,5 +353,90 @@ public final class HTTPResponse {
     final String cs = "charset=";
     final int i = c.toLowerCase(Locale.ENGLISH).lastIndexOf(cs);
     return i == -1 ? null : c.substring(i + cs.length());
+  }
+
+  /**
+   * Returns an XQuery item for the specified content type.
+   * @param in input source
+   * @param prop database properties
+   * @param type content type (media type)
+   * @return xml parser
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  public static Item item(final IO in, final Prop prop, final String type)
+      throws IOException, QueryException {
+
+    Item it = null;
+    if(type != null) {
+      if(Token.eq(type, APP_JSON, APP_JSONML)) {
+        final String options = ParserProp.JSONML[0] + "=" + eq(type, APP_JSONML);
+        it = new DBNode(new JSONParser(in, prop, options));
+      } else if(TEXT_CSV.equals(type)) {
+        it = new DBNode(new CSVParser(in, prop));
+      } else if(TEXT_HTML.equals(type)) {
+        it = new DBNode(new HTMLParser(in, prop));
+      } else if(MimeTypes.isXML(type)) {
+        it = new DBNode(in, prop);
+      } else if(MimeTypes.isText(type)) {
+        it = Str.get(new TextInput(in).content());
+      } else if(MULTI_FORM.equals(type)) {
+        it = multiForm(in);
+      }
+    }
+    return it == null ? new B64(in.read()) : it;
+  }
+
+  /**
+   * Returns a map with multipart form data.
+   * @param in input source
+   * @return map, or {@code null}
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  public static Item multiForm(final IO in) throws IOException, QueryException {
+    Map map = Map.EMPTY;
+    byte[] cont = in.read();
+
+    byte[] bound = null;
+    String fn = null;
+    do {
+      int b = indexOf(cont, CRLF);
+      if(b == -1) {
+        Util.errln("CRLF missing.");
+        return null;
+      }
+      final byte[] line = substring(cont, 0, b);
+      if(bound == null) {
+        bound = concat(CRLF, line);
+      } else if(startsWith(cont, token(CONTENT_DISPOSITION))) {
+        fn = string(line).replaceAll("^.*filename=\"|\"$", "");
+      } else if(line.length == 0) {
+        final int s = b + 2;
+        b = indexOf(cont, bound, s);
+        if(b == -1) {
+          Util.errln("multipart/form-data: no closing boundary found.");
+          return null;
+        }
+        map = map.insert(Str.get(fn), new B64(substring(cont, s, b)), null);
+        b += bound.length;
+        if(b + 2 > cont.length) {
+          Util.errln("multipart/form-data: no characters found after boundary.");
+          return null;
+        }
+        if(cont[b] == '-' && cont[b + 1] == '-') break;
+        if(cont[b] != '\r' || cont[b + 1] != '\n') {
+          Util.errln("multipart/form-data: no CRLF found after boundary.");
+          return null;
+        }
+      } else {
+        Util.debug("multipart/form-data: ignored: " + string(line));
+      }
+      cont = substring(cont, b + 2);
+
+    } while(true);
+
+    return map;
+
   }
 }

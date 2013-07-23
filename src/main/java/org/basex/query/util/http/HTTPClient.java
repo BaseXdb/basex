@@ -1,6 +1,5 @@
 package org.basex.query.util.http;
 
-import static java.lang.Integer.*;
 import static java.net.HttpURLConnection.*;
 import static org.basex.data.DataText.*;
 import static org.basex.io.MimeTypes.*;
@@ -129,7 +128,7 @@ public final class HTTPClient {
     }
 
     final byte[] timeout = r.attrs.get(TIMEOUT);
-    if(timeout != null) conn.setConnectTimeout(parseInt(string(timeout)));
+    if(timeout != null) conn.setConnectTimeout(Integer.parseInt(string(timeout)));
     final byte[] redirect = r.attrs.get(FOLLOW_REDIRECT);
     if(redirect != null) setFollowRedirects(Bln.parse(redirect, info));
   }
