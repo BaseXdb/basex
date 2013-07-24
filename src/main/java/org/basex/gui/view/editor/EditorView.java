@@ -274,6 +274,9 @@ public final class EditorView extends View {
     label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
     for(final EditorArea edit : editors()) edit.setFont(GUIConstants.mfont);
     search.refreshLayout();
+    final Font ef = GUIConstants.font.deriveFont(7f + (GUIConstants.fontSize >> 1));
+    info.setFont(ef);
+    pos.setFont(ef);
   }
 
   @Override
