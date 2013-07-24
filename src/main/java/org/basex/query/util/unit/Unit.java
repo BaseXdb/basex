@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -46,12 +45,8 @@ public final class Unit {
    * @throws QueryException query exception
    */
   public FElem test() throws QueryException {
-    final IO file = ctx.sc.baseIO();
     final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
-    for(final StaticFunc uf : ctx.funcs.funcs()) {
-      // consider only functions that are defined in the same file
-      if(file.eq(new IOFile(uf.info.file()))) funcs.add(uf);
-    }
+    for(final StaticFunc uf : ctx.funcs.funcs()) funcs.add(uf);
     return test(funcs);
   }
 
