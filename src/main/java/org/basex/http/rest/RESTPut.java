@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.core.cmd.*;
 import org.basex.http.*;
+import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.server.*;
 
@@ -38,9 +39,9 @@ public class RESTPut extends RESTCode {
       session.execute("set parser csv");
     } else if(TEXT_HTML.equals(ct)) {
       session.execute("set parser html");
-    } else if(TEXT_PLAIN.equals(ct)) {
+    } else if(ct != null && MimeTypes.isText(ct)) {
       session.execute("set parser text");
-    } else if(ct != null && !APP_XML.equals(ct)) {
+    } else if(ct != null && !MimeTypes.isXML(ct)) {
       xml = false;
     }
 

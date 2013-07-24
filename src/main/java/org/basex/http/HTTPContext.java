@@ -131,14 +131,24 @@ public final class HTTPContext {
   }
 
   /**
+   * Returns the content type extension of a request (without an optional encoding).
+   * @return content type
+   */
+  public String contentTypeExt() {
+    final String ct = req.getContentType();
+    return ct != null ? ct.replaceFirst("^.*?;\\s*", "") : null;
+  }
+
+  /**
    * Initializes the output. Sets the expected encoding and content type.
    * @param sprop serialization properties
    */
   public void initResponse(final SerializerProp sprop) {
     // set content type and encoding
-    final String encoding = sprop.get(SerializerProp.S_ENCODING);
-    res.setCharacterEncoding(encoding);
-    res.setContentType(mediaType(sprop) + MimeTypes.CHARSET + encoding);
+    final String enc = sprop.get(SerializerProp.S_ENCODING);
+    res.setCharacterEncoding(enc);
+    final String ct = mediaType(sprop);
+    res.setContentType(new TokenBuilder(ct).add(CHARSET).add(enc).toString());
   }
 
   /**
