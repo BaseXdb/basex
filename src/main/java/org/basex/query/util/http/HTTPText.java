@@ -20,8 +20,16 @@ public interface HTTPText {
   /** Payload string. */
   String PAYLOAD = "payload";
 
+  /** Content-Disposition. */
+  byte[] CONTENT_DISPOSITION = token("Content-Disposition");
   /** Multipart string. */
   byte[] MULTIPART = token("multipart");
+  /** Dashes. */
+  byte[] DASHES = token("--");
+  /** Multipart string. */
+  String CHARSET_IS = "charset=";
+  /** Multipart string. */
+  String BOUNDARY_IS = "boundary=";
 
   /** Module prefix. */
   String PREFIX = "http";
@@ -66,7 +74,7 @@ public interface HTTPText {
   byte[] DELETE = token("delete");
 
   /** Carriage return/line feed. */
-  byte[] CRLF = token("\r\n");
+  byte[] CRLF = { '\r', '\n' };
   /** Default multipart boundary. */
   byte[] DEFAULT_BOUND = token("1BEF0A57BE110FD467A");
 
