@@ -114,7 +114,7 @@ public final class EditorView extends View {
     filter.setEnabled(false);
 
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
-    buttons.layout(new TableLayout(1, 8, 1, 0)).border(0, 0, 4, 0);
+    buttons.layout(new TableLayout(1, 8, 1, 0)).border(0, 0, 8, 0);
     buttons.add(openB);
     buttons.add(saveB);
     buttons.add(hist);
