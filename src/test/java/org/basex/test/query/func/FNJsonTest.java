@@ -102,6 +102,11 @@ public final class FNJsonTest extends AdvancedQueryTest {
     }
   }
 
+  /** Test method with namespaces. */
+  @Test public void ns() {
+    query("json:serialize(<x xmlns='X'>{ json:parse('{}') }</x>/*)", "{}");
+  }
+
   /** Tests the configuration argument of {@code json:parse(...)}. */
   @Test public void config() {
     query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', map{'type':='jsonml'})",
