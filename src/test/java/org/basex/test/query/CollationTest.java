@@ -88,7 +88,7 @@ public class CollationTest extends AdvancedQueryTest {
     query(PROLOG + "for $a in ('\u00c4', 'b') order by $a return $a", "\u00c4 b");
     query("for $a in ('\u00c4', 'b') order by $a collation '" + COLLATION + "'return $a",
         "\u00c4 b");
-    query("for $a in ( 'Ä', 'A' ) " +
+    query("for $a in ( '\u00c4', 'A' ) " +
         "group by $b := $a collation '?lang=de;strength=primary' " +
         "return count($a)", 2);
   }
@@ -104,5 +104,7 @@ public class CollationTest extends AdvancedQueryTest {
     query(PROLOG + "for $a in ('a','\u00c4') group by $b:=$a return count($a)", "2");
     query("for $a in ('a','\u00c4') group by $b:=$a collation '" + COLLATION +
         "' return count($a)", "2");
+    query("for $a in 'a' group by $a, $a:=$a collation '" + COLLATION +
+        "' return $a", "a");
   }
 }
