@@ -423,6 +423,7 @@ public abstract class Serializer {
     // process remaining elements...
     while(!pars.isEmpty()) {
       closeElement();
+      indent = indt.pop();
       pars.pop();
     }
     if(doc) closeDoc();
