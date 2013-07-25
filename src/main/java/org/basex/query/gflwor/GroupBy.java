@@ -34,8 +34,6 @@ public final class GroupBy extends GFLWOR.Clause {
   Var[] post;
   /** Number of non-occluded grouping variables. */
   final int nonOcc;
-  /** If this clause uses collations. */
-  final boolean usesColl;
 
   /**
    * Constructor.
@@ -52,13 +50,8 @@ public final class GroupBy extends GFLWOR.Clause {
     System.arraycopy(pr, 0, preExpr, 0, pr.length);
     post = pst;
     int n = 0;
-    boolean coll = false;
-    for(final Spec spec : specs) {
-      if(!spec.occluded) n++;
-      coll |= spec.coll != null;
-    }
+    for(final Spec spec : specs) if(!spec.occluded) n++;
     nonOcc = n;
-    usesColl = coll;
   }
 
   /**
@@ -67,17 +60,15 @@ public final class GroupBy extends GFLWOR.Clause {
    * @param pe pre-grouping expressions
    * @param pst post-grouping variables
    * @param no number of non-occluded grouping variables
-   * @param coll if the clause uses collations
    * @param ii input info
    */
   private GroupBy(final Spec[] gs, final Expr[] pe, final Var[] pst,
-      final int no, final boolean coll, final InputInfo ii) {
+      final int no, final InputInfo ii) {
     super(ii, vars(gs, pst));
     specs = gs;
     preExpr = pe;
     post = pst;
     nonOcc = no;
-    usesColl = coll;
   }
 
   /**
@@ -128,13 +119,10 @@ public final class GroupBy extends GFLWOR.Clause {
        */
       private Group[] init(final QueryContext ctx) throws QueryException {
         final ArrayList<Group> grps = new ArrayList<Group>();
-        final IntObjMap<Group> map = usesColl ? null : new IntObjMap<Group>();
+        final IntObjMap<Group> map = new IntObjMap<Group>();
         final Collation[] colls = new Collation[nonOcc];
-        if(usesColl) {
-          for(int i = 0; i < specs.length; i++) {
-            if(!specs[i].occluded) colls[i] = specs[i].coll;
-          }
-        }
+        for(int i = 0, p = 0; i < specs.length; i++)
+          if(!specs[i].occluded) colls[p++] = specs[i].coll;
 
         while(sub.next(ctx)) {
           final Item[] key = new Item[nonOcc];
@@ -144,28 +132,22 @@ public final class GroupBy extends GFLWOR.Clause {
                 atom = ki == null ? null : StandardFunc.atom(ki, info);
             if(!spec.occluded) {
               key[p++] = atom;
-              hash = 31 * hash + (atom == null ? 0 : atom.hash(info));
+              // If the values are compared using a special collation, we let them collide
+              // here and let the comparison do all the work later.
+              // This enables other non-collation specs to avoid the collision.
+              hash = 31 * hash +
+                  (atom == null || spec.coll != null ? 0 : atom.hash(info));
             }
             ctx.set(spec.var, atom == null ? Empty.SEQ : atom, info);
           }
 
           // find the group for this key
           Group fst = null, grp = null;
-          if(usesColl) {
-            // use linear search
-            for(final Group g : grps) {
-              if(eq(key, g.key, colls)) {
-                grp = g;
-                break;
-              }
-            }
-          } else {
-            // no collations, so we can use hashing
-            for(Group g = fst = map.get(hash); g != null; g = g.next) {
-              if(eq(key, g.key, colls)) {
-                grp = g;
-                break;
-              }
+          // no collations, so we can use hashing
+          for(Group g = fst = map.get(hash); g != null; g = g.next) {
+            if(eq(key, g.key, colls)) {
+              grp = g;
+              break;
             }
           }
 
@@ -176,15 +158,13 @@ public final class GroupBy extends GFLWOR.Clause {
             grp = new Group(key, ngs);
             grps.add(grp);
 
-            if(!usesColl) {
-              // insert the group into the hash table
-              if(fst == null) {
-                map.put(hash, grp);
-              } else {
-                final Group nxt = fst.next;
-                fst.next = grp;
-                grp.next = nxt;
-              }
+            // insert the group into the hash table
+            if(fst == null) {
+              map.put(hash, grp);
+            } else {
+              final Group nxt = fst.next;
+              fst.next = grp;
+              grp.next = nxt;
             }
           }
 
@@ -288,7 +268,7 @@ public final class GroupBy extends GFLWOR.Clause {
     }
 
     // done
-    return new GroupBy(Arr.copyAll(ctx, scp, vs, specs), pEx, ps, nonOcc, usesColl, info);
+    return new GroupBy(Arr.copyAll(ctx, scp, vs, specs), pEx, ps, nonOcc, info);
   }
 
   @Override
