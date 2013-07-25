@@ -53,13 +53,13 @@ public class JsonParserTest {
 
     error("01", Spec.ECMA_262);
     error("-", Spec.ECMA_262);
-    error("-ä", Spec.ECMA_262);
+    error("-\u00e4", Spec.ECMA_262);
     error("0.", Spec.ECMA_262);
-    error("0.ä", Spec.ECMA_262);
+    error("0.\u00e4", Spec.ECMA_262);
     error("1e", Spec.ECMA_262);
     error("1e+", Spec.ECMA_262);
-    error("1e+ä", Spec.ECMA_262);
-    error("1e+0ä", Spec.ECMA_262);
+    error("1e+\u00e4", Spec.ECMA_262);
+    error("1e+0\u00e4", Spec.ECMA_262);
   }
 
   /**
@@ -69,7 +69,7 @@ public class JsonParserTest {
   @Test public void stringTest() throws QueryException {
     parse("\"\"", Spec.ECMA_262);
     parse("\"test\"", Spec.ECMA_262);
-    parse("\"ä\"", Spec.ECMA_262);
+    parse("\"\u00e4\"", Spec.ECMA_262);
     parse("\"\uD834\uDD1E\"", Spec.ECMA_262);
     parse("\"\uD834\"", Spec.ECMA_262);
     parse("\"\uD853\uDF5C\"", Spec.ECMA_262);
