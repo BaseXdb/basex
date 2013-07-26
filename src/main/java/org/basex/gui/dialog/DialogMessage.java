@@ -1,7 +1,8 @@
 package org.basex.gui.dialog;
 
 import java.awt.*;
-import java.awt.event.*;
+
+import javax.swing.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
@@ -62,9 +63,9 @@ public final class DialogMessage extends BaseXDialog {
     }
     set(buttons, BorderLayout.SOUTH);
 
-    addWindowListener(new WindowAdapter() {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
-      public void windowOpened(final WindowEvent e) {
+      public void run() {
         yes.requestFocusInWindow();
       }
     });

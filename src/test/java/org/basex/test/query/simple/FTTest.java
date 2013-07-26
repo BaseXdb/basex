@@ -202,6 +202,9 @@ public final class FTTest extends QueryTest {
       { "FTWildCard 27", "'a' <- 'a.{1}' using wildcards" },
       { "FTWildCard 28", "'a' <- 'a.{1-5}' using wildcards" },
       { "FTWildCard 29", bool(true), "'hi' <- '\\h\\i' using wildcards" },
+      // #660: combination of FTAnyAllOption and wildcards
+      { "FTWildCard 30", bool(true),
+        "'a' contains text '.*' all words using wildcards" },
 
       { "FTFuzzy 1", node(7, 9, 11), "//* [text() <- 'Database' using fuzzy]" },
       { "FTFuzzy 2", node(7, 9, 11), "//* [text() <- 'Databaze' using fuzzy]" },
@@ -316,7 +319,8 @@ public final class FTTest extends QueryTest {
       { "FTStemming 9", bool(true),
         "'base' <- ('bases' using stemming) using no stemming" },
       { "FTStemming 10", bool(true),
-        "'книга' <- 'книги' using stemming using language 'Russian'" },
+        "'\u043a\u043d\u0438\u0433\u0430' <- '\u043a\u043d\u0438\u0433\u0438'" +
+        " using stemming using language 'Russian'" },
       { "FTStemming 11", bool(true),
         "'de' <- 'de' using stemming using language 'pt'" },
 

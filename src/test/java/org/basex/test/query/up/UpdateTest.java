@@ -1028,6 +1028,14 @@ public final class UpdateTest extends AdvancedQueryTest {
  }
 
  /**
+  * Replaces a node with two others.
+  */
+ @Test
+ public void duplAttribute() {
+   query("replace node document { <A><B/></A> }//B with (<X/>, <X/>)");
+ }
+
+ /**
   * Tests the combination of transform expressions and xquery:eval().
   */
  @Test

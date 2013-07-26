@@ -64,8 +64,11 @@ public abstract class ContextModifier {
    * @param db databases
    */
   void databases(final StringList db) {
-    for(final DatabaseUpdates du : pendingUpdates.values()) db.add(du.data().meta.name);
-    for(final DBCreate du : dbCreates.values()) db.add(du.name);
+    for(final DatabaseUpdates du : pendingUpdates.values()) {
+      final Data d = du.data();
+      if(!d.inMemory()) db.add(d.meta.name);
+    }
+    for(final DBCreate dc : dbCreates.values()) db.add(dc.name);
   }
 
   /**

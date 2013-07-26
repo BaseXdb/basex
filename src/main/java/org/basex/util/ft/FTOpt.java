@@ -19,9 +19,7 @@ import org.basex.query.value.node.*;
  */
 public final class FTOpt extends ExprInfo {
   /** Flag values. */
-  private final EnumMap<FTFlag, Boolean> map =
-    new EnumMap<FTFlag, Boolean>(FTFlag.class);
-
+  private final EnumMap<FTFlag, Boolean> map = new EnumMap<FTFlag, Boolean>(FTFlag.class);
   /** Stemming dictionary. */
   public StemDir sd;
   /** Stop words. */

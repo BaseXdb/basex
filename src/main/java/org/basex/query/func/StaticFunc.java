@@ -19,7 +19,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
- * A static User-defined function.
+ * A static user-defined function.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler

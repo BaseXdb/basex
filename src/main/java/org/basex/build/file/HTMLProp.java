@@ -18,7 +18,7 @@ public final class HTMLProp extends AProp {
   /** TagSoup option: method (html). */
   public static final Object[] METHOD = { "method", "" };
   /** TagSoup option: nons. */
-  public static final Object[] NONS = { "nons", false };
+  public static final Object[] NONS = { "nons", true };
   /** TagSoup option: nobogons. */
   public static final Object[] NOBOGONS = { "nobogons", false };
   /** TagSoup option: nodefaults. */

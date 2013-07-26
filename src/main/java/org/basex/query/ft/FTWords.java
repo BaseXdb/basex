@@ -135,8 +135,8 @@ public final class FTWords extends FTExpr {
           FTIndexIterator ia;
           // number of distinct tokens
           int t  = 0;
-          // loop through all tokens
-          final TokenSet ts = tokens(txt != null ? txt : tokens(ctx), ftt.opt);
+          // loop through unique tokens
+          final TokenSet ts = unique(txt != null ? txt : tokens(ctx));
           for(final byte[] k : ts) {
             lex.init(k);
             ia = null;
@@ -250,26 +250,24 @@ public final class FTWords extends FTExpr {
    */
   private int contains(final QueryContext ctx) throws QueryException {
     first = true;
-    final FTLexer intok = ftt.copy(ctx.fttoken);
+    final FTLexer lexer = ftt.lexer(ctx.fttoken);
 
-    // use shortcut for default options
+    // use faster evaluation for default options
     int num = 0;
     if(fast) {
       for(final byte[] t : txt) {
         final FTTokens qtok = ftt.cache(t);
-        num = Math.max(num, ftt.contains(qtok, intok) * qtok.length());
+        num = Math.max(num, ftt.contains(qtok, lexer) * qtok.length());
       }
       return num;
     }
 
     // find and count all occurrences
-    final TokenList tl = tokens(ctx);
-    final TokenSet ts = tokens(tl, intok.ftOpt());
     final boolean all = mode == FTMode.ALL || mode == FTMode.ALL_WORDS;
     int oc = 0;
-    for(final byte[] k : ts) {
-      final FTTokens qtok = ftt.cache(k);
-      final int o = ftt.contains(qtok, intok);
+    for(final byte[] w : unique(tokens(ctx))) {
+      final FTTokens qtok = ftt.cache(w);
+      final int o = ftt.contains(qtok, lexer);
       if(all && o == 0) return 0;
       num = Math.max(num, o * qtok.length());
       oc += o;
@@ -285,11 +283,10 @@ public final class FTWords extends FTExpr {
   /**
    * Caches and returns all unique tokens specified in a query.
    * @param list token list
-   * @param ftopt full-text options
    * @return token set
    */
-  TokenSet tokens(final TokenList list, final FTOpt ftopt) {
-    // cache all query tokens (remove duplicates)
+  TokenSet unique(final TokenList list) {
+    // cache all query tokens in a set (duplicates are removed)
     final TokenSet ts = new TokenSet();
     switch(mode) {
       case ALL:
@@ -298,7 +295,7 @@ public final class FTWords extends FTExpr {
         break;
       case ALL_WORDS:
       case ANY_WORD:
-        final FTLexer l = new FTLexer(ftopt);
+        final FTLexer l = new FTLexer(ftt.opt);
         for(final byte[] t : list) {
           l.init(t);
           while(l.hasNext()) ts.add(l.nextToken());

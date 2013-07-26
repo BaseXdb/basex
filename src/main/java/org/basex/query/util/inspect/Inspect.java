@@ -44,12 +44,20 @@ public abstract class Inspect {
   }
 
   /**
+   * Parses a module and returns an inspection element.
+   * @param io input reference
+   * @return inspection element
+   * @throws QueryException query exception
+   */
+  public abstract FElem parse(final IO io) throws QueryException;
+
+  /**
    * Parses a module.
    * @param io input reference
    * @return query parser
    * @throws QueryException query exception
    */
-  protected final QueryParser parseQuery(final IO io) throws QueryException {
+  public final QueryParser parseQuery(final IO io) throws QueryException {
     if(!io.exists()) WHICHRES.thrw(info, io);
 
     final QueryContext qc = new QueryContext(ctx.context);

@@ -19,8 +19,9 @@ import org.basex.util.*;
 public final class MimeTypes {
   /** Content-Type. */
   public static final String CONTENT_TYPE = "Content-Type";
-  /** Charset. */
-  public static final String CHARSET = "; charset=";
+
+  /** Media type: multipart/form-data. */
+  public static final String MULTI_FORM = "multipart/form-data";
 
   /** Media type: application/html+xml. */
   public static final String APP_HTML_XML = "application/html+xml";

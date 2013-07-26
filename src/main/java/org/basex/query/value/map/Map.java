@@ -38,7 +38,7 @@ public final class Map extends FItem {
    * Constructor.
    * @param m map
    */
-  private  Map(final TrieNode m) {
+  private Map(final TrieNode m) {
     super(SeqType.ANY_MAP);
     root = m;
   }
@@ -59,8 +59,8 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
     return get(args[0].item(ctx, ii), ii);
   }
 
@@ -222,7 +222,7 @@ public final class Map extends FItem {
    * @return token map
    * @throws QueryException query exception
    */
-  public TokenMap tokenJavaMap(final InputInfo ii) throws QueryException {
+  public TokenMap tokenMap(final InputInfo ii) throws QueryException {
     final TokenMap tm = new TokenMap();
     final ValueIter vi = keys().iter();
     for(Item it; (it = vi.next()) != null;) {

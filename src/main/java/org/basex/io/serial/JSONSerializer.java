@@ -69,10 +69,9 @@ public final class JSONSerializer extends OutputSerializer {
       }
     }
     if(eq(name, T_TYPE)) {
+      if(!eq(value, TYPES)) error("Element <%> has invalid type \"%\"", elem, value);
       types.set(level, value);
-      if(!eq(value, TYPES))
-        error("Element <%> has invalid type \"%\"", elem, value);
-    } else {
+    } else if(!eq(name, XMLNS) && !startsWith(name, XMLNSC)) {
       error("Element <%> has invalid attribute \"%\"", elem, name);
     }
   }

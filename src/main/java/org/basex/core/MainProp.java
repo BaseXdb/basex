@@ -76,7 +76,7 @@ public final class MainProp extends AProp {
   public static final Object[] WEBPATH = { "WEBPATH",
     Prop.HOME + (USERHOME ? Prop.NAME + "Web" : "webapp") };
   /** RESTXQ path (relative to web path). */
-  public static final Object[] RESTXQPATH = { "RESTXQPATH", "restxq" };
+  public static final Object[] RESTXQPATH = { "RESTXQPATH", "" };
   /** Local (embedded) mode. */
   public static final Object[] HTTPLOCAL = { "HTTPLOCAL", false };
   /** Port for stopping the web server. */

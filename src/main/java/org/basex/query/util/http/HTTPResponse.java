@@ -6,9 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
-import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -66,7 +64,7 @@ public final class HTTPResponse {
 
     final byte[] cType;
     if(is == null) {
-      cType = ctype == null ? token(extractContentType(type)) : ctype;
+      cType = ctype == null ? token(HTTPPayload.contentType(type)) : ctype;
       is = conn.getInputStream();
     } else {
       // error: use text/plain as content type
@@ -74,15 +72,17 @@ public final class HTTPResponse {
     }
 
     if(startsWith(cType, MULTIPART)) {
-      final byte[] boundary = extractBoundary(type);
+      final byte[] boundary = HTTPPayload.boundary(type);
+      if(boundary == null) HC_REQ.thrw(info, "No separation boundary specified");
+
       body = new FElem(Q_MULTIPART).add(MEDIA_TYPE, cType).add(BOUNDARY, boundary);
-      final ANodeList list = extractParts(is, s, payloads, concat(token("--"), boundary));
+      final ANodeList list = extractParts(is, s, payloads, concat(DASHES, boundary));
       for(final ANode node : list) body.add(node);
       // single part response
     } else {
       body = createBody(cType);
       if(!s) {
-        final byte[] payload = extractPayload(is, cType, extractCharset(type));
+        final byte[] payload = extractPayload(is, cType, HTTPPayload.charset(type));
         payloads.add(interpretPayload(payload, cType));
       }
     }
@@ -149,9 +149,7 @@ public final class HTTPResponse {
   }
 
   /**
-   * Interprets payload according to content type and returns a corresponding
-   * item: - text content type => string - XML or HTML content type => document
-   * node - binary content type => base64Binary.
+   * Interprets payload according to content type and returns a corresponding item.
    * @param p payload
    * @param ct content type
    * @return interpreted payload
@@ -161,7 +159,7 @@ public final class HTTPResponse {
     try {
       final IOContent io = new IOContent(p);
       io.name(PAYLOAD + IO.XMLSUFFIX);
-      return Parser.item(io, prop, string(ct));
+      return HTTPPayload.item(io, prop, string(ct), null);
     } catch(final IOException ex) {
       throw HC_PARSE.thrw(info, ex);
     }
@@ -188,7 +186,7 @@ public final class HTTPResponse {
         next = readLine(io);
       if(next == null) HC_REQ.thrw(info, "No body specified for http:part");
 
-      final byte[] end = concat(sep, token("--"));
+      final byte[] end = concat(sep, DASHES);
       final ANodeList p = new ANodeList();
       while(extractNextPart(io, status, payloads, sep, end, p));
       return p;
@@ -231,7 +229,7 @@ public final class HTTPResponse {
       while(nextHdr != null && nextHdr.length > 0) {
         // extract charset from header 'Content-Type'
         if(startsWith(lc(nextHdr), CONTENT_TYPE_LC))
-          charset = extractCharset(string(nextHdr));
+          charset = HTTPPayload.charset(string(nextHdr));
         // parse header:
         final int pos = indexOf(nextHdr, ':');
         if(pos > 0) {
@@ -309,47 +307,5 @@ public final class HTTPResponse {
       bl.add(next).add('\n');
     }
     return new NewlineInput(new IOContent(bl.toArray())).encoding(ce).content();
-  }
-
-  /**
-   * Extracts the content from a "Content-type" header.
-   * @param c value for "Content-type" header
-   * @return result
-   */
-  private static String extractContentType(final String c) {
-    if(c == null) return MimeTypes.APP_OCTET;
-    final int end = c.indexOf(';');
-    return end == -1 ? c : c.substring(0, end);
-  }
-
-  /**
-   * Extracts the encapsulation boundary from the content type.
-   * @param c content type
-   * @return boundary
-   * @throws QueryException query exception
-   */
-  private byte[] extractBoundary(final String c) throws QueryException {
-    int index = c.toLowerCase(Locale.ENGLISH).lastIndexOf("boundary=");
-    if(index == -1) HC_REQ.thrw(info, "No separation boundary specified");
-    String b = c.substring(index + 9); // 9 for "boundary="
-    if(b.charAt(0) == '"') {
-      // if the boundary is enclosed in quotes, strip them
-      index = b.lastIndexOf('"');
-      b = b.substring(1, index);
-    }
-    return token(b);
-  }
-
-  /**
-   * Extracts the charset from the 'Content-Type' header if present.
-   * @param c Content-Type header
-   * @return charset charset
-   */
-  private static String extractCharset(final String c) {
-    // content type is unknown
-    if(c == null) return null;
-    final String cs = "charset=";
-    final int i = c.toLowerCase(Locale.ENGLISH).lastIndexOf(cs);
-    return i == -1 ? null : c.substring(i + cs.length());
   }
 }

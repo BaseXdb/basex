@@ -103,10 +103,10 @@ public class BufferInput extends InputStream {
     final int blen = buffer.length;
     final byte[] buf = buffer;
     if(bpos >= bsize) {
-      if(bsize == 0 || bsize == blen) {
+      read += bsize;
+      if(bsize == blen) {
         // reset mark if buffer is full
-        if(bsize == blen) bmark = -1;
-        // buffer is empty or full: re-fill it
+        bmark = -1;
         bsize = 0;
         bpos = 0;
       }
@@ -114,7 +114,6 @@ public class BufferInput extends InputStream {
       while((r = in.read(buf, bsize, blen - bsize)) == 0);
       if(r < 0) return -1;
       bsize += r;
-      read += r;
     }
     return buf[bpos++] & 0xFF;
   }

@@ -58,7 +58,7 @@ public final class DialogManage extends BaseXDialog {
    */
   public DialogManage(final GUI main) {
     super(main, MANAGE_DB);
-    panel.setLayout(new BorderLayout(8, 0));
+    panel.setLayout(new BorderLayout(4, 0));
 
     // create database chooser
     final StringList dbs = main.context.databases.list();
@@ -71,7 +71,7 @@ public final class DialogManage extends BaseXDialog {
     doc1.setSize(420, doc1.getHeight());
 
     detail = new Editor(false, this);
-    detail.border(5).setFont(panel.getFont());
+    detail.setFont(panel.getFont());
 
     // database buttons
     rename = new BaseXButton(RENAME + DOTS, this);

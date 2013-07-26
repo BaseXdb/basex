@@ -17,9 +17,9 @@ public abstract class Proc {
   public InfoListener listen;
   /** This flag indicates that a command may perform updates. */
   public boolean updating;
-
   /** Indicates if a process is currently registered. */
-  private boolean registered;
+  boolean registered;
+
   /** Stopped flag. */
   private boolean stopped;
   /** Timeout thread. */
@@ -69,8 +69,11 @@ public abstract class Proc {
    */
   protected final <P extends Proc> P proc(final P proc) {
     sub = proc;
-    sub.listen = listen;
-    if(stopped) sub.stop();
+    if(proc != null) {
+      proc.listen = listen;
+      proc.registered = registered;
+      if(stopped) proc.stop();
+    }
     return proc;
   }
 
@@ -136,15 +139,16 @@ public abstract class Proc {
    * Checks if the process is registered.
    * @return result of check
    */
-  public boolean registered() {
-    return registered;
+  public final boolean registered() {
+    return sub != null ? sub.registered() : registered;
   }
 
   /**
    * Sets the registered state.
    * @param reg registered flag
    */
-  public void registered(final boolean reg) {
+  public final void registered(final boolean reg) {
+    if(sub != null) sub.registered(reg);
     registered = reg;
   }
 

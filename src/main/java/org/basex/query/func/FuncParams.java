@@ -64,7 +64,7 @@ public final class FuncParams {
    */
   public TokenMap parse(final Item it, final boolean ignore) throws QueryException {
     // XQuery map: convert to internal map
-    if(it instanceof Map) return ((Map) it).tokenJavaMap(info);
+    if(it instanceof Map) return ((Map) it).tokenMap(info);
 
     // initialize token map
     final TokenMap tm = new TokenMap();

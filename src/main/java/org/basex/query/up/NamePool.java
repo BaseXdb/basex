@@ -17,7 +17,7 @@ public final class NamePool {
   /** Name cache. */
   private NameCache[] cache = new NameCache[1];
   /** Number of entries. */
-  private int size;
+  public int size;
 
   /**
    * Adds an entry to the pool and increases its number of occurrence.
@@ -41,13 +41,13 @@ public final class NamePool {
   }
 
   /**
-   * Finds duplicate attributes.
-   * @return duplicate attribute, or {@code null}
+   * Returns the name of a duplicate attribute, or {@code null}.
+   * @return name of duplicate attribute
    */
   QNm duplicate() {
     // if node has been deleted, overall count for duplicates must be bigger 2
     for(int i = 0; i < size; ++i) {
-      if(cache[i].add > (cache[i].del ? 2 : 1)) return cache[i].name;
+      if(cache[i].attr && cache[i].add > (cache[i].del ? 2 : 1)) return cache[i].name;
     }
     return null;
   }

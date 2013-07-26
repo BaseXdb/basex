@@ -142,8 +142,10 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str dirName(final QueryContext ctx) throws QueryException {
-    final String path = checkFile(0, ctx).getParent();
-    return Str.get(dir(path == null ? "." : path));
+    final File file = checkFile(0, ctx);
+    String par = file.getParent();
+    if(par == null) par = file.toString().contains(File.separator) ? "" : ".";
+    return Str.get(dir(par));
   }
 
   /**

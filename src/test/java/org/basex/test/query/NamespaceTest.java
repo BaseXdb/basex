@@ -785,6 +785,18 @@ public final class NamespaceTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test query.
+   * @throws Exception exception
+   */
+  @Test
+  public void duplicateXMLNamespace() throws Exception {
+    create(1);
+    query("insert node attribute xml:space { 'preserve' } into /x", "");
+    query(".", "<x xml:space='preserve'/>");
+    error("insert node attribute xml:space { 'preserve' } into /x", Err.UPATTDUPL);
+  }
+
+  /**
    * Creates the database context.
    * @throws BaseXException database exception
    */

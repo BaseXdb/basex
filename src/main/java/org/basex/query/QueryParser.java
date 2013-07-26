@@ -1112,7 +1112,7 @@ public class QueryParser extends InputParser {
         final VarRef[] vs = new VarRef[curr.size()];
         int i = 0;
         for(final Var v : curr.values()) vs[i++] = new VarRef(ob[0].info, v);
-        clauses.add(new OrderBy(vs, ob, stable, ob[0].info));
+        clauses.add(new OrderBy(vs, ob, ob[0].info));
         alter = ORDERBY;
       }
 
@@ -1944,6 +1944,7 @@ public class QueryParser extends InputParser {
     if(ax == null) {
       ax = Axis.CHILD;
       test = nodeTest(false, true);
+      if(test == Test.NSP) error(NSNOTALL);
       if(test != null && test.type == NodeType.ATT) ax = Axis.ATTR;
       checkTest(test, ax == Axis.ATTR);
     }
@@ -2975,7 +2976,7 @@ public class QueryParser extends InputParser {
     wsCheck(PAR2);
     if(tp != null) return tp;
     tp = Test.get(t);
-    if(tp == Test.NSP) error(NSNOTALL);
+    if(tp == Test.NSP && !ctx.sc.xquery3) error(NSNOTALL);
     return tp;
   }
 

@@ -60,9 +60,11 @@ public abstract class NodeCopy extends UpdatePrimitive {
   final void add(final NamePool pool) {
     final Data d = insseq.data;
     final int ps = insseq.start;
-    for(int p = ps; p < insseq.end; ++p) {
+    final int pe = insseq.end;
+    for(int p = ps; p < pe; ++p) {
       final int k = d.kind(p);
-      if(k != Data.ATTR && k != Data.ELEM || d.parent(p, k) >= ps) continue;
+      if(k != Data.ATTR && k != Data.ELEM) continue;
+      if(p > ps && d.parent(p, k) >= ps) break;
       final int u = d.uri(p, k);
       final QNm qnm = new QNm(d.name(p, k));
       if(u != 0) qnm.uri(d.nspaces.uri(u));

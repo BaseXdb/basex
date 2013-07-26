@@ -44,8 +44,8 @@ public class Execute extends Command {
 
     final StringBuilder sb = new StringBuilder();
     for(final Command c : list) {
-      proc(c);
-      final boolean ok = c.run(context, out);
+      final boolean ok = proc(c).run(context, out);
+      proc(null);
       sb.append(c.info());
       if(!ok) return error(sb.toString());
     }
@@ -67,9 +67,19 @@ public class Execute extends Command {
    * @return success flag
    */
   protected boolean init(final Context ctx) {
+    return init(args[0], ctx);
+  }
+
+  /**
+   * Initializes the specified input.
+   * @param input command input
+   * @param ctx database context
+   * @return success flag
+   */
+  protected final boolean init(final String input, final Context ctx) {
     if(list.isEmpty() && error == null) {
       try {
-        Collections.addAll(list, new CommandParser(args[0], ctx).parse());
+        Collections.addAll(list, new CommandParser(input, ctx).parse());
       } catch(final QueryException ex) {
         error = Util.message(ex);
         return false;
@@ -79,7 +89,7 @@ public class Execute extends Command {
   }
 
   @Override
-  public final void build(final CmdBuilder cb) {
+  public void build(final CmdBuilder cb) {
     cb.init().arg(0);
   }
 }

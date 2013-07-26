@@ -38,6 +38,8 @@ public final class DirParser extends Parser {
   private final boolean skipCorrupt;
   /** Add ignored files as raw files. */
   private final boolean addRaw;
+  /** DTD parsing. */
+  private final boolean dtd;
   /** Raw parsing. */
   private final boolean rawParser;
   /** Database path for storing binary files. */
@@ -63,6 +65,7 @@ public final class DirParser extends Parser {
     skipCorrupt = prop.is(Prop.SKIPCORRUPT);
     archives = prop.is(Prop.ADDARCHIVES);
     addRaw = prop.is(Prop.ADDRAW);
+    dtd = prop.is(Prop.DTD);
     rawParser = prop.get(Prop.PARSER).toLowerCase(Locale.ENGLISH).equals(DataText.M_RAW);
 
     filter = !source.isDir() && !source.isArchive() ? null :
@@ -161,7 +164,7 @@ public final class DirParser extends Parser {
           // parse file twice to ensure that it is well-formed
           try {
             // cache file contents to allow or speed up a second run
-            if(!(src instanceof IOContent)) {
+            if(!(src instanceof IOContent || dtd)) {
               in = new IOContent(src.read());
               in.name(src.name());
             }

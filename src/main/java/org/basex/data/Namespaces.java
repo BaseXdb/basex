@@ -111,8 +111,8 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the namespace uri reference for the specified name,
-   * or 0 if namespace cannot be found.
+   * Returns the namespace URI reference for the specified name,
+   * or {@code 0} if no namespace is found.
    * @param name tag/attribute name
    * @param elem element flag
    * @return namespace
@@ -158,8 +158,8 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the specified namespace uri.
-   * @param id namespace uri reference
+   * Returns the specified namespace URI.
+   * @param id namespace URI reference
    * @return prefix
    */
   public byte[] uri(final int id) {
@@ -167,11 +167,12 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the namespace URI reference for the specified QName and pre value.
-   * @param name tag/attribute name
+   * Returns the namespace URI reference for the specified name and pre value,
+   * or {@code 0} if namespace cannot be found.
+   * @param name element/attribute name
    * @param pre pre value
    * @param data data reference
-   * @return namespace URI reference or 0 if no namespace was found
+   * @return namespace URI reference
    */
   public int uri(final byte[] name, final int pre, final Data data) {
     return uri(Token.prefix(name), current.find(pre, data));
@@ -278,13 +279,12 @@ public final class Namespaces {
 
   /**
    * Returns the namespace URI reference for the specified prefix and node,
-   * or 0 if namespace cannot be found.
+   * or {@code 0} if no namespace is found.
    * @param pref prefix
    * @param node node to start with
-   * @return namespace
+   * @return namespace URI reference
    */
   private int uri(final byte[] pref, final NSNode node) {
-    if(Token.eq(Token.XML, pref)) return 0;
     final int id = prefs.id(pref);
     if(id == 0) return 0;
 
@@ -376,9 +376,9 @@ public final class Namespaces {
   }
 
   /**
-   * Returns a reference to the specified namespace uri. {@code 0} will be returned
-   * if the uri is empty or not found.
-   * @param uri namespace uri
+   * Returns a reference to the specified namespace URI,
+   * or {@code 0} if the URI is empty or no namespace is found.
+   * @param uri namespace URI
    * @return reference, or {@code 0}
    */
   public int uri(final byte[] uri) {

@@ -182,6 +182,8 @@ public final class SeqType {
   public static final SeqType FUN_OZ = new SeqType(FuncType.ANY_FUN, Occ.ZERO_ONE);
   /** Single function. */
   public static final SeqType FUN_O = FuncType.ANY_FUN.seqType();
+  /** Zero of more functions. */
+  public static final SeqType FUN_ZM = new SeqType(FuncType.ANY_FUN, Occ.ZERO_MORE);
   /** Zero or more bytes. */
   public static final SeqType BYT_ZM = new SeqType(AtomType.BYT, Occ.ZERO_MORE);
   /** One attribute node. */

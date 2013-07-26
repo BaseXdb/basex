@@ -225,7 +225,7 @@ public final class Context {
    * @param pr process
    */
   public void register(final Proc pr) {
-    assert !pr.registered() : "Already registered";
+    assert !pr.registered() : "Already registered:" + pr;
     pr.registered(true);
 
     // administrators will not be affected by the timeout
@@ -245,6 +245,7 @@ public final class Context {
    * @param write write locks to keep
    */
   public void downgrade(final Proc pr, final StringList write) {
+    // ignore downgrade call if process is not registered
     if(pr.registered()) locks.downgrade(prepareLock(write, false));
   }
 
@@ -253,7 +254,7 @@ public final class Context {
    * @param pr process
    */
   public void unregister(final Proc pr) {
-    if(!pr.registered()) return;
+    assert pr.registered() : "Not registered:" + pr;
     pr.registered(false);
     locks.release(pr);
     pr.stopTimeout();
