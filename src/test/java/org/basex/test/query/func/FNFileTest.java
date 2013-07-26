@@ -409,6 +409,8 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_DIR_NAME.args(""), "." + File.separator);
     // check with a path without directory separators
     query(_FILE_DIR_NAME.args(NAME), "." + File.separator);
+    // check with a path without directory separators
+    query(_FILE_DIR_NAME.args("/"), File.separator);
   }
 
   /**
