@@ -114,8 +114,8 @@ public final class HTTPPayload {
       throws IOException, QueryException {
 
     // parse boundary
-    byte[] b = boundary(ext);
-    if(b == null) throw new IOException("No boundary specified.");
+    final byte[] b = boundary(ext);
+    if(b == null) throw new IOException("multipart/form-data: no boundary specified.");
 
     // helper arrays
     final byte[] boundary = concat(DASHES, b);
@@ -128,7 +128,7 @@ public final class HTTPPayload {
     String fn = null;
     for(int s = 0, i; s < cl; s = i + 2) {
       i = indexOf(cont, CRLF, s);
-      if(i == -1) throw new IOException("CRLF expected.");
+      if(i == -1) throw new IOException("multipart/form-data: CRLF expected.");
       final byte[] line = substring(cont, s, i);
 
       if(startsWith(line, boundary)) {

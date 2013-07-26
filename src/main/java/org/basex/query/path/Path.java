@@ -276,7 +276,7 @@ public abstract class Path extends ParseExpr {
         } else if(sa == DESC || sa == CHILD || sa == ATTR) {
           // .../descendant:: / .../child:: / .../attribute::
           warning = lsa == ATTR || ls.test == Test.TXT || ls.test == Test.COM ||
-             ls.test == Test.PI || (sa == ATTR && s.test == Test.NSP);
+             ls.test == Test.PI || sa == ATTR && s.test == Test.NSP;
         } else if(sa == PARENT || sa == ANC) {
           // .../parent:: / .../ancestor::
           warning = ls.test == Test.DOC;

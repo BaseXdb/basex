@@ -112,13 +112,13 @@ public final class OrderBy extends GFLWOR.Clause {
                   if(c != 0) return or.desc ? -c : c;
                 }
                 return 0;
-              } catch(final QueryException e) {
-                throw new QueryRTException(e);
+              } catch(final QueryException ex) {
+                throw new QueryRTException(ex);
               }
             }
           });
-        } catch(QueryRTException e) {
-          throw e.wrapped();
+        } catch(final QueryRTException ex) {
+          throw ex.getCause();
         }
       }
     };

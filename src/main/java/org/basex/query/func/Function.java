@@ -981,7 +981,7 @@ public enum Function {
   /** XQuery function. */
   _UNIT_TEST(FNUnit.class, "test([functions])", arg(FUN_ZM), ELM, flag(NDT)),
   /** XQuery function. */
-  _UNIT_TEST_LIBRARIES(FNUnit.class, "test-libraries(uris)", arg(STR_ZM), ELM, flag(NDT)),
+  _UNIT_TEST_URIS(FNUnit.class, "test-uris(uris)", arg(STR_ZM), ELM, flag(NDT)),
 
   /* FNValidate functions. */
 

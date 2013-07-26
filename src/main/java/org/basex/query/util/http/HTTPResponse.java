@@ -109,7 +109,6 @@ public final class HTTPResponse {
     return result;
   }
 
-
   /**
    * Creates a <http:body/> element.
    * @param cType content type
