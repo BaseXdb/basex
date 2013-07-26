@@ -54,9 +54,7 @@ public abstract class ParseExpr extends Expr {
     if(it == null || ir.size() == 1) return it;
     Item n = ir.next();
     if(n != null) {
-      final ValueBuilder vb = new ValueBuilder();
-      vb.add(it);
-      vb.add(n);
+      final ValueBuilder vb = new ValueBuilder().add(it).add(n);
       n = ir.next();
       if(n != null) vb.add(Str.get("..."));
       SEQCAST.thrw(ii, vb.value());
