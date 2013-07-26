@@ -1170,19 +1170,21 @@ public class QueryParser extends InputParser {
       final boolean emp = ctx.sc.xquery3() && wsConsume(ALLOWING);
       if(emp) wsCheck(EMPTYORD);
 
-      final Var ps = wsConsumeWs(AT) ? addLocal(varName(), SeqType.ITR, false) : null;
-      final Var sc = wsConsumeWs(SCORE) ? addLocal(varName(), SeqType.DBL, false) : null;
+      final QNm p = wsConsumeWs(AT) ? varName() : null;
+      final QNm s = wsConsumeWs(SCORE) ? varName() : null;
 
       wsCheck(IN);
       final Expr e = check(single(), NOVARDECL);
 
       // declare late because otherwise it would shadow the wrong variables
       final Var var = addLocal(nm, tp, false);
-      if(ps != null && nm.eq(ps.name)) error(DUPLVAR, var);
-      if(sc != null) {
-        if(nm.eq(sc.name)) error(DUPLVAR, var);
-        if(ps != null && ps.name.eq(sc.name)) error(DUPLVAR, ps);
+      final Var ps = p != null ? addLocal(p, SeqType.ITR, false) : null;
+      final Var sc = s != null ? addLocal(s, SeqType.DBL, false) : null;
+      if(p != null) {
+        if(nm.eq(p)) error(DUPLVAR, var);
+        if(s != null && p.eq(s)) error(DUPLVAR, ps);
       }
+      if(s != null && nm.eq(s)) error(DUPLVAR, var);
 
       cls.add(new For(var, ps, sc, e, emp, info()));
     } while(wsConsumeWs(COMMA));
