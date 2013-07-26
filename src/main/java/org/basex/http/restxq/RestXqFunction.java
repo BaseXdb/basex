@@ -233,7 +233,6 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       try {
         // bind request body in the correct format
         body.name(http.method + IO.XMLSUFFIX);
-        new IOFile("c:/temp/cache").write(body.read());
         final String ext = http.contentTypeExt();
         bind(requestBody, arg, HTTPPayload.item(body, context.context.prop, ct, ext));
       } catch(final IOException ex) {
