@@ -3,7 +3,8 @@ package org.basex.test.query.expr;
 import static org.junit.Assert.*;
 
 import org.basex.query.*;
-import org.basex.test.*;
+import org.basex.query.util.*;
+import org.basex.test.query.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -13,13 +14,15 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class FLWORTest extends SandboxTest {
+public final class FLWORTest extends AdvancedQueryTest {
   /** Tests shadowing of outer variables. */
   @Test
   public void shadowTest() {
     query("for $a in for $a in <a>1</a> return $a/text() return <x>{ $a }</x>",
         "<x>1</x>");
+    error("for $a at $b in 'c'[$b > 1] return $a", Err.VARUNDEF);
   }
+
   /** Tests shadowing between grouping variables. */
   @Test
   public void groupShadowTest() {
