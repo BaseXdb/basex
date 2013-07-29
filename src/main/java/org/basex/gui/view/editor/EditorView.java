@@ -106,7 +106,7 @@ public final class EditorView extends View {
     stop.setEnabled(false);
 
     go = new BaseXButton(gui, "go",
-        BaseXLayout.addShortcut(H_REPLACE, BaseXKeys.EXEC.toString()));
+        BaseXLayout.addShortcut(H_EXECUTE_QUERY, BaseXKeys.EXEC.toString()));
     go.addKeyListener(this);
 
     filter = BaseXButton.command(GUICommands.C_FILTER, gui);
