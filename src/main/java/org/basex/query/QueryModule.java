@@ -96,6 +96,24 @@ public abstract class QueryModule {
   @Target(ElementType.METHOD)
   public @interface FocusDependent { }
 
+  /**
+   * TODO
+   */
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target(ElementType.METHOD)
+  public @interface Lock {
+    /**
+     * Read locks.
+     * @return read locks
+     */
+    String[] read() default {};
+    /**
+     * Write locks.
+     * @return write locks
+     */
+    String[] write() default {};
+  }
+
   /** Query context. */
   public QueryContext context;
 }
