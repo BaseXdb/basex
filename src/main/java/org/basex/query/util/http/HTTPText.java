@@ -26,10 +26,14 @@ public interface HTTPText {
   byte[] MULTIPART = token("multipart");
   /** Dashes. */
   byte[] DASHES = token("--");
-  /** Multipart string. */
+  /** Character string. */
   String CHARSET_IS = "charset=";
-  /** Multipart string. */
+  /** Boundary string. */
   String BOUNDARY_IS = "boundary=";
+  /** Name string. */
+  String NAME_IS = "name=";
+  /** Filename string. */
+  String FILENAME_IS = "filename=";
 
   /** Module prefix. */
   String PREFIX = "http";

@@ -102,8 +102,8 @@ public final class FNHof extends StandardFunc {
     final ValueBuilder vb = v.cache();
     try {
       Arrays.sort(vb.item, 0, (int) vb.size(), cmp);
-    } catch(final QueryRTException err) {
-      throw err.wrapped();
+    } catch(final QueryRTException ex) {
+      throw ex.getCause();
     }
     return vb.value();
   }
@@ -153,7 +153,7 @@ public final class FNHof extends StandardFunc {
         heap.insert(checkNoEmpty(getKey.invItem(ctx, info, it)), it);
         if(heap.size() > k) heap.removeMin();
       }
-    } catch(final QueryRTException e) { throw e.wrapped(); }
+    } catch(final QueryRTException ex) { throw ex.getCause(); }
 
     final Item[] arr = new Item[heap.size()];
     for(int i = arr.length; --i >= 0;) arr[i] = heap.removeMin();
@@ -179,7 +179,7 @@ public final class FNHof extends StandardFunc {
         heap.insert(it, it);
         if(heap.size() > k) heap.removeMin();
       }
-    } catch(final QueryRTException e) { throw e.wrapped(); }
+    } catch(final QueryRTException ex) { throw ex.getCause(); }
 
     final Item[] arr = new Item[heap.size()];
     for(int i = arr.length; --i >= 0;) arr[i] = heap.removeMin();

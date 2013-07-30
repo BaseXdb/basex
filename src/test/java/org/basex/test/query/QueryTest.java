@@ -186,8 +186,6 @@ public abstract class QueryTest extends SandboxTest {
    * @return iterator
    */
   private static ValueBuilder item(final Item i) {
-    final ValueBuilder vb = new ValueBuilder();
-    vb.add(i);
-    return vb;
+    return new ValueBuilder().add(i);
   }
 }

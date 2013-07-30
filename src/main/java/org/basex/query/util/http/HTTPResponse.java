@@ -103,12 +103,8 @@ public final class HTTPResponse {
     responseEl.add(body);
 
     // result
-    final ValueBuilder result = new ValueBuilder();
-    result.add(responseEl);
-    result.add(payloads.value());
-    return result;
+    return new ValueBuilder().add(responseEl).add(payloads.value());
   }
-
 
   /**
    * Creates a <http:body/> element.

@@ -17,12 +17,9 @@ public final class QueryRTException extends RuntimeException {
     super(qe);
   }
 
-  /**
-   * Getter for the wrapped exception.
-   * @return wrapped query exception
-   */
-  public QueryException wrapped() {
-    return (QueryException) getCause();
+  @Override
+  public QueryException getCause() {
+    return (QueryException) super.getCause();
   }
 
   @Override

@@ -32,11 +32,11 @@ public final class FNUnit extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _UNIT_ASSERT:         return assrt(ctx);
-      case _UNIT_FAIL:           return fail(ctx);
-      case _UNIT_TEST:           return test(ctx);
-      case _UNIT_TEST_LIBRARIES: return testLibraries(ctx);
-      default:                   return super.item(ctx, ii);
+      case _UNIT_ASSERT:    return assrt(ctx);
+      case _UNIT_FAIL:      return fail(ctx);
+      case _UNIT_TEST:      return test(ctx);
+      case _UNIT_TEST_URIS: return testUris(ctx);
+      default:              return super.item(ctx, ii);
     }
   }
 
@@ -82,12 +82,12 @@ public final class FNUnit extends StandardFunc {
   }
 
   /**
-   * Performs the test-libraries function (still experimental).
+   * Performs the test-uris function.
    * @param ctx query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Item testLibraries(final QueryContext ctx) throws QueryException {
+  private Item testUris(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
     final TokenList tl = new TokenList();
     final Iter ir = ctx.iter(expr[0]);

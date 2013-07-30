@@ -12,9 +12,11 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -79,8 +81,8 @@ public final class HTTPPayload {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public static Item item(final IO in, final Prop prop, final String ct,
-      final String ext) throws IOException, QueryException {
+  public static Item item(final IO in, final Prop prop, final String ct, final String ext)
+      throws IOException, QueryException {
 
     Item it = null;
     if(ct != null) {
@@ -114,8 +116,8 @@ public final class HTTPPayload {
       throws IOException, QueryException {
 
     // parse boundary
-    byte[] b = boundary(ext);
-    if(b == null) throw new IOException("No boundary specified.");
+    final byte[] b = boundary(ext);
+    if(b == null) throw new IOException("multipart/form-data: no boundary specified.");
 
     // helper arrays
     final byte[] boundary = concat(DASHES, b);
@@ -125,24 +127,36 @@ public final class HTTPPayload {
     final byte[] cont = in.read();
 
     final int cl = cont.length;
-    String fn = null;
+    String name = null, fn = null;
     for(int s = 0, i; s < cl; s = i + 2) {
       i = indexOf(cont, CRLF, s);
-      if(i == -1) throw new IOException("CRLF expected.");
+      if(i == -1) throw new IOException("multipart/form-data: CRLF expected.");
       final byte[] line = substring(cont, s, i);
 
       if(startsWith(line, boundary)) {
         if(eq(line, last)) break;
       } else if(startsWith(line, CONTENT_DISPOSITION)) {
-        fn = string(line).replaceAll("^.*filename=\"?|\"?$", "");
+        name = !contains(line, token(NAME_IS)) ? null : string(line).
+          replaceAll("^.*?" + NAME_IS + "\"|\".*", "").replaceAll("\\[\\]", "");
+        fn = !contains(line, token(FILENAME_IS)) ? null :
+          string(line).replaceAll("^.*" + FILENAME_IS + "\"|\"$", "");
       } else if(line.length == 0) {
         s = i + 2;
         i = indexOf(cont, end, s);
         if(i == -1) throw new IOException("multipart/form-data: no closing boundary.");
 
-        map = map.insert(Str.get(fn), new B64(substring(cont, s, i)), null);
+        final Str key = Str.get(name);
+        Value val = map.get(key, null);
+        if(val == Empty.SEQ && fn != null) val = Map.EMPTY;
+
+        if(fn != null && val instanceof Map) {
+          val = ((Map) val).insert(Str.get(fn), new B64(substring(cont, s, i)), null);
+        } else {
+          val = Str.get(substring(cont, s, i));
+        }
+        map = map.insert(key, val, null);
       } else {
-        Util.debug("multipart/form-data: ignored: " + string(line));
+        Util.debug("multipart/form-data: ignored: %", line);
       }
     }
     return map;
