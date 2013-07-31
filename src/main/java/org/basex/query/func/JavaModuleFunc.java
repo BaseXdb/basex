@@ -4,7 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
 import java.lang.reflect.*;
-import org.basex.core.*;
+
 import org.basex.query.*;
 import org.basex.query.QueryModule.Deterministic;
 import org.basex.query.QueryModule.FocusDependent;
@@ -85,21 +85,6 @@ public final class JavaModuleFunc extends JavaMapping {
   @Override
   public String description() {
     return name() + " method";
-  }
-
-  @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    // Add module locks to QueryContext.
-    QueryModule.Lock lock = mth.getAnnotation(QueryModule.Lock.class);
-    if (lock != null) {
-      for (String read : lock.read()) {
-        ctx.readLocks.add(DBLocking.MODULE_PREFIX + read);
-      }
-      for (String write : lock.write()) {
-        ctx.writeLocks.add(DBLocking.MODULE_PREFIX + write);
-      }
-    }
-    return super.compile(ctx, scp);
   }
 
   /**

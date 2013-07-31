@@ -191,6 +191,12 @@ public final class LockingTest extends SandboxTest {
         new XQuery(f("for $i in ('%s') return insert node %s into doc($i)", NAME, Q)),
         new XQuery(f("for $i in ('%s') return insert node %s into doc($i)", NAME, Q)),
         false);
+    // Custom Java Module locking
+    testQueries(new XQuery(f(
+        "import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';"
+            + "(qm:writeLock(), %s)", Q)), new XQuery(f(
+        "import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';"
+            + "(qm:writeLock(), %s)", Q)), false);
   }
 
   /**
