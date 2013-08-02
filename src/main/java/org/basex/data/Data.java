@@ -605,6 +605,7 @@ public abstract class Data {
    */
   public final void delete(final int pre) {
     meta.update();
+
     // size of the subtree to delete
     int k = kind(pre);
     final int s = size(pre, k);
