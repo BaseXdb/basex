@@ -1036,6 +1036,21 @@ public final class UpdateTest extends AdvancedQueryTest {
  }
 
  /**
+  * Inserts attributes.
+  */
+ @Test
+ public void attributeInserts() {
+   // Issue #736
+   query("let $x := <n01>" +
+       "<n02/><n03/><n04/><n05/><n06/><n07/><n08/><n09/><n10/><n11/>" +
+       "<n12/><n13/><n14/><n15/><n16/><n17/><n18/><n19/><n20/><n21/>" +
+       "<n22/><n23/><n24/><n25/><n26/><n27/><n28/><n29/><n30/><n31/>" +
+       "</n01> " +
+       "return (insert node attribute Q{x}x { } into $x," +
+       " insert node $x into <x/>)");
+ }
+
+ /**
   * Tests the combination of transform expressions and xquery:eval().
   */
  @Test

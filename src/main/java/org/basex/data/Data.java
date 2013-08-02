@@ -505,61 +505,70 @@ public abstract class Data {
 
   /**
    * Replaces parts of the database with the specified data instance.
-   * @param rpre pre value to be replaced
-   * @param clip data clip
+   * @param tpre pre value of target node to be replaced
+   * @param source clip with source data
    */
-  public final void replace(final int rpre, final DataClip clip) {
+  public final void replace(final int tpre, final DataClip source) {
     meta.update();
 
-    final int dsize = clip.size();
-    final Data data = clip.data;
+    final int size = source.size();
+    final Data data = source.data;
 
-    final int rkind = kind(rpre);
-    final int rsize = size(rpre, rkind);
-    final int rpar = parent(rpre, rkind);
-    final int diff = dsize - rsize;
-    buffer(dsize);
-    resources.replace(rpre, rsize, clip);
+    final int tkind = kind(tpre);
+    final int tsize = size(tpre, tkind);
+    final int tpar = parent(tpre, tkind);
+    final int diff = size - tsize;
+    buffer(size);
+    resources.replace(tpre, tsize, source);
 
     if(meta.updindex) {
       // update index
-      indexDelete(rpre, rsize);
+      indexDelete(tpre, tsize);
       indexBegin();
     }
 
-    int clipTopLevel = clip.start;
-    for(int dpre = clipTopLevel; dpre < clip.end; ++dpre) {
-      final int dkind = data.kind(dpre);
-      final int dpar = data.parent(dpre, dkind);
-      final int pre = rpre + dpre - clip.start;
-      final int dis = dpre != clipTopLevel ? dpre - dpar : pre - rpar;
-      // increment clipTopLevel to following sibling
-      if(dpre == clipTopLevel)
-        clipTopLevel += data.size(clipTopLevel, data.kind(clipTopLevel));
+    int sTopPre = source.start;
+    for(int spre = sTopPre; spre < source.end; ++spre) {
+      final int kind = data.kind(spre);
+      // size and parent value of source node
+      final int ssize = data.size(spre, kind);
+      final int spar = data.parent(spre, kind);
+      final int pre = tpre + spre - source.start;
 
-      switch(dkind) {
+      // calculate new distance value
+      final int dist;
+      if(spre == sTopPre) {
+        // handle top level entry: calculate distance based on target database
+        dist = pre - tpar;
+        // calculate pre value of next top level entry
+        sTopPre += ssize;
+      } else {
+        dist = spre - spar;
+      }
+
+      switch(kind) {
         case DOC:
           // add document
-          doc(pre, data.size(dpre, dkind), data.text(dpre, true));
+          doc(pre, ssize, data.text(spre, true));
           meta.ndocs++;
           break;
         case ELEM:
           // add element
-          byte[] nm = data.name(dpre, dkind);
-          elem(dis, tagindex.index(nm, null, false), data.attSize(dpre, dkind),
-              data.size(dpre, dkind), nspaces.uri(nm, true), false);
+          byte[] nm = data.name(spre, kind);
+          elem(dist, tagindex.index(nm, null, false), data.attSize(spre, kind),
+              ssize, nspaces.uri(nm, true), false);
           break;
         case TEXT:
         case COMM:
         case PI:
           // add text
-          text(pre, dis, data.text(dpre, true), dkind);
+          text(pre, dist, data.text(spre, true), kind);
           break;
         case ATTR:
           // add attribute
-          nm = data.name(dpre, dkind);
-          attr(pre, dis, atnindex.index(nm, null, false),
-              data.text(dpre, false), nspaces.uri(nm, false), false);
+          nm = data.name(spre, kind);
+          attr(pre, dist, atnindex.index(nm, null, false),
+              data.text(spre, false), nspaces.uri(nm, false), false);
           break;
       }
     }
@@ -567,19 +576,19 @@ public abstract class Data {
     if(meta.updindex) {
       indexEnd();
       // update ID -> PRE map:
-      idmap.delete(rpre, id(rpre), -rsize);
-      idmap.insert(rpre, meta.lastid - dsize + 1, dsize);
+      idmap.delete(tpre, id(tpre), -tsize);
+      idmap.insert(tpre, meta.lastid - size + 1, size);
     }
 
     // update table:
-    table.replace(rpre, buffer(), rsize);
+    table.replace(tpre, buffer(), tsize);
     buffer(1);
 
     // no distance/size update if the two subtrees are of equal size
     if(diff == 0) return;
 
     // increase/decrease size of ancestors, adjust distances of siblings
-    int p = rpar;
+    int p = tpar;
     while(p >= 0) {
       final int k = kind(p);
       size(p, k, size(p, k) + diff);
@@ -587,15 +596,15 @@ public abstract class Data {
     }
 
     if(!cache)
-      updateDist(rpre + dsize, diff);
+      updateDist(tpre + size, diff);
 
     // adjust attribute size of parent if attributes inserted. attribute size
     // of parent cannot be reduced via a replace expression.
-    int dpre = clip.start;
-    if(data.kind(dpre) == ATTR) {
+    int spre = source.start;
+    if(data.kind(spre) == ATTR) {
       int d = 0;
-      while(dpre < clip.end && data.kind(dpre++) == ATTR) d++;
-      if(d > 1) attSize(rpar, kind(rpar), d + 1);
+      while(spre < source.end && data.kind(spre++) == ATTR) d++;
+      if(d > 1) attSize(tpar, kind(tpar), d + 1);
     }
   }
 
@@ -657,34 +666,34 @@ public abstract class Data {
    * Inserts attributes.
    * @param pre pre value
    * @param par parent of node
-   * @param clip data clip
+   * @param source clip with source data
    */
-  public final void insertAttr(final int pre, final int par, final DataClip clip) {
-    insert(pre, par, clip);
-    attSize(par, ELEM, attSize(par, ELEM) + clip.size());
+  public final void insertAttr(final int pre, final int par, final DataClip source) {
+    insert(pre, par, source);
+    attSize(par, ELEM, attSize(par, ELEM) + source.size());
   }
 
   /**
    * Inserts a data instance at the specified pre value.
    * Note that the specified data instance must differ from this instance.
-   * @param ipre value at which to insert new data
-   * @param ipar parent pre value of node
-   * @param clip data clip
+   * @param tpre target pre value
+   * @param tpar target parent pre value of node ({@code -1} if document is added)
+   * @param source clip with source data
    */
-  public final void insert(final int ipre, final int ipar, final DataClip clip) {
+  public final void insert(final int tpre, final int tpar, final DataClip source) {
     meta.update();
 
     // update value and document indexes
     if(meta.updindex) indexBegin();
-    resources.insert(ipre, clip);
+    resources.insert(tpre, source);
 
-    final int dsize = clip.size();
-    final int buf = Math.min(dsize, IO.BLOCKSIZE >> IO.NODEPOWER);
+    final int size = source.size();
+    final int buf = Math.min(size, IO.BLOCKSIZE >> IO.NODEPOWER);
     // resize buffer to cache more entries
     buffer(buf);
 
     // find all namespaces in scope to avoid duplicate declarations
-    final TokenMap nsScope = nspaces.scope(ipar, this);
+    final TokenMap nsScope = nspaces.scope(tpar, this);
 
     // loop through all entries
     final IntList preStack = new IntList();
@@ -693,32 +702,39 @@ public abstract class Data {
     final IntList flagPres = new IntList();
 
     // indicates if database only contains a dummy node
-    final Data data = clip.data;
-    int c = 0;
-    int clipTopLevel = clip.start;
-    for(int dpre = clipTopLevel; dpre < clip.end; ++dpre, ++c) {
-      if(c != 0 && c % buf == 0) insert(ipre + c - buf);
+    final Data data = source.data;
+    int c = 0, sTopPre = source.start;
+    for(int spre = sTopPre; spre < source.end; ++spre, ++c) {
+      if(c != 0 && c % buf == 0) insert(tpre + c - buf);
 
-      final int pre = ipre + c;
-      final int dkind = data.kind(dpre);
-      final int dpar = data.parent(dpre, dkind);
-      // ipar < 0 if document nodes on top level are added
-      final int dis = dpre != clipTopLevel ? dpre - dpar : ipar >= 0 ? pre - ipar : 0;
-      final int par = dis == 0 ? -1 : pre - dis;
-      // increment clipTopLevel to following sibling
-      if(dpre == clipTopLevel)
-        clipTopLevel += data.size(clipTopLevel, data.kind(clipTopLevel));
+      final int pre = tpre + c;
+      final int kind = data.kind(spre);
+      // size and parent value of source node
+      final int ssize = data.size(spre, kind);
+      final int spar = data.parent(spre, kind);
 
-      if(c == 0) nspaces.root(par, this);
+      // calculate new distance value
+      final int dist;
+      if(spre == sTopPre) {
+        // handle top level entry: calculate distance based on target database
+        dist = pre - tpar;
+        // calculate pre value of next top level entry
+        sTopPre += ssize;
+      } else {
+        // handle descendant node: calculate distance based on source database
+        dist = spre - spar;
+      }
 
-      while(!preStack.isEmpty() && preStack.peek() > par) nspaces.close(preStack.pop());
+      // documents: use -1 as namespace root
+      final int nsPre = kind == Data.DOC ? -1 : pre - dist;
+      if(c == 0) nspaces.root(nsPre, this);
+      while(!preStack.isEmpty() && preStack.peek() > nsPre) nspaces.close(preStack.pop());
 
-      switch(dkind) {
+      switch(kind) {
         case DOC:
           // add document
           nspaces.prepare();
-          final int s = data.size(dpre, dkind);
-          doc(pre, s, data.text(dpre, true));
+          doc(pre, ssize, data.text(spre, true));
           meta.ndocs++;
           preStack.push(pre);
           break;
@@ -726,8 +742,8 @@ public abstract class Data {
           // add element
           nspaces.prepare();
           boolean ne = false;
-          if(data.nsFlag(dpre)) {
-            final Atts at = data.ns(dpre);
+          if(data.nsFlag(spre)) {
+            final Atts at = data.ns(spre);
             for(int a = 0; a < at.size(); ++a) {
               // see if prefix has been declared/ is part of current ns scope
               final byte[] old = nsScope.get(at.name(a));
@@ -743,33 +759,33 @@ public abstract class Data {
               }
             }
           }
-          byte[] nm = data.name(dpre, dkind);
-          elem(dis, tagindex.index(nm, null, false), data.attSize(dpre, dkind),
-              data.size(dpre, dkind), nspaces.uri(nm, true), ne);
+          byte[] nm = data.name(spre, kind);
+          elem(dist, tagindex.index(nm, null, false), data.attSize(spre, kind),
+              ssize, nspaces.uri(nm, true), ne);
           preStack.push(pre);
           break;
         case TEXT:
         case COMM:
         case PI:
           // add text
-          text(pre, dis, data.text(dpre, true), dkind);
+          text(pre, dist, data.text(spre, true), kind);
           break;
         case ATTR:
           // add attribute
-          nm = data.name(dpre, dkind);
+          nm = data.name(spre, kind);
           // check if prefix already in nsScope or not
           final byte[] attPref = prefix(nm);
           // check if prefix of attribute has already been declared, otherwise
           // add declaration to parent node
-          if(data.nsFlag(dpre) && nsScope.get(attPref) == null) {
-            nspaces.add(par, preStack.isEmpty() ? -1 : preStack.peek(),
-                attPref, data.nspaces.uri(data.uri(dpre, dkind)), this);
+          if(data.nsFlag(spre) && nsScope.get(attPref) == null) {
+            nspaces.add(nsPre, preStack.isEmpty() ? -1 : preStack.peek(),
+                attPref, data.nspaces.uri(data.uri(spre, kind)), this);
             // save pre value to set ns flag later for this node. can't be done
             // here as direct table access would interfere with the buffer
-            flagPres.add(par);
+            flagPres.add(nsPre);
           }
-          attr(pre, dis, atnindex.index(nm, null, false),
-              data.text(dpre, false), nspaces.uri(nm, false), false);
+          attr(pre, dist, atnindex.index(nm, null, false),
+              data.text(spre, false), nspaces.uri(nm, false), false);
           break;
       }
     }
@@ -777,7 +793,7 @@ public abstract class Data {
     while(!preStack.isEmpty()) nspaces.close(preStack.pop());
     nspaces.root(nsRoot);
 
-    if(bp != 0) insert(ipre + c - 1 - (c - 1) % buf);
+    if(bp != 0) insert(tpre + c - 1 - (c - 1) % buf);
     // reset buffer to old size
     buffer(1);
 
@@ -788,24 +804,23 @@ public abstract class Data {
     }
 
     // increase size of ancestors
-    int p = ipar;
+    int p = tpar;
     while(p >= 0) {
       final int k = kind(p);
-      size(p, k, size(p, k) + dsize);
+      size(p, k, size(p, k) + size);
       p = parent(p, k);
     }
 
     if(meta.updindex) {
       // add the entries to the ID -> PRE mapping:
-      idmap.insert(ipre, id(ipre), dsize);
+      idmap.insert(tpre, id(tpre), size);
       indexEnd();
     }
 
-    if(!cache)
-      updateDist(ipre + dsize, dsize);
+    if(!cache) updateDist(tpre + size, size);
 
     // propagate PRE value shifts to namespaces
-    if(ipar != -1) nspaces.insert(ipre, dsize, newNodes);
+    if(tpar != -1) nspaces.insert(tpre, size, newNodes);
   }
 
   /**
@@ -977,7 +992,7 @@ public abstract class Data {
    * @param name attribute name
    * @param value attribute value
    * @param uri namespace uri reference
-   * @param ne namespace flag
+   * @param ne namespace flag (only {@code true} if this is a stand-alone attribute)
    */
   public final void attr(final int pre, final int dist, final int name,
       final byte[] value, final int uri, final boolean ne) {

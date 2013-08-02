@@ -119,7 +119,8 @@ public final class DataBuilder {
       u = data.nspaces.uri(uri);
     }
     final int n = data.atnindex.index(q.string(), null, false);
-    // attribute namespace flag is only set in main memory instance
+    // usually, attributes don't have a namespace flag.
+    // this is different here, because as a stand-alone attribute has no parent element.
     data.attr(ds, pre - par, n, node.string(), u, u != 0);
     data.insert(ds);
     return pre + 1;
