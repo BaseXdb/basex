@@ -527,11 +527,15 @@ public abstract class Data {
       indexBegin();
     }
 
-    for(int dpre = clip.start; dpre < clip.end; ++dpre) {
+    int clipTopLevel = clip.start;
+    for(int dpre = clipTopLevel; dpre < clip.end; ++dpre) {
       final int dkind = data.kind(dpre);
       final int dpar = data.parent(dpre, dkind);
       final int pre = rpre + dpre - clip.start;
-      final int dis = dpar >= 0 ? dpre - dpar : pre - rpar;
+      final int dis = dpre != clipTopLevel ? dpre - dpar : pre - rpar;
+      // increment clipTopLevel to following sibling
+      if(dpre == clipTopLevel)
+        clipTopLevel += data.size(clipTopLevel, data.kind(clipTopLevel));
 
       switch(dkind) {
         case DOC:
@@ -601,7 +605,6 @@ public abstract class Data {
    */
   public final void delete(final int pre) {
     meta.update();
-
     // size of the subtree to delete
     int k = kind(pre);
     final int s = size(pre, k);
@@ -691,15 +694,19 @@ public abstract class Data {
     // indicates if database only contains a dummy node
     final Data data = clip.data;
     int c = 0;
-    for(int dpre = clip.start; dpre < clip.end; ++dpre, ++c) {
+    int clipTopLevel = clip.start;
+    for(int dpre = clipTopLevel; dpre < clip.end; ++dpre, ++c) {
       if(c != 0 && c % buf == 0) insert(ipre + c - buf);
 
       final int pre = ipre + c;
       final int dkind = data.kind(dpre);
       final int dpar = data.parent(dpre, dkind);
       // ipar < 0 if document nodes on top level are added
-      final int dis = dpar >= 0 ? dpre - dpar : ipar >= 0 ? pre - ipar : 0;
+      final int dis = dpre != clipTopLevel ? dpre - dpar : ipar >= 0 ? pre - ipar : 0;
       final int par = dis == 0 ? -1 : pre - dis;
+      // increment clipTopLevel to following sibling
+      if(dpre == clipTopLevel)
+        clipTopLevel += data.size(clipTopLevel, data.kind(clipTopLevel));
 
       if(c == 0) nspaces.root(par, this);
 
