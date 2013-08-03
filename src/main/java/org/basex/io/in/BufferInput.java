@@ -178,7 +178,7 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Retrieves and returns the whole text and closes the stream.
+   * Retrieves and returns the whole data and closes the stream.
    * @return contents
    * @throws IOException I/O exception
    */

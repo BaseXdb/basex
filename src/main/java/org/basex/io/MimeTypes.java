@@ -20,8 +20,13 @@ public final class MimeTypes {
   /** Content-Type. */
   public static final String CONTENT_TYPE = "Content-Type";
 
+  /** Text type. */
+  public static final String TEXT = "text/";
+  /** Multipart type. */
+  public static final String MULTIPART = "multipart/";
+
   /** Media type: multipart/form-data. */
-  public static final String MULTI_FORM = "multipart/form-data";
+  public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
   /** Media type: application/html+xml. */
   public static final String APP_HTML_XML = "application/html+xml";
@@ -34,9 +39,9 @@ public final class MimeTypes {
   /** Media type: application/xml. */
   public static final String APP_XML = "application/xml";
   /** Media type: application/xml-external-parsed-entity. */
-  public static final String APP_EXT_XML = "application/xml-external-parsed-entity";
+  public static final String APP_XML_EXTERNAL = "application/xml-external-parsed-entity";
   /** Media type: application/x-www-form-urlencoded. */
-  public static final String APP_FORM = "application/x-www-form-urlencoded";
+  public static final String APP_FORM_URLENCODED = "application/x-www-form-urlencoded";
 
   /** Media type: text/comma-separated-values. */
   public static final String TEXT_CSV = "text/comma-separated-values";
@@ -46,13 +51,11 @@ public final class MimeTypes {
   public static final String TEXT_PLAIN = "text/plain";
   /** Media type: text/xml. */
   public static final String TEXT_XML = "text/xml";
-
-  /** XML media types' suffix. */
-  public static final String MIME_XML_SUFFIX = "+xml";
-  /** Text media types' prefix. */
-  public static final String MIME_TEXT_PREFIX = "text/";
   /** XML media type. */
   public static final String TEXT_XML_EXT = "text/xml-external-parsed-entity";
+
+  /** XML media types' suffix. */
+  public static final String XML_SUFFIX = "+xml";
 
   /** Private constructor. */
   private MimeTypes() { }
@@ -74,8 +77,8 @@ public final class MimeTypes {
    * @return result of check
    */
   public static boolean isXML(final String type) {
-    return eq(type, TEXT_XML, TEXT_XML_EXT, APP_XML, APP_EXT_XML) ||
-        type.endsWith(MIME_XML_SUFFIX);
+    return eq(type, TEXT_XML, TEXT_XML_EXT, APP_XML, APP_XML_EXTERNAL) ||
+        type.endsWith(XML_SUFFIX);
   }
 
   /**
@@ -84,7 +87,16 @@ public final class MimeTypes {
    * @return result of check
    */
   public static boolean isText(final String type) {
-    return type.startsWith(MIME_TEXT_PREFIX);
+    return type.startsWith(TEXT);
+  }
+
+  /**
+   * Checks if the content type is a multipart content type.
+   * @param type content type
+   * @return result of check
+   */
+  public static boolean isMultipart(final String type) {
+    return type.startsWith(MULTIPART);
   }
 
   /**

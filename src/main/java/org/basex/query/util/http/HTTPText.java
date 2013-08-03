@@ -22,8 +22,6 @@ public interface HTTPText {
 
   /** Content-Disposition. */
   byte[] CONTENT_DISPOSITION = token("Content-Disposition");
-  /** Multipart string. */
-  byte[] MULTIPART = token("multipart");
   /** Dashes. */
   byte[] DASHES = token("--");
   /** Character string. */

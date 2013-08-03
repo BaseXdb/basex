@@ -79,8 +79,9 @@ public final class HTTPClient {
           setContentType(conn, r);
           setRequestContent(conn.getOutputStream(), r);
         }
+        final byte[] mt = r.attrs.get(OVERRIDE_MEDIA_TYPE);
         return new HTTPResponse(info, prop).getResponse(conn, r.attrs.get(STATUS_ONLY),
-            r.attrs.get(OVERRIDE_MEDIA_TYPE));
+            mt == null ? null : string(mt));
       } finally {
         conn.disconnect();
       }
@@ -226,11 +227,11 @@ public final class HTTPClient {
       if(m == null) {
         if(eq(type, APP_HTML_XML)) {
           m = token(M_XHTML);
-        } else if(isXML(type)) {
-          m = token(M_XML);
         } else if(eq(type, TEXT_HTML)) {
           m = token(M_HTML);
-        } else if(type != null && type.startsWith(MIME_TEXT_PREFIX)) {
+        } else if(type != null && isXML(type)) {
+          m = token(M_XML);
+        } else if(type != null && isText(type)) {
           m = token(M_TEXT);
         } else {
           // default serialization method is XML
