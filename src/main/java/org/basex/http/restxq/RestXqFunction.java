@@ -230,10 +230,9 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     IOContent body = null;
 
     if(requestBody != null) {
+      // bind request body in the correct format
       body = cache(http, null);
       try {
-        // bind request body in the correct format
-        body.name(http.method + IO.XMLSUFFIX);
         final String ext = http.contentTypeExt();
         bind(requestBody, arg, HTTPPayload.value(body, context.context.prop, ct, ext));
       } catch(final IOException ex) {
@@ -241,7 +240,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       }
     }
 
-    // convert query parameters to XQuery values
+    // convert parameters to XQuery values
     final Map<String, Value> params = new HashMap<String, Value>();
     for(final Map.Entry<String, String[]> entry : http.params().entrySet()) {
       final String[] values = entry.getValue();
@@ -295,9 +294,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         errs.put(string(Catch.NAMES[v].local()), values[v]);
       }
     }
-    for(final RestXqParam rxp : errorParams) {
-      bind(rxp, arg, errs.get(rxp.key));
-    }
+    for(final RestXqParam rxp : errorParams) bind(rxp, arg, errs.get(rxp.key));
   }
 
   /**
