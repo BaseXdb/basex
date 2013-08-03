@@ -11,6 +11,7 @@ import java.util.regex.*;
 
 import javax.servlet.http.*;
 
+import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -234,34 +235,34 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         // bind request body in the correct format
         body.name(http.method + IO.XMLSUFFIX);
         final String ext = http.contentTypeExt();
-        bind(requestBody, arg, HTTPPayload.item(body, context.context.prop, ct, ext));
+        bind(requestBody, arg, HTTPPayload.value(body, context.context.prop, ct, ext));
       } catch(final IOException ex) {
         error(INPUT_CONV, ex);
       }
     }
 
-    // bind query parameters
-    final Map<String, String[]> params = http.params();
-    for(final RestXqParam rxp : queryParams) {
-      final ValueBuilder vb = new ValueBuilder();
-      final String[] strings = params.get(rxp.key);
-      if(strings != null) for(final String v : params.get(rxp.key)) vb.add(new Atm(v));
-      bind(rxp, arg, vb.value());
+    // convert query parameters to XQuery values
+    final Map<String, Value> params = new HashMap<String, Value>();
+    for(final Map.Entry<String, String[]> entry : http.params().entrySet()) {
+      final String[] values = entry.getValue();
+      final ValueBuilder vb = new ValueBuilder(values.length);
+      for(final String v : values) vb.add(new Atm(v));
+      params.put(entry.getKey(), vb.value());
     }
+
+    // bind query parameters
+    for(final RestXqParam rxp : queryParams) bind(rxp, arg, params.get(rxp.key));
 
     // bind form parameters
     if(!formParams.isEmpty()) {
-      if(MimeTypes.APP_FORM.equals(ct)) {
-        // convert parameters encoded in a form
-        body = cache(http, body);
-        addParams(body.toString(), params);
+      if(MimeTypes.MULTIPART_FORM_DATA.equals(ct)) {
+        // convert multipart parameters encoded in a form
+        addMultipart(cache(http, body), params, http.contentTypeExt());
+      } else if(MimeTypes.APP_FORM_URLENCODED.equals(ct)) {
+        // convert URL-encoded parameters
+        addURLEncoded(cache(http, body), params);
       }
-      for(final RestXqParam rxp : formParams) {
-        final ValueBuilder vb = new ValueBuilder();
-        final String[] strings = params.get(rxp.key);
-        if(strings != null) for(final String v : params.get(rxp.key)) vb.add(new Atm(v));
-        bind(rxp, arg, vb.value());
-      }
+      for(final RestXqParam rxp : formParams) bind(rxp, arg, params.get(rxp.key));
     }
 
     // bind header parameters
@@ -409,24 +410,14 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * Binds the specified parameter to a variable.
    * @param rxp parameter
    * @param args argument array
-   * @param values values to be bound; the parameter's default value is assigned
+   * @param value values to be bound; the parameter's default value is assigned
    *        if the argument is {@code null} or empty
    * @throws QueryException query exception
    */
-  private void bind(final RestXqParam rxp, final Expr[] args, final Value values)
+  private void bind(final RestXqParam rxp, final Expr[] args, final Value value)
       throws QueryException {
 
-    final Value val;
-    if(values == null || values.size() == 0) {
-      val = rxp.value;
-    } else {
-      final ValueBuilder vb = new ValueBuilder();
-      for(final Object o : values) {
-        vb.add(o instanceof Value ? (Value) o : new Atm(o.toString()));
-      }
-      val = vb.value();
-    }
-    bind(rxp.name, args, val);
+    bind(rxp.name, args, value == null || value.isEmpty() ? rxp.value : value);
   }
 
   /**
@@ -527,6 +518,26 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     return new RestXqError(code);
   }
 
+  /**
+   * Adds multipart form-data from the passed on request body.
+   * @param body request body
+   * @param pars map parameters
+   * @param ext content type extension (may be {@code null})
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  private void addMultipart(final IOContent body,
+      final Map<String, Value> pars, final String ext)
+      throws IOException, QueryException {
+
+    final Prop prop = context.context.prop;
+    final HTTPPayload hp = new HTTPPayload(body.inputStream(), false, null, prop);
+    final HashMap<String, Value> map = hp.multiForm(ext);
+    for(final Map.Entry<String, Value> entry : map.entrySet()) {
+      pars.put(entry.getKey(), entry.getValue());
+    }
+  }
+
   // PRIVATE STATIC METHODS =============================================================
 
   /**
@@ -547,16 +558,18 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   }
 
   /**
-   * Adds parameters from the passed on request body.
+   * Adds URL-encoded parameters from the passed on request body.
    * @param body request body
-   * @param params map parameters
+   * @param pars map parameters
    */
-  private static void addParams(final String body, final Map<String, String[]> params) {
-    for(final String nv : body.split("&")) {
+  private static void addURLEncoded(final IOContent body,
+      final Map<String, Value> pars) {
+
+    for(final String nv : body.toString().split("&")) {
       final String[] parts = nv.split("=", 2);
       if(parts.length < 2) continue;
       try {
-        params.put(parts[0], new String[] { URLDecoder.decode(parts[1], Token.UTF8) });
+        pars.put(parts[0], Str.get(URLDecoder.decode(parts[1], Token.UTF8)));
       } catch(final Exception ex) {
         Util.notexpected(ex);
       }

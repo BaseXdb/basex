@@ -9,7 +9,7 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
-public class ServerHTTPClientTest extends HTTPClientTest {
+public class ServerFnHttpTest extends FnHttpTest {
   /**
    * Start server.
    * @throws Exception exception

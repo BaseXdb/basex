@@ -8,7 +8,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -101,24 +100,11 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns all query parameters.
+   * Returns an immutable map with all query parameters.
    * @return parameters
-   * @throws HTTPException HTTP exception
    */
-  public Map<String, String[]> params() throws HTTPException {
-    final Map<String, String[]> params = new HashMap<String, String[]>();
-    try {
-      final Map<?, ?> map = req.getParameterMap();
-      for(final Entry<?, ?> s : map.entrySet()) {
-        final String key = s.getKey().toString();
-        final String[] vals = s.getValue() instanceof String[] ?
-            (String[]) s.getValue() : new String[] { s.getValue().toString() };
-        params.put(key, vals);
-      }
-    } catch(final IllegalArgumentException ex) {
-      HTTPErr.INVALID_PARAM_X.thrw(req.getQueryString());
-    }
-    return params;
+  public Map<String, String[]> params() {
+    return req.getParameterMap();
   }
 
   /**

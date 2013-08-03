@@ -1,6 +1,7 @@
 package org.basex.test.http;
 
 import static org.basex.core.Text.*;
+import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
@@ -32,7 +33,7 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
-public class HTTPClientTest extends HTTPTest {
+public class FnHttpTest extends HTTPTest {
   /** Example url. */
   static final String ROOT = "http://" + LOCALHOST + ":9998/rest/";
   /** Example url. */
@@ -72,10 +73,10 @@ public class HTTPClientTest extends HTTPTest {
    */
   @Test
   public void put() throws Exception {
-    final QueryProcessor qp = new QueryProcessor("http:send-request("
-        + "<http:request method='put' status-only='true'>"
+    final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
-        + "</http:request>, '" + RESTURL + "')", ctx);
+        + "</http:request>", RESTURL), ctx);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_CREATED, 1);
     qp.close();
   }
@@ -87,26 +88,26 @@ public class HTTPClientTest extends HTTPTest {
   @Test
   public void post() throws Exception {
     // POST - query
-    QueryProcessor qp = new QueryProcessor("http:send-request("
-        + "<http:request method='post'>"
+    QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request method='post'>"
         + "<http:body media-type='application/xml'>"
         + "<query xmlns='" + URL + "/rest'>"
         + "<text>1</text>"
         + "<parameter name='wrap' value='yes'/>"
         + "</query>" + "</http:body>"
-        + "</http:request>, '" + RESTURL + "')", ctx);
+        + "</http:request>", RESTURL), ctx);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 2);
     qp.close();
 
     // Execute the same query but with content set from $bodies
-    qp = new QueryProcessor("http:send-request("
-        + "<http:request method='post'>"
-        + "<http:body media-type='application/xml'/></http:request>"
-        + ", '" + RESTURL + "',"
-        + "<query xmlns='" + URL + "/rest'>"
+    qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+       "<http:request method='post'>"
+        + "<http:body media-type='application/xml'/></http:request>",
+        RESTURL,
+        "<query xmlns='" + URL + "/rest'>"
         + "<text>1</text>"
         + "<parameter name='wrap' value='yes'/>"
-        + "</query>)", ctx);
+        + "</query>"), ctx);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 2);
     qp.close();
   }
@@ -118,8 +119,8 @@ public class HTTPClientTest extends HTTPTest {
   @Test
   public void postGet() throws Exception {
     // GET1 - just send a GET request
-    QueryProcessor qp = new QueryProcessor("http:send-request("
-        + "<http:request method='get' href='" + ROOT + "'/>)", ctx);
+    QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request method='get' href='" + ROOT + "'/>"), ctx);
     Result r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
@@ -127,9 +128,8 @@ public class HTTPClientTest extends HTTPTest {
     qp.close();
 
     // GET2 - with override-media-type='text/plain'
-    qp = new QueryProcessor("http:send-request("
-        + "<http:request method='get' override-media-type='text/plain'/>, '"
-        + ROOT + "')", ctx);
+    qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request method='get' override-media-type='text/plain'/>", ROOT), ctx);
     r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
@@ -137,9 +137,8 @@ public class HTTPClientTest extends HTTPTest {
     qp.close();
 
     // Get3 - with status-only='true'
-    qp = new QueryProcessor("http:send-request("
-        + "<http:request method='get' status-only='true'/>, '" + ROOT + "')",
-        ctx);
+    qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request method='get' status-only='true'/>", ROOT), ctx);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
     qp.close();
   }
@@ -151,17 +150,16 @@ public class HTTPClientTest extends HTTPTest {
   @Test
   public void postDelete() throws Exception {
     // add document to be deleted
-    QueryProcessor qp = new QueryProcessor("http:send-request("
-        + "<http:request method='put'>"
+    QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request method='put'>"
         + "<http:body media-type='text/xml'><ToBeDeleted/></http:body>"
-        + "</http:request>, '" + RESTURL + "')", ctx);
+        + "</http:request>", RESTURL), ctx);
     qp.execute();
     qp.close();
 
     // DELETE
-    qp = new QueryProcessor("http:send-request("
-        + "<http:request method='delete' status-only='true'/>, '"
-        + RESTURL + "')", ctx);
+    qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request method='delete' status-only='true'/>", RESTURL), ctx);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
     qp.close();
   }
@@ -173,7 +171,7 @@ public class HTTPClientTest extends HTTPTest {
   @Test
   public void sendEmptyReq() {
     try {
-      new XQuery("http:send-request(<http:request/>)").execute(ctx);
+      new XQuery(_HTTP_SEND_REQUEST.args("<http:request/>")).execute(ctx);
     } catch(final BaseXException ex) {
       assertTrue(contains(token(ex.getMessage()), token(ErrType.HC.toString())));
     }
@@ -184,7 +182,7 @@ public class HTTPClientTest extends HTTPTest {
    */
   @Test
   public void sendReqNoParams() {
-    final Command c = new XQuery("http:send-request(())");
+    final Command c = new XQuery(_HTTP_SEND_REQUEST.args("()"));
     try {
       c.execute(ctx);
     } catch(final BaseXException ex) {
@@ -198,8 +196,8 @@ public class HTTPClientTest extends HTTPTest {
    */
   @Test
   public void error() throws QueryException {
-    final QueryProcessor qp = new QueryProcessor("http:send-request(" +
-        "<http:request method='get'/>, '" + RESTURL + "unknown')[1]/@status/data()", ctx);
+    final QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        "<http:request method='get'/>", RESTURL + "unknown") + "[1]/@status/data()", ctx);
     assertEquals("404", qp.execute().toString());
     qp.close();
   }
@@ -433,8 +431,7 @@ public class HTTPClientTest extends HTTPTest {
     req.payloadAttrs.put(token("media-type"), token("multipart/alternative"));
     req.payloadAttrs.put(token("boundary"), token("boundary42"));
     final Part p1 = new Part();
-    p1.headers.put(token("Content-Type"), token("text/plain; "
-        + "charset=us-ascii"));
+    p1.headers.put(token("Content-Type"), token("text/plain; charset=us-ascii"));
     p1.bodyAttrs.put(token("media-type"), token("text/plain"));
     p1.bodyContent.add(Str.get(plain + '\n'));
 
@@ -589,7 +586,7 @@ public class HTTPClientTest extends HTTPTest {
   @Test
   public void writeFromResource() throws IOException, QueryException {
     // Create a file form which will be read
-    final File f = new File(Prop.TMP + Util.name(HTTPClientTest.class));
+    final File f = new File(Prop.TMP + Util.name(FnHttpTest.class));
     final FileOutputStream out = new FileOutputStream(f);
     out.write(token("test"));
     out.close();
