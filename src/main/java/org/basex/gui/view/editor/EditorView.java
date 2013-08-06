@@ -48,7 +48,7 @@ public final class EditorView extends View {
       LINE_X.replaceAll("%", "(.*?)") + COL + ".*");
   /** Error information pattern. */
   private static final Pattern ERRORINFO = Pattern.compile(
-      "^.*\r?\n\\[.*?\\] |" + LINE_X.replaceAll("%", ".*?") + COLS + "|\r?\n.*",
+      "^.*\r?\n\\[.*?\\] |" + LINE_X.replaceAll("%", "\\d+") + COLS + "|\r?\n.*",
       Pattern.DOTALL);
   /** Error tooltip pattern. */
   private static final Pattern ERRORTT = Pattern.compile(
