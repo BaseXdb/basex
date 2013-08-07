@@ -3,6 +3,34 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.7 (August 7, 2013) -------------------------------------------
+
+ XQUERY
+ - Our XQuery 3.0 support is now complete!
+   http://docs.basex.org/wiki/XQuery_3.0
+ - the Unit Module allows standardized testing of XQuery applications
+   http://docs.basex.org/wiki/Unit_Module
+ - the Streaming Module speeds up operations on large files
+   http://docs.basex.org/wiki/Streaming_Module
+ - the Inspection Module provides reflection and documentation features
+   http://docs.basex.org/wiki/Inspection_Module
+ - we have added support for XQuery collations
+   http://docs.basex.org/wiki/Full-Text#Collations
+ - we have extended the Database, Archive, File and other Modules
+   http://docs.basex.org/wiki/Module_Library
+ 
+ COMMANDS
+ - database names have got more flexible
+   http://docs.basex.org/wiki/Commands#Valid_Names
+ - we have new options for simplifying the creation of large databases
+   http://docs.basex.org/wiki/Options
+ 
+ WEB/HTTP SERVICES:
+ - WebDAV has been enriched with locking features (sponsored feature!)
+   http://docs.basex.org/wiki/WebDAV#Locking
+ - RESTXQ has been improved and extended:
+   http://docs.basex.org/wiki/RESTXQ
+
 VERSION 7.6 (February 5, 2013) -----------------------------------------
 
  DATABASE LOCKING:
