@@ -209,18 +209,18 @@ public final class HTTPPayload {
    * @throws IOException I/O Exception
    */
   private byte[] readLine() throws IOException {
-    final TokenBuilder tb = new TokenBuilder();
+    final ByteList bl = new ByteList();
     for(int b; (b = in.read()) != -1;) {
       // RFC 1341: a line ends with CRLF
       while(b == '\r') {
         b = in.read();
-        if(b == '\n') return tb.finish();
-        tb.add('\r');
-        if(b == -1) return tb.finish();
+        if(b == '\n') return bl.toArray();
+        bl.add('\r');
+        if(b == -1) return bl.toArray();
       }
-      tb.add(b);
+      bl.add(b);
     }
-    return tb.isEmpty() ? null : tb.finish();
+    return bl.isEmpty() ? null : bl.toArray();
   }
 
   /**
@@ -277,42 +277,42 @@ public final class HTTPPayload {
   public HashMap<String, Value> multiForm(final String ext)
       throws IOException, QueryException {
 
-    // parse boundary
+    // parse boundary, create helper arrays
     final byte[] b = boundary(ext);
-
-    // helper arrays
     final byte[] boundary = concat(DASHES, b), last = concat(boundary, DASHES);
 
     HashMap<String, Value> map = new HashMap<String, Value>();
 
+    final ByteList cont = new ByteList();
+    int lines = -1;
     String name = null, fn = null;
     for(byte[] line; (line = readLine()) != null;) {
-      if(startsWith(line, boundary)) {
-        if(eq(line, last)) break;
-      } else if(startsWith(line, CONTENT_DISPOSITION)) {
-        name = !contains(line, token(NAME_IS)) ? null : string(line).
-          replaceAll("^.*?" + NAME_IS + "\"|\".*", "").replaceAll("\\[\\]", "");
-        fn = !contains(line, token(FILENAME_IS)) ? null :
-          string(line).replaceAll("^.*" + FILENAME_IS + "\"|\"$", "");
-      } else if(line.length == 0) {
-        final ByteList cont = new ByteList();
-        while(true) {
-          line = readLine();
-          if(line == null || eq(line, boundary)) break;
-          if(!cont.isEmpty()) cont.add(CRLF);
+      if(lines >= 0) {
+        if(startsWith(line, boundary)) {
+          Value val = map.get(name);
+          if(val == null && fn != null) val = Map.EMPTY;
+          if(fn != null && val instanceof Map) {
+            val = ((Map) val).insert(Str.get(fn), new B64(cont.toArray()), null);
+          } else {
+            val = Str.get(cont.toArray());
+          }
+          map.put(name, val);
+          cont.reset();
+          lines = -1;
+          if(eq(line, last)) break;
+        } else {
+          if(lines++ > 0) cont.add(CRLF);
           cont.add(line);
         }
-
-        Value val = map.get(name);
-        if(val == null && fn != null) val = Map.EMPTY;
-        if(fn != null && val instanceof Map) {
-          val = ((Map) val).insert(Str.get(fn), new B64(cont.toArray()), null);
-        } else {
-          val = Str.get(cont.toArray());
-        }
-        map.put(name, val);
       } else {
-        Util.debug("multipart/form-data: ignored: %", line);
+        if(startsWith(line, CONTENT_DISPOSITION)) {
+          name = !contains(line, token(NAME_IS)) ? null : string(line).
+            replaceAll("^.*?" + NAME_IS + "\"|\".*", "").replaceAll("\\[\\]", "");
+          fn = !contains(line, token(FILENAME_IS)) ? null :
+            string(line).replaceAll("^.*" + FILENAME_IS + "\"|\"$", "");
+        } else if(line.length == 0) {
+          lines = 0;
+        }
       }
     }
     return map;
