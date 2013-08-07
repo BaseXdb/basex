@@ -523,9 +523,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private void addMultipart(final IOContent body,
-      final Map<String, Value> pars, final String ext)
-      throws IOException, QueryException {
+  private void addMultipart(final IOContent body, final Map<String, Value> pars,
+      final String ext) throws IOException, QueryException {
 
     final Prop prop = context.context.prop;
     final HTTPPayload hp = new HTTPPayload(body.inputStream(), false, null, prop);
