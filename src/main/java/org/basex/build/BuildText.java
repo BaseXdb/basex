@@ -49,7 +49,7 @@ public interface BuildText {
   /** Scanner error. */
   String CLOSING = "Element was not properly closed.";
   /** Scanner error. */
-  String COMMDASH = "Missing '-' in comment declaration.";
+  String COMMDASH = "Comment or doctype declaration expected after '<!'.";
   /** Scanner error. */
   String ATTCHAR = "Invalid character '%' in attribute value.";
   /** Scanner error. */

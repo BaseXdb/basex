@@ -173,13 +173,14 @@ final class XMLScanner extends Proc {
 
     // parse comments etc...
     if(c == '!') {
-      if(!fragment && consume(DOCTYPE)) {
+      if(consume('-') && consume('-')) {
+        type = Type.COMMENT;
+        comment();
+      } else if(!fragment && consume(DOCTYPE)) {
         type = Type.DTD;
         dtd();
       } else {
-        type = Type.COMMENT;
-        if(!consume('-') || !consume('-')) error(COMMDASH);
-        comment();
+        error(COMMDASH);
       }
       return;
     }

@@ -90,9 +90,11 @@ public final class DiskBuilder extends Builder {
       parse();
       if(Prop.debug) Util.errln(" " + perf + " (" + Performance.getMemory() + ')');
 
-    } finally {
-      close();
+    } catch(final IOException ex) {
+      try { close(); } catch(final IOException ignored) { }
+      throw ex;
     }
+    close();
 
     // copy temporary values into database table
     final DataInput in = new DataInput(md.dbfile(DATATMP));

@@ -51,9 +51,11 @@ public final class MemBuilder extends Builder {
     init();
     try {
       parse();
-    } finally {
-      close();
+    } catch(final IOException ex) {
+      try { close(); } catch(final IOException ignored) { }
+      throw ex;
     }
+    close();
     return data;
   }
 
