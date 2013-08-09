@@ -138,7 +138,7 @@ public abstract class BaseXTest extends MainTest {
    */
   @Test
   public void runs() throws IOException {
-    equals("2", "-r10", "-q2");
+    equals("1", "-r2", "-q1");
   }
 
   /**

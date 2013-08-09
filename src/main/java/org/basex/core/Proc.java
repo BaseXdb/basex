@@ -72,6 +72,7 @@ public abstract class Proc {
     if(proc != null) {
       proc.listen = listen;
       proc.registered = registered;
+      proc.proc(sub.sub);
       if(stopped) proc.stop();
     }
     return proc;
