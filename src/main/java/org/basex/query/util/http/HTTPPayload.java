@@ -278,8 +278,7 @@ public final class HTTPPayload {
       throws IOException, QueryException {
 
     // parse boundary, create helper arrays
-    final byte[] b = boundary(ext);
-    final byte[] boundary = concat(DASHES, b), last = concat(boundary, DASHES);
+    final byte[] bound = concat(DASHES, boundary(ext)), last = concat(bound, DASHES);
 
     HashMap<String, Value> map = new HashMap<String, Value>();
 
@@ -288,11 +287,15 @@ public final class HTTPPayload {
     String name = null, fn = null;
     for(byte[] line; (line = readLine()) != null;) {
       if(lines >= 0) {
-        if(startsWith(line, boundary)) {
+        if(startsWith(line, bound)) {
           Value val = map.get(name);
           if(val == null && fn != null) val = Map.EMPTY;
           if(fn != null && val instanceof Map) {
-            val = ((Map) val).insert(Str.get(fn), new B64(cont.toArray()), null);
+            final Map m = (Map) val;
+            final Str k = Str.get(fn);
+            final Value v = new ValueBuilder().add(m.get(k, info)).add(
+                new B64(cont.toArray())).value();
+            val = m.insert(k, v, info);
           } else {
             val = Str.get(cont.toArray());
           }
@@ -304,15 +307,13 @@ public final class HTTPPayload {
           if(lines++ > 0) cont.add(CRLF);
           cont.add(line);
         }
-      } else {
-        if(startsWith(line, CONTENT_DISPOSITION)) {
-          name = !contains(line, token(NAME_IS)) ? null : string(line).
-            replaceAll("^.*?" + NAME_IS + "\"|\".*", "").replaceAll("\\[\\]", "");
-          fn = !contains(line, token(FILENAME_IS)) ? null :
-            string(line).replaceAll("^.*" + FILENAME_IS + "\"|\"$", "");
-        } else if(line.length == 0) {
-          lines = 0;
-        }
+      } else if(startsWith(line, CONTENT_DISPOSITION)) {
+        name = !contains(line, token(NAME_IS)) ? null : string(line).
+          replaceAll("^.*?" + NAME_IS + "\"|\".*", "").replaceAll("\\[\\]", "");
+        fn = !contains(line, token(FILENAME_IS)) ? null :
+          string(line).replaceAll("^.*" + FILENAME_IS + "\"|\"$", "");
+      } else if(line.length == 0) {
+        lines = 0;
       }
     }
     return map;
