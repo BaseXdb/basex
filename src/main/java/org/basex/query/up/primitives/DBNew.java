@@ -54,12 +54,10 @@ public abstract class DBNew extends BasicOperation {
   /** Insertion sequence. */
   protected Data md;
 
-  /** Cached numeric options. */
-  private int[] onums;
-  /** Cached boolean options. */
-  private boolean[] obools;
-  /** Cached string options. */
-  private String[] ostrs;
+  /** Original options. */
+  protected final HashMap<Object[], Object> oprops = new HashMap<Object[], Object>();
+  /** New options. */
+  protected final HashMap<Object[], Object> nprops = new HashMap<Object[], Object>();
 
 
   /**
@@ -143,49 +141,41 @@ public abstract class DBNew extends BasicOperation {
   /**
    * Assigns indexing options.
    */
-  protected void assignOptions() {
-    final Prop prop = qc.context.prop;
-    final int ns = N_OPT.length;
-    onums = new int[ns];
-    for(int o = 0; o < ns; o++) onums[o] = prop.num(N_OPT[o]);
-    final int[] nnums = onums.clone();
-    for(int o = 0; o < ns; o++) if(options.contains(K_N_OPT[o]))
-      nnums[o] = toInt(options.get(K_N_OPT[o]));
-
-    final int bs = B_OPT.length;
-    obools = new boolean[bs];
-    for(int o = 0; o < bs; o++) obools[o] = prop.is(B_OPT[o]);
-    final boolean[] nbools = obools.clone();
-    for(int o = 0; o < bs; o++) if(options.contains(K_B_OPT[o]))
-      nbools[o] = eq(options.get(K_B_OPT[o]), TRUE);
-
-    final int ss = S_OPT.length;
-    ostrs = new String[ss];
-    for(int o = 0; o < ss; o++) ostrs[o] = prop.get(S_OPT[o]);
-    final String[] nstrs = ostrs.clone();
-    for(int o = 0; o < ss; o++) if(options.contains(K_S_OPT[o]))
-      nstrs[o] = string(options.get(K_S_OPT[o]));
-    set(prop, nnums, nbools, nstrs);
+  protected void initOptions() {
+    for(int o = 0; o < K_N_OPT.length; o++) if(options.contains(K_N_OPT[o]))
+      nprops.put(N_OPT[o], toInt(options.get(K_N_OPT[o])));
+    for(int o = 0; o < K_B_OPT.length; o++) if(options.contains(K_B_OPT[o]))
+      nprops.put(B_OPT[o], eq(options.get(K_B_OPT[o]), TRUE));
+    for(int o = 0; o < K_S_OPT.length; o++) if(options.contains(K_S_OPT[o]))
+      nprops.put(S_OPT[o], string(options.get(K_S_OPT[o])));
   }
 
   /**
-   * Restores original indexing options.
+   * Caches original options and assigns cached options.
+   */
+  protected void assignOptions() {
+    final Prop prop = qc.context.prop;
+    for(final Object[] key : nprops.keySet()) {
+      oprops.put(key, prop.get(key[0].toString()));
+    }
+    setProps(nprops);
+  }
+
+  /**
+   * Restores original options.
    */
   protected void resetOptions() {
-    set(qc.context.prop, onums, obools, ostrs);
+    setProps(oprops);
   }
 
   /**
    * Assigns the specified options.
-   * @param prop properties
-   * @param nums numbers
-   * @param bools booleans
-   * @param strs strings
+   * @param props property map
    */
-  protected void set(final Prop prop, final int[] nums, final boolean[] bools,
-      final String[] strs) {
-    for(int o = 0; o < nums.length;  o++) prop.set(N_OPT[o], nums[o]);
-    for(int o = 0; o < bools.length; o++) prop.set(B_OPT[o], bools[o]);
-    for(int o = 0; o < strs.length;  o++) prop.set(S_OPT[o], strs[o]);
+  private void setProps(final HashMap<Object[], Object> props) {
+    final Prop prop = qc.context.prop;
+    for(final Map.Entry<Object[], Object> e : props.entrySet()) {
+      prop.setObject(e.getKey()[0].toString(), e.getValue());
+    }
   }
 }

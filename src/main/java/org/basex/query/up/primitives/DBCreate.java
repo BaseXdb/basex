@@ -66,6 +66,7 @@ public final class DBCreate extends DBNew {
     // check if addressed database is still pinned by any other process
     if(qc.context.pinned(name)) BXDB_OPENED.thrw(info, name);
 
+    initOptions();
     assignOptions();
     try {
       data = CreateDB.create(name, Parser.emptyParser(qc.context.prop), qc.context);

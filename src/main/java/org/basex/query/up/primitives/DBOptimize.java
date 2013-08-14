@@ -49,19 +49,15 @@ public final class DBOptimize extends DBNew {
 
   @Override
   public void apply() throws QueryException {
-    final Prop prop = qc.context.prop;
-    final int ns = N_OPT.length;
-    final int[] onums = new int[ns];
-    for(int o = 0; o < ns; o++) onums[o] = prop.num(N_OPT[o]);
-    final int bs = B_OPT.length;
-    final boolean[] obools = new boolean[bs];
-    for(int o = 0; o < bs; o++) obools[o] = prop.is(B_OPT[o]);
-    final int ss = S_OPT.length;
-    final String[] ostrs = new String[ss];
-    for(int o = 0; o < ss; o++) ostrs[o] = prop.get(S_OPT[o]);
-
-    assignOptions();
     final MetaData meta = data.meta;
+    final Prop prop = meta.prop;
+
+    nprops.put(Prop.TEXTINDEX, meta.createtext);
+    nprops.put(Prop.ATTRINDEX, meta.createattr);
+    nprops.put(Prop.FTINDEX, meta.createftxt);
+    initOptions();
+    assignOptions();
+
     final boolean rebuild = prop.num(Prop.MAXCATS) != meta.maxcats ||
         prop.num(Prop.MAXLEN) != meta.maxlen;
     meta.maxcats = prop.num(Prop.MAXCATS);
