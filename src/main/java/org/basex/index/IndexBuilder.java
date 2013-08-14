@@ -72,7 +72,7 @@ public abstract class IndexBuilder extends Proc {
         if(gc >= 0) throw new BaseXException(OUT_OF_MEM + H_OUT_OF_MEM);
         gc = 30;
       } else {
-        gc = Math.max(-1, gc);
+        gc = Math.max(-1, gc - 1);
       }
       gcCount = gc;
     }
