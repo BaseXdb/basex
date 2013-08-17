@@ -4,8 +4,10 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
 import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.test.*;
 import org.basex.util.list.*;
 import org.junit.*;
@@ -349,6 +351,18 @@ public final class LockingTest extends SandboxTest {
     assertTrue("Thread 2 should be able to acquire lock now.",
         test.await(WAIT, TimeUnit.MILLISECONDS));
     th2.release();
+  }
+
+  /**
+   * Test for concurrent writes.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void downgradeTest() throws BaseXException {
+    // hangs if QueryContext.downgrade call is activated..
+    new CreateDB(NAME, "<x/>").execute(context);
+    new XQuery("delete node /y").execute(context);
+    new XQuery("let $d := '" + NAME + "' return doc($d)").execute(context);
   }
 
   /**
