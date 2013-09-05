@@ -39,7 +39,7 @@ final class XMLParser extends CmdParser {
   }
 
   @Override
-  void parse(final ArrayList<Command> cmds) throws QueryException {
+  protected void parse(final ArrayList<Command> cmds) throws QueryException {
     try {
       final DBNode node = new DBNode(IO.get(input), ctx.prop);
       String query = "/*";

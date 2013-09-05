@@ -47,5 +47,5 @@ abstract class CmdParser {
    * @param cmds container for created commands
    * @throws QueryException query exception
    */
-  abstract void parse(final ArrayList<Command> cmds) throws QueryException;
+  protected abstract void parse(final ArrayList<Command> cmds) throws QueryException;
 }

@@ -34,7 +34,7 @@ import org.basex.util.list.*;
  */
 public final class StringParser extends CmdParser {
   /** Input lines. */
-  private final StringList lines = new StringList();
+  private final String in;
   /** Context. */
   private final Context ctx;
 
@@ -48,16 +48,15 @@ public final class StringParser extends CmdParser {
    */
   public StringParser(final String input, final Context context) {
     ctx = context;
-    final Scanner sc = new Scanner(input).useDelimiter(single ? "\0" : "\r\n?|\n");
-    while(sc.hasNext()) {
-      final String line = sc.next().trim();
-      if(!line.isEmpty() && !line.startsWith("#")) lines.add(line);
-    }
+    in = input;
   }
 
   @Override
-  void parse(final ArrayList<Command> cmds) throws QueryException {
-    for(final String line : lines) {
+  protected void parse(final ArrayList<Command> cmds) throws QueryException {
+    final Scanner sc = new Scanner(in).useDelimiter(single ? "\0" : "\r\n?|\n");
+    while(sc.hasNext()) {
+      final String line = sc.next().trim();
+      if(line.isEmpty() || line.startsWith("#")) continue;
       parser = new InputParser(line);
       while(parser.more()) {
         final Cmd cmd = consume(Cmd.class, null);
