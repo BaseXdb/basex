@@ -53,21 +53,21 @@ final class RestXqResponse {
     String redirect = null, forward = null;
     RestXqRespBuilder resp = null;
 
+    // bind variables
+    final StaticFunc uf = function.function;
+    final Expr[] args = new Expr[uf.args.length];
+    function.bind(http, args, error);
+
+    // wrap function with a function call
+    final StaticFuncCall sfc = new BaseFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
+    final MainModule mm = new MainModule(sfc, new VarScope(), null);
+
+    // assign main module and http context and register process
+    query.mainModule(mm);
+    query.context(http, null);
+
     query.context.register(query);
     try {
-      // bind variables
-      final StaticFunc uf = function.function;
-      final Expr[] args = new Expr[uf.args.length];
-      function.bind(http, args, error);
-
-      // wrap function with a function call
-      final StaticFuncCall sfc = new BaseFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
-      final MainModule mm = new MainModule(sfc, new VarScope(), null);
-
-      // assign main module and http context and register process
-      query.mainModule(mm);
-      query.context(http, null);
-
       // compile and evaluate query
       query.compile();
       final Iter iter = query.iter();
