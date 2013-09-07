@@ -251,11 +251,12 @@ public final class WebDAVService<T> {
    */
   public void retrieve(final String db, final String p, final boolean raw,
       final OutputStream out) throws IOException {
+
     final Session session = http.session();
     session.setOutputStream(out);
-    final Query q = session.query(raw ?
-        "declare option output:method 'raw'; " + _DB_RETRIEVE.args("$db", "$path") :
-        _DB_OPEN.args("$db", "$path"));
+    final Query q = session.query("declare option output:" + (raw ?
+      "method 'raw'; " + _DB_RETRIEVE.args("$db", "$path") :
+      "use-character-maps 'webdav'; " + _DB_OPEN.args("$db", "$path")));
     q.bind("db", db);
     q.bind("path", p);
     q.execute();
