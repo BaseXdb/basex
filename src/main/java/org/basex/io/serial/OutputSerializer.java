@@ -46,6 +46,8 @@ public abstract class OutputSerializer extends Serializer {
   protected final boolean saomit;
   /** Include content type flag. */
   protected final boolean content;
+  /** WebDAV flag. */
+  protected final boolean webdav;
   /** New line. */
   protected final byte[] nl;
   /** Output stream. */
@@ -131,7 +133,8 @@ public abstract class OutputSerializer extends Serializer {
     undecl  = p.yes(S_UNDECLARE_PREFIXES);
     indent  = p.yes(S_INDENT) && format;
 
-    if(!maps.isEmpty()) SERMAP.thrwSerial(maps);
+    webdav = maps.equals("webdav");
+    if(!webdav && !maps.isEmpty()) SERMAP.thrwSerial(maps);
 
     if(docsys.isEmpty()) docsys = null;
     if(docpub.isEmpty()) docpub = null;
@@ -379,7 +382,8 @@ public abstract class OutputSerializer extends Serializer {
   protected void code(final int ch) throws IOException {
     if(!format) {
       printChar(ch);
-    } else if(ch < ' ' && ch != '\n' && ch != '\t' || ch >= 0x7F && ch < 0xA0) {
+    } else if(ch < ' ' && ch != '\n' && ch != '\t' || ch >= 0x7F && ch < 0xA0 ||
+        webdav && ch == 0xA0) {
       hex(ch);
     } else if(ch == '&') {
       print(E_AMP);
