@@ -9,6 +9,7 @@ import java.awt.event.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
@@ -19,6 +20,7 @@ import org.basex.gui.view.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -157,18 +159,25 @@ public final class TextView extends View {
    * @param out cached output
    * @param c command
    * @param r result
+   * @throws QueryException query exception
    */
-  public void cacheText(final ArrayOutput out, final Command c, final Result r) {
+  public void cacheText(final ArrayOutput out, final Command c, final Result r)
+      throws QueryException {
+
     // cache command or node set
     cmd = null;
     ns = null;
+
     final int mh = gui.context.prop.num(Prop.MAXHITS);
+    boolean parse = false;
     if(mh >= 0 && r != null && r.size() >= mh) {
-      cmd = c;
+      parse = true;
     } else if(out.finished()) {
       if(r instanceof Nodes) ns = (Nodes) r;
-      else cmd = c;
+      else parse = true;
     }
+    // create new command instance
+    if(parse) cmd = new CommandParser(c.toString(), gui.context).parseSingle();
   }
 
   /**
