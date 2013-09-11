@@ -13,6 +13,10 @@ import org.basex.query.value.item.*;
 public class QueryModuleTest extends QueryModule {
   /** Fruits array. */
   private static final String[] FRUITS = { "Apple", "Banana", "Cherry" };
+  /** Lock string. */
+  public static final String LOCK1 = "foo";
+  /** Lock string. */
+  public static final String LOCK2 = "bar";
 
   /**
    * Returns the specified fruit modulo number of fruits.
@@ -52,6 +56,22 @@ public class QueryModuleTest extends QueryModule {
   public Str functionNS() {
     return Str.get(context.sc.funcNS);
   }
+
+  /**
+   * Read lock.
+   */
+  @Requires(Permission.NONE)
+  @ContextDependent
+  @Lock(read = { LOCK1, LOCK2})
+  public void readLock() { }
+
+  /**
+   * Write locks.
+   */
+  @Requires(Permission.NONE)
+  @ContextDependent
+  @Lock(write = { LOCK1, LOCK2})
+  public void writeLock() { }
 
   /**
    * Throws an error.

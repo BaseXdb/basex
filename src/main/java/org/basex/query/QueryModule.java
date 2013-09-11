@@ -96,6 +96,26 @@ public abstract class QueryModule {
   @Target(ElementType.METHOD)
   public @interface FocusDependent { }
 
+  /**
+   * Set additional locks to be fetched. These are useful if a module accesses external
+   * resources which must be under concurrency control. These locks are in a "java module
+   * namespace" and do not interfere with user locks or databases with the same name.
+   */
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target(ElementType.METHOD)
+  public @interface Lock {
+    /**
+     * Read locks.
+     * @return read locks
+     */
+    String[] read() default {};
+    /**
+     * Write locks.
+     * @return write locks
+     */
+    String[] write() default {};
+  }
+
   /** Query context. */
   public QueryContext context;
 }
