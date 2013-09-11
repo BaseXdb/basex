@@ -7,7 +7,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.gflwor.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -22,7 +21,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class StaticFuncCall extends Arr {
+public final class StaticFuncCall extends FuncCall {
   /** Static context of this function call. */
   protected final StaticContext sc;
   /** Function name. */
@@ -31,17 +30,33 @@ public abstract class StaticFuncCall extends Arr {
   StaticFunc func;
 
   /**
-   * Function constructor.
+   * Function call constructor.
    * @param ii input info
    * @param nm function name
    * @param arg arguments
    * @param sctx static context
    */
-  StaticFuncCall(final QNm nm, final Expr[] arg, final StaticContext sctx,
+  public StaticFuncCall(final QNm nm, final Expr[] arg, final StaticContext sctx,
       final InputInfo ii) {
+    this(nm, arg, sctx, null, false, ii);
+  }
+
+  /**
+   * Copy constructor.
+   * @param ii input info
+   * @param nm function name
+   * @param arg arguments
+   * @param sctx static context
+   * @param fun referenced function
+   * @param tail tail-call flag
+   */
+  private StaticFuncCall(final QNm nm, final Expr[] arg, final StaticContext sctx,
+      final StaticFunc fun, final boolean tail, final InputInfo ii) {
     super(ii, arg);
     sc = sctx;
     name = nm;
+    func = fun;
+    tailCall = tail;
   }
 
   @Override
@@ -80,34 +95,14 @@ public abstract class StaticFuncCall extends Arr {
   }
 
   @Override
-  public final Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
-  }
-
-  @Override
-  public final BaseFuncCall copy(final QueryContext ctx, final VarScope scp,
+  public StaticFuncCall copy(final QueryContext ctx, final VarScope scp,
       final IntObjMap<Var> vs) {
     final Expr[] arg = new Expr[expr.length];
     for(int i = 0; i < arg.length; i++) arg[i] = expr[i].copy(ctx, scp, vs);
-    final BaseFuncCall call = new BaseFuncCall(name, arg, sc, info);
-    call.func = func;
+    final StaticFuncCall call = new StaticFuncCall(name, arg, sc, func, false, info);
     call.type = type;
     call.size = size;
     return call;
-  }
-
-  /**
-   * Evaluates all function arguments.
-   * @param ctx query context
-   * @return argument values
-   * @throws QueryException query exception
-   */
-  Value[] args(final QueryContext ctx) throws QueryException {
-    final int al = expr.length;
-    final Value[] args = new Value[al];
-    // evaluate arguments
-    for(int a = 0; a < al; ++a) args[a] = expr[a].value(ctx);
-    return args;
   }
 
   /**
@@ -124,15 +119,15 @@ public abstract class StaticFuncCall extends Arr {
   }
 
   /**
-   * Getter for the called function.
-   * @return user-defined function
+   * Returns the called function if already known, {@code false} otherwise.
+   * @return the function
    */
-  public final StaticFunc func() {
+  public StaticFunc func() {
     return func;
   }
 
   @Override
-  public final boolean isVacuous() {
+  public boolean isVacuous() {
     return func != null && func.isVacuous();
   }
 
@@ -147,8 +142,8 @@ public abstract class StaticFuncCall extends Arr {
   }
 
   @Override
-  public final void plan(final FElem plan) {
-    addPlan(plan, planElem(NAM, this), expr);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(NAM, this, TCL, tailCall), expr);
   }
 
   @Override
@@ -166,42 +161,16 @@ public abstract class StaticFuncCall extends Arr {
     return visitor.funcCall(this) && super.accept(visitor);
   }
 
-  /**
-   * A continuation that's thrown to free stack frames.
-   * @author Leo Woerteler
-   */
-  final class Continuation extends RuntimeException {
-    /** Arguments. */
-    private final Value[] args;
+  @Override
+  public StaticFunc evalFunc(final QueryContext ctx) {
+    return func;
+  }
 
-    /**
-     * Constructor.
-     * @param arg arguments
-     */
-    Continuation(final Value[] arg) {
-      args = arg;
-    }
-
-    /**
-     * Getter for the continuation function.
-     * @return the next function to call
-     */
-    StaticFunc getFunc() {
-      return func;
-    }
-
-    /**
-     * Getter for the function arguments.
-     * @return the next function call's arguments
-     */
-    Value[] getArgs() {
-      return args;
-    }
-
-    @Override
-    public synchronized Continuation fillInStackTrace() {
-      // ignore this for efficiency reasons
-      return this;
-    }
+  @Override
+  Value[] evalArgs(final QueryContext ctx) throws QueryException {
+    final int al = expr.length;
+    final Value[] args = new Value[al];
+    for(int a = 0; a < al; ++a) args[a] = ctx.value(expr[a]);
+    return args;
   }
 }

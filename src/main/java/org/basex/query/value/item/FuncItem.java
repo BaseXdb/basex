@@ -234,7 +234,7 @@ public final class FuncItem extends FItem implements Scope {
       vars[i] = sc.uniqueVar(ctx, t.args[i], true);
       refs[i] = new VarRef(ii, vars[i]);
     }
-    return new FuncItem(fun.name, vars, new DynFuncCall(ii, fun, refs), t,
+    return new FuncItem(fun.name, vars, new DynFuncCall(ii, fun, refs).markTailCalls(), t,
         fun.cast != null, null, sc, ctx.sc, fun.func);
   }
 

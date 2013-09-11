@@ -262,7 +262,7 @@ public final class StaticFuncs extends ExprInfo {
      */
     public TypedFunc newCall(final QNm nm, final Expr[] args, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      final StaticFuncCall call = new BaseFuncCall(nm, args, sc, ii);
+      final StaticFuncCall call = new StaticFuncCall(nm, args, sc, ii);
       calls.add(call);
 
       if(func == null) {

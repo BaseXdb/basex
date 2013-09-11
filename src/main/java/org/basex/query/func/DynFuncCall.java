@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
@@ -22,7 +21,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class DynFuncCall extends Arr {
+public final class DynFuncCall extends FuncCall {
   /**
    * Function constructor.
    * @param ii input info
@@ -49,57 +48,15 @@ public final class DynFuncCall extends Arr {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return getFun(ctx).invItem(ctx, ii, argv(ctx));
-  }
-
-  @Override
-  public Value value(final QueryContext ctx) throws QueryException {
-    return getFun(ctx).invValue(ctx, info, argv(ctx));
-  }
-
-  @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return value(ctx).iter();
-  }
-
-  @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] copy = copyAll(ctx, scp, vs, expr);
     final int last = copy.length - 1;
     return copyType(new DynFuncCall(info, copy[last], Arrays.copyOf(copy, last)));
   }
 
-  /**
-   * Evaluates all arguments.
-   * @param ctx query context
-   * @return array of argument values
-   * @throws QueryException query exception
-   */
-  private Value[] argv(final QueryContext ctx) throws QueryException {
-    final Value[] argv = new Value[expr.length - 1];
-    for(int i = argv.length; --i >= 0;) argv[i] = ctx.value(expr[i]);
-    return argv;
-  }
-
-  /**
-   * Evaluates and checks the function item.
-   * @param ctx query context
-   * @return function item
-   * @throws QueryException query exception
-   */
-  private FItem getFun(final QueryContext ctx) throws QueryException {
-    final int ar = expr.length - 1;
-    final Item it = checkItem(expr[ar], ctx);
-    if(!(it instanceof FItem)) INVCAST.thrw(info, it.type, "function item");
-    final FItem fit = (FItem) it;
-    if(fit.arity() != ar) INVARITY.thrw(info, fit, ar);
-    return fit;
-  }
-
   @Override
   public void plan(final FElem plan) {
-    final FElem el = planElem();
+    final FElem el = planElem(QueryText.TCL, tailCall);
     final int es = expr.length;
     addPlan(plan, el, expr[es - 1]);
     for(int e = 0; e < es - 1; e++) expr[e].plan(el);
@@ -119,5 +76,23 @@ public final class DynFuncCall extends Arr {
       if(e < es - 2) tb.add(", ");
     }
     return tb.add(')').toString();
+  }
+
+  @Override
+  FItem evalFunc(final QueryContext ctx) throws QueryException {
+    final int ar = expr.length - 1;
+    final Item it = checkItem(expr[ar], ctx);
+    if(!(it instanceof FItem)) INVCAST.thrw(info, it.type, "function item");
+    final FItem fit = (FItem) it;
+    if(fit.arity() != ar) INVARITY.thrw(info, fit, ar);
+    return fit;
+  }
+
+  @Override
+  Value[] evalArgs(final QueryContext ctx) throws QueryException {
+    final int al = expr.length - 1;
+    final Value[] args = new Value[al];
+    for(int a = 0; a < al; ++a) args[a] = ctx.value(expr[a]);
+    return args;
   }
 }
