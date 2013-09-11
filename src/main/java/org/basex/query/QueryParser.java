@@ -1977,7 +1977,7 @@ public class QueryParser extends InputParser {
       // name test: *
       if(!consume(':')) return new NameTest(att);
       // name test: *:name
-      return new NameTest(new QNm(ncName(QNAMEINV)), NameTest.Mode.NAME, att);
+      return new NameTest(new QNm(ncName(QNAMEINV)), NameTest.Mode.LN, att);
     }
 
     if(ctx.sc.xquery3() && consume(EQNAME)) {

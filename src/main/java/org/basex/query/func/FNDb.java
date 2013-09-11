@@ -208,7 +208,7 @@ public final class FNDb extends StandardFunc {
     if(!nm.hasPrefix()) nm.uri(ctx.sc.ns.uri(Token.EMPTY));
 
     final NameTest nt = new NameTest(nm, NameTest.Mode.STD, true);
-    // no results expected: return empty sequence
+    // return empty sequence if test will yield no results
     if(!nt.compile(ctx)) return Empty.ITER;
 
     // wrap iterator with name test

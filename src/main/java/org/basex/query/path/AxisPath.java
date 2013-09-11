@@ -202,7 +202,7 @@ public abstract class AxisPath extends Path {
         for(; j <= smin; ++j) {
           final Step s = axisStep(j);
           // step must use child axis and name test, and have no predicates
-          if(s == null || s.test.mode != Mode.NAME || s.axis != Axis.CHILD ||
+          if(s == null || s.test.mode != Mode.LN || s.axis != Axis.CHILD ||
               j != smin && s.preds.length > 0) break;
 
           // support only unique paths with nodes on the correct level
@@ -286,7 +286,7 @@ public abstract class AxisPath extends Path {
     final Step s = step(steps.length - 1);
 
     if(s.preds.length != 0 || !s.axis.down || s.test.type == NodeType.ATT ||
-        s.test.mode != Mode.NAME && s.test.mode != Mode.STD) return this;
+        s.test.mode != Mode.LN && s.test.mode != Mode.STD) return this;
 
     final Data data = ctx.data();
     if(data == null || !data.meta.uptodate) return this;

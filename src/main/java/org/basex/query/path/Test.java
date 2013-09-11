@@ -36,7 +36,7 @@ public abstract class Test {
   /** Name test types. */
   public enum Mode {
     /** Accept all nodes (*).     */ ALL,
-    /** Test names (*:tag).       */ NAME,
+    /** Test names (*:tag).       */ LN,
     /** Test namespaces (pre:*).  */ NS,
     /** Test all nodes (pre:tag). */ STD
   }

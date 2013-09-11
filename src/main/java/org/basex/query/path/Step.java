@@ -64,6 +64,8 @@ public abstract class Step extends Preds {
   @Override
   public final Expr compile(final QueryContext ctx, final VarScope scp)
       throws QueryException {
+
+    // return empty sequence if test will yield no results
     if(!test.compile(ctx)) return Empty.SEQ;
 
     // leaf flag indicates that a context node can be replaced by a text() step
@@ -72,7 +74,7 @@ public abstract class Step extends Preds {
     ctx.leaf = false;
     try {
       final Data data = ctx.data();
-      if(data != null && test.mode == Mode.NAME && test.type != NodeType.ATT &&
+      if(data != null && test.mode == Mode.LN && test.type != NodeType.ATT &&
           axis.down && data.meta.uptodate && data.nspaces.size() == 0) {
         final Stats s = data.tagindex.stat(data.tagindex.id(((NameTest) test).ln));
         ctx.leaf = s != null && s.isLeaf();
@@ -109,7 +111,7 @@ public abstract class Step extends Preds {
    */
   public final boolean simple(final Axis ax, final boolean name) {
     return axis == ax && preds.length == 0 &&
-      (name ? test.mode == Mode.NAME : test == Test.NOD);
+      (name ? test.mode == Mode.LN : test == Test.NOD);
   }
 
   /**
@@ -128,7 +130,7 @@ public abstract class Step extends Preds {
       kind = ANode.kind(test.type);
       if(kind == Data.PI) return null;
 
-      if(test.mode == Mode.NAME) {
+      if(test.mode == Mode.LN) {
         // element/attribute test (*:ln)
         final Names names = kind == Data.ATTR ? data.atnindex : data.tagindex;
         name = names.id(((NameTest) test).ln);

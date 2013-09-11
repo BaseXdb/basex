@@ -335,7 +335,7 @@ public abstract class Path extends ParseExpr {
             ((Step) steps[s]).preds : new Expr[0];
         final QNm nm = qnm.get(ts - t - 1);
         final NameTest nt = nm == null ? new NameTest(false) :
-          new NameTest(nm, Mode.NAME, false);
+          new NameTest(nm, Mode.LN, false);
         stps[t] = Step.get(info, CHILD, nt, preds);
       }
       while(++s < steps.length) stps[ts++] = steps[s];
@@ -351,7 +351,7 @@ public abstract class Path extends ParseExpr {
         final Step st = path.axisStep(s);
         if(st == null || st.axis != CHILD) break;
         if(st.test.mode == Mode.ALL || st.test.mode == null) continue;
-        if(st.test.mode != Mode.NAME) break;
+        if(st.test.mode != Mode.LN) break;
 
         // check if one of the addressed nodes is on the correct level
         final int name = data.tagindex.id(st.test.name.local());
@@ -391,7 +391,7 @@ public abstract class Path extends ParseExpr {
       final Step curr = axisStep(s);
       if(curr == null) return null;
       final boolean desc = curr.axis == DESC;
-      if(!desc && curr.axis != CHILD || curr.test.mode != Mode.NAME)
+      if(!desc && curr.axis != CHILD || curr.test.mode != Mode.LN)
         return null;
 
       final int name = data.tagindex.id(curr.test.name.local());
