@@ -26,9 +26,9 @@ public final class StaticContext {
   /** Default collation. */
   public Collation collation;
   /** Default element/type namespace. */
-  public byte[] nsElem;
+  public byte[] elemNS;
   /** Default function namespace. */
-  public byte[] nsFunc = FNURI;
+  public byte[] funcNS = FNURI;
   /** Context item static type. */
   public SeqType initType;
 
@@ -41,9 +41,9 @@ public final class StaticContext {
   /** Boundary-space policy. */
   public boolean spaces;
   /** Copy-namespaces mode: (no-)preserve. */
-  public boolean nsPreserve = true;
+  public boolean preserveNS = true;
   /** Copy-namespaces mode: (no-)inherit. */
-  public boolean nsInherit = true;
+  public boolean inheritNS = true;
   /** XQuery version flag. */
   boolean xquery3;
 
@@ -68,7 +68,7 @@ public final class StaticContext {
    */
   public void namespace(final String prefix, final String uri) throws QueryException {
     if(prefix.isEmpty()) {
-      nsElem = uri.isEmpty() ? null : token(uri);
+      elemNS = uri.isEmpty() ? null : token(uri);
     } else if(uri.isEmpty()) {
       ns.delete(token(prefix));
     } else {

@@ -132,8 +132,8 @@ public final class CElem extends CName {
         final ANode child = constr.children.get(c);
         // add inherited and remove unused namespaces
         if(child.type == NodeType.ELM) {
-          if(ctx.sc.nsInherit) inherit(child, ns);
-          if(!ctx.sc.nsPreserve) noPreserve(child);
+          if(ctx.sc.inheritNS) inherit(child, ns);
+          if(!ctx.sc.preserveNS) noPreserve(child);
           child.optimize();
         }
       }

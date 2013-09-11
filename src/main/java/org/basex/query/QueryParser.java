@@ -295,7 +295,7 @@ public class QueryParser extends InputParser {
 
     // completes the parsing step
     assignURI(0);
-    if(ctx.sc.nsElem != null) ctx.sc.ns.add(EMPTY, ctx.sc.nsElem, null);
+    if(ctx.sc.elemNS != null) ctx.sc.ns.add(EMPTY, ctx.sc.elemNS, null);
 
     // set default decimal format
     final byte[] empty = new QNm(EMPTY).id();
@@ -531,10 +531,10 @@ public class QueryParser extends InputParser {
 
     if(elem) {
       if(!decl.add(ELEMENT)) error(DUPLNS);
-      ctx.sc.nsElem = uri.length == 0 ? null : uri;
+      ctx.sc.elemNS = uri.length == 0 ? null : uri;
     } else {
       if(!decl.add(FUNCTION)) error(DUPLNS);
-      ctx.sc.nsFunc = uri.length == 0 ? null : uri;
+      ctx.sc.funcNS = uri.length == 0 ? null : uri;
     }
     return true;
   }
@@ -632,11 +632,11 @@ public class QueryParser extends InputParser {
    */
   private void copyNamespacesDecl() throws QueryException {
     if(!decl.add(COPY_NAMESPACES)) error(DUPLCOPYNS);
-    ctx.sc.nsPreserve = wsConsumeWs(PRESERVE);
-    if(!ctx.sc.nsPreserve) wsCheck(NO_PRESERVE);
+    ctx.sc.preserveNS = wsConsumeWs(PRESERVE);
+    if(!ctx.sc.preserveNS) wsCheck(NO_PRESERVE);
     wsCheck(COMMA);
-    ctx.sc.nsInherit = wsConsumeWs(INHERIT);
-    if(!ctx.sc.nsInherit) wsCheck(NO_INHERIT);
+    ctx.sc.inheritNS = wsConsumeWs(INHERIT);
+    if(!ctx.sc.inheritNS) wsCheck(NO_INHERIT);
   }
 
   /**
@@ -926,7 +926,7 @@ public class QueryParser extends InputParser {
    */
   private void functionDecl(final Ann ann) throws QueryException {
     final InputInfo ii = info();
-    final QNm name = eQName(FUNCNAME, ctx.sc.nsFunc);
+    final QNm name = eQName(FUNCNAME, ctx.sc.funcNS);
     if(ctx.sc.xquery3() && keyword(name)) error(RESERVED, name.local());
     if(module != null && !eq(name.uri(), module.uri())) error(MODNS, name);
 
@@ -2143,7 +2143,7 @@ public class QueryParser extends InputParser {
 
     // named function reference
     pos = ip;
-    final QNm name = eQName(null, ctx.sc.nsFunc);
+    final QNm name = eQName(null, ctx.sc.funcNS);
     if(name != null && consume('#')) {
       if(keyword(name)) error(RESERVED, name.local());
       final Expr ex = numericLiteral(true);
@@ -2310,7 +2310,7 @@ public class QueryParser extends InputParser {
    */
   private Expr functionCall() throws QueryException {
     final int i = pos;
-    final QNm name = eQName(null, ctx.sc.nsFunc);
+    final QNm name = eQName(null, ctx.sc.funcNS);
     if(name != null && !keyword(name)) {
       if(wsConsume(PAR1)) {
         final InputInfo ii = info();
@@ -2391,7 +2391,7 @@ public class QueryParser extends InputParser {
   private Expr dirElement() throws QueryException {
     // cache namespace information
     final int s = ctx.sc.ns.size();
-    final byte[] nse = ctx.sc.nsElem;
+    final byte[] nse = ctx.sc.elemNS;
     final int npos = names.size();
 
     final QNm tag = new QNm(qName(TAGNAME));
@@ -2475,7 +2475,7 @@ public class QueryParser extends InputParser {
             ctx.sc.ns.add(pref, uri);
           } else {
             if(eq(uri, XMLURI)) error(XMLNSDEF, uri);
-            ctx.sc.nsElem = uri;
+            ctx.sc.elemNS = uri;
           }
           if(ns.contains(pref)) error(DUPLNSDEF, pref);
           ns.add(pref, uri);
@@ -2520,7 +2520,7 @@ public class QueryParser extends InputParser {
     }
 
     ctx.sc.ns.size(s);
-    ctx.sc.nsElem = nse;
+    ctx.sc.elemNS = nse;
     return new CElem(info(), tag, ns, cont.finish());
   }
 
@@ -2817,7 +2817,7 @@ public class QueryParser extends InputParser {
    */
   private SeqType simpleType() throws QueryException {
     skipWS();
-    final QNm name = eQName(TYPEINVALID, ctx.sc.nsElem);
+    final QNm name = eQName(TYPEINVALID, ctx.sc.elemNS);
     Type t = ListType.find(name);
     if(t == null) {
       t = AtomType.find(name, false);
@@ -2901,7 +2901,7 @@ public class QueryParser extends InputParser {
       if(t == null) error(NOTYPE, name.string());
     } else {
       // attach default element namespace
-      if(!name.hasURI()) name.uri(ctx.sc.nsElem);
+      if(!name.hasURI()) name.uri(ctx.sc.elemNS);
       // atomic types
       t = AtomType.find(name, false);
       // no type found
@@ -3003,13 +3003,13 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test elementTest() throws QueryException {
-    final QNm name = eQName(null, ctx.sc.nsElem);
+    final QNm name = eQName(null, ctx.sc.elemNS);
     if(name == null && !consume(ASTERISK)) return null;
 
     Type type = null;
     if(wsConsumeWs(COMMA)) {
       // parse type name
-      final QNm tn = eQName(QNAMEINV, ctx.sc.nsElem);
+      final QNm tn = eQName(QNAMEINV, ctx.sc.elemNS);
       type = ListType.find(tn);
       if(type == null) type = AtomType.find(tn, true);
       if(type == null) error(TYPEUNDEF, tn);
@@ -3025,7 +3025,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test schemaTest() throws QueryException {
-    final QNm name = eQName(QNAMEINV, ctx.sc.nsElem);
+    final QNm name = eQName(QNAMEINV, ctx.sc.elemNS);
     throw error(SCHEMAINV, name);
   }
 
@@ -3041,7 +3041,7 @@ public class QueryParser extends InputParser {
     Type type = null;
     if(wsConsumeWs(COMMA)) {
       // parse type name
-      final QNm tn = eQName(QNAMEINV, ctx.sc.nsElem);
+      final QNm tn = eQName(QNAMEINV, ctx.sc.elemNS);
       type = ListType.find(tn);
       if(type == null) type = AtomType.find(tn, true);
       if(type == null) error(TYPEUNDEF, tn);
@@ -4018,7 +4018,7 @@ public class QueryParser extends InputParser {
         name.uri(ctx.sc.ns.uri(name.prefix()));
         if(check && !name.hasURI()) error(NOURI, name.string());
       } else if(nsElem) {
-        name.uri(ctx.sc.nsElem);
+        name.uri(ctx.sc.elemNS);
       }
       return name.hasURI();
     }

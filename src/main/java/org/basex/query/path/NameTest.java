@@ -53,7 +53,7 @@ public final class NameTest extends Test {
     // check if test may yield results
     boolean results = true;
     if(mode == Mode.STD && !name.hasURI()) {
-      final byte[] elemNS = ctx.sc.nsElem != null ? ctx.sc.nsElem : Token.EMPTY;
+      final byte[] elemNS = ctx.sc.elemNS != null ? ctx.sc.elemNS : Token.EMPTY;
       if(type == NodeType.ATT || Token.eq(dataNS, elemNS)) {
         // namespace is irrelevant/identical: only check local name
         mode = Mode.LN;
