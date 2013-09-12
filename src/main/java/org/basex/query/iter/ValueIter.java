@@ -30,11 +30,7 @@ public abstract class ValueIter extends Iter implements Iterable<Item> {
   public abstract boolean reset();
 
   @Override
-  public Value value() {
-    final ValueBuilder vb = new ValueBuilder((int) size());
-    for(Item i; (i = next()) != null;) vb.add(i);
-    return vb.value();
-  }
+  public abstract Value value();
 
   @Override
   public final Iterator<Item> iterator() {

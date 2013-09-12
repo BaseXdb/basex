@@ -475,7 +475,7 @@ public final class SeqType {
         vb.add(funcConv(ctx, ii, it));
       }
     }
-    return vb != null ? vb.value() : val;
+    return vb != null ? Seq.get(vb.item, (int) vb.size(), type) : val;
   }
 
   /**

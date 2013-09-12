@@ -95,14 +95,6 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public Value sub(final long start, final long length) {
-    final int l = (int) length;
-    final Item[] tmp = new Item[l];
-    System.arraycopy(item, (int) start, tmp, 0, l);
-    return get(tmp, l, type);
-  }
-
-  @Override
   public Value reverse() {
     final int s = item.length;
     final Item[] tmp = new Item[s];

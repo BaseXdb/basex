@@ -11,6 +11,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -51,11 +52,21 @@ public final class FNSeq extends StandardFunc {
       case INSERT_BEFORE:   return insertBefore(ctx);
       case REVERSE:         return reverse(ctx);
       case REMOVE:          return remove(ctx);
-      case SUBSEQUENCE:     return subsequence(ctx);
+      case SUBSEQUENCE:     return subseqIter(ctx);
       case TAIL:            return tail(ctx);
       case OUTERMOST:       return most(ctx, true);
       case INNERMOST:       return most(ctx, false);
       default:              return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    switch(sig) {
+      case SUBSEQUENCE:     return subseqValue(ctx);
+      case TAIL:            final Value seq = ctx.value(expr[0]);
+                            return SubSeq.get(seq, 1, seq.size() - 1);
+      default:              return super.value(ctx);
     }
   }
 
@@ -206,11 +217,14 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter tail(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
-    if(e instanceof Seq) return ((Seq) e).sub(1, e.size() - 1).iter();
-
     if(e.type().zeroOrOne()) return Empty.ITER;
 
     final Iter ir = e.iter(ctx);
+    if(ir instanceof ValueIter) {
+      final Value val = ir.value();
+      return SubSeq.get(val, 1, val.size() - 1).iter();
+    }
+
     if(ir.next() == null) return Empty.ITER;
 
     return new Iter() {
@@ -327,7 +341,7 @@ public final class FNSeq extends StandardFunc {
    * @return subsequence
    * @throws QueryException query exception
    */
-  private Iter subsequence(final QueryContext ctx) throws QueryException {
+  private Iter subseqIter(final QueryContext ctx) throws QueryException {
     final double ds = checkDbl(expr[1], ctx);
     if(Double.isNaN(ds)) return Empty.ITER;
     final long s = StrictMath.round(ds);
@@ -343,16 +357,16 @@ public final class FNSeq extends StandardFunc {
     final boolean li = l == Long.MAX_VALUE;
     if(si) return li ? expr[0].iter(ctx) : Empty.ITER;
 
+    final Iter iter = ctx.iter(expr[0]);
+
     // optimization: return subsequence
-    if(expr[0] instanceof Seq) {
-      final Seq seq = (Seq) expr[0];
-      final long rs = seq.size();
+    if(iter instanceof ValueIter) {
+      final Value val = iter.value();
+      final long rs = val.size();
       final long from = Math.max(1, s) - 1;
       final long len = Math.min(rs - from, l + Math.min(0, s - 1));
-      return from >= rs || len <= 0 ? Empty.ITER : seq.sub(from, len).iter();
+      return SubSeq.get(val, from, len).iter();
     }
-
-    final Iter iter = ctx.iter(expr[0]);
     final long max = iter.size();
     final long e = li ? l : s + l;
 
@@ -393,6 +407,63 @@ public final class FNSeq extends StandardFunc {
         }
       }
     };
+  }
+
+  /**
+   * Evaluates the {@code subsequence} function strictly.
+   * @param ctx query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private Value subseqValue(final QueryContext ctx) throws QueryException {
+    final double dstart = checkDbl(expr[1], ctx);
+    if(Double.isNaN(dstart)) return Empty.SEQ;
+    final long start = StrictMath.round(dstart);
+    final boolean sinf = start == Long.MIN_VALUE;
+
+    long length = Long.MAX_VALUE;
+    if(expr.length > 2) {
+      final double dlength = checkDbl(expr[2], ctx);
+      if(Double.isNaN(dlength)) return Empty.SEQ;
+      if(sinf && dlength == Double.POSITIVE_INFINITY) return Empty.SEQ;
+      length = StrictMath.round(dlength);
+    }
+    final boolean linf = length == Long.MAX_VALUE;
+    if(sinf) return linf ? expr[0].value(ctx) : Empty.SEQ;
+
+    final Iter iter = ctx.iter(expr[0]);
+
+    // optimization: return subsequence
+    if(iter instanceof ValueIter) {
+      final Value val = iter.value();
+      final long rs = val.size();
+      final long from = Math.max(1, start) - 1;
+      final long len = Math.min(rs - from, length + Math.min(0, start - 1));
+      return SubSeq.get(val, from, len);
+    }
+
+    // fast route if the size is known
+    final long max = iter.size();
+    if(max >= 0) {
+      final long from = Math.max(1, start) - 1;
+      final long len = Math.min(max - from, length + Math.min(0, start - 1));
+      if(from >= max || len <= 0) return Empty.SEQ;
+      final ValueBuilder vb = new ValueBuilder(Math.max((int) len, 1));
+      for(long i = 0; i < len; i++) vb.add(iter.get(from + i));
+      return vb.value();
+    }
+
+    final long e = linf ? length : start + length;
+    final ValueBuilder build = new ValueBuilder();
+    Item i;
+    for(int c = 1; (i = iter.next()) != null; c++) {
+      if(c >= e) {
+        iter.reset();
+        break;
+      }
+      if(c >= start) build.add(i);
+    }
+    return build.value();
   }
 
   /**
