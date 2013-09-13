@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+
+<catalog>
+
+  <book isbn="0470192747">
+    <author>Kay, Michael</author>
+    <title>XSLT 2.0 and XPath 2.0 (4th Edition)</title>
+    <genre>Computer</genre>
+    <price>33.99</price>
+    <publish_date>2008-06-03</publish_date>
+    <description>This book is primarily a practical reference
+    book for professional XSLT developers.</description>
+  </book>
+
+  <book isbn="0596006349">
+    <author>Walmsley, Priscilla</author>
+    <title>XQuery</title>
+    <genre>Computer</genre>
+    <price>38.50</price>
+    <publish_date>2007-03-30</publish_date>
+    <description>This in-depth tutorial not only walks you through
+    the XQuery specification, but also teaches you how to program with
+    this widely anticipated query language.</description>
+  </book>
+
+  <book isbn="059652112X">
+    <author>Kalin, Martin</author>
+    <title>Java Web Services: Up and Running</title>
+    <genre>Computer</genre>
+    <price>26.99</price>
+    <publish_date>2009-02-23</publish_date>
+    <description>With this example-driven book, you get a quick, practical,
+    and thorough introduction to Java's API for XML Web Services (JAX-WS)
+    and the Java API for RESTful Web Services (JAX-RS).</description>
+  </book>
+
+  <book isbn="0321356683">
+    <author>Bloch, Joshua</author>
+    <title>Effective Java (2nd Edition)</title>
+    <genre>Computer</genre>
+    <price>35.99</price>
+    <publish_date>2008-05-22</publish_date>
+    <description>Presents the most practical, authoritative guidelines
+    available for writing efficient,well-designed programs.</description>
+  </book>
+
+  <book isbn="0141014865">
+    <author>de Botton, Alain</author>
+    <title>Status Anxiety</title>
+    <genre>Philosophy</genre>
+    <price>9.99</price>
+    <publish_date>2005-01-13</publish_date>
+    <description>The author presents a universal condition of which
+    many of us suffer from called Status Anxiety, investigates it's
+    origins and possible solutions.</description>
+  </book>
+
+  <book isbn="0201771861">
+    <author>Rusty Harold, Elliotte</author>
+    <title>Processing XML with Java (SAX, DOM, JDOM, JAXP &amp; TrAX)</title>
+    <genre>Computer</genre>
+    <price>37.99</price>
+    <publish_date>2002-11-14</publish_date>
+    <description>Handing and processing XML in
+    the Java programming language.</description>
+  </book>
+
+  <book isbn="1887521143">
+    <author>Poomsan Becker, Benjawan</author>
+    <title>Thai-English and English-Thai Dictionary</title>
+    <genre>Dictionary</genre>
+    <price>14.95</price>
+    <publish_date>2005-04-30</publish_date>
+    <description>With Transliteration for Non-Thai Speakers -
+    Complete with Thai Alphabet Guide</description>
+  </book>
+
+  <book isbn="0415071771">
+    <author>Jung, Carl Gustav</author>
+    <title>Psychological Types</title>
+    <genre>Psychology</genre>
+    <price>19.99</price>
+    <publish_date>1992-01-02</publish_date>
+    <description>Essential reading for anyone requiring a proper
+    understanding of Jung's psychology, this was the work in which Jung
+    set out his theory of psychological types as a means of understanding
+    ourselves and the world around us.</description>
+  </book>
+
+  <book isbn="0596003552">
+    <author>Pawson, Dave</author>
+    <title>XSL-FO: Making XML Look Good in Print</title>
+    <genre>Computer</genre>
+    <price>26.99</price>
+    <publish_date>2002-08-19</publish_date>
+    <description>Outlines XSL FO's strengths and weaknesses, provides
+    a tutorial and reference guide.</description>
+  </book>
+
+  <book isbn="0321392795">
+    <author>Gray, Simon</author>
+    <title>Data Structures in Java</title>
+    <genre>Computer</genre>
+    <price>53.99</price>
+    <publish_date>2006-11-13</publish_date>
+    <description>From Abstract Data Types to the
+    Java Collections Framework.</description>
+  </book>
+
+</catalog>

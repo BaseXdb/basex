@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<stores>
+  <store>
+    <store-number>1</store-number>
+    <state>CA</state>
+  </store>
+  <store>
+    <store-number>2</store-number>
+    <state>CA</state>
+  </store>
+  <store>
+    <store-number>3</store-number>
+    <state>MA</state>
+  </store>
+  <store>
+    <store-number>4</store-number>
+    <state>WA</state>
+  </store>
+</stores>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inscope>
+<parent1 xmlns:foo="http://www.example.com/parent1" foo:attr1="attr1"><child1 attr="child"/></parent1>
+<parent2 xmlns:foo="http://www.example.com/parent2" foo:attr2="attr2"><child2 attr="child"/></parent2>
+<parent3 xmlns:foo="http://www.example.com/parent3"><foo:child3/></parent3>
+<parent4 xmlns="http://www.example.com/parent4"><child4/></parent4>
+</inscope>

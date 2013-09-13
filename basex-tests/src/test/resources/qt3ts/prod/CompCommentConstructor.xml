@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog"
+          name="prod-CompCommentConstructor">
+   
+   <description>Tests for the CompCommentConstructor (computed comment constructor) production </description>
+   
+   <link type="spec" document="http://www.w3.org/TR/xquery-30/"
+         idref="doc-xquery30-CompCommentConstructor"/>
+   <link type="spec" document="XQuery" section-number="3.7.3.6"
+         idref="id-computed-comments"/>
+         
+   <environment name="DupNode">
+      <source role="." file="CompAttrConstructor/DupNode.xml">
+         <description>Simple document with all node kinds</description>
+         <created by="Andreas Behm" on="2005-04-26"/>
+      </source>
+   </environment>         
+         
+   <dependency type="spec" value="XQ10+"/>       
+
+   <test-case name="Constr-compcomment-enclexpr-1">
+      <description> enclosed expression in computed comment node - atomic values </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test>comment {1,'string',3.14,xs:float('1.2345e-2'),xs:dateTime('2002-04-02T12:00:00-01:00')}</test>
+      <result>
+         <assert-xml><![CDATA[<!--1 string 3.14 0.012345 2002-04-02T12:00:00-01:00-->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-enclexpr-2">
+      <description> enclosed expression in computed comment node - nodes </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[comment {<elem>123</elem>, (<elem attr='456'/>)/@attr, (<elem>789</elem>)/text()}]]></test>
+      <result>
+         <assert-xml><![CDATA[<!--123 456 789-->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-enclexpr-3">
+      <description> enclosed expression in computed comment node - empty string </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test>comment {1,'',2}</test>
+      <result>
+         <assert-xml><![CDATA[<!--1  2-->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-enclexpr-4">
+      <description> enclosed expression in computed comment node - empty node </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[comment {1,<a/>,2}]]></test>
+      <result>
+         <assert-xml><![CDATA[<!--1  2-->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-enclexpr-5">
+      <description> enclosed expression in computed comment node - nodes </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <environment ref="DupNode"/>
+      <test>comment {/root}</test>
+      <result>
+         <assert-xml><![CDATA[<!--texttext-->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-doc-1">
+      <description> strip document nodes </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <environment ref="DupNode"/>
+      <test>comment {., .}</test>
+      <result>
+         <assert-xml><![CDATA[<!--texttext texttext-->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-parent-1">
+      <description> empty parent </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test>count((comment {'comment'})/..)</test>
+      <result>
+         <assert-eq>0</assert-eq>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-string-1">
+      <description> string value of computed comment node </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test>fn:string(comment {'a', element a {}, 'b'})</test>
+      <result>
+         <assert-string-value>a  b</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-data-1">
+      <description> typed value of computed comment node </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test>fn:data(comment {'a', element a {}, 'b'})</test>
+      <result>
+         <assert-string-value>a  b</assert-string-value>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-nested-1">
+      <description> nested computed comment node constructor </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test>comment {comment {'one', comment {'two'}}, 'three', comment {'four'}}</test>
+      <result>
+         <assert-xml><![CDATA[<!--one two three four-->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-nested-2">
+      <description> nested computed comment nodes in element constructor </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[<elem>{comment {'one'}}<a>{comment {'two'}}</a>{comment {'three'}}</elem>]]></test>
+      <result>
+         <assert-xml><![CDATA[<elem><!--one--><a><!--two--></a><!--three--></elem>]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-nested-3">
+      <description> nested computed comment nodes in element constructor </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[document {comment {'one'}, <a/>, comment {'two'}, <b/>, comment {'three'}}]]></test>
+      <result>
+         <assert-xml><![CDATA[<!--one--><a/><!--two--><b/><!--three-->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-dash-1">
+      <description> dash as comment </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test>comment {'-'}</test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-dash-2">
+      <description> comment ends with a dash </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test>comment {'comment-'}</test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-dash-3">
+      <description> character ref as dash </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test><![CDATA[comment {'comment&#x2D;'}]]></test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-dash-4">
+      <description>dash at the end of content -</description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <environment>
+        <source role="." file="CompCommentConstructor.xml"/>
+      </environment>
+      <test>comment {//*:test-case[@name="Constr-compcomment-dash-4"]/*:description}</test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-doubledash-1">
+      <description> double dash as comment </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test>comment {'--'}</test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-doubledash-2">
+      <description> comment contains double dash </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test>comment {'com--ment'}</test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-doubledash-3">
+      <description> character ref as double dash </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test><![CDATA[comment {'com&#x2D;&#x2D;ment'}]]></test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-doubledash-4">
+      <description> double dash -- in content </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <environment>
+        <source role="." file="CompCommentConstructor.xml"/>
+      </environment>
+      <test>comment {//*:test-case[@name="Constr-compcomment-doubledash-4"]/*:description}</test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+
+   <test-case name="Constr-compcomment-doubledash-5">
+      <description> adjacent dashes in seperate expressions </description>
+      <created by="Andreas Behm" on="2005-05-20"/>
+      <test>comment {'com','-','-','ment'}</test>
+      <result>
+         <assert-xml><![CDATA[<!--com - - ment-->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ComputeConComment-1">
+      <description> Comment constructors cannot specify a name. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <test>comment {"name"} {"content"}</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ComputeConComment-2">
+      <description> Comment constructors cannot specify a name. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <test>comment name {"content"}</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ComputeConComment-3">
+      <description> A computed comment constructor having an empty sequence as input. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <test>comment {()}</test>
+      <result>
+         <assert-xml><![CDATA[<!---->]]></assert-xml>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ComputeConComment-4">
+      <description> The enclosed expression isn't optional. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <test>comment{}</test>
+      <result>
+         <error code="XPST0003"/>
+      </result>
+   </test-case>
+
+   <test-case name="K2-ComputeConComment-5">
+      <description> Test the atomized type. </description>
+      <created by="Frans Englich" on="2007-11-26"/>
+      <test>data(comment {"content"}) instance of xs:string</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   
+      <test-case name="cbcl-constr-compcomment-001">
+      <description> test detection of '--' in computed comment </description>
+      <created by="Tim Mills" on="2008-07-01"/>      
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[<element> { comment { '-', '-' } } </element>]]></test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+   
+
+   <test-case name="cbcl-constr-compcomment-002">
+      <description> test detection of '--' in computed comment </description>
+      <created by="Tim Mills" on="2008-07-01"/>      
+      <dependency type="spec" value="XQ10+"/>
+      <test><![CDATA[
+      	declare function local:tag($arg) as element() { element { 'tag' } { $arg } }; 
+      	<element> { comment { 'comment', local:tag('--') } } </element>
+      ]]></test>
+      <result>
+         <error code="XQDY0072"/>
+      </result>
+   </test-case>
+</test-set>

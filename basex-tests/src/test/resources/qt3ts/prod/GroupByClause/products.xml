@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<products>
+  <product>
+    <name>broiler</name>
+    <category>kitchen</category>
+    <price>100</price>
+    <cost>70</cost>
+  </product>
+  <product>
+    <name>toaster</name>
+    <category>kitchen</category>
+    <price>30</price>
+    <cost>10</cost>
+  </product>
+  <product>
+    <name>blender</name>
+    <category>kitchen</category>
+    <price>50</price>
+    <cost>25</cost>
+  </product>
+  <product>
+    <name>socks</name>
+    <category>clothes</category>
+    <price>5</price>
+    <cost>2</cost>
+  </product>
+  <product>
+    <name>shirt</name>
+    <category>clothes</category>
+    <price>10</price>
+    <cost>3</cost>
+  </product>
+</products>

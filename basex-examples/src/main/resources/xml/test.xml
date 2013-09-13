@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<a>
+    <previousnode>
+        <previouschild/>
+    </previousnode>
+    <parentnode>
+    	<previoussiblingnode/>
+        <contextnode name="baz bar blu" id="context">
+            <childnode>
+                text in child
+            </childnode>
+        </contextnode>
+        <b>3</b>
+        <followingsiblingnode/>
+    </parentnode>
+    <followingnode/>
+    <b>3.4</b>
+    <b>3</b>
+    <c>3</c>
+</a>

@@ -1,0 +1,6 @@
+<doc>
+    <entities>text1&amp;text2</entities>
+    <entities>text1&lt;text2</entities>
+    <entities>text1&gt;text2</entities>
+    <entities>text1&apos;text2</entities>
+</doc>

@@ -1,0 +1,9 @@
+<stream>
+  <event temp="10" time="1"/>
+  <event temp="8" time="2"/>
+  <event temp="6" time="3"/>
+  <event temp="13" time="4"/>
+  <event temp="32" time="5"/>
+  <event temp="9" time="6"/>
+  <event temp="10" time="7"/>
+</stream>

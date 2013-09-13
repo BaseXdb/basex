@@ -1,0 +1,234 @@
+[{
+  "colorsArray": [
+    {
+      "colorName": "red",
+      "hexValue": "#f00"
+    },
+    {
+      "colorName": "green",
+      "hexValue": "#0f0"
+    },
+    {
+      "colorName": "blue",
+      "hexValue": "#00f"
+    },
+    {
+      "colorName": "cyan",
+      "hexValue": "#0ff"
+    },
+    {
+      "colorName": "magenta",
+      "hexValue": "#f0f"
+    },
+    {
+      "colorName": "yellow",
+      "hexValue": "#ff0"
+    },
+    {
+      "colorName": "black",
+      "hexValue": "#000"
+    }
+  ]
+}, {
+  "firstName": "John",
+  "lastName": "Smith",
+  "age": 25,
+  "address": {
+    "streetAddress": "21 2nd Street",
+    "city": "New York",
+    "state": "NY",
+    "postalCode": "10021"
+  },
+  "phoneNumber": [
+    {
+      "type": "home",
+      "number": "212 555-1234"
+    },
+    {
+      "type": "fax",
+      "number": "646 555-4567"
+    }
+  ]
+}, {
+  "data": [
+    {
+      "id": "X999_Y999",
+      "from": {
+        "name": "Tom Brady",
+        "id": "X12"
+      },
+      "message": "Looking forward to 2010!",
+      "actions": [
+        {
+          "name": "Comment",
+          "link": "http:\/\/www.facebook.com\/X999\/posts\/Y999"
+        },
+        {
+          "name": "Like",
+          "link": "http:\/\/www.facebook.com\/X999\/posts\/Y999"
+        }
+      ],
+      "type": "status",
+      "created_time": "2010-08-02T21:27:44+0000",
+      "updated_time": "2010-08-02T21:27:44+0000"
+    },
+    {
+      "id": "X998_Y998",
+      "from": {
+        "name": "Peyton Manning",
+        "id": "X18"
+      },
+      "message": "Where's my contract?",
+      "actions": [
+        {
+          "name": "Comment",
+          "link": "http:\/\/www.facebook.com\/X998\/posts\/Y998"
+        },
+        {
+          "name": "Like",
+          "link": "http:\/\/www.facebook.com\/X998\/posts\/Y998"
+        }
+      ],
+      "type": "status",
+      "created_time": "2010-08-02T21:27:44+0000",
+      "updated_time": "2010-08-02T21:27:44+0000"
+    }
+  ]
+}, {
+  "title": "Talk On Travel Pool",
+  "link": "http:\/\/www.flickr.com\/groups\/talkontravel\/pool\/",
+  "description": "Travel and vacation photos from around the world.",
+  "modified": "2009-02-02T11:10:27Z",
+  "generator": "http:\/\/www.flickr.com\/",
+  "items": [
+    {
+      "title": "View from the hotel",
+      "link": "http:\/\/www.flickr.com\/photos\/33112458@N08\/3081564649\/in\/pool-998875@N22",
+      "media": {
+        "m": "http:\/\/farm4.static.flickr.com\/3037\/3081564649_4a6569750c_m.jpg"
+      },
+      "date_taken": "2008-12-04T04:43:03-08:00",
+      "description": "&lt;p&gt;&lt;a href=\"http:\/\/www.flickr.com\/people\/33112458@N08\/\"&gt; Talk On Travel&lt;\/a&gt; has added a photo to the pool:&lt;\/p&gt; &lt;p&gt;&lt;a href=\"http:\/\/ www.flickr.com\/photos\/33112458@N08\/3081564649\/\" title=\"View from the hotel\"&gt; &lt;img src=\"http:\/\/farm4.static.flickr.com\/3037\/3081564649_4a6569750c_m.jpg\" width=\"240\" height=\"180\" alt=\"View from the hotel\" \/&gt;&lt;\/a&gt;&lt;\/p&gt; ",
+      "published": "2008-12-04T12:43:03Z",
+      "author": "nobody@flickr.com (Talk On Travel)",
+      "author_id": "33112458@N08",
+      "tags": "spain dolphins tenerife canaries lagomera aqualand playadelasamericas junglepark losgigantos loscristines talkontravel"
+    }
+  ]
+}, {
+  "ResultSet": {
+    "totalResultsAvailable": "1827221",
+    "totalResultsReturned": 2,
+    "firstResultPosition": 1,
+    "Result": [
+      {
+        "Title": "potato jpg",
+        "Summary": "Kentang Si bungsu dari keluarga Solanum tuberosum L ini ternyata memiliki khasiat untuk mengurangi kerutan  jerawat  bintik hitam dan kemerahan pada kulit  Gunakan seminggu sekali sebagai",
+        "Url": "http:\/\/www.mediaindonesia.com\/spaw\/uploads\/images\/potato.jpg",
+        "ClickUrl": "http:\/\/www.mediaindonesia.com\/spaw\/uploads\/images\/potato.jpg",
+        "RefererUrl": "http:\/\/www.mediaindonesia.com\/mediaperempuan\/index.php?ar_id=Nzkw",
+        "FileSize": 22630,
+        "FileFormat": "jpeg",
+        "Height": "362",
+        "Width": "532",
+        "Thumbnail": {
+          "Url": "http:\/\/thm-a01.yimg.com\/nimage\/557094559c18f16a",
+          "Height": "98",
+          "Width": "145"
+        }
+      },
+      {
+        "Title": "potato jpg",
+        "Summary": "Introduction of puneri aloo This is a traditional potato preparation flavoured with curry leaves and peanuts and can be eaten on fasting day  Preparation time   10 min",
+        "Url": "http:\/\/www.infovisual.info\/01\/photo\/potato.jpg",
+        "ClickUrl": "http:\/\/www.infovisual.info\/01\/photo\/potato.jpg",
+        "RefererUrl": "http:\/\/sundayfood.com\/puneri-aloo-indian-%20recipe",
+        "FileSize": 119398,
+        "FileFormat": "jpeg",
+        "Height": "685",
+        "Width": "1024",
+        "Thumbnail": {
+          "Url": "http:\/\/thm-a01.yimg.com\/nimage\/7fa23212efe84b64",
+          "Height": "107",
+          "Width": "160"
+        }
+      }
+    ]
+  }
+}, {
+  "menu": {
+    "header": "xProgress SVG Viewer",
+    "items": [
+      {
+        "id": "Open"
+      },
+      {
+        "id": "OpenNew",
+        "label": "Open New"
+      },
+      null,
+      {
+        "id": "ZoomIn",
+        "label": "Zoom In"
+      },
+      {
+        "id": "ZoomOut",
+        "label": "Zoom Out"
+      },
+      {
+        "id": "OriginalView",
+        "label": "Original View"
+      },
+      null,
+      {
+        "id": "Quality"
+      },
+      {
+        "id": "Pause"
+      },
+      {
+        "id": "Mute"
+      },
+      null,
+      {
+        "id": "Find",
+        "label": "Find..."
+      },
+      {
+        "id": "FindAgain",
+        "label": "Find Again"
+      },
+      {
+        "id": "Copy"
+      },
+      {
+        "id": "CopyAgain",
+        "label": "Copy Again"
+      },
+      {
+        "id": "CopySVG",
+        "label": "Copy SVG"
+      },
+      {
+        "id": "ViewSVG",
+        "label": "View SVG"
+      },
+      {
+        "id": "ViewSource",
+        "label": "View Source"
+      },
+      {
+        "id": "SaveAs",
+        "label": "Save As"
+      },
+      null,
+      {
+        "id": "Help"
+      },
+      {
+        "id": "About",
+        "label": "About xProgress CVG Viewer..."
+      }
+    ]
+  }
+}]

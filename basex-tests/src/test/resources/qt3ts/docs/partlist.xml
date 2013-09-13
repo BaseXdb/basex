@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<partlist>
+  <part partid="0" name="car"/>
+  <part partid="1" partof="0" name="engine"/>
+  <part partid="2" partof="0" name="door"/>
+  <part partid="3" partof="1" name="piston"/>
+  <part partid="4" partof="2" name="window"/>
+  <part partid="5" partof="2" name="lock"/>
+  <part partid="10" name="skateboard"/>
+  <part partid="11" partof="10" name="board"/>
+  <part partid="12" partof="10" name="wheel"/>
+  <part partid="20" name="canoe"/>
+</partlist>
+

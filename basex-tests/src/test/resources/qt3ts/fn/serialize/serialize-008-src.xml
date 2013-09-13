@@ -1,0 +1,4 @@
+<doc>
+  <title>A document</title>
+  <p>A paragraph containing some <code>code</code> which should not be indented</p>
+</doc>

@@ -1,0 +1,75 @@
+body, td {
+  font-family: "Trebuchet MS","Droid sans", sans-serif;
+  overflow-y: scroll;
+  margin: 1.2em;
+  border: 0;
+}
+
+ul, dd {
+  padding-left: 1.2em;
+  margin-left: 0;
+}
+
+dl {
+  margin: 0;
+}
+
+dt {
+  margin: 0.6em 0 0.6em 0;
+  font-weight: bold;
+}
+
+th {
+  text-align: left;
+  color: #CC3333;
+  padding: 0 1.5em 0 0;
+}
+
+td {
+  border-top: 1px solid #CCC;
+  padding: 0.3em 1.5em 0 0;
+  vertical-align: top;
+}
+
+code {
+  font-family: "Consolas", "Ubuntu Mono", monospace;
+  border: 1px solid #E3E3FF;
+  border-radius: 3px;
+  padding: 0 4px 0 4px;
+  margin: 0 2px 0 2px;
+  font-size: 90%;
+}
+
+pre {
+  font-family: "Consolas", "Ubuntu Mono", monospace;
+  font-size: 90%;
+}
+
+h2 {
+  color: #C00000;
+  margin: 0 0 0.4em 0;
+}
+
+h3 {
+  color: #C00000;
+  margin: 1em 0 0.5em 0;
+}
+
+hr {
+  height: 1px;
+  border: 0px;
+  background-color: #222222;
+}
+
+a {
+  color: #C00000;
+  text-decoration: none;
+}
+
+p {
+  margin: 0 0 0.6em 0;
+}
+
+.right {
+  float: right;
+}

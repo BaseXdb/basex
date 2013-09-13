@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<far-north> Text-before
+  <!-- Comment-1 --> Level-1
+  <north mark="n0">  North-text-1
+    <near-north>  way-far-West-text
+      <!-- Comment-2 --> Level-3
+      <far-west/>  still-Level-3
+      <center mark="c-upper" center-attr-2="cu2"><!-- Comment-3 --> Level-4</center>  far-West-text
+      <west mark="w0" west-attr-1="w1" west-attr-2="w2" west-attr-3="w3"/>  West-text
+      <near-west/>  near-West-text
+      <center mark="c-real" center-attr-1="c1" center-attr-2="c2" center-attr-3="c3">  center-text-1
+          <!-- Comment-4 --> Level-4
+        <near-south-west/>  center-text-2
+        <center mark="c-left" center-attr-1="cl1"/>  center-text-3
+        <near-south>  South-text-1
+          <center mark="c-mid-left" center-attr-2="cml2"/>  South-center-text
+            <!-- Comment-5 --> Level-5
+          <south mark="s0" south-attr-1="s1" south-attr-2="s2">  deep-South-text
+            <center mark="c-lower" center-attr-3="cl3"/>  deep-South-center-text
+            <far-south/>  far-South-text
+              <!-- Comment-6 --> Level-6
+            <center mark="c-deep-lower" center-attr-1="cdl1"/>  center-South-text
+          </south>  South-text-2
+          <center mark="c-mid-right" center-attr-2="cmr2"/>  shallow-South-text
+        </near-south>  center-text-4
+        <center mark="c-right" center-attr-3="cr3"/>  center-text-5
+        <south-east mark="1se"/>  center-text-6
+        <south-east mark="2se"/>  center-text-7
+          <!-- Comment-7 --> Level-4
+      </center>  near-East-text
+      <near-east/>  East-text
+      <east mark="e0">Text in east</east>  far-East-text
+      <far-east/>  way-far-East-text
+    </near-north>  North-text-2
+    <center mark="c-final" center-attr-3="cf3"/>  North-text-3
+    <!-- Comment-8 --> Level-2
+  </north>  Text-after
+</far-north>

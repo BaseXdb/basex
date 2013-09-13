@@ -1,0 +1,15 @@
+<prices>
+  <priceList effDate="2006-11-15">
+    <prod num="557">
+      <price currency="USD">29.99</price>
+      <discount type="CLR">10.00</discount>
+    </prod>
+    <prod num="563">
+      <price currency="USD">69.99</price>
+    </prod>
+    <prod num="443">
+      <price currency="USD">39.99</price>
+      <discount type="CLR">3.99</discount>
+    </prod>
+  </priceList>
+</prices>

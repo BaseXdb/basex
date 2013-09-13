@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?> 
+<company>
+   <name>Foobar Corporation</name>
+   <ticker_symbol>FOO</ticker_symbol>
+
+   <description>Foobar Corporation is a maker of Foo(TM) and
+        Foobar(TM) products and a leading software company with a 300
+        Billion dollar revenue in 1999. It is located in Alaska.
+   </description>
+
+   <business_code>Software</business_code>
+   <partners>
+        <partner>YouNameItWeIntegrateIt.com</partner>
+        <partner>TheAppCompany Inc.</partner>
+   </partners>
+   <competitors>
+        <competitor>Gorilla Corporation</competitor>
+   </competitors>
+</company>

@@ -1,0 +1,29 @@
+BASEX DATABASE CLIENT FOR C ====================================================
+
+Connect to running BaseX database server (basex.org) from C code.
+
+Compile dependencies:
+	openssl
+		debian: apt-get install libssl-dev
+
+Build (tested on Debian GNU/Linux unstable only):
+	$ make [all|lib|example]
+	# make install
+
+Inspect and test example:
+	$ less example.c
+	$ ./example (or, if lib is not installed, $ LD_LIBRARY_PATH=. ./example)
+
+Cleanup:
+	$ make clean
+	# make clean-all  (removes 'make install'ed files as well)
+
+License:
+	Copyright (c) 2005-12, Alexander Holupirek <alex@holupirek.de>, BSD license
+
+Bug reports:
+	https://github.com/holu/basexdbc/issues
+
+Have fun.
+	Alex
+================================================================================

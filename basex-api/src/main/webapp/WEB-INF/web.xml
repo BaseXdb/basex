@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app
+  xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+  version="2.5">
+
+  <display-name>BaseX: The XML Database and XQuery Processor</display-name>
+  <description>HTTP Services</description>
+
+  <!-- BaseX options (HTTPLOCAL, TIMEOUT, LOG, etc.) can be overwritten
+       by prefixing the key with "org.basex." and specifying them in
+       <context-param/> elements, as shown below. Please checkout
+       http://docs.basex.org/wiki/Options for a list of all options. -->
+
+  <!-- Set default credentials -->
+  <context-param>
+    <param-name>org.basex.user</param-name>
+    <param-value>admin</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.basex.password</param-name>
+    <param-value>admin</param-value>
+  </context-param>
+
+  <!--
+  <context-param>
+    <param-name>org.basex.restxqpath</param-name>
+    <param-value>.</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.basex.dbpath</param-name>
+    <param-value>WEB-INF/data</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.basex.repopath</param-name>
+    <param-value>WEB-INF/repo</param-value>
+  </context-param>
+
+  <context-param>
+    <param-name>org.basex.httplocal</param-name>
+    <param-value>true</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.basex.timeout</param-name>
+    <param-value>5</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.basex.log</param-name>
+    <param-value>false</param-value>
+  </context-param>
+  -->
+
+  <!-- Global session listener -->
+  <listener>
+    <listener-class>org.basex.http.SessionListener</listener-class>
+  </listener>
+
+  <!-- RESTXQ Service (can be deactivated by removing this entry) -->
+  <servlet>
+    <servlet-name>RESTXQ</servlet-name>
+    <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+    <!-- service-specific credentials
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value/>
+    </init-param>
+    <init-param>
+      <param-name>org.basex.password</param-name>
+      <param-value/>
+    </init-param>
+    -->
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RESTXQ</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- REST Service (can be deactivated by removing this entry) -->
+  <servlet>
+    <servlet-name>REST</servlet-name>
+    <servlet-class>org.basex.http.rest.RESTServlet</servlet-class>
+    <!-- service-specific credentials
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value/>
+    </init-param>
+    <init-param>
+      <param-name>org.basex.password</param-name>
+      <param-value/>
+    </init-param>
+    -->
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>REST</servlet-name>
+    <url-pattern>/rest/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- WebDAV Service (can be deactivated by removing this entry) -->
+  <servlet>
+    <servlet-name>WebDAV</servlet-name>
+    <servlet-class>org.basex.http.webdav.WebDAVServlet</servlet-class>
+    <!-- service-specific credentials
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value/>
+    </init-param>
+    <init-param>
+      <param-name>org.basex.password</param-name>
+      <param-value/>
+    </init-param>
+    -->
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WebDAV</servlet-name>
+    <url-pattern>/webdav/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Mapping for static resources (may be restricted to a sub path) -->
+  <servlet>
+    <servlet-name>default</servlet-name>
+    <init-param>
+      <param-name>useFileMappedBuffer</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/static/*</url-pattern>
+  </servlet-mapping>
+
+</web-app>

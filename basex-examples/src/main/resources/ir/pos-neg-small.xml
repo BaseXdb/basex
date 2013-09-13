@@ -1,0 +1,10 @@
+<Affect_Lexicon>
+	<axis name="positive">
+		<term name="positive"/>
+		<term name="good"/>
+	</axis>
+	<axis name="negative">
+		<term name="negative"/>
+		<term name="bad"/>
+	</axis>
+</Affect_Lexicon>
