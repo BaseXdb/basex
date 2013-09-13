@@ -3,22 +3,19 @@ BaseX
 
 Welcome to the source code of BaseX.
 
-To get the project running as smooth as possible, please consider the
-following notes:
+To get the project running as smooth as possible, please consider the following notes:
 
 Compiling BaseX
 ---------------
 
-JDK 1.6 and JUnit is currently needed to compile the complete sources
+JDK 1.6 and JUnit is currently required to compile the complete sources
 of the main project. If you are using another environment than Eclipse
-or don't have JUnit installed, just delete the `test` package inside
+or don't have JUnit installed, just delete the `test` packages inside
 the project and rebuild the project.
 
-Please take a look at the [Maven documentation](https://docs.basex.org/wiki/Maven)
-for information on how to use Maven.
+Please take a look at the [Maven documentation](https://docs.basex.org/wiki/Maven) for information on how to use Maven.
 
-You can launch the following classes, which are all placed in the main
-package org.basex:
+You can launch the following classes, which are all placed in the basex-core directory and the `org.basex` main package:
 
     BaseX        : console mode
     BaseXServer  : server instance, waiting for requests
@@ -61,12 +58,7 @@ Some additional Checkstyle guidelines are defined in the project:
 Using Git
 ---------
 
-The code base of BaseX can be accessed via [GitHub](https://www.github.com):
-
- - Main Package: https://github.com/BaseXdb/basex
- - APIs: REST, WebDAV, XML:DB, XQJ: https://github.com/BaseXdb/basex-api
- - Examples: https://github.com/BaseXdb/basex-examples
- - Tests, Stress Tests: https://github.com/BaseXdb/basex-tests
+The code base of BaseX can be accessed via [GitHub](https://www.github.com).
 
 Feedback
 --------
@@ -78,7 +70,6 @@ Tell us if you run into any troubles installing BaseX:
     basex-talk@mailman.uni-konstanz.de.
 
 You are as well invited to contribute to our [bug tracker](https://github.com/BaseXdb/BaseX/issues).
-
 
 All the best,
 
