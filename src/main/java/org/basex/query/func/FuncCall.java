@@ -59,9 +59,8 @@ public abstract class FuncCall extends Arr {
   }
 
   @Override
-  public final FuncCall markTailCalls() {
+  public final void markTailCalls() {
     tailCall = true;
-    return this;
   }
 
   /**

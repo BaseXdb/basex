@@ -228,14 +228,15 @@ public final class FuncItem extends FItem implements Scope {
   private static FuncItem coerce(final QueryContext ctx, final InputInfo ii,
       final FuncItem fun, final FuncType t) {
     final VarScope sc = new VarScope();
-    final Var[] vars = new Var[fun.vars.length];
-    final Expr[] refs = new Expr[vars.length];
-    for(int i = vars.length; i-- > 0;) {
-      vars[i] = sc.uniqueVar(ctx, t.args[i], true);
-      refs[i] = new VarRef(ii, vars[i]);
+    final Var[] vs = new Var[fun.vars.length];
+    final Expr[] refs = new Expr[vs.length];
+    for(int i = vs.length; i-- > 0;) {
+      vs[i] = sc.uniqueVar(ctx, t.args[i], true);
+      refs[i] = new VarRef(ii, vs[i]);
     }
-    return new FuncItem(fun.name, vars, new DynFuncCall(ii, fun, refs).markTailCalls(), t,
-        fun.cast != null, null, sc, ctx.sc, fun.func);
+    final Expr e = new DynFuncCall(ii, fun, refs);
+    e.markTailCalls();
+    return new FuncItem(fun.name, vs, e, t, fun.cast != null, null, sc, ctx.sc, fun.func);
   }
 
   @Override

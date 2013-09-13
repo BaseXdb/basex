@@ -136,7 +136,7 @@ public final class InlineFunc extends Single implements Scope {
 
     // convert all function calls in tail position to proper tail calls
     ctx.compInfo(OPTTCE, this);
-    expr = expr.markTailCalls();
+    expr.markTailCalls();
 
     return optimize(ctx, scp);
   }
