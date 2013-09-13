@@ -49,6 +49,6 @@ public class FruitsModule extends QueryModule {
    * @return function namespace
    */
   public String functionNamespace() {
-    return Token.string(context.sc.nsFunc);
+    return Token.string(context.sc.funcNS);
   }
 }
