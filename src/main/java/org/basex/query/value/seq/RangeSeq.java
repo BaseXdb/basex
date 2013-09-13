@@ -83,11 +83,6 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Value sub(final long s, final long sz) {
-    return get(start + (asc ? s : -s), sz, asc);
-  }
-
-  @Override
   public Value reverse() {
     final long s = size();
     return asc ? get(start + s - 1, s, false) : get(start - s + 1, s, true);

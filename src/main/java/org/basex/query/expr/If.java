@@ -170,10 +170,9 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr markTailCalls() {
-    expr[0] = expr[0].markTailCalls();
-    expr[1] = expr[1].markTailCalls();
-    return this;
+  public void markTailCalls() {
+    expr[0].markTailCalls();
+    expr[1].markTailCalls();
   }
 
   @Override

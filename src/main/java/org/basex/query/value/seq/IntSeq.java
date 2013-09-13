@@ -63,14 +63,6 @@ public final class IntSeq extends NativeSeq {
   }
 
   @Override
-  public Value sub(final long start, final long length) {
-    final int l = (int) length;
-    final long[] tmp = new long[l];
-    System.arraycopy(values, (int) start, tmp, 0, l);
-    return get(tmp, type);
-  }
-
-  @Override
   public Value reverse() {
     final int s = values.length;
     final long[] tmp = new long[s];

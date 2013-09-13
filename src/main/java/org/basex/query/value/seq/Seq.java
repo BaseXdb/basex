@@ -113,14 +113,6 @@ public abstract class Seq extends Value {
   }
 
   /**
-   * Returns a subsequence.
-   * @param start first value
-   * @param length length of sequence
-   * @return resulting item or sequence
-   */
-  public abstract Value sub(final long start, final long length);
-
-  /**
    * Returns a sequence in reverse order.
    * @return sequence
    */
