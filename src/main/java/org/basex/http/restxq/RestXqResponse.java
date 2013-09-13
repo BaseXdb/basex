@@ -59,7 +59,7 @@ final class RestXqResponse {
     function.bind(http, args, error);
 
     // wrap function with a function call
-    final StaticFuncCall sfc = new BaseFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
+    final StaticFuncCall sfc = new StaticFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
     final MainModule mm = new MainModule(sfc, new VarScope(), null);
 
     // assign main module and http context and register process
