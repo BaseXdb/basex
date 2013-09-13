@@ -1,16 +1,3 @@
-## generic files to ignore
-*~
-*.lock
-*.DS_Store
-*.swp
-*.out
-
-# Java classfiles
-*.class
-
-# Maven target dir
 /doc
+/lib
 /target
-
-# /.settings/
-/.settings/org.maven.ide.eclipse.prefs
