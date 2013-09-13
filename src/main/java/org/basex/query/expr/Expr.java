@@ -374,13 +374,8 @@ public abstract class Expr extends ExprInfo {
     });
   }
 
-  /**
-   * Finds and marks tail calls, enabling TCO.
-   * @return the expression, with tail calls marked
-   */
-  public Expr markTailCalls() {
-    return this;
-  }
+  /** Finds and marks tail calls, enabling TCO. */
+  public void markTailCalls() { }
 
   /**
    * Traverses this expression, notifying the visitor of declared and used variables,

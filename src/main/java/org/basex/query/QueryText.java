@@ -700,12 +700,14 @@ public interface QueryText {
   byte[] AXIS = token("axis");
   /** Query Plan. */
   byte[] TEST = token("test");
-  /** Minimum . */
+  /** Minimum. */
   byte[] MIN = token("min");
   /** Attribute name. */
   byte[] MAX = token("max");
-  /** Minimum . */
+  /** Infinity. */
   byte[] INF = token("inf");
+  /** Infinity. */
+  byte[] TCL = token("tailCall");
 
   /** Example for a Date format. */
   String XDATE = "2000-12-31";

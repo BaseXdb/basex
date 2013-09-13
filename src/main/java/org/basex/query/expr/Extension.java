@@ -84,8 +84,7 @@ public final class Extension extends Single {
   }
 
   @Override
-  public Expr markTailCalls() {
-    expr = expr.markTailCalls();
-    return this;
+  public void markTailCalls() {
+    // cannot be tail-call optimized because otherwise pragmas could be finished too early
   }
 }

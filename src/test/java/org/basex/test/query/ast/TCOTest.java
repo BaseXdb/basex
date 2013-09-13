@@ -2,6 +2,7 @@ package org.basex.test.query.ast;
 
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -26,7 +27,7 @@ public class TCOTest extends QueryPlanTest {
         "14721860295199062616467307339074198149529600000000000000000000000000" +
         "00",
 
-        "exists(//" + Util.name(TailFuncCall.class) + ")"
+        "exists(//" + Util.name(StaticFuncCall.class) + "[@tailCall = 'true'])"
     );
   }
 
@@ -45,7 +46,7 @@ public class TCOTest extends QueryPlanTest {
 
         "true",
 
-        "count(//" + Util.name(TailFuncCall.class) + ") eq 2"
+        "count(//" + Util.name(StaticFuncCall.class) + "[@tailCall eq 'true']) eq 2"
     );
   }
 
@@ -61,8 +62,8 @@ public class TCOTest extends QueryPlanTest {
 
         "1024",
 
-        "exists(//" + Util.name(TailFuncCall.class) + ")",
-        "count(//" + Util.name(BaseFuncCall.class) + ") eq 2"
+        "exists(//" + Util.name(StaticFuncCall.class) + "[@tailCall eq 'true'])",
+        "count(//" + Util.name(StaticFuncCall.class) + "[@tailCall eq 'false']) eq 2"
     );
   }
 
@@ -74,8 +75,8 @@ public class TCOTest extends QueryPlanTest {
         null,
 
         "exists(//" + Util.name(StaticFunc.class) + "/" +
-            Util.name(TailFuncCall.class) + ")",
-        "exists(//" + Util.name(BaseFuncCall.class) + ")"
+            Util.name(StaticFuncCall.class) + "[@tailCall eq 'true'])",
+        "exists(//" + Util.name(StaticFuncCall.class) + "[@tailCall eq 'false'])"
     );
   }
 
@@ -88,7 +89,7 @@ public class TCOTest extends QueryPlanTest {
         "12345",
 
         "exists(//" + Util.name(If.class) + "/" +
-            Util.name(TailFuncCall.class) + ")"
+            Util.name(StaticFuncCall.class) + "[@tailCall eq 'true'])"
     );
   }
 
@@ -103,7 +104,28 @@ public class TCOTest extends QueryPlanTest {
         "12345",
 
         "exists(//" + Util.name(If.class) + "/" +
-            Util.name(TailFuncCall.class) + ")"
+            Util.name(StaticFuncCall.class) + "[@tailCall eq 'true'])"
+    );
+  }
+
+  /** Checks if dynamic function calls are tail-call optimized. */
+  @Test
+  public void dynFuncCall() {
+    check("let $sum :=" +
+        "  function($seq) {" +
+        "    let $go :=" +
+        "      function($seq, $acc, $go) {" +
+        "        if(empty($seq)) then $acc" +
+        "        else $go(tail($seq), $acc + head($seq), $go)" +
+        "      }" +
+        "    return $go($seq, 0, $go)" +
+        "  }" +
+        "return $sum(1 to 100000)",
+
+        "5000050000",
+
+        "empty(//" + Util.name(FuncItem.class) +
+            "//" + Util.name(DynFuncCall.class) + "[@tailCall eq 'false'])"
     );
   }
 }

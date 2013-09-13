@@ -149,9 +149,8 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public TypeCase markTailCalls() {
-    expr = expr.markTailCalls();
-    return this;
+  public void markTailCalls() {
+    expr.markTailCalls();
   }
 
   @Override
