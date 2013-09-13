@@ -2,6 +2,7 @@ package org.basex.test.query.ast;
 
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -104,6 +105,27 @@ public class TCOTest extends QueryPlanTest {
 
         "exists(//" + Util.name(If.class) + "/" +
             Util.name(StaticFuncCall.class) + "[@tailCall eq 'true'])"
+    );
+  }
+
+  /** Checks if dynamic function calls are tail-call optimized. */
+  @Test
+  public void dynFuncCall() {
+    check("let $sum :=" +
+        "  function($seq) {" +
+        "    let $go :=" +
+        "      function($seq, $acc, $go) {" +
+        "        if(empty($seq)) then $acc" +
+        "        else $go(tail($seq), $acc + head($seq), $go)" +
+        "      }" +
+        "    return $go($seq, 0, $go)" +
+        "  }" +
+        "return $sum(1 to 100000)",
+
+        "5000050000",
+
+        "empty(//" + Util.name(FuncItem.class) +
+            "//" + Util.name(DynFuncCall.class) + "[@tailCall eq 'false'])"
     );
   }
 }
