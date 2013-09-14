@@ -1,0 +1,450 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+
+
+  <!-- Artifact information -->
+  <groupId>org.basex</groupId>
+  <artifactId>basex-parent</artifactId>
+  <version>7.7.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>basex-core</module>
+    <module>basex-api</module>
+  </modules>
+
+  <properties>
+    <compileSource>1.6</compileSource>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <project.lib.directory>lib</project.lib.directory>
+    <jettyVersion>8.1.11.v20130520</jettyVersion>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.8.2</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>jp.sourceforge.igo</groupId>
+        <artifactId>igo</artifactId>
+        <version>0.4.3</version>
+        <scope>runtime</scope>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.apache</groupId>
+        <artifactId>lucene-stemmers</artifactId>
+        <version>3.4.0</version>
+        <scope>runtime</scope>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.ccil.cowan.tagsoup</groupId>
+        <artifactId>tagsoup</artifactId>
+        <version>1.2</version>
+        <scope>runtime</scope>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>xml-resolver</groupId>
+        <artifactId>xml-resolver</artifactId>
+        <version>1.2</version>
+        <scope>runtime</scope>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>jline</groupId>
+        <artifactId>jline</artifactId>
+        <version>1.0</version>
+        <scope>runtime</scope>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>net.xqj</groupId>
+        <artifactId>basex-xqj</artifactId>
+        <version>1.2.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xmldb</groupId>
+        <artifactId>xmldb-api</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-server</artifactId>
+        <version>${jettyVersion}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-servlet</artifactId>
+        <version>${jettyVersion}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-webapp</artifactId>
+        <version>${jettyVersion}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.ettrema</groupId>
+        <artifactId>milton-api</artifactId>
+        <version>1.8.1.4</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>commons-logging</artifactId>
+            <groupId>commons-logging</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>commons-beanutils</artifactId>
+            <groupId>commons-beanutils</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>slf4j-log4j12</artifactId>
+            <groupId>org.slf4j</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>log4j</artifactId>
+            <groupId>log4j</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>slf4j-api</artifactId>
+            <groupId>org.slf4j</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-fileupload</groupId>
+        <artifactId>commons-fileupload</artifactId>
+        <version>1.2.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-nop</artifactId>
+        <version>1.5.8</version>
+      </dependency>
+      <dependency>
+        <groupId>com.vividsolutions</groupId>
+        <artifactId>jts</artifactId>
+        <version>1.13</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies><!-- TODO --></dependencies>
+
+
+
+  <!-- Project Information -->
+  <name>BaseX</name>
+  <description>BaseX XML database and XPath/XQuery processor</description>
+  <url>http://basex.org</url>
+  <inceptionYear>2005</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>BSD License</name>
+      <url>http://www.opensource.org/licenses/bsd-license.php</url>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>BaseX Team</name>
+    <url>http://basex.org</url>
+  </organization>
+
+  <developers><!-- TODO --></developers>
+  <contributors><!-- TODO --></contributors>
+
+
+
+  <!-- Environment Settings -->
+  <issueManagement>
+    <system>GitHub Tracker</system>
+    <url>https://github.com/BaseXdb/basex/issues</url>
+  </issueManagement>
+
+  <mailingLists>
+    <mailingList>
+      <name>BaseX Talk</name>
+      <post>basex-talk@mailman.uni-konstanz.de</post>
+      <archive>https://mailman.uni-konstanz.de/mailman/listinfo/basex-talk</archive>
+    </mailingList>
+  </mailingLists>
+
+  <scm>
+    <connection>scm:git:git://github.com/BaseXdb/basex.git</connection>
+    <developerConnection>scm:git:git@github.com:BaseXdb/basex.git</developerConnection>
+    <url>https://github.com/BaseXdb/basex</url>
+  </scm>
+
+  <repositories>
+    <repository>
+      <id>basex</id>
+      <name>BaseX Maven Repository</name>
+      <url>http://files.basex.org/maven</url>
+    </repository>
+    <repository>
+      <id>karatachi</id>
+      <name>Karatachi Maven Repository</name>
+      <url>http://repo.karatachi.org/mvn/</url>
+    </repository>
+    <repository>
+      <id>xqj</id>
+      <name>XQJ Maven Repository</name>
+      <url>http://xqj.net/maven</url>
+    </repository>
+    <repository>
+      <id>milton</id>
+      <name>Milton Maven Repository</name>
+      <url>http://milton.io/maven</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Central Maven Repository</name>
+      <url>http://repo2.maven.org/maven2/</url>
+    </repository>
+  </repositories>
+
+  <distributionManagement>
+    <repository>
+      <id>basex.mvn</id>
+      <name>BaseX Maven Repository</name>
+      <url>ftp://basex.org/</url> <!-- TODO: fix the path; use sftp or ssh -->
+    </repository>
+  </distributionManagement>
+
+  <prerequisites>
+    <maven>3.0.0</maven>
+  </prerequisites>
+
+  <ciManagement><!-- TODO --></ciManagement>
+  <pluginRepositories><!-- TODO --></pluginRepositories>
+  <profiles><!-- TODO --></profiles>
+
+
+
+  <!-- Build Settings -->
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>javacc-maven-plugin</artifactId>
+          <version>2.6</version>
+          <inherited>true</inherited>
+          <executions>
+            <execution>
+              <id>javacc</id>
+              <goals>
+                <goal>javacc</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <outputDirectory>src/main/java</outputDirectory>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.1</version>
+          <inherited>true</inherited>
+          <configuration>
+            <source>${compileSource}</source>
+            <target>${compileSource}</target>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.4</version>
+          <inherited>true</inherited>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.15</version>
+          <inherited>true</inherited>
+          <configuration>
+            <!-- <skipTests>true</skipTests> -->
+            <forkMode>always</forkMode>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.2.1</version>
+          <inherited>true</inherited>
+          <configuration>
+            <outputDirectory>target</outputDirectory>
+          </configuration>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <phase>package</phase>
+              <goals>
+                <goal>jar-no-fork</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.8</version>
+          <inherited>true</inherited>
+          <configuration>
+            <outputDirectory>${project.lib.directory}</outputDirectory>
+            <includeScope>runtime</includeScope>
+          </configuration>
+          <executions>
+            <execution>
+              <id>copy-libs</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.2.1</version>
+          <inherited>true</inherited>
+          <executions>
+            <execution>
+              <goals>
+                <goal>java</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.7</version>
+          <inherited>true</inherited>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.9</version>
+          <inherited>true</inherited>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>2.10</version>
+          <inherited>true</inherited>
+          <executions>
+            <execution>
+              <phase>test</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <configLocation>.settings/checkstyle.xml</configLocation>
+            <failsOnError>true</failsOnError>
+            <includeTestSourceDirectory>true</includeTestSourceDirectory>
+            <linkXRef>false</linkXRef>
+            <consoleOutput>true</consoleOutput>
+            <violationSeverity>warning</violationSeverity>
+          </configuration>
+        </plugin>
+
+        <!-- Eclipse m2e plugin does not "support plugin execution" -->
+        <!-- we need to tell it to ignore the goals -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <inherited>true</inherited>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[2.0,)</versionRange>
+                    <goals>
+                      <goal>copy-dependencies</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>javacc-maven-plugin</artifactId>
+                    <versionRange>[2.6,)</versionRange>
+                    <goals>
+                      <goal>javacc</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>jetty-maven-plugin</artifactId>
+          <version>${jettyVersion}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ftp</artifactId>
+        <version>2.4</version>
+      </extension>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>2.4</version>
+      </extension>
+    </extensions>
+  </build>
+
+  <reporting><!-- TODO --></reporting>
+
+</project>
