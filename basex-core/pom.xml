@@ -2,129 +2,64 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.basex</groupId>
+
   <artifactId>basex</artifactId>
-  <version>7.7.1-SNAPSHOT</version>
-  <name>BaseX</name>
-  <properties>
-    <compileSource>1.6</compileSource>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <project.lib.directory>lib</project.lib.directory>
-  </properties>
-  <licenses>
-    <license>
-      <name>BSD License</name>
-      <url>http://www.opensource.org/licenses/bsd-license.php</url>
-    </license>
-  </licenses>
-  <repositories>
-    <repository>
-      <id>basex</id>
-      <name>BaseX Maven Repository</name>
-      <url>http://files.basex.org/maven</url>
-    </repository>
-    <repository>
-      <id>karatachi</id>
-      <name>Karatachi Maven Repository</name>
-      <url>http://repo.karatachi.org/mvn/</url>
-    </repository>
-    <repository>
-      <id>central</id>
-      <name>Central Maven Repository</name>
-      <url>http://repo2.maven.org/maven2/</url>
-    </repository>
-  </repositories>
-  <organization>
-    <name>BaseX Team</name>
-    <url>http://basex.org</url>
-  </organization>
-  <mailingLists>
-    <mailingList>
-      <name>BaseX Talk</name>
-      <post>basex-talk@mailman.uni-konstanz.de</post>
-      <archive>https://mailman.uni-konstanz.de/mailman/listinfo/basex-talk</archive>
-    </mailingList>
-  </mailingLists>
-  <issueManagement>
-    <system>GitHub Tracker</system>
-    <url>https://github.com/BaseXdb/basex/issues</url>
-  </issueManagement>
+
+  <parent>
+    <groupId>org.basex</groupId>
+    <artifactId>basex-parent</artifactId>
+    <version>7.7.1-SNAPSHOT</version>
+    <relativePath>..</relativePath>
+  </parent>
+
+  <name>BaseX Core</name>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.8.2</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>jp.sourceforge.igo</groupId>
       <artifactId>igo</artifactId>
-      <version>0.4.3</version>
-      <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.apache</groupId>
       <artifactId>lucene-stemmers</artifactId>
-      <version>3.4.0</version>
-      <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.ccil.cowan.tagsoup</groupId>
       <artifactId>tagsoup</artifactId>
-      <version>1.2</version>
-      <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>xml-resolver</groupId>
       <artifactId>xml-resolver</artifactId>
-      <version>1.2</version>
-      <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>jline</groupId>
       <artifactId>jline</artifactId>
-      <version>1.0</version>
-      <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
   </dependencies>
+
   <build>
     <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>javacc-maven-plugin</artifactId>
-        <version>2.6</version>
-        <executions>
-          <execution>
-            <id>javacc</id>
-            <goals>
-              <goal>javacc</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <outputDirectory>src/main/java</outputDirectory>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
         <configuration>
           <archive>
             <manifest>
@@ -140,58 +75,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.15</version>
-        <configuration>
-          <!-- <skipTests>true</skipTests> -->
-          <forkMode>always</forkMode>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.2.1</version>
-        <configuration>
-          <outputDirectory>target</outputDirectory>
-        </configuration>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.8</version>
-        <executions>
-          <execution>
-            <id>copy-libs</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.lib.directory}</outputDirectory>
-              <includeScope>runtime</includeScope>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2.1</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>java</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <mainClass>org.basex.BaseXGUI</mainClass>
         </configuration>
@@ -199,129 +94,20 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
-        <version>2.7</version>
       </plugin>
       <!--<plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9</version>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>-->
-      <!-- Required for openSUSE builds:
-         - rename basex...-src.tar.gz to basex....tar.gz
-         - remove other -src files
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.4</version>
-        <executions>
-          <execution>
-            <id>create-executable-jar</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>src</descriptorRef>
-          </descriptorRefs>
-          <archive>
-            <manifest>
-              <mainClass>org.basex.BaseXGUI</mainClass>
-              <packageName>org.basex</packageName>
-            </manifest>
-          </archive>
-        </configuration>
       </plugin>-->
       <!-- Temporarily removed (takes some time)
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.10</version>
-        <executions>
-          <execution>
-            <phase>test</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
-          <configLocation>.settings/checkstyle.xml</configLocation>
-          <failsOnError>true</failsOnError>
-          <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <excludes>org/basex/query/regex/parse/**.java</excludes>
-          <linkXRef>false</linkXRef>
-          <consoleOutput>true</consoleOutput>
-          <violationSeverity>warning</violationSeverity>
         </configuration>
       </plugin>-->
     </plugins>
-    <!-- Eclipse Maven plugin does not "support copy-dependencies" -->
-    <!-- we need to tell it to ignore the goal -->
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <versionRange>[2.0,)</versionRange>
-                    <goals>
-                      <goal>copy-dependencies</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>javacc-maven-plugin</artifactId>
-                    <versionRange>[2.6,)</versionRange>
-                    <goals>
-                      <goal>javacc</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ftp</artifactId>
-        <version>2.0</version>
-      </extension>
-    </extensions>
   </build>
-  <distributionManagement>
-    <repository>
-      <id>basex.mvn</id>
-      <name>BaseX Maven Repository</name>
-      <url>ftp://basex.org/</url>
-    </repository>
-  </distributionManagement>
 </project>
 
