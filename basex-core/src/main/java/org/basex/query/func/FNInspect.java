@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public class FNInspect extends StandardFunc {
+public final class FNInspect extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info

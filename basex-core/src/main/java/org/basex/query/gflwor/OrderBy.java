@@ -233,7 +233,7 @@ public final class OrderBy extends GFLWOR.Clause {
    * @author BaseX Team 2005-12, BSD License
    * @author Leo Woerteler
    */
-  public static class Key extends Single {
+  public static final class Key extends Single {
     /** Descending order flag. */
     final boolean desc;
     /** Position of empty sort keys. */
