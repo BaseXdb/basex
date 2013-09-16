@@ -285,16 +285,13 @@ public final class GUI extends AGUI {
   void execute() {
     final String in = input.getText().trim();
     final boolean cmd = mode.getSelectedIndex() == 2;
-    if(cmd || in.startsWith("!")) {
-      // run as command: command mode or exclamation mark as first character
-      final int i = cmd ? 0 : 1;
-      if(i == in.length()) return;
-
+    // run as command: command mode or exclamation mark as first character
+    final boolean exc = in.startsWith("!");
+    if(cmd || exc) {
       try {
-        final CommandParser cp = new CommandParser(in.substring(i), context);
-        cp.pwReader(READER);
-
         // parse and execute all commands
+        final CommandParser cp = new CommandParser(in.substring(exc ? 1 : 0), context);
+        cp.pwReader(READER);
         execute(false, cp.parse());
       } catch(final QueryException ex) {
         if(!info.visible()) GUICommands.C_SHOWINFO.execute(this);
@@ -346,6 +343,7 @@ public final class GUI extends AGUI {
     new Thread() {
       @Override
       public void run() {
+        if(cmd.length == 0) info.setInfo("", null, true, true);
         for(final Command c : cmd) if(!exec(c, edit)) break;
       }
     }.start();
