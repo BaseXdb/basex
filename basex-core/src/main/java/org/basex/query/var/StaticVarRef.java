@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class StaticVarRef extends ParseExpr {
+public final class StaticVarRef extends ParseExpr {
   /** Variable name. */
   private final QNm name;
   /** Referenced variable. */
