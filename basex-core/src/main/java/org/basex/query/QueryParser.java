@@ -2080,8 +2080,11 @@ public class QueryParser extends InputParser {
     // ordered expression
     if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE) ||
         wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE)) return enclosed(NOENCLEXPR);
-    // map literal
-    if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE)) return mapLiteral();
+    // map literal (old syntax)
+    if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE)) return mapLiteral(true);
+    // map literal (new syntax)
+    if(consume(BRACE1)) return mapLiteral(false);
+
     // context item
     if(c == '.' && !digit(next())) {
       if(next() == '.') return null;
@@ -2094,17 +2097,18 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses a literal map.
+   * @param old old syntax
    * @return map literal
    * @throws QueryException query exception
    */
-  private Expr mapLiteral() throws QueryException {
-    wsCheck(BRACE1);
-    final ExprList el = new ExprList();
+  private Expr mapLiteral(final boolean old) throws QueryException {
+    if(old) wsCheck(BRACE1);
 
+    final ExprList el = new ExprList();
     if(!wsConsume(BRACE2)) {
       do {
         add(el, check(single(), INVMAPKEY));
-        wsCheck(ASSIGN);
+        wsCheck(old ? ASSIGN : COL);
         add(el, check(single(), INVMAPVAL));
       } while(wsConsume(COMMA));
       wsCheck(BRACE2);
