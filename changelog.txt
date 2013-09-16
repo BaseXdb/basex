@@ -3,6 +3,20 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.7.1 (September 16, 2013) -------------------------------------
+
+ XQUERY
+ - new map syntax: { 'key' : 'value' }
+ - tail call optimization for dynamic functions
+ - optimize fn:subsequence() calls and sequence casts
+ - db:optimize(): original options are preserved
+
+ WEBDAV
+ - return non-breakable spaces as &#xA0;
+
+ CORE
+ - avoid OutOfMemory exception when building large databases
+
 VERSION 7.7 (August 7, 2013) -------------------------------------------
 
  XQUERY
