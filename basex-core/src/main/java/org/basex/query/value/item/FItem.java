@@ -4,6 +4,7 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -26,9 +27,15 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... args)
-      throws QueryException {
-    return invValue(ctx, ii, args).item(ctx, ii);
+  public final Value invValue(final QueryContext ctx, final InputInfo ii,
+      final Value... args) throws QueryException {
+    return FuncCall.callValue(this, args, ctx, ii);
+  }
+
+  @Override
+  public final Item invItem(final QueryContext ctx, final InputInfo ii,
+      final Value... args) throws QueryException {
+    return FuncCall.callItem(this, args, ctx, ii);
   }
 
   /**
@@ -51,11 +58,6 @@ public abstract class FItem extends Item implements XQFunction {
   public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
     throw FIEQ.thrw(ii, description());
-  }
-
-  @Override
-  public Object toJava() throws QueryException {
-    throw Util.notexpected();
   }
 
   @Override

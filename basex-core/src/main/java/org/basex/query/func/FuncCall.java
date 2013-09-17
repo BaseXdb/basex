@@ -45,12 +45,12 @@ public abstract class FuncCall extends Arr {
   @Override
   public final Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return (Item) call(evalFunc(ctx), evalArgs(ctx), ctx, true);
+    return (Item) call(evalFunc(ctx), evalArgs(ctx), true, tailCall, ctx, info);
   }
 
   @Override
   public final Value value(final QueryContext ctx) throws QueryException {
-    return call(evalFunc(ctx), evalArgs(ctx), ctx, false);
+    return call(evalFunc(ctx), evalArgs(ctx), false, tailCall, ctx, info);
   }
 
   @Override
@@ -69,30 +69,33 @@ public abstract class FuncCall extends Arr {
    * @param arg arguments for the call
    * @param ctx query context
    * @param itm flag for requesting a single item
+   * @param tc flag for a tail call
+   * @param ii input info
    * @return result of the function call
    * @throws QueryException query exception
    */
-  private Value call(final XQFunction fun, final Value[] arg,
-      final QueryContext ctx, final boolean itm) throws QueryException {
+  private static Value call(final XQFunction fun, final Value[] arg,
+      final boolean itm, final boolean tc, final QueryContext ctx, final InputInfo ii)
+          throws QueryException {
 
     final int calls = ctx.tailCalls, max = ctx.maxCalls;
-    if(tailCall && max >= 0 && ++ctx.tailCalls >= max) {
+    if(tc && max >= 0 && ++ctx.tailCalls >= max) {
       // there are at least `ctx.maxCalls` tail-calls on the stack, eliminate them
       throw new Continuation(fun, arg);
     }
 
     try {
       // tail-calls are evaluated immediately
-      if(tailCall) return itm ? fun.invItem(ctx, info, arg)
-                              : fun.invValue(ctx, info, arg);
+      if(tc) return itm ? fun.internalInvItem(ctx, ii, arg)
+                        : fun.internalInvValue(ctx, ii, arg);
 
       // non-tail-calls have to catch the continuations and resume from there
       XQFunction func = fun;
       Value[] args = arg;
       for(;;) {
         try {
-          return itm ? func.invItem(ctx, info, args)
-                     : func.invValue(ctx, info, args);
+          return itm ? func.internalInvItem(ctx, ii, args)
+                     : func.internalInvValue(ctx, ii, args);
         } catch(final Continuation c) {
           func = c.getFunc();
           args = c.getArgs();
@@ -100,11 +103,41 @@ public abstract class FuncCall extends Arr {
         }
       }
     } catch(final QueryException ex) {
-      ex.add(info);
+      ex.add(ii);
       throw ex;
     } finally {
       ctx.tailCalls = calls;
     }
+  }
+
+  /**
+   * Calls the given function with the given arguments, returning zero or one item.
+   * This method takes care of tail calls.
+   * @param fun function to call
+   * @param arg arguments to the function
+   * @param ctx query context
+   * @param ii input info
+   * @return the resulting item
+   * @throws QueryException query exception
+   */
+  public static Item callItem(final XQFunction fun, final Value[] arg,
+      final QueryContext ctx, final InputInfo ii) throws QueryException {
+    return (Item) call(fun, arg, true, false, ctx, ii);
+  }
+
+  /**
+   * Calls the given function with the given arguments, returning zero or more items.
+   * This method takes care of tail calls.
+   * @param fun function to call
+   * @param arg arguments to the function
+   * @param ctx query context
+   * @param ii input info
+   * @return the resulting value
+   * @throws QueryException query exception
+   */
+  public static Value callValue(final XQFunction fun, final Value[] arg,
+      final QueryContext ctx, final InputInfo ii) throws QueryException {
+    return call(fun, arg, false, false, ctx, ii);
   }
 
   /**

@@ -34,6 +34,32 @@ public interface XQFunction {
 
   /**
    * Invokes this function with the given arguments.
+   * This method does not deal with tail calls, so it is unsafe to call.
+   * Use {@link #invValue(QueryContext, InputInfo, Value...)} instead.
+   * @param ctx query context
+   * @param ii input info
+   * @param args arguments
+   * @return resulting iterator
+   * @throws QueryException query exception
+   */
+  Value internalInvValue(QueryContext ctx, InputInfo ii, Value... args)
+      throws QueryException;
+
+  /**
+   * Invokes this function with the given arguments.
+   * This method does not deal with tail calls, so it is unsafe to call.
+   * Use {@link #invItem(QueryContext, InputInfo, Value...)} instead.
+   * @param ctx query context
+   * @param ii input info
+   * @param args arguments
+   * @return resulting item
+   * @throws QueryException query exception
+   */
+  Item internalInvItem(QueryContext ctx, InputInfo ii, Value... args)
+      throws QueryException;
+
+  /**
+   * Invokes this function with the given arguments.
    * @param ctx query context
    * @param ii input info
    * @param args arguments
