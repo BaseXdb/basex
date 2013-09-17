@@ -128,4 +128,14 @@ public class TCOTest extends QueryPlanTest {
             "//" + Util.name(DynFuncCall.class) + "[@tailCall eq 'false'])"
     );
   }
+
+  /** Checks if continuations are caught in built-in HOFs. */
+  @Test
+  public void hofCont() {
+    check("declare function local:f($n) { if($n eq 0) then 42 else local:f($n - 1) };" +
+        "fn:for-each(1000, function($x) { local:f($x) })",
+
+        "42"
+    );
+  }
 }
