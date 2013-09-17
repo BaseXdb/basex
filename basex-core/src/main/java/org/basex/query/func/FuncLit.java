@@ -64,6 +64,7 @@ public final class FuncLit extends Single implements Scope {
     final int fp = scope.enter(ctx);
     try {
       expr = expr.compile(ctx, scope);
+      expr.markTailCalls();
     } finally {
       scope.cleanUp(this);
       scope.exit(ctx, fp);

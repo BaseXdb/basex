@@ -163,8 +163,8 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... args)
-      throws QueryException {
+  public Value internalInvValue(final QueryContext ctx, final InputInfo ii,
+      final Value... args) throws QueryException {
 
     // bind variables and cache context
     final StaticContext cs = ctx.sc;
@@ -190,8 +190,8 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... args)
-      throws QueryException {
+  public Item internalInvItem(final QueryContext ctx, final InputInfo ii,
+      final Value... args) throws QueryException {
 
     // bind variables and cache context
     final StaticContext cs = ctx.sc;
@@ -272,6 +272,11 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean compiled() {
     return true;
+  }
+
+  @Override
+  public Object toJava() throws QueryException {
+    throw Util.notexpected();
   }
 
   @Override
