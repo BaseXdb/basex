@@ -884,7 +884,8 @@ public abstract class Data {
    * @param value value
    */
   private void attSize(final int pre, final int kind, final int value) {
-    if(kind == ELEM) table.write1(pre, 0, value << 3 | ELEM);
+    // the magic value 31 is used to signal that there are 31 or more attributes
+    if(kind == ELEM) table.write1(pre, 0, Math.min(value, IO.MAXATTS) << 3 | ELEM);
   }
 
   /**

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.atomic.*;
+import org.basex.io.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
@@ -733,327 +734,342 @@ public final class UpdateTest extends AdvancedQueryTest {
     query("/", "<A><XB/><B><XC/><C/></B><XD/><D/></A>");
   }
 
- /**
-  * Distance caching tested for inserts at different levels.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching2() throws BaseXException {
-   createDB("<A><B><C/></B><D><E/></D></A>");
-   query("insert node <XB/> before //B, insert node <XC/> before //C, " +
-       "insert node <XD/> before //D, insert node <XE/> before //E");
-   query("/", "<A><XB/><B><XC/><C/></B><XD/><D><XE/><E/></D></A>");
- }
+  /**
+   * Distance caching tested for inserts at different levels.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching2() throws BaseXException {
+    createDB("<A><B><C/></B><D><E/></D></A>");
+    query("insert node <XB/> before //B, insert node <XC/> before //C, " +
+        "insert node <XD/> before //D, insert node <XE/> before //E");
+    query("/", "<A><XB/><B><XC/><C/></B><XD/><D><XE/><E/></D></A>");
+  }
 
- /**
-  * Distance caching tested for inserts at different levels.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching3() throws BaseXException {
-   createDB("<A><B><C/><D/></B></A>");
-   query("insert node <XB/> before //B, insert node <XC/> before //C, " +
-       "insert node <XXC/> into //C");
-   query("/", "<A><XB/><B><XC/><C><XXC/></C><D/></B></A>");
- }
+  /**
+   * Distance caching tested for inserts at different levels.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching3() throws BaseXException {
+    createDB("<A><B><C/><D/></B></A>");
+    query("insert node <XB/> before //B, insert node <XC/> before //C, " +
+        "insert node <XXC/> into //C");
+    query("/", "<A><XB/><B><XC/><C><XXC/></C><D/></B></A>");
+  }
 
- /**
-  * Distance caching tested for inserts at different levels.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching4() throws BaseXException {
-   createDB("<A><B><C/><D/></B><E/></A>");
-   query("insert node <XB/> before //B, insert node <XC/> before //C, " +
-       "insert node <XXC/> into //C");
-   query("/", "<A><XB/><B><XC/><C><XXC/></C><D/></B><E/></A>");
- }
+  /**
+   * Distance caching tested for inserts at different levels.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching4() throws BaseXException {
+    createDB("<A><B><C/><D/></B><E/></A>");
+    query("insert node <XB/> before //B, insert node <XC/> before //C, " +
+        "insert node <XXC/> into //C");
+    query("/", "<A><XB/><B><XC/><C><XXC/></C><D/></B><E/></A>");
+  }
 
- /**
-  * Distance caching tested for inserts at different levels.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching5() throws BaseXException {
-   createDB("<A><B><C/></B></A>");
-   query("insert node <XB/> before //B, insert node <XC/> before //C");
-   query("/", "<A><XB/><B><XC/><C/></B></A>");
- }
+  /**
+   * Distance caching tested for inserts at different levels.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching5() throws BaseXException {
+    createDB("<A><B><C/></B></A>");
+    query("insert node <XB/> before //B, insert node <XC/> before //C");
+    query("/", "<A><XB/><B><XC/><C/></B></A>");
+  }
 
- /**
-  * Distance caching tested for simple deletes.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching6() throws BaseXException {
-   createDB("<A><B/><C/></A>");
-   query("delete node //B");
-   query("/", "<A><C/></A>");
- }
+  /**
+   * Distance caching tested for simple deletes.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching6() throws BaseXException {
+    createDB("<A><B/><C/></A>");
+    query("delete node //B");
+    query("/", "<A><C/></A>");
+  }
 
- /**
-  * Distance caching tested for simple deletes.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching7() throws BaseXException {
-   createDB("<A><B/><C/><D/><E/></A>");
-   query("delete node (//B,//D)");
-   query("/", "<A><C/><E/></A>");
- }
+  /**
+   * Distance caching tested for simple deletes.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching7() throws BaseXException {
+    createDB("<A><B/><C/><D/><E/></A>");
+    query("delete node (//B,//D)");
+    query("/", "<A><C/><E/></A>");
+  }
 
- /**
-  * Distance caching tested for deletes at different levels.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching8() throws BaseXException {
-   createDB("<A><B/><C><D/><E/></C></A>");
-   query("delete node (//B,//D)");
-   query("/", "<A><C><E/></C></A>");
- }
+  /**
+   * Distance caching tested for deletes at different levels.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching8() throws BaseXException {
+    createDB("<A><B/><C><D/><E/></C></A>");
+    query("delete node (//B,//D)");
+    query("/", "<A><C><E/></C></A>");
+  }
 
- /**
-  * Distance caching tested for deletes at different levels.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching9() throws BaseXException {
-   createDB("<A><B/><C><D/><E/><F/></C></A>");
-   query("delete node (//B,//D)");
-   query("/", "<A><C><E/><F/></C></A>");
- }
+  /**
+   * Distance caching tested for deletes at different levels.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching9() throws BaseXException {
+    createDB("<A><B/><C><D/><E/><F/></C></A>");
+    query("delete node (//B,//D)");
+    query("/", "<A><C><E/><F/></C></A>");
+  }
 
- /**
-  * Distance caching tested for deletes at different levels.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching10() throws BaseXException {
-   createDB("<A><B/><C><D/><E/></C><F/></A>");
-   query("delete node (//B,//D)");
-   query("/", "<A><C><E/></C><F/></A>");
- }
+  /**
+   * Distance caching tested for deletes at different levels.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching10() throws BaseXException {
+    createDB("<A><B/><C><D/><E/></C><F/></A>");
+    query("delete node (//B,//D)");
+    query("/", "<A><C><E/></C><F/></A>");
+  }
 
- /**
-  * Distance caching tested for deletes at different levels.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching11() throws BaseXException {
-   createDB("<A><B/><C/><D/><E/></A>");
-   query("delete node (//C,//D)");
-   query("/", "<A><B/><E/></A>");
- }
+  /**
+   * Distance caching tested for deletes at different levels.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching11() throws BaseXException {
+    createDB("<A><B/><C/><D/><E/></A>");
+    query("delete node (//C,//D)");
+    query("/", "<A><B/><E/></A>");
+  }
 
- /**
-  * Distance caching tested for deletes at different levels.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching12() throws BaseXException {
-   createDB("<A><B/><C/><D/><E/></A>");
-   query("delete node (//B, //C), insert node <CNEW><X/></CNEW> before //D");
-   query("/", "<A><CNEW><X/></CNEW><D/><E/></A>");
- }
+  /**
+   * Distance caching tested for deletes at different levels.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching12() throws BaseXException {
+    createDB("<A><B/><C/><D/><E/></A>");
+    query("delete node (//B, //C), insert node <CNEW><X/></CNEW> before //D");
+    query("/", "<A><CNEW><X/></CNEW><D/><E/></A>");
+  }
 
- /**
-  * Distance caching tested for deletes at different levels.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching13() throws BaseXException {
-   createDB("<A><B><C/><D/></B></A>");
-   query("insert node <X/> into //C," +
-       "insert node <X><Y/></X> before //C," +
-       "insert node <X/> after //D");
-   query("/", "<A><B><X><Y/></X><C><X/></C><D/><X/></B></A>");
- }
+  /**
+   * Distance caching tested for deletes at different levels.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching13() throws BaseXException {
+    createDB("<A><B><C/><D/></B></A>");
+    query("insert node <X/> into //C," +
+        "insert node <X><Y/></X> before //C," +
+        "insert node <X/> after //D");
+    query("/", "<A><B><X><Y/></X><C><X/></C><D/><X/></B></A>");
+  }
 
- /**
-  * Distance caching tested for neighboring inserts.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching14() throws BaseXException {
-   createDB("<A><B><C/><D/></B></A>");
-   query("insert node <X><Y/></X> into //C," +
-       "insert node <X><Y/></X> before //C," +
-       "insert node <X><Y/></X> after //D");
-   query("/", "<A><B><X><Y/></X><C><X><Y/></X></C><D/><X><Y/></X></B></A>");
- }
+  /**
+   * Distance caching tested for neighboring inserts.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching14() throws BaseXException {
+    createDB("<A><B><C/><D/></B></A>");
+    query("insert node <X><Y/></X> into //C," +
+        "insert node <X><Y/></X> before //C," +
+        "insert node <X><Y/></X> after //D");
+    query("/", "<A><B><X><Y/></X><C><X><Y/></X></C><D/><X><Y/></X></B></A>");
+  }
 
- /**
-  * Distance caching tested for neighboring inserts.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching15() throws BaseXException {
-   createDB("<A><B/><C/></A>");
-   query("insert node <X2/> before //C," +
-       "insert node <X1/> after //B");
-   query("/", "<A><B/><X1/><X2/><C/></A>");
- }
+  /**
+   * Distance caching tested for neighboring inserts.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching15() throws BaseXException {
+    createDB("<A><B/><C/></A>");
+    query("insert node <X2/> before //C," +
+        "insert node <X1/> after //B");
+    query("/", "<A><B/><X1/><X2/><C/></A>");
+  }
 
- /**
-  * Distance caching tested for neighboring inserts.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching16() throws BaseXException {
-   createDB("<A><B/><C><D/></C><E/></A>");
-   query("insert node <X1/> into //C," +
-       "insert node <X2/> as last into //C");
-   query("/", "<A><B/><C><D/><X1/><X2/></C><E/></A>");
- }
+  /**
+   * Distance caching tested for neighboring inserts.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching16() throws BaseXException {
+    createDB("<A><B/><C><D/></C><E/></A>");
+    query("insert node <X1/> into //C," +
+        "insert node <X2/> as last into //C");
+    query("/", "<A><B/><C><D/><X1/><X2/></C><E/></A>");
+  }
 
- /**
-  * Tests if pre cache is clear / free of ambiguous entries.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching17() throws BaseXException {
-   createDB("<A><B/><C/><D/></A>");
-   query("insert node <X/> after //B, delete node //C");
-   query("/", "<A><B/><X/><D/></A>");
- }
+  /**
+   * Tests if pre cache is clear / free of ambiguous entries.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching17() throws BaseXException {
+    createDB("<A><B/><C/><D/></A>");
+    query("insert node <X/> after //B, delete node //C");
+    query("/", "<A><B/><X/><D/></A>");
+  }
 
- /**
-  * Tests if pre cache is clear / free of ambiguous entries.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching18() throws BaseXException {
-   createDB("<A><B/><C/><D/></A>");
-   query("insert node <X/> before //D, delete node //C");
-   query("/", "<A><B/><X/><D/></A>");
- }
+  /**
+   * Tests if pre cache is clear / free of ambiguous entries.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching18() throws BaseXException {
+    createDB("<A><B/><C/><D/></A>");
+    query("insert node <X/> before //D, delete node //C");
+    query("/", "<A><B/><X/><D/></A>");
+  }
 
- /**
-  * Tests if pre cache is clear / free of ambiguous entries.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching19() throws BaseXException {
-   createDB("<A><B/><C/><D/></A>");
-   query("replace node //C with <X/>");
-   query("/", "<A><B/><X/><D/></A>");
- }
+  /**
+   * Tests if pre cache is clear / free of ambiguous entries.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching19() throws BaseXException {
+    createDB("<A><B/><C/><D/></A>");
+    query("replace node //C with <X/>");
+    query("/", "<A><B/><X/><D/></A>");
+  }
 
- /**
-  * Testing cached distance updates.
-  */
- @Test
- public void distanceCaching20() {
-   query("copy $c := <n><a/><a/><a/><a/><a/></n> " +
-       "modify (replace node ($c//a)[1] with <b/>, " +
-       "replace node ($c//a)[2] with <b/>, " +
-       "insert node <c/> into ($c//a)[3], " +
-       "replace node ($c//a)[4] with <b/>, " +
-       "replace node ($c//a)[5] with <b/>) " +
-       "return $c");
- }
+  /**
+   * Testing cached distance updates.
+   */
+  @Test
+  public void distanceCaching20() {
+    query("copy $c := <n><a/><a/><a/><a/><a/></n> " +
+        "modify (replace node ($c//a)[1] with <b/>, " +
+        "replace node ($c//a)[2] with <b/>, " +
+        "insert node <c/> into ($c//a)[3], " +
+        "replace node ($c//a)[4] with <b/>, " +
+        "replace node ($c//a)[5] with <b/>) " +
+        "return $c");
+  }
 
- /**
-  * Testing cached distance updates. Insert + replace statement on the same
-  * target node.
-  */
- @Test
- public void distanceCaching21() {
-   query("copy $c := <n><a/><a/><a/><a/><a/></n> " +
-       "modify (replace node ($c//a)[1] with <b/>, " +
-       "replace node ($c//a)[2] with <b/>, " +
-       "insert node <c/> into ($c//a)[3], " +
-       "replace node ($c//a)[4] with <b/>, " +
-       "replace node ($c//a)[5] with <b/>) " +
-       "return $c");
- }
+  /**
+   * Testing cached distance updates. Insert + replace statement on the same
+   * target node.
+   */
+  @Test
+  public void distanceCaching21() {
+    query("copy $c := <n><a/><a/><a/><a/><a/></n> " +
+        "modify (replace node ($c//a)[1] with <b/>, " +
+        "replace node ($c//a)[2] with <b/>, " +
+        "insert node <c/> into ($c//a)[3], " +
+        "replace node ($c//a)[4] with <b/>, " +
+        "replace node ($c//a)[5] with <b/>) " +
+        "return $c");
+  }
 
- /**
-  * Testing distance caching when a node is deleted and there have been updates on the
-  * descendant axis. Tests effect on following nodes.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching22() throws BaseXException {
-   createDB("<A><B><C/><D/></B><E/></A>");
-   query("insert node <X/> into //D, delete node //B");
-   query("/", "<A><E/></A>");
- }
+  /**
+   * Testing distance caching when a node is deleted and there have been updates on the
+   * descendant axis. Tests effect on following nodes.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching22() throws BaseXException {
+    createDB("<A><B><C/><D/></B><E/></A>");
+    query("insert node <X/> into //D, delete node //B");
+    query("/", "<A><E/></A>");
+  }
 
- /**
-  * Tests if updates are executed in the correct order and if the sorting of updates
-  * is stable.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching23() throws BaseXException {
-   createDB("<A><B/></A>");
-   query("insert node <P2/> into //B, insert node <P3/> into //A");
-   query("/", "<A><B><P2/></B><P3/></A>");
- }
+  /**
+   * Tests if updates are executed in the correct order and if the sorting of updates
+   * is stable.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching23() throws BaseXException {
+    createDB("<A><B/></A>");
+    query("insert node <P2/> into //B, insert node <P3/> into //A");
+    query("/", "<A><B><P2/></B><P3/></A>");
+  }
 
- /**
-  * Tests if reordering of updates works correctly.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching24() throws BaseXException {
-   createDB("<A><B/><C/><D/><E/></A>");
-   query("insert node <X/> into //B, delete node //C");
-   query("/", "<A><B><X/></B><D/><E/></A>");
- }
+  /**
+   * Tests if reordering of updates works correctly.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching24() throws BaseXException {
+    createDB("<A><B/><C/><D/><E/></A>");
+    query("insert node <X/> into //B, delete node //C");
+    query("/", "<A><B><X/></B><D/><E/></A>");
+  }
 
- /**
-  * Tests if reordering of updates works correctly.
-  * @throws BaseXException excp
-  */
- @Test
- public void distanceCaching25() throws BaseXException {
-   createDB("<A><B><C/></B><D/><E/></A>");
-   query("insert node <X/> into //B, delete node //C");
-   query("/", "<A><B><X/></B><D/><E/></A>");
- }
+  /**
+   * Tests if reordering of updates works correctly.
+   * @throws BaseXException excp
+   */
+  @Test
+  public void distanceCaching25() throws BaseXException {
+    createDB("<A><B><C/></B><D/><E/></A>");
+    query("insert node <X/> into //B, delete node //C");
+    query("/", "<A><B><X/></B><D/><E/></A>");
+  }
 
- /**
-  * Tests if side-effecting updates within transform expressions are rejected.
-  * Also includes db:output() and fn:put().
-  */
- @Test
- public void dbUpdateTransform() {
-   error("copy $c := <a/> modify db:output('x') return $c", Err.BASX_DBTRANSFORM);
-   error("copy $c := <a/> modify db:add('" + NAME + "','<x/>','x.xml') return $c",
-       Err.BASX_DBTRANSFORM);
-   error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", Err.BASX_DBTRANSFORM);
- }
+  /**
+   * Tests if side-effecting updates within transform expressions are rejected.
+   * Also includes db:output() and fn:put().
+   */
+  @Test
+  public void dbUpdateTransform() {
+    error("copy $c := <a/> modify db:output('x') return $c", Err.BASX_DBTRANSFORM);
+    error("copy $c := <a/> modify db:add('" + NAME + "','<x/>','x.xml') return $c",
+        Err.BASX_DBTRANSFORM);
+    error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", Err.BASX_DBTRANSFORM);
+  }
 
- /**
-  * Replaces a node with two others.
-  */
- @Test
- public void duplAttribute() {
-   query("replace node document { <A><B/></A> }//B with (<X/>, <X/>)");
- }
+  /**
+   * Replaces a node with two others.
+   */
+  @Test
+  public void duplAttribute() {
+    query("replace node document { <A><B/></A> }//B with (<X/>, <X/>)");
+  }
 
- /**
-  * Inserts attributes.
-  */
- @Test
- public void attributeInserts() {
-   // Issue #736
-   query("declare namespace x='x';" +
-       "let $x := <n01><n/><n/></n01> " +
-       "for $n in $x//n " +
-       "for $i in 1 to 16 " +
-       "return insert node attribute {concat('x:', 'att', $i)} {} into  $n");
- }
+  /**
+   * Inserts attributes.
+   */
+  @Test
+  public void attributeInserts() {
+    // Issue #736
+    query("declare namespace x='x';" +
+        "let $x := <n01><n/><n/></n01> " +
+        "for $n in $x//n " +
+        "for $i in 1 to 16 " +
+        "return insert node attribute {concat('x:', 'att', $i)} {} into  $n");
+  }
 
- /**
-  * Tests the combination of transform expressions and xquery:eval().
-  */
- @Test
- public void evalFItem() {
-   query("declare function local:c() { copy $a := <a/> modify () return $a };" +
-     "xquery:eval('$c()', map { 'c' := local:c#0 })", "<a/>");
- }
+  /**
+   * Tests the combination of transform expressions and xquery:eval().
+   */
+  @Test
+  public void evalFItem() {
+    query("declare function local:c() { copy $a := <a/> modify () return $a };" +
+      "xquery:eval('$c()', map { 'c' := local:c#0 })", "<a/>");
+  }
+
+  /** Tests adding an attribute and thus crossing the {@link IO#MAXATTS} line (GH-752). */
+  @Test
+  public void insertAttrMaxAtt() {
+    query(
+        transform(
+            "<x a01='' a02='' a03='' a04='' a05='' a06='' a07='' a08='' a09='' a10=''" +
+            "   a11='' a12='' a13='' a14='' a15='' a16='' a17='' a18='' a19='' a20=''" +
+            "   a21='' a22='' a23='' a24='' a25='' a26='' a27='' a28='' a29='' a30=''/>",
+            "insert node attribute { 'b' } { '' } into $input",
+            "count($input/@*)"
+        ),
+        "31"
+    );
+  }
 }
