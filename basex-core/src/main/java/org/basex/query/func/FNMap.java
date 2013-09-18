@@ -49,7 +49,7 @@ public final class FNMap extends StandardFunc {
       case _MAP_NEW:       return newMap(ctx, ii);
       case _MAP_ENTRY:     return entry(ctx, ii);
       case _MAP_CONTAINS:  return contains(ctx, ii);
-      case _MAP_SIZE:      return map(ctx).mapSize();
+      case _MAP_SIZE:      return Int.get(map(ctx).mapSize());
       case _MAP_REMOVE:    return remove(ctx, ii);
       case _MAP_COLLATION: return map(ctx).collation();
       default:             return super.item(ctx, ii);

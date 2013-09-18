@@ -163,7 +163,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Item internalInvItem(final QueryContext ctx, final InputInfo ii,
+  public Item invItem(final QueryContext ctx, final InputInfo ii,
       final Value... arg) throws QueryException {
 
     // reset context and evaluate function
@@ -186,7 +186,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Value internalInvValue(final QueryContext ctx, final InputInfo ii,
+  public Value invValue(final QueryContext ctx, final InputInfo ii,
       final Value... arg) throws QueryException {
     // reset context and evaluate function
     final Value cv = ctx.value;
@@ -207,15 +207,15 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... arg)
+  public Value invokeValue(final QueryContext ctx, final InputInfo ii, final Value... arg)
       throws QueryException {
-    return FuncCall.callValue(this, arg, ctx, ii);
+    return FuncCall.value(this, arg, ctx, ii);
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... arg)
+  public Item invokeItem(final QueryContext ctx, final InputInfo ii, final Value... arg)
       throws QueryException {
-    return FuncCall.callItem(this, arg, ctx, ii);
+    return FuncCall.item(this, arg, ctx, ii);
   }
 
   /**

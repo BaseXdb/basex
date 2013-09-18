@@ -31,8 +31,6 @@ public final class Map extends FItem {
   private final TrieNode root;
   /** Key sequence. */
   private Value keys;
-  /** Size. */
-  private Int size;
 
   /**
    * Constructor.
@@ -59,13 +57,13 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Item internalInvItem(final QueryContext ctx, final InputInfo ii,
+  public Item invItem(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
     return get(args[0].item(ctx, ii), ii).item(ctx, ii);
   }
 
   @Override
-  public Value internalInvValue(final QueryContext ctx, final InputInfo ii,
+  public Value invValue(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
     return get(args[0].item(ctx, ii), ii);
   }
@@ -157,8 +155,8 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Map coerceTo(final FuncType ft, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
+  public Map coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
 
     if(!(ft instanceof MapType) || !hasType((MapType) ft)) throw cast(ii, ft, this);
     return this;
@@ -185,9 +183,8 @@ public final class Map extends FItem {
    * Number of values contained in this map.
    * @return size
    */
-  public Int mapSize() {
-    if(size == null) size = Int.get(root.size);
-    return size;
+  public int mapSize() {
+    return root.size;
   }
 
   /**
@@ -266,11 +263,11 @@ public final class Map extends FItem {
 
   @Override
   public void plan(final FElem plan) {
-    final long s = mapSize().itr();
+    final int s = mapSize();
     final FElem el = planElem(SIZE, s);
     final Value ks = keys();
     try {
-      final long max = Math.min(s, 5);
+      final int max = Math.min(s, 5);
       for(long i = 0; i < max; i++) {
         final Item key = ks.itemAt(i);
         final Value val = get(key, null);

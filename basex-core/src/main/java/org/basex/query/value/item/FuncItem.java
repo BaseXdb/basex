@@ -163,7 +163,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Value internalInvValue(final QueryContext ctx, final InputInfo ii,
+  public Value invValue(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
     // bind variables and cache context
@@ -190,7 +190,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public Item internalInvItem(final QueryContext ctx, final InputInfo ii,
+  public Item invItem(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
     // bind variables and cache context

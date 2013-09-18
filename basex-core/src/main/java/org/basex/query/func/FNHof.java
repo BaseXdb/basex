@@ -85,7 +85,7 @@ public final class FNHof extends StandardFunc {
     final Iter xs = expr[0].iter(ctx);
 
     Value sum = checkNoEmpty(xs.next());
-    for(Item x; (x = xs.next()) != null;) sum = f.invValue(ctx, info, sum, x);
+    for(Item x; (x = xs.next()) != null;) sum = f.invokeValue(ctx, info, sum, x);
     return sum;
   }
 
@@ -118,8 +118,8 @@ public final class FNHof extends StandardFunc {
     final FItem pred = withArity(0, 1, ctx);
     final FItem fun = withArity(1, 1, ctx);
     Value v = ctx.value(expr[2]);
-    while(!checkBln(checkNoEmpty(pred.invItem(ctx, info, v)), ctx)) {
-      v = fun.invValue(ctx, info, v);
+    while(!checkBln(checkNoEmpty(pred.invokeItem(ctx, info, v)), ctx)) {
+      v = fun.invokeValue(ctx, info, v);
     }
     return v;
   }
@@ -150,7 +150,7 @@ public final class FNHof extends StandardFunc {
 
     try {
       for(Item it; (it = iter.next()) != null;) {
-        heap.insert(checkNoEmpty(getKey.invItem(ctx, info, it)), it);
+        heap.insert(checkNoEmpty(getKey.invokeItem(ctx, info, it)), it);
         if(heap.size() > k) heap.removeMin();
       }
     } catch(final QueryRTException ex) { throw ex.getCause(); }
@@ -202,7 +202,7 @@ public final class FNHof extends StandardFunc {
       @Override
       public int compare(final Item a, final Item b) {
         try {
-          return checkType(lt.invItem(ctx, info, a == null ? Empty.SEQ : a,
+          return checkType(lt.invokeItem(ctx, info, a == null ? Empty.SEQ : a,
               b == null ? Empty.SEQ : b), AtomType.BLN).bool(info) ? -1 : 1;
         } catch(final QueryException qe) {
           throw new QueryRTException(qe);

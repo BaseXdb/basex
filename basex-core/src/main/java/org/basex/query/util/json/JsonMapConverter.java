@@ -85,7 +85,7 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
 
   @Override
   public void openArrayEntry() {
-    stack.push(Int.get(((Map) stack.peek()).mapSize().itr() + 1));
+    stack.push(Int.get(((Map) stack.peek()).mapSize() + 1));
   }
 
   @Override

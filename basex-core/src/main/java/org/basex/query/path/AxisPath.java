@@ -65,7 +65,7 @@ public abstract class AxisPath extends Path {
         // or if last step uses attribute axis
         case DESC: case DESCORSELF: case FOLL: case FOLLSIBL:
           return s + 1 == sl || s + 2 == sl && step(s + 1).axis == Axis.ATTR;
-        // allow iteration for CHILD, ATTR, PARENT and SELF
+        // allow iteration for CHILD, ATTR, PARENT and SELF axes
         default:
       }
     }

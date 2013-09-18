@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public abstract class FuncCall extends Arr {
   /** Tail-call flag. */
-  boolean tailCall;
+  protected boolean tailCall;
 
   /**
    * Constructor.
@@ -45,12 +45,12 @@ public abstract class FuncCall extends Arr {
   @Override
   public final Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return (Item) call(evalFunc(ctx), evalArgs(ctx), true, tailCall, ctx, info);
+    return (Item) invoke(evalFunc(ctx), evalArgs(ctx), true, tailCall, ctx, info);
   }
 
   @Override
   public final Value value(final QueryContext ctx) throws QueryException {
-    return call(evalFunc(ctx), evalArgs(ctx), false, tailCall, ctx, info);
+    return invoke(evalFunc(ctx), evalArgs(ctx), false, tailCall, ctx, info);
   }
 
   @Override
@@ -74,7 +74,7 @@ public abstract class FuncCall extends Arr {
    * @return result of the function call
    * @throws QueryException query exception
    */
-  private static Value call(final XQFunction fun, final Value[] arg,
+  private static Value invoke(final XQFunction fun, final Value[] arg,
       final boolean itm, final boolean tc, final QueryContext ctx, final InputInfo ii)
           throws QueryException {
 
@@ -86,19 +86,19 @@ public abstract class FuncCall extends Arr {
 
     try {
       // tail-calls are evaluated immediately
-      if(tc) return itm ? fun.internalInvItem(ctx, ii, arg)
-                        : fun.internalInvValue(ctx, ii, arg);
+      if(tc) return itm ? fun.invItem(ctx, ii, arg)
+                        : fun.invValue(ctx, ii, arg);
 
       // non-tail-calls have to catch the continuations and resume from there
       XQFunction func = fun;
       Value[] args = arg;
       for(;;) {
         try {
-          return itm ? func.internalInvItem(ctx, ii, args)
-                     : func.internalInvValue(ctx, ii, args);
+          return itm ? func.invItem(ctx, ii, args)
+                     : func.invValue(ctx, ii, args);
         } catch(final Continuation c) {
-          func = c.getFunc();
-          args = c.getArgs();
+          func = c.func;
+          args = c.args;
           ctx.tailCalls = calls;
         }
       }
@@ -120,9 +120,9 @@ public abstract class FuncCall extends Arr {
    * @return the resulting item
    * @throws QueryException query exception
    */
-  public static Item callItem(final XQFunction fun, final Value[] arg,
+  public static Item item(final XQFunction fun, final Value[] arg,
       final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return (Item) call(fun, arg, true, false, ctx, ii);
+    return (Item) invoke(fun, arg, true, false, ctx, ii);
   }
 
   /**
@@ -135,16 +135,16 @@ public abstract class FuncCall extends Arr {
    * @return the resulting value
    * @throws QueryException query exception
    */
-  public static Value callValue(final XQFunction fun, final Value[] arg,
+  public static Value value(final XQFunction fun, final Value[] arg,
       final QueryContext ctx, final InputInfo ii) throws QueryException {
-    return call(fun, arg, false, false, ctx, ii);
+    return invoke(fun, arg, false, false, ctx, ii);
   }
 
   /**
    * A continuation that's thrown to free stack frames.
    * @author Leo Woerteler
    */
-  private static class Continuation extends RuntimeException {
+  private static final class Continuation extends RuntimeException {
     /** The function to call. */
     private final XQFunction func;
     /** The arguments to call the function with. */
@@ -155,25 +155,9 @@ public abstract class FuncCall extends Arr {
      * @param fun function to call
      * @param arg arguments to the function
      */
-    public Continuation(final XQFunction fun, final Value[] arg) {
+    private Continuation(final XQFunction fun, final Value[] arg) {
       func = fun;
       args = arg;
-    }
-
-    /**
-     * Getter for the function to call.
-     * @return the function
-     */
-    public XQFunction getFunc() {
-      return func;
-    }
-
-    /**
-     * Getter for the function arguments.
-     * @return the arguments
-     */
-    public Value[] getArgs() {
-      return args;
     }
 
     @Override

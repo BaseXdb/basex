@@ -179,7 +179,7 @@ public final class Unit {
    */
   private void eval(final StaticFunc fn) throws QueryException {
     current = fn;
-    final Iter ir = fn.invValue(ctx, info).iter();
+    final Iter ir = fn.invokeValue(ctx, info).iter();
     for(Item it; (it = ir.next()) != null;) it.materialize(info);
   }
 

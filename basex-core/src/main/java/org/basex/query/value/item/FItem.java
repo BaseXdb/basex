@@ -27,15 +27,15 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public final Value invValue(final QueryContext ctx, final InputInfo ii,
+  public final Value invokeValue(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
-    return FuncCall.callValue(this, args, ctx, ii);
+    return FuncCall.value(this, args, ctx, ii);
   }
 
   @Override
-  public final Item invItem(final QueryContext ctx, final InputInfo ii,
+  public final Item invokeItem(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
-    return FuncCall.callItem(this, args, ctx, ii);
+    return FuncCall.item(this, args, ctx, ii);
   }
 
   /**

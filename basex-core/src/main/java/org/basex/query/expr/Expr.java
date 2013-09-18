@@ -291,9 +291,9 @@ public abstract class Expr extends ExprInfo {
   public abstract SeqType type();
 
   /**
-   * Returns true if the expression is iterable, i.e., if it will not contain any
-   * duplicate nodes and if all nodes will be are sorted. The return value of this method
-   * is only relevant for node sequences. It is e.g. called by {@link AxisPath}.
+   * Indicates if the items returned by this expression are iterable, i.e., if returned
+   * node are in document order and contain no duplicates.
+   * It is e.g. called by {@link AxisPath}.
    * @return result of check
    */
   public boolean iterable() {
@@ -398,6 +398,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Counts the number of expressions in this expression's sub-tree.
+   * This method is e.g. called by {@link StaticFunc#inline} to check if an expression
+   * is small enough to be inlined.
    * @return number of expressions
    */
   public abstract int exprSize();
