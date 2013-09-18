@@ -78,8 +78,8 @@ public final class FNFormat extends StandardFunc {
     // retrieve picture
     final byte[] pic = checkStr(expr[1], ctx);
     // retrieve format declaration
-    final byte[] name = expr.length == 3 ? trim(checkEStr(expr[2], ctx)) : EMPTY;
-    final QNm frm = new QNm(name, ctx);
+    final QNm frm = expr.length == 3 ? new QNm(trim(checkEStr(expr[2], ctx)), ctx) :
+      new QNm(EMPTY);
     final DecFormatter df = ctx.sc.decFormats.get(frm.id());
     if(df == null) throw FORMNUM.thrw(info, frm);
 
