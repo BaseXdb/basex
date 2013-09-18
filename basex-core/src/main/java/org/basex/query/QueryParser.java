@@ -2172,20 +2172,7 @@ public class QueryParser extends InputParser {
     // literals
     if(digit(c) || c == '.') return numericLiteral(false);
     // strings
-    if(!quote(c)) return null;
-
-    final int i = pos;
-    final byte[] s = stringLiteral();
-    final int p2 = pos;
-    if(consume(':')) {
-      // check for EQName
-      if(!consume('=')) {
-        pos = i;
-        return null;
-      }
-      pos = p2;
-    }
-    return Str.get(s);
+    return quote(c) ? Str.get(stringLiteral()) : null;
   }
 
   /**
