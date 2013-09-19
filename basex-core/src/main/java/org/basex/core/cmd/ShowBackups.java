@@ -20,7 +20,7 @@ public final class ShowBackups extends ABackup {
   @Override
   protected boolean run() throws IOException {
     final Table table = new Table();
-    table.description = BACKUPS;
+    table.description = BACKUPS_X;
     table.header.add(NAME);
     table.header.add(SIZE);
 

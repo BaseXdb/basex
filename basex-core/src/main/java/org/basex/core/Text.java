@@ -1122,6 +1122,8 @@ public interface Text {
 
   /** Users. */
   String USERS = lang("users");
+  /** Users. */
+  String USERS_X = lang("users_%");
   /** Confirmation . */
   String ARE_YOU_SURE = lang("are_you_sure");
 
@@ -1131,8 +1133,12 @@ public interface Text {
   String INVALID_X = lang("invalid_%");
   /** Databases. */
   String DATABASES = lang("databases");
+  /** Databases. */
+  String DATABASES_X = lang("databases_%");
   /** Backups. */
   String BACKUPS = lang("backups");
+  /** Backup(s). */
+  String BACKUPS_X = lang("backups_%");
   /** Line number. */
   String LINE_NUMBER = lang("line_number");
 

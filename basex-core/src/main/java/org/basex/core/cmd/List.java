@@ -61,7 +61,7 @@ public final class List extends Command {
    */
   private boolean list() throws IOException {
     final Table table = new Table();
-    table.description = DATABASES;
+    table.description = DATABASES_X;
 
     final boolean create = context.user.has(Perm.CREATE);
     table.header.add(T_NAME);

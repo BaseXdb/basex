@@ -175,7 +175,7 @@ public final class Users {
    */
   public synchronized Table info(final Users users) {
     final Table table = new Table();
-    table.description = USERS;
+    table.description = USERS_X;
 
     final int sz = file == null ? 3 : 5;
     for(int u = 0; u < sz; ++u) table.header.add(USERHEAD[u]);

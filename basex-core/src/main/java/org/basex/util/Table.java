@@ -165,7 +165,7 @@ public final class Table {
       tb.add(NL);
     }
     if(description != null) {
-      tb.add(NL).add(contents.size() + " " + description + DOT);
+      tb.add(NL).addExt(description, contents.size()).add(DOT);
     }
     return tb.finish();
   }
