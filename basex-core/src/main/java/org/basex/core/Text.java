@@ -160,8 +160,6 @@ public interface Text {
   String TIMEOUT_EXCEEDED = lang("timeout_exceeded");
   /** Connection error. */
   String CONNECTION_ERROR = lang("connection_error");
-  /** Query has already been executed. */
-  String ALREADY_EXECUTED = lang("already_executed");
   /** Access denied. */
   String ACCESS_DENIED = lang("access_denied");
   /** User name. */
@@ -558,8 +556,6 @@ public interface Text {
   String DB_NOT_RESTORED_X = lang("db_not_restored_%");
   /** Database opened. */
   String DB_OPENED_X = lang("db_opened_%");
-  /** Database not opened. */
-  String DB_NOT_OPENED_X = lang("db_not_opened_%");
   /** Database exported. */
   String DB_EXPORTED_X = lang("db_exported_%");
   /** Database not deleted. */
@@ -646,10 +642,6 @@ public interface Text {
   String STOPPED_AT = lang("stopped_at") + ' ';
   /** Line info. */
   String LINE_X = lang("line_%");
-  /** Column info. */
-  String COLUMN_X = lang("column_%");
-  /** File info. */
-  String IN_FILE_X = lang("in_file_%");
 
   /** Query hits. */
   String ITEM = "Item";
@@ -933,8 +925,6 @@ public interface Text {
   String SAVE_AS = lang("save_as");
   /** Command info. */
   String PACKAGES = lang("packages");
-  /** Command info. */
-  String TEXT = lang("text");
 
   /** Command info. */
   String FONTS_D = lang("fonts") + DOTS;
@@ -1229,6 +1219,8 @@ public interface Text {
   String MAP_LAYOUT = lang("map_layout");
   /** Show attributes. */
   String SHOW_ATTS = lang("show_atts");
+  /** Algorithm. */
+  String ALGORITHM = lang("algorithm");
   /** Predefined number of layouts. */
   String[] MAP_CHOICES = {
     lang("map_choice1"), lang("map_choice2"), lang("map_choice3"),
@@ -1236,10 +1228,7 @@ public interface Text {
   };
 
   /** Predefined number of layouts. */
-  String[] MAP_LAYOUTS = {
-    "Split Layout", "Strip Layout", "Squarified Layout",
-    "Slice&Dice Layout", "Binary Layout"
-  };
+  String[] MAP_LAYOUTS = { "Split", "Strip", "Squarified", "Slice & Dice", "Binary" };
 
   /** Map layout-algorithm. */
   String OFFSETS = lang("offsets");

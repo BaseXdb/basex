@@ -18,11 +18,9 @@ public abstract class JsonConverter {
   /** Input info. */
   protected final InputInfo info;
   /** The {@code map} conversion type. */
-  public static final byte[] MAPS = token("maps");
-  /** The {@code compact} conversion type. */
-  public static final byte[] COMPACT = token("compact");
+  private static final byte[] MAPS = token("maps");
   /** The {@code jsonml} conversion type. */
-  public static final byte[] JSONML = token("jsonml");
+  private static final byte[] JSONML = token("jsonml");
 
   /**
    * Constructor.

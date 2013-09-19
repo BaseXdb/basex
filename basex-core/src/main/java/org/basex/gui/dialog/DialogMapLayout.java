@@ -4,8 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 
-import javax.swing.*;
-
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 
@@ -16,8 +14,8 @@ import org.basex.gui.layout.*;
  * @author Christian Gruen
  */
 public final class DialogMapLayout extends BaseXDialog {
-  /** Map layouts. */
-  private final BaseXList algo;
+  /** Algorithm combobox. */
+  private final BaseXCombo algo;
   /** Layout slider. */
   private final BaseXSlider sizeSlider;
   /** Show attributes. */
@@ -37,17 +35,19 @@ public final class DialogMapLayout extends BaseXDialog {
     final BaseXBack p = new BaseXBack(new TableLayout(4, 1, 0, 8));
 
     // create list
-    algo = new BaseXList(MAP_LAYOUTS, this);
-    p.add(algo);
+    BaseXBack tmp = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    tmp.add(new BaseXLabel(ALGORITHM + COL));
+    algo = new BaseXCombo(this, MAP_LAYOUTS);
+    tmp.add(algo);
+    p.add(tmp);
 
     // create drop down
     final GUIProp gprop = gui.gprop;
     border = new BaseXCombo(this, MAP_CHOICES);
     border.setSelectedIndex(gprop.num(GUIProp.MAPOFFSETS));
 
-    BaseXBack tmp = new BaseXBack(new TableLayout(1, 3));
+    tmp = new BaseXBack(new TableLayout(1, 2, 8, 0));
     tmp.add(new BaseXLabel(OFFSETS + COL));
-    tmp.add(Box.createHorizontalStrut(25));
     tmp.add(border);
     p.add(tmp);
 
@@ -70,14 +70,14 @@ public final class DialogMapLayout extends BaseXDialog {
     set(p, BorderLayout.CENTER);
     finish(gprop.nums(GUIProp.MAPLAYOUTLOC));
 
-    algo.setIndex(gprop.num(GUIProp.MAPALGO));
+    algo.setSelectedIndex(gprop.num(GUIProp.MAPALGO));
   }
 
   @Override
   public void action(final Object cmp) {
     final GUIProp gprop = gui.gprop;
     gprop.set(GUIProp.MAPOFFSETS, border.getSelectedIndex());
-    gprop.set(GUIProp.MAPALGO, algo.getIndex());
+    gprop.set(GUIProp.MAPALGO, algo.getSelectedIndex());
     gprop.set(GUIProp.MAPATTS, atts.isSelected());
     final int sizeprp = sizeSlider.value();
     gprop.set(GUIProp.MAPWEIGHT, sizeprp);
