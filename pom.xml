@@ -229,7 +229,39 @@
 
   <ciManagement><!-- TODO --></ciManagement>
   <pluginRepositories><!-- TODO --></pluginRepositories>
-  <profiles><!-- TODO --></profiles>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.4</version>
+            <inherited>true</inherited>
+            <executions>
+              <execution>
+                <id>create-executable-jar</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <descriptorRefs>
+                <descriptorRef>src</descriptorRef>
+              </descriptorRefs>
+              <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 
 
@@ -309,6 +341,7 @@
           <version>2.4.1</version>
           <configuration>
             <tagNameFormat>@{project.version}</tagNameFormat>
+            <releaseProfiles>release</releaseProfiles>
           </configuration>
         </plugin>
 
