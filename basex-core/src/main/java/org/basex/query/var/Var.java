@@ -18,6 +18,9 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class Var extends ExprInfo {
+  /** Static context. */
+  private final StaticContext sc;
+
   /** Variable name. */
   public final QNm name;
   /** Variable ID. */
@@ -40,11 +43,14 @@ public final class Var extends ExprInfo {
   /**
    * Constructor.
    * @param ctx query context, used for generating a variable ID
+   * @param sctx static context
    * @param n variable name, {@code null} for unnamed variable
    * @param typ expected type, {@code null} for no check
    * @param fun function parameter flag
    */
-  Var(final QueryContext ctx, final QNm n, final SeqType typ, final boolean fun) {
+  Var(final QueryContext ctx, final StaticContext sctx, final QNm n, final SeqType typ,
+      final boolean fun) {
+    sc = sctx;
     name = n;
     declType = typ;
     inType = SeqType.ITEM_ZM;
@@ -57,20 +63,22 @@ public final class Var extends ExprInfo {
   /**
    * Constructor for local variables.
    * @param ctx query context, used for generating a variable ID
+   * @param sctx static context
    * @param n variable name, {@code null} for unnamed variable
    * @param typ expected type, {@code null} for no check
    */
-  Var(final QueryContext ctx, final QNm n, final SeqType typ) {
-    this(ctx, n, typ, false);
+  Var(final QueryContext ctx, final StaticContext sctx, final QNm n, final SeqType typ) {
+    this(ctx, sctx, n, typ, false);
   }
 
   /**
    * Copy constructor.
    * @param ctx query context
+   * @param sctx static context
    * @param var variable to copy
    */
-  Var(final QueryContext ctx, final Var var) {
-    this(ctx, var.name, var.declType, var.param);
+  Var(final QueryContext ctx, final StaticContext sctx, final Var var) {
+    this(ctx, sctx, var.name, var.declType, var.param);
     promote = var.promote;
     inType = var.inType;
     size = var.size;
@@ -142,7 +150,7 @@ public final class Var extends ExprInfo {
   public Expr checked(final Expr e, final QueryContext ctx, final VarScope scp,
       final InputInfo ii) throws QueryException {
     return checksType()
-        ? new TypeCheck(ii, e, declType, promotes()).optimize(ctx, scp) : e;
+        ? new TypeCheck(sc, ii, e, declType, promote).optimize(ctx, scp) : e;
   }
 
   /**
@@ -156,7 +164,7 @@ public final class Var extends ExprInfo {
   public Value checkType(final Value val, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     if(!checksType() || declType.instance(val)) return val;
-    if(promote) return declType.funcConvert(ctx, ii, val);
+    if(promote) return declType.funcConvert(ctx, sc, ii, val);
     throw Err.INVCAST.thrw(ii, val.type(), declType);
   }
 

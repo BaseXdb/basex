@@ -16,12 +16,14 @@ import org.basex.util.*;
 public final class FNHttp extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNHttp(final InputInfo ii, final Function f, final Expr[] e) {
-    super(ii, f, e);
+  public FNHttp(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override

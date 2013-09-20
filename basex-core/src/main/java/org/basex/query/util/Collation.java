@@ -61,22 +61,23 @@ public final class Collation {
    * Returns a collation instance for the specified uri.
    * @param uri collation uri
    * @param ctx query context
+   * @param sc static context
    * @param info input info
    * @param err error code for unknown collation uris
    * @return collator instance or {@code null} for unicode point collation
    * @throws QueryException query exception
    */
   public static Collation get(final byte[] uri, final QueryContext ctx,
-      final InputInfo info, final Err err) throws QueryException {
+      final StaticContext sc, final InputInfo info, final Err err) throws QueryException {
 
     // return default collation
-    if(uri == null) return ctx.sc.collation;
+    if(uri == null) return sc.collation;
 
     byte[] args = uri;
     final Uri u = Uri.uri(args);
     if(!u.isValid()) INVURI.thrw(info, args);
     if(!u.isAbsolute() && !Token.startsWith(args, '?')) {
-      args = ctx.sc.baseURI().resolve(u, info).string();
+      args = sc.baseURI().resolve(u, info).string();
     }
     // return unicode point collation
     if(eq(URLCOLL, args)) return null;

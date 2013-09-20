@@ -167,8 +167,6 @@ public final class FuncItem extends FItem implements Scope {
       final Value... args) throws QueryException {
 
     // bind variables and cache context
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
     final int fp = ctx.stack.enterFrame(stackSize);
     final Value cv = ctx.value;
     final long ps = ctx.pos, sz = ctx.size;
@@ -179,13 +177,12 @@ public final class FuncItem extends FItem implements Scope {
       ctx.size = size;
       final Value v = ctx.value(expr);
       // optionally cast return value to target type
-      return cast != null ? cast.funcConvert(ctx, ii, v) : v;
+      return cast != null ? cast.funcConvert(ctx, sc, ii, v) : v;
     } finally {
       ctx.value = cv;
       ctx.pos = ps;
       ctx.size = sz;
       ctx.stack.exitFrame(fp);
-      ctx.sc = cs;
     }
   }
 
@@ -194,8 +191,6 @@ public final class FuncItem extends FItem implements Scope {
       final Value... args) throws QueryException {
 
     // bind variables and cache context
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
     final int fp = ctx.stack.enterFrame(stackSize);
     final Value cv = ctx.value;
     final long ps = ctx.pos, sz = ctx.size;
@@ -207,36 +202,36 @@ public final class FuncItem extends FItem implements Scope {
       final Item it = expr.item(ctx, ii);
       final Value v = it == null ? Empty.SEQ : it;
       // optionally cast return value to target type
-      return cast != null ? cast.funcConvert(ctx, ii, v).item(ctx, ii) : it;
+      return cast != null ? cast.funcConvert(ctx, sc, ii, v).item(ctx, ii) : it;
     } finally {
       ctx.value = cv;
       ctx.pos = ps;
       ctx.size = sz;
       ctx.stack.exitFrame(fp);
-      ctx.sc = cs;
     }
   }
 
   /**
    * Coerces a function item to the given type.
    * @param ctx query context
+   * @param sc static context
    * @param ii input info
    * @param fun function item to coerce
    * @param t type to coerce to
    * @return coerced function item
    */
-  private static FuncItem coerce(final QueryContext ctx, final InputInfo ii,
-      final FuncItem fun, final FuncType t) {
-    final VarScope sc = new VarScope();
+  private static FuncItem coerce(final QueryContext ctx, final StaticContext sc,
+      final InputInfo ii, final FuncItem fun, final FuncType t) {
+    final VarScope vsc = new VarScope(sc);
     final Var[] vs = new Var[fun.vars.length];
     final Expr[] refs = new Expr[vs.length];
     for(int i = vs.length; i-- > 0;) {
-      vs[i] = sc.uniqueVar(ctx, t.args[i], true);
+      vs[i] = vsc.uniqueVar(ctx, t.args[i], true);
       refs[i] = new VarRef(ii, vs[i]);
     }
     final Expr e = new DynFuncCall(ii, fun, refs);
     e.markTailCalls();
-    return new FuncItem(fun.name, vs, e, t, fun.cast != null, null, sc, ctx.sc, fun.func);
+    return new FuncItem(fun.name, vs, e, t, fun.cast != null, null, vsc, sc, fun.func);
   }
 
   @Override
@@ -244,7 +239,7 @@ public final class FuncItem extends FItem implements Scope {
       throws QueryException {
 
     if(vars.length != ft.args.length) throw Err.cast(ii, ft, this);
-    return type.instanceOf(ft) ? this : coerce(ctx, ii, this, ft);
+    return type.instanceOf(ft) ? this : coerce(ctx, sc, ii, this, ft);
   }
 
   @Override

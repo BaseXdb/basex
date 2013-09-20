@@ -37,12 +37,14 @@ import org.xml.sax.helpers.*;
 public final class FNValidate extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNValidate(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNValidate(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -130,11 +132,11 @@ public final class FNValidate extends StandardFunc {
         } else {
           final Item it = checkItem(expr[1], ctx);
           // schema specified as string
-          IO sc = read(it, ctx, null);
-          if(!sc.exists()) WHICHRES.thrw(info, sc);
-          tmp = createTmp(sc);
-          if(tmp != null) sc = tmp;
-          schema = sf.newSchema(new URL(sc.url()));
+          IO scio = read(it, ctx, null);
+          if(!scio.exists()) WHICHRES.thrw(info, scio);
+          tmp = createTmp(scio);
+          if(tmp != null) scio = tmp;
+          schema = sf.newSchema(new URL(scio.url()));
         }
 
         final Validator v = schema.newValidator();
@@ -192,11 +194,11 @@ public final class FNValidate extends StandardFunc {
         if(expr.length > 1) {
           sp = new SerializerOptions();
           final String dtd = string(checkStr(expr[1], ctx));
-          IO sc = IO.get(dtd);
-          if(!sc.exists()) WHICHRES.thrw(info, dtd);
-          tmp = createTmp(sc);
-          if(tmp != null) sc = tmp;
-          sp.set(SerializerOptions.DOCTYPE_SYSTEM, sc.url());
+          IO scio = IO.get(dtd);
+          if(!scio.exists()) WHICHRES.thrw(info, dtd);
+          tmp = createTmp(scio);
+          if(tmp != null) scio = tmp;
+          sp.set(SerializerOptions.DOCTYPE_SYSTEM, scio.url());
         }
 
         final IO in = read(it, ctx, sp);

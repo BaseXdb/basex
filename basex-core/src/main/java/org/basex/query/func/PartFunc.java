@@ -20,18 +20,23 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class PartFunc extends Arr {
+  /** Static context. */
+  private final StaticContext sc;
   /** Positions of the placeholders. */
   private final int[] holes;
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param fn function expression
    * @param arg argument expressions
    * @param hl positions of the placeholders
    */
-  public PartFunc(final InputInfo ii, final Expr fn, final Expr[] arg, final int[] hl) {
+  public PartFunc(final StaticContext sctx, final InputInfo ii, final Expr fn,
+      final Expr[] arg, final int[] hl) {
     super(ii, Array.add(arg, fn));
+    sc = sctx;
     holes = hl;
     type = SeqType.FUN_O;
   }
@@ -70,7 +75,7 @@ public final class PartFunc extends Arr {
     if(f.arity() != arity) Err.INVARITY.thrw(ii, f, arity);
     final Expr[] args = new Expr[arity];
 
-    final VarScope scp = new VarScope();
+    final VarScope scp = new VarScope(sc);
     final Var[] vars = new Var[holes.length];
     int p = -1;
     for(int i = 0; i < holes.length; i++) {
@@ -83,7 +88,7 @@ public final class PartFunc extends Arr {
     final Expr call = new DynFuncCall(info, f, args).optimize(ctx, scp);
     // [LW] introduce annotations
     final InlineFunc func = new InlineFunc(
-        info, ft.type, vars, call, new Ann(), ctx.sc, scp);
+        info, ft.type, vars, call, new Ann(), sc, scp);
     return func.optimize(ctx, null).item(ctx, ii);
   }
 
@@ -94,7 +99,7 @@ public final class PartFunc extends Arr {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new PartFunc(info, expr[expr.length - 1].copy(ctx, scp, vs),
+    return new PartFunc(sc, info, expr[expr.length - 1].copy(ctx, scp, vs),
         copyAll(ctx, scp, vs, Arrays.copyOf(expr, expr.length - 1)), holes.clone());
   }
 

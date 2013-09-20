@@ -67,12 +67,14 @@ public final class FNDb extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNDb(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNDb(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -204,10 +206,10 @@ public final class FNDb extends StandardFunc {
     if(expr.length <= a) return ia.iter(ctx);
 
     // parse and compile the name test
-    final QNm nm = new QNm(checkStr(expr[a], ctx), ctx);
-    if(!nm.hasPrefix()) nm.uri(ctx.sc.ns.uri(Token.EMPTY));
+    final QNm nm = new QNm(checkStr(expr[a], ctx), sc);
+    if(!nm.hasPrefix()) nm.uri(sc.ns.uri(Token.EMPTY));
 
-    final NameTest nt = new NameTest(nm, NameTest.Mode.STD, true);
+    final NameTest nt = new NameTest(nm, NameTest.Mode.STD, true, sc.elemNS);
     // return empty sequence if test will yield no results
     if(!nt.compile(ctx)) return Empty.ITER;
 

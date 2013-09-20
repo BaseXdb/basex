@@ -21,12 +21,14 @@ import org.basex.util.list.*;
 public final class FNUnit extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNUnit(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNUnit(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -70,7 +72,7 @@ public final class FNUnit extends StandardFunc {
    */
   private Item test(final QueryContext ctx) throws QueryException {
     final Unit unit = new Unit(ctx, info);
-    if(expr.length == 0) return unit.test();
+    if(expr.length == 0) return unit.test(sc);
 
     final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
     final Iter ir = ctx.iter(expr[0]);
@@ -78,7 +80,7 @@ public final class FNUnit extends StandardFunc {
       final FItem fi = checkFunc(it, ctx);
       if(fi instanceof FuncItem) funcs.add(((FuncItem) fi).func);
     }
-    return unit.test(funcs);
+    return unit.test(sc, funcs);
   }
 
   /**

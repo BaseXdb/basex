@@ -81,7 +81,7 @@ public final class If extends Arr {
     // if A then B else true() -> not(A) or B
     if(expr[0].type().eq(SeqType.BLN) && expr[1] == Bln.TRUE) {
       ctx.compInfo(OPTWRITE, this);
-      final Expr e = Function.NOT.get(info, cond);
+      final Expr e = Function.NOT.get(null, info, cond);
       return expr[0] == Bln.FALSE ? e : new Or(info, e, expr[0]);
     }
 

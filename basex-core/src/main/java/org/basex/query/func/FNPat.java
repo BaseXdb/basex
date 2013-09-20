@@ -49,12 +49,14 @@ public final class FNPat extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNPat(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNPat(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -238,7 +240,7 @@ public final class FNPat extends StandardFunc {
     final byte[] key = tb.finish();
     Pattern p = patterns.get(key);
     if(p == null) {
-      p = RegExParser.parse(pat, mod, ctx.sc.xquery3(), info);
+      p = RegExParser.parse(pat, mod, sc.xquery3(), info);
       patterns.put(key, p);
     }
     return p;

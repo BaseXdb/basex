@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -24,12 +25,14 @@ import org.basex.util.*;
 public final class FNXQuery extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNXQuery(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNXQuery(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -84,17 +87,18 @@ public final class FNXQuery extends StandardFunc {
       throws QueryException {
 
     final QueryContext qc = new QueryContext(ctx.context);
+    final StaticContext sctx = new StaticContext(qc.context.options.get(MainOptions.XQUERY3));
 
     // bind variables and context item
     for(final Map.Entry<String, Value> it : bindings(1, ctx).entrySet()) {
       final String k = it.getKey();
       final Value v = it.getValue();
-      if(k.isEmpty()) qc.context(v, null);
+      if(k.isEmpty()) qc.context(v, null, sctx);
       else qc.bind(k, v, null);
     }
     // evaluate query
     try {
-      qc.parseMain(string(qu), path);
+      qc.parseMain(string(qu), path, sctx);
       if(qc.updating) BXXQ_UPDATING.thrw(info);
       qc.compile();
       final ValueBuilder vb = new ValueBuilder();

@@ -22,12 +22,14 @@ import org.basex.util.*;
 public final class FNQName extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNQName(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNQName(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -49,7 +51,7 @@ public final class FNQName extends StandardFunc {
       case LOCAL_NAME_FROM_QNAME:    return lnFromQName(ctx, it);
       case PREFIX_FROM_QNAME:        return prefixFromQName(ctx, it);
       case NAMESPACE_URI_FOR_PREFIX: return nsUriForPrefix(it, it2);
-      case RESOLVE_URI:              return resolveUri(ctx, it, it2);
+      case RESOLVE_URI:              return resolveUri(it, it2);
       default:                       return super.item(ctx, ii);
     }
   }
@@ -104,8 +106,8 @@ public final class FNQName extends StandardFunc {
    */
   private Item lnFromQName(final QueryContext ctx, final Item it) throws QueryException {
     if(it == null) return null;
-    final QNm nm = checkQNm(it, ctx);
-    return AtomType.NCN.cast(Str.get(nm.local()), ctx, info);
+    final QNm nm = checkQNm(it, ctx, sc);
+    return AtomType.NCN.cast(Str.get(nm.local()), ctx, sc, info);
   }
 
   /**
@@ -118,8 +120,8 @@ public final class FNQName extends StandardFunc {
   private Item prefixFromQName(final QueryContext ctx, final Item it) throws QueryException {
 
     if(it == null) return null;
-    final QNm nm = checkQNm(it, ctx);
-    return nm.hasPrefix() ? AtomType.NCN.cast(Str.get(nm.prefix()), ctx, info) : null;
+    final QNm nm = checkQNm(it, ctx, sc);
+    return nm.hasPrefix() ? AtomType.NCN.cast(Str.get(nm.prefix()), ctx, sc, info) : null;
   }
 
   /**
@@ -165,13 +167,12 @@ public final class FNQName extends StandardFunc {
 
   /**
    * Resolves a URI.
-   * @param ctx query context
    * @param it item
    * @param it2 second item
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Item resolveUri(final QueryContext ctx, final Item it, final Item it2)
+  private Item resolveUri(final Item it, final Item it2)
       throws QueryException {
 
     if(it == null) return null;
@@ -181,7 +182,7 @@ public final class FNQName extends StandardFunc {
     if(rel.isAbsolute()) return rel;
 
     // check base uri
-    final Uri base = it2 == null ? ctx.sc.baseURI() : Uri.uri(checkEStr(it2));
+    final Uri base = it2 == null ? sc.baseURI() : Uri.uri(checkEStr(it2));
     if(!base.isAbsolute()) URIABS.thrw(info, base);
     if(!base.isValid() || contains(base.string(), '#') || !contains(base.string(), '/'))
       URIINVRES.thrw(info, base);

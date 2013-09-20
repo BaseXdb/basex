@@ -50,7 +50,7 @@ public class QueryModuleTest extends QueryModule {
   @Requires(Permission.NONE)
   @ContextDependent
   public Str functionNS() {
-    return Str.get(context.sc.funcNS);
+    return Str.get(staticContext.funcNS);
   }
 
   /**

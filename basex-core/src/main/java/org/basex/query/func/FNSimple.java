@@ -23,12 +23,14 @@ import org.basex.util.*;
 public final class FNSimple extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNSimple(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNSimple(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -184,7 +186,7 @@ public final class FNSimple extends StandardFunc {
    * @throws QueryException query exception
    */
   private boolean deep(final QueryContext ctx) throws QueryException {
-    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx, sc);
     return new Compare(info).collation(coll).deep(ctx.iter(expr[0]), ctx.iter(expr[1]));
   }
 

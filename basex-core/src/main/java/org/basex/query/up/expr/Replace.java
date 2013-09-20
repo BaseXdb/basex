@@ -28,20 +28,21 @@ public final class Replace extends Update {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param t target expression
    * @param r source expression
    * @param v replace value of
    */
-  public Replace(final InputInfo ii, final Expr t, final Expr r,
+  public Replace(final StaticContext sctx, final InputInfo ii, final Expr t, final Expr r,
       final boolean v) {
-    super(ii, t, r);
+    super(sctx, ii, t, r);
     value = v;
   }
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Constr c = new Constr(ii, ctx).add(expr[1]);
+    final Constr c = new Constr(ii, sc).add(ctx, expr[1]);
     if(c.errAtt) UPNOATTRPER.thrw(info);
     if(c.duplAtt != null) UPATTDUPL.thrw(info, new QNm(c.duplAtt));
 
@@ -86,7 +87,7 @@ public final class Replace extends Update {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Replace(info, expr[0].copy(ctx, scp, vs),
+    return new Replace(sc, info, expr[0].copy(ctx, scp, vs),
         expr[1].copy(ctx, scp, vs), value);
   }
 

@@ -57,16 +57,16 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
   /**
    * Checks if all variables were declared and are visible to all their references.
-   * @param ctx query context
+   * @param sc static context
    * @throws QueryException query exception
    */
-  public void check(final QueryContext ctx) throws QueryException {
+  public void check(final StaticContext sc) throws QueryException {
     for(final Entry<QNm, VarEntry> e : vars.entrySet()) {
       final QNm name = e.getKey();
       final VarEntry ve = e.getValue();
       if(ve.var == null) {
         if(name.uri().length != 0) throw Err.VARUNDEF.thrw(ve.refs[0].info, ve.refs[0]);
-        ve.setVar(new StaticVar(ctx, name, ve.refs[0].info));
+        ve.setVar(new StaticVar(sc, name, ve.refs[0].info));
       }
     }
   }

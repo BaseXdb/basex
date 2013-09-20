@@ -19,12 +19,14 @@ import org.basex.util.*;
 public final class FNInfo extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNInfo(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNInfo(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -68,7 +70,7 @@ public final class FNInfo extends StandardFunc {
     if(it == null) {
       if(al == 1) INVEMPTY.thrw(info, description());
     } else {
-      name = checkQNm(it, ctx);
+      name = checkQNm(it, ctx, sc);
     }
     if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
     final Value val = al > 2 ? ctx.value(expr[2]) : null;
@@ -148,6 +150,7 @@ public final class FNInfo extends StandardFunc {
    * @return function
    */
   public static FNInfo error(final QueryException ex) {
-    return new FNInfo(ex.info(), ERROR, ex.qname(), Str.get(ex.getLocalizedMessage()));
+    return new FNInfo(null, ex.info(), ERROR, ex.qname(),
+        Str.get(ex.getLocalizedMessage()));
   }
 }

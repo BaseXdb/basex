@@ -41,23 +41,26 @@ public final class Unit {
 
   /**
    * Performs the test function.
+   * @param sc static context
    * @return resulting value
    * @throws QueryException query exception
    */
-  public FElem test() throws QueryException {
+  public FElem test(final StaticContext sc) throws QueryException {
     final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
     for(final StaticFunc uf : ctx.funcs.funcs()) funcs.add(uf);
-    return test(funcs);
+    return test(sc, funcs);
   }
 
   /**
    * Performs the test function.
+   * @param sc static context
    * @param funcs functions to test
    * @return resulting value
    * @throws QueryException query exception
    */
-  public FElem test(final ArrayList<StaticFunc> funcs) throws QueryException {
-    final FElem testsuite = new FElem(TESTSUITE).add(NAME, ctx.sc.baseURI().string());
+  public FElem test(final StaticContext sc, final ArrayList<StaticFunc> funcs)
+      throws QueryException {
+    final FElem testsuite = new FElem(TESTSUITE).add(NAME, sc.baseURI().string());
     int t = 0, e = 0, f = 0, s = 0;
 
     final ArrayList<StaticFunc> before = new ArrayList<StaticFunc>(1);

@@ -22,12 +22,14 @@ import org.basex.util.*;
 public final class FNAcc extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNAcc(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNAcc(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -48,7 +50,7 @@ public final class FNAcc extends StandardFunc {
         return Str.get(norm(checkEStr(e, ctx)));
       case NAMESPACE_URI_FROM_QNAME:
         final Item it = e.item(ctx, info);
-        return it == null ? null : Uri.uri(checkQNm(it, ctx).uri());
+        return it == null ? null : Uri.uri(checkQNm(it, ctx, sc).uri());
       default:
         return super.item(ctx, ii);
     }
@@ -83,7 +85,7 @@ public final class FNAcc extends StandardFunc {
     if(it == null || ir.next() != null) return Dbl.NAN;
     if(it instanceof FItem) FIATOM.thrw(info, this);
     try {
-      return it.type == AtomType.DBL ? it : AtomType.DBL.cast(it, ctx, info);
+      return it.type == AtomType.DBL ? it : AtomType.DBL.cast(it, ctx, sc, info);
     } catch(final QueryException ex) {
       return Dbl.NAN;
     }

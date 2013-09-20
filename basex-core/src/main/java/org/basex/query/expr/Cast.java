@@ -19,14 +19,19 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Cast extends Single {
+  /** Static context. */
+  private final StaticContext sc;
+
   /**
    * Function constructor.
+   * @param sx static context
    * @param ii input info
    * @param e expression
    * @param t data type
    */
-  public Cast(final InputInfo ii, final Expr e, final SeqType t) {
+  public Cast(final StaticContext sx, final InputInfo ii, final Expr e, final SeqType t) {
     super(ii, e);
+    sc = sx;
     type = t;
   }
 
@@ -56,12 +61,12 @@ public final class Cast extends Single {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    return type.cast(expr.item(ctx, info), ctx, info, this);
+    return type.cast(expr.item(ctx, info), ctx, sc, info, this);
   }
 
   @Override
   public Cast copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Cast(info, expr.copy(ctx, scp, vs), type);
+    return new Cast(sc, info, expr.copy(ctx, scp, vs), type);
   }
 
   @Override

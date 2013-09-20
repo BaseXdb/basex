@@ -114,7 +114,8 @@ public final class CmpR extends Single {
     if(mn > mx) return Bln.FALSE;
     if(mn == mx) {
       // return simplified comparison for exact hit, or false if value is not included
-      return mni && mxi ? new CmpG(expr, Dbl.get(mn), CmpG.OpG.EQ, info) : Bln.FALSE;
+      return mni && mxi ? new CmpG(expr, Dbl.get(mn), CmpG.OpG.EQ, null, info)
+                        : Bln.FALSE;
     }
 
     return new CmpR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, info);

@@ -571,7 +571,7 @@ public abstract class W3CTS {
             src = dbname;
           }
         }
-        expr = def.get(Str.get(src));
+        expr = def.get(qp.sc, Str.get(src));
       }
       if(var != null) qp.bind(string(data.atom(var.pres[c])), expr);
     }
@@ -604,7 +604,7 @@ public abstract class W3CTS {
    * @throws QueryException query exception
    */
   private Uri coll(final byte[] name, final QueryProcessor qp) throws QueryException {
-    qp.ctx.resource.addCollection(string(name), colls.get(string(name)));
+    qp.ctx.resource.addCollection(string(name), colls.get(string(name)), qp.sc.baseIO());
     return Uri.uri(name);
   }
 

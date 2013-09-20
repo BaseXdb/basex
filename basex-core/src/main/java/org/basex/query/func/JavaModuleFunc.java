@@ -29,13 +29,15 @@ public final class JavaModuleFunc extends JavaMapping {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param jm Java module
    * @param m Java method/field
    * @param a arguments
    */
-  JavaModuleFunc(final InputInfo ii, final Object jm, final Method m, final Expr[] a) {
-    super(ii, a);
+  JavaModuleFunc(final StaticContext sctx, final InputInfo ii, final Object jm,
+      final Method m, final Expr[] a) {
+    super(sctx, ii, a);
     module = jm;
     mth = m;
   }
@@ -44,7 +46,11 @@ public final class JavaModuleFunc extends JavaMapping {
   protected Object eval(final Value[] vals, final QueryContext ctx) throws QueryException {
 
     // assign context if module is inheriting {@link QueryModule}
-    if(module instanceof QueryModule) ((QueryModule) module).context = ctx;
+    if(module instanceof QueryModule) {
+      final QueryModule mod = (QueryModule) module;
+      mod.staticContext = sc;
+      mod.context = ctx;
+    }
 
     final Object[] args = JavaFunc.args(mth.getParameterTypes(), vals, true);
     if(args != null) {
@@ -73,7 +79,7 @@ public final class JavaModuleFunc extends JavaMapping {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new JavaModuleFunc(info, module, mth, copyAll(ctx, scp, vs, expr));
+    return new JavaModuleFunc(sc, info, module, mth, copyAll(ctx, scp, vs, expr));
   }
 
   @Override

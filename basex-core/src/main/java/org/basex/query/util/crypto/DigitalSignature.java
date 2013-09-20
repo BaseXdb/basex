@@ -270,7 +270,7 @@ public final class DigitalSignature {
 
       // actually sign the document
       xmlSig.sign(signContext);
-      signedNode = NodeType.DOC.cast(inputNode, ctx, ii);
+      signedNode = NodeType.DOC.cast(inputNode, ctx, null, ii);
 
     } catch(final XPathExpressionException e) {
       CX_XPINV.thrw(info, e);

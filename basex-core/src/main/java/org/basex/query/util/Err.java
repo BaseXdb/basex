@@ -1355,14 +1355,12 @@ public enum Err {
 
   /**
    * Throws an exception for circular static variables.
-   * @param ctx query context
    * @param var variable expression
    * @return never
    * @throws QueryException query exception
    */
-  public static QueryException circVar(final QueryContext ctx, final StaticVar var)
-      throws QueryException {
-    throw (ctx.sc.xquery3() ? CIRCVAR30 : CIRCVAR).thrw(var.info, var);
+  public static QueryException circVar(final StaticVar var) throws QueryException {
+    throw (var.sc.xquery3() ? CIRCVAR30 : CIRCVAR).thrw(var.info, var);
   }
 
   @Override

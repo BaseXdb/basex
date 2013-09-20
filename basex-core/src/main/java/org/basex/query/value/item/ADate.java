@@ -366,7 +366,7 @@ public abstract class ADate extends ADateDur {
   @Override
   public final boolean eq(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, ii));
+    final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, null, ii));
     final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
     final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));
     return d1.compareTo(d2) == 0;
@@ -380,7 +380,7 @@ public abstract class ADate extends ADateDur {
   @Override
   public int diff(final Item it, final Collation coll, final InputInfo ii)
       throws QueryException {
-    final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, ii));
+    final ADate d = (ADate) (it instanceof ADate ? it : type.cast(it, null, null, ii));
     final BigDecimal d1 = seconds().add(days().multiply(DAYSECONDS));
     final BigDecimal d2 = d.seconds().add(d.days().multiply(DAYSECONDS));
     return d1.compareTo(d2);

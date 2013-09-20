@@ -231,7 +231,7 @@ public final class For extends GFLWOR.Clause {
     final Expr r = p.inline(ctx, scp, var, new Context(info)), e = r == null ? p : r;
 
     // attach predicates to axis path or filter, or create a new filter
-    final Expr a = e.type().mayBeNumber() ? Function.BOOLEAN.get(info, e) : e;
+    final Expr a = e.type().mayBeNumber() ? Function.BOOLEAN.get(null, info, e) : e;
 
     // add to clause expression
     if(expr instanceof AxisPath) {

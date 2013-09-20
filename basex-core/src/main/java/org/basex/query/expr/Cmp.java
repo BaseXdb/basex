@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
 import org.basex.query.path.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -14,14 +15,18 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Cmp extends Arr {
+  /** Collation used for comparisons. */
+  final Collation collation;
   /**
    * Constructor.
    * @param ii input info
    * @param e1 first expression
    * @param e2 second expression
+   * @param coll collation
    */
-  Cmp(final InputInfo ii, final Expr e1, final Expr e2) {
+  Cmp(final InputInfo ii, final Expr e1, final Expr e2, final Collation coll) {
     super(ii, e1, e2);
+    collation = coll;
   }
 
   /**
@@ -72,10 +77,10 @@ public abstract class Cmp extends Arr {
        o == OpV.EQ && v != (int) v) return Bln.FALSE;
     // EXISTS: c > (v<1), c >= (v<=1), c != (v=0)
     if(o == OpV.GT && v < 1 || o == OpV.GE && v <= 1 || o == OpV.NE && v == 0)
-      return Function.EXISTS.get(info, ((StandardFunc) expr[0]).expr);
+      return Function.EXISTS.get(null, info, ((StandardFunc) expr[0]).expr);
     // EMPTY: c < (v<=1), c <= (v<1), c = (v=0)
     if(o == OpV.LT && v <= 1 || o == OpV.LE && v < 1 || o == OpV.EQ && v == 0)
-      return Function.EMPTY.get(info, ((StandardFunc) expr[0]).expr);
+      return Function.EMPTY.get(null, info, ((StandardFunc) expr[0]).expr);
 
     return this;
   }

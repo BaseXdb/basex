@@ -97,7 +97,7 @@ public final class StringRangeAccess extends IndexAccess {
   @Override
   public String toString() {
     return (sr.type == IndexType.TEXT ? Function._DB_TEXT_RANGE :
-      Function._DB_ATTRIBUTE_RANGE).get(info, Str.get(ictx.data.meta.name),
+      Function._DB_ATTRIBUTE_RANGE).get(null, info, Str.get(ictx.data.meta.name),
           Str.get(sr.min), Str.get(sr.max)).toString();
   }
 }

@@ -5,9 +5,13 @@ import java.util.*;
 import javax.xml.namespace.*;
 
 import org.basex.core.*;
+import org.basex.core.Context;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.tests.bxapi.xdm.*;
@@ -101,7 +105,7 @@ public final class XQuery implements Iterable<XdmItem> {
       for(final Map.Entry<String, String> e : map.entrySet()) {
         tm.put(Token.token(e.getKey()), Token.token(e.getValue()));
       }
-      qp.ctx.sc.decFormats.put(new QNm(name).id(), new DecFormatter(null, tm));
+      qp.sc.decFormats.put(new QNm(name).id(), new DecFormatter(null, tm));
       return this;
     } catch(final QueryException ex) {
       Util.debug(ex);
@@ -119,7 +123,7 @@ public final class XQuery implements Iterable<XdmItem> {
     final StringList sl = new StringList();
     for(final String p : paths) sl.add(p);
     try {
-      qp.ctx.resource.addCollection(name, sl.toArray());
+      qp.ctx.resource.addCollection(name, sl.toArray(), qp.sc.baseIO());
     } catch(final QueryException ex) {
       Util.debug(ex);
       throw new XQueryException(ex);
@@ -134,7 +138,7 @@ public final class XQuery implements Iterable<XdmItem> {
    */
   public void addDocument(final String name, final String path) {
     try {
-      qp.ctx.resource.addDoc(name, path);
+      qp.ctx.resource.addDoc(name, path, qp.sc.baseIO());
     } catch(final QueryException ex) {
       Util.debug(ex);
       throw new XQueryException(ex);
@@ -168,8 +172,25 @@ public final class XQuery implements Iterable<XdmItem> {
    * @throws XQueryException exception
    */
   public XQuery baseURI(final String base) {
-    qp.ctx.sc.baseURI(base);
+    qp.sc.baseURI(base);
     return this;
+  }
+
+  /**
+   * Creates a function call to the function with the given name with the given arguments.
+   * @param fName function name
+   * @param args function arguments
+   * @return the function call
+   */
+  public Object funcCall(final String fName, final Expr... args) {
+    try {
+      final QNm qName = new QNm(fName);
+      qName.uri(qName.hasPrefix() ? NSGlobal.uri(qName.prefix()) : qp.sc.funcNS);
+      return Functions.get().get(qName, args, qp.sc, null);
+    } catch(QueryException ex) {
+      Util.debug(ex);
+      throw new XQueryException(ex);
+    }
   }
 
   /**

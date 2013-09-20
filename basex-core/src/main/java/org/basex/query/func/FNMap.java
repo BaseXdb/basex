@@ -17,12 +17,14 @@ import org.basex.util.*;
 public final class FNMap extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNMap(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNMap(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -89,7 +91,7 @@ public final class FNMap extends StandardFunc {
   private Map newMap(final QueryContext ctx, final InputInfo ii) throws QueryException {
     if(expr.length == 0) return Map.EMPTY;
     // collations are ignored here as they may disappear in a future version
-    checkColl(expr.length == 2 ? expr[1] : null, ctx);
+    checkColl(expr.length == 2 ? expr[1] : null, ctx, sc);
 
     Map map = Map.EMPTY;
     final Iter maps = expr[0].iter(ctx);

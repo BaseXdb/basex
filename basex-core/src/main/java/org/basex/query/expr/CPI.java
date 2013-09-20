@@ -21,12 +21,13 @@ import org.basex.util.hash.*;
 public final class CPI extends CName {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param n name
    * @param v value
    */
-  public CPI(final InputInfo ii, final Expr n, final Expr v) {
-    super(PI, ii, n, v);
+  public CPI(final StaticContext sctx, final InputInfo ii, final Expr n, final Expr v) {
+    super(PI, sctx, ii, n, v);
     type = SeqType.PI;
   }
 
@@ -49,6 +50,6 @@ public final class CPI extends CName {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CPI(info, name.copy(ctx, scp, vs), expr[0].copy(ctx, scp, vs));
+    return new CPI(sc, info, name.copy(ctx, scp, vs), expr[0].copy(ctx, scp, vs));
   }
 }

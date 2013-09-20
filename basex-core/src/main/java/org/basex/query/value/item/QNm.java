@@ -86,11 +86,11 @@ public final class QNm extends Item {
    * Constructor, binding a statically known namespace.
    * If no namespace is found, the namespace uri is set to {@code null}.
    * @param n name
-   * @param ctx query context
+   * @param sc static context
    */
-  public QNm(final byte[] n, final QueryContext ctx) {
+  public QNm(final byte[] n, final StaticContext sc) {
     this(n);
-    uri(ctx.sc.ns.uri(prefix()));
+    uri(sc.ns.uri(prefix()));
   }
 
   /**

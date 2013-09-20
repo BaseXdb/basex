@@ -143,7 +143,7 @@ public final class ValueAccess extends IndexAccess {
   @Override
   public String toString() {
     return (itype == IndexType.TEXT ? Function._DB_TEXT : Function._DB_ATTRIBUTE).get(
-        info, Str.get(ictx.data.meta.name), expr).toString();
+        null, info, Str.get(ictx.data.meta.name), expr).toString();
   }
 
   @Override

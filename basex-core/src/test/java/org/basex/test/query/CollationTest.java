@@ -31,6 +31,8 @@ public class CollationTest extends AdvancedQueryTest {
       query(prolog + "'A'     ='a'      ", s < 2);
       query(prolog + "'A'     ='\u00c4' ", s < 1);
       query(prolog + "'A'     ='B'      ", false);
+
+      query(prolog + "count(('A', '\u00c4')[. >= 'A' and . <= 'B']) eq 2", true);
     }
   }
 

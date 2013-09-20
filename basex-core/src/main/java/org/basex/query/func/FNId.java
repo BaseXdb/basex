@@ -22,12 +22,14 @@ import org.basex.util.list.*;
 public final class FNId extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNId(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNId(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override

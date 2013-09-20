@@ -126,8 +126,8 @@ final class RestXqModule {
     try {
       final String cont = string(file.read());
       final String path = file.path();
-      if(main) qc.parseMain(cont, path);
-      else qc.parseLibrary(cont, path);
+      if(main) qc.parseMain(cont, path, null);
+      else qc.parseLibrary(cont, path, null);
       return qc;
     } catch(final IOException ex) {
       throw IOERR.thrw(null, ex);

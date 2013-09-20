@@ -49,12 +49,14 @@ public final class FNIndex extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNIndex(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNIndex(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override

@@ -116,9 +116,6 @@ public final class InlineFunc extends Single implements Scope {
     for(final Entry<Var, Expr> e : scope.closure().entrySet())
       e.setValue(e.getValue().compile(ctx, scp));
 
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
-
     final int fp = scope.enter(ctx);
     try {
       // constant propagation
@@ -131,7 +128,6 @@ public final class InlineFunc extends Single implements Scope {
     } finally {
       scope.cleanUp(this);
       scope.exit(ctx, fp);
-      ctx.sc = cs;
     }
 
     // convert all function calls in tail position to proper tail calls
@@ -171,9 +167,6 @@ public final class InlineFunc extends Single implements Scope {
       }
     }
 
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
-
     if(val) {
       final int fp = scope.enter(ctx);
       try {
@@ -186,7 +179,6 @@ public final class InlineFunc extends Single implements Scope {
       } finally {
         scope.cleanUp(this);
         scope.exit(ctx, fp);
-        ctx.sc = cs;
       }
     }
 
@@ -211,7 +203,7 @@ public final class InlineFunc extends Single implements Scope {
     for(final Entry<Var, Expr> e : scope.closure().entrySet())
       clos.put(e.getKey(), e.getValue().value(ctx));
 
-    return new FuncItem(args, expr, ft, clos, c, scope, ctx.sc);
+    return new FuncItem(args, expr, ft, clos, c, scope, sc);
   }
 
   @Override

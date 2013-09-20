@@ -82,7 +82,7 @@ public final class QueryCompiler {
   private Scope circCheck(final Scope[] comp) throws QueryException {
     if(comp.length > 1)
       for(final Scope scp : comp)
-        if(scp instanceof StaticVar) throw Err.circVar(ctx, (StaticVar) scp);
+        if(scp instanceof StaticVar) throw Err.circVar((StaticVar) scp);
     return comp[0];
   }
 

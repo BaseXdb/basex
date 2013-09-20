@@ -15,12 +15,14 @@ import org.basex.util.*;
 public final class FNContext extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNContext(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNContext(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -31,10 +33,10 @@ public final class FNContext extends StandardFunc {
       case CURRENT_TIME:      return ctx.initDateTime().time;
       case IMPLICIT_TIMEZONE: return ctx.initDateTime().zone;
       case DEFAULT_COLLATION:
-        final Collation coll = ctx.sc.collation;
+        final Collation coll = sc.collation;
         return Uri.uri(coll == null ? QueryText.URLCOLL : coll.uri());
       case STATIC_BASE_URI:
-        final Uri uri = ctx.sc.baseURI();
+        final Uri uri = sc.baseURI();
         return uri == Uri.EMPTY ? null : uri;
       default: return super.item(ctx, ii);
     }

@@ -8,10 +8,10 @@ import java.lang.annotation.*;
  * empty constructor can be imported as module.</p>
  *
  * <p>If a class extends the {@link QueryModule} class, it inherits the {@link #context}
- * variable, which provides access to all properties of the current query. E.g., it
- * provides access to the current {@link QueryContext#value context item} or the
- * {@link QueryContext#sc static context} of a query. Next, the following default
- * properties of functions can be changed via annotations:</p>
+ * and {@link #staticContext} variables, which provide access to all properties of the
+ * current query. E.g., they provide access to the current {@link QueryContext#value
+ * context item} or the {@link StaticContext#ns declared namespaces} of a query.
+ * Next, the following default properties of functions can be changed via annotations:</p>
  * <ul>
  *   <li>Java functions can only be executed by users with {@code ADMIN} permissions.
  *       You may annotate a function with {@link Requires}({@link Permission}) to
@@ -95,6 +95,9 @@ public abstract class QueryModule {
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.METHOD)
   public @interface FocusDependent { }
+
+  /** Static context. */
+  public StaticContext staticContext;
 
   /** Query context. */
   public QueryContext context;

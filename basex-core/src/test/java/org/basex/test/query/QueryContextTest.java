@@ -16,13 +16,16 @@ import org.junit.*;
  * @author Leo Woerteler
  */
 public class QueryContextTest extends SandboxTest {
-  /** Tests the {@link QueryContext#parseLibrary(String, String)} method. */
+  /**
+   * Tests the {@link QueryContext#parseLibrary(String, String, StaticContext)}
+   * method.
+   */
   @Test
   public void module() {
     final QueryContext qc = new QueryContext(context);
     try {
       qc.parseLibrary(
-          "module namespace m='foo'; declare function m:foo() { m:bar() }; ", "");
+          "module namespace m='foo'; declare function m:foo() { m:bar() }; ", "", null);
       fail("Unknown function 'm:bar()' was not detected.");
     } catch(final QueryException e) {
       assertSame(Err.FUNCUNKNOWN, e.err());
@@ -32,7 +35,7 @@ public class QueryContextTest extends SandboxTest {
   }
 
   /**
-   * Tests the {@link QueryContext#parseLibrary(String, String)} method.
+   * Tests the {@link QueryContext#parseLibrary(String, String, StaticContext)} method.
    * @throws Exception exception
    */
   @Test
@@ -40,7 +43,7 @@ public class QueryContextTest extends SandboxTest {
     final QueryContext qc = new QueryContext(context);
     final IOFile a = new IOFile("src/test/resources/recmod/a.xqm");
     try {
-      qc.parseLibrary(Token.string(a.read()), a.path());
+      qc.parseLibrary(Token.string(a.read()), a.path(), null);
     } finally {
       qc.close();
     }

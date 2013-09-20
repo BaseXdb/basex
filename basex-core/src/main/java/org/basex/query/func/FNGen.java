@@ -33,12 +33,14 @@ import org.basex.util.*;
 public final class FNGen extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNGen(final InputInfo ii, final Function f, final Expr[] e) {
-    super(ii, f, e);
+  public FNGen(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -117,7 +119,7 @@ public final class FNGen extends StandardFunc {
     // check if reference is valid
     final byte[] in = checkEStr(expr[0].item(ctx, info));
     if(!Uri.uri(in).isValid()) INVCOLL.thrw(info, in);
-    return ctx.resource.collection(string(in), info);
+    return ctx.resource.collection(string(in), sc.baseIO(), info);
   }
 
   /**
@@ -173,7 +175,7 @@ public final class FNGen extends StandardFunc {
     if(it == null) return null;
     final byte[] in = checkEStr(it);
     if(!Uri.uri(in).isValid()) INVDOC.thrw(info, in);
-    return ctx.resource.doc(new QueryInput(string(in)), info);
+    return ctx.resource.doc(new QueryInput(string(in)), sc.baseIO(), info);
   }
 
   /**
@@ -204,7 +206,7 @@ public final class FNGen extends StandardFunc {
 
     checkCreate(ctx);
     final byte[] path = checkStr(expr[0], ctx);
-    final IO base = ctx.sc.baseIO();
+    final IO base = sc.baseIO();
     if(base == null) throw STBASEURI.thrw(info);
 
     String enc = null;
@@ -291,7 +293,7 @@ public final class FNGen extends StandardFunc {
     final Item item = expr[0].item(ctx, info);
     if(item == null) return null;
     try {
-      final IO io = new IOContent(checkStr(item), string(ctx.sc.baseURI().string()));
+      final IO io = new IOContent(checkStr(item), string(sc.baseURI().string()));
       return parseXml(io, ctx.context, frag);
     } catch(final IOException ex) {
       throw SAXERR.thrw(info, ex);

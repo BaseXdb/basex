@@ -19,22 +19,23 @@ import org.basex.util.hash.*;
 public final class CDoc extends CFrag {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param e expression
    */
-  public CDoc(final InputInfo ii, final Expr e) {
-    super(ii, e);
+  public CDoc(final StaticContext sctx, final InputInfo ii, final Expr e) {
+    super(sctx, ii, e);
     type = SeqType.DOC_O;
   }
 
   @Override
   public FDoc item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // create node
-    final Constr c = new Constr(ii, ctx);
+    final Constr c = new Constr(ii, sc);
     final FDoc doc = new FDoc(c.children, Token.EMPTY);
 
     // add child nodes
-    c.add(expr);
+    c.add(ctx, expr);
     if(c.errAtt || !c.atts.isEmpty()) DOCATTS.thrw(ii);
     if(c.errNS || !c.nspaces.isEmpty()) DOCNS.thrw(ii);
     return doc.optimize();
@@ -42,7 +43,7 @@ public final class CDoc extends CFrag {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CDoc(info, expr[0].copy(ctx, scp, vs));
+    return new CDoc(sc, info, expr[0].copy(ctx, scp, vs));
   }
 
   @Override

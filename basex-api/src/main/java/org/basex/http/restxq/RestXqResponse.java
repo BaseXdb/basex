@@ -60,11 +60,11 @@ final class RestXqResponse {
 
     // wrap function with a function call
     final StaticFuncCall sfc = new StaticFuncCall(uf.name, args, uf.sc, uf.info).init(uf);
-    final MainModule mm = new MainModule(sfc, new VarScope(), null);
+    final MainModule mm = new MainModule(sfc, new VarScope(uf.sc), null, uf.sc);
 
     // assign main module and http context and register process
     query.mainModule(mm);
-    query.context(http, null);
+    query.context(http, null, null);
 
     query.context.register(query);
     try {

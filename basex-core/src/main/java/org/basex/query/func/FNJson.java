@@ -25,12 +25,14 @@ public final class FNJson extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNJson(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNJson(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override

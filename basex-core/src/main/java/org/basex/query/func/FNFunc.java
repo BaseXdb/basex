@@ -21,12 +21,14 @@ import org.basex.util.*;
 public final class FNFunc extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNFunc(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNFunc(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -59,12 +61,12 @@ public final class FNFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item lookup(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final QNm name = checkQNm(expr[0], ctx);
+    final QNm name = checkQNm(expr[0], ctx, sc);
     final long arity = checkItr(expr[1], ctx);
     if(arity < 0 || arity > Integer.MAX_VALUE) FUNCUNKNOWN.thrw(ii, name);
 
     try {
-      final Expr lit = Functions.getLiteral(name, (int) arity, ctx, ii);
+      final Expr lit = Functions.getLiteral(name, (int) arity, ctx, sc, ii);
       return lit == null ? null : lit.item(ctx, ii);
     } catch(final QueryException e) {
       // function not found (in most cases: XPST0017)

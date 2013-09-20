@@ -20,6 +20,8 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public abstract class StaticScope extends ExprInfo implements Scope {
+  /** Static context. */
+  public final StaticContext sc;
   /** Variable scope. */
   protected final VarScope scope;
   /** Input info. */
@@ -37,8 +39,11 @@ public abstract class StaticScope extends ExprInfo implements Scope {
    * @param scp variable scope
    * @param ii input info
    * @param xqdoc documentation (may be {@code null} or empty)
+   * @param sctx static context
    */
-  public StaticScope(final VarScope scp, final String xqdoc, final InputInfo ii) {
+  public StaticScope(final VarScope scp, final String xqdoc, final StaticContext sctx,
+      final InputInfo ii) {
+    sc = sctx;
     scope = scp;
     info = ii;
     doc = xqdoc != null && !xqdoc.isEmpty() ? Token.token(xqdoc) : null;

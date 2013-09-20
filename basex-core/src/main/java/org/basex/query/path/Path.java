@@ -334,7 +334,7 @@ public abstract class Path extends ParseExpr {
             ((Step) steps[s]).preds : new Expr[0];
         final QNm nm = qnm.get(ts - t - 1);
         final NameTest nt = nm == null ? new NameTest(false) :
-          new NameTest(nm, Mode.LN, false);
+          new NameTest(nm, Mode.LN, false, null);
         stps[t] = Step.get(info, CHILD, nt, preds);
       }
       while(++s < steps.length) stps[ts++] = steps[s];

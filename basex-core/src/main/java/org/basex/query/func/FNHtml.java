@@ -25,12 +25,14 @@ public final class FNHtml extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNHtml(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNHtml(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override

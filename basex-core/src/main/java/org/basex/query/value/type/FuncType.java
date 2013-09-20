@@ -81,8 +81,8 @@ public class FuncType implements Type {
   }
 
   @Override
-  public FItem cast(final Item it, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public FItem cast(final Item it, final QueryContext ctx, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
 
     if(!(it instanceof FItem)) throw Err.cast(ii, this, it);
     final FItem f = (FItem) it;
@@ -90,13 +90,14 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final Item cast(final Object o, final QueryContext ctx, final InputInfo ii) {
+  public final Item cast(final Object o, final QueryContext ctx, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     throw Util.notexpected(o);
   }
 
   @Override
   public final Item castString(final String s, final QueryContext ctx,
-      final InputInfo ii) {
+      final StaticContext sc, final InputInfo ii) throws QueryException {
     throw Util.notexpected(s);
   }
 

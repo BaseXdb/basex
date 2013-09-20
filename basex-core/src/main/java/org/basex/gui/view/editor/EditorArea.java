@@ -159,8 +159,8 @@ final class EditorArea extends Editor {
         gui.context.options.set(MainOptions.QUERYPATH, path);
         final QueryContext qc = new QueryContext(gui.context);
         try {
-          if(lib) qc.parseLibrary(input, null);
-          else qc.parseMain(input, null);
+          if(lib) qc.parseLibrary(input, null, null);
+          else qc.parseMain(input, null, null);
           view.info(OK, true, false);
         } catch(final QueryException ex) {
           view.info(Util.message(ex), false, false);

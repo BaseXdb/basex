@@ -19,12 +19,14 @@ import org.basex.util.*;
 public final class FNInspect extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNInspect(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNInspect(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -98,7 +100,9 @@ public final class FNInspect extends StandardFunc {
    */
   private ValueBuilder contextFunctions(final QueryContext ctx) throws QueryException {
     final ValueBuilder vb = new ValueBuilder();
-    for(final StaticFunc sf : ctx.funcs.funcs()) vb.add(Functions.getUser(sf, ctx, info));
+    for(final StaticFunc sf : ctx.funcs.funcs()) {
+      vb.add(Functions.getUser(sf, ctx, sc, info));
+    }
     return vb;
   }
 }

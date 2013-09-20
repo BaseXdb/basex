@@ -26,12 +26,14 @@ public abstract class CName extends CFrag {
   /**
    * Constructor.
    * @param d description
+   * @param sctx static context
    * @param ii input info
    * @param n name
    * @param v attribute values
    */
-  CName(final String d, final InputInfo ii, final Expr n, final Expr... v) {
-    super(ii, v);
+  CName(final String d, final StaticContext sctx, final InputInfo ii, final Expr n,
+      final Expr... v) {
+    super(sctx, ii, v);
     name = n;
     desc = d;
   }
@@ -86,7 +88,7 @@ public abstract class CName extends CFrag {
       (ip.isStringOrUntyped() ? INVNAME : INVQNAME).thrw(info, str);
     }
     // create and update namespace
-    return new QNm(str, ctx);
+    return new QNm(str, sc);
   }
 
   @Override

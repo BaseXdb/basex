@@ -308,7 +308,7 @@ public final class QT3TS {
           query.addDocument(src.get(URI), file);
           final String role = src.get(ROLE);
           if(role == null) continue;
-          final Object call = Function.DOC.get(Str.get(file));
+          final Object call = query.funcCall("fn:doc", Str.get(file));
           if(role.equals(".")) query.context(call);
           else query.bind(role, call);
         }
@@ -319,7 +319,7 @@ public final class QT3TS {
         // bind collections
         query.addCollection(e.collURI, e.collSources.toArray());
         if(e.collContext) {
-          query.context(Function.COLLECTION.get(Str.get(e.collURI)));
+          query.context(query.funcCall("fn:collection", Str.get(e.collURI)));
         }
         // bind context item
         if(e.context != null) {

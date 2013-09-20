@@ -33,17 +33,18 @@ public final class Insert extends Update {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param src source expression
    * @param f first flag
    * @param l last
    * @param b before
    * @param a after
-   * @param trg target expression
+   * @param tr target expression
    */
-  public Insert(final InputInfo ii, final Expr src, final boolean f,
-      final boolean l, final boolean b, final boolean a, final Expr trg) {
-    super(ii, trg, src);
+  public Insert(final StaticContext sctx, final InputInfo ii, final Expr src,
+      final boolean f, final boolean l, final boolean b, final boolean a, final Expr tr) {
+    super(sctx, ii, tr, src);
     first = f;
     last = l;
     before = b;
@@ -52,7 +53,7 @@ public final class Insert extends Update {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    final Constr c = new Constr(ii, ctx).add(expr[1]);
+    final Constr c = new Constr(ii, sc).add(ctx, expr[1]);
     final ANodeList cList = c.children;
     final ANodeList aList = c.atts;
     if(c.errAtt) UPNOATTRPER.thrw(info);
@@ -104,7 +105,7 @@ public final class Insert extends Update {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Insert(info, expr[1].copy(ctx, scp, vs), first, last, before, after,
+    return new Insert(sc, info, expr[1].copy(ctx, scp, vs), first, last, before, after,
         expr[0].copy(ctx, scp, vs));
   }
 

@@ -29,12 +29,14 @@ import org.basex.util.list.*;
 public final class FNConvert extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNConvert(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNConvert(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override

@@ -22,12 +22,14 @@ import org.basex.util.*;
 public final class FNAggr extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNAggr(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNAggr(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -115,7 +117,7 @@ public final class FNAggr extends StandardFunc {
   private Item minmax(final Iter iter, final OpV cmp, final QueryContext ctx)
       throws QueryException {
 
-    final Collation coll = checkColl(expr.length == 2 ? expr[1] : null, ctx);
+    final Collation coll = checkColl(expr.length == 2 ? expr[1] : null, ctx, sc);
 
     Item rs = iter.next();
     if(rs == null) return null;
@@ -140,11 +142,11 @@ public final class FNAggr extends StandardFunc {
       return rs;
     }
     // numbers
-    if(rs.type.isUntyped()) rs = DBL.cast(rs, ctx, info);
+    if(rs.type.isUntyped()) rs = DBL.cast(rs, ctx, sc, info);
     for(Item it; (it = iter.next()) != null;) {
       final Type t = numType(rs, it);
       if(cmp.eval(rs, it, coll, info) || Double.isNaN(it.dbl(info))) rs = it;
-      if(rs.type != t) rs = (Item) t.cast(rs, ctx, info);
+      if(rs.type != t) rs = (Item) t.cast(rs, ctx, sc, info);
     }
     return rs;
   }

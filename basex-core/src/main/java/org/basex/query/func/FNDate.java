@@ -16,12 +16,14 @@ import org.basex.util.*;
 public final class FNDate extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNDate(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNDate(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -106,7 +108,7 @@ public final class FNDate extends StandardFunc {
    */
   private ADate checkDate(final Item it, final Type t, final QueryContext ctx)
       throws QueryException {
-    return (ADate) (it.type.isUntyped() ? t.cast(it, ctx, info) : checkType(it, t));
+    return (ADate) (it.type.isUntyped() ? t.cast(it, ctx, sc, info) : checkType(it, t));
   }
 
   /**
@@ -152,7 +154,7 @@ public final class FNDate extends StandardFunc {
 
     final ADate ad;
     if(it.type.isUntyped()) {
-      ad = (ADate) t.cast(it, ctx, info);
+      ad = (ADate) t.cast(it, ctx, sc, info);
     } else {
       // clone item
       final ADate a = (ADate) checkType(it, t);

@@ -39,8 +39,8 @@ public final class QueryInfo {
    * @param detailed return detailed query info
    * @return query string
    */
-  public String toString(final QueryProcessor qp, final PrintOutput out,
-      final long hits, final boolean detailed) {
+  public String toString(final QueryProcessor qp, final PrintOutput out, final long hits,
+      final boolean detailed) {
 
     final TokenBuilder tb = new TokenBuilder();
     final long total = pars + cmpl + evlt + srlz;
@@ -65,7 +65,7 @@ public final class QueryInfo {
       else tb.add("local ").add(Arrays.toString(writeLocked.toArray()));
       tb.add(NL);
     }
-    final IO io = qp.ctx.sc.baseIO();
+    final IO io = qp.sc.baseIO();
     final String name = io == null ? "" : " \"" + io.name() + "\"";
     tb.addExt(NL + QUERY_EXECUTED_X_X, name, Performance.getTime(total, runs));
     return tb.toString();

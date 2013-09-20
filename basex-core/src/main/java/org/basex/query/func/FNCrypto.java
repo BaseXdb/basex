@@ -18,12 +18,14 @@ public final class FNCrypto extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
-   * @param fd function
-   * @param args function arguments
+   * @param f function definition
+   * @param e arguments
    */
-  public FNCrypto(final InputInfo ii, final Function fd, final Expr[] args) {
-    super(ii, fd, args);
+  public FNCrypto(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
