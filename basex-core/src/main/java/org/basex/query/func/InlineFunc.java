@@ -124,7 +124,7 @@ public final class InlineFunc extends Single implements Scope {
 
       expr = expr.compile(ctx, scope);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe);
+      expr = FNInfo.error(qe, ret != null ? ret : expr.type());
     } finally {
       scope.cleanUp(this);
       scope.exit(ctx, fp);
@@ -175,7 +175,7 @@ public final class InlineFunc extends Single implements Scope {
           if(inl != null) expr = inl;
         }
       } catch(final QueryException qe) {
-        expr = FNInfo.error(qe);
+        expr = FNInfo.error(qe, ret != null ? ret : expr.type());
       } finally {
         scope.cleanUp(this);
         scope.exit(ctx, fp);

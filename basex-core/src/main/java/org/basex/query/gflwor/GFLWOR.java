@@ -598,7 +598,7 @@ public final class GFLWOR extends ParseExpr {
           iter.next();
           iter.remove();
         }
-        ret = FNInfo.error(qe);
+        ret = FNInfo.error(qe, ret.type());
         return true;
       }
     }

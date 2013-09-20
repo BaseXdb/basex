@@ -8,6 +8,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -147,10 +148,13 @@ public final class FNInfo extends StandardFunc {
   /**
    * Creates an error function instance.
    * @param ex query exception
+   * @param tp type of the expression
    * @return function
    */
-  public static FNInfo error(final QueryException ex) {
-    return new FNInfo(null, ex.info(), ERROR, ex.qname(),
+  public static FNInfo error(final QueryException ex, final SeqType tp) {
+    final FNInfo err = new FNInfo(null, ex.info(), ERROR, ex.qname(),
         Str.get(ex.getLocalizedMessage()));
+    err.type = tp;
+    return err;
   }
 }
