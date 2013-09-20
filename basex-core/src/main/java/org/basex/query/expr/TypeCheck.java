@@ -59,7 +59,13 @@ public final class TypeCheck extends Single {
       if(occ == null) throw Err.INVCAST.thrw(info, argType, type);
     }
 
-    return this;
+    switch(type.occ) {
+      case ZERO_ONE:
+      case ONE:
+        return new Cast(sc, info, expr, type);
+      default:
+        return this;
+    }
   }
 
   @Override

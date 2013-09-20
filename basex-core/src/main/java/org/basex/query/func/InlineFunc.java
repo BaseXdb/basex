@@ -190,7 +190,9 @@ public final class InlineFunc extends Single implements Scope {
     final VarScope v = scope.copy(cx, scp, vs);
     final Var[] a = args.clone();
     for(int i = 0; i < a.length; i++) a[i] = vs.get(a[i].id);
-    return copyType(new InlineFunc(info, name, ret, a, expr.copy(cx, v, vs), ann, sc, v));
+    final Expr e = expr.copy(cx, v, vs);
+    e.markTailCalls();
+    return copyType(new InlineFunc(info, name, ret, a, e, ann, sc, v));
   }
 
   @Override

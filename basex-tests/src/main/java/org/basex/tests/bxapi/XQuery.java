@@ -4,7 +4,6 @@ import java.util.*;
 
 import javax.xml.namespace.*;
 
-import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.io.serial.*;
 import org.basex.query.*;

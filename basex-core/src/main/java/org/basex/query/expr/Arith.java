@@ -66,7 +66,8 @@ public final class Arith extends Arr {
 
   @Override
   public Arith copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Arith(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs), calc);
+    final Expr a = expr[0].copy(ctx, scp, vs), b = expr[1].copy(ctx, scp, vs);
+    return copyType(new Arith(info, a, b, calc));
   }
 
   @Override

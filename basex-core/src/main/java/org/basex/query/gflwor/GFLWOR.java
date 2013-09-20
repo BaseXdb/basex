@@ -150,13 +150,27 @@ public final class GFLWOR extends ParseExpr {
 
       if(!clauses.isEmpty() && clauses.getFirst() instanceof For) {
         final For fst = (For) clauses.getFirst();
-        if(!fst.empty && fst.expr instanceof GFLWOR) {
-          ctx.compInfo(QueryText.OPTFLAT, fst);
-          final GFLWOR sub = (GFLWOR) fst.expr;
-          clauses.set(0, new For(fst.var, null, fst.score, sub.ret, false, fst.info));
-          if(fst.pos != null) clauses.add(1, new Count(fst.pos, fst.info));
-          clauses.addAll(0, sub.clauses);
-          changed = true;
+        if(!fst.empty) {
+          if(fst.expr instanceof GFLWOR) {
+            ctx.compInfo(QueryText.OPTFLAT, fst);
+            final GFLWOR sub = (GFLWOR) fst.expr;
+            clauses.set(0, new For(fst.var, null, fst.score, sub.ret, false, fst.info));
+            if(fst.pos != null) clauses.add(1, new Count(fst.pos, fst.info));
+            clauses.addAll(0, sub.clauses);
+            changed = true;
+          } else if(clauses.size() > 1 && clauses.get(1) instanceof Count) {
+            final Count cnt = (Count) clauses.get(1);
+            if(fst.pos != null) {
+              final Let lt = new Let(cnt.count,
+                  new VarRef(cnt.info, fst.pos).optimize(ctx, scp), false, cnt.info);
+              clauses.set(1, lt.optimize(ctx, scp));
+            } else {
+              clauses.set(0, new For(fst.var, cnt.count, fst.score,
+                  fst.expr, false, fst.info).optimize(ctx, scp));
+              clauses.remove(1);
+            }
+            changed = true;
+          }
         }
       }
 
