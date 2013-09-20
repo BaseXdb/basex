@@ -341,6 +341,7 @@
           <configuration>
             <tagNameFormat>@{project.version}</tagNameFormat>
             <releaseProfiles>release</releaseProfiles>
+            <scmCommentPrefix>Release: </scmCommentPrefix>
           </configuration>
         </plugin>
 
