@@ -3252,9 +3252,14 @@ public class QueryParser extends InputParser {
     }
 
     skipWS();
-    final Expr e = curr('{') ? enclosed(NOENCLEXPR)
-        : quote(curr()) ? Str.get(stringLiteral()) : null;
-    if(e == null) error(prg ? NOPRAGMA : NOENCLEXPR);
+    Expr e = null;
+    if(quote(curr())) {
+      e = Str.get(stringLiteral());
+    } else if(curr('{')) {
+      e = enclosed(NOENCLEXPR);
+    } else {
+      error(prg ? NOPRAGMA : NOFTSELECT, found());
+    }
 
     // FTAnyAllOption
     FTMode mode = FTMode.ANY;

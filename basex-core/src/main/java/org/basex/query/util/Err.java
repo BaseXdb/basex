@@ -663,7 +663,9 @@ public enum Err {
   /** XPST0003. */
   NSWRONG(XPST, 3, "Expecting namespace prefix."),
   /** XPST0003. */
-  NOENCLEXPR(XPST, 3, "Expecting valid expression after '{'."),
+  NOENCLEXPR(XPST, 3, "Expecting valid expression after curly brace."),
+  /** XPST0003. */
+  NOFTSELECT(XPST, 3, "Expecting quote or opening curly brace%."),
   /** XPST0003. */
   NODOCCONS(XPST, 3, "Expecting expression in document constructor."),
   /** XPST0003. */
