@@ -218,15 +218,19 @@ public final class HTTPContext {
   public void status(final int code, final String message, final boolean error)
       throws IOException {
 
-    log(message, code);
-    res.resetBuffer();
-    if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
+    try {
+      log(message, code);
+      res.resetBuffer();
+      if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
 
-    if(error && code >= 400) {
-      res.sendError(code, message);
-    } else {
-      res.setStatus(code);
-      if(message != null) res.getOutputStream().write(token(message));
+      if(error && code >= 400) {
+        res.sendError(code, message);
+      } else {
+        res.setStatus(code);
+        if(message != null) res.getOutputStream().write(token(message));
+      }
+    } catch(final IllegalStateException ex) {
+      log(Util.message(ex), SC_INTERNAL_SERVER_ERROR);
     }
   }
 
