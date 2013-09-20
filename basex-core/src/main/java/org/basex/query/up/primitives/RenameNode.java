@@ -41,7 +41,7 @@ public final class RenameNode extends UpdatePrimitive {
   @Override
   public void update(final NamePool pool) {
     final DBNode node = getTargetNode();
-    pool.add(name, node.type);
+    pool.add(name, node.nodeType());
     pool.remove(node);
   }
 

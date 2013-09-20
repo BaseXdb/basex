@@ -18,4 +18,10 @@ public final class MapTest extends AdvancedQueryTest {
         "$q",
         Err.FIATOM);
   }
+
+  /** Tests the the new syntax for map literals (see GH-755). */
+  @Test public void jsonSyntax() {
+    query("(<x><y/></x> / {'test':y, 42:'asdf'})('test')",
+        "<y/>");
+  }
 }
