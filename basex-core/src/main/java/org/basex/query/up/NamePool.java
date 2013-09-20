@@ -17,14 +17,14 @@ public final class NamePool {
   /** Name cache. */
   private NameCache[] cache = new NameCache[1];
   /** Number of entries. */
-  public int size;
+  private int size;
 
   /**
    * Adds an entry to the pool and increases its number of occurrence.
    * @param name name
    * @param type node type
    */
-  public void add(final QNm name, final Type type) {
+  public void add(final QNm name, final NodeType type) {
     if(type != NodeType.ATT && type != NodeType.ELM) return;
     final int i = index(name, type == NodeType.ATT);
     cache[i].add++;
@@ -63,6 +63,8 @@ public final class NamePool {
       final QNm nm = cache[i].name;
       final byte[] pref = nm.prefix();
       final byte[] uri = nm.uri();
+      // attributes with empty URI don't conflict with anything
+      if(cache[i].attr && uri.length == 0) continue;
       final byte[] u = at.value(pref);
       if(u == null) at.add(pref, uri);
       // check if only one uri is assigned to a prefix
