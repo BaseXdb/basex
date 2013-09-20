@@ -41,7 +41,9 @@ public final class Transform extends Arr {
   @Override
   public void checkUp() throws QueryException {
     for(final Let c : copies) c.checkUp();
-    if(!expr[0].isVacuous() && !expr[0].has(Flag.UPD)) UPEXPECTT.thrw(info);
+    final Expr m = expr[0];
+    m.checkUp();
+    if(!m.isVacuous() && !m.has(Flag.UPD)) UPMODIFY.thrw(info);
     checkNoUp(expr[1]);
   }
 

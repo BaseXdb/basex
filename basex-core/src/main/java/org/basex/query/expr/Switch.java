@@ -97,6 +97,12 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
+  public boolean isVacuous() {
+    for(final SwitchCase sc : cases) if(!sc.expr[0].isVacuous()) return false;
+    return true;
+  }
+
+  @Override
   public boolean has(final Flag flag) {
     for(final SwitchCase sc : cases) if(sc.has(flag)) return true;
     return cond.has(flag);

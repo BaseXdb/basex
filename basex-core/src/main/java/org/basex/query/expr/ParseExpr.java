@@ -175,8 +175,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Ensures that all specified expressions are either updating or vacuous.
-   * Otherwise, throws an exception.
+   * Ensures that all specified expressions are either updating and vacuous or
+   * non-updating. Otherwise, throws an exception.
    * @param expr expressions to be checked
    * @throws QueryException query exception
    */

@@ -1060,7 +1060,8 @@ public enum Err {
   /** XUST0001. */
   UPCTX(XUST, 1, "Context item may not declare an updating expression."),
   /** XUST0002. */
-  UPEXPECTT(XUST, 2, "Updating expression expected in modify clause."),
+  UPMODIFY(XUST, 2,
+      "Modify clause: all expressions must be updating or return an empty sequence."),
   /** XUST0002. */
   UPEXPECTF(XUST, 2, "Function body must be an updating expression."),
   /** XUST0003. */

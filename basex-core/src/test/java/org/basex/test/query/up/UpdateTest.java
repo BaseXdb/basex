@@ -1058,6 +1058,15 @@ public final class UpdateTest extends AdvancedQueryTest {
       "xquery:eval('$c()', map { 'c' := local:c#0 })", "<a/>");
   }
 
+  /**
+   * Tests the expressions in modify clauses for updates.
+   */
+  @Test
+  public void modifyCheck() {
+    error("copy $c:= <a>X</a> modify 'a' return $c", Err.UPMODIFY);
+    error("copy $c:= <a>X</a> modify(delete node $c/text(),'a') return $c", Err.UPALL);
+  }
+
   /** Tests adding an attribute and thus crossing the {@link IO#MAXATTS} line (GH-752). */
   @Test
   public void insertAttrMaxAtt() {
