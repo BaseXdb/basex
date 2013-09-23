@@ -72,9 +72,9 @@ public final class JSONParser extends XMLParser {
     final ParserProp props = new ParserProp(options);
     final byte[] format = props.is(ParserProp.JSONML) ? JsonConverter.JSONML :
       JsonConverter.JSON;
-    final boolean unescape = props.is(ParserProp.JSON_UNESC);
-    final String encoding = props.get(ParserProp.ENCODING),
-        spec = props.get(ParserProp.JSON_SPEC);
+    final boolean unescape = props.is(ParserProp.UNESCAPE);
+    final String encoding = props.get(ParserProp.ENCODING);
+    final String spec = props.get(ParserProp.SPEC);
 
     Spec sp = Spec.RFC4627;
     for(final Spec s : Spec.values())

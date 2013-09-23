@@ -96,7 +96,7 @@ public final class Prop extends AProp {
   public static final Object[] PARSER = { "PARSER", "xml" };
   /** Define parser options. */
   public static final Object[] PARSEROPT = { "PARSEROPT",
-    "encoding=UTF-8,flat=false,format=verbose,header=false,jsonml=false," +
+    "encoding=UTF-8,flat=false,header=false,jsonml=false," +
     "lines=true,separator=comma" };
   /** Cache new documents before adding them to a database. */
   public static final Object[] ADDCACHE = { "ADDCACHE", false };

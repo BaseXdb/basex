@@ -113,7 +113,7 @@ public final class RestXqTest extends HTTPTest {
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
     post(f, "", "<A/>", "[\"A\"]", APP_JSONML);
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x/csv/*/*};";
-    post(f, "", "<col>A</col>", "A", TEXT_CSV);
+    post(f, "", "<entry>A</entry>", "A", TEXT_CSV);
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
     post(f, "", "QUFB", "AAA", APP_OCTET);
     post(f, "", "QUFB", "AAA", "whatever/type");

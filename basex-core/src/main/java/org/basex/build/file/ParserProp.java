@@ -26,9 +26,11 @@ public final class ParserProp extends AProp {
   /** Parser option: jsonml format. */
   public static final Object[] JSONML = { "jsonml", false };
   /** Parser option: JSON spec. */
-  public static final Object[] JSON_SPEC = { "json_spec", Spec.RFC4627.name() };
+  public static final Object[] SPEC = { "spec", Spec.RFC4627.name() };
   /** Parser option: JSON {@code unescape}. */
-  public static final Object[] JSON_UNESC = { "json_unesc", true };
+  public static final Object[] UNESCAPE = { "unescape", true };
+  /** Parser option: XML format (obsolete). */
+  public static final Object[] FORMAT = { "format", "verbose" };
 
   /**
    * Constructor.
