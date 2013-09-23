@@ -40,16 +40,20 @@ public class Execute extends Command {
 
   @Override
   protected boolean run() {
-    if(!init(context)) return error(error);
+    try {
+      if(!init(context)) return error(error);
 
-    final StringBuilder sb = new StringBuilder();
-    for(final Command c : list) {
-      final boolean ok = proc(c).run(context, out);
-      proc(null);
-      sb.append(c.info());
-      if(!ok) return error(sb.toString());
+      final StringBuilder sb = new StringBuilder();
+      for(final Command c : list) {
+        final boolean ok = proc(c).run(context, out);
+        proc(null);
+        sb.append(c.info());
+        if(!ok) return error(sb.toString());
+      }
+      return info(sb.toString().replaceAll("\r?\n?$", ""));
+    } finally {
+      finish(context);
     }
-    return info(sb.toString().replaceAll("\r?\n?$", ""));
   }
 
   @Override
@@ -86,6 +90,14 @@ public class Execute extends Command {
       }
     }
     return error == null;
+  }
+
+  /**
+   * Finalizes command execution.
+   * @param ctx database context
+   */
+  @SuppressWarnings("unused")
+  protected void finish(final Context ctx) {
   }
 
   @Override

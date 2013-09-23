@@ -54,4 +54,9 @@ public final class Run extends Execute {
     ctx.prop.set(Prop.QUERYPATH, file.path());
     return error == null;
   }
+
+  @Override
+  protected void finish(final Context ctx) {
+    ctx.prop.set(Prop.QUERYPATH, "");
+  }
 }

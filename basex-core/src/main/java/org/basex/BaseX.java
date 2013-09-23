@@ -81,6 +81,7 @@ public class BaseX extends Main {
           }
           execute(new Set(Prop.QUERYPATH, base), false);
           execute(val);
+          execute(new Set(Prop.QUERYPATH, ""), false);
           console = false;
         } else if(c == 'd') {
           // toggle debug mode
@@ -107,7 +108,6 @@ public class BaseX extends Main {
           session().setOutputStream(out);
         } else if(c == 'q') {
           // evaluate query
-          execute(new Set(Prop.QUERYPATH, "."), false);
           execute(new XQuery(val), verbose);
           console = false;
         } else if(c == 'Q') {
@@ -120,6 +120,7 @@ public class BaseX extends Main {
           }
           execute(new Set(Prop.QUERYPATH, base), false);
           execute(new XQuery(val), verbose);
+          execute(new Set(Prop.QUERYPATH, ""), false);
           console = false;
         } else if(c == 'r') {
           // hidden option: parse number of runs
