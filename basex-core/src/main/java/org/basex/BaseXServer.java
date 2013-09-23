@@ -173,6 +173,7 @@ public final class BaseXServer extends Main implements Runnable {
         break;
       } catch(final Throwable ex) {
         // socket may have been unexpectedly closed
+        Util.errln(ex);
         context.log.writeError(ex);
         break;
       }
@@ -208,6 +209,7 @@ public final class BaseXServer extends Main implements Runnable {
       esocket.close();
       socket.close();
     } catch(final IOException ex) {
+      Util.errln(ex);
       context.log.writeError(ex);
     }
     console = false;
