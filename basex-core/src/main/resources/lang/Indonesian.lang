@@ -369,7 +369,6 @@ watching_event_%     = Amati kejadian '%'.
 whole_word           = Seluruh kata
 write_locking        = Write Locking
 ws_chopping          = Pemotongan spasi
-xml_format           = Bentuk XML
 xquery               = XQuery
 yes                  = Ya
 

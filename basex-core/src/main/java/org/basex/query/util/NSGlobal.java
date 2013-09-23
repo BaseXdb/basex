@@ -50,6 +50,7 @@ public final class NSGlobal {
     NS.add(ARCHIVE, ARCHIVEURI);
     NS.add(CLIENT, CLIENTURI);
     NS.add(CONVERT, CONVERTURI);
+    NS.add(CSV, CSVURI);
     NS.add(DB, DBURI);
     NS.add(FETCH, FETCHURI);
     NS.add(FT, FTURI);

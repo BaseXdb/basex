@@ -9,10 +9,9 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.util.json.*;
 import org.basex.query.util.json.JsonParser.Spec;
-import org.basex.query.value.node.*;
+import org.basex.query.value.item.*;
 
 /**
  * This class parses files in the JSON format
@@ -71,8 +70,9 @@ public final class JSONParser extends XMLParser {
   private static IO toXML(final IO io, final String options) throws IOException {
     // set parser properties
     final ParserProp props = new ParserProp(options);
-    final boolean jsonml = props.is(ParserProp.JSONML),
-        unescape = props.is(ParserProp.JSON_UNESC);
+    final byte[] format = props.is(ParserProp.JSONML) ? JsonConverter.JSONML :
+      JsonConverter.JSON;
+    final boolean unescape = props.is(ParserProp.JSON_UNESC);
     final String encoding = props.get(ParserProp.ENCODING),
         spec = props.get(ParserProp.JSON_SPEC);
 
@@ -84,10 +84,9 @@ public final class JSONParser extends XMLParser {
     final byte[] content = new NewlineInput(io).encoding(encoding).content();
 
     // parse input and convert to XML node
-    final ANode node;
+    final Item node;
     try {
-      final JsonXMLConverter conv = jsonml ? new JsonMLConverter(null) :
-        new JsonCGConverter(sp, unescape, null);
+      final JsonConverter conv = JsonConverter.newInstance(format, sp, unescape, null);
       node = conv.convert(string(content));
 
       // create XML input container from serialized node
@@ -95,7 +94,7 @@ public final class JSONParser extends XMLParser {
       xml.name(io.name());
       return xml;
     } catch(final QueryException ex) {
-      throw new BaseXException(ex.getLocalizedMessage());
+      throw new BaseXException(ex);
     }
   }
 }

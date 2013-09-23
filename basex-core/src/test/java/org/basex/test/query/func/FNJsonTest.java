@@ -7,7 +7,7 @@ import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the functions of the Json Module.
+ * This class tests the functions of the JSON Module.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -109,14 +109,14 @@ public final class FNJsonTest extends AdvancedQueryTest {
 
   /** Tests the configuration argument of {@code json:parse(...)}. */
   @Test public void config() {
-    query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', map{'type':='jsonml'})",
+    query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', map{'format':='jsonml'})",
         "<foo test=\"asdf\"/>");
-    query("map:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map{'type':='maps'}))",
+    query("map:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map{'format':='maps'}))",
         "2");
     query("json:parse('\"\\t\\u000A\"'," +
-        "  map{'type':='maps','unescape':=false(),'spec':='liberal'})", "\\t\\u000A");
+        "  map{'format':='maps','unescape':=false(),'spec':='liberal'})", "\\t\\u000A");
     query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
-        "  map{'type':='maps','unescape':=true(),'spec':='liberal'}))", "9 10");
+        "  map{'format':='maps','unescape':=true(),'spec':='liberal'}))", "9 10");
     error("json:parse('42', map{'spec':='garbage'})", Err.BXJS_PARSE_CFG);
   }
 }

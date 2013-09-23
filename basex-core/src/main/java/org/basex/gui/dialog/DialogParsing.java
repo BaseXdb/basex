@@ -66,8 +66,6 @@ final class DialogParsing extends BaseXBack {
   private final BaseXCombo sepcombo;
   /** CSV: Separator (numeric). */
   private final BaseXTextField sepchar;
-  /** CSV: Format. */
-  private final BaseXCombo format;
   /** CSV: encoding. */
   private final BaseXCombo cencoding;
 
@@ -143,9 +141,6 @@ final class DialogParsing extends BaseXBack {
     separator.add(sepchar);
     BaseXLayout.setWidth(sepchar, 35);
 
-    format = new BaseXCombo(d, CSVParser.FORMATS);
-    format.setSelectedItem(props.get(ParserProp.FORMAT));
-
     final String enc = props.get(ParserProp.ENCODING);
     cencoding = DialogExport.encoding(d, enc);
     tencoding = DialogExport.encoding(d, enc);
@@ -154,7 +149,7 @@ final class DialogParsing extends BaseXBack {
     xmlopts  = new BaseXBack(new TableLayout(9, 1));
     htmlopts = new BaseXBack(new TableLayout(2, 1));
     jsonopts = new BaseXBack(new TableLayout(2, 1));
-    csvopts  = new BaseXBack(new TableLayout(2, 1));
+    csvopts  = new BaseXBack(new TableLayout(2, 1, 0, 8));
     textopts = new BaseXBack(new TableLayout(2, 1));
     createOptionsPanels();
 
@@ -213,13 +208,11 @@ final class DialogParsing extends BaseXBack {
     jsonopts.add(p);
     jsonopts.add(jsonml);
 
-    p = new BaseXBack(new TableLayout(3, 2, 8, 4));
+    p = new BaseXBack(new TableLayout(2, 2, 8, 4));
     p.add(new BaseXLabel(ENCODING + COL, true, true));
     p.add(cencoding);
     p.add(new BaseXLabel(SEPARATOR, true, true));
     p.add(separator);
-    p.add(new BaseXLabel(XML_FORMAT, true, true));
-    p.add(format);
     csvopts.add(p);
     csvopts.add(header);
 
@@ -301,7 +294,6 @@ final class DialogParsing extends BaseXBack {
     final BaseXCombo cb = type.equals(DataText.M_TEXT) ? tencoding :
       type.equals(DataText.M_JSON) ? jencoding : cencoding;
     props.set(ParserProp.ENCODING, cb.getSelectedItem().toString());
-    props.set(ParserProp.FORMAT, format.getSelectedItem().toString());
     props.set(ParserProp.HEADER, header.isSelected());
     props.set(ParserProp.LINES, lines.isSelected());
     props.set(ParserProp.JSONML, jsonml.isSelected());

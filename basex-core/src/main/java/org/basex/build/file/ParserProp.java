@@ -17,8 +17,6 @@ public final class ParserProp extends AProp {
   public static final Object[] SEPARATOR = { "separator", "comma" };
   /** Parser option: header line. */
   public static final Object[] HEADER = { "header", false };
-  /** Parser option: XML format. */
-  public static final Object[] FORMAT = { "format", "verbose" };
   /** Parser option: line. */
   public static final Object[] LINES = { "lines", true };
   /** Parser option: flat. */

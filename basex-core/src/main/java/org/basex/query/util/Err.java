@@ -56,7 +56,7 @@ public enum Err {
   /** BXCL0006. */
   BXCL_ITEM(BXCL, 6, "Value to be bound is no single item: %"),
 
-  // Convert module (to be moved from Utility module)
+  // Conversion module
 
   /** BXCO0001. */
   BXCO_STRING(BXCO, 1, "String conversion: %."),
@@ -64,6 +64,13 @@ public enum Err {
   BXCO_BASE64(BXCO, 1, "String cannot be converted to the supplied encoding."),
   /** BXCO0002. */
   BXCO_ENCODING(BXCO, 2, "Encoding '%' is not supported."),
+
+  // CSV module
+
+  /** BXCS0001. */
+  BXCS_SEP(BXCS, 1, "CSV parser configuration: Separator must be single character."),
+  /** BXCS0002. */
+  BXCS_ERROR(BXCS, 2, "CSV parser: %."),
 
   // Database module
 
@@ -121,7 +128,7 @@ public enum Err {
   /** BXJS0001. */
   BXJS_PARSE(BXJS, 1, "JSON parser (%:%): %."),
   /** BXJS0001. */
-  BXJS_PARSE_CFG(BXJS, 1, "JSON parser config: %."),
+  BXJS_PARSE_CFG(BXJS, 1, "JSON parser configuration: %."),
   /** BXJS0001. */
   BXJS_PARSEML(BXJS, 1, "JsonML parser: %."),
   /** BXJS0002. */
@@ -1150,6 +1157,7 @@ public enum Err {
 
     /** BXCL Error type. */ BXCL(QueryText.BXERR, QueryText.BXERRORS),
     /** BXCO Error type. */ BXCO(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXCS Error type. */ BXCS(QueryText.BXERR, QueryText.BXERRORS),
     /** BXDB Error type. */ BXDB(QueryText.BXERR, QueryText.BXERRORS),
     /** BXFE Error type. */ BXFE(QueryText.BXERR, QueryText.BXERRORS),
     /** BXFT Error type. */ BXFT(QueryText.BXERR, QueryText.BXERRORS),

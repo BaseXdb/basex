@@ -12,15 +12,16 @@ import org.basex.util.*;
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
- *
  */
 public abstract class JsonConverter {
   /** Input info. */
   protected final InputInfo info;
-  /** The {@code map} conversion type. */
-  private static final byte[] MAPS = token("maps");
-  /** The {@code jsonml} conversion type. */
-  private static final byte[] JSONML = token("jsonml");
+  /** The {@code map} conversion format. */
+  public static final byte[] MAPS = token("maps");
+  /** The {@code jsonml} conversion format. */
+  public static final byte[] JSONML = token("jsonml");
+  /** The {@code json} conversion format. */
+  public static final byte[] JSON = token("json");
 
   /**
    * Constructor.
@@ -40,16 +41,19 @@ public abstract class JsonConverter {
 
   /**
    * Returns a {@link JsonConverter} for the given configuration.
-   * @param type conversion type
+   * @param format conversion format
    * @param spec JSON spec
    * @param unesc unescape flag
    * @param ii input info
    * @return a JSON converter
    */
-  public static JsonConverter newInstance(final byte[] type, final Spec spec,
+  public static JsonConverter newInstance(final byte[] format, final Spec spec,
     final boolean unesc, final InputInfo ii) {
-    if(eq(type, JSONML)) return new JsonMLConverter(ii);
-    if(eq(type, MAPS)) return new JsonMapConverter(spec, unesc, ii);
+
+    if(format != null) {
+      if(eq(format, JSONML)) return new JsonMLConverter(ii);
+      if(eq(format, MAPS)) return new JsonMapConverter(spec, unesc, ii);
+    }
     return new JsonCGConverter(spec, unesc, ii);
   }
 }

@@ -1089,8 +1089,6 @@ public interface Text {
   String SPLIT_INPUT_LINES = lang("split_input_lines");
   /** CSV header information. */
   String FIRST_LINE_HEADER = lang("first_line_header");
-  /** CSV Database format information. */
-  String XML_FORMAT = lang("xml_format") + COL;
   /** CSV Separator information. */
   String SEPARATOR = lang("separator") + COL;
 

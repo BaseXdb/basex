@@ -1,11 +1,11 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -13,23 +13,25 @@ import org.basex.query.expr.*;
 import org.basex.query.util.json.*;
 import org.basex.query.util.json.JsonParser.Spec;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
- * Project specific functions.
+ * Functions for parsing and serializing JSON objects.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNJson extends StandardFunc {
+  /** Element: options. */
+  private static final QNm Q_OPTIONS = QNm.get("options", JSONURI);
   /** The {@code unescape} key. */
-  private static final Str UNESC = Str.get("unescape");
+  private static final byte[] UNESCAPE = token("unescape");
   /** The {@code spec} key. */
-  private static final Str SPEC = Str.get("spec");
+  private static final byte[] SPEC = token("spec");
   /** The {@code type} key. */
-  private static final Str TYPE = Str.get(DataText.T_TYPE);
+  private static final byte[] FORMAT = token("format");
 
   /**
    * Constructor.
@@ -45,9 +47,7 @@ public final class FNJson extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case _JSON_PARSE:
-        final Map cfg = expr.length < 2 ? Map.EMPTY : checkMap(checkItem(expr[1], ctx));
-        final JsonConverter conv = getConverter(cfg, ctx);
-        return conv.convert(string(checkStr(expr[0], ctx))).item(ctx, ii);
+        return parse(ctx);
       case _JSON_PARSE_ML:
         return new JsonMLConverter(info).convert(string(checkStr(expr[0], ctx)));
       case _JSON_SERIALIZE:
@@ -60,19 +60,20 @@ public final class FNJson extends StandardFunc {
   }
 
   /**
-   * Creates a JSON converter according to the given configuration.
-   * @param cfg configuration map
+   * Converts a JSON object to an item according to the given configuration.
    * @param ctx query context
-   * @return JSON converter
+   * @return item
    * @throws QueryException query exception
    */
-  private JsonConverter getConverter(final Map cfg, final QueryContext ctx)
-      throws QueryException {
-    final boolean unesc = !cfg.contains(UNESC, info).bool(info)
-        || cfg.get(UNESC, info).ebv(ctx, info).bool(info);
+  private Item parse(final QueryContext ctx) throws QueryException {
+    final byte[] input = checkStr(expr[0], ctx);
+    final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
+    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
+
+    final boolean unesc = !map.contains(UNESCAPE) || eq(map.get(UNESCAPE), TRUE);
     final Spec spec;
-    if(cfg.contains(SPEC, info).bool(info)) {
-      final byte[] sp = checkStr(cfg.get(SPEC, info), ctx);
+    final byte[] sp = map.get(SPEC);
+    if(sp != null) {
       Spec spc = null;
       for(final Spec s : Spec.values()) if(eq(sp, s.desc)) spc = s;
       if(spc == null) BXJS_PARSE_CFG.thrw(info, "Unknown spec '" + string(sp) + "'");
@@ -81,8 +82,9 @@ public final class FNJson extends StandardFunc {
       spec = Spec.RFC4627;
     }
 
-    final byte[] typ = checkEStr(cfg.get(TYPE, info), ctx);
-    return JsonConverter.newInstance(typ, spec, unesc, info);
+    final byte[] form = map.get(FORMAT);
+    final JsonConverter conv = JsonConverter.newInstance(form, spec, unesc, info);
+    return conv.convert(string(input)).item(ctx, info);
   }
 
   /**

@@ -79,7 +79,7 @@ public final class CSVTest extends SandboxTest {
     assertEquals("3", new XQuery("count(//Name)").execute(context));
     assertEquals("2", new XQuery("count(//Email)").execute(context));
 
-    new Set(Prop.PARSEROPT, "format=simple,header=true").execute(context);
+    new Set(Prop.PARSEROPT, "header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("3", new XQuery("count(//record)").execute(context));
   }
@@ -90,7 +90,7 @@ public final class CSVTest extends SandboxTest {
    */
   @Test
   public void simple() throws Exception {
-    new Set(Prop.PARSEROPT, "format=simple,header=true").execute(context);
+    new Set(Prop.PARSEROPT, "header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("3", new XQuery("count(//record)").execute(context));
   }

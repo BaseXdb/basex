@@ -6,12 +6,13 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.build.*;
+import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.util.*;
-import org.basex.util.list.*;
+import org.basex.query.*;
+import org.basex.query.util.csv.*;
+import org.basex.query.value.node.*;
 
 /**
  * This class parses files in the CSV format
@@ -44,38 +45,9 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CSVParser extends SingleParser {
+public final class CSVParser extends XMLParser {
   /** Separators. */
   public static final String[] SEPARATORS = { "comma", "semicolon", "tab", "space" };
-  /** Formats. */
-  public static final String[] FORMATS = { "simple", "verbose" };
-
-  /** Separator mappings. */
-  private static final char[] SEPMAPPINGS = { ',', ';', '\t', ' ' };
-  /** CSV root element. */
-  private static final byte[] CSV = token("csv");
-  /** CSV header element. */
-  private static final byte[] HEADER = token("header");
-  /** CSV record element. */
-  private static final byte[] RECORD = token("record");
-  /** CSV field element. */
-  private static final byte[] ENTRY = token("entry");
-  /** CSV column attribute. */
-  private static final byte[] COLUMN = token("col");
-
-  /** Headers. */
-  private final TokenList headers = new TokenList();
-  /** Simple format. */
-  private final boolean simple;
-  /** Encoding. */
-  private final String encoding;
-  /** Column separator (see {@link ParserProp#SEPARATOR}). */
-  private final int separator;
-
-  /** Current row. */
-  private int row;
-  /** Current column. */
-  private int col;
 
   /**
    * Constructor.
@@ -84,161 +56,48 @@ public final class CSVParser extends SingleParser {
    * @throws IOException I/O exception
    */
   public CSVParser(final IO source, final Prop pr) throws IOException {
-    super(source, pr);
+    super(toXML(source, pr.get(Prop.PARSEROPT)), pr);
+  }
 
+  /**
+   * Converts a JSON document to XML.
+   * @param io io reference
+   * @param options parsing options
+   * @return parser
+   * @throws IOException I/O exception
+   */
+  private static IO toXML(final IO io, final String options) throws IOException {
     // set parser properties
-    final ParserProp props = new ParserProp(pr.get(Prop.PARSEROPT));
-    row = props.is(ParserProp.HEADER) ? 0 : 1;
+    final ParserProp props = new ParserProp(options);
+    final boolean header = props.is(ParserProp.HEADER);
 
     // set separator
-    String val = props.get(ParserProp.SEPARATOR).toLowerCase(Locale.ENGLISH);
+    final String val = props.get(ParserProp.SEPARATOR).toLowerCase(Locale.ENGLISH);
     int s = -1;
     for(int i = 0; i < SEPARATORS.length && s == -1; i++) {
-      if(val.equals(SEPARATORS[i])) s = SEPMAPPINGS[i];
+      if(val.equals(SEPARATORS[i])) s = CsvParser.SEPMAPPINGS[i];
     }
     if(s == -1) {
       final int i = toInt(token(val));
       if(i > 0) s = i;
       else throw new BaseXException(INVALID_VALUE_X_X, ParserProp.SEPARATOR[0], val);
     }
-    separator = s;
+    int separator = s;
 
-    // set XML format
-    val = props.get(ParserProp.FORMAT).toLowerCase(Locale.ENGLISH);
-    simple = val.equals(FORMATS[0]);
-    if(!simple && !val.equals(FORMATS[1])) throw new BaseXException(
-        INVALID_VALUE_X_X, ParserProp.FORMAT[0], val);
-    encoding = props.get(ParserProp.ENCODING);
-  }
+    // retrieve content in correct encoding
+    String encoding = props.get(ParserProp.ENCODING);
+    final byte[] content = new NewlineInput(io).encoding(encoding).content();
 
-  @Override
-  public void parse() throws IOException {
-    builder.openElem(CSV, atts, nsp);
-
-    final TokenBuilder tb = new TokenBuilder();
-    final NewlineInput nli = new NewlineInput(src).encoding(encoding);
-
-    boolean quoted = false, open = true;
-    int ch = -1;
-    while(true) {
-      if(ch == -1) ch = nli.read();
-      if(ch == -1) break;
-      if(quoted) {
-        if(ch == '"') {
-          ch = nli.read();
-          if(ch != '"') {
-            quoted = false;
-            continue;
-          }
-        }
-        tb.add(ch);
-      } else if(ch == separator) {
-        if(open) {
-          open();
-          open = false;
-        }
-        add(tb);
-      } else if(ch == '\n') {
-        finish(tb, open);
-        open = true;
-      } else if(ch == '"') {
-        quoted = true;
-      } else {
-        tb.add(XMLToken.valid(ch) ? ch : '?');
-      }
-      ch = -1;
+    // parse input and convert to XML node
+    try {
+      final CsvParser conv = new CsvParser(separator, header);
+      final ANode node = conv.convert(content);
+      // cache XML representation
+      final IOContent xml = new IOContent(node.serialize().toArray());
+      xml.name(io.name());
+      return xml;
+    } catch(final QueryException ex) {
+      throw new BaseXException(ex);
     }
-    nli.close();
-
-    finish(tb, open);
-    builder.closeElem();
-  }
-
-  /**
-   * Opens a new record.
-   * @throws IOException I/O exception
-   */
-  private void open() throws IOException {
-    if(row == 0) {
-      if(simple) builder.openElem(HEADER, atts, nsp);
-    } else {
-      builder.openElem(RECORD, atts, nsp);
-    }
-  }
-
-  /**
-   * Finishes the current record.
-   * @param tb token builder
-   * @param open open flag
-   * @throws IOException I/O exception
-   */
-  private void finish(final TokenBuilder tb, final boolean open) throws IOException {
-    boolean close = !open;
-    if(open && !tb.isEmpty()) {
-      open();
-      close = true;
-    }
-    add(tb);
-    if(close) {
-      if(simple || row != 0) builder.closeElem();
-      ++row;
-    }
-    col = 0;
-  }
-
-  /**
-   * Adds a field.
-   * @param tb token builder
-   * @throws IOException I/O exception
-   */
-  private void add(final TokenBuilder tb) throws IOException {
-    if(row == 0 && !simple) {
-      addHeader(tb.finish());
-      tb.reset();
-      return;
-    }
-
-    final byte[] t;
-    if(simple) {
-      t = ENTRY;
-    } else {
-      if(col == headers.size()) addHeader(COLUMN);
-      t = headers.get(col);
-    }
-
-    if(!tb.isEmpty() || simple) {
-      builder.openElem(t, atts, nsp);
-      builder.text(tb.finish());
-      builder.closeElem();
-      tb.reset();
-    }
-    ++col;
-  }
-
-  /**
-   * Adds a field header.
-   * @param f field name
-   */
-  private void addHeader(final byte[] f) {
-    // create tag name
-    final TokenBuilder nm = new TokenBuilder();
-    for(int p = 0; p < f.length; p += cl(f, p)) {
-      final int cp = cp(f, p);
-      nm.add((p == 0 ? XMLToken.isNCStartChar(cp) :
-        XMLToken.isNCChar(cp)) ? cp : '_');
-    }
-    // no valid characters found: add default column name
-    if(nm.isEmpty()) nm.add(COLUMN);
-
-    // tag exists: attach enumerator
-    byte[] fb = nm.finish();
-    if(headers.contains(fb)) {
-      int c = 2;
-      do {
-        fb = concat(nm.finish(), token(c++));
-      } while(headers.contains(fb));
-    }
-    // add header
-    headers.add(fb);
   }
 }

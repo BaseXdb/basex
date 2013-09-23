@@ -369,7 +369,6 @@ watching_event_%     = Guarda l'evento '%'.
 whole_word           = Parola Intera
 write_locking        = Write Locking
 ws_chopping          = Rimozione spazi
-xml_format           = Formato XML
 xquery               = XQuery
 yes                  = Sì
 

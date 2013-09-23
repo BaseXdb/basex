@@ -460,12 +460,14 @@ public interface QueryText {
   byte[] BASEX = token("basex");
   /** BXErr token. */
   byte[] BXERR = token("bxerr");
+  /** Admin token. */
+  byte[] ADMIN = token("admin");
   /** Client token. */
   byte[] CLIENT = token("client");
   /** Convert token. */
   byte[] CONVERT = token("convert");
-  /** Admin token. */
-  byte[] ADMIN = token("admin");
+  /** CSV token. */
+  byte[] CSV = token("csv");
   /** DB token. */
   byte[] DB = token("db");
   /** QUERY token. */
@@ -599,8 +601,10 @@ public interface QueryText {
   byte[] ARCHIVEURI = token(BXMODULES + "archive");
   /** Client module URI. */
   byte[] CLIENTURI = token(BXMODULES + "client");
-  /** Convert module URI. */
+  /** Conversion module URI. */
   byte[] CONVERTURI = token(BXMODULES + "convert");
+  /** CSV module URI. */
+  byte[] CSVURI = token(BXMODULES + "csv");
   /** Database module URI. */
   byte[] DBURI = token(BXMODULES + "db");
   /** Fetch module URI. */

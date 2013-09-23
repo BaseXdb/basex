@@ -369,7 +369,6 @@ watching_event_%     = イベント '%' を監視しています.
 whole_word           = 単語全体
 write_locking        = Write Locking
 ws_chopping          = 空白の除去
-xml_format           = XML フォーマット
 xquery               = XQuery
 yes                  = はい
 

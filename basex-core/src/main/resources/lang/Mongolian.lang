@@ -370,7 +370,6 @@ watching_event_%     = Үйл ажиллагаа(event) '%' хянах.
 whole_word           = Whole Word
 write_locking        = Write Locking
 ws_chopping          = Сул зайг хасах
-xml_format           = XML формат
 xquery               = XQuery
 yes                  = Тийм
 

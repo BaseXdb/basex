@@ -126,9 +126,9 @@ public final class Map extends FItem {
    * @return {@code true()}, if the key exists, {@code false()} otherwise
    * @throws QueryException query exception
    */
-  public Bln contains(final Item k, final InputInfo ii) throws QueryException {
+  public boolean contains(final Item k, final InputInfo ii) throws QueryException {
     final Item key = key(k, ii);
-    return Bln.get(key != null && root.contains(key.hash(ii), key, 0, ii));
+    return key != null && root.contains(key.hash(ii), key, 0, ii);
   }
 
   /**

@@ -600,6 +600,11 @@ public enum Function {
   _CRYPTO_VALIDATE_SIGNATURE(FNCrypto.class, "validate-signature(node)",
       arg(NOD), BLN),
 
+  /* FNCsv functions. */
+
+  /** XQuery function. */
+  _CSV_PARSE(FNCsv.class, "parse(string[,config])", arg(STR, MAP_O), ITEM_ZO),
+
   /* FNDb functions. */
 
   /** XQuery function. */
@@ -1065,6 +1070,7 @@ public enum Function {
     URIS.put(FNArchive.class,  ARCHIVEURI);
     URIS.put(FNClient.class,   CLIENTURI);
     URIS.put(FNConvert.class,  CONVERTURI);
+    URIS.put(FNCsv.class,      CSVURI);
     URIS.put(FNDb.class,       DBURI);
     URIS.put(FNFetch.class,    FETCHURI);
     URIS.put(FNFt.class,       FTURI);

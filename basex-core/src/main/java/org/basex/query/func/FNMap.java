@@ -48,7 +48,7 @@ public final class FNMap extends StandardFunc {
     switch(sig) {
       case _MAP_NEW:       return newMap(ctx, ii);
       case _MAP_ENTRY:     return entry(ctx, ii);
-      case _MAP_CONTAINS:  return contains(ctx, ii);
+      case _MAP_CONTAINS:  return Bln.get(contains(ctx, ii));
       case _MAP_SIZE:      return Int.get(map(ctx).mapSize());
       case _MAP_REMOVE:    return remove(ctx, ii);
       case _MAP_COLLATION: return map(ctx).collation();
@@ -114,7 +114,8 @@ public final class FNMap extends StandardFunc {
    * @return result of check
    * @throws QueryException query exception
    */
-  private Bln contains(final QueryContext ctx, final InputInfo ii) throws QueryException {
+  private boolean contains(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     return map(ctx).contains(expr[1].item(ctx, ii), ii);
   }
 

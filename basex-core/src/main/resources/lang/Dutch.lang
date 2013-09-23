@@ -369,7 +369,6 @@ watching_event_%     = Bekijk event '%'.
 whole_word           = Heel woord
 write_locking        = Write Locking
 ws_chopping          = Whitespace afkappen
-xml_format           = XML formaat
 xquery               = XQuery
 yes                  = Ja
 

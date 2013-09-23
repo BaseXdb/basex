@@ -369,7 +369,6 @@ watching_event_%     = Uita-te la evenimentul '%'.
 whole_word           = Cuvantul intreg
 write_locking        = Write Locking
 ws_chopping          = Tocare spatii albe
-xml_format           = XML format
 xquery               = XQuery
 yes                  = Da
 
