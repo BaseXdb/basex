@@ -26,11 +26,8 @@ import org.basex.query.value.node.*;
  *   <code>comma</code>, <code>semicolon</code>, or <code>tab</code>
  *   (default: <code>comma</code>).</li>
  *   <li><code>header</code> specifies if the input file contains a header.
- *   Can be set to <code>yes</code> or <code>no</code>
- *   (default: <code>yes</code>)</li>
- *   <li><code>format</code> specifies the XML format, which can be
- *   <code>simple</code> or <code>verbose</code>
- *   (default: <code>verbose</code>).</li>
+ *   Can be set to <code>true</code> or <code>false</code>
+ *   (default: <code>true</code>)</li>
  * </ul>
  *
  * <p>All options are separated by commas, and the keys and values are
@@ -82,16 +79,15 @@ public final class CSVParser extends XMLParser {
       if(i > 0) s = i;
       else throw new BaseXException(INVALID_VALUE_X_X, ParserProp.SEPARATOR[0], val);
     }
-    int separator = s;
+    final int separator = s;
 
     // retrieve content in correct encoding
-    String encoding = props.get(ParserProp.ENCODING);
-    final byte[] content = new NewlineInput(io).encoding(encoding).content();
+    final String encoding = props.get(ParserProp.ENCODING);
 
     // parse input and convert to XML node
     try {
       final CsvParser conv = new CsvParser(separator, header);
-      final ANode node = conv.convert(content);
+      final ANode node = conv.convert(new NewlineInput(io).encoding(encoding));
       // cache XML representation
       final IOContent xml = new IOContent(node.serialize().toArray());
       xml.name(io.name());

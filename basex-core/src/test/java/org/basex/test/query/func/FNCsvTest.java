@@ -36,4 +36,8 @@ public final class FNCsvTest extends AdvancedQueryTest {
       }
     }
   }
+
+  /** Test method. */
+  @Test public void serialize() {
+  }
 }

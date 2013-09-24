@@ -24,7 +24,7 @@ abstract class TrieNode {
   static final TrieNode EMPTY = new TrieNode(0) {
     @Override
     StringBuilder toString(final StringBuilder sb, final String ind) {
-      return sb.append("map{}"); }
+      return sb.append("{ }"); }
     @Override
     TrieNode delete(final int h, final Item k, final int l, final InputInfo i) {
       return this; }

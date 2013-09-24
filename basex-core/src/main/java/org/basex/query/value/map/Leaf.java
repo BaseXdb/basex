@@ -188,6 +188,6 @@ final class Leaf extends TrieNode {
 
   @Override
   StringBuilder toString(final StringBuilder sb) {
-    return sb.append(key).append(ASSIGN).append(value).append(", ");
+    return sb.append(key).append(COL).append(value).append(", ");
   }
 }

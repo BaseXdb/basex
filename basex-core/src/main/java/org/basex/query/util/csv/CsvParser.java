@@ -26,8 +26,6 @@ public final class CsvParser {
   private static final byte[] RECORD = token("record");
   /** CSV field element. */
   private static final byte[] ENTRY = token("entry");
-  /** CSV column attribute. */
-  private static final byte[] COLUMN = token("column");
 
   /** Column separator (see {@link ParserProp#SEPARATOR}). */
   private final int separator;
@@ -55,56 +53,67 @@ public final class CsvParser {
   }
 
   /**
-   * Converts the CSV input to an XML node.
+   * Converts the specified input to an XML element.
    * @param input CSV input
    * @return node
    * @throws IOException I/O exception
    */
   public FElem convert(final byte[] input) throws IOException {
-    final TokenBuilder tb = new TokenBuilder();
-    final NewlineInput nli = new NewlineInput(new IOContent(input));
+    return convert(new NewlineInput(new IOContent(input)));
+  }
 
+  /**
+   * Converts the specified input stream to an XML element.
+   * @param input CSV input
+   * @return node
+   * @throws IOException I/O exception
+   */
+  public FElem convert(final NewlineInput input) throws IOException {
+    final TokenBuilder data = new TokenBuilder();
     boolean quoted = false, open = true;
     int ch = -1;
-    while(true) {
-      if(ch == -1) ch = nli.read();
-      if(ch == -1) break;
-      if(quoted) {
-        if(ch == '"') {
-          ch = nli.read();
-          if(ch != '"') {
-            quoted = false;
-            continue;
+
+    try {
+      while(true) {
+        if(ch == -1) ch = input.read();
+        if(ch == -1) break;
+        if(quoted) {
+          if(ch == '"') {
+            ch = input.read();
+            if(ch != '"') {
+              quoted = false;
+              continue;
+            }
           }
+          data.add(ch);
+        } else if(ch == separator) {
+          if(open) {
+            newRecord();
+            open = false;
+          }
+          newEntry(data);
+        } else if(ch == '\n') {
+          finish(data, open);
+          open = true;
+        } else if(ch == '"') {
+          quoted = true;
+        } else {
+          data.add(XMLToken.valid(ch) ? ch : '?');
         }
-        tb.add(ch);
-      } else if(ch == separator) {
-        if(open) {
-          open();
-          open = false;
-        }
-        add(tb);
-      } else if(ch == '\n') {
-        finish(tb, open);
-        open = true;
-      } else if(ch == '"') {
-        quoted = true;
-      } else {
-        tb.add(XMLToken.valid(ch) ? ch : '?');
+        ch = -1;
       }
-      ch = -1;
+    } finally {
+      input.close();
     }
-    nli.close();
 
-    finish(tb, open);
-
+    finish(data, open);
     return root;
   }
 
   /**
    * Creates a new record.
    */
-  private void open() {
+  private void newRecord() {
     if(header) return;
     record = new FElem(RECORD);
     root.add(record);
@@ -112,57 +121,32 @@ public final class CsvParser {
 
   /**
    * Finishes the current record.
-   * @param tb token builder
+   * @param entry current entry
    * @param open open flag
    */
-  private void finish(final TokenBuilder tb, final boolean open) {
-    boolean close = !open;
-    if(open && !tb.isEmpty()) {
-      open();
-      close = true;
-    }
-    add(tb);
-    if(close) header = false;
+  private void finish(final TokenBuilder entry, final boolean open) {
+    if(open && !entry.isEmpty()) newRecord();
+    if(!entry.isEmpty()) newEntry(entry);
+    header = false;
     col = 0;
   }
 
   /**
-   * Adds a field.
-   * @param tb token builder
+   * Adds an entry.
+   * @param entry current entry
    */
-  private void add(final TokenBuilder tb) {
+  private void newEntry(final TokenBuilder entry) {
     if(header) {
-      // create element name
-      final TokenBuilder name = new TokenBuilder();
-      final byte[] field = tb.finish();
-      for(int p = 0; p < field.length; p += cl(field, p)) {
-        final int cp = cp(field, p);
-        name.add((p == 0 ? XMLToken.isNCStartChar(cp) :
-          XMLToken.isNCChar(cp)) ? cp : '_');
-      }
-      // no valid characters found: add default column name
-      if(name.isEmpty()) name.add(COLUMN);
-
       // add header
-      byte[] fb = name.finish();
-      if(headers.contains(fb)) {
-        int c = 2;
-        do {
-          fb = concat(field, token(c++));
-        } while(headers.contains(fb));
-      }
-      headers.add(fb);
-      tb.reset();
-      return;
-    }
+      headers.add(XMLToken.encode(entry.finish()));
+      entry.reset();
+    } else {
+      byte[] tag = headers.get(col);
+      if(tag == null) tag = ENTRY;
 
-    byte[] tag = headers.get(col);
-    if(tag == null) tag = ENTRY;
-
-    if(!tb.isEmpty()) {
-      if(record != null) record.add(new FElem(tag).add(tb.finish()));
-      tb.reset();
+      if(record != null) record.add(new FElem(tag).add(entry.finish()));
+      entry.reset();
+      ++col;
     }
-    ++col;
   }
 }

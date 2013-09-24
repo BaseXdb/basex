@@ -381,30 +381,30 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // specify additional index options
     for(final boolean b : new boolean[] { false, true }) {
-      query(_DB_CREATE.args(dbname, "()", "()", " map { 'updindex':=" + b + "() }"));
+      query(_DB_CREATE.args(dbname, "()", "()", " { 'updindex':" + b + "() }"));
       query(_DB_INFO.args(dbname) + "//updindex/text()", b ? "ON" : "OFF");
     }
     assertEquals(context.prop.is(Prop.UPDINDEX), false);
 
     final String[] nopt = { "maxcats", "maxlen", "indexsplitsize", "ftindexsplitsize" };
     for(final String k : nopt) {
-      query(_DB_CREATE.args(dbname, "()", "()", " map { '" + k + "':=1 }"));
+      query(_DB_CREATE.args(dbname, "()", "()", " { '" + k + "':1 }"));
     }
     final String[] bopt = { "textindex", "attrindex", "ftindex", "stemming",
         "casesens", "diacritics" };
     for(final String k : bopt) {
       for(final boolean v : new boolean[] { true, false }) {
-        query(_DB_CREATE.args(dbname, "()", "()", " map { '" + k + "':=" + v + "() }"));
+        query(_DB_CREATE.args(dbname, "()", "()", " { '" + k + "':" + v + "() }"));
       }
     }
     final String[] sopt = { "language", "stopwords" };
     for(final String k : sopt) {
-      query(_DB_CREATE.args(dbname, "()", "()", " map { '" + k + "':='' }"));
+      query(_DB_CREATE.args(dbname, "()", "()", " { '" + k + "':'' }"));
     }
 
-    error(_DB_CREATE.args(dbname, "()", "()", " map { 'xyz':='abc' }"), Err.BASX_OPTIONS);
-    error(_DB_CREATE.args(dbname, "()", "()", " map { 'maxlen':=-1 }"), Err.BASX_VALUE);
-    error(_DB_CREATE.args(dbname, "()", "()", " map { 'maxlen':='a' }"), Err.BASX_VALUE);
+    error(_DB_CREATE.args(dbname, "()", "()", " { 'xyz':'abc' }"), Err.BASX_OPTIONS);
+    error(_DB_CREATE.args(dbname, "()", "()", " { 'maxlen':-1 }"), Err.BASX_VALUE);
+    error(_DB_CREATE.args(dbname, "()", "()", " { 'maxlen':'a' }"), Err.BASX_VALUE);
   }
 
   /**
@@ -643,7 +643,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     final IOFile f = new IOFile(new IOFile(Prop.TMP, NAME), FILE.replaceAll(".*/", ""));
     query(_FILE_EXISTS.args(f));
     // serializes as text; ensures that the output contains no angle bracket
-    query(_DB_EXPORT.args(NAME, new IOFile(Prop.TMP, NAME), " map{'method':='text'}"));
+    query(_DB_EXPORT.args(NAME, new IOFile(Prop.TMP, NAME), " {'method':'text'}"));
     query("0[" + CONTAINS.args(_FILE_READ_TEXT.args(f), "&lt;") + "]", "");
     // deletes the exported file
     query(_FILE_DELETE.args(f));

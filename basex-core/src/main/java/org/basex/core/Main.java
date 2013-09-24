@@ -77,7 +77,7 @@ public abstract class Main {
    */
   protected final void console() {
     // create console reader
-    final ConsoleReader cr = ConsoleReader.newInstance();
+    final ConsoleReader cr = ConsoleReader.get();
     // loop until console is set to false (may happen in server mode)
     while(console) {
       // get next line

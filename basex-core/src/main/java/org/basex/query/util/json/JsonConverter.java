@@ -17,7 +17,7 @@ public abstract class JsonConverter {
   /** Input info. */
   protected final InputInfo info;
   /** The {@code map} conversion format. */
-  public static final byte[] MAPS = token("maps");
+  public static final byte[] MAP = token("map");
   /** The {@code jsonml} conversion format. */
   public static final byte[] JSONML = token("jsonml");
   /** The {@code json} conversion format. */
@@ -47,12 +47,12 @@ public abstract class JsonConverter {
    * @param ii input info
    * @return a JSON converter
    */
-  public static JsonConverter newInstance(final byte[] format, final Spec spec,
+  public static JsonConverter get(final byte[] format, final Spec spec,
     final boolean unesc, final InputInfo ii) {
 
     if(format != null) {
       if(eq(format, JSONML)) return new JsonMLConverter(ii);
-      if(eq(format, MAPS)) return new JsonMapConverter(spec, unesc, ii);
+      if(eq(format, MAP)) return new JsonMapConverter(spec, unesc, ii);
     }
     return new JsonCGConverter(spec, unesc, ii);
   }

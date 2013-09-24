@@ -71,8 +71,9 @@ public abstract class Serializer {
     if(M_XHTML.equals(m))  return new XHTMLSerializer(os, props);
     if(M_HTML.equals(m))   return new HTMLSerializer(os, props);
     if(M_TEXT.equals(m))   return new TextSerializer(os, props);
-    if(M_JSON.equals(m))   return new JSONSerializer(os, props);
+    if(M_JSON.equals(m))   return new JsonCGSerializer(os, props);
     if(M_JSONML.equals(m)) return new JsonMLSerializer(os, props);
+    if(M_CSV.equals(m))    return new CsvSerializer(os, props);
     if(M_RAW.equals(m))    return new RawSerializer(os, props);
     return new XMLSerializer(os, props);
   }

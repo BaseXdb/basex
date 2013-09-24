@@ -29,7 +29,7 @@ public final class JsonMLSerializer extends OutputSerializer {
    * @param props serialization properties
    * @throws IOException I/O exception
    */
-  public JsonMLSerializer(final OutputStream os, final SerializerProp props)
+  protected JsonMLSerializer(final OutputStream os, final SerializerProp props)
       throws IOException {
     super(os, props);
   }

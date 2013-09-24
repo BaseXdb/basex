@@ -1,7 +1,6 @@
 package org.basex.util;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Reflect.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -19,9 +18,9 @@ import org.basex.io.*;
  */
 public abstract class ConsoleReader {
   /** Password prompt. */
-  protected static final String PASSWORD_PROMPT = PASSWORD + COLS;
+  private static final String PW_PROMPT = PASSWORD + COLS;
   /** Default prompt. */
-  private static final String DEFAULT_PROMPT = "> ";
+  private static final String PROMPT = "> ";
 
   /** Password reader. */
   private final PasswordReader pwReader = new PasswordReader() {
@@ -55,7 +54,7 @@ public abstract class ConsoleReader {
    * Creates a new instance.
    * @return instance of console reader
    */
-  public static final ConsoleReader newInstance() {
+  public static final ConsoleReader get() {
     if(JLineConsoleReader.isAvailable()) {
       try {
         return new JLineConsoleReader();
@@ -79,7 +78,7 @@ public abstract class ConsoleReader {
     @Override
     public String readLine() {
       try {
-        Util.out(DEFAULT_PROMPT);
+        Util.out(PROMPT);
         return in.readLine();
       } catch(final IOException e) {
         // should not happen
@@ -89,7 +88,7 @@ public abstract class ConsoleReader {
 
     @Override
     public String readPassword() {
-      Util.out(PASSWORD_PROMPT);
+      Util.out(PW_PROMPT);
       return Util.password();
     }
   }
@@ -106,7 +105,7 @@ public abstract class ConsoleReader {
     private static final Character PASSWORD_ECHO = (char) 0;
 
     /** JLine console reader class. */
-    private final Class<?> consoleReaderClass;
+    private final Class<?> readerClass;
     /** Method to read the next line. */
     private final Method readLine;
     /** Method to read the next line with echoing a character. */
@@ -121,7 +120,7 @@ public abstract class ConsoleReader {
      * @return {@code true} if JLine is in the classpath
      */
     static boolean isAvailable() {
-      return available(JLINE_CONSOLE_READER);
+      return Reflect.available(JLINE_CONSOLE_READER);
     }
 
     /**
@@ -130,46 +129,49 @@ public abstract class ConsoleReader {
      */
     JLineConsoleReader() throws Exception {
       // reflection
-      consoleReaderClass = find(JLINE_CONSOLE_READER);
+      readerClass = Reflect.find(JLINE_CONSOLE_READER);
 
-      readLine = method(consoleReaderClass, "readLine");
-      readEcho = method(consoleReaderClass, "readLine", String.class, Character.class);
-      setDefaultPrompt = method(consoleReaderClass, "setDefaultPrompt", String.class);
+      readLine = Reflect.method(readerClass, "readLine");
+      readEcho = Reflect.method(readerClass, "readLine", String.class, Character.class);
+      setDefaultPrompt = Reflect.method(readerClass, "setDefaultPrompt", String.class);
 
       // initialization
-      reader = consoleReaderClass.newInstance();
+      reader = readerClass.newInstance();
 
       defaultConfiguration();
     }
 
     /** Apply default configuration. */
     private void defaultConfiguration() {
-      final Class<?> historyClass = find(JLINE_HISTORY);
+      final Class<?> historyClass = Reflect.find(JLINE_HISTORY);
       final File hist = new File(Prop.HOME, HISTORY_FILE);
-      final Object history = get(find(historyClass, File.class), hist);
+      final Object history = Reflect.get(Reflect.find(historyClass, File.class), hist);
 
-      invoke(method(consoleReaderClass, "setUseHistory", boolean.class), reader, true);
-      invoke(method(consoleReaderClass, "setBellEnabled", boolean.class), reader, false);
-      invoke(method(consoleReaderClass, "setHistory", historyClass), reader, history);
+      Reflect.invoke(Reflect.method(readerClass, "setUseHistory", boolean.class),
+          reader, true);
+      Reflect.invoke(Reflect.method(readerClass, "setBellEnabled", boolean.class),
+          reader, false);
+      Reflect.invoke(Reflect.method(readerClass, "setHistory", historyClass),
+          reader, history);
 
       restoreDefaultPrompt();
     }
 
     /** Restore the default prompt. */
     private void restoreDefaultPrompt() {
-      invoke(setDefaultPrompt, reader, DEFAULT_PROMPT);
+      Reflect.invoke(setDefaultPrompt, reader, PROMPT);
     }
 
     @Override
     public String readLine() {
-      return (String) invoke(readLine, reader);
+      return (String) Reflect.invoke(readLine, reader);
     }
 
     @Override
     public String readPassword() {
-      final String pw = (String) invoke(readEcho, reader, PASSWORD_PROMPT, PASSWORD_ECHO);
+      final Object pw = Reflect.invoke(readEcho, reader, PW_PROMPT, PASSWORD_ECHO);
       restoreDefaultPrompt();
-      return pw;
+      return (String) pw;
     }
   }
 }

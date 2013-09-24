@@ -1055,7 +1055,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void evalFItem() {
     query("declare function local:c() { copy $a := <a/> modify () return $a };" +
-      "xquery:eval('$c()', map { 'c' := local:c#0 })", "<a/>");
+      "xquery:eval('$c()', { 'c' : local:c#0 })", "<a/>");
   }
 
   /**

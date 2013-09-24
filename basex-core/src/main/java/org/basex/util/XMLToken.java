@@ -10,6 +10,9 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public final class XMLToken {
+  /** The underscore. */
+  private static final byte[] UNDERSCORE = { '_' };
+
   /** Hidden constructor. */
   private XMLToken() { }
 
@@ -132,5 +135,103 @@ public final class XMLToken {
       if(i == p ? !isNCStartChar(c) : !isNCChar(c)) return i;
     }
     return l;
+  }
+
+  /**
+   * Encodes a string to a valid NCName.
+   * @param name token
+   * @return valid NCName
+   */
+  public static byte[] encode(final byte[] name) {
+    if(name.length == 0) return UNDERSCORE;
+    for(int i = 0, cp; i < name.length; i += cl(name, i)) {
+      cp = cp(name, i);
+      if(cp == '_' || !(i == 0 ? XMLToken.isNCStartChar(cp) : XMLToken.isNCChar(cp))) {
+        final TokenBuilder tb = new TokenBuilder(name.length << 1).add(name, 0, i);
+        for(int j = i; j < name.length; j += cl(name, j)) {
+          cp = cp(name, j);
+          if(cp == '_') tb.addByte(UNDERSCORE[0]).addByte(UNDERSCORE[0]);
+          else if(j == 0 ? XMLToken.isNCStartChar(cp) :
+            XMLToken.isNCChar(cp)) tb.add(cp);
+          else if(cp < 0x10000) addEsc(tb, cp);
+          else {
+            final int r = cp - 0x10000;
+            addEsc(addEsc(tb, (r >>> 10) + 0xD800), (r & 0x3FF) + 0xDC00);
+          }
+        }
+        return tb.finish();
+      }
+    }
+    return name;
+  }
+
+  /**
+   * Adds the given 16-bit char to the token builder in encoded form.
+   * @param tb token builder
+   * @param cp char
+   * @return the token builder for convenience
+   */
+  private static TokenBuilder addEsc(final TokenBuilder tb, final int cp) {
+    tb.addByte(UNDERSCORE[0]);
+    final int a = cp >>> 12;
+    tb.addByte((byte) (a + (a > 9 ? 'A' : '0')));
+    final int b = cp >>> 8 & 0x0F;
+    tb.addByte((byte) (b + (b > 9 ? 'A' : '0')));
+    final int c = cp >>> 4 & 0x0F;
+    tb.addByte((byte) (c + (c > 9 ? 'A' : '0')));
+    final int d = cp & 0x0F;
+    tb.addByte((byte) (d + (d > 9 ? 'A' : '0')));
+    return tb;
+  }
+
+  /**
+   * Decodes an NCName to a string.
+   * @param name name
+   * @return cached QName
+   */
+  public static byte[] decode(final byte[] name) {
+    // convert name to valid XML representation
+    final TokenBuilder tb = new TokenBuilder();
+    int uc = 0;
+    // mode: 0=normal, 1=unicode, 2=underscore, 3=building unicode
+    int mode = 0;
+    for(int n = 0; n < name.length;) {
+      final int cp = cp(name, n);
+      if(mode >= 3) {
+        uc = (uc << 4) + cp - (cp >= '0' && cp <= '9' ? '0' : 0x37);
+        if(++mode == 7) {
+          tb.add(uc);
+          mode = 0;
+          uc = 0;
+        }
+      } else if(cp == '_') {
+        // limit underscore counter
+        if(++mode == 3) {
+          tb.add('_');
+          mode = 0;
+          continue;
+        }
+      } else if(mode == 1) {
+        // unicode
+        mode = 3;
+        continue;
+      } else if(mode == 2) {
+        // underscore
+        tb.add('_');
+        mode = 0;
+        continue;
+      } else {
+        // normal character
+        tb.add(cp);
+        mode = 0;
+      }
+      n += cl(name, n);
+    }
+    if(mode == 2) {
+      tb.add('_');
+    } else if(mode > 0 && !tb.isEmpty()) {
+      tb.add('?');
+    }
+    return tb.finish();
   }
 }

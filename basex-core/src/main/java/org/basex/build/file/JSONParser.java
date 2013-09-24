@@ -72,13 +72,7 @@ public final class JSONParser extends XMLParser {
     final ParserProp props = new ParserProp(options);
     final byte[] format = props.is(ParserProp.JSONML) ? JsonConverter.JSONML :
       JsonConverter.JSON;
-    final boolean unescape = props.is(ParserProp.UNESCAPE);
     final String encoding = props.get(ParserProp.ENCODING);
-    final String spec = props.get(ParserProp.SPEC);
-
-    Spec sp = Spec.RFC4627;
-    for(final Spec s : Spec.values())
-      if(string(s.desc).equalsIgnoreCase(spec)) sp = s;
 
     // parse input, using specified encoding
     final byte[] content = new NewlineInput(io).encoding(encoding).content();
@@ -86,7 +80,7 @@ public final class JSONParser extends XMLParser {
     // parse input and convert to XML node
     final Item node;
     try {
-      final JsonConverter conv = JsonConverter.newInstance(format, sp, unescape, null);
+      final JsonConverter conv = JsonConverter.get(format, Spec.RFC4627, true, null);
       node = conv.convert(string(content));
 
       // create XML input container from serialized node

@@ -34,9 +34,9 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry " +
         "last-modified='2000-01-01T12:12:12'>X</archive:entry>", "")), "1");
     query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        " map { }")), "1");
+        " { }")), "1");
     query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        " map { 'format':='zip', 'algorithm':='deflate' }")), "1");
+        " { 'format':'zip', 'algorithm':'deflate' }")), "1");
     query(COUNT.args(_ARCHIVE_CREATE.args("X", "", "<archive:options/>")), "1");
     query(COUNT.args(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         "<archive:options><archive:format value='zip'/>" +
@@ -68,7 +68,7 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     error(_ARCHIVE_CREATE.args("<archive:entry encoding='US-ASCII'>X</archive:entry>",
         "\u00fc"), Err.ARCH_ENCODE);
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        " map { 'format':='rar' }"), Err.ARCH_UNKNOWN);
+        " { 'format':'rar' }"), Err.ARCH_UNKNOWN);
     // format not supported
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         "<archive:options><archive:format value='rar'/></archive:options>"),

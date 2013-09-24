@@ -151,7 +151,7 @@ public interface DataText {
   /** Method. */
   String M_RAW = "raw";
   /** Methods. */
-  String[] METHODS = { M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_JSONML, M_RAW };
+  String[] METHODS = { M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_JSONML, M_CSV, M_RAW };
 
   /** Normalization. */
   String NFC = "NFC";

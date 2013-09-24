@@ -68,9 +68,11 @@ public enum Err {
   // CSV module
 
   /** BXCS0001. */
-  BXCS_SEP(BXCS, 1, "CSV parser configuration: Separator must be single character."),
+  BXCS_ERROR(BXCS, 1, "CSV parser: %."),
   /** BXCS0002. */
-  BXCS_ERROR(BXCS, 2, "CSV parser: %."),
+  BXCS_SER(BXCS, 2, "CSV serialization: %."),
+  /** BXCS0003. */
+  BXCS_SEP(BXCS, 3, "CSV configuration: separator must be single character."),
 
   // Database module
 
@@ -128,11 +130,11 @@ public enum Err {
   /** BXJS0001. */
   BXJS_PARSE(BXJS, 1, "JSON parser (%:%): %."),
   /** BXJS0001. */
-  BXJS_PARSE_CFG(BXJS, 1, "JSON parser configuration: %."),
-  /** BXJS0001. */
   BXJS_PARSEML(BXJS, 1, "JsonML parser: %."),
   /** BXJS0002. */
   BXJS_SER(BXJS, 2, "JSON serialization: %."),
+  /** BXJS0001. */
+  BXJS_PARSE_CFG(BXJS, 3, "JSON parser configuration: %."),
 
   // Process module
 

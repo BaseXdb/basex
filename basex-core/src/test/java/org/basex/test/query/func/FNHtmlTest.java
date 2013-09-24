@@ -25,6 +25,6 @@ public final class FNHtmlTest extends AdvancedQueryTest {
     // check if the function returns a HTML root node
     query(EXISTS.args(_HTML_PARSE.args("&lt;html/&gt;") + "/*:html"), "true");
     // check if the function returns <html/>
-    query(_HTML_PARSE.args("&lt;html/&gt;", " map{'nons':=true()}"), "<html/>");
+    query(_HTML_PARSE.args("&lt;html/&gt;", " {'nons':true()}"), "<html/>");
   }
 }

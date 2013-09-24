@@ -23,11 +23,12 @@ import org.basex.util.*;
  *   <dt>null<dd>an empty sequence <code>()</code>
  *   <dt>array (e.g. {@code ["foo", true, 123]})
  *   <dd>an XQuery map with integer keys, starting by 1 (e.g.
- *     <code>map{1:='foo', 2:=true(), 3:=123}</code>)
+ *     <code>{1:'foo', 2:true(), 3:123}</code>)
  *   <dt>object (e.g. <code>{"foo": 42, "bar": null}</code>)
  *   <dd>an XQuery map (e.g.
- *     <code>map{'foo':=42, 'bar':=()}</code>)
+ *     <code>{'foo':42, 'bar':()}</code>)
  * </dl>
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */

@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class JSONSerializer extends OutputSerializer {
+public final class JsonCGSerializer extends JsonSerializer {
   /** Plural. */
   private static final byte[] S = { 's' };
   /** Global data type attributes. */
@@ -30,9 +30,10 @@ public final class JSONSerializer extends OutputSerializer {
   /** Supported data types. */
   private static final byte[][] TYPES = {
     T_BOOLEAN, T_NUMBER, NULL, T_ARRAY, T_OBJECT, T_STRING };
+
   /** Cached data types. */
   private final TokenSet[] typeCache = new TokenSet[TYPES.length];
-  /** Comma flag. */
+  /** Comma flags. */
   private final BoolList comma = new BoolList();
   /** Types. */
   private final TokenList types = new TokenList();
@@ -43,7 +44,7 @@ public final class JSONSerializer extends OutputSerializer {
    * @param props serialization properties
    * @throws IOException I/O exception
    */
-  public JSONSerializer(final OutputStream os, final SerializerProp props)
+  protected JsonCGSerializer(final OutputStream os, final SerializerProp props)
       throws IOException {
     super(os, props);
     for(int t = 0; t < typeCache.length; t++) typeCache[t] = new TokenMap();
@@ -51,8 +52,7 @@ public final class JSONSerializer extends OutputSerializer {
 
   @Override
   protected void startOpen(final byte[] name) throws IOException {
-    if(level == 0 && !eq(name, T_JSON))
-      error("<%> expected as root node", T_JSON);
+    if(level == 0 && !eq(name, T_JSON)) error("<%> expected as root node", T_JSON);
     types.set(level, null);
     comma.set(level + 1, false);
   }
@@ -86,7 +86,7 @@ public final class JSONSerializer extends OutputSerializer {
       final byte[] par = types.get(level - 1);
       if(eq(par, T_OBJECT)) {
         print('"');
-        print(name(elem));
+        print(XMLToken.decode(elem));
         print("\": ");
       } else if(!eq(par, T_ARRAY)) {
         error("Element <%> is typed as \"%\" and cannot be nested",
@@ -195,57 +195,6 @@ public final class JSONSerializer extends OutputSerializer {
     print(nl);
     final int ls = lvl * indents;
     for(int l = 0; l < ls; ++l) print(tab);
-  }
-
-  /**
-   * Converts an XML element name to a JSON name.
-   * @param name name
-   * @return cached QName
-   */
-  private static byte[] name(final byte[] name) {
-    // convert name to valid XML representation
-    final TokenBuilder tb = new TokenBuilder();
-    int uc = 0;
-    // mode: 0=normal, 1=unicode, 2=underscore, 3=building unicode
-    int mode = 0;
-    for(int n = 0; n < name.length;) {
-      final int cp = cp(name, n);
-      if(mode >= 3) {
-        uc = (uc << 4) + cp - (cp >= '0' && cp <= '9' ? '0' : 0x37);
-        if(++mode == 7) {
-          tb.add(uc);
-          mode = 0;
-          uc = 0;
-        }
-      } else if(cp == '_') {
-        // limit underscore counter
-        if(++mode == 3) {
-          tb.add('_');
-          mode = 0;
-          continue;
-        }
-      } else if(mode == 1) {
-        // unicode
-        mode = 3;
-        continue;
-      } else if(mode == 2) {
-        // underscore
-        tb.add('_');
-        mode = 0;
-        continue;
-      } else {
-        // normal character
-        tb.add(cp);
-        mode = 0;
-      }
-      n += cl(name, n);
-    }
-    if(mode == 2) {
-      tb.add('_');
-    } else if(mode > 0 && !tb.isEmpty()) {
-      tb.add('?');
-    }
-    return tb.finish();
   }
 
   /**

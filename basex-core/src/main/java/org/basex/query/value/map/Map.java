@@ -282,7 +282,7 @@ public final class Map extends FItem {
 
   @Override
   public String toString() {
-    final StringBuilder sb = root.toString(new StringBuilder("map{ "));
+    final StringBuilder sb = root.toString(new StringBuilder("{ "));
     // remove superfluous comma
     if(root.size > 0) sb.deleteCharAt(sb.length() - 2);
     return sb.append('}').toString();

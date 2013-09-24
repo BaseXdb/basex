@@ -109,14 +109,14 @@ public final class FNJsonTest extends AdvancedQueryTest {
 
   /** Tests the configuration argument of {@code json:parse(...)}. */
   @Test public void config() {
-    query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', map{'format':='jsonml'})",
+    query("json:parse('[\"foo\",{\"test\":\"asdf\"}]', {'format':'jsonml'})",
         "<foo test=\"asdf\"/>");
-    query("map:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', map{'format':='maps'}))",
+    query("map:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', {'format':'map'}))",
         "2");
     query("json:parse('\"\\t\\u000A\"'," +
-        "  map{'format':='maps','unescape':=false(),'spec':='liberal'})", "\\t\\u000A");
+        "  {'format':'map','unescape':false(),'spec':'liberal'})", "\\t\\u000A");
     query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
-        "  map{'format':='maps','unescape':=true(),'spec':='liberal'}))", "9 10");
-    error("json:parse('42', map{'spec':='garbage'})", Err.BXJS_PARSE_CFG);
+        "  {'format':'map','unescape':true(),'spec':'liberal'}))", "9 10");
+    error("json:parse('42', {'spec':'garbage'})", Err.BXJS_PARSE_CFG);
   }
 }

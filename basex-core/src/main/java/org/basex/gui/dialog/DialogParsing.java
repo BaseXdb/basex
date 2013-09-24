@@ -147,10 +147,10 @@ final class DialogParsing extends BaseXBack {
     jencoding = DialogExport.encoding(d, enc);
 
     xmlopts  = new BaseXBack(new TableLayout(9, 1));
-    htmlopts = new BaseXBack(new TableLayout(2, 1));
-    jsonopts = new BaseXBack(new TableLayout(2, 1));
+    htmlopts = new BaseXBack(new TableLayout(2, 1, 0, 8));
+    jsonopts = new BaseXBack(new TableLayout(2, 1, 0, 8));
     csvopts  = new BaseXBack(new TableLayout(2, 1, 0, 8));
-    textopts = new BaseXBack(new TableLayout(2, 1));
+    textopts = new BaseXBack(new TableLayout(2, 1, 0, 8));
     createOptionsPanels();
 
     setLayout(new TableLayout(1, 1));
@@ -192,8 +192,7 @@ final class DialogParsing extends BaseXBack {
     }
 
     final boolean avl = HTMLParser.available();
-    htmlopts.add(new BaseXLabel(avl ? H_HTML_PARSER : H_NO_HTML_PARSER).
-        border(0, 0, 12, 0));
+    htmlopts.add(new BaseXLabel(avl ? H_HTML_PARSER : H_NO_HTML_PARSER));
 
     if(avl) {
       final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
@@ -202,7 +201,7 @@ final class DialogParsing extends BaseXBack {
       htmlopts.add(p);
     }
 
-    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 4));
+    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
     p.add(new BaseXLabel(ENCODING + COL, true, true));
     p.add(jencoding);
     jsonopts.add(p);

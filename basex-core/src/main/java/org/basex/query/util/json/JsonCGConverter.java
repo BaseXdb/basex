@@ -58,8 +58,6 @@ public final class JsonCGConverter extends JsonXMLConverter {
   /** Type names. */
   private static final byte[][] NAMES = { T_ARRAY, T_OBJECT, T_STRING, T_NUMBER,
     T_BOOLEAN, NULL };
-  /** The underscore. */
-  static final byte[] UNDERSCORE = { '_' };
   /** The {@code types} QNames. */
   private static final byte[][] TYPES = new byte[NAMES.length][];
   static {
@@ -107,25 +105,6 @@ public final class JsonCGConverter extends JsonXMLConverter {
     return handler.elem;
   }
 
-  /**
-   * Adds the given 16-bit char to the token builder in encoded form.
-   * @param tb token builder
-   * @param cp char
-   * @return the token builder for convenience
-   */
-  static TokenBuilder addEsc(final TokenBuilder tb, final int cp) {
-    tb.addByte(UNDERSCORE[0]);
-    final int a = cp >>> 12;
-    tb.addByte((byte) (a + (a > 9 ? 'A' : '0')));
-    final int b = cp >>> 8 & 0x0F;
-    tb.addByte((byte) (b + (b > 9 ? 'A' : '0')));
-    final int c = cp >>> 4 & 0x0F;
-    tb.addByte((byte) (c + (c > 9 ? 'A' : '0')));
-    final int d = cp & 0x0F;
-    tb.addByte((byte) (d + (d > 9 ? 'A' : '0')));
-    return tb;
-  }
-
   /** JSON handler containing the state of the conversion. */
   static class JsonCGHandler implements JsonHandler {
     /** Map from element name to a pair of all its nodes and the collective node type. */
@@ -164,34 +143,6 @@ public final class JsonCGConverter extends JsonXMLConverter {
       return e;
     }
 
-    /**
-     * Creates a valid XML NCName from the given token.
-     * @param tok token
-     * @return valid NCName
-     */
-    private static byte[] name(final byte[] tok) {
-      if(tok.length == 0) return UNDERSCORE;
-      for(int i = 0, cp; i < tok.length; i += cl(tok, i)) {
-        cp = cp(tok, i);
-        if(cp == '_' || !(i == 0 ? XMLToken.isNCStartChar(cp) : XMLToken.isNCChar(cp))) {
-          final TokenBuilder tb = new TokenBuilder(tok.length << 1).add(tok, 0, i);
-          for(int j = i; j < tok.length; j += cl(tok, j)) {
-            cp = cp(tok, j);
-            if(cp == '_') tb.addByte(UNDERSCORE[0]).addByte(UNDERSCORE[0]);
-            else if(j == 0 ? XMLToken.isNCStartChar(cp) :
-              XMLToken.isNCChar(cp)) tb.add(cp);
-            else if(cp < 0x10000) addEsc(tb, cp);
-            else {
-              final int r = cp - 0x10000;
-              addEsc(addEsc(tb, (r >>> 10) + 0xD800), (r & 0x3FF) + 0xDC00);
-            }
-          }
-          return tb.finish();
-        }
-      }
-      return tok;
-    }
-
     @Override
     public void openObject() throws QueryException {
       elem = addElem(T_OBJECT);
@@ -199,7 +150,7 @@ public final class JsonCGConverter extends JsonXMLConverter {
 
     @Override
     public void openEntry(final byte[] key) throws QueryException {
-      name = name(key);
+      name = XMLToken.encode(key);
     }
 
     @Override

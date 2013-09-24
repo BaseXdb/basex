@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.io.serial.SerializerProp.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
@@ -83,7 +84,7 @@ public final class FNJson extends StandardFunc {
     }
 
     final byte[] form = map.get(FORMAT);
-    final JsonConverter conv = JsonConverter.newInstance(form, spec, unesc, info);
+    final JsonConverter conv = JsonConverter.get(form, spec, unesc, info);
     return conv.convert(string(input)).item(ctx, info);
   }
 
@@ -91,19 +92,25 @@ public final class FNJson extends StandardFunc {
    * Serializes the specified XML document to JSON/JsonML.
    * @param ml ml flag
    * @param ctx query context
-   * @return serialized document
+   * @return string representation
    * @throws QueryException query exception
    */
   private Str serialize(final boolean ml, final QueryContext ctx) throws QueryException {
     final ANode node = checkNode(expr[0], ctx);
+    final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
+    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
+
     final ArrayOutput ao = new ArrayOutput();
+    final SerializerProp props = new SerializerProp();
+    if(map.contains(UNESCAPE)) props.set(S_JSON_UNESCAPE, string(map.get(UNESCAPE)));
+    if(map.contains(SPEC)) props.set(S_JSON_SPEC, string(map.get(SPEC)));
+    props.set(S_JSON_FORMAT, map.contains(FORMAT) ?
+      string(map.get(FORMAT)) : ml ? "jsonml" : "json");
+
     try {
-      // run serialization
-      final SerializerProp props = new SerializerProp();
-      final Serializer json = ml ? new JsonMLSerializer(ao, props) :
-          new JSONSerializer(ao, props);
-      json.serialize(node);
-      json.close();
+      final Serializer ser = JsonSerializer.get(ao, props);
+      ser.serialize(node);
+      ser.close();
     } catch(final SerializerException ex) {
       throw ex.getCause(info);
     } catch(final IOException ex) {

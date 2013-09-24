@@ -48,10 +48,10 @@ public final class LitMap extends Arr {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder("map { ");
+    final TokenBuilder tb = new TokenBuilder("{ ");
     boolean key = true;
     for(final Expr e : expr) {
-      tb.add(key ? tb.size() > 6 ? ", " : "" : ":=").add(e.toString());
+      tb.add(key ? tb.size() > 2 ? ", " : "" : ":").add(e.toString());
       key ^= true;
     }
     return tb.add(" }").toString();

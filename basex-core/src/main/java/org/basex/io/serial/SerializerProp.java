@@ -101,6 +101,18 @@ public final class SerializerProp extends AProp {
   public static final Object[] S_WRAP_URI = {
     "wrap-uri", "" };
 
+  /** Specific serialization parameter. */
+  public static final Object[] S_CSV_SEPARATOR = { "csv-separator", "," };
+  /** Specific serialization parameter. */
+  public static final Object[] S_CSV_HEADER = { "csv-header", "false" };
+
+  /** Specific serialization parameter. */
+  public static final Object[] S_JSON_SPEC = { "json-spec", "RFC4672" };
+  /** Specific serialization parameter. */
+  public static final Object[] S_JSON_UNESCAPE = { "json-unescape", "true" };
+  /** Specific serialization parameter. */
+  public static final Object[] S_JSON_FORMAT = { "json-format", "json" };
+
   /** Unknown properties. */
   public final StringList unknown = new StringList(0);
 
