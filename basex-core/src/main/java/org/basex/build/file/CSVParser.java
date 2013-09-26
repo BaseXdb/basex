@@ -45,6 +45,8 @@ import org.basex.query.value.node.*;
 public final class CSVParser extends XMLParser {
   /** Separators. */
   public static final String[] SEPARATORS = { "comma", "semicolon", "tab", "space" };
+  /** Separator mappings. */
+  private static final byte[] SEPMAPPINGS = { ',', ';', '\t', ' ' };
 
   /**
    * Constructor.
@@ -71,8 +73,8 @@ public final class CSVParser extends XMLParser {
     // set separator
     final String val = props.get(ParserProp.SEPARATOR).toLowerCase(Locale.ENGLISH);
     int s = -1;
-    for(int i = 0; i < SEPARATORS.length && s == -1; i++) {
-      if(val.equals(SEPARATORS[i])) s = CsvParser.SEPMAPPINGS[i];
+    for(int i = 0; i < SEPARATORS.length; i++) {
+      if(val.equals(SEPARATORS[i])) s = SEPMAPPINGS[i];
     }
     if(s == -1) {
       final int i = toInt(token(val));

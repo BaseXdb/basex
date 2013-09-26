@@ -77,7 +77,7 @@ public final class FNJson extends StandardFunc {
     if(sp != null) {
       Spec spc = null;
       for(final Spec s : Spec.values()) if(eq(sp, s.desc)) spc = s;
-      if(spc == null) BXJS_PARSE_CFG.thrw(info, "Unknown spec '" + string(sp) + "'");
+      if(spc == null) BXJS_CONFIG.thrw(info, "Unknown spec '" + string(sp) + "'");
       spec = spc;
     } else {
       spec = Spec.RFC4627;

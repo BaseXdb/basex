@@ -1,5 +1,6 @@
 package org.basex.io.serial;
 
+import static org.basex.io.serial.SerializerProp.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -36,10 +37,10 @@ public final class CsvSerializer extends OutputSerializer {
       throws IOException {
 
     super(os, props);
-    final byte[] cp = token(props.get(SerializerProp.S_CSV_SEPARATOR));
-    if(cp.length != 1) BXCS_SEP.thrwSerial();
-    separator = cp[0];
-    header = props.get(SerializerProp.S_CSV_HEADER).equals("true");
+    final TokenParser tp = new TokenParser(token(props.get(S_CSV_SEPARATOR)));
+    separator = tp.next();
+    if(separator == -1 || tp.next() != -1) BXCS_CONFIG.thrwSerial();
+    header = Util.yes(props.get(S_CSV_HEADER));
     headers = header ? new TokenList() : null;
   }
 
@@ -169,6 +170,6 @@ public final class CsvSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   private static void error(final String msg) throws IOException {
-    throw BXCS_SER.thrwSerial(msg);
+    throw BXCS_SERIAL.thrwSerial(msg);
   }
 }

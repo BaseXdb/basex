@@ -18,13 +18,11 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class CsvParser {
-  /** Separator mappings. */
-  public static final byte[] SEPMAPPINGS = { ',', ';', '\t', ' ' };
-  /** CSV root element. */
+  /** CSV element. */
   private static final byte[] CSV = token("csv");
-  /** CSV record element. */
+  /** CSV element. */
   private static final byte[] RECORD = token("record");
-  /** CSV field element. */
+  /** CSV element. */
   private static final byte[] ENTRY = token("entry");
 
   /** Column separator (see {@link ParserProp#SEPARATOR}). */

@@ -123,6 +123,6 @@ public final class JsonMLSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   private static void error(final String msg, final Object... ext) throws IOException {
-    throw BXJS_SER.thrwSerial(Util.inf(msg, ext));
+    throw BXJS_SERIAL.thrwSerial(Util.inf(msg, ext));
   }
 }

@@ -76,14 +76,14 @@ public final class FNJsonTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test public void parse() {
-    for(final String[] f : TOXML) {
-      final String qu = _JSON_PARSE.args(f[0]);
-      if(f.length == 1) {
-        error(qu, Err.BXJS_PARSE);
-      } else if(f[1].startsWith("...")) {
-        contains(qu, f[1].substring(3));
+    for(final String[] test : TOXML) {
+      final String query = _JSON_PARSE.args(test[0]);
+      if(test.length == 1) {
+        error(query, Err.BXJS_PARSE);
+      } else if(test[1].startsWith("...")) {
+        contains(query, test[1].substring(3));
       } else {
-        query(qu, f[1]);
+        query(query, test[1]);
       }
     }
   }
@@ -93,7 +93,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
     for(final String[] f : TOJSON) {
       final String qu = _JSON_SERIALIZE.args(f[0]);
       if(f.length == 1) {
-        error(qu, Err.BXJS_SER);
+        error(qu, Err.BXJS_SERIAL);
       } else if(f[1].startsWith("...")) {
         contains(qu, f[1].substring(3));
       } else {
@@ -117,6 +117,6 @@ public final class FNJsonTest extends AdvancedQueryTest {
         "  {'format':'map','unescape':false(),'spec':'liberal'})", "\\t\\u000A");
     query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
         "  {'format':'map','unescape':true(),'spec':'liberal'}))", "9 10");
-    error("json:parse('42', {'spec':'garbage'})", Err.BXJS_PARSE_CFG);
+    error("json:parse('42', {'spec':'garbage'})", Err.BXJS_CONFIG);
   }
 }
