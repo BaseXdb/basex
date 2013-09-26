@@ -212,12 +212,15 @@ public final class InfoView extends View implements LinkListener {
       } else if(line.startsWith(STACK_TRACE_C)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) {
           final TokenBuilder tb = new TokenBuilder();
-          if(split[i].startsWith(LI)) {
-            tb.add(LI).uline().add(split[i].substring(2)).uline();
+          final String sp = split[i].replaceAll("<.*", "");
+          final boolean last = !sp.equals(split[i]);
+          if(sp.startsWith(LI)) {
+            tb.add(LI).uline().add(sp.substring(2)).uline();
           } else {
-            tb.add(split[i]);
+            tb.add(sp);
           }
           stack.add(tb.toString());
+          if(last) break;
         }
       } else if(!ok && !line.isEmpty()) {
         err.add(line);
