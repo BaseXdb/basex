@@ -68,11 +68,11 @@ public enum Err {
   // CSV module
 
   /** BXCS0001. */
-  BXCS_ERROR(BXCS, 1, "CSV parser: %."),
+  BXCS_PARSE(BXCS, 1, "CSV parser: %."),
   /** BXCS0002. */
-  BXCS_SER(BXCS, 2, "CSV serialization: %."),
+  BXCS_SERIAL(BXCS, 2, "CSV serializer: %."),
   /** BXCS0003. */
-  BXCS_SEP(BXCS, 3, "CSV configuration: separator must be single character."),
+  BXCS_CONFIG(BXCS, 3, "CSV configuration: separator must be single character."),
 
   // Database module
 
@@ -132,9 +132,9 @@ public enum Err {
   /** BXJS0001. */
   BXJS_PARSEML(BXJS, 1, "JsonML parser: %."),
   /** BXJS0002. */
-  BXJS_SER(BXJS, 2, "JSON serialization: %."),
-  /** BXJS0001. */
-  BXJS_PARSE_CFG(BXJS, 3, "JSON parser configuration: %."),
+  BXJS_SERIAL(BXJS, 2, "JSON serializer: %."),
+  /** BXJS0003. */
+  BXJS_CONFIG(BXJS, 3, "JSON parser configuration: %."),
 
   // Process module
 
@@ -1098,7 +1098,7 @@ public enum Err {
   /** XUTY0012. */
   UPWRTRGTYP(XUTY, 12, "Single element, attribute or pi expected as rename target."),
   /** XUTY0013. */
-  UPCOPYMULT(XUTY, 13, "Source expression in copy clause must return a single node."),
+  UPCOPYMULT(XUTY, 13, "Value assigned to $% must be a single node."),
   /** XUTY0022. */
   UPATTELM2(XUTY, 22, "Insert target must be an element.");
 
