@@ -218,7 +218,12 @@
     <repository>
       <id>basex.mvn</id>
       <name>BaseX Maven Repository</name>
-      <url>ftp://basex.org/</url> <!-- TODO: fix the path; use sftp or ssh -->
+      <url>ftp://basex.org/</url>
+    </repository>
+    <repository>
+      <id>basex.mvn.ssh</id>
+      <name>BaseX Maven Repository</name>
+      <url>scp://basex.org/</url>
     </repository>
   </distributionManagement>
 
