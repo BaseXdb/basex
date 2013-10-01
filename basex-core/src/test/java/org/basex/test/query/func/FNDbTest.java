@@ -169,7 +169,12 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void list() throws BaseXException {
     // add documents
     new Add("test/docs", FLDR).execute(context);
-    contains(_DB_LIST.args(NAME), "test/");
+    contains(_DB_LIST.args(NAME), "test/docs");
+    contains(_DB_LIST.args(NAME, "test/"), "test/docs");
+    contains(_DB_LIST.args(NAME, "test/docs/input.xml"), "input.xml");
+    query(_DB_STORE.args(NAME, "bin/b", "b"));
+    query(_DB_LIST.args(NAME, "bin/"), "bin/b");
+    query(_DB_LIST.args(NAME, "bin/b"), "bin/b");
     // create two other database and compare substring
     new CreateDB(NAME + 1).execute(context);
     new CreateDB(NAME + 2).execute(context);

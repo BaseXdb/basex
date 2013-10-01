@@ -40,7 +40,7 @@ final class Binaries {
     if(np == null || data.inMemory()) return tl;
 
     final String exct = Prop.CASE ? np : np.toLowerCase(Locale.ENGLISH);
-    final String pref = exct + '/';
+    final String pref = exct.endsWith("/") ? exct : exct + '/';
     for(final String f : data.meta.binaries().descendants()) {
       final String lc = Prop.CASE ? f : f.toLowerCase(Locale.ENGLISH);
       if(exct.isEmpty() || lc.equals(exct) || lc.startsWith(pref)) tl.add(f);
