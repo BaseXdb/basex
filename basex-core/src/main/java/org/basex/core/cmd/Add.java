@@ -55,7 +55,7 @@ public final class Add extends ACreate {
   @Override
   protected boolean run() {
     String name = MetaData.normPath(args[0]);
-    if(name == null || name.endsWith(".")) return error(NAME_INVALID_X, args[0]);
+    if(name == null) return error(NAME_INVALID_X, args[0]);
 
     // retrieve input
     final IO io;
