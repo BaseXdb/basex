@@ -7,3 +7,4 @@
 org.maven.ide.eclipse.prefs
 .idea/
 *.class
+/target
