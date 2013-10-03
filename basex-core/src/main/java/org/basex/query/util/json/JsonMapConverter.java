@@ -65,12 +65,12 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
   }
 
   @Override
-  public void openEntry(final byte[] key) {
+  public void openPair(final byte[] key) {
     stack.push(Str.get(key));
   }
 
   @Override
-  public void closeEntry() throws QueryException {
+  public void closePair() throws QueryException {
     final Value val = stack.pop();
     final Item key = (Item) stack.pop();
     final Map map = (Map) stack.pop();
@@ -85,13 +85,13 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
   }
 
   @Override
-  public void openArrayEntry() {
+  public void openItem() {
     stack.push(Int.get(((Map) stack.peek()).mapSize() + 1));
   }
 
   @Override
-  public void closeArrayEntry() throws QueryException {
-    closeEntry();
+  public void closeItem() throws QueryException {
+    closePair();
   }
 
   @Override public void closeArray() { }
@@ -99,22 +99,22 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
   @Override
   public void openConstr(final byte[] name) {
     openObject();
-    openEntry(name);
+    openPair(name);
     openArray();
   }
 
   @Override public void openArg() {
-    openArrayEntry();
+    openItem();
   }
 
   @Override public void closeArg() throws QueryException {
-    closeArrayEntry();
+    closeItem();
   }
 
   @Override
   public void closeConstr() throws QueryException {
     closeArray();
-    closeEntry();
+    closePair();
     closeObject();
   }
 
@@ -134,7 +134,7 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
   }
 
   @Override
-  public void booleanLit(final boolean b) {
-    stack.push(Bln.get(b));
+  public void booleanLit(final byte[] b) {
+    stack.push(Bln.get(Token.eq(b, Token.TRUE)));
   }
 }

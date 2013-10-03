@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.data.DataText.*;
 import static org.basex.io.serial.SerializerProp.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
@@ -7,7 +8,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.io.out.*;
+import org.basex.build.file.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -87,21 +88,17 @@ public class FNCsv extends StandardFunc {
     final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
     final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
 
-    final ArrayOutput ao = new ArrayOutput();
     final SerializerProp props = new SerializerProp();
-    if(map.contains(HEADER)) props.set(S_CSV_HEADER, string(map.get(HEADER)));
-    if(map.contains(SEPARATOR)) props.set(S_CSV_SEPARATOR, string(map.get(SEPARATOR)));
+    props.set(S_METHOD, M_CSV);
+    // create csv properties and set options
+    final CsvProp cprop = new CsvProp();
+    final byte[] header = map.get(HEADER);
+    if(header != null) cprop.set(CsvProp.HEADER, Util.yes(string(header)));
+    final byte[] sep = map.get(SEPARATOR);
+    if(sep != null) cprop.set(CsvProp.SEPARATOR, string(sep));
+    props.set(S_CSV, cprop.toString());
 
-    try {
-      // run serialization
-      final Serializer ser = new CsvSerializer(ao, props);
-      ser.serialize(node);
-      ser.close();
-    } catch(final SerializerException ex) {
-      throw ex.getCause(info);
-    } catch(final IOException ex) {
-      SERANY.thrw(info, ex);
-    }
-    return Str.get(delete(ao.toArray(), '\r'));
+    // serialize node
+    return Str.get(delete(serialize(node.iter(), props), '\r'));
   }
 }

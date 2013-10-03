@@ -14,20 +14,8 @@ import org.basex.util.*;
  * This class parses files in the plain-text format
  * and sends events to the specified database builder.
  *
- * <p>The parser provides one option, which can be specified via
- * <code>SET PARSEROPT ...</code>:</p>
- *
- * <ul>
- *   <li><code>encoding</code> specifies the input encoding
- *   (default: <code>UTF-8</code>).</li>
- *   <li><code>lines</code> specified if the resulting XML splits the input
- *   into lines. Can be set to <code>yes</code> or <code>no</code>
- *   (default: <code>yes</code>).</li>
- * </ul>
- *
- * <p><b>Example</b>:
- * <code>SET PARSEROPT lines=no; CREATE DB ...</code><br/>
- * <b>Description</b>: Puts complete input into one text node.</p>
+ * <p>The parser provides some options, which can be specified via the
+ * {@link Prop#TEXTPARSER} option.</p>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -52,9 +40,9 @@ public final class TextParser extends SingleParser {
   public TextParser(final IO source, final Prop pr) throws IOException {
     super(source, pr);
     // set parser properties
-    final ParserProp props = new ParserProp(pr.get(Prop.PARSEROPT));
-    lines = props.is(ParserProp.LINES);
-    encoding = props.get(ParserProp.ENCODING);
+    final TextProp tp = new TextProp(pr.get(Prop.TEXTPARSER));
+    lines = tp.is(TextProp.LINES);
+    encoding = tp.get(TextProp.ENCODING);
   }
 
   @Override

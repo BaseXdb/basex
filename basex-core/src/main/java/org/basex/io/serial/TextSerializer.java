@@ -41,7 +41,7 @@ public class TextSerializer extends OutputSerializer {
   protected void finishClose() throws IOException { }
 
   @Override
-  protected void code(final int ch) throws IOException {
+  protected void encode(final int ch) throws IOException {
     printChar(ch);
   }
 }

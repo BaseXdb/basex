@@ -151,8 +151,6 @@ public interface QueryText {
   /** Parser token. */
   String ITEMM = "item";
   /** Parser token. */
-  String JSONSTR = "json";
-  /** Parser token. */
   String LANGUAGE = "language";
   /** Parser token. */
   String LAST = "last";
@@ -505,7 +503,7 @@ public interface QueryText {
   /** HTML token. */
   byte[] HTML = token("html");
   /** JSON token. */
-  byte[] JSON = token(JSONSTR);
+  byte[] JSON = token("json");
   /** MAP token. */
   byte[] MAP = token(MAPSTR);
   /** Package token. */

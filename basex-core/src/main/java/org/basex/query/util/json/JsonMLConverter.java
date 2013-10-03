@@ -27,17 +27,19 @@ public class JsonMLConverter extends JsonXMLConverter {
 
   /**
    * Constructor.
+   * @param sp JSON spec to use
+   * @param unesc unescape flag
    * @param ii input info
    */
-  public JsonMLConverter(final InputInfo ii) {
-    super(ii);
+  public JsonMLConverter(final Spec sp, final boolean unesc, final InputInfo ii) {
+    super(sp, unesc, ii);
   }
 
   @Override
   public ANode convert(final String in) throws QueryException {
     final JsonMLHandler handler = new JsonMLHandler();
     stack.clear();
-    JsonParser.parse(in, Spec.RFC4627, true, handler, null);
+    JsonParser.parse(in, Spec.RFC4627, true, handler, info);
     return stack.pop();
   }
 
@@ -80,12 +82,12 @@ public class JsonMLConverter extends JsonXMLConverter {
     }
 
     @Override
-    public void openEntry(final byte[] key) throws QueryException {
+    public void openPair(final byte[] key) throws QueryException {
       attName = check(key);
     }
 
     @Override
-    public void closeEntry() throws QueryException { }
+    public void closePair() throws QueryException { }
 
     @Override
     public void closeObject() {
@@ -110,10 +112,10 @@ public class JsonMLConverter extends JsonXMLConverter {
     }
 
     @Override
-    public void openArrayEntry() { }
+    public void openItem() { }
 
     @Override
-    public void closeArrayEntry() throws QueryException { }
+    public void closeItem() throws QueryException { }
 
     @Override
     public void closeArray() throws QueryException {
@@ -160,7 +162,7 @@ public class JsonMLConverter extends JsonXMLConverter {
     }
 
     @Override
-    public void booleanLit(final boolean b) throws QueryException {
+    public void booleanLit(final byte[] b) throws QueryException {
       error("No booleans allowed");
     }
 

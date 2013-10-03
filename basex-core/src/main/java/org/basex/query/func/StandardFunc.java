@@ -11,6 +11,8 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -93,6 +95,29 @@ public abstract class StandardFunc extends Arr {
     final Type ip = it.type;
     return it instanceof ANode ? ip == NodeType.PI || ip == NodeType.COM ?
         Str.get(it.string(ii)) : new Atm(it.string(ii)) : it.materialize(ii);
+  }
+
+  /**
+   * Serializes the data from the specified iterator.
+   * @param ir data to serialize
+   * @param props serialization properties
+   * @return result
+   * @throws QueryException query exception
+   */
+  protected byte[] serialize(final Iter ir, final SerializerProp props)
+      throws QueryException {
+
+    final ArrayOutput ao = new ArrayOutput();
+    try {
+      final Serializer ser = Serializer.get(ao, props);
+      for(Item it; (it = ir.next()) != null;) ser.serialize(it);
+      ser.close();
+    } catch(final SerializerException ex) {
+      throw ex.getCause(info);
+    } catch(final IOException ex) {
+      SERANY.thrw(info, ex);
+    }
+    return ao.toArray();
   }
 
   @Override

@@ -879,7 +879,9 @@ public enum Err {
   /** XQDY0072. */
   COMINVALID(XQDY, 72, "Invalid comment."),
   /** XQDY0074. */
-  INVNAME(XQDY, 74, "Invalid name: '%'."),
+  INVNSNAME(XQDY, 74, "Invalid namespace prefix: '%'."),
+  /** XQDY0074. */
+  INVNAME(XQDY, 74, "Invalid QName: '%'."),
   /** XQDY0074. */
   INVPREF(XQDY, 74, "No namespace declared for %."),
   /** XQDY0096. */

@@ -11,7 +11,6 @@ import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -309,20 +308,9 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-    final ArrayOutput ao = new ArrayOutput();
-    try {
-      // run serialization
-      Item it = expr.length > 1 ? expr[1].item(ctx, info) : null;
-      final Serializer ser = Serializer.get(ao, FuncParams.serializerProp(it, info));
-      final Iter ir = expr[0].iter(ctx);
-      while((it = ir.next()) != null) ser.serialize(it);
-      ser.close();
-    } catch(final SerializerException ex) {
-      throw ex.getCause(info);
-    } catch(final IOException ex) {
-      SERANY.thrw(info, ex);
-    }
-    return Str.get(ao.toArray());
+    Item it = expr.length > 1 ? expr[1].item(ctx, info) : null;
+    final SerializerProp props = FuncParams.serializerProp(it, info);
+    return Str.get(serialize(expr[0].iter(ctx), props));
   }
 
   @Override

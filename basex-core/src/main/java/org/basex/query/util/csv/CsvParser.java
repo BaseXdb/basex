@@ -25,7 +25,7 @@ public final class CsvParser {
   /** CSV element. */
   private static final byte[] ENTRY = token("entry");
 
-  /** Column separator (see {@link ParserProp#SEPARATOR}). */
+  /** Column separator (see {@link CsvProp#SEPARATOR}). */
   private final int separator;
 
   /** Root node. */

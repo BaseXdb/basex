@@ -1,11 +1,11 @@
 package org.basex.io.serial;
 
-import static org.basex.io.serial.SerializerProp.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.build.file.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -33,14 +33,16 @@ public final class CsvSerializer extends OutputSerializer {
    * @param props serialization properties
    * @throws IOException I/O exception
    */
-  public CsvSerializer(final OutputStream os, final SerializerProp props)
+  CsvSerializer(final OutputStream os, final SerializerProp props)
       throws IOException {
 
     super(os, props);
-    final TokenParser tp = new TokenParser(token(props.get(S_CSV_SEPARATOR)));
+
+    final CsvProp cprop = new CsvProp(props.get(SerializerProp.S_CSV));
+    final TokenParser tp = new TokenParser(token(cprop.get(CsvProp.SEPARATOR)));
     separator = tp.next();
     if(separator == -1 || tp.next() != -1) BXCS_CONFIG.thrwSerial();
-    header = Util.yes(props.get(S_CSV_HEADER));
+    header = cprop.is(CsvProp.HEADER);
     headers = header ? new TokenList() : null;
   }
 
@@ -106,7 +108,7 @@ public final class CsvSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void code(final int ch) throws IOException {
+  protected void encode(final int ch) throws IOException {
     printChar(ch);
   }
 

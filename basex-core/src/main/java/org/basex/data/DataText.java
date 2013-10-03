@@ -133,8 +133,6 @@ public interface DataText {
 
   /** Method. */
   String M_CSV = "csv";
-  /** Method. */
-  String M_MAB2 = "mab2";
 
   /** Method. */
   String M_XML = "xml";
@@ -200,6 +198,10 @@ public interface DataText {
   byte[] T_TYPE = token("type");
   /** Token: value. */
   byte[] T_VALUE = token("value");
+  /** Token: pair. */
+  byte[] T_PAIR = token("pair");
+  /** Token: item. */
+  byte[] T_ITEM = token("item");
 
   /** Token: string. */
   byte[] T_STRING = token("string");

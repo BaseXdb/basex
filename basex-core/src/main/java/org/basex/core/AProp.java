@@ -306,7 +306,7 @@ public abstract class AProp implements Iterable<String> {
     final TokenBuilder tb = new TokenBuilder();
     for(final Entry<String, Object> e : props.entrySet()) {
       if(!tb.isEmpty()) tb.add(',');
-      tb.add(e.getKey()).add('=').addExt(e.getValue());
+      tb.add(e.getKey()).add('=').add(e.getValue().toString().replace(",", ",,"));
     }
     return tb.toString();
   }
@@ -378,18 +378,25 @@ public abstract class AProp implements Iterable<String> {
 
   /**
    * Parses a property string and sets the properties accordingly.
-   * @param s property string
+   * @param string property string
    * @throws IOException io exception
    */
-  protected final synchronized void parse(final String s) throws IOException {
-    for(final String ser : s.trim().split(",")) {
-      if(ser.isEmpty()) continue;
-      final String[] sprop = ser.split("=", 2);
-
-      final String key = sprop[0].trim();
-      final String val = sprop.length < 2 ? "" : sprop[1];
+  protected final synchronized void parse(final String string) throws IOException {
+    final int sl = string.length();
+    int i = 0;
+    while(i < sl) {
+      int k = string.indexOf('=', i);
+      if(k == -1) break;
+      final String key = string.substring(i, k);
+      final StringBuilder val = new StringBuilder();
+      i = k;
+      while(++i < sl) {
+        final char ch = string.charAt(i);
+        if(ch == ',' && (++i == sl || string.charAt(i) != ',')) break;
+        val.append(ch);
+      }
       try {
-        if(set(key, val) != null) continue;
+        if(set(key, val.toString()) != null) continue;
       } catch(final Exception ex) {
         throw new BaseXException(Text.INVALID_VALUE_X_X, key, val);
       }

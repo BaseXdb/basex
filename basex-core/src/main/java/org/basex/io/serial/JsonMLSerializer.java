@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class JsonMLSerializer extends OutputSerializer {
+public final class JsonMLSerializer extends JsonSerializer {
   /** Indicates serialized attributes. */
   private boolean att;
 
@@ -29,8 +29,7 @@ public final class JsonMLSerializer extends OutputSerializer {
    * @param props serialization properties
    * @throws IOException I/O exception
    */
-  protected JsonMLSerializer(final OutputStream os, final SerializerProp props)
-      throws IOException {
+  JsonMLSerializer(final OutputStream os, final SerializerProp props) throws IOException {
     super(os, props);
   }
 
@@ -40,9 +39,8 @@ public final class JsonMLSerializer extends OutputSerializer {
       print(',');
       indent();
     }
-    print('[');
-    print('"');
-    for(final byte ch : local(name)) code(ch);
+    print("[\"");
+    for(final byte ch : local(name)) encode(ch);
     print('"');
     att = false;
   }
@@ -55,9 +53,9 @@ public final class JsonMLSerializer extends OutputSerializer {
       att = true;
     }
     print('"');
-    for(final byte ch : name) code(ch);
+    for(final byte ch : name) encode(ch);
     print("\":\"");
-    for(final byte ch : value) code(ch);
+    for(final byte ch : value) encode(ch);
     print("\"");
   }
 
@@ -75,7 +73,7 @@ public final class JsonMLSerializer extends OutputSerializer {
     print(',');
     indent();
     print('"');
-    for(final byte ch : text) code(ch);
+    for(final byte ch : text) encode(ch);
     print('"');
   }
 
@@ -91,7 +89,7 @@ public final class JsonMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void code(final int ch) throws IOException {
+  protected void encode(final int ch) throws IOException {
     switch(ch) {
       case '\b': print("\\b");  break;
       case '\f': print("\\f");  break;

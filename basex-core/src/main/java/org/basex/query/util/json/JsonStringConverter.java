@@ -46,14 +46,14 @@ public final class JsonStringConverter implements JsonHandler {
   }
 
   @Override
-  public void openEntry(final byte[] key) throws QueryException {
+  public void openPair(final byte[] key) throws QueryException {
     if(!first) tb.add(", ");
     stringLit(key);
     tb.add(": ");
   }
 
   @Override
-  public void closeEntry() throws QueryException {
+  public void closePair() throws QueryException {
     first = false;
   }
 
@@ -69,12 +69,12 @@ public final class JsonStringConverter implements JsonHandler {
   }
 
   @Override
-  public void openArrayEntry() throws QueryException {
+  public void openItem() throws QueryException {
     if(!first) tb.add(", ");
   }
 
   @Override
-  public void closeArrayEntry() throws QueryException {
+  public void closeItem() throws QueryException {
     first = false;
   }
 
@@ -151,11 +151,11 @@ public final class JsonStringConverter implements JsonHandler {
 
   @Override
   public void nullLit() throws QueryException {
-    tb.add("null");
+    tb.add(Token.NULL);
   }
 
   @Override
-  public void booleanLit(final boolean b) throws QueryException {
-    tb.add(b ? "true" : "false");
+  public void booleanLit(final byte[] b) throws QueryException {
+    tb.add(b);
   }
 }

@@ -65,7 +65,7 @@ public final class HTMLParser extends XMLParser {
    * @throws IOException I/O exception
    */
   public HTMLParser(final IO source, final Prop pr) throws IOException {
-    this(source, pr.get(Prop.HTMLOPT), pr);
+    this(source, pr.get(Prop.HTMLPARSER), pr);
   }
 
   /**

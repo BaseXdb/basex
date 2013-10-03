@@ -19,7 +19,7 @@ public final class Prop extends AProp {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = "7.7.2 beta";
+  public static final String VERSION = "7.8 beta";
   /** Main author. */
   public static final String AUTHOR = "Christian Gr\u00FCn";
   /** Co-authors (1). */
@@ -92,19 +92,18 @@ public final class Prop extends AProp {
   public static final Object[] SKIPCORRUPT = { "SKIPCORRUPT", false };
   /** Flag for adding remaining files as raw files. */
   public static final Object[] ADDRAW = { "ADDRAW", false };
-  /** Define import parser. */
-  public static final Object[] PARSER = { "PARSER", "xml" };
-  /** Define parser options. */
-  public static final Object[] PARSEROPT = { "PARSEROPT",
-    "encoding=UTF-8,flat=false,header=false,jsonml=false," +
-    "lines=true,separator=comma" };
   /** Cache new documents before adding them to a database. */
   public static final Object[] ADDCACHE = { "ADDCACHE", false };
+  /** Define import parser. */
+  public static final Object[] PARSER = { "PARSER", "xml" };
+  /** Define CSV parser options. */
+  public static final Object[] CSVPARSER = { "CSVPARSER", "" };
+  /** Define text parser options. */
+  public static final Object[] TEXTPARSER = { "TEXTPARSER", "" };
+  /** Define JSON parser options. */
+  public static final Object[] JSONPARSER = { "JSONPARSER", "" };
   /** Define TagSoup HTML options. */
-  public static final Object[] HTMLOPT = { "HTMLOPT",
-    "html=false,omit-xml-declaration=false,method=xml,nons=false,nobogons=false," +
-    "nodefaults=false,nocolons=false,norestart=false,ignorable=false,emptybogons=false," +
-    "any=false,norootbogons=false,nocdata=false,lexical=false,encoding=utf-8" };
+  public static final Object[] HTMLPARSER = { "HTMLPARSER", "" };
 
   // XML Parsing
 

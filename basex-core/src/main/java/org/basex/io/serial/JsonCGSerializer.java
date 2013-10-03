@@ -44,8 +44,7 @@ public final class JsonCGSerializer extends JsonSerializer {
    * @param props serialization properties
    * @throws IOException I/O exception
    */
-  protected JsonCGSerializer(final OutputStream os, final SerializerProp props)
-      throws IOException {
+  JsonCGSerializer(final OutputStream os, final SerializerProp props) throws IOException {
     super(os, props);
     for(int t = 0; t < typeCache.length; t++) typeCache[t] = new TokenMap();
   }
@@ -109,8 +108,7 @@ public final class JsonCGSerializer extends JsonSerializer {
     } else if(eq(type, T_ARRAY)) {
       print('[');
     } else if(level == 0) {
-      error("Element <%> must be typed as \"%\" or \"%\"",
-          T_JSON, T_OBJECT, T_ARRAY);
+      error("Element <%> must be typed as \"%\" or \"%\"", T_JSON, T_OBJECT, T_ARRAY);
     }
   }
 
@@ -119,7 +117,7 @@ public final class JsonCGSerializer extends JsonSerializer {
     final byte[] type = types.get(level - 1);
     if(eq(type, T_STRING)) {
       print('"');
-      for(final byte ch : text) code(ch);
+      for(final byte ch : text) encode(ch);
       print('"');
     } else if(eq(type, T_BOOLEAN, T_NUMBER)) {
       print(text);
@@ -156,7 +154,7 @@ public final class JsonCGSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void code(final int ch) throws IOException {
+  protected void encode(final int ch) throws IOException {
     switch(ch) {
       case '\b': print("\\b");  break;
       case '\f': print("\\f");  break;

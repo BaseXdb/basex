@@ -58,7 +58,7 @@ public class HTMLSerializer extends OutputSerializer {
       } else if(ch == 0x9 || ch == 0xA) {
         hex(ch);
       } else {
-        code(ch);
+        encode(ch);
       }
     }
     print(ATT2);
@@ -84,11 +84,11 @@ public class HTMLSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void code(final int ch) throws IOException {
+  protected void encode(final int ch) throws IOException {
     if(script) printChar(ch);
     else if(ch > 0x7F && ch < 0xA0 && !html5) SERILL.thrwSerial(Integer.toHexString(ch));
     else if(ch == 0xA0) print(E_NBSP);
-    else super.code(ch);
+    else super.encode(ch);
   }
 
   @Override

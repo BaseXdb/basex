@@ -7,6 +7,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.test.*;
 import org.junit.*;
@@ -29,7 +30,7 @@ public final class CSVTest extends SandboxTest {
    */
   @BeforeClass
   public static void before() throws BaseXException {
-    new Set(Prop.PARSER, "csv").execute(context);
+    new Set(Prop.PARSER, DataText.M_CSV).execute(context);
   }
 
   /**
@@ -46,7 +47,7 @@ public final class CSVTest extends SandboxTest {
    */
   @Before
   public void init() throws BaseXException {
-    new Set(Prop.PARSEROPT, "header=true").execute(context);
+    new Set(Prop.CSVPARSER, "header=true").execute(context);
   }
 
   /**
@@ -79,7 +80,7 @@ public final class CSVTest extends SandboxTest {
     assertEquals("3", new XQuery("count(//Name)").execute(context));
     assertEquals("2", new XQuery("count(//Email)").execute(context));
 
-    new Set(Prop.PARSEROPT, "header=true").execute(context);
+    new Set(Prop.CSVPARSER, "header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("3", new XQuery("count(//record)").execute(context));
   }
@@ -90,7 +91,7 @@ public final class CSVTest extends SandboxTest {
    */
   @Test
   public void simple() throws Exception {
-    new Set(Prop.PARSEROPT, "header=true").execute(context);
+    new Set(Prop.CSVPARSER, "header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("3", new XQuery("count(//record)").execute(context));
   }
@@ -101,10 +102,10 @@ public final class CSVTest extends SandboxTest {
    */
   @Test
   public void sep() throws Exception {
-    new Set(Prop.PARSEROPT, "separator=tab,header=true").execute(context);
+    new Set(Prop.CSVPARSER, "separator=tab,header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("0", new XQuery("count(//Name)").execute(context));
-    new Set(Prop.PARSEROPT, "separator=9,header=true").execute(context);
+    new Set(Prop.CSVPARSER, "separator=9,header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("0", new XQuery("count(//Name)").execute(context));
   }

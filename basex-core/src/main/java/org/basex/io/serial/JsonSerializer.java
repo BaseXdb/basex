@@ -1,8 +1,13 @@
 package org.basex.io.serial;
 
+import static org.basex.data.DataText.*;
 import static org.basex.io.serial.SerializerProp.*;
+import static org.basex.query.util.Err.*;
 
 import java.io.*;
+
+import org.basex.build.file.*;
+import org.basex.query.util.json.JsonParser.Spec;
 
 /**
  * Abstract JSON serializer class.
@@ -11,6 +16,9 @@ import java.io.*;
  * @author Christian Gruen
  */
 public abstract class JsonSerializer extends OutputSerializer {
+  /** JSON props. */
+  protected final JsonProp jprop;
+
   /**
    * Constructor.
    * @param os output stream reference
@@ -19,20 +27,13 @@ public abstract class JsonSerializer extends OutputSerializer {
    */
   protected JsonSerializer(final OutputStream os, final SerializerProp props)
       throws IOException {
+
     super(os, props);
-  }
+    props.set(S_METHOD, M_JSON);
 
-  /**
-   * Returns a specific serializer.
-   * @param os output stream reference
-   * @param props serialization properties (can be {@code null})
-   * @return serializer
-   * @throws IOException I/O exception
-   */
-  public static Serializer get(final OutputStream os, final SerializerProp props)
-      throws IOException {
-
-    return props.get(S_JSON_FORMAT).equals("json") ?
-      new JsonCGSerializer(os, props) : new JsonMLSerializer(os, props);
+    jprop = new JsonProp(props.get(SerializerProp.S_JSON));
+    final String s = jprop.get(JsonProp.SPEC);
+    final Spec spec = Spec.find(s);
+    if(spec == null) BXJS_CONFIG.thrwSerial("Unknown spec '" + s + "'");
   }
 }

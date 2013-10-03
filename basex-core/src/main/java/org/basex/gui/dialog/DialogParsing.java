@@ -54,7 +54,7 @@ final class DialogParsing extends BaseXBack {
   /** HTML options panel. */
   private final BaseXBack htmlopts;
   /** Parameters. */
-  private final BaseXTextField params;
+  private final BaseXTextField html;
 
   /** CSV options panel. */
   private final BaseXBack csvopts;
@@ -85,8 +85,13 @@ final class DialogParsing extends BaseXBack {
   private BaseXBack parseropts;
   /** XML options panel. */
   private final BaseXBack xmlopts;
-  /** ParserProps. */
-  private ParserProp props;
+
+  /** Text parser options. */
+  TextProp tprop;
+  /** Text parser options. */
+  CsvProp cprop;
+  /** Text parser options. */
+  JsonProp jprop;
 
   /**
    * Default constructor.
@@ -102,10 +107,14 @@ final class DialogParsing extends BaseXBack {
 
     final Prop prop = gui.context.prop;
     try {
-      props = new ParserProp(prop.get(Prop.PARSEROPT));
-    } catch(final IOException ex) {
-      props = new ParserProp();
-    }
+      tprop = new TextProp(prop.get(Prop.TEXTPARSER));
+    } catch(final IOException ex) { tprop = new TextProp(); }
+    try {
+      cprop = new CsvProp(prop.get(Prop.CSVPARSER));
+    } catch(final IOException ex) { cprop = new CsvProp(); }
+    try {
+      jprop = new JsonProp(prop.get(Prop.JSONPARSER));
+    } catch(final IOException ex) { jprop = new JsonProp(); }
 
     intparse = new BaseXCheckBox(INT_PARSER, prop.is(Prop.INTPARSE), 0, d);
     dtd = new BaseXCheckBox(PARSE_DTDS, prop.is(Prop.DTD), 0, d);
@@ -115,36 +124,40 @@ final class DialogParsing extends BaseXBack {
     browsec = new BaseXButton(BROWSE_D, d);
     usecat = new BaseXCheckBox(USE_CATALOG_FILE, !prop.get(Prop.CATFILE).isEmpty(), 0, d);
 
-    jsonml = new BaseXCheckBox(PARSE_AS_JSONML, props.is(ParserProp.JSONML), 0, d);
+    // json
+    jencoding = DialogExport.encoding(d, jprop.get(JsonProp.ENCODING));
+    jsonml = new BaseXCheckBox(PARSE_AS_JSONML,
+        jprop.get(JsonProp.FORMAT).equals(DataText.M_JSONML), 0, d);
 
-    params = new BaseXTextField(prop.get(Prop.HTMLOPT), d);
+    // html
+    html = new BaseXTextField(prop.get(Prop.HTMLPARSER), d);
 
-    lines = new BaseXCheckBox(SPLIT_INPUT_LINES, props.is(ParserProp.LINES), 0, d);
-    header = new BaseXCheckBox(FIRST_LINE_HEADER, props.is(ParserProp.HEADER), 0, d);
+    // text
+    tencoding = DialogExport.encoding(d, tprop.get(TextProp.ENCODING));
+    lines = new BaseXCheckBox(SPLIT_INPUT_LINES, tprop.is(TextProp.LINES), 0, d);
+
+    // csv
+    cencoding = DialogExport.encoding(d, cprop.get(CsvProp.ENCODING));
+    header = new BaseXCheckBox(FIRST_LINE_HEADER, cprop.is(CsvProp.HEADER), 0, d);
 
     separator = new BaseXBack().layout(new TableLayout(1, 2, 6, 0));
     final StringList sl = new StringList();
-    sl.add(CSVParser.SEPARATORS).add("");
+    sl.add(CsvProp.SEPARATORS).add("");
     sepcombo = new BaseXCombo(d, sl.toArray());
     separator.add(sepcombo);
 
     String f = "";
-    final String s = props.get(ParserProp.SEPARATOR);
-    if(Token.eq(s, CSVParser.SEPARATORS)) {
+    final String s = cprop.get(CsvProp.SEPARATOR);
+    if(Token.eq(s, CsvProp.SEPARATORS)) {
       sepcombo.setSelectedItem(s);
     } else {
-      sepcombo.setSelectedIndex(CSVParser.SEPARATORS.length);
+      sepcombo.setSelectedIndex(CsvProp.SEPARATORS.length);
       final int ch = Token.toInt(s);
       f = ch > 0 ? String.valueOf((char) ch) : "";
     }
     sepchar = new BaseXTextField(f, d);
     separator.add(sepchar);
     BaseXLayout.setWidth(sepchar, 35);
-
-    final String enc = props.get(ParserProp.ENCODING);
-    cencoding = DialogExport.encoding(d, enc);
-    tencoding = DialogExport.encoding(d, enc);
-    jencoding = DialogExport.encoding(d, enc);
 
     xmlopts  = new BaseXBack(new TableLayout(9, 1));
     htmlopts = new BaseXBack(new TableLayout(2, 1, 0, 8));
@@ -197,7 +210,7 @@ final class DialogParsing extends BaseXBack {
     if(avl) {
       final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
       p.add(new BaseXLabel(PARAMETERS + COL, true, true));
-      p.add(params);
+      p.add(html);
       htmlopts.add(p);
     }
 
@@ -280,7 +293,7 @@ final class DialogParsing extends BaseXBack {
     browsec.setEnabled(uc);
 
     final int s = sepcombo.getSelectedIndex();
-    final boolean customsep = s == CSVParser.SEPARATORS.length;
+    final boolean customsep = s == CsvProp.SEPARATORS.length;
     sepchar.setEnabled(customsep);
     return !customsep || sepchar.getText().length() == 1;
   }
@@ -290,23 +303,27 @@ final class DialogParsing extends BaseXBack {
    * @param type parsing type
    */
   public void setOptions(final String type) {
-    final BaseXCombo cb = type.equals(DataText.M_TEXT) ? tencoding :
-      type.equals(DataText.M_JSON) ? jencoding : cencoding;
-    props.set(ParserProp.ENCODING, cb.getSelectedItem().toString());
-    props.set(ParserProp.HEADER, header.isSelected());
-    props.set(ParserProp.LINES, lines.isSelected());
-    props.set(ParserProp.JSONML, jsonml.isSelected());
-    props.set(ParserProp.SEPARATOR, sepcombo.getSelectedIndex() <
-      CSVParser.SEPARATORS.length ? sepcombo.getSelectedItem().toString() :
+    jprop.set(JsonProp.ENCODING, jencoding.getSelectedItem().toString());
+    jprop.set(JsonProp.FORMAT, jsonml.isSelected() ? DataText.M_JSONML : DataText.M_JSON);
+    gui.set(Prop.JSONPARSER, jprop.toString());
+
+    tprop.set(TextProp.ENCODING, tencoding.getSelectedItem().toString());
+    tprop.set(TextProp.LINES, lines.isSelected());
+    gui.set(Prop.TEXTPARSER, tprop.toString());
+
+    cprop.set(CsvProp.ENCODING, cencoding.getSelectedItem().toString());
+    cprop.set(CsvProp.HEADER, header.isSelected());
+    cprop.set(CsvProp.SEPARATOR, sepcombo.getSelectedIndex() <
+      CsvProp.SEPARATORS.length ? sepcombo.getSelectedItem().toString() :
       String.valueOf((int) sepchar.getText().charAt(0)));
+    gui.set(Prop.CSVPARSER, cprop.toString());
 
     gui.set(Prop.PARSER, type);
-    gui.set(Prop.PARSEROPT, props.toString());
     gui.set(Prop.CHOP, chopWS.isSelected());
     gui.set(Prop.STRIPNS, stripNS.isSelected());
     gui.set(Prop.DTD, dtd.isSelected());
     gui.set(Prop.INTPARSE, intparse.isSelected());
     gui.set(Prop.CATFILE, usecat.isSelected() ? cfile.getText() : "");
-    gui.set(Prop.HTMLOPT, params.getText());
+    gui.set(Prop.HTMLPARSER, html.getText());
   }
 }

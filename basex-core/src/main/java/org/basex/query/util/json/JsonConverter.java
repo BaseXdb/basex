@@ -20,6 +20,8 @@ public abstract class JsonConverter {
   public static final byte[] MAP = token("map");
   /** The {@code jsonml} conversion format. */
   public static final byte[] JSONML = token("jsonml");
+  /** The {@code plain} conversion format. */
+  public static final byte[] PLAIN = token("plain");
   /** The {@code json} conversion format. */
   public static final byte[] JSON = token("json");
 
@@ -27,7 +29,7 @@ public abstract class JsonConverter {
    * Constructor.
    * @param ii input info
    */
-  public JsonConverter(final InputInfo ii) {
+  protected JsonConverter(final InputInfo ii) {
     info = ii;
   }
 
@@ -51,8 +53,9 @@ public abstract class JsonConverter {
     final boolean unesc, final InputInfo ii) {
 
     if(format != null) {
-      if(eq(format, JSONML)) return new JsonMLConverter(ii);
-      if(eq(format, MAP)) return new JsonMapConverter(spec, unesc, ii);
+      if(eq(format, JSONML)) return new JsonMLConverter(spec, unesc, ii);
+      if(eq(format, PLAIN))  return new JsonPlainConverter(spec, unesc, ii);
+      if(eq(format, MAP))    return new JsonMapConverter(spec, unesc, ii);
     }
     return new JsonCGConverter(spec, unesc, ii);
   }

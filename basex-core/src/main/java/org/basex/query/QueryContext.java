@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
+import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -623,14 +624,12 @@ public final class QueryContext extends Proc {
    */
   private Expr cast(final Object val, final String type) throws QueryException {
     // return original value
-    if(type == null || type.isEmpty()) {
+    if(type == null || type.isEmpty())
       return val instanceof Expr ? (Expr) val : JavaMapping.toValue(val, this);
-    }
 
     // convert to json
-    if(type.equalsIgnoreCase(QueryText.JSONSTR)) {
+    if(type.equalsIgnoreCase(M_JSON))
       return new JsonMapConverter(Spec.ECMA_262, true, null).convert(val.toString());
-    }
 
     // convert to the specified type
     final QNm nm = new QNm(token(type.replaceAll("\\(.*?\\)$", "")), this);

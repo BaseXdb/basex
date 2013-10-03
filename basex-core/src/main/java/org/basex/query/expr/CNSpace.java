@@ -34,7 +34,7 @@ public final class CNSpace extends CName {
   public FNames item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Item it = name.item(ctx, info);
     final byte[] cp = checkEStr(it);
-    if(cp.length != 0 && !XMLToken.isNCName(cp)) INVNAME.thrw(info, expr[0]);
+    if(cp.length != 0 && !XMLToken.isNCName(cp)) INVNSNAME.thrw(info, cp);
 
     final byte[] cu = trim(value(ctx, ii));
     if(eq(cp, XML) ^ eq(cu, XMLURI)) CNXML.thrw(info);

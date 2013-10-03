@@ -60,15 +60,11 @@ public final class JsonCGConverter extends JsonXMLConverter {
     T_BOOLEAN, NULL };
   /** The {@code types} QNames. */
   private static final byte[][] TYPES = new byte[NAMES.length][];
+
   static {
     final byte[] s = { 's' };
     for(int i = 0; i < NAMES.length; i++) TYPES[i] = concat(NAMES[i], s);
   }
-
-  /** Spec to use. */
-  private final Spec spec;
-  /** Flag for interpreting character escape sequences. */
-  private final boolean unescape;
 
   /**
    * Constructor.
@@ -77,15 +73,13 @@ public final class JsonCGConverter extends JsonXMLConverter {
    * @param ii input info
    */
   public JsonCGConverter(final Spec sp, final boolean unesc, final InputInfo ii) {
-    super(ii);
-    spec = sp;
-    unescape = unesc;
+    super(sp, unesc, ii);
   }
 
   @Override
   public ANode convert(final String in) throws QueryException {
     final JsonCGHandler handler = new JsonCGHandler();
-    JsonParser.parse(in, spec, unescape, handler, null);
+    JsonParser.parse(in, spec, unescape, handler, info);
     final ByteList[] types = new ByteList[TYPES.length];
     for(final TypedArray arr : handler.names.values()) {
       if(arr != null) {
@@ -119,7 +113,7 @@ public final class JsonCGConverter extends JsonXMLConverter {
      * @param type JSON type
      * @return the element
      */
-    FElem addElem(final byte[] type) {
+    private FElem addElem(final byte[] type) {
       final FElem e = new FElem(name);
 
       if(names.contains(name)) {
@@ -144,85 +138,85 @@ public final class JsonCGConverter extends JsonXMLConverter {
     }
 
     @Override
-    public void openObject() throws QueryException {
+    public void openObject() {
       elem = addElem(T_OBJECT);
     }
 
     @Override
-    public void openEntry(final byte[] key) throws QueryException {
+    public void openPair(final byte[] key) {
       name = XMLToken.encode(key);
     }
 
     @Override
-    public void closeEntry() throws QueryException { }
+    public void closePair() { }
 
     @Override
-    public void closeObject() throws QueryException {
+    public void closeObject() {
       final FElem par = (FElem) elem.parent();
       if(par != null) elem = par;
     }
 
     @Override
-    public void openArray() throws QueryException {
+    public void openArray() {
       elem = addElem(T_ARRAY);
     }
 
     @Override
-    public void openArrayEntry() throws QueryException {
+    public void openItem() {
       name = T_VALUE;
     }
 
     @Override
-    public void closeArrayEntry() throws QueryException { }
+    public void closeItem() { }
 
     @Override
-    public void closeArray() throws QueryException {
+    public void closeArray() {
       closeObject();
     }
 
     @Override
-    public void openConstr(final byte[] nm) throws QueryException {
+    public void openConstr(final byte[] nm) {
       // [LW] what can be done here?
       openObject();
-      openEntry(nm);
+      openPair(nm);
       openArray();
     }
 
     @Override
-    public void openArg() throws QueryException {
-      openArrayEntry();
+    public void openArg() {
+      openItem();
     }
 
     @Override
-    public void closeArg() throws QueryException {
-      closeArrayEntry();
+    public void closeArg() {
+      closeItem();
     }
 
     @Override
-    public void closeConstr() throws QueryException {
+    public void closeConstr() {
       closeArray();
-      closeEntry();
+      closePair();
       closeObject();
     }
 
     @Override
-    public void numberLit(final byte[] value) throws QueryException {
+    public void numberLit(final byte[] value) {
       addElem(T_NUMBER).add(value);
     }
 
     @Override
-    public void stringLit(final byte[] value) throws QueryException {
+    public void stringLit(final byte[] value) {
       addElem(T_STRING).add(value);
     }
 
     @Override
-    public void nullLit() throws QueryException {
+    public void nullLit() {
       addElem(NULL);
     }
 
     @Override
-    public void booleanLit(final boolean b) throws QueryException {
-      addElem(T_BOOLEAN).add(token(b));
+    public void booleanLit(final byte[] b) {
+      addElem(T_BOOLEAN).add(b);
     }
   }
 
@@ -230,7 +224,7 @@ public final class JsonCGConverter extends JsonXMLConverter {
    * A simple container for all elements having the same name.
    * @author Leo Woerteler
    */
-  private static class TypedArray {
+  private static final class TypedArray {
     /** The shared JSON type. */
     final byte[] type;
     /** The nodes. */
@@ -243,7 +237,7 @@ public final class JsonCGConverter extends JsonXMLConverter {
      * @param tp JSON type
      * @param nd element
      */
-    protected TypedArray(final byte[] tp, final FElem nd) {
+    TypedArray(final byte[] tp, final FElem nd) {
       type = tp;
       vals[0] = nd;
       size = 1;
@@ -253,7 +247,7 @@ public final class JsonCGConverter extends JsonXMLConverter {
      * Adds a new element to the list.
      * @param nd element to add
      */
-    protected void add(final FElem nd) {
+    void add(final FElem nd) {
       if(size == vals.length) vals = Array.copy(vals, new FElem[Array.newSize(size)]);
       vals[size++] = nd;
     }

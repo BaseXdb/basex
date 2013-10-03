@@ -20,14 +20,24 @@ public final class JsonParser extends InputParser {
     /** Parse the input being as compatible as possible. */ LIBERAL("liberal");
 
     /** Description. */
-    public final byte[] desc;
+    private final String desc;
 
     /**
      * Constructor.
      * @param dsc description
      */
     Spec(final String dsc) {
-      desc = token(dsc);
+      desc = dsc;
+    }
+
+    /**
+     * Returns an enum for the specified spec.
+     * @param spec specification
+     * @return enum
+     */
+    public static Spec find(final String spec) {
+      for(final Spec s : values()) if(s.desc.equals(spec)) return s;
+      return null;
     }
   }
 
@@ -125,8 +135,8 @@ public final class JsonParser extends InputParser {
         break;
       default:
         // boolean, null or constructor
-        if(consume("true")) h.booleanLit(true);
-        else if(consume("false")) h.booleanLit(false);
+        if(consume("true")) h.booleanLit(TRUE);
+        else if(consume("false")) h.booleanLit(FALSE);
         else if(consume("null")) h.nullLit();
         else if(spec == Spec.LIBERAL && consume("new") &&
             Character.isWhitespace(curr())) constr(h);
@@ -145,10 +155,10 @@ public final class JsonParser extends InputParser {
     h.openObject();
     if(!consumeWs('}', false)) {
       do {
-        h.openEntry(spec != Spec.LIBERAL || curr() == '"' ? string() : unquoted());
+        h.openPair(spec != Spec.LIBERAL || curr() == '"' ? string() : unquoted());
         consumeWs(':', true);
         value(h);
-        h.closeEntry();
+        h.closePair();
       } while(consumeWs(',', false) && !(spec == Spec.LIBERAL && curr() == '}'));
       consumeWs('}', true);
     }
@@ -165,9 +175,9 @@ public final class JsonParser extends InputParser {
     h.openArray();
     if(!consumeWs(']', false)) {
       do {
-        h.openArrayEntry();
+        h.openItem();
         value(h);
-        h.closeArrayEntry();
+        h.closeItem();
       } while(consumeWs(',', false) && !(spec == Spec.LIBERAL && curr() == ']'));
       consumeWs(']', true);
     }

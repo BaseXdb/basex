@@ -255,7 +255,7 @@ public abstract class OutputSerializer extends Serializer {
       } else if(ch == 0x9 || ch == 0xA) {
         hex(ch);
       } else {
-        code(ch);
+        encode(ch);
       }
     }
     print(ATT2);
@@ -264,7 +264,7 @@ public abstract class OutputSerializer extends Serializer {
   @Override
   protected void finishText(final byte[] b) throws IOException {
     if(cdata.isEmpty() || tags.isEmpty() || !cdata.contains(tags.peek())) {
-      for(int k = 0; k < b.length; k += cl(b, k)) code(cp(b, k));
+      for(int k = 0; k < b.length; k += cl(b, k)) encode(cp(b, k));
     } else {
       print(CDATA_O);
       int c = 0;
@@ -293,7 +293,7 @@ public abstract class OutputSerializer extends Serializer {
       final FTSpan span = lex.next();
       if(!span.special && ftp.contains(span.pos)) print((char) TokenBuilder.MARK);
       final byte[] t = span.text;
-      for(int k = 0; k < t.length; k += cl(t, k)) code(cp(t, k));
+      for(int k = 0; k < t.length; k += cl(t, k)) encode(cp(t, k));
     }
     sep = false;
   }
@@ -326,13 +326,13 @@ public abstract class OutputSerializer extends Serializer {
       if(it instanceof StrStream) {
         final InputStream ni = ((StrStream) it).input(null);
         try {
-          for(int i; (i = ni.read()) != -1;) code(i);
+          for(int i; (i = ni.read()) != -1;) encode(i);
         } finally {
           ni.close();
         }
       } else {
         final byte[] atom = it.string(null);
-        for(int a = 0; a < atom.length; a += cl(atom, a)) code(cp(atom, a));
+        for(int a = 0; a < atom.length; a += cl(atom, a)) encode(cp(atom, a));
       }
     } catch(final QueryException ex) {
       throw new SerializerException(ex);
@@ -379,7 +379,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param ch character to be encoded and printed
    * @throws IOException I/O exception
    */
-  protected void code(final int ch) throws IOException {
+  protected void encode(final int ch) throws IOException {
     if(!format) {
       printChar(ch);
     } else if(ch < ' ' && ch != '\n' && ch != '\t' || ch >= 0x7F && ch < 0xA0 ||

@@ -126,8 +126,6 @@ public abstract class Parser extends Proc {
       p = new HTMLParser(in, prop);
     } else if(parser.equals(DataText.M_TEXT)) {
       p = new TextParser(in, prop);
-    } else if(parser.equals(DataText.M_MAB2)) {
-      p = new MAB2Parser(in, prop);
     } else if(parser.equals(DataText.M_JSON)) {
       p = new JSONParser(in, prop);
     } else if(parser.equals(DataText.M_CSV)) {
