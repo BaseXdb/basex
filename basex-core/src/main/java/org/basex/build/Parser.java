@@ -123,13 +123,13 @@ public abstract class Parser extends Proc {
     final String parser = prop.get(Prop.PARSER).toLowerCase(Locale.ENGLISH);
     final SingleParser p;
     if(parser.equals(DataText.M_HTML)) {
-      p = new HTMLParser(in, prop);
+      p = new HtmlParser(in, prop);
     } else if(parser.equals(DataText.M_TEXT)) {
       p = new TextParser(in, prop);
     } else if(parser.equals(DataText.M_JSON)) {
-      p = new JSONParser(in, prop);
+      p = new JsonParser(in, prop);
     } else if(parser.equals(DataText.M_CSV)) {
-      p = new CSVParser(in, prop);
+      p = new CsvParser(in, prop);
     } else if(parser.equals(DataText.M_XML)) {
       p = xmlParser(in, prop);
     } else {

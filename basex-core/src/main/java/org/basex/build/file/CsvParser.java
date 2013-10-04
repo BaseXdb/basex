@@ -19,14 +19,14 @@ import org.basex.query.util.csv.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CSVParser extends XMLParser {
+public final class CsvParser extends XMLParser {
   /**
    * Constructor.
    * @param source document source
    * @param pr database properties
    * @throws IOException I/O exception
    */
-  public CSVParser(final IO source, final Prop pr) throws IOException {
+  public CsvParser(final IO source, final Prop pr) throws IOException {
     super(toXML(source, pr.get(Prop.CSVPARSER)), pr);
   }
 
@@ -43,7 +43,8 @@ public final class CSVParser extends XMLParser {
 
     // parse input and convert to XML node
     try {
-      final CsvParser conv = new CsvParser(cprop.separator(), cprop.is(CsvProp.HEADER));
+      final CsvConverter conv = new CsvConverter(cprop.separator(),
+          cprop.is(CsvProp.HEADER));
       final NewlineInput nli = new NewlineInput(io).encoding(cprop.get(CsvProp.ENCODING));
       // cache XML representation
       final IOContent xml = new IOContent(conv.convert(nli).serialize().toArray());

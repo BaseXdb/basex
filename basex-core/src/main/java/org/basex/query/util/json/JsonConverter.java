@@ -1,9 +1,10 @@
 package org.basex.query.util.json;
 
+import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.build.file.*;
 import org.basex.query.*;
-import org.basex.query.util.json.JsonParser.Spec;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -43,20 +44,15 @@ public abstract class JsonConverter {
 
   /**
    * Returns a {@link JsonConverter} for the given configuration.
-   * @param format conversion format
-   * @param spec JSON spec
-   * @param unesc unescape flag
+   * @param jprop json properties
    * @param ii input info
    * @return a JSON converter
    */
-  public static JsonConverter get(final byte[] format, final Spec spec,
-    final boolean unesc, final InputInfo ii) {
-
-    if(format != null) {
-      if(eq(format, JSONML)) return new JsonMLConverter(spec, unesc, ii);
-      if(eq(format, PLAIN))  return new JsonPlainConverter(spec, unesc, ii);
-      if(eq(format, MAP))    return new JsonMapConverter(spec, unesc, ii);
-    }
-    return new JsonCGConverter(spec, unesc, ii);
+  public static JsonConverter get(final JsonProp jprop, final InputInfo ii) {
+    final String format = jprop.get(JsonProp.FORMAT);
+    if(format.equals(M_JSONML)) return new JsonMLConverter(jprop, ii);
+    if(format.equals(M_PLAIN))  return new JsonPlainConverter(jprop, ii);
+    if(format.equals(M_MAP))    return new JsonMapConverter(jprop, ii);
+    return new JsonBaseXConverter(jprop, ii);
   }
 }

@@ -10,7 +10,6 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.util.json.*;
-import org.basex.query.util.json.JsonParser.Spec;
 import org.basex.query.value.item.*;
 
 /**
@@ -23,14 +22,14 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class JSONParser extends XMLParser {
+public final class JsonParser extends XMLParser {
   /**
    * Constructor.
    * @param source document source
    * @param pr database properties
    * @throws IOException I/O exception
    */
-  public JSONParser(final IO source, final Prop pr) throws IOException {
+  public JsonParser(final IO source, final Prop pr) throws IOException {
     this(source, pr, pr.get(Prop.JSONPARSER));
   }
 
@@ -41,7 +40,7 @@ public final class JSONParser extends XMLParser {
    * @param options parser options
    * @throws IOException I/O exception
    */
-  public JSONParser(final IO source, final Prop pr, final String options)
+  public JsonParser(final IO source, final Prop pr, final String options)
       throws IOException {
     super(toXML(source, options), pr);
   }
@@ -55,9 +54,8 @@ public final class JSONParser extends XMLParser {
    */
   private static IO toXML(final IO io, final String options) throws IOException {
     // set parser properties
-    final JsonProp props = new JsonProp(options);
-    final byte[] format = token(props.get(JsonProp.FORMAT));
-    final String encoding = props.get(JsonProp.ENCODING);
+    final JsonProp jprop = new JsonProp(options);
+    final String encoding = jprop.get(JsonProp.ENCODING);
 
     // parse input, using specified encoding
     final byte[] content = new NewlineInput(io).encoding(encoding).content();
@@ -65,7 +63,7 @@ public final class JSONParser extends XMLParser {
     // parse input and convert to XML node
     final Item node;
     try {
-      final JsonConverter conv = JsonConverter.get(format, Spec.RFC4627, true, null);
+      final JsonConverter conv = JsonConverter.get(jprop, null);
       node = conv.convert(string(content));
 
       // create XML input container from serialized node

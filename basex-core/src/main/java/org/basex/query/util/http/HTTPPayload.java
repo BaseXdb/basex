@@ -340,11 +340,11 @@ public final class HTTPPayload {
       final boolean ml = eq(ctype, APP_JSON);
       if(ml || Token.eq(ctype, APP_JSON)) {
         final String options = ml ? JsonProp.FORMAT[0] + "=" + DataText.M_JSONML : "";
-        val = new DBNode(new JSONParser(in, prop, options));
+        val = new DBNode(new JsonParser(in, prop, options));
       } else if(TEXT_CSV.equals(ctype)) {
-        val = new DBNode(new CSVParser(in, prop));
+        val = new DBNode(new CsvParser(in, prop));
       } else if(TEXT_HTML.equals(ctype)) {
-        val = new DBNode(new HTMLParser(in, prop));
+        val = new DBNode(new HtmlParser(in, prop));
       } else if(APP_FORM_URLENCODED.equals(ctype)) {
         final String enc = charset(ext);
         val = Str.get(URLDecoder.decode(string(in.read()), enc == null ? UTF8 : enc));

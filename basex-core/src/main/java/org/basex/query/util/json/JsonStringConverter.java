@@ -1,7 +1,7 @@
 package org.basex.query.util.json;
 
+import org.basex.build.file.JsonProp.Spec;
 import org.basex.query.*;
-import org.basex.query.util.json.JsonParser.*;
 import org.basex.util.*;
 
 /**

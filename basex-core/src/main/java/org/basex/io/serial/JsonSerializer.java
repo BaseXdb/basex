@@ -7,7 +7,6 @@ import static org.basex.query.util.Err.*;
 import java.io.*;
 
 import org.basex.build.file.*;
-import org.basex.query.util.json.JsonParser.Spec;
 
 /**
  * Abstract JSON serializer class.
@@ -32,8 +31,7 @@ public abstract class JsonSerializer extends OutputSerializer {
     props.set(S_METHOD, M_JSON);
 
     jprop = new JsonProp(props.get(SerializerProp.S_JSON));
-    final String s = jprop.get(JsonProp.SPEC);
-    final Spec spec = Spec.find(s);
-    if(spec == null) BXJS_CONFIG.thrwSerial("Unknown spec '" + s + "'");
+    if(jprop.spec() == null) BXJS_CONFIG.thrwSerial(
+        "Unknown spec '" + jprop.get(JsonProp.SPEC) + "'");
   }
 }

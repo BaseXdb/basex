@@ -2,11 +2,12 @@ package org.basex.query.util.json;
 
 import static org.basex.query.util.Err.*;
 
-import java.util.Stack;
+import java.util.*;
 
-import org.basex.query.QueryException;
+import org.basex.build.file.*;
+import org.basex.build.file.JsonProp.Spec;
+import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.query.util.json.JsonParser.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -27,12 +28,11 @@ public class JsonMLConverter extends JsonXMLConverter {
 
   /**
    * Constructor.
-   * @param sp JSON spec to use
-   * @param unesc unescape flag
+   * @param jp json properties
    * @param ii input info
    */
-  public JsonMLConverter(final Spec sp, final boolean unesc, final InputInfo ii) {
-    super(sp, unesc, ii);
+  public JsonMLConverter(final JsonProp jp, final InputInfo ii) {
+    super(jp, ii);
   }
 
   @Override

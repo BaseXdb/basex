@@ -1,11 +1,13 @@
 package org.basex.test;
 
+import static org.junit.Assert.*;
+
+import org.basex.build.file.JsonProp.Spec;
 import org.basex.query.*;
 import org.basex.query.util.json.*;
-import org.basex.query.util.json.JsonParser.*;
+import org.basex.query.util.json.JsonParser;
 import org.basex.util.*;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.*;
 
 /**
  * Tests for the {@link JsonParser} class.

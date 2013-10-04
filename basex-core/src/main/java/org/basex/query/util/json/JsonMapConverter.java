@@ -2,12 +2,13 @@ package org.basex.query.util.json;
 
 import java.util.*;
 
-import org.basex.query.QueryException;
-import org.basex.query.util.json.JsonParser.*;
-import org.basex.query.value.Value;
+import org.basex.build.file.*;
+import org.basex.build.file.JsonProp.Spec;
+import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.Map;
-import org.basex.query.value.seq.Empty;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 
@@ -42,14 +43,13 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
 
   /**
    * Constructor.
-   * @param sp JSON spec
-   * @param unesc unescape flag
+   * @param jp json properties
    * @param ii input info
    */
-  public JsonMapConverter(final Spec sp, final boolean unesc, final InputInfo ii) {
+  public JsonMapConverter(final JsonProp jp, final InputInfo ii) {
     super(ii);
-    spec = sp;
-    unescape = unesc;
+    spec = jp.spec();
+    unescape = jp.is(JsonProp.UNESCAPE);
   }
 
   @Override

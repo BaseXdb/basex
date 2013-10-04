@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class CsvParser {
+public final class CsvConverter {
   /** CSV element. */
   private static final byte[] CSV = token("csv");
   /** CSV element. */
@@ -45,7 +45,7 @@ public final class CsvParser {
    * @param sep separator character
    * @param head header flag
    */
-  public CsvParser(final int sep, final boolean head) {
+  public CsvConverter(final int sep, final boolean head) {
     separator = sep;
     header = head;
   }

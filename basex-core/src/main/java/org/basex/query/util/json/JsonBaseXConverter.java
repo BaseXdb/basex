@@ -1,17 +1,15 @@
 package org.basex.query.util.json;
 
-import org.basex.query.QueryException;
-import org.basex.query.util.*;
-import org.basex.query.util.json.JsonParser.*;
-import org.basex.query.value.node.*;
-
+import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.build.file.*;
+import org.basex.query.*;
+import org.basex.query.util.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.TokenObjMap;
-import org.basex.util.list.ByteList;
-
-import static org.basex.data.DataText.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * <p>This class converts a JSON document to XML. The converted XML document is
@@ -54,7 +52,7 @@ import static org.basex.data.DataText.*;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public final class JsonCGConverter extends JsonXMLConverter {
+public final class JsonBaseXConverter extends JsonXMLConverter {
   /** Type names. */
   private static final byte[][] NAMES = { T_ARRAY, T_OBJECT, T_STRING, T_NUMBER,
     T_BOOLEAN, NULL };
@@ -68,12 +66,11 @@ public final class JsonCGConverter extends JsonXMLConverter {
 
   /**
    * Constructor.
-   * @param sp JSON spec to use
-   * @param unesc unescape flag
+   * @param jp json properties
    * @param ii input info
    */
-  public JsonCGConverter(final Spec sp, final boolean unesc, final InputInfo ii) {
-    super(sp, unesc, ii);
+  public JsonBaseXConverter(final JsonProp jp, final InputInfo ii) {
+    super(jp, ii);
   }
 
   @Override

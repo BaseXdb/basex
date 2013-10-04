@@ -10,7 +10,7 @@ import org.basex.core.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class HTMLProp extends AProp {
+public final class HtmlProp extends AProp {
   /** TagSoup option: html. */
   public static final Object[] HTML = { "html", false };
   /** TagSoup option: omit-xml-declaration. */
@@ -51,7 +51,7 @@ public final class HTMLProp extends AProp {
    * @param s properties string
    * @throws IOException exception
    */
-  public HTMLProp(final String s) throws IOException {
+  public HtmlProp(final String s) throws IOException {
     parse(s);
   }
 }

@@ -204,7 +204,7 @@ final class DialogParsing extends BaseXBack {
       xmlopts.add(rs);
     }
 
-    final boolean avl = HTMLParser.available();
+    final boolean avl = HtmlParser.available();
     htmlopts.add(new BaseXLabel(avl ? H_HTML_PARSER : H_NO_HTML_PARSER));
 
     if(avl) {

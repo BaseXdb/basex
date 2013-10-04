@@ -9,6 +9,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.*;
 
+import org.basex.build.file.*;
+import org.basex.build.file.JsonProp.Spec;
 import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.data.*;
@@ -21,7 +23,6 @@ import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
 import org.basex.query.util.json.*;
-import org.basex.query.util.json.JsonParser.Spec;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -628,8 +629,11 @@ public final class QueryContext extends Proc {
       return val instanceof Expr ? (Expr) val : JavaMapping.toValue(val, this);
 
     // convert to json
-    if(type.equalsIgnoreCase(M_JSON))
-      return new JsonMapConverter(Spec.ECMA_262, true, null).convert(val.toString());
+    if(type.equalsIgnoreCase(M_JSON)) {
+      final JsonProp jp = new JsonProp();
+      jp.set(JsonProp.SPEC, Spec.ECMA_262.desc);
+      return new JsonMapConverter(jp, null).convert(val.toString());
+    }
 
     // convert to the specified type
     final QNm nm = new QNm(token(type.replaceAll("\\(.*?\\)$", "")), this);

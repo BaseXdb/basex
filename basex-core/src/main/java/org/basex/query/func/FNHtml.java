@@ -36,7 +36,7 @@ public final class FNHtml extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _HTML_PARSER: return Str.get(HTMLParser.parser());
+      case _HTML_PARSER: return Str.get(HtmlParser.parser());
       case _HTML_PARSE:  return parse(ctx);
       default:           return super.item(ctx, ii);
     }
@@ -60,7 +60,7 @@ public final class FNHtml extends StandardFunc {
 
     // convert html
     try {
-      return new DBNode(new HTMLParser(io, tb.toString(), ctx.context.prop));
+      return new DBNode(new HtmlParser(io, tb.toString(), ctx.context.prop));
     } catch(final IOException ex) {
       throw BXHL_IO.thrw(info, ex);
     }

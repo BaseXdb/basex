@@ -22,7 +22,7 @@ import org.xml.sax.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class HTMLParser extends XMLParser {
+public final class HtmlParser extends XMLParser {
   /** Name of HTML Parser. */
   public static final String NAME = "TagSoup";
   /** TagSoup URL. */
@@ -64,7 +64,7 @@ public final class HTMLParser extends XMLParser {
    * @param pr database properties
    * @throws IOException I/O exception
    */
-  public HTMLParser(final IO source, final Prop pr) throws IOException {
+  public HtmlParser(final IO source, final Prop pr) throws IOException {
     this(source, pr.get(Prop.HTMLPARSER), pr);
   }
 
@@ -75,7 +75,7 @@ public final class HTMLParser extends XMLParser {
    * @param pr database properties
    * @throws IOException I/O exception
    */
-  public HTMLParser(final IO source, final String options, final Prop pr)
+  public HtmlParser(final IO source, final String options, final Prop pr)
       throws IOException {
     super(toXML(source, options), pr);
   }
@@ -117,59 +117,59 @@ public final class HTMLParser extends XMLParser {
       final Object writer = Reflect.get(WRITER, sw);
 
       // set TagSoup options
-      final HTMLProp props = new HTMLProp(options);
+      final HtmlProp props = new HtmlProp(options);
       String p;
-      if(props.is(HTMLProp.HTML)) {
+      if(props.is(HtmlProp.HTML)) {
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
         opt("method", "html");
         opt("omit-xml-declaration", "yes");
       }
-      if(props.is(HTMLProp.NONS)) {
+      if(props.is(HtmlProp.NONS)) {
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
       }
-      if(props.is(HTMLProp.OMITXML)) {
+      if(props.is(HtmlProp.OMITXML)) {
         opt("omit-xml-declaration", "yes");
       }
-      if(!(p = props.get(HTMLProp.METHOD)).isEmpty()) {
+      if(!(p = props.get(HtmlProp.METHOD)).isEmpty()) {
         opt("method", p);
       }
-      if(props.is(HTMLProp.NOBOGONS)) {
+      if(props.is(HtmlProp.NOBOGONS)) {
         reader.setFeature(FEATURES + "ignore-bogons", true);
       }
-      if(props.is(HTMLProp.NODEFAULTS)) {
+      if(props.is(HtmlProp.NODEFAULTS)) {
         reader.setFeature(FEATURES + "default-attributes", false);
       }
-      if(props.is(HTMLProp.NOCOLONS)) {
+      if(props.is(HtmlProp.NOCOLONS)) {
         reader.setFeature(FEATURES + "translate-colons", true);
       }
-      if(props.is(HTMLProp.NORESTART)) {
+      if(props.is(HtmlProp.NORESTART)) {
         reader.setFeature(FEATURES + "restart-elements", false);
       }
-      if(props.is(HTMLProp.IGNORABLE)) {
+      if(props.is(HtmlProp.IGNORABLE)) {
         reader.setFeature(FEATURES + "ignorable-whitespace", true);
       }
-      if(props.is(HTMLProp.EMPTYBOGONS)) {
+      if(props.is(HtmlProp.EMPTYBOGONS)) {
         reader.setFeature(FEATURES + "bogons-empty", true);
       }
-      if(props.is(HTMLProp.ANY)) {
+      if(props.is(HtmlProp.ANY)) {
         reader.setFeature(FEATURES + "bogons-empty", false);
       }
-      if(props.is(HTMLProp.NOROOTBOGONS)) {
+      if(props.is(HtmlProp.NOROOTBOGONS)) {
         reader.setFeature(FEATURES + "root-bogons", false);
       }
-      if(props.is(HTMLProp.NOCDATA)) {
+      if(props.is(HtmlProp.NOCDATA)) {
         reader.setFeature(FEATURES + "cdata-elements", false);
       }
-      if(props.is(HTMLProp.LEXICAL)) {
+      if(props.is(HtmlProp.LEXICAL)) {
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
       }
-      if(!(p = props.get(HTMLProp.DOCTYPESYS)).isEmpty()) {
+      if(!(p = props.get(HtmlProp.DOCTYPESYS)).isEmpty()) {
         opt("doctype-system", p);
       }
-      if(!(p = props.get(HTMLProp.DOCTYPEPUB)).isEmpty()) {
+      if(!(p = props.get(HtmlProp.DOCTYPEPUB)).isEmpty()) {
         opt("doctype-public", p);
       }
-      if(!(p = props.get(HTMLProp.ENCODING)).isEmpty()) {
+      if(!(p = props.get(HtmlProp.ENCODING)).isEmpty()) {
         is.setEncoding(p);
       }
       // end TagSoup options

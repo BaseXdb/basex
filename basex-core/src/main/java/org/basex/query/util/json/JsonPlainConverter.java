@@ -3,9 +3,9 @@ package org.basex.query.util.json;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.build.file.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.query.util.json.JsonParser.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -22,12 +22,11 @@ public class JsonPlainConverter extends JsonXMLConverter implements JsonHandler 
 
   /**
    * Constructor.
-   * @param sp JSON spec to use
-   * @param unesc unescape flag
+   * @param jp json properties
    * @param ii input info
    */
-  public JsonPlainConverter(final Spec sp, final boolean unesc, final InputInfo ii) {
-    super(sp, unesc, ii);
+  public JsonPlainConverter(final JsonProp jp, final InputInfo ii) {
+    super(jp, ii);
   }
 
   @Override

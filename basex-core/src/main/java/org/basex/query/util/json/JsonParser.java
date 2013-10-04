@@ -1,5 +1,6 @@
 package org.basex.query.util.json;
 
+import org.basex.build.file.JsonProp.Spec;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -13,34 +14,6 @@ import static org.basex.util.Token.*;
  * @author Leo Woerteler
  */
 public final class JsonParser extends InputParser {
-  /** JSON specs. */
-  public static enum Spec {
-    /** Parse the input according to RFC 4627.           */ RFC4627("RFC4627"),
-    /** Parse the input according to ECMA-262.           */ ECMA_262("ECMA-262"),
-    /** Parse the input being as compatible as possible. */ LIBERAL("liberal");
-
-    /** Description. */
-    private final String desc;
-
-    /**
-     * Constructor.
-     * @param dsc description
-     */
-    Spec(final String dsc) {
-      desc = dsc;
-    }
-
-    /**
-     * Returns an enum for the specified spec.
-     * @param spec specification
-     * @return enum
-     */
-    public static Spec find(final String spec) {
-      for(final Spec s : values()) if(s.desc.equals(spec)) return s;
-      return null;
-    }
-  }
-
   /** Names of control characters not allowed in string literals. */
   private static final String[] CTRL = {
     // U+0000 -- U+001F

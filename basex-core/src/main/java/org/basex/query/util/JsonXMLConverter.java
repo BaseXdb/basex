@@ -1,8 +1,9 @@
 package org.basex.query.util;
 
+import org.basex.build.file.*;
+import org.basex.build.file.JsonProp.Spec;
 import org.basex.query.*;
 import org.basex.query.util.json.*;
-import org.basex.query.util.json.JsonParser.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -13,6 +14,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class JsonXMLConverter extends JsonConverter {
+  /** JSON properties. */
+  protected final JsonProp jprop;
   /** Spec to use. */
   protected final Spec spec;
   /** Flag for interpreting character escape sequences. */
@@ -20,14 +23,14 @@ public abstract class JsonXMLConverter extends JsonConverter {
 
   /**
    * Constructor.
-   * @param sp JSON spec to use
-   * @param unesc unescape flag
+   * @param jp json properties
    * @param ii input info
    */
-  protected JsonXMLConverter(final Spec sp, final boolean unesc, final InputInfo ii) {
+  protected JsonXMLConverter(final JsonProp jp, final InputInfo ii) {
     super(ii);
-    spec = sp;
-    unescape = unesc;
+    jprop = jp;
+    spec = jp.spec();
+    unescape = jp.is(JsonProp.UNESCAPE);
   }
 
   @Override
