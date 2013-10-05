@@ -83,17 +83,7 @@ public final class CsvTest extends SandboxTest {
     new Set(Options.CSVPARSER, "header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("3", new XQuery("count(//record)").execute(context));
-  }
-
-  /**
-   * Adds the sample CSV file, using the simple XML format.
-   * @throws Exception exception
-   */
-  @Test
-  public void simple() throws Exception {
-    new Set(Options.CSVPARSER, "header=true").execute(context);
-    new CreateDB(NAME, FILE).execute(context);
-    assertEquals("3", new XQuery("count(//record)").execute(context));
+    assertEquals("true", new XQuery("//text() = 'Picard?'").execute(context));
   }
 
   /**
@@ -105,7 +95,7 @@ public final class CsvTest extends SandboxTest {
     new Set(Options.CSVPARSER, "separator=tab,header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("0", new XQuery("count(//Name)").execute(context));
-    new Set(Options.CSVPARSER, "separator=9,header=true").execute(context);
+    new Set(Options.CSVPARSER, "separator=;,header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("0", new XQuery("count(//Name)").execute(context));
   }

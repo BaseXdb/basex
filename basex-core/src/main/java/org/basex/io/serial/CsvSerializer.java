@@ -119,7 +119,7 @@ public final class CsvSerializer extends OutputSerializer {
       if(!headers.contains(name)) headers.add(name);
       final byte[] old = data.get(name);
       final byte[] txt = old == null || old.length == 0 ? text :
-        new TokenBuilder(old).add(',').add(text).finish();
+        text.length == 0 ? old : new TokenBuilder(old).add(',').add(text).finish();
       data.put(name, txt);
     } else {
       data.put(token(data.size()), text);
@@ -148,7 +148,7 @@ public final class CsvSerializer extends OutputSerializer {
 
       if(v == null) continue;
       byte[] txt = v;
-      if(contains(txt, separator) || contains(txt, '\n')) {
+      if(contains(txt, separator) || contains(txt, '\n') || contains(txt, '"')) {
         final TokenBuilder tb = new TokenBuilder().add('"');
         final int len = txt.length;
         for(int c = 0; c < len; c += cl(txt, c)) {

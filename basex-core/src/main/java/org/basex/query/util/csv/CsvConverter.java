@@ -160,7 +160,7 @@ public final class CsvConverter {
       byte[] tag = headers.get(col);
       if(tag == null) tag = ENTRY;
 
-      if(record != null) record.add(new FElem(tag).add(entry.finish()));
+      record.add(new FElem(tag).add(entry.finish()));
       entry.reset();
       ++col;
     }
