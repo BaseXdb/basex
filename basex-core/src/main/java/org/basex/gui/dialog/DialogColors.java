@@ -66,9 +66,9 @@ public final class DialogColors extends BaseXDialog {
   public void action(final Object comp) {
     final GUIOptions gopts = gui.gopts;
     if(comp instanceof BaseXButton) {
-      sliderRed.value(MAXCOLOR - (Integer) GUIOptions.COLORRED[1]);
-      sliderGreen.value(MAXCOLOR - (Integer) GUIOptions.COLORGREEN[1]);
-      sliderBlue.value(MAXCOLOR - (Integer) GUIOptions.COLORBLUE[1]);
+      sliderRed.value(MAXCOLOR - (Integer) GUIOptions.COLORRED.value);
+      sliderGreen.value(MAXCOLOR - (Integer) GUIOptions.COLORGREEN.value);
+      sliderBlue.value(MAXCOLOR - (Integer) GUIOptions.COLORBLUE.value);
     }
 
     gopts.set(GUIOptions.COLORRED, MAXCOLOR - sliderRed.value());

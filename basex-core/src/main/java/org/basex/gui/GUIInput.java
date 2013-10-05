@@ -12,6 +12,7 @@ import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.layout.*;
 import org.basex.query.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -63,7 +64,7 @@ public final class GUIInput extends BaseXTextField {
             // store current input in history
             final Data data = main.context.data();
             final int i = data == null ? 2 : gui.gopts.num(GUIOptions.SEARCHMODE);
-            final Object[] options = i == 0 ? GUIOptions.SEARCH : i == 1 ?
+            final Option options = i == 0 ? GUIOptions.SEARCH : i == 1 ?
               GUIOptions.XQUERY : GUIOptions.COMMANDS;
             new BaseXHistory(main, options).store(getText());
 

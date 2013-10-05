@@ -1,7 +1,9 @@
 package org.basex.test.query.simple;
 
 import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.test.query.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -576,12 +578,12 @@ public final class FTTest extends QueryTest {
 
   /**
    * Returns a flag string.
-   * @param key key
+   * @param option option
    * @param opts options
    * @return string
    */
-  private static String set(final Object[] key, final AOptions opts) {
-    return "set " + key[0] + ' ' + opts.is(key);
+  private static String set(final Option option, final AOptions opts) {
+    return new Set(option, opts.is(option)).toString();
   }
 
   /* TABLE REPRESENTATION

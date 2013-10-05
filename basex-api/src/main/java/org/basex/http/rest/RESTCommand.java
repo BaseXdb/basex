@@ -2,7 +2,6 @@ package org.basex.http.rest;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.http.*;
 import org.basex.io.serial.*;
@@ -31,8 +30,8 @@ public class RESTCommand extends RESTCode {
     // open addressed database
     open(http);
     // set default content type to raw
-    final String sopts = AOptions.toString(SerializerOptions.S_METHOD) + '=' + DataText.M_TEXT +
-            ',' + http.serialization;
+    final String sopts = SerializerOptions.S_METHOD.key + '=' + DataText.M_TEXT + ',' +
+        http.serialization;
     http.initResponse(new SerializerOptions(sopts));
 
     // perform command

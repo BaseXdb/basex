@@ -11,6 +11,7 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.test.*;
+import org.basex.util.*;
 import org.junit.*;
 import org.junit.runner.*;
 import org.junit.runners.*;

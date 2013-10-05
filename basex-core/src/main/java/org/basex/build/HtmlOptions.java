@@ -2,7 +2,7 @@ package org.basex.build;
 
 import java.io.*;
 
-import org.basex.core.*;
+import org.basex.util.*;
 
 /**
  * This class contains HTML parsing options for TagSoup.
@@ -12,39 +12,39 @@ import org.basex.core.*;
  */
 public final class HtmlOptions extends AOptions {
   /** TagSoup option: html. */
-  public static final Object[] HTML = { "html", false };
+  public static final Option HTML = new Option("html", false);
   /** TagSoup option: omit-xml-declaration. */
-  public static final Object[] OMITXML = { "omit-xml-declaration", false };
+  public static final Option OMITXML = new Option("omit-xml-declaration", false);
   /** TagSoup option: method (html). */
-  public static final Object[] METHOD = { "method", "xml" };
+  public static final Option METHOD = new Option("method", "xml");
   /** TagSoup option: nons. */
-  public static final Object[] NONS = { "nons", true };
+  public static final Option NONS = new Option("nons", true);
   /** TagSoup option: nobogons. */
-  public static final Object[] NOBOGONS = { "nobogons", false };
+  public static final Option NOBOGONS = new Option("nobogons", false);
   /** TagSoup option: nodefaults. */
-  public static final Object[] NODEFAULTS = { "nodefaults", false };
+  public static final Option NODEFAULTS = new Option("nodefaults", false);
   /** TagSoup option: nocolons. */
-  public static final Object[] NOCOLONS = { "nocolons", false };
+  public static final Option NOCOLONS = new Option("nocolons", false);
   /** TagSoup option: norestart. */
-  public static final Object[] NORESTART = { "norestart", false };
+  public static final Option NORESTART = new Option("norestart", false);
   /** TagSoup option: nobogons. */
-  public static final Object[] IGNORABLE = { "ignorable", false };
+  public static final Option IGNORABLE = new Option("ignorable", false);
   /** TagSoup option: emptybogons. */
-  public static final Object[] EMPTYBOGONS = { "emptybogons", false };
+  public static final Option EMPTYBOGONS = new Option("emptybogons", false);
   /** TagSoup option: any. */
-  public static final Object[] ANY = { "any", false };
+  public static final Option ANY = new Option("any", false);
   /** TagSoup option: norootbogons. */
-  public static final Object[] NOROOTBOGONS = { "norootbogons", false };
+  public static final Option NOROOTBOGONS = new Option("norootbogons", false);
   /** TagSoup option: nocdata. */
-  public static final Object[] NOCDATA = { "nocdata", false };
+  public static final Option NOCDATA = new Option("nocdata", false);
   /** TagSoup option: lexical. */
-  public static final Object[] LEXICAL = { "lexical", false };
+  public static final Option LEXICAL = new Option("lexical", false);
   /** TagSoup option: doctype-system=systemid. */
-  public static final Object[] DOCTYPESYS = { "doctype-system", "" };
+  public static final Option DOCTYPESYS = new Option("doctype-system", "");
   /** TagSoup option: doctype-public=publicid. */
-  public static final Object[] DOCTYPEPUB = { "doctype-public", "" };
+  public static final Option DOCTYPEPUB = new Option("doctype-public", "");
   /** TagSoup option: encoding=encoding. */
-  public static final Object[] ENCODING = { "encoding", "" };
+  public static final Option ENCODING = new Option("encoding", "");
 
   /**
    * Constructor.

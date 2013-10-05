@@ -55,7 +55,7 @@ public final class FNXslt extends StandardFunc {
       while(s != 0 && find(IMPL[s]) == null) s -= 3;
       OFFSET = s;
       // set processor, or use default processor
-      if(s != 0) System.setProperty(fac, IMPL[s]);
+      if(s != 0) AOptions.setSystem(fac, IMPL[s]);
     }
   }
 

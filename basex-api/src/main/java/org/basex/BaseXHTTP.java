@@ -175,7 +175,7 @@ public final class BaseXHTTP {
    * @param gopts global options
    * @return numeric value
    */
-  private static int num(final Object[] option, final GlobalOptions gopts) {
+  private static int num(final Option option, final GlobalOptions gopts) {
     final String val = AOptions.getSystem(option);
     return val.isEmpty() ? gopts.num(option) : Token.toInt(val);
   }
@@ -186,7 +186,7 @@ public final class BaseXHTTP {
    * @param gopts global options
    * @return boolean value
    */
-  private static boolean bool(final Object[] option, final GlobalOptions gopts) {
+  private static boolean bool(final Option option, final GlobalOptions gopts) {
     final String val = AOptions.getSystem(option);
     return val.isEmpty() ? gopts.is(option) : Boolean.parseBoolean(val);
   }

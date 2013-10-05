@@ -3,6 +3,7 @@ package org.basex.core;
 import java.util.*;
 
 import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * This class defines options which are used all around the project.
@@ -16,71 +17,71 @@ public final class GlobalOptions extends AOptions {
   private static final boolean USERHOME = Prop.HOME.equals(Prop.USERHOME);
 
   /** Comment: written to options file. */
-  public static final Object[] C_GENERAL = { "General Options" };
+  public static final Option C_GENERAL = new Option("General Options");
 
   /** Database path. */
-  public static final Object[] DBPATH = { "DBPATH",
-    Prop.HOME + (USERHOME ? Prop.NAME + "Data" : "data") };
+  public static final Option DBPATH = new Option("DBPATH",
+    Prop.HOME + (USERHOME ? Prop.NAME + "Data" : "data"));
   /** Package repository path. */
-  public static final Object[] REPOPATH = { "REPOPATH",
-    Prop.HOME + (USERHOME ? Prop.NAME + "Repo" : "repo") };
+  public static final Option REPOPATH = new Option("REPOPATH",
+    Prop.HOME + (USERHOME ? Prop.NAME + "Repo" : "repo"));
   /** Debug mode. */
-  public static final Object[] DEBUG = { "DEBUG", false };
+  public static final Option DEBUG = new Option("DEBUG", false);
   /** Language name. */
-  public static final Object[] LANG = { "LANG", Prop.language };
+  public static final Option LANG = new Option("LANG", Prop.language);
   /** Flag to include key names in the language strings. */
-  public static final Object[] LANGKEYS = { "LANGKEYS", false };
+  public static final Option LANGKEYS = new Option("LANGKEYS", false);
   /** Applied locking algorithm: local (database) vs. global (process) locking. */
-  public static final Object[] GLOBALLOCK = { "GLOBALLOCK", false };
+  public static final Option GLOBALLOCK = new Option("GLOBALLOCK", false);
 
   /** Comment: written to options file. */
-  public static final Object[] C_CLIENT = { "Client/Server Architecture" };
+  public static final Option C_CLIENT = new Option("Client/Server Architecture");
 
   /** Server: host, used for connecting new clients. */
-  public static final Object[] HOST = { "HOST", Text.LOCALHOST };
+  public static final Option HOST = new Option("HOST", Text.LOCALHOST);
   /** Server: port, used for connecting new clients. */
-  public static final Object[] PORT = { "PORT", 1984 };
+  public static final Option PORT = new Option("PORT", 1984);
   /** Server: port, used for binding the server. */
-  public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
+  public static final Option SERVERPORT = new Option("SERVERPORT", 1984);
   /** Server: port, used for sending events. */
-  public static final Object[] EVENTPORT = { "EVENTPORT", 1985 };
+  public static final Option EVENTPORT = new Option("EVENTPORT", 1985);
   /** Default user. */
-  public static final Object[] USER = { "USER", "" };
+  public static final Option USER = new Option("USER", "");
   /** Default password. */
-  public static final Object[] PASSWORD = { "PASSWORD", "" };
+  public static final Option PASSWORD = new Option("PASSWORD", "");
 
   /** Server: host, used for binding the server. Empty string for wildcard.*/
-  public static final Object[] SERVERHOST = { "SERVERHOST", "" };
+  public static final Option SERVERHOST = new Option("SERVERHOST", "");
   /** Server: proxy host. */
-  public static final Object[] PROXYHOST = { "PROXYHOST", "" };
+  public static final Option PROXYHOST = new Option("PROXYHOST", "");
   /** Server: proxy port. */
-  public static final Object[] PROXYPORT = { "PROXYPORT", 80 };
+  public static final Option PROXYPORT = new Option("PROXYPORT", 80);
   /** Server: non-proxy host. */
-  public static final Object[] NONPROXYHOSTS = { "NONPROXYHOSTS", "" };
+  public static final Option NONPROXYHOSTS = new Option("NONPROXYHOSTS", "");
 
   /** Timeout (seconds) for processing client requests; deactivated if set to 0. */
-  public static final Object[] TIMEOUT = { "TIMEOUT", 30 };
+  public static final Option TIMEOUT = new Option("TIMEOUT", 30);
   /** Keep alive time of clients; deactivated if set to 0. */
-  public static final Object[] KEEPALIVE = { "KEEPALIVE", 600 };
+  public static final Option KEEPALIVE = new Option("KEEPALIVE", 600);
   /** Defines the number of parallel readers. */
-  public static final Object[] PARALLEL = { "PARALLEL", 8 };
+  public static final Option PARALLEL = new Option("PARALLEL", 8);
   /** Logging flag. */
-  public static final Object[] LOG = { "LOG", true };
+  public static final Option LOG = new Option("LOG", true);
   /** Log message cut-off. */
-  public static final Object[] LOGMSGMAXLEN = { "LOGMSGMAXLEN", 1000 };
+  public static final Option LOGMSGMAXLEN = new Option("LOGMSGMAXLEN", 1000);
 
   /** Comment: written to options file. */
-  public static final Object[] C_HTTP = { "HTTP Services" };
+  public static final Option C_HTTP = new Option("HTTP Services");
 
   /** Web path. */
-  public static final Object[] WEBPATH = { "WEBPATH",
-    Prop.HOME + (USERHOME ? Prop.NAME + "Web" : "webapp") };
+  public static final Option WEBPATH = new Option("WEBPATH",
+    Prop.HOME + (USERHOME ? Prop.NAME + "Web" : "webapp"));
   /** RESTXQ path (relative to web path). */
-  public static final Object[] RESTXQPATH = { "RESTXQPATH", "" };
+  public static final Option RESTXQPATH = new Option("RESTXQPATH", "");
   /** Local (embedded) mode. */
-  public static final Object[] HTTPLOCAL = { "HTTPLOCAL", false };
+  public static final Option HTTPLOCAL = new Option("HTTPLOCAL", false);
   /** Port for stopping the web server. */
-  public static final Object[] STOPPORT = { "STOPPORT", 8985 };
+  public static final Option STOPPORT = new Option("STOPPORT", 8985);
 
   /**
    * Constructor, adopting system properties starting with "org.basex.".

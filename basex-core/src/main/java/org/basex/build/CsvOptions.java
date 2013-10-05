@@ -5,7 +5,6 @@ import static org.basex.query.util.Err.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
 
@@ -17,13 +16,13 @@ import org.basex.util.*;
  */
 public final class CsvOptions extends AOptions {
   /** Option: encoding. */
-  public static final Object[] ENCODING = { "encoding", Token.UTF8 };
+  public static final Option ENCODING = new Option("encoding", Token.UTF8);
   /** Option: column separator. */
-  public static final Object[] SEPARATOR = { "separator", "comma" };
+  public static final Option SEPARATOR = new Option("separator", "comma");
   /** Option: header line. */
-  public static final Object[] HEADER = { "header", false };
+  public static final Option HEADER = new Option("header", false);
   /** Option: lax conversion of strings to QNames. */
-  public static final Object[] LAX = { "lax", true };
+  public static final Option LAX = new Option("lax", true);
 
   /** CSV separators. */
   public static enum CsvSep {

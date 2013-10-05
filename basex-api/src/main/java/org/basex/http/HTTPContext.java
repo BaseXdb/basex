@@ -339,12 +339,12 @@ public final class HTTPContext {
       String k = key;
       String v = val;
       if(key.equals(Prop.DBPREFIX + "httppath")) {
-        k = Prop.DBPREFIX + GlobalOptions.RESTXQPATH[0];
+        k = Prop.DBPREFIX + GlobalOptions.RESTXQPATH.key;
       } else if(key.equals(Prop.DBPREFIX + "mode")) {
-        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL[0];
+        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.key;
         v = Boolean.toString(v.equals("local"));
       } else if(key.equals(Prop.DBPREFIX + "server")) {
-        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL[0];
+        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.key;
         v = Boolean.toString(!Boolean.parseBoolean(v));
       }
       k = k.toLowerCase(Locale.ENGLISH);

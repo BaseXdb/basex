@@ -47,10 +47,10 @@ public final class SyntaxXQuery extends Syntax {
         final String s = f.toString();
         Collections.addAll(FUNC, s.substring(0, s.indexOf('(')).split(":|-"));
       }
-      // add serialization and database parameters
-      addProps(SerializerOptions.class);
-      addProps(GlobalOptions.class);
-      addProps(Options.class);
+      // add serialization parameters and database options
+      addOptions(SerializerOptions.class);
+      addOptions(GlobalOptions.class);
+      addOptions(Options.class);
     } catch(final Exception ex) {
       Util.stack(ex);
     }
@@ -61,11 +61,10 @@ public final class SyntaxXQuery extends Syntax {
    * @param opt option class
    * @throws Exception exception
    */
-  private static void addProps(final Class<? extends AOptions> opt) throws Exception {
-    for(final Object[] arr : AOptions.options(opt)) {
-      if(arr.length < 2) continue;
-      final String key = AOptions.toString(arr).toLowerCase(Locale.ENGLISH);
-      Collections.addAll(FUNC, key.split("-"));
+  private static void addOptions(final Class<? extends AOptions> opt) throws Exception {
+    for(final Option o : AOptions.options(opt)) {
+      if(o.value == null) continue;
+      Collections.addAll(FUNC, o.key.toLowerCase(Locale.ENGLISH).split("-"));
     }
   }
 

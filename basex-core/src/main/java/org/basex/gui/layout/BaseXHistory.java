@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import org.basex.gui.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -14,15 +15,15 @@ public final class BaseXHistory {
   private static final int MAX = 12;
   /** GUI reference. */
   final GUI gui;
-  /** History object. */
-  final Object[] history;
+  /** History option. */
+  final Option history;
 
   /**
    * Constructor.
    * @param main main window
    * @param option option
    */
-  public BaseXHistory(final GUI main, final Object[] option) {
+  public BaseXHistory(final GUI main, final Option option) {
     history = option;
     gui = main;
   }

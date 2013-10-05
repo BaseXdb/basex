@@ -6,7 +6,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.build.*;
-import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -89,13 +88,13 @@ public final class FNJson extends StandardFunc {
    */
   private JsonOptions options(final TokenMap map) {
     final JsonOptions jopts = new JsonOptions();
-    final byte[] unesc = map.get(token(AOptions.toString(JsonOptions.UNESCAPE)));
+    final byte[] unesc = map.get(token(JsonOptions.UNESCAPE.key));
     if(unesc != null) jopts.set(JsonOptions.UNESCAPE, Util.yes(string(unesc)));
 
-    final byte[] spec = map.get(token(AOptions.toString(JsonOptions.SPEC)));
+    final byte[] spec = map.get(token(JsonOptions.SPEC.key));
     if(spec != null) jopts.set(JsonOptions.SPEC, string(spec));
 
-    final byte[] format = map.get(token(AOptions.toString(JsonOptions.FORMAT)));
+    final byte[] format = map.get(token(JsonOptions.FORMAT.key));
     if(format != null) jopts.set(JsonOptions.FORMAT, string(format));
     return jopts;
   }

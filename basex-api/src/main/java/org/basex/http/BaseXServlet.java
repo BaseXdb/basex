@@ -37,9 +37,9 @@ public abstract class BaseXServlet extends HttpServlet {
         String key = en.nextElement().toLowerCase(Locale.ENGLISH);
         final String val = config.getInitParameter(key);
         if(key.startsWith(Prop.DBPREFIX)) key = key.substring(Prop.DBPREFIX.length());
-        if(key.equalsIgnoreCase(AOptions.toString(GlobalOptions.USER))) {
+        if(key.equalsIgnoreCase(GlobalOptions.USER.key)) {
           user = val;
-        } else if(key.equalsIgnoreCase(AOptions.toString(GlobalOptions.PASSWORD))) {
+        } else if(key.equalsIgnoreCase(GlobalOptions.PASSWORD.key)) {
           pass = val;
         }
       }

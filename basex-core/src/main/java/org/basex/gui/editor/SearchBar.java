@@ -11,6 +11,7 @@ import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.editor.Editor.SearchDir;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
+import org.basex.util.*;
 
 /**
  * This panel provides search and replace facilities.
@@ -272,7 +273,7 @@ public final class SearchBar extends BaseXBack {
    * @return button
    */
   private BaseXButton onOffButton(final String icon, final String help,
-      final Object[] option) {
+      final Option option) {
 
     final BaseXButton b = new BaseXButton(gui, icon, help);
     b.setSelected(gui.gopts.is(option));

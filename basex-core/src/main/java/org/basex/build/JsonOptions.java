@@ -5,7 +5,6 @@ import static org.basex.query.util.Err.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.util.*;
@@ -18,15 +17,15 @@ import org.basex.util.*;
  */
 public final class JsonOptions extends AOptions {
   /** Option: encoding. */
-  public static final Object[] ENCODING = { "encoding", Token.UTF8 };
+  public static final Option ENCODING = new Option("encoding", Token.UTF8);
   /** Option: parser specification. */
-  public static final Object[] SPEC = { "spec", JsonSpec.RFC4627.desc };
+  public static final Option SPEC = new Option("spec", JsonSpec.RFC4627.desc);
   /** Option: unescape special characters. */
-  public static final Object[] UNESCAPE = { "unescape", true };
+  public static final Option UNESCAPE = new Option("unescape", true);
   /** Option: JSON format (default, jsonml, plain, map). */
-  public static final Object[] FORMAT = { "format", "default" };
+  public static final Option FORMAT = new Option("format", "default");
   /** Option: lax conversion of names to QNames. */
-  public static final Object[] LAX = { "lax", false };
+  public static final Option LAX = new Option("lax", false);
 
   /** JSON specs. */
   public static enum JsonSpec {

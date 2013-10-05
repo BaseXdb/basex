@@ -559,7 +559,7 @@ public class QueryParser extends InputParser {
       }
       if(ctx.serialOpts.get(key) == null) error(OUTWHICH, key);
       if(!decl.add("S " + key)) error(OUTDUPL, key);
-      if(key.equals(AOptions.toString(SerializerOptions.S_PARAMETER_DOCUMENT))) {
+      if(key.equals(SerializerOptions.S_PARAMETER_DOCUMENT.key)) {
         final IO io = IO.get(string(resolvedUri(val).string()));
         try {
           final ANode node = new DBNode(io, ctx.context.options).children().next();

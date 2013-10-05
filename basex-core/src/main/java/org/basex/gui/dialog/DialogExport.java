@@ -207,8 +207,7 @@ public final class DialogExport extends BaseXDialog {
    */
   private String parameters(final SerializerOptions sopts, final boolean excl) {
     final String[] ex = !excl ? new String[0] : new String[] {
-        AOptions.toString(SerializerOptions.S_METHOD),
-        AOptions.toString(SerializerOptions.S_ENCODING) };
+        SerializerOptions.S_METHOD.key, SerializerOptions.S_ENCODING.key };
     final StringBuilder sb = new StringBuilder();
     for(final String key : sopts) {
       if(Token.eq(key, ex)) continue;

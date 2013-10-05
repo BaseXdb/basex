@@ -63,7 +63,7 @@ public class BaseX extends Main {
       for(int i = 0; i < ops.size(); i++) {
         final int c = ops.get(i);
         String val = vals.get(i);
-        Object[] opt = null;
+        Option opt = null;
 
         if(c == 'b') {
           // set/add variable binding
@@ -98,8 +98,7 @@ public class BaseX extends Main {
           // toggle newline separators
           newline ^= true;
           if(serial.length() != 0) serial.append(',');
-          val = serial.append(AOptions.toString(SerializerOptions.S_ITEM_SEPARATOR)).
-              append("=\\n").toString();
+          val = serial.append(SerializerOptions.S_ITEM_SEPARATOR.key).append("=\\n").toString();
           opt = Options.SERIALIZER;
         } else if(c == 'o') {
           // change output stream

@@ -1,4 +1,4 @@
-package org.basex.core;
+package org.basex.util;
 
 import static org.basex.core.Prop.*;
 import static org.basex.util.Token.*;
@@ -8,8 +8,8 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -19,8 +19,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class AOptions implements Iterable<String> {
-  /** Comment in configuration file. */
-  private static final String PROPHEADER = "# " + Prop.NAME + " Options File." + NL;
   /** Comment in configuration file. */
   private static final String PROPUSER = "# Local Options";
 
@@ -44,8 +42,8 @@ public abstract class AOptions implements Iterable<String> {
    */
   public AOptions(final String suffix) {
     try {
-      for(final Object[] arr : options(getClass())) {
-        if(arr.length > 1) options.put(toString(arr), arr[1]);
+      for(final Option opt : options(getClass())) {
+        if(opt.value != null) options.put(opt.key, opt.value);
       }
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -63,31 +61,28 @@ public abstract class AOptions implements Iterable<String> {
     BufferedWriter bw = null;
     try {
       bw = new BufferedWriter(new FileWriter(file.file()));
-      bw.write(PROPHEADER);
-
-      for(final Object[] arr : options(getClass())) {
-        final String key = toString(arr);
-        if(arr.length == 1) {
-          bw.write(NL + "# " + key + NL);
+      for(final Option opt : options(getClass())) {
+        if(opt.value == null) {
+          bw.write(NL + "# " + opt.key + NL);
           continue;
         }
 
-        final Object val = options.get(key);
+        final Object val = options.get(opt.key);
         if(val instanceof String[]) {
           final String[] str = (String[]) val;
-          bw.write(key + " = " + str.length + NL);
+          bw.write(opt.key + " = " + str.length + NL);
           final int is = str.length;
           for(int i = 0; i < is; ++i) {
-            if(str[i] != null) bw.write(key + (i + 1) + " = " + str[i] + NL);
+            if(str[i] != null) bw.write(opt.key + (i + 1) + " = " + str[i] + NL);
           }
         } else if(val instanceof int[]) {
           final int[] num = (int[]) val;
           final int ns = num.length;
           for(int i = 0; i < ns; ++i) {
-            bw.write(key + i + " = " + num[i] + NL);
+            bw.write(opt.key + i + " = " + num[i] + NL);
           }
         } else {
-          bw.write(key + " = " + val + NL);
+          bw.write(opt.key + " = " + val + NL);
         }
       }
       bw.write(NL + PROPUSER + NL);
@@ -111,92 +106,92 @@ public abstract class AOptions implements Iterable<String> {
 
   /**
    * Returns the requested string.
-   * @param key key to be found
+   * @param option option to be found
    * @return value
    */
-  public final synchronized String get(final Object[] key) {
-    return get(key, String.class).toString();
+  public final synchronized String get(final Option option) {
+    return get(option, String.class).toString();
   }
 
   /**
    * Returns the requested integer.
-   * @param key key to be found
+   * @param option option to be found
    * @return value
    */
-  public final synchronized int num(final Object[] key) {
-    return (Integer) get(key, Integer.class);
+  public final synchronized int num(final Option option) {
+    return (Integer) get(option, Integer.class);
   }
 
   /**
    * Returns the requested boolean.
-   * @param key key to be found
+   * @param option option to be found
    * @return value
    */
-  public final synchronized boolean is(final Object[] key) {
-    return (Boolean) get(key, Boolean.class);
+  public final synchronized boolean is(final Option option) {
+    return (Boolean) get(option, Boolean.class);
   }
 
   /**
    * Returns the requested string array.
-   * @param key key to be found
+   * @param option option to be found
    * @return value
    */
-  public final synchronized String[] strings(final Object[] key) {
-    return (String[]) get(key, String[].class);
+  public final synchronized String[] strings(final Option option) {
+    return (String[]) get(option, String[].class);
   }
 
   /**
    * Returns the requested integer array.
-   * @param key key to be found
+   * @param option option to be found
    * @return value
    */
-  public final synchronized int[] nums(final Object[] key) {
-    return (int[]) get(key, int[].class);
+  public final synchronized int[] nums(final Option option) {
+    return (int[]) get(option, int[].class);
   }
 
   /**
    * Assigns the specified value for the specified key.
-   * @param key key to be found
+   * @param option option to be found
    * @param val value to be written
    */
-  public final synchronized void set(final Object[] key, final String val) {
-    setObject(toString(key), val);
+  public final synchronized void set(final Option option, final String val) {
+    setObject(option.key, val);
   }
 
   /**
    * Assigns the specified integer for the specified key.
-   * @param key key to be found
+   * @param option option to be found
    * @param val value to be written
    */
-  public final synchronized void set(final Object[] key, final int val) {
-    setObject(toString(key), val);
+  public final synchronized void set(final Option option, final int val) {
+    setObject(option.key, val);
   }
 
   /**
    * Assigns the specified boolean for the specified key.
-   * @param key key to be found
+   * @param option option to be found
    * @param val value to be written
    */
-  public final synchronized void set(final Object[] key, final boolean val) {
-    setObject(toString(key), val);
+  public final synchronized void set(final Option option, final boolean val) {
+    setObject(option.key, val);
   }
 
   /**
    * Assigns the specified string array for the specified key.
-   * @param key key to be found
+   * @param option option to be found
    * @param val value to be written
    */
-  public final synchronized void set(final Object[] key, final String[] val) {
-    setObject(toString(key), val);
+  public final synchronized void set(final Option option, final String[] val) {
+    setObject(option.key, val);
   }
 
   /**
    * Assigns the specified integer array for the specified key.
-   * @param key key to be found
+   * @param option option to be found
    * @param val value to be written
    */
-  public final synchronized void set(final Object[] key, final int[] val) {
-    setObject(toString(key), val);
+  public final synchronized void set(final Option option, final int[] val) {
+    setObject(option.key, val);
   }
 
   /**
@@ -250,7 +245,7 @@ public abstract class AOptions implements Iterable<String> {
    * @param key key
    * @return new value
    */
-  public final synchronized boolean invert(final Object[] key) {
+  public final synchronized boolean invert(final Option key) {
     final boolean val = !is(key);
     set(key, val);
     return val;
@@ -258,12 +253,12 @@ public abstract class AOptions implements Iterable<String> {
 
   /**
    * Checks if the specified option has changed.
-   * @param key key
+   * @param option option
    * @param val new value
    * @return result of check
    */
-  public final synchronized boolean sameAs(final Object[] key, final Object val) {
-    return options.get(toString(key)).equals(val);
+  public final synchronized boolean sameAs(final Option option, final Object val) {
+    return options.get(option.key).equals(val);
   }
 
   /**
@@ -318,11 +313,11 @@ public abstract class AOptions implements Iterable<String> {
 
   /**
    * Returns a system property.
-   * @param key {@link Options} key
+   * @param option option
    * @return value, or empty string
    */
-  public static String getSystem(final Object[] key) {
-    return key.length > 0 ? getSystem(toString(key)) : "";
+  public static String getSystem(final Option option) {
+    return getSystem(option.key);
   }
 
   /**
@@ -340,11 +335,11 @@ public abstract class AOptions implements Iterable<String> {
 
   /**
    * Sets a system property if it has not been set before.
-   * @param key {@link Options} key
+   * @param option option
    * @param val value
    */
-  public static void setSystem(final Object[] key, final Object val) {
-    if(key.length > 0) setSystem(toString(key), val);
+  public static void setSystem(final Option option, final Object val) {
+    setSystem(option.key, val);
   }
 
   /**
@@ -365,16 +360,16 @@ public abstract class AOptions implements Iterable<String> {
    * @return option instances
    * @throws IllegalAccessException exception
    */
-  public static final Object[][] options(final Class<? extends AOptions> clz)
+  public static final Option[] options(final Class<? extends AOptions> clz)
       throws IllegalAccessException {
 
-    final ArrayList<Object[]> opts = new ArrayList<Object[]>();
+    final ArrayList<Option> opts = new ArrayList<Option>();
     for(final Field f : clz.getFields()) {
       if(!Modifier.isStatic(f.getModifiers())) continue;
       final Object obj = f.get(null);
-      if(obj instanceof Object[]) opts.add((Object[]) obj);
+      if(obj instanceof Option) opts.add((Option) obj);
     }
-    return opts.toArray(new Object[opts.size()][]);
+    return opts.toArray(new Option[opts.size()]);
   };
 
   // PROTECTED METHODS ==================================================================
@@ -495,8 +490,8 @@ public abstract class AOptions implements Iterable<String> {
     try {
       if(err.isEmpty()) {
         boolean ok = true;
-        for(final Object[] arr : options(getClass())) {
-          if(arr.length > 1) ok &= read.contains(toString(arr));
+        for(final Option opt : options(getClass())) {
+          if(ok && opt.value != null) ok = read.contains(opt.key);
         }
         if(!ok) err.addExt("Saving options in \"%\"..." + NL, file);
       }
@@ -511,27 +506,17 @@ public abstract class AOptions implements Iterable<String> {
   }
 
   /**
-   * Retrieves the specified value. Throws an error if value cannot be read.
-   * @param key key
+   * Retrieves the value of the specified option. Throws an error if value cannot be read.
+   * @param opt option
    * @param c expected type
    * @return result
    */
-  private Object get(final Object[] key, final Class<?> c) {
-    final String k = toString(key);
-    final Object entry = options.get(k);
-    if(entry == null) Util.notexpected("Option " + k + " not defined.");
+  private Object get(final Option opt, final Class<?> c) {
+    final Object entry = options.get(opt.key);
+    if(entry == null) Util.notexpected("Option " + opt.key + " not defined.");
 
     final Class<?> cc = entry.getClass();
-    if(c != cc) Util.notexpected("Option '" + k + "' is a " + Util.name(cc));
+    if(c != cc) Util.notexpected("Option '" + opt.key + "' is a " + Util.name(cc));
     return entry;
-  }
-
-  /**
-   * Returns a string representation of the specified key.
-   * @param key option
-   * @return string representation
-   */
-  public static String toString(final Object[] key) {
-    return key[0].toString();
   }
 }

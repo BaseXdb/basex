@@ -19,67 +19,67 @@ public final class SerializerOptions extends AOptions {
   static final String UNDEFINED = "\u0001";
 
   /** Serialization parameter: yes/no. */
-  public static final Object[] S_BYTE_ORDER_MARK = { "byte-order-mark", NO };
+  public static final Option S_BYTE_ORDER_MARK = new Option("byte-order-mark", NO);
   /** Serialization parameter: list of QNames. */
-  public static final Object[] S_CDATA_SECTION_ELEMENTS = {
-    "cdata-section-elements", "" };
+  public static final Option S_CDATA_SECTION_ELEMENTS =
+      new Option("cdata-section-elements", "");
   /** Serialization parameter. */
-  public static final Object[] S_DOCTYPE_PUBLIC = { "doctype-public", "" };
+  public static final Option S_DOCTYPE_PUBLIC = new Option("doctype-public", "");
   /** Serialization parameter. */
-  public static final Object[] S_DOCTYPE_SYSTEM = { "doctype-system", "" };
+  public static final Option S_DOCTYPE_SYSTEM = new Option("doctype-system", "");
   /** Serialization parameter: valid encoding. */
-  public static final Object[] S_ENCODING = { "encoding", Token.UTF8 };
+  public static final Option S_ENCODING = new Option("encoding", Token.UTF8);
   /** Serialization parameter: yes/no. */
-  public static final Object[] S_ESCAPE_URI_ATTRIBUTES = { "escape-uri-attributes", NO };
+  public static final Option S_ESCAPE_URI_ATTRIBUTES = new Option("escape-uri-attributes", NO);
   /** Serialization parameter: yes/no. */
-  public static final Object[] S_INCLUDE_CONTENT_TYPE = { "include-content-type", NO };
+  public static final Option S_INCLUDE_CONTENT_TYPE = new Option("include-content-type", NO);
   /** Serialization parameter: yes/no. */
-  public static final Object[] S_INDENT = { "indent", YES };
+  public static final Option S_INDENT = new Option("indent", YES);
   /** Serialization parameter. */
-  public static final Object[] S_SUPPRESS_INDENTATION = { "suppress-indentation", "" };
+  public static final Option S_SUPPRESS_INDENTATION = new Option("suppress-indentation", "");
   /** Serialization parameter. */
-  public static final Object[] S_MEDIA_TYPE = { "media-type", "" };
+  public static final Option S_MEDIA_TYPE = new Option("media-type", "");
   /** Serialization parameter: xml/xhtml/html/text. */
-  public static final Object[] S_METHOD = { "method", M_XML };
+  public static final Option S_METHOD = new Option("method", M_XML);
   /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
-  public static final Object[] S_NORMALIZATION_FORM = { "normalization-form", NFC };
+  public static final Option S_NORMALIZATION_FORM = new Option("normalization-form", NFC);
   /** Serialization parameter: yes/no. */
-  public static final Object[] S_OMIT_XML_DECLARATION = { "omit-xml-declaration", YES };
+  public static final Option S_OMIT_XML_DECLARATION = new Option("omit-xml-declaration", YES);
   /** Serialization parameter: yes/no/omit. */
-  public static final Object[] S_STANDALONE = { "standalone", OMIT };
+  public static final Option S_STANDALONE = new Option("standalone", OMIT);
   /** Serialization parameter: yes/no. */
-  public static final Object[] S_UNDECLARE_PREFIXES = { "undeclare-prefixes", NO };
+  public static final Option S_UNDECLARE_PREFIXES = new Option("undeclare-prefixes", NO);
   /** Serialization parameter. */
-  public static final Object[] S_USE_CHARACTER_MAPS = { "use-character-maps", "" };
+  public static final Option S_USE_CHARACTER_MAPS = new Option("use-character-maps", "");
   /** Serialization parameter. */
-  public static final Object[] S_ITEM_SEPARATOR = { "item-separator", UNDEFINED };
+  public static final Option S_ITEM_SEPARATOR = new Option("item-separator", UNDEFINED);
   /** Serialization parameter: 1.0/1.1. */
-  public static final Object[] S_VERSION = { "version", "" };
+  public static final Option S_VERSION = new Option("version", "");
   /** Serialization parameter: 4.0/4.01/5.0. */
-  public static final Object[] S_HTML_VERSION = { "html-version", "" };
+  public static final Option S_HTML_VERSION = new Option("html-version", "");
   /** Parameter document. */
-  public static final Object[] S_PARAMETER_DOCUMENT = { "parameter-document", "" };
+  public static final Option S_PARAMETER_DOCUMENT = new Option("parameter-document", "");
 
   /** Specific serialization parameter: newline. */
-  public static final Object[] S_NEWLINE = {
-    "newline", Prop.NL.equals("\r") ? S_CR : Prop.NL.equals("\n") ? S_NL : S_CRNL };
+  public static final Option S_NEWLINE = new Option(
+    "newline", Prop.NL.equals("\r") ? S_CR : Prop.NL.equals("\n") ? S_NL : S_CRNL);
   /** Specific serialization parameter: formatting. */
-  public static final Object[] S_FORMAT = { "format", YES };
+  public static final Option S_FORMAT = new Option("format", YES);
   /** Specific serialization parameter: indent with spaces or tabs. */
-  public static final Object[] S_TABULATOR = { "tabulator", NO };
+  public static final Option S_TABULATOR = new Option("tabulator", NO);
   /** Specific serialization parameter: number of spaces to indent. */
-  public static final Object[] S_INDENTS = { "indents", "2" };
+  public static final Option S_INDENTS = new Option("indents", "2");
   /** Specific serialization parameter: item separator. */
-  public static final Object[] S_SEPARATOR = { "separator", UNDEFINED };
+  public static final Option S_SEPARATOR = new Option("separator", UNDEFINED);
   /** Specific serialization parameter: prefix of result wrapper. */
-  public static final Object[] S_WRAP_PREFIX = { "wrap-prefix", "" };
+  public static final Option S_WRAP_PREFIX = new Option("wrap-prefix", "");
   /** Specific serialization parameter: URI of result wrapper. */
-  public static final Object[] S_WRAP_URI = { "wrap-uri", "" };
+  public static final Option S_WRAP_URI = new Option("wrap-uri", "");
 
   /** Specific serialization parameter. */
-  public static final Object[] S_CSV = { "csv", "" };
+  public static final Option S_CSV = new Option("csv", "");
   /** Specific serialization parameter. */
-  public static final Object[] S_JSON = { "json", "" };
+  public static final Option S_JSON = new Option("json", "");
 
   /** Unknown options. */
   public final StringList unknown = new StringList(0);
@@ -116,75 +116,80 @@ public final class SerializerOptions extends AOptions {
 
   /**
    * Retrieves a value from the specified option and checks allowed values.
-   * @param key option
+   * @param option option
    * @param allowed allowed values
    * @return value
    * @throws SerializerException serializer exception
    */
-  public String check(final Object[] key, final String... allowed) throws SerializerException {
-    final String val = get(key);
+  public String check(final Option option, final String... allowed) throws SerializerException {
+    final String val = get(option);
     for(final String a : allowed) if(a.equals(val)) return val;
-    throw error(key[0], val, allowed);
+    throw error(option.key, val, allowed);
   }
 
   /**
    * Retrieves a value from the specified option and checks for supported values.
-   * @param key option
+   * @param option option
    * @param allowed allowed values
    * @return value
    * @throws SerializerException serializer exception
    */
-  public String supported(final Object[] key, final String... allowed)
+  public String supported(final Option option, final String... allowed)
       throws SerializerException {
 
-    final String val = get(key);
+    final String val = get(option);
     if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;
     for(final String a : allowed) if(a.equals(val)) return val;
-    throw SERNOTSUPP.thrwSerial(allowed(key[0], val, allowed));
+    throw SERNOTSUPP.thrwSerial(allowed(option.key, val, allowed));
   }
 
   /**
-   * Retrieves a value from the specified option and checks for its boolean
-   * value.
-   * @param key option
+   * Retrieves a value from the specified option and checks for its boolean value.
+   * @param option option
    * @return value
    * @throws SerializerException serializer exception
    */
-  public boolean yes(final Object[] key) throws SerializerException {
-    final String val = get(key);
-    for(final String a : new String[] { YES, TRUE, ON }) {
-      if(a.equals(val)) return true;
-    }
-    for(final String a : new String[] { NO, FALSE, OFF }) {
-      if(a.equals(val)) return false;
-    }
-    throw error(key[0], val, YES, NO);
+  public boolean yes(final Option option) throws SerializerException {
+    return yes(option.key, get(option));
+  }
+
+  /**
+   * Converts the specified value to a boolean or throws an exception if value is unknown.
+   * @param key key
+   * @param value value
+   * @return result of check
+   * @throws SerializerException serializer exception
+   */
+  public static boolean yes(final String key, final String value) throws SerializerException {
+    if(Util.yes(value)) return true;
+    if(Util.no(value)) return false;
+    throw error(key, value, YES, NO);
   }
 
   /**
    * Returns an exception string for a wrong key.
-   * @param key option
+   * @param name name of option
    * @param found found value
    * @param allowed allowed values
    * @return exception
    * @throws SerializerException serializer exception
    */
-  public static SerializerException error(final Object key, final String found,
+  public static SerializerException error(final String name, final String found,
       final String... allowed) throws SerializerException {
-    throw SEROPT.thrwSerial(allowed(key, found, allowed));
+    throw SEROPT.thrwSerial(allowed(name, found, allowed));
   }
 
   /**
    * Returns a list of allowed keys.
-   * @param key option
+   * @param name name of option
    * @param found found value
-   * @param allowed allowed values
+   * @param all allowed values
    * @return exception
    */
-  public static String allowed(final Object key, final String found, final String... allowed) {
+  private static String allowed(final String name, final String found, final String... all) {
     final TokenBuilder tb = new TokenBuilder();
-    tb.addExt(SERVAL, key, allowed[0]);
-    for(int a = 1; a < allowed.length; ++a) tb.addExt(SERVAL2, allowed[a]);
+    tb.addExt(SERVAL, name, all[0]);
+    for(int a = 1; a < all.length; ++a) tb.addExt(SERVAL2, all[a]);
     tb.addExt(SERVAL3, found);
     return tb.toString();
   }

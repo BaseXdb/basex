@@ -212,11 +212,11 @@ public class RESTTest extends HTTPTest {
   public void getOption() throws IOException {
     assertEquals("2",
         get("?query=switch(1)+case+1+return+2+default+return+3&" +
-        Options.XQUERY3[0] + "=true")
+        Options.XQUERY3.key + "=true")
     );
     try {
       get("?query=switch(1)+case+1+return+2+default+return+3&" +
-          Options.XQUERY3[0] + "=false");
+          Options.XQUERY3.key + "=false");
       fail("Error expected.");
     } catch(final IOException ex) {
       assertContains(ex.getMessage(), "[XPST0003]");
@@ -310,12 +310,12 @@ public class RESTTest extends HTTPTest {
   public void postOption() throws IOException {
     assertEquals("2", post("", "<query xmlns=\"" + URI + "\">" +
         "<text>switch(1) case 1 return 2 default return 3</text>" +
-        "<option name='" + Options.XQUERY3[0] + "' value='true'/></query>", APP_XML));
+        "<option name='" + Options.XQUERY3.key + "' value='true'/></query>", APP_XML));
 
     try {
       post("", "<query xmlns=\"" + URI + "\">" +
         "<text>switch(1) case 1 return 2 default return 3</text>" +
-        "<option name='" + Options.XQUERY3[0] + "' value='false'/></query>", APP_XML);
+        "<option name='" + Options.XQUERY3.key + "' value='false'/></query>", APP_XML);
       fail("Error expected.");
     } catch(final IOException ex) {
       assertContains(ex.getMessage(), "[XPST0003]");
@@ -388,9 +388,9 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void putOption() throws IOException {
-    put(ROOT + NAME + "?" + Options.CHOP[0] + "=true", new FileInputStream(FILE));
+    put(ROOT + NAME + "?" + Options.CHOP.key + "=true", new FileInputStream(FILE));
     assertEquals("5", get(NAME + "?query=count(//text())"));
-    put(ROOT + NAME + "?" + Options.CHOP[0] + "=false", new FileInputStream(FILE));
+    put(ROOT + NAME + "?" + Options.CHOP.key + "=false", new FileInputStream(FILE));
     assertEquals("22", get(NAME + "?query=count(//text())"));
 
     try {
@@ -449,7 +449,7 @@ public class RESTTest extends HTTPTest {
   @Test
   public void deleteOption() throws IOException {
     put(ROOT + NAME, null);
-    delete(NAME + "/a?" + Options.CHOP[0] + "=true");
+    delete(NAME + "/a?" + Options.CHOP.key + "=true");
     try {
       delete(NAME + "/a?xxx=true");
       fail("Error expected.");

@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -132,8 +131,8 @@ public final class FuncParams {
 
     final SerializerOptions sp = new SerializerOptions(tb.toString());
     if(!sp.unknown.isEmpty()) SERWHICH.thrw(info, sp.unknown.get(0));
-    final Object[] cm = SerializerOptions.S_USE_CHARACTER_MAPS;
-    if(!sp.get(cm).isEmpty()) SERWHICH.thrw(info, AOptions.toString(cm));
+    final Option cm = SerializerOptions.S_USE_CHARACTER_MAPS;
+    if(!sp.get(cm).isEmpty()) SERWHICH.thrw(info, cm.key);
     return sp;
   }
 }

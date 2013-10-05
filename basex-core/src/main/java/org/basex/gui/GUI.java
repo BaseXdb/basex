@@ -496,17 +496,17 @@ public final class GUI extends AGUI {
   * @param opt option to be set
   * @param val value
   */
- public void set(final Object[] opt, final Object val) {
+ public void set(final Option opt, final Object val) {
    set(context.options, opt, val);
  }
 
  /**
   * Sets an option and displays the command in the info view.
-  * @param options options instance
+  * @param options option
   * @param opt option to be set
   * @param val value
   */
- private void set(final AOptions options, final Object[] opt, final Object val) {
+ private void set(final AOptions options, final Option opt, final Object val) {
    if(!options.sameAs(opt, val)) {
      final Set cmd = new Set(opt, val);
      cmd.run(context);
@@ -603,7 +603,7 @@ public final class GUI extends AGUI {
     menu.refresh();
 
     final int i = context.data() == null ? 2 : gopts.num(GUIOptions.SEARCHMODE);
-    final Object[] options = i == 0 ? GUIOptions.SEARCH : i == 1 ?
+    final Option options = i == 0 ? GUIOptions.SEARCH : i == 1 ?
       GUIOptions.XQUERY : GUIOptions.COMMANDS;
     hist.setEnabled(gopts.strings(options).length != 0);
   }

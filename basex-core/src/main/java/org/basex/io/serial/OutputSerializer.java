@@ -85,26 +85,26 @@ public abstract class OutputSerializer extends Serializer {
   /**
    * Constructor.
    * @param os output stream reference
-   * @param opts serialization parameters
+   * @param sopts serialization parameters
    * @param versions supported versions
    * @throws IOException I/O exception
    */
-  OutputSerializer(final OutputStream os, final SerializerOptions opts,
+  OutputSerializer(final OutputStream os, final SerializerOptions sopts,
       final String... versions) throws IOException {
 
-    final SerializerOptions p = opts == null ? OPTIONS : opts;
-    final String ver = p.supported(S_VERSION, versions);
-    final String htmlver = p.supported(S_HTML_VERSION, V40, V401, V50);
+    final SerializerOptions opts = sopts == null ? OPTIONS : sopts;
+    final String ver = opts.supported(S_VERSION, versions);
+    final String htmlver = opts.supported(S_HTML_VERSION, V40, V401, V50);
     html5 = htmlver.equals(V50) || ver.equals(V50);
 
-    final boolean omitDecl = p.yes(S_OMIT_XML_DECLARATION);
-    final boolean bom  = p.yes(S_BYTE_ORDER_MARK);
-    final String sa = p.check(S_STANDALONE, YES, NO, OMIT);
+    final boolean omitDecl = opts.yes(S_OMIT_XML_DECLARATION);
+    final boolean bom  = opts.yes(S_BYTE_ORDER_MARK);
+    final String sa = opts.check(S_STANDALONE, YES, NO, OMIT);
     saomit = sa.equals(OMIT);
-    p.check(S_NORMALIZATION_FORM, NFC, DataText.NONE);
+    opts.check(S_NORMALIZATION_FORM, NFC, DataText.NONE);
 
-    final String maps = p.get(S_USE_CHARACTER_MAPS);
-    final String enc = normEncoding(p.get(S_ENCODING));
+    final String maps = opts.get(S_USE_CHARACTER_MAPS);
+    final String enc = normEncoding(opts.get(S_ENCODING));
     try {
       encoding = Charset.forName(enc);
     } catch(final Exception ex) {
@@ -113,25 +113,25 @@ public abstract class OutputSerializer extends Serializer {
     utf8 = enc == UTF8;
 
     // project specific options
-    indents = Math.max(0, toInt(p.get(S_INDENTS)));
-    format  = p.yes(S_FORMAT);
-    tab     = p.yes(S_TABULATOR) ? '\t' : ' ';
-    wPre    = token(p.get(S_WRAP_PREFIX));
+    indents = Math.max(0, toInt(opts.get(S_INDENTS)));
+    format  = opts.yes(S_FORMAT);
+    tab     = opts.yes(S_TABULATOR) ? '\t' : ' ';
+    wPre    = token(opts.get(S_WRAP_PREFIX));
     wrap    = wPre.length != 0;
-    final String eol = p.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
+    final String eol = opts.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
     nl = utf8(token(eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n"), enc);
-    String s = p.get(S_ITEM_SEPARATOR);
-    if(s.equals(UNDEFINED)) s = p.get(S_SEPARATOR);
+    String s = opts.get(S_ITEM_SEPARATOR);
+    if(s.equals(UNDEFINED)) s = opts.get(S_SEPARATOR);
     itemsep = s.equals(UNDEFINED) ? null : token(s.indexOf('\\') != -1 ?
       s.replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t") : s);
 
-    docsys  = p.get(S_DOCTYPE_SYSTEM);
-    docpub  = p.get(S_DOCTYPE_PUBLIC);
-    media   = p.get(S_MEDIA_TYPE);
-    escape  = p.yes(S_ESCAPE_URI_ATTRIBUTES);
-    content = p.yes(S_INCLUDE_CONTENT_TYPE);
-    undecl  = p.yes(S_UNDECLARE_PREFIXES);
-    indent  = p.yes(S_INDENT) && format;
+    docsys  = opts.get(S_DOCTYPE_SYSTEM);
+    docpub  = opts.get(S_DOCTYPE_PUBLIC);
+    media   = opts.get(S_MEDIA_TYPE);
+    escape  = opts.yes(S_ESCAPE_URI_ATTRIBUTES);
+    content = opts.yes(S_INCLUDE_CONTENT_TYPE);
+    undecl  = opts.yes(S_UNDECLARE_PREFIXES);
+    indent  = opts.yes(S_INDENT) && format;
 
     webdav = maps.equals("webdav");
     if(!webdav && !maps.isEmpty()) SERMAP.thrwSerial(maps);
@@ -152,7 +152,7 @@ public abstract class OutputSerializer extends Serializer {
       }
     }
 
-    final String supp = p.get(S_SUPPRESS_INDENTATION);
+    final String supp = opts.get(S_SUPPRESS_INDENTATION);
     if(!supp.isEmpty()) {
       for(final String c : supp.split("\\s+")) {
         if(!c.isEmpty()) suppress.add(c);
@@ -163,7 +163,7 @@ public abstract class OutputSerializer extends Serializer {
     final boolean html = this instanceof HTMLSerializer;
     final boolean xml = this instanceof XMLSerializer || this instanceof XHTMLSerializer;
     if(xml || html) {
-      final String cdse = p.get(S_CDATA_SECTION_ELEMENTS);
+      final String cdse = opts.get(S_CDATA_SECTION_ELEMENTS);
       for(final String c : cdse.split("\\s+")) {
         if(c.isEmpty()) continue;
         if(!html || c.contains(":") && (!html5 || !c.contains("html:"))) cdata.add(c);
@@ -178,7 +178,7 @@ public abstract class OutputSerializer extends Serializer {
           print(DOCDECL1);
           print(ver);
           print(DOCDECL2);
-          print(p.get(S_ENCODING));
+          print(opts.get(S_ENCODING));
           if(!saomit) {
             print(DOCDECL3);
             print(sa);
@@ -193,7 +193,7 @@ public abstract class OutputSerializer extends Serializer {
     // open results element
     if(wrap) {
       startElement(concat(wPre, COLON, T_RESULTS));
-      namespace(wPre, token(p.get(S_WRAP_URI)));
+      namespace(wPre, token(opts.get(S_WRAP_URI)));
     }
   }
 

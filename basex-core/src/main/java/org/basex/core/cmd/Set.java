@@ -16,12 +16,20 @@ import org.basex.util.*;
 public final class Set extends AGet {
   /**
    * Default constructor.
-   * @param key key to be found (string or option)
+   * @param option option to be found
    * @param value value to set (optional, depending on the option)
    */
-  public Set(final Object key, final Object value) {
-    super(Perm.NONE, (key instanceof Object[] ?
-        ((Object[]) key)[0] : key).toString(), value == null ? "" : value.toString());
+  public Set(final Option option, final Object value) {
+    this(option.key, value);
+  }
+
+  /**
+   * Default constructor.
+   * @param name name of option
+   * @param value value to set (optional, depending on the option)
+   */
+  public Set(final String name, final Object value) {
+    super(Perm.NONE, name, value == null ? "" : value.toString());
   }
 
   @Override

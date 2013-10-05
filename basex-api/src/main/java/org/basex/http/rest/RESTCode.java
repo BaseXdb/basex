@@ -13,7 +13,6 @@ import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
-import org.basex.util.*;
 
 /**
  * Abstract class for performing REST operations.
@@ -53,13 +52,10 @@ public abstract class RESTCode {
    * @throws HTTPException REST exception
    */
   static void wrap(final String val, final HTTPContext http) throws HTTPException {
-    http.wrapping = Util.yes(val);
-    if(!http.wrapping && !Util.no(val)) {
-      try {
-        SerializerOptions.error(WRAP, val, Text.YES, Text.NO);
-      } catch(final SerializerException ex) {
-        HTTPErr.BAD_REQUEST_X.thrw(ex);
-      }
+    try {
+      http.wrapping = SerializerOptions.yes(WRAP, val);
+    } catch(final SerializerException ex) {
+      HTTPErr.BAD_REQUEST_X.thrw(ex);
     }
   }
 

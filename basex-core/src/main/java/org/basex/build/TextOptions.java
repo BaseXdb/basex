@@ -2,7 +2,6 @@ package org.basex.build;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.util.*;
 
 /**
@@ -13,9 +12,9 @@ import org.basex.util.*;
  */
 public final class TextOptions extends AOptions {
   /** Parser option: encoding. */
-  public static final Object[] ENCODING = { "encoding", Token.UTF8 };
+  public static final Option ENCODING = new Option("encoding", Token.UTF8);
   /** Parser option: line-wise parsing. */
-  public static final Object[] LINES = { "lines", true };
+  public static final Option LINES = new Option("lines", true);
 
   /**
    * Constructor.

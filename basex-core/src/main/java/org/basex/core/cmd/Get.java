@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'get' command and return the value of a database option.
@@ -18,17 +19,23 @@ public final class Get extends AGet {
    * Empty constructor.
    */
   public Get() {
-    this(null);
+    this((String) null);
   }
 
   /**
    * Default constructor.
-   * @param key key to be found (string or option)
+   * @param option option to be found
    */
-  public Get(final Object key) {
-    super(Perm.NONE, key == null ? null :
-      (key instanceof Object[] ? ((Object[]) key)[0] : key).toString()
-    );
+  public Get(final Option option) {
+    this(option.key);
+  }
+
+  /**
+   * Default constructor.
+   * @param key key to be found
+   */
+  public Get(final String key) {
+    super(Perm.NONE, key);
   }
 
   @Override

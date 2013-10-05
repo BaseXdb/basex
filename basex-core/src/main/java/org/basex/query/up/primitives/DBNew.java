@@ -23,15 +23,14 @@ import org.basex.util.hash.*;
  */
 public abstract class DBNew extends BasicOperation {
   /** Numeric index options. */
-  protected static final Object[][] N_OPT = { Options.MAXCATS, Options.MAXLEN,
+  protected static final Option[] N_OPT = { Options.MAXCATS, Options.MAXLEN,
     Options.INDEXSPLITSIZE, Options.FTINDEXSPLITSIZE };
   /** Boolean index options. */
-  protected static final Object[][] B_OPT = { Options.TEXTINDEX,
-    Options.ATTRINDEX, Options.FTINDEX, Options.STEMMING,
-    Options.CASESENS, Options.DIACRITICS,  Options.UPDINDEX };
+  protected static final Option[] B_OPT = { Options.TEXTINDEX, Options.ATTRINDEX,
+    Options.FTINDEX, Options.STEMMING, Options.CASESENS, Options.DIACRITICS,
+    Options.UPDINDEX };
   /** String index options. */
-  protected static final Object[][] S_OPT =
-    { Options.LANGUAGE, Options.STOPWORDS };
+  protected static final Option[] S_OPT = { Options.LANGUAGE, Options.STOPWORDS };
   /** Keys of numeric index options. */
   protected static final byte[][] K_N_OPT = new byte[N_OPT.length][];
   /** Keys of boolean index options. */
@@ -42,9 +41,9 @@ public abstract class DBNew extends BasicOperation {
   static {
     // initialize options arrays
     final int n = N_OPT.length, b = B_OPT.length, s = S_OPT.length;
-    for(int o = 0; o < n; o++) K_N_OPT[o] = lc(token(AOptions.toString(N_OPT[o])));
-    for(int o = 0; o < b; o++) K_B_OPT[o] = lc(token(AOptions.toString(B_OPT[o])));
-    for(int o = 0; o < s; o++) K_S_OPT[o] = lc(token(AOptions.toString(S_OPT[o])));
+    for(int o = 0; o < n; o++) K_N_OPT[o] = lc(token(N_OPT[o].key));
+    for(int o = 0; o < b; o++) K_B_OPT[o] = lc(token(B_OPT[o].key));
+    for(int o = 0; o < s; o++) K_S_OPT[o] = lc(token(S_OPT[o].key));
   }
 
   /** Query context. */
@@ -57,9 +56,9 @@ public abstract class DBNew extends BasicOperation {
   protected Data md;
 
   /** Original options. */
-  protected final HashMap<Object[], Object> oprops = new HashMap<Object[], Object>();
+  protected final HashMap<Option, Object> oprops = new HashMap<Option, Object>();
   /** New options. */
-  protected final HashMap<Object[], Object> nprops = new HashMap<Object[], Object>();
+  protected final HashMap<Option, Object> nprops = new HashMap<Option, Object>();
 
 
   /**
@@ -157,8 +156,8 @@ public abstract class DBNew extends BasicOperation {
    */
   protected void assignOptions() {
     final Options opts = qc.context.options;
-    for(final Object[] key : nprops.keySet()) {
-      oprops.put(key, opts.get(AOptions.toString(key)));
+    for(final Option option : nprops.keySet()) {
+      oprops.put(option, opts.get(option.key));
     }
     setOptions(nprops);
   }
@@ -174,10 +173,10 @@ public abstract class DBNew extends BasicOperation {
    * Assigns the specified options.
    * @param map options map
    */
-  private void setOptions(final HashMap<Object[], Object> map) {
+  private void setOptions(final HashMap<Option, Object> map) {
     final Options opts = qc.context.options;
-    for(final Map.Entry<Object[], Object> e : map.entrySet()) {
-      opts.setObject(AOptions.toString(e.getKey()), e.getValue());
+    for(final Map.Entry<Option, Object> e : map.entrySet()) {
+      opts.setObject(e.getKey().key, e.getValue());
     }
   }
 }

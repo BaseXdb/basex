@@ -69,7 +69,7 @@ final class RESTRetrieve extends RESTQuery {
       ser.close();
     } else if(isRaw(http)) {
       // retrieve raw file; prefix user parameters with media type
-      final String ct = SerializerOptions.S_MEDIA_TYPE[0] + "=" + contentType(http);
+      final String ct = SerializerOptions.S_MEDIA_TYPE.key + '=' + contentType(http);
       http.initResponse(new SerializerOptions(ct + ',' + http.serialization));
       session.setOutputStream(http.res.getOutputStream());
       session.execute(new Retrieve(http.dbpath()));
