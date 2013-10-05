@@ -34,7 +34,7 @@ public class Restore extends ABackup {
     if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
 
     // find backup file with or without date suffix
-    IOFile file = globalopts.dbpath(db + IO.ZIPSUFFIX);
+    IOFile file = goptions.dbpath(db + IO.ZIPSUFFIX);
     if(!file.exists()) {
       final StringList list = Databases.backupPaths(db, context).sort(Prop.CASE, false);
       if(!list.isEmpty()) file = new IOFile(list.get(0));
@@ -70,7 +70,7 @@ public class Restore extends ABackup {
    */
   private boolean restore(final IOFile file) {
     try {
-      proc(new Zip(file)).unzip(globalopts.dbpath());
+      proc(new Zip(file)).unzip(goptions.dbpath());
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);

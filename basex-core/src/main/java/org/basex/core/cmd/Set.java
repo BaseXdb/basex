@@ -41,7 +41,7 @@ public final class Set extends AGet {
       if(v != null) return info(key + COLS + v);
 
       // retrieve values of all options
-      if(context.user.has(Perm.ADMIN) && globalopts.get(key) != null) {
+      if(context.user.has(Perm.ADMIN) && goptions.get(key) != null) {
         return error(Text.GLOBAL_OPTION_X, key);
       }
       return error(options.unknown(key));

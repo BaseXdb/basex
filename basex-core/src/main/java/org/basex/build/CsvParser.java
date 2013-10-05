@@ -31,7 +31,7 @@ public final class CsvParser extends XMLParser {
   }
 
   /**
-   * Converts a JSON document to XML.
+   * Converts CSV data to XML.
    * @param io input
    * @param options parsing options
    * @return parser

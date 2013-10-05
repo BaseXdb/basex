@@ -23,7 +23,7 @@ public abstract class AOptions implements Iterable<String> {
   private static final String PROPUSER = "# Local Options";
 
   /** Options. */
-  protected final TreeMap<String, Object> options = new TreeMap<String, Object>();
+  private final TreeMap<String, Object> options = new TreeMap<String, Object>();
   /** Options, cached from an input file. */
   private final StringBuilder user = new StringBuilder();
   /** Options file. */
@@ -200,7 +200,7 @@ public abstract class AOptions implements Iterable<String> {
    * @param val value to be written
    */
   public final synchronized void setObject(final String key, final Object val) {
-    options.put(key, val);
+    if(options.put(key, val) == null) Util.notexpected("Option " + key + " not defined.");
   }
 
   /**

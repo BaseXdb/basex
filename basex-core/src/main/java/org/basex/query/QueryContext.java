@@ -498,10 +498,10 @@ public final class QueryContext extends Proc {
     if(closed) return;
     closed = true;
 
-    // reset database options to initial value
-    for(final Entry<String, Object> e : globalOpt.entrySet()) {
+    // reset database options to their initial values
+    for(final Entry<String, Object> e : globalOpt.entrySet())
       context.options.setObject(e.getKey(), e.getValue());
-    }
+
     // close database connections
     resource.close();
     // close JDBC connections

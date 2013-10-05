@@ -36,7 +36,7 @@ public abstract class Command extends Proc {
   /** Database options. */
   protected Options options;
   /** Global options. */
-  protected GlobalOptions globalopts;
+  protected GlobalOptions goptions;
 
   /** Container for query information. */
   private final TokenBuilder info = new TokenBuilder();
@@ -338,7 +338,7 @@ public abstract class Command extends Proc {
     perf = new Performance();
     context = ctx;
     options = ctx.options;
-    globalopts = ctx.globalopts;
+    goptions = ctx.globalopts;
     out = PrintOutput.get(os);
 
     try {

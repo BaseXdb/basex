@@ -41,7 +41,7 @@ public final class CreateBackup extends ABackup {
     // loop through all databases
     boolean ok = true;
     for(final String db : dbs) {
-      if(!globalopts.dbpath(db).isDir()) continue;
+      if(!goptions.dbpath(db).isDir()) continue;
       if(backup(db)) {
         // backup was successful
         info(DB_BACKUP_X, db, perf);
@@ -61,11 +61,11 @@ public final class CreateBackup extends ABackup {
   private boolean backup(final String db) {
     final String backup = db + '-' + DateTime.format(new Date(), DateTime.DATETIME) +
         IO.ZIPSUFFIX;
-    final IOFile zf = globalopts.dbpath(backup);
+    final IOFile zf = goptions.dbpath(backup);
     final Zip zip = proc(new Zip(zf));
 
     try {
-      final IOFile path = globalopts.dbpath(db);
+      final IOFile path = goptions.dbpath(db);
       zip.zip(path, path.descendants());
       return true;
     } catch(final IOException ex) {

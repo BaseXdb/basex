@@ -84,7 +84,7 @@ public final class List extends Command {
       }
 
       // count number of raw files
-      final IOFile dir = new IOFile(globalopts.dbpath(name), M_RAW);
+      final IOFile dir = new IOFile(goptions.dbpath(name), M_RAW);
       final int bin = dir.descendants().size();
 
       // create entry

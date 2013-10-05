@@ -44,7 +44,7 @@ public final class Get extends AGet {
       // retrieve values of all options
       if(context.user.has(Perm.ADMIN)) {
         out.println(MAIN_OPTIONS + COL);
-        for(final String s : globalopts) out.println(s + COLS + globalopts.get(s));
+        for(final String s : goptions) out.println(s + COLS + goptions.get(s));
       }
       out.println(NL + OPTIONS + COL);
       for(final String s : options) out.println(s + COLS + options.get(s));
@@ -52,7 +52,7 @@ public final class Get extends AGet {
       // retrieve value of specific option
       final String key = args[0].toUpperCase(Locale.ENGLISH);
       Object type = options.get(key);
-      if(type == null && context.user.has(Perm.ADMIN)) type = globalopts.get(key);
+      if(type == null && context.user.has(Perm.ADMIN)) type = goptions.get(key);
       if(type == null) return error(options.unknown(key));
       out.println(key + COLS + type);
     }
