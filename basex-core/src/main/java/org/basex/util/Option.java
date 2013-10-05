@@ -7,8 +7,8 @@ package org.basex.util;
  * @author Christian Gruen
  */
 public final class Option {
-  /** Key. */
-  public final String key;
+  /** Name. */
+  public final String name;
   /** Default value. */
   public final Object value;
 
@@ -17,7 +17,7 @@ public final class Option {
    * @param k key
    */
   public Option(final String k) {
-    key = k;
+    name = k;
     value = null;
   }
 
@@ -27,7 +27,7 @@ public final class Option {
    * @param v value
    */
   public Option(final String k, final boolean v) {
-    key = k;
+    name = k;
     value = v;
   }
 
@@ -37,7 +37,7 @@ public final class Option {
    * @param v value
    */
   public Option(final String k, final String v) {
-    key = k;
+    name = k;
     value = v;
   }
 
@@ -47,7 +47,7 @@ public final class Option {
    * @param v value
    */
   public Option(final String k, final int v) {
-    key = k;
+    name = k;
     value = v;
   }
 
@@ -57,7 +57,7 @@ public final class Option {
    * @param v value
    */
   public Option(final String k, final int[] v) {
-    key = k;
+    name = k;
     value = v;
   }
 
@@ -67,12 +67,12 @@ public final class Option {
    * @param v value
    */
   public Option(final String k, final String[] v) {
-    key = k;
+    name = k;
     value = v;
   }
 
   @Override
   public String toString() {
-    return value == null ? key : key + '=' + value;
+    return value == null ? name : name + '=' + value;
   }
 }

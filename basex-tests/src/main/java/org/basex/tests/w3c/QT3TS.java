@@ -110,9 +110,9 @@ public final class QT3TS {
     init();
 
     final Performance perf = new Performance();
-    ctx.options.set(Options.CHOP, false);
-    ctx.options.set(Options.INTPARSE, false);
-    ctx.options.set(Options.SERIALIZER, "omit-xml-declaration=no,indent=no");
+    ctx.options.set(MainOptions.CHOP, false);
+    ctx.options.set(MainOptions.INTPARSE, false);
+    ctx.options.set(MainOptions.SERIALIZER, "omit-xml-declaration=no,indent=no");
 
     final XdmValue doc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx).value();
     final String version = asString("*:catalog/@version", doc);
@@ -235,7 +235,7 @@ public final class QT3TS {
 
     // use XQuery 1.0 if XQ10 or XP20 is specified
     if(new XQuery("*:dependency[@type='spec'][matches(@value,'(XQ10)([^+]|$)')]", ctx).
-        context(test).next() != null) ctx.options.set(Options.XQUERY3, false);
+        context(test).next() != null) ctx.options.set(MainOptions.XQUERY3, false);
 
     // check if environment is defined in test-case
     QT3Env e = null;
@@ -348,7 +348,7 @@ public final class QT3TS {
     }
 
     // revert to XQuery as default
-    ctx.options.set(Options.XQUERY3, true);
+    ctx.options.set(MainOptions.XQUERY3, true);
 
     final String exp = test(result, expected);
     final TokenBuilder tmp = new TokenBuilder();
@@ -861,7 +861,7 @@ public final class QT3TS {
         " -r  generate report file" + NL +
         " -s  print slow queries" + NL +
         " -v  verbose output",
-        Util.info(Text.CONSOLE, Util.name(this)));
+        Util.info(Text.CONSOLE, Util.className(this)));
 
     while(arg.more()) {
       if(arg.dash()) {

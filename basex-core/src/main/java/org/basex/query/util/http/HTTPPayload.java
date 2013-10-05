@@ -38,7 +38,7 @@ public final class HTTPPayload {
   /** Input info. */
   private final InputInfo info;
   /** Database options. */
-  private final Options options;
+  private final MainOptions options;
 
   /**
    * Constructor.
@@ -48,7 +48,7 @@ public final class HTTPPayload {
    * @param opts database options
    */
   public HTTPPayload(final InputStream is, final boolean st, final InputInfo ii,
-      final Options opts) {
+      final MainOptions opts) {
     in = is;
     info = ii;
     options = opts;
@@ -332,14 +332,14 @@ public final class HTTPPayload {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public static Value value(final IO in, final Options opts, final String ctype,
+  public static Value value(final IO in, final MainOptions opts, final String ctype,
       final String ext) throws IOException, QueryException {
 
     Value val = null;
     if(ctype != null) {
       if(MimeTypes.isJSON(ctype)) {
         final String options = eq(ctype, APP_JSON) ? "" :
-          JsonOptions.FORMAT.key + "=" + JsonFormat.JSONML;
+          JsonOptions.FORMAT.name + "=" + JsonFormat.JSONML;
         val = new DBNode(new JsonParser(in, opts, options));
       } else if(TEXT_CSV.equals(ctype)) {
         val = new DBNode(new CsvParser(in, opts));

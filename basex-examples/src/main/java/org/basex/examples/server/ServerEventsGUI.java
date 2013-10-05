@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public final class ServerEventsGUI extends JFrame {
   /** Name of test database and user. */
-  static final String NAME = Util.name(ServerEventsGUI.class);
+  static final String NAME = Util.className(ServerEventsGUI.class);
   /** Number of clients. */
   static final int CLIENTS = 2;
   /** Color. */

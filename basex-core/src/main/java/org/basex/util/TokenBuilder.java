@@ -318,7 +318,7 @@ public final class TokenBuilder {
    * <ul>
    * <li> objects of type {@link Throwable} are converted to a string representation
    *      via {@link Util#message}.</li>
-   * <li> objects of type {@link Class} are converted via {@link Util#name(Class)}.</li>
+   * <li> objects of type {@link Class} are converted via {@link Util#className(Class)}.</li>
    * <li> {@code null} references are replaced by the string {@code "null"}.</li>
    * <li> byte arrays are directly inserted as tokens.</li>
    * <li> for all other typed, {@link Object#toString} is called.</li>
@@ -343,7 +343,7 @@ public final class TokenBuilder {
       } else if(object instanceof Throwable) {
         s = Util.message((Throwable) object);
       } else if(object instanceof Class<?>) {
-        s = Util.name((Class<?>) object);
+        s = Util.className((Class<?>) object);
       } else {
         s = object.toString();
       }

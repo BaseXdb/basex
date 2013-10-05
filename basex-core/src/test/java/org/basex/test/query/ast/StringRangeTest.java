@@ -108,9 +108,9 @@ public final class StringRangeTest extends QueryPlanTest {
       final Class<? extends Expr> expr) throws BaseXException {
 
     new CreateIndex(CmdIndex.TEXT).execute(context);
-    check(query, result, "exists(//" + expr.getSimpleName() + ")");
+    check(query, result, "exists(//" + Util.className(expr) + ")");
     new DropIndex(CmdIndex.TEXT).execute(context);
-    check(query, result, "not(//" + expr.getSimpleName() + ")");
+    check(query, result, "not(//" + Util.className(expr) + ")");
   }
 
   /**

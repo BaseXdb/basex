@@ -406,6 +406,6 @@ public final class WesternTokenizer extends Tokenizer {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + string(text) + ']';
+    return Util.className(this) + '[' + string(text) + ']';
   }
 }

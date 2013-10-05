@@ -2,8 +2,6 @@ package org.basex.query.ft;
 
 import java.util.*;
 
-import org.basex.util.*;
-
 /**
  * Search mode.
  *
@@ -27,8 +25,8 @@ public enum FTMode {
    * @param mode mode
    * @return mode enumeration
    */
-  public static FTMode get(final byte[] mode) {
-    final String md = Token.string(mode).toLowerCase(Locale.ENGLISH);
+  public static FTMode get(final String mode) {
+    final String md = mode.toLowerCase(Locale.ENGLISH);
     for(final FTMode m : values()) {
       final String s = m.toString().replace('_', ' ').toLowerCase(Locale.ENGLISH);
       if(s.equals(md)) return m;

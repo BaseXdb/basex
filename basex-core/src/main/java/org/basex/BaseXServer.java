@@ -186,7 +186,7 @@ public final class BaseXServer extends Main implements Runnable {
    * @return stop file
    */
   private static IOFile stopFile(final int port) {
-    return new IOFile(Prop.TMP, Util.name(BaseXServer.class) + port);
+    return new IOFile(Prop.TMP, Util.className(BaseXServer.class) + port);
   }
 
   @Override

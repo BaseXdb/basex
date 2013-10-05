@@ -822,7 +822,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @BeforeClass
   public static void start() throws BaseXException {
     // turn off pretty printing
-    new Set(Options.SERIALIZER, "indent=no").execute(context);
+    new Set(MainOptions.SERIALIZER, "indent=no").execute(context);
   }
 
   /**

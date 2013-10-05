@@ -92,7 +92,7 @@ public class QueryStack {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.name(this)).append('[');
+    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
     for(int i = 0; i < sl; i++) sb.append(i == 0 ? "" : ", ").append(stack[i]);
     return sb.append(']').toString();
   }

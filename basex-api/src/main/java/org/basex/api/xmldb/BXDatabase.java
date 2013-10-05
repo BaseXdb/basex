@@ -50,7 +50,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
   public String getProperty(final String key) {
     try {
       final String prop = key.toUpperCase(Locale.ENGLISH);
-      return ((Option) Options.class.getField(prop).get(null)).value.toString();
+      return ((Option) MainOptions.class.getField(prop).get(null)).value.toString();
     } catch(final Exception ex) {
       return null;
     }

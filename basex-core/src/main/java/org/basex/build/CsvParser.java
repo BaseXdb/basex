@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  * and converts them to XML.
  *
  * <p>The parser provides some options, which can be specified via the
- * {@link Options#CSVPARSER} option.</p>
+ * {@link MainOptions#CSVPARSER} option.</p>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -26,8 +26,8 @@ public final class CsvParser extends XMLParser {
    * @param opts database options
    * @throws IOException I/O exception
    */
-  public CsvParser(final IO source, final Options opts) throws IOException {
-    super(toXML(source, opts.get(Options.CSVPARSER)), opts);
+  public CsvParser(final IO source, final MainOptions opts) throws IOException {
+    super(toXML(source, opts.get(MainOptions.CSVPARSER)), opts);
   }
 
   /**

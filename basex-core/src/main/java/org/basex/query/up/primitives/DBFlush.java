@@ -27,11 +27,11 @@ public final class DBFlush extends BasicOperation {
 
   @Override
   public void apply() {
-    final Options opts = data.meta.options;
-    if(opts.is(Options.AUTOFLUSH)) return;
-    opts.set(Options.AUTOFLUSH, true);
+    final MainOptions opts = data.meta.options;
+    if(opts.is(MainOptions.AUTOFLUSH)) return;
+    opts.set(MainOptions.AUTOFLUSH, true);
     data.finishUpdate();
-    opts.set(Options.AUTOFLUSH, false);
+    opts.set(MainOptions.AUTOFLUSH, false);
   }
 
   @Override

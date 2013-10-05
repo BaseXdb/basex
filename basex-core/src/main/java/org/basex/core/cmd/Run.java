@@ -51,12 +51,12 @@ public final class Run extends Execute {
         }
       }
     }
-    ctx.options.set(Options.QUERYPATH, file.path());
+    ctx.options.set(MainOptions.QUERYPATH, file.path());
     return error == null;
   }
 
   @Override
   protected void finish(final Context ctx) {
-    ctx.options.set(Options.QUERYPATH, "");
+    ctx.options.set(MainOptions.QUERYPATH, "");
   }
 }

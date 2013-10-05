@@ -64,30 +64,30 @@ public final class HtmlParser extends XMLParser {
    * @param opts database options
    * @throws IOException I/O exception
    */
-  public HtmlParser(final IO source, final Options opts) throws IOException {
-    this(source, opts, opts.get(Options.HTMLPARSER));
+  public HtmlParser(final IO source, final MainOptions opts) throws IOException {
+    this(source, opts, new HtmlOptions(opts.get(MainOptions.HTMLPARSER)));
   }
 
   /**
    * Constructor.
    * @param source document source
    * @param opts database options
-   * @param parser options
+   * @param hopts html options
    * @throws IOException I/O exception
    */
-  public HtmlParser(final IO source, final Options opts, final String parser)
+  public HtmlParser(final IO source, final MainOptions opts, final HtmlOptions hopts)
       throws IOException {
-    super(toXML(source, parser), opts);
+    super(toXML(source, hopts), opts);
   }
 
   /**
    * Converts an HTML document to XML.
    * @param io io reference
-   * @param options parsing options
+   * @param opts html options
    * @return parser
    * @throws IOException I/O exception
    */
-  private static IO toXML(final IO io, final String options) throws IOException {
+  private static IO toXML(final IO io, final HtmlOptions opts) throws IOException {
     // reader could not be initialized; fall back to XML
     if(READER == null) return io;
 
@@ -117,7 +117,6 @@ public final class HtmlParser extends XMLParser {
       final Object writer = Reflect.get(WRITER, sw);
 
       // set TagSoup options
-      final HtmlOptions opts = new HtmlOptions(options);
       String p;
       if(opts.is(HtmlOptions.HTML)) {
         reader.setFeature("http://xml.org/sax/features/namespaces", false);

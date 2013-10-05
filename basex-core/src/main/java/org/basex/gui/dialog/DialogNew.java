@@ -48,7 +48,7 @@ public final class DialogNew extends BaseXDialog {
     buttons = okCancel();
 
     db = List.list(main.context);
-    final Options opts = gui.context.options;
+    final MainOptions opts = gui.context.options;
     final GUIOptions gopts = main.gopts;
 
     dbname = new BaseXTextField(gopts.get(GUIOptions.DBNAME), this);
@@ -65,18 +65,18 @@ public final class DialogNew extends BaseXDialog {
     // index panel
     final BaseXBack indexes = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
 
-    txtindex = new BaseXCheckBox(TEXT_INDEX, opts.is(Options.TEXTINDEX), 0, this).large();
+    txtindex = new BaseXCheckBox(TEXT_INDEX, opts.is(MainOptions.TEXTINDEX), 0, this).large();
     indexes.add(txtindex);
     indexes.add(new BaseXLabel(H_TEXT_INDEX, true, false));
 
     atvindex = new BaseXCheckBox(ATTRIBUTE_INDEX,
-        opts.is(Options.ATTRINDEX), 0, this).large();
+        opts.is(MainOptions.ATTRINDEX), 0, this).large();
     indexes.add(atvindex);
     indexes.add(new BaseXLabel(H_ATTR_INDEX, true, false));
 
     // full-text panel
     //final BaseXBack fulltext = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
-    ftxindex = new BaseXCheckBox(FULLTEXT_INDEX, opts.is(Options.FTINDEX), 0, this).large();
+    ftxindex = new BaseXCheckBox(FULLTEXT_INDEX, opts.is(MainOptions.FTINDEX), 0, this).large();
     indexes.add(ftxindex);
 
     ft = new DialogFT(this, true);
@@ -133,9 +133,9 @@ public final class DialogNew extends BaseXDialog {
     if(!ok) return;
 
     super.close();
-    gui.set(Options.TEXTINDEX, txtindex.isSelected());
-    gui.set(Options.ATTRINDEX, atvindex.isSelected());
-    gui.set(Options.FTINDEX,   ftxindex.isSelected());
+    gui.set(MainOptions.TEXTINDEX, txtindex.isSelected());
+    gui.set(MainOptions.ATTRINDEX, atvindex.isSelected());
+    gui.set(MainOptions.FTINDEX,   ftxindex.isSelected());
     general.setOptions();
     ft.setOptions();
   }

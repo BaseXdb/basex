@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -13,7 +14,6 @@ import org.basex.data.atomic.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Update primitive for adding documents to databases.
@@ -23,27 +23,27 @@ import org.basex.util.hash.*;
  */
 public abstract class DBNew extends BasicOperation {
   /** Numeric index options. */
-  protected static final Option[] N_OPT = { Options.MAXCATS, Options.MAXLEN,
-    Options.INDEXSPLITSIZE, Options.FTINDEXSPLITSIZE };
+  protected static final Option[] N_OPT = { MainOptions.MAXCATS, MainOptions.MAXLEN,
+    MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE };
   /** Boolean index options. */
-  protected static final Option[] B_OPT = { Options.TEXTINDEX, Options.ATTRINDEX,
-    Options.FTINDEX, Options.STEMMING, Options.CASESENS, Options.DIACRITICS,
-    Options.UPDINDEX };
+  protected static final Option[] B_OPT = { MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
+    MainOptions.FTINDEX, MainOptions.STEMMING, MainOptions.CASESENS, MainOptions.DIACRITICS,
+    MainOptions.UPDINDEX };
   /** String index options. */
-  protected static final Option[] S_OPT = { Options.LANGUAGE, Options.STOPWORDS };
+  protected static final Option[] S_OPT = { MainOptions.LANGUAGE, MainOptions.STOPWORDS };
   /** Keys of numeric index options. */
-  protected static final byte[][] K_N_OPT = new byte[N_OPT.length][];
+  protected static final String[] K_N_OPT = new String[N_OPT.length];
   /** Keys of boolean index options. */
-  protected static final byte[][] K_B_OPT = new byte[B_OPT.length][];
+  protected static final String[] K_B_OPT = new String[B_OPT.length];
   /** Keys of numeric index options. */
-  protected static final byte[][] K_S_OPT = new byte[S_OPT.length][];
+  protected static final String[] K_S_OPT = new String[S_OPT.length];
 
   static {
     // initialize options arrays
     final int n = N_OPT.length, b = B_OPT.length, s = S_OPT.length;
-    for(int o = 0; o < n; o++) K_N_OPT[o] = lc(token(N_OPT[o].key));
-    for(int o = 0; o < b; o++) K_B_OPT[o] = lc(token(B_OPT[o].key));
-    for(int o = 0; o < s; o++) K_S_OPT[o] = lc(token(S_OPT[o].key));
+    for(int o = 0; o < n; o++) K_N_OPT[o] = N_OPT[o].name.toLowerCase(Locale.ENGLISH);
+    for(int o = 0; o < b; o++) K_B_OPT[o] = B_OPT[o].name.toLowerCase(Locale.ENGLISH);
+    for(int o = 0; o < s; o++) K_S_OPT[o] = S_OPT[o].name.toLowerCase(Locale.ENGLISH);
   }
 
   /** Query context. */
@@ -51,7 +51,7 @@ public abstract class DBNew extends BasicOperation {
   /** Inputs to add. */
   protected List<NewInput> inputs;
   /** Optimization options. */
-  protected TokenMap options;
+  protected HashMap<String, String> options;
   /** Insertion sequence. */
   protected Data md;
 
@@ -79,9 +79,7 @@ public abstract class DBNew extends BasicOperation {
    * @param name name of database
    * @throws QueryException query exception
    */
-  protected final void addDocs(final MemData dt, final String name)
-      throws QueryException {
-
+  protected final void addDocs(final MemData dt, final String name) throws QueryException {
     md = dt;
     final long ds = inputs.size();
     for(int i = 0; i < ds; i++) {
@@ -125,15 +123,16 @@ public abstract class DBNew extends BasicOperation {
    * @throws QueryException query exception
    */
   protected final void check(final boolean create) throws QueryException {
-    for(final byte[] key : options) {
+    for(final Entry<String, String> entry : options.entrySet()) {
+      final String key = entry.getKey();
       if(!eq(key, K_N_OPT) && !eq(key, K_B_OPT) && !eq(key, K_S_OPT) ||
          !create && eq(key, K_B_OPT[K_B_OPT.length - 1])) BASX_OPTIONS.thrw(info, key);
-      final String v = string(options.get(key));
+      final String v = entry.getValue();
       if(eq(key, K_N_OPT)) {
         if(toInt(v) < 0) BASX_VALUE.thrw(info, key, v);
       } else if(eq(key, K_B_OPT)) {
-        if(eqic(v, Text.YES, Text.TRUE, Text.ON)) options.put(key, Token.TRUE);
-        else if(eqic(v, Text.NO, Text.FALSE, Text.OFF)) options.put(key, Token.FALSE);
+        if(Util.yes(v)) options.put(key, Text.TRUE);
+        else if(Util.no(v)) options.put(key, Text.FALSE);
         else BASX_VALUE.thrw(info, key, v);
       }
     }
@@ -143,22 +142,20 @@ public abstract class DBNew extends BasicOperation {
    * Assigns indexing options.
    */
   protected void initOptions() {
-    for(int o = 0; o < K_N_OPT.length; o++) if(options.contains(K_N_OPT[o]))
+    for(int o = 0; o < K_N_OPT.length; o++) if(options.containsKey(K_N_OPT[o]))
       nprops.put(N_OPT[o], toInt(options.get(K_N_OPT[o])));
-    for(int o = 0; o < K_B_OPT.length; o++) if(options.contains(K_B_OPT[o]))
-      nprops.put(B_OPT[o], eq(options.get(K_B_OPT[o]), TRUE));
-    for(int o = 0; o < K_S_OPT.length; o++) if(options.contains(K_S_OPT[o]))
-      nprops.put(S_OPT[o], string(options.get(K_S_OPT[o])));
+    for(int o = 0; o < K_B_OPT.length; o++) if(options.containsKey(K_B_OPT[o]))
+      nprops.put(B_OPT[o], Util.yes(options.get(K_B_OPT[o])));
+    for(int o = 0; o < K_S_OPT.length; o++) if(options.containsKey(K_S_OPT[o]))
+      nprops.put(S_OPT[o], options.get(K_S_OPT[o]));
   }
 
   /**
    * Caches original options and assigns cached options.
    */
   protected void assignOptions() {
-    final Options opts = qc.context.options;
-    for(final Option option : nprops.keySet()) {
-      oprops.put(option, opts.get(option.key));
-    }
+    final MainOptions opts = qc.context.options;
+    for(final Option option : nprops.keySet()) oprops.put(option, opts.get(option.name));
     setOptions(nprops);
   }
 
@@ -174,9 +171,9 @@ public abstract class DBNew extends BasicOperation {
    * @param map options map
    */
   private void setOptions(final HashMap<Option, Object> map) {
-    final Options opts = qc.context.options;
+    final MainOptions opts = qc.context.options;
     for(final Map.Entry<Option, Object> e : map.entrySet()) {
-      opts.setObject(e.getKey().key, e.getValue());
+      opts.setObject(e.getKey().name, e.getValue());
     }
   }
 }

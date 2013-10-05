@@ -99,7 +99,7 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.name(this));
+    final StringBuilder sb = new StringBuilder(Util.className(this));
     for(final FTStringMatch s : this) sb.append(' ').append(s);
     return sb.toString();
   }

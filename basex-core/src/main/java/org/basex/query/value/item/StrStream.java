@@ -37,7 +37,7 @@ public final class StrStream extends AStr {
     input = io;
     encoding = enc;
     error = err;
-    validate = ctx.context.options.is(Options.CHECKSTRINGS);
+    validate = ctx.context.options.is(MainOptions.CHECKSTRINGS);
   }
 
   @Override

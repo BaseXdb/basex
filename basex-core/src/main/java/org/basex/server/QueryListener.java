@@ -157,7 +157,7 @@ final class QueryListener extends Proc {
         qi.srlz = perf.time();
 
         // generate query info
-        info = qi.toString(qp, po, c, ctx.options.is(Options.QUERYINFO));
+        info = qi.toString(qp, po, c, ctx.options.is(MainOptions.QUERYINFO));
 
       } catch(final QueryException ex) {
         throw new BaseXException(ex);

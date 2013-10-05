@@ -172,8 +172,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         // serialization parameters
         final String key = string(local);
         final String val = toString(value, name);
-        if(output.get(key) == null) error(info, UNKNOWN_SER, key);
-        output.set(key, val);
+        if(output.set(key, val) == null) error(info, UNKNOWN_SER, key);
       }
       found |= rexq;
     }
@@ -526,7 +525,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   private void addMultipart(final IOContent body, final Map<String, Value> pars,
       final String ext) throws IOException, QueryException {
 
-    final Options opts = context.context.options;
+    final MainOptions opts = context.context.options;
     final HTTPPayload hp = new HTTPPayload(body.inputStream(), false, null, opts);
     final HashMap<String, Value> map = hp.multiForm(ext);
     for(final Map.Entry<String, Value> entry : map.entrySet()) {

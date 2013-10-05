@@ -20,7 +20,7 @@ public final class Set extends AGet {
    * @param value value to set (optional, depending on the option)
    */
   public Set(final Option option, final Object value) {
-    this(option.key, value);
+    this(option.name, value);
   }
 
   /**
@@ -34,8 +34,7 @@ public final class Set extends AGet {
 
   @Override
   protected boolean run() {
-    final String key = args[0].toUpperCase(Locale.ENGLISH);
-    final String val = args[1];
+    final String key = args[0].toUpperCase(Locale.ENGLISH), val = args[1];
     try {
       final String v = options.set(key, val);
       if(v != null) return info(key + COLS + v);
@@ -45,7 +44,7 @@ public final class Set extends AGet {
         return error(Text.GLOBAL_OPTION_X, key);
       }
       return error(options.unknown(key));
-    } catch(final Exception ex) {
+    } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
       return error(INVALID_VALUE_X_X, key, val);
     }

@@ -320,8 +320,7 @@ public abstract class JavaMapping extends Arr {
     final StringBuilder sb = new StringBuilder();
     for(final Value v : args) {
       if(sb.length() != 0) sb.append(", ");
-      sb.append(v instanceof Jav ? ((Jav) v).toJava().getClass().getSimpleName() :
-        v.type());
+      sb.append(v instanceof Jav ? Util.className(((Jav) v).toJava()) : v.type());
     }
     return sb.toString();
   }

@@ -147,13 +147,13 @@ public abstract class W3CTS {
     final String sources = path + "TestSources/";
 
     final Performance perf = new Performance();
-    context.options.set(Options.CHOP, false);
+    context.options.set(MainOptions.CHOP, false);
 
     //new Check(path + input).execute(context);
     data = CreateDB.mainMem(new IOFile(path + input), context);
 
     final Nodes root = new Nodes(0, data);
-    Util.outln(NL + Util.name(this) + " Test Suite " +
+    Util.outln(NL + Util.className(this) + " Test Suite " +
         text("/*:test-suite/@version", root));
 
     Util.outln("Caching Sources...");
@@ -276,7 +276,7 @@ public abstract class W3CTS {
 
       final String inname = text("*:query/@name", state);
       final IOFile query = new IOFile(queries + pth + inname + IO.XQSUFFIX);
-      context.options.set(Options.QUERYPATH, query.path());
+      context.options.set(MainOptions.QUERYPATH, query.path());
       final String in = read(query);
       String er = null;
       ValueBuilder iter = null;
@@ -290,9 +290,9 @@ public abstract class W3CTS {
         curr.root = true;
       }
 
-      context.options.set(Options.QUERYINFO, compile);
+      context.options.set(MainOptions.QUERYINFO, compile);
       final QueryProcessor xq = new QueryProcessor(in, context).context(curr);
-      context.options.set(Options.QUERYINFO, false);
+      context.options.set(MainOptions.QUERYINFO, false);
 
       final ArrayOutput ao = new ArrayOutput();
       final TokenBuilder files = new TokenBuilder();
@@ -770,7 +770,7 @@ public abstract class W3CTS {
         " -p     change path" + NL +
         " -r     create report" + NL +
         " -t[ms] list slowest queries" + NL +
-        " -v     verbose output", Util.info(CONSOLE, Util.name(this)));
+        " -v     verbose output", Util.info(CONSOLE, Util.className(this)));
 
     while(arg.more()) {
       if(arg.dash()) {

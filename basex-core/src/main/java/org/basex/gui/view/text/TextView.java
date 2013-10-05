@@ -168,7 +168,7 @@ public final class TextView extends View {
     cmd = null;
     ns = null;
 
-    final int mh = gui.context.options.num(Options.MAXHITS);
+    final int mh = gui.context.options.num(MainOptions.MAXHITS);
     boolean parse = false;
     if(mh >= 0 && r != null && r.size() >= mh) {
       parse = true;
@@ -209,10 +209,10 @@ public final class TextView extends View {
 
     PrintOutput out = null;
     gui.cursor(CURSORWAIT, true);
-    final Options opts = gui.context.options;
-    final int mh = opts.num(Options.MAXHITS);
-    opts.set(Options.MAXHITS, -1);
-    opts.set(Options.CACHEQUERY, false);
+    final MainOptions opts = gui.context.options;
+    final int mh = opts.num(MainOptions.MAXHITS);
+    opts.set(MainOptions.MAXHITS, -1);
+    opts.set(MainOptions.CACHEQUERY, false);
 
     try {
       out = new PrintOutput(file.toString());
@@ -228,8 +228,8 @@ public final class TextView extends View {
       BaseXDialog.error(gui, FILE_NOT_SAVED);
     } finally {
       if(out != null) try { out.close(); } catch(final IOException ignored) { }
-      opts.set(Options.MAXHITS, mh);
-      opts.set(Options.CACHEQUERY, true);
+      opts.set(MainOptions.MAXHITS, mh);
+      opts.set(MainOptions.CACHEQUERY, true);
       gui.cursor(CURSORARROW, true);
     }
   }

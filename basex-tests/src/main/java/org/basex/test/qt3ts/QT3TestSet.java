@@ -47,9 +47,9 @@ public abstract class QT3TestSet {
   @Before
   public void buildUp() throws BaseXException {
     ctx = new Context();
-    new Set(Options.CHOP, false).execute(ctx);
-    new Set(Options.INTPARSE, false).execute(ctx);
-    new Set(Options.XQUERY3, true).execute(ctx);
+    new Set(MainOptions.CHOP, false).execute(ctx);
+    new Set(MainOptions.INTPARSE, false).execute(ctx);
+    new Set(MainOptions.XQUERY3, true).execute(ctx);
     result = null;
   }
 
@@ -63,7 +63,7 @@ public abstract class QT3TestSet {
 
   /** Sets the XQuery version to 1.0. */
   protected void xquery10() {
-    ctx.options.set(Options.XQUERY3, false);
+    ctx.options.set(MainOptions.XQUERY3, false);
   }
 
   /**
@@ -218,7 +218,7 @@ public abstract class QT3TestSet {
     }
 
     final String msg = result.error.getMessage();
-    final String res = msg == null ? Util.name(result.error)
+    final String res = msg == null ? Util.className(result.error)
                                    : msg.replaceAll("\\[|\\].*\r?\n?.*", "");
     return result(code.equals(res), Util.info("% (found: %)", code, res));
   }

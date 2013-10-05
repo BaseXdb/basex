@@ -14,7 +14,7 @@ import org.basex.util.*;
  * and converts them to XML.
  *
  * <p>The parser provides some options, which can be specified via the
- * {@link Options#TEXTPARSER} option.</p>
+ * {@link MainOptions#TEXTPARSER} option.</p>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -36,9 +36,9 @@ public final class TextParser extends SingleParser {
    * @param opts database options
    * @throws IOException I/O exception
    */
-  public TextParser(final IO source, final Options opts) throws IOException {
+  public TextParser(final IO source, final MainOptions opts) throws IOException {
     super(source, opts);
-    final TextOptions tp = new TextOptions(opts.get(Options.TEXTPARSER));
+    final TextOptions tp = new TextOptions(opts.get(MainOptions.TEXTPARSER));
     lines = tp.is(TextOptions.LINES);
     encoding = tp.get(TextOptions.ENCODING);
   }

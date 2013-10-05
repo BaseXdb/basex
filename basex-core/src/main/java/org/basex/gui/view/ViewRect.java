@@ -54,7 +54,7 @@ public class ViewRect {
 
   @Override
   public final String toString() {
-    return Util.name(this) + "[x=" + x + ",y=" + y + ",h=" + h +
+    return Util.className(this) + "[x=" + x + ",y=" + y + ",h=" + h +
       ",w=" + w + ",h=" + h + ",pre=" + pre + ",level=" + level + ']';
   }
 }

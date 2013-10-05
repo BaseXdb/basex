@@ -16,7 +16,6 @@ import org.basex.query.util.csv.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Functions for parsing CSV input.
@@ -27,10 +26,6 @@ import org.basex.util.hash.*;
 public class FNCsv extends StandardFunc {
   /** Element: options. */
   private static final QNm Q_OPTIONS = QNm.get("options", CSVURI);
-  /** The {@code header} key. */
-  private static final byte[] HEADER = token("header");
-  /** The {@code separator} key. */
-  private static final byte[] SEPARATOR = token("separator");
 
   /**
    * Constructor.
@@ -59,11 +54,11 @@ public class FNCsv extends StandardFunc {
    */
   private FElem parse(final QueryContext ctx) throws QueryException {
     final byte[] input = checkStr(expr[0], ctx);
-    final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
+    final CsvOptions opts = new CsvOptions();
+    if(expr.length > 1) new FuncOptions(Q_OPTIONS, info).parse(expr[1].item(ctx, info), opts);
 
     try {
-      return new CsvConverter(options(map)).convert(input);
+      return new CsvConverter(opts).convert(input);
     } catch(final IOException ex) {
       throw BXCS_PARSE.thrw(info, ex);
     }
@@ -78,28 +73,13 @@ public class FNCsv extends StandardFunc {
   private Str serialize(final QueryContext ctx) throws QueryException {
     final ANode node = checkNode(expr[0], ctx);
     final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
+    final CsvOptions opts = new CsvOptions();
+    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
 
-    final SerializerOptions opts = new SerializerOptions();
-    opts.set(S_METHOD, M_CSV);
-    opts.set(S_CSV, options(map).toString());
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(S_METHOD, M_CSV);
+    sopts.set(S_CSV, opts.toString());
     // serialize node and remove carriage returns
-    return Str.get(delete(serialize(node.iter(), opts), '\r'));
-  }
-
-  /**
-   * Creates CSV options.
-   * @param map map
-   * @return options
-   */
-  private CsvOptions options(final TokenMap map) {
-    final CsvOptions copts = new CsvOptions();
-
-    final byte[] header = map.get(HEADER);
-    if(header != null) copts.set(CsvOptions.HEADER, Util.yes(string(header)));
-
-    final byte[] sep = map.get(SEPARATOR);
-    if(sep != null) copts.set(CsvOptions.SEPARATOR, string(sep));
-    return copts;
+    return Str.get(delete(serialize(node.iter(), sopts), '\r'));
   }
 }

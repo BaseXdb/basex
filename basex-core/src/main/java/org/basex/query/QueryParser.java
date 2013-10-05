@@ -110,7 +110,7 @@ public class QueryParser extends InputParser {
   /**
    * Constructor.
    * @param in input
-   * @param path file path (if {@code null}, {@link Options#QUERYPATH} will be assigned)
+   * @param path file path (if {@code null}, {@link MainOptions#QUERYPATH} will be assigned)
    * @param c query context
    * @throws QueryException query exception
    */
@@ -121,12 +121,12 @@ public class QueryParser extends InputParser {
     ctx = c;
 
     // set path to query file
-    final Options opts = c.context.options;
-    final String bi = path != null ? path : opts.get(Options.QUERYPATH);
+    final MainOptions opts = c.context.options;
+    final String bi = path != null ? path : opts.get(MainOptions.QUERYPATH);
     if(!bi.isEmpty()) c.sc.baseURI(bi);
 
     // parse pre-defined external variables
-    final String bind = opts.get(Options.BINDINGS).trim();
+    final String bind = opts.get(MainOptions.BINDINGS).trim();
     final StringBuilder key = new StringBuilder();
     final StringBuilder val = new StringBuilder();
     boolean first = true;
@@ -554,26 +554,28 @@ public class QueryParser extends InputParser {
       if(module != null) error(MODOUT);
 
       if(ctx.serialOpts == null) {
-        final Options opts = ctx.context.options;
-        ctx.serialOpts = new SerializerOptions(opts.get(Options.SERIALIZER));
+        final MainOptions opts = ctx.context.options;
+        ctx.serialOpts = new SerializerOptions(opts.get(MainOptions.SERIALIZER));
       }
-      if(ctx.serialOpts.get(key) == null) error(OUTWHICH, key);
       if(!decl.add("S " + key)) error(OUTDUPL, key);
-      if(key.equals(SerializerOptions.S_PARAMETER_DOCUMENT.key)) {
+      if(ctx.serialOpts.set(key, string(val)) == null) error(OUTWHICH, key);
+
+      if(key.equals(SerializerOptions.S_PARAMETER_DOCUMENT.name)) {
         final IO io = IO.get(string(resolvedUri(val).string()));
         try {
           final ANode node = new DBNode(io, ctx.context.options).children().next();
           // check parameters and add values to serialization parameters
           final InputInfo info = info();
-          final TokenMap tm = FuncParams.serializerMap(node, info);
-          FuncParams.serializerProp(tm, info);
-          for(final byte[] sk : tm) ctx.serialOpts.set(string(sk), string(tm.get(sk)));
+          FuncOptions.parse(node, ctx.serialOpts, info);
+
+          final HashMap<String, String> unknown = ctx.serialOpts.free();
+          if(!unknown.isEmpty()) SERWHICH.thrw(info, unknown.keySet().iterator().next());
+          final Option cm = SerializerOptions.S_USE_CHARACTER_MAPS;
+          if(!ctx.serialOpts.get(cm).isEmpty()) SERWHICH.thrw(info, cm.name);
         } catch(final IOException ex) {
           error(OUTDOC, val);
         }
       }
-
-      ctx.serialOpts.set(key, string(val));
     } else if(ctx.sc.xquery3() && eq(name.uri(), XQURI)) {
       error(DECLOPTION, name);
     } else if(eq(name.uri(), DBURI)) {
@@ -3227,7 +3229,7 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(WEIGHT)) expr = new FTWeight(info(), expr, enclosed(NOENCLEXPR));
 
     // skip options if none were specified...
-    return found ? new FTOptions(info(), expr, fto) : expr;
+    return found ? new FTOpts(info(), expr, fto) : expr;
   }
 
   /**

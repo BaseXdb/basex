@@ -67,7 +67,7 @@ public final class ViewContainer extends BaseXBack {
     gui = main;
     // build layout or use default if something goes wrong
     if(!buildLayout(gui.gopts.get(GUIOptions.VIEWS)) && !buildLayout(VIEWS)) {
-      Util.errln(Util.name(this) + ": could not build layout \"%\"", VIEWS);
+      Util.errln(Util.className(this) + ": could not build layout \"%\"", VIEWS);
     }
   }
 
@@ -369,10 +369,10 @@ public final class ViewContainer extends BaseXBack {
         }
       }
       if(nv == views.length) return true;
-      Util.errln(Util.name(this) + ": initializing views: " + cnstr);
+      Util.errln(Util.className(this) + ": initializing views: " + cnstr);
     } catch(final Exception ex) {
       Util.debug(ex);
-      Util.errln(Util.name(this) + ": could not build layout: " + cnstr);
+      Util.errln(Util.className(this) + ": could not build layout: " + cnstr);
     }
     return false;
   }
@@ -387,7 +387,7 @@ public final class ViewContainer extends BaseXBack {
     for(final ViewPanel view : views) {
       if(view.toString().equals(name)) return view;
     }
-    Util.debug(Util.name(this) + ": Unknown view \"%\"", name);
+    Util.debug(Util.className(this) + ": Unknown view \"%\"", name);
     return null;
   }
 }

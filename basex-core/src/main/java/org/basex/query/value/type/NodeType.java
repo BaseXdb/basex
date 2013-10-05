@@ -60,7 +60,7 @@ public enum NodeType implements Type {
       if(o instanceof BXElem)  return ((BXElem) o).getNode();
       if(o instanceof Element) return new FElem((Element) o, null, new TokenMap());
       try {
-        final DBNode db = new DBNode(new IOContent(o.toString()), new Options());
+        final DBNode db = new DBNode(new IOContent(o.toString()), new MainOptions());
         return db.children().next();
       } catch(final IOException ex) {
         NODEERR.thrw(ii, this, ex);
@@ -77,7 +77,7 @@ public enum NodeType implements Type {
       if(o instanceof BXDoc) return ((BXDoc) o).getNode();
       try {
         if(o instanceof Document) {
-          final DOMWrapper p = new DOMWrapper((Document) o, "", new Options());
+          final DOMWrapper p = new DOMWrapper((Document) o, "", new MainOptions());
           return new DBNode(MemBuilder.build(p));
         }
         if(o instanceof DocumentFragment) {
@@ -87,7 +87,7 @@ public enum NodeType implements Type {
           return new FDoc(df, bu != null ? Token.token(bu) : Token.EMPTY);
         }
         final String c = o.toString();
-        if(c.startsWith("<")) return new DBNode(new IOContent(c), new Options());
+        if(c.startsWith("<")) return new DBNode(new IOContent(c), new MainOptions());
         return new FDoc().add(new FTxt(c));
       } catch(final IOException ex) {
         throw NODEERR.thrw(ii, this, ex);

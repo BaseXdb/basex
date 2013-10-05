@@ -24,6 +24,8 @@ public final class CsvSerializer extends OutputSerializer {
   private TokenMap data;
   /** Separator. */
   private final int separator;
+  /** Lax flag. */
+  private final boolean lax;
   /** Header flag. */
   private boolean header;
 
@@ -35,12 +37,12 @@ public final class CsvSerializer extends OutputSerializer {
    */
   CsvSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
     super(os, opts);
-
     final CsvOptions copts = new CsvOptions(opts.get(SerializerOptions.S_CSV));
     int s = copts.separator();
     separator = s;
     header = copts.is(CsvOptions.HEADER);
     headers = header ? new TokenList() : null;
+    lax = copts.is(CsvOptions.LAX);
   }
 
   @Override
@@ -115,7 +117,7 @@ public final class CsvSerializer extends OutputSerializer {
    */
   private void cache(final byte[] text) {
     if(headers != null) {
-      final byte[] name = XMLToken.decode(elem);
+      final byte[] name = XMLToken.decode(elem, lax);
       if(!headers.contains(name)) headers.add(name);
       final byte[] old = data.get(name);
       final byte[] txt = old == null || old.length == 0 ? text :

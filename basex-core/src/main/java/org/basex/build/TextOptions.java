@@ -10,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class TextOptions extends AOptions {
+public final class TextOptions extends Options {
   /** Parser option: encoding. */
   public static final Option ENCODING = new Option("encoding", Token.UTF8);
   /** Parser option: line-wise parsing. */
@@ -29,6 +29,6 @@ public final class TextOptions extends AOptions {
    * @throws IOException I/O exception
    */
   public TextOptions(final String opts) throws IOException {
-    parse(opts);
+    parse(opts, true);
   }
 }

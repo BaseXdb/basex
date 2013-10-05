@@ -76,12 +76,12 @@ public final class LockingTest extends SandboxTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    AOptions.setSystem(GlobalOptions.GLOBALLOCK, false);
+    Options.setSystem(GlobalOptions.GLOBALLOCK, false);
     server = createServer();
     final CountDownLatch latch = new CountDownLatch(2);
     new Client(new CreateDB(NAME, DOC), null, latch);
-    new Client(new CreateDB(NAME + "1", DOC), null, latch);
-    // Wait for both databases being created
+    new Client(new CreateDB(NAME + '1', DOC), null, latch);
+    // wait for both databases being created
     latch.await();
   }
 
@@ -106,9 +106,7 @@ public final class LockingTest extends SandboxTest {
    */
   public static void countDownAndWait() throws Exception {
     sync.countDown();
-    if(sync.await(SLEEP, TimeUnit.MILLISECONDS)) {
-      test.countDown();
-    }
+    if(sync.await(SLEEP, TimeUnit.MILLISECONDS)) test.countDown();
   }
 
   /**

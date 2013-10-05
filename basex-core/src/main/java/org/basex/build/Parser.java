@@ -25,7 +25,7 @@ public abstract class Parser extends Proc {
   /** Namespaces of currently parsed element. */
   protected final Atts nsp = new Atts();
   /** Database options. */
-  protected final Options options;
+  protected final MainOptions options;
   /** Target path (empty, or suffixed with a single slash). */
   String target = "";
 
@@ -34,7 +34,7 @@ public abstract class Parser extends Proc {
    * @param source document source, or {@code null}
    * @param opts database options
    */
-  protected Parser(final String source, final Options opts) {
+  protected Parser(final String source, final MainOptions opts) {
     this(source == null ? null : IO.get(source), opts);
   }
 
@@ -43,7 +43,7 @@ public abstract class Parser extends Proc {
    * @param source document source, or {@code null}
    * @param opts database options
    */
-  protected Parser(final IO source, final Options opts) {
+  protected Parser(final IO source, final MainOptions opts) {
     src = source;
     options = opts;
   }
@@ -87,7 +87,7 @@ public abstract class Parser extends Proc {
    * @param options database options
    * @return parser
    */
-  public static Parser emptyParser(final Options options) {
+  public static Parser emptyParser(final MainOptions options) {
     return new Parser((IO) null, options) {
       @Override
       public void parse(final Builder build) { /* empty */ }
@@ -101,10 +101,10 @@ public abstract class Parser extends Proc {
    * @return xml parser
    * @throws IOException I/O exception
    */
-  public static SingleParser xmlParser(final IO in, final Options options)
+  public static SingleParser xmlParser(final IO in, final MainOptions options)
       throws IOException {
     // use internal or default XML parser
-    return options.is(Options.INTPARSE) ? new XMLParser(in, options) :
+    return options.is(MainOptions.INTPARSE) ? new XMLParser(in, options) :
       new SAXWrapper(in, options);
   }
 
@@ -116,11 +116,11 @@ public abstract class Parser extends Proc {
    * @return parser
    * @throws IOException I/O exception
    */
-  public static SingleParser singleParser(final IO in, final Options options,
+  public static SingleParser singleParser(final IO in, final MainOptions options,
       final String target) throws IOException {
 
     // use file specific parser
-    final String parser = options.get(Options.PARSER).toLowerCase(Locale.ENGLISH);
+    final String parser = options.get(MainOptions.PARSER).toLowerCase(Locale.ENGLISH);
     final SingleParser p;
     if(parser.equals(DataText.M_HTML)) {
       p = new HtmlParser(in, options);

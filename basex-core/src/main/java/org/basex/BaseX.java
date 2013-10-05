@@ -70,7 +70,7 @@ public class BaseX extends Main {
           if(bind.length() != 0) bind.append(',');
           // commas are escaped by a second comma
           val = bind.append(val.replaceAll(",", ",,")).toString();
-          opt = Options.BINDINGS;
+          opt = MainOptions.BINDINGS;
         } else if(c == 'c') {
           // evaluate commands
           final IO io = IO.get(val);
@@ -79,27 +79,28 @@ public class BaseX extends Main {
             val = io.string();
             base = io.path();
           }
-          execute(new Set(Options.QUERYPATH, base), false);
+          execute(new Set(MainOptions.QUERYPATH, base), false);
           execute(val);
-          execute(new Set(Options.QUERYPATH, ""), false);
+          execute(new Set(MainOptions.QUERYPATH, ""), false);
           console = false;
         } else if(c == 'd') {
           // toggle debug mode
           Prop.debug ^= true;
         } else if(c == 'D') {
           // hidden option: show/hide dot query graph
-          opt = Options.DOTPLAN;
+          opt = MainOptions.DOTPLAN;
         } else if(c == 'i') {
           // open database or create main memory representation
-          execute(new Set(Options.MAINMEM, true), false);
+          execute(new Set(MainOptions.MAINMEM, true), false);
           execute(new Check(val), verbose);
-          execute(new Set(Options.MAINMEM, false), false);
+          execute(new Set(MainOptions.MAINMEM, false), false);
         } else if(c == 'L') {
           // toggle newline separators
           newline ^= true;
           if(serial.length() != 0) serial.append(',');
-          val = serial.append(SerializerOptions.S_ITEM_SEPARATOR.key).append("=\\n").toString();
-          opt = Options.SERIALIZER;
+          val = serial.append(SerializerOptions.S_ITEM_SEPARATOR.name).
+              append("=\\n").toString();
+          opt = MainOptions.SERIALIZER;
         } else if(c == 'o') {
           // change output stream
           if(out != System.out) out.close();
@@ -117,44 +118,44 @@ public class BaseX extends Main {
             val = io.string();
             base = io.path();
           }
-          execute(new Set(Options.QUERYPATH, base), false);
+          execute(new Set(MainOptions.QUERYPATH, base), false);
           execute(new XQuery(val), verbose);
-          execute(new Set(Options.QUERYPATH, ""), false);
+          execute(new Set(MainOptions.QUERYPATH, ""), false);
           console = false;
         } else if(c == 'r') {
           // hidden option: parse number of runs
-          opt = Options.RUNS;
+          opt = MainOptions.RUNS;
         } else if(c == 's') {
           // set/add serialization parameter
           if(serial.length() != 0) serial.append(',');
           val = serial.append(val.replaceAll(",", ",,")).toString();
-          opt = Options.SERIALIZER;
+          opt = MainOptions.SERIALIZER;
         } else if(c == 'u') {
           // (de)activate write-back for updates
-          opt = Options.WRITEBACK;
+          opt = MainOptions.WRITEBACK;
         } else if(c == 'v') {
           // show/hide verbose mode
           v ^= true;
         } else if(c == 'V') {
           // show/hide query info
           qi ^= true;
-          opt = Options.QUERYINFO;
+          opt = MainOptions.QUERYINFO;
         } else if(c == 'w') {
           // toggle chopping of whitespaces
-          opt = Options.CHOP;
+          opt = MainOptions.CHOP;
         } else if(c == 'W') {
           // hidden option: toggle writing of options before exit
           writeOptions ^= true;
         } else if(c == 'x') {
           // show/hide xml query plan
-          opt = Options.XMLPLAN;
+          opt = MainOptions.XMLPLAN;
           qp ^= true;
         } else if(c == 'X') {
           // hidden option: show query plan before/after query compilation
-          opt = Options.COMPPLAN;
+          opt = MainOptions.COMPPLAN;
         } else if(c == 'z') {
           // toggle result serialization
-          opt = Options.SERIALIZE;
+          opt = MainOptions.SERIALIZE;
         }
         if(opt != null) execute(new Set(opt, val), false);
         verbose = qi || qp || v;

@@ -19,7 +19,7 @@ public final class XMLParserTest extends SandboxTest {
    */
   @Before
   public void before() {
-    context.options.set(Options.MAINMEM, true);
+    context.options.set(MainOptions.MAINMEM, true);
   }
 
   /**
@@ -27,19 +27,19 @@ public final class XMLParserTest extends SandboxTest {
    */
   @Before
   public void after() {
-    context.options.set(Options.MAINMEM, false);
-    context.options.set(Options.CHOP, true);
-    context.options.set(Options.STRIPNS, false);
-    context.options.set(Options.SERIALIZER, "");
-    context.options.set(Options.INTPARSE, true);
+    context.options.set(MainOptions.MAINMEM, false);
+    context.options.set(MainOptions.CHOP, true);
+    context.options.set(MainOptions.STRIPNS, false);
+    context.options.set(MainOptions.SERIALIZER, "");
+    context.options.set(MainOptions.INTPARSE, true);
   }
 
   /**
-   * Tests the internal parser (Option {@link Options#INTPARSE}).
+   * Tests the internal parser (Option {@link MainOptions#INTPARSE}).
    */
   @Test
   public void intParse() {
-    context.options.set(Options.CHOP, false);
+    context.options.set(MainOptions.CHOP, false);
 
     final StringBuilder sb = new StringBuilder();
 
@@ -49,7 +49,7 @@ public final class XMLParserTest extends SandboxTest {
     };
     for(final String doc : docs) {
       // parse document with default parser (expected to yield correct result)
-      context.options.set(Options.INTPARSE, false);
+      context.options.set(MainOptions.INTPARSE, false);
       boolean def = true;
       try {
         new CreateDB(NAME, doc).execute(context);
@@ -58,7 +58,7 @@ public final class XMLParserTest extends SandboxTest {
       }
 
       // parse document with internal parser
-      context.options.set(Options.INTPARSE, true);
+      context.options.set(MainOptions.INTPARSE, true);
       boolean cust = true;
       try {
         new CreateDB(NAME, doc).execute(context);
@@ -75,21 +75,21 @@ public final class XMLParserTest extends SandboxTest {
     // list all errors
     if(sb.length() != 0) fail(sb.toString());
 
-    context.options.set(Options.MAINMEM, false);
+    context.options.set(MainOptions.MAINMEM, false);
   }
 
   /**
-   * Tests the namespace stripping option (Option {@link Options#STRIPNS}).
+   * Tests the namespace stripping option (Option {@link MainOptions#STRIPNS}).
    * @throws Exception exceptions
    */
   @Test
   public void parse() throws Exception {
-    context.options.set(Options.STRIPNS, true);
-    context.options.set(Options.SERIALIZER, "indent=no");
+    context.options.set(MainOptions.STRIPNS, true);
+    context.options.set(MainOptions.SERIALIZER, "indent=no");
 
     final String doc = "<e xmlns='A'><b:f xmlns:b='B'/></e>";
     for(final boolean b : new boolean[] { false, true }) {
-      context.options.set(Options.INTPARSE, b);
+      context.options.set(MainOptions.INTPARSE, b);
       new CreateDB(NAME, doc).execute(context);
       String result = new XQuery(".").execute(context);
       assertEquals("<e><f/></e>", result);
@@ -104,7 +104,7 @@ public final class XMLParserTest extends SandboxTest {
    */
   @Test
   public void xmlSpace() throws Exception {
-    context.options.set(Options.SERIALIZER, "indent=no");
+    context.options.set(MainOptions.SERIALIZER, "indent=no");
 
     final String in = "<x><a xml:space='default'> </a><a> </a>" +
         "<a xml:space='preserve'> </a></x>";
@@ -112,7 +112,7 @@ public final class XMLParserTest extends SandboxTest {
         "<a xml:space=\"preserve\"> </a></x>";
 
     for(final boolean b : new boolean[] { true, false }) {
-      context.options.set(Options.INTPARSE, b);
+      context.options.set(MainOptions.INTPARSE, b);
       new CreateDB(NAME, in).execute(context);
       final String result = new XQuery(".").execute(context);
       assertEquals("Internal parser: " + b, out, result);

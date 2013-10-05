@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CsvOptions extends AOptions {
+public final class CsvOptions extends Options {
   /** Option: encoding. */
   public static final Option ENCODING = new Option("encoding", Token.UTF8);
   /** Option: column separator. */
@@ -62,7 +62,7 @@ public final class CsvOptions extends AOptions {
    * @throws IOException I/O exception
    */
   public CsvOptions(final String opts) throws IOException {
-    parse(opts);
+    parse(opts, true);
   }
 
   /**
@@ -77,9 +77,7 @@ public final class CsvOptions extends AOptions {
     for(final CsvSep s : CsvSep.values()) {
       if(val.equals(s.toString())) return s.ch;
     }
-    final byte[] s = Token.token(sep);
-    final int sl = s.length;
-    if(sl > 0 && Token.cl(s, 0) == sl) return Token.cp(s, 0);
-    throw BXCS_CONFIG.thrwSerial(sep);
+    if(sep.length() != 1) BXCS_CONFSEP.thrwSerial(sep);
+    return sep.charAt(0);
   }
 }

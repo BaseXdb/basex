@@ -13,7 +13,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * The map item.
@@ -217,28 +216,6 @@ public final class Map extends FItem {
    */
   public boolean deep(final InputInfo ii, final Map o) throws QueryException {
     return root.deep(ii, o.root);
-  }
-
-  /**
-   * Converts the map to a map with keys and values represented as tokens.
-   * @param ii input info
-   * @return token map
-   * @throws QueryException query exception
-   */
-  public TokenMap tokenMap(final InputInfo ii) throws QueryException {
-    final TokenMap tm = new TokenMap();
-    final ValueIter vi = keys().iter();
-    for(Item it; (it = vi.next()) != null;) {
-      if(!(it instanceof AStr)) FUNCMP.thrw(ii, description(), AtomType.STR, it.type);
-      final Value v = get(it, ii);
-      if(!v.isItem()) FUNCMP.thrw(ii, description(), AtomType.ITEM, v);
-      final byte[] key = it.string(null);
-      byte[] val = ((Item) v).string(ii);
-      final byte[] o = tm.get(key);
-      if(o != null) val = new TokenBuilder(o).add(',').add(val).finish();
-      tm.put(key, val);
-    }
-    return tm;
   }
 
   @Override

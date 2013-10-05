@@ -18,7 +18,7 @@ public final class CollAddTest extends SandboxTest {
    */
   @BeforeClass
   public static void init() throws Exception {
-    new Set(Options.INTPARSE, true).execute(context);
+    new Set(MainOptions.INTPARSE, true).execute(context);
   }
 
   /**
@@ -91,7 +91,7 @@ public final class CollAddTest extends SandboxTest {
    * @throws Exception exception
    */
   private static void add(final int n, final boolean flush) throws Exception {
-    new Set(Options.AUTOFLUSH, flush).execute(context);
+    new Set(MainOptions.AUTOFLUSH, flush).execute(context);
 
     // Create test database
     final Command cmd = new CreateDB(NAME);

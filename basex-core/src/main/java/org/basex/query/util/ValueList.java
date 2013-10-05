@@ -51,6 +51,6 @@ public final class ValueList extends ElementList {
 
   @Override
   public String toString() {
-    return Util.name(this) + Arrays.toString(Arrays.copyOf(list, size));
+    return Util.className(this) + Arrays.toString(Arrays.copyOf(list, size));
   }
 }

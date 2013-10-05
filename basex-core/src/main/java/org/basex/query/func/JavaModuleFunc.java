@@ -66,7 +66,7 @@ public final class JavaModuleFunc extends JavaMapping {
     final TokenBuilder expect = new TokenBuilder();
     for(final Class<?> c : mth.getParameterTypes()) {
       if(!expect.isEmpty()) expect.add(", ");
-      expect.add(c.getSimpleName());
+      expect.add(Util.className(c));
     }
     throw JAVAMOD.thrw(info, mth.getName() + '(' + expect + ')',
         mth.getName() + '(' + foundArgs(vals) + ')');
@@ -92,7 +92,7 @@ public final class JavaModuleFunc extends JavaMapping {
    * @return string
    */
   private String name() {
-    return module.getClass().getSimpleName() + ':' + mth.getName();
+    return Util.className(module) + ':' + mth.getName();
   }
 
   @Override

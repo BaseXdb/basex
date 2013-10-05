@@ -506,7 +506,7 @@ public final class GUI extends AGUI {
   * @param opt option to be set
   * @param val value
   */
- private void set(final AOptions options, final Option opt, final Object val) {
+ private void set(final Options options, final Option opt, final Object val) {
    if(!options.sameAs(opt, val)) {
      final Set cmd = new Set(opt, val);
      cmd.run(context);
@@ -583,8 +583,8 @@ public final class GUI extends AGUI {
     filter.setEnabled(marked != null && marked.size() != 0);
 
     final boolean inf = gopts.is(GUIOptions.SHOWINFO);
-    context.options.set(Options.QUERYINFO, inf);
-    context.options.set(Options.XMLPLAN, inf);
+    context.options.set(MainOptions.QUERYINFO, inf);
+    context.options.set(MainOptions.XMLPLAN, inf);
 
     final Data data = context.data();
     final int t = mode.getSelectedIndex();
@@ -613,7 +613,7 @@ public final class GUI extends AGUI {
    * @param n number of results
    */
   private void setResults(final long n) {
-    int mh = context.options.num(Options.MAXHITS);
+    int mh = context.options.num(MainOptions.MAXHITS);
     if(mh < 0) mh = Integer.MAX_VALUE;
     hits.setText(Util.info(RESULTS_X, (n >= mh ? "\u2265" : "") + n));
   }

@@ -155,7 +155,7 @@ public final class DialogPrefs extends BaseXDialog {
     opts.write();
 
     final int mh = hitsAsProperty();
-    gui.context.options.set(Options.MAXHITS, mh);
+    gui.context.options.set(MainOptions.MAXHITS, mh);
 
     final GUIOptions gopts = gui.gopts;
     gopts.set(GUIOptions.MOUSEFOCUS, focus.isSelected());
@@ -187,7 +187,7 @@ public final class DialogPrefs extends BaseXDialog {
    * @return maximum number of hits
    */
   private int hitsForSlider() {
-    int mh = gui.gopts.num(Options.MAXHITS);
+    int mh = gui.gopts.num(MainOptions.MAXHITS);
     if(mh == -1) mh = Integer.MAX_VALUE;
     final int hl = HITS.length - 1;
     int h = -1;

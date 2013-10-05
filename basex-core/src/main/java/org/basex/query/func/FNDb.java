@@ -30,7 +30,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -451,9 +450,9 @@ public final class FNDb extends StandardFunc {
     final Data data = checkData(ctx);
     final String path = string(checkStr(expr[1], ctx));
     final Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final SerializerOptions sp = FuncParams.serializerProp(it, info);
+    final SerializerOptions sopts = FuncOptions.serializer(it, info);
     try {
-      Export.export(data, path, sp, null);
+      Export.export(data, path, sopts, null);
     } catch(final SerializerException ex) {
       throw ex.getCause(info);
     } catch(final IOException ex) {
@@ -667,8 +666,10 @@ public final class FNDb extends StandardFunc {
     }
 
     final Item opt = expr.length > 3 ? expr[3].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
-    ctx.updates.add(new DBCreate(info, name, inputs, map, ctx), ctx);
+
+    final Options opts = new Options();
+    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
+    ctx.updates.add(new DBCreate(info, name, inputs, opts, ctx), ctx);
     return null;
   }
 
@@ -727,9 +728,10 @@ public final class FNDb extends StandardFunc {
     final boolean all = expr.length > 1 && checkBln(expr[1], ctx);
 
     final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
+    final Options opts = new Options();
+    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
     // check database options
-    ctx.updates.add(new DBOptimize(data, ctx, all, map, info), ctx);
+    ctx.updates.add(new DBOptimize(data, ctx, all, opts, info), ctx);
     return null;
   }
 

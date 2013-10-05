@@ -18,21 +18,24 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class AOptions implements Iterable<String> {
+public class Options implements Iterable<String> {
   /** Comment in configuration file. */
   private static final String PROPUSER = "# Local Options";
 
   /** Options. */
   private final TreeMap<String, Object> options = new TreeMap<String, Object>();
+  /** Free options. */
+  private final HashMap<String, String> free = new HashMap<String, String>();
   /** Options, cached from an input file. */
   private final StringBuilder user = new StringBuilder();
+
   /** Options file. */
   private IOFile file;
 
   /**
    * Constructor.
    */
-  public AOptions() {
+  public Options() {
     this(null);
   }
 
@@ -40,10 +43,10 @@ public abstract class AOptions implements Iterable<String> {
    * Constructor, reading options from a configuration file.
    * @param suffix if {@code null}, file parsing will be skipped
    */
-  public AOptions(final String suffix) {
+  public Options(final String suffix) {
     try {
       for(final Option opt : options(getClass())) {
-        if(opt.value != null) options.put(opt.key, opt.value);
+        if(opt.value != null) options.put(opt.name, opt.value);
       }
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -63,26 +66,26 @@ public abstract class AOptions implements Iterable<String> {
       bw = new BufferedWriter(new FileWriter(file.file()));
       for(final Option opt : options(getClass())) {
         if(opt.value == null) {
-          bw.write(NL + "# " + opt.key + NL);
+          bw.write(NL + "# " + opt.name + NL);
           continue;
         }
 
-        final Object val = options.get(opt.key);
+        final Object val = options.get(opt.name);
         if(val instanceof String[]) {
           final String[] str = (String[]) val;
-          bw.write(opt.key + " = " + str.length + NL);
+          bw.write(opt.name + " = " + str.length + NL);
           final int is = str.length;
           for(int i = 0; i < is; ++i) {
-            if(str[i] != null) bw.write(opt.key + (i + 1) + " = " + str[i] + NL);
+            if(str[i] != null) bw.write(opt.name + (i + 1) + " = " + str[i] + NL);
           }
         } else if(val instanceof int[]) {
           final int[] num = (int[]) val;
           final int ns = num.length;
           for(int i = 0; i < ns; ++i) {
-            bw.write(opt.key + i + " = " + num[i] + NL);
+            bw.write(opt.name + i + " = " + num[i] + NL);
           }
         } else {
-          bw.write(opt.key + " = " + val + NL);
+          bw.write(opt.name + " = " + val + NL);
         }
       }
       bw.write(NL + PROPUSER + NL);
@@ -155,7 +158,7 @@ public abstract class AOptions implements Iterable<String> {
    * @param val value to be written
    */
   public final synchronized void set(final Option option, final String val) {
-    setObject(option.key, val);
+    setObject(option.name, val);
   }
 
   /**
@@ -164,7 +167,7 @@ public abstract class AOptions implements Iterable<String> {
    * @param val value to be written
    */
   public final synchronized void set(final Option option, final int val) {
-    setObject(option.key, val);
+    setObject(option.name, val);
   }
 
   /**
@@ -173,7 +176,7 @@ public abstract class AOptions implements Iterable<String> {
    * @param val value to be written
    */
   public final synchronized void set(final Option option, final boolean val) {
-    setObject(option.key, val);
+    setObject(option.name, val);
   }
 
   /**
@@ -182,7 +185,7 @@ public abstract class AOptions implements Iterable<String> {
    * @param val value to be written
    */
   public final synchronized void set(final Option option, final String[] val) {
-    setObject(option.key, val);
+    setObject(option.name, val);
   }
 
   /**
@@ -191,7 +194,7 @@ public abstract class AOptions implements Iterable<String> {
    * @param val value to be written
    */
   public final synchronized void set(final Option option, final int[] val) {
-    setObject(option.key, val);
+    setObject(option.name, val);
   }
 
   /**
@@ -210,8 +213,23 @@ public abstract class AOptions implements Iterable<String> {
    * @return final value, or {@code null} if the key has not been found
    */
   public final synchronized String set(final String key, final String val) {
+    return set(key, val, false);
+  }
+
+  /**
+   * Sets the specified value after casting it to the correct type.
+   * @param key key
+   * @param val value
+   * @param cache cache unknown (free) options
+   * @return final value, or {@code null} if the key has not been found
+   */
+  public final synchronized String set(final String key, final String val,
+      final boolean cache) {
     final Object type = get(key);
-    if(type == null) return null;
+    if(type == null) {
+      if(cache) free.put(key, val);
+      return null;
+    }
 
     String v = val;
     if(type instanceof Boolean) {
@@ -224,9 +242,25 @@ public abstract class AOptions implements Iterable<String> {
     } else if(type instanceof String) {
       setObject(key, val);
     } else {
-      Util.notexpected("Unknown option type: " + type.getClass().getSimpleName());
+      throw new IllegalArgumentException("Unknown option type: " + Util.className(type));
     }
     return v;
+  }
+
+  /**
+   * Returns all name/value pairs without pre-defined option.
+   * @return options
+   */
+  public final synchronized HashMap<String, String> free() {
+    return free;
+  }
+
+  /**
+   * Indicates if allowed options are pre-defined.
+   * @return result of check
+   */
+  public final synchronized boolean predefined() {
+    return !options.isEmpty();
   }
 
   /**
@@ -258,7 +292,7 @@ public abstract class AOptions implements Iterable<String> {
    * @return result of check
    */
   public final synchronized boolean sameAs(final Option option, final Object val) {
-    return options.get(option.key).equals(val);
+    return options.get(option.name).equals(val);
   }
 
   /**
@@ -289,8 +323,8 @@ public abstract class AOptions implements Iterable<String> {
     }
     // assign properties
     for(final String key : sl) {
-      final String k = key.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
-      set(k, System.getProperty(key));
+      final String v = System.getProperty(key);
+      set(key.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH), v);
     }
   }
 
@@ -317,13 +351,13 @@ public abstract class AOptions implements Iterable<String> {
    * @return value, or empty string
    */
   public static String getSystem(final Option option) {
-    return getSystem(option.key);
+    return getSystem(option.name);
   }
 
   /**
    * Returns a system property. If necessary, the key will
    * be converted to lower-case and prefixed with {@link Prop#DBPREFIX}.
-   * @param key {@link Options} key
+   * @param key {@link MainOptions} key
    * @return value, or empty string
    */
   public static String getSystem(final String key) {
@@ -339,7 +373,7 @@ public abstract class AOptions implements Iterable<String> {
    * @param val value
    */
   public static void setSystem(final Option option, final Object val) {
-    setSystem(option.key, val);
+    setSystem(option.name, val);
   }
 
   /**
@@ -360,7 +394,7 @@ public abstract class AOptions implements Iterable<String> {
    * @return option instances
    * @throws IllegalAccessException exception
    */
-  public static final Option[] options(final Class<? extends AOptions> clz)
+  public static final Option[] options(final Class<? extends Options> clz)
       throws IllegalAccessException {
 
     final ArrayList<Option> opts = new ArrayList<Option>();
@@ -377,9 +411,22 @@ public abstract class AOptions implements Iterable<String> {
   /**
    * Parses an option string and sets the options accordingly.
    * @param string options string
-   * @throws IOException io exception
+   * @param error throw exception when a value is unknown
+   * @throws BaseXException database exception
    */
-  protected final synchronized void parse(final String string) throws IOException {
+  protected final synchronized void parse(final String string, final boolean error)
+      throws BaseXException {
+    final BaseXException ex = parse(string);
+    if(error && ex != null) throw ex;
+  }
+
+  /**
+   * Parses an option string and sets the options accordingly.
+   * @param string options string
+   * @return exception, or {@code null}
+   */
+  public final synchronized BaseXException parse(final String string) {
+    free.clear();
     final int sl = string.length();
     int i = 0;
     while(i < sl) {
@@ -394,12 +441,14 @@ public abstract class AOptions implements Iterable<String> {
         val.append(ch);
       }
       try {
-        if(set(key, val.toString()) != null) continue;
+        if(set(key, val.toString(), true) != null) continue;
       } catch(final Exception ex) {
-        throw new BaseXException(Text.INVALID_VALUE_X_X, key, val);
+        return new BaseXException(Text.INVALID_VALUE_X_X, key, val);
       }
-      throw new BaseXException(unknown(key));
     }
+
+    return free.isEmpty() ? null :
+      new BaseXException(unknown(free.keySet().iterator().next()));
   }
 
   // PRIVATE METHODS ====================================================================
@@ -491,7 +540,7 @@ public abstract class AOptions implements Iterable<String> {
       if(err.isEmpty()) {
         boolean ok = true;
         for(final Option opt : options(getClass())) {
-          if(ok && opt.value != null) ok = read.contains(opt.key);
+          if(ok && opt.value != null) ok = read.contains(opt.name);
         }
         if(!ok) err.addExt("Saving options in \"%\"..." + NL, file);
       }
@@ -512,11 +561,11 @@ public abstract class AOptions implements Iterable<String> {
    * @return result
    */
   private Object get(final Option opt, final Class<?> c) {
-    final Object entry = options.get(opt.key);
-    if(entry == null) Util.notexpected("Option " + opt.key + " not defined.");
+    final Object entry = options.get(opt.name);
+    if(entry == null) Util.notexpected("Option " + opt.name + " not defined.");
 
     final Class<?> cc = entry.getClass();
-    if(c != cc) Util.notexpected("Option '" + opt.key + "' is a " + Util.name(cc));
+    if(c != cc) Util.notexpected("Option '" + opt.name + "' is a " + Util.className(cc));
     return entry;
   }
 }

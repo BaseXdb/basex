@@ -200,7 +200,7 @@ public final class VarScope {
 
   @Override
   public String toString() {
-    return Util.name(this) + vars.toString();
+    return Util.className(this) + vars.toString();
   }
 
   /**

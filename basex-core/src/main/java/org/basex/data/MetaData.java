@@ -25,7 +25,7 @@ public final class MetaData {
   /** Database path. Set to {@code null} if database is in main memory. */
   public final IOFile path;
   /** Database options. */
-  public final Options options;
+  public final MainOptions options;
 
   /** Database name. */
   public volatile String name;
@@ -101,7 +101,7 @@ public final class MetaData {
    * Constructor, specifying the database options.
    * @param opts database options
    */
-  public MetaData(final Options opts) {
+  public MetaData(final MainOptions opts) {
     this("", opts, null);
   }
 
@@ -120,21 +120,21 @@ public final class MetaData {
    * @param opts database options
    * @param gopts global options
    */
-  private MetaData(final String db, final Options opts, final GlobalOptions gopts) {
+  private MetaData(final String db, final MainOptions opts, final GlobalOptions gopts) {
     path = gopts != null ? gopts.dbpath(db) : null;
     options = opts;
     name = db;
-    chop = options.is(Options.CHOP);
-    createtext = options.is(Options.TEXTINDEX);
-    createattr = options.is(Options.ATTRINDEX);
-    createftxt = options.is(Options.FTINDEX);
-    diacritics = options.is(Options.DIACRITICS);
-    stemming = options.is(Options.STEMMING);
-    casesens = options.is(Options.CASESENS);
-    updindex = options.is(Options.UPDINDEX);
-    maxlen = options.num(Options.MAXLEN);
-    maxcats = options.num(Options.MAXCATS);
-    stopwords = options.get(Options.STOPWORDS);
+    chop = options.is(MainOptions.CHOP);
+    createtext = options.is(MainOptions.TEXTINDEX);
+    createattr = options.is(MainOptions.ATTRINDEX);
+    createftxt = options.is(MainOptions.FTINDEX);
+    diacritics = options.is(MainOptions.DIACRITICS);
+    stemming = options.is(MainOptions.STEMMING);
+    casesens = options.is(MainOptions.CASESENS);
+    updindex = options.is(MainOptions.UPDINDEX);
+    maxlen = options.num(MainOptions.MAXLEN);
+    maxcats = options.num(MainOptions.MAXCATS);
+    stopwords = options.get(MainOptions.STOPWORDS);
     language = Language.get(options);
     users = new Users(null);
   }

@@ -135,9 +135,9 @@ public final class PinTest extends SandboxTest {
     // fail, close database and succeed
     noCloseOk(new CreateDB(NAME));
     // allow main-memory instances with same name
-    ok(new Set(Options.MAINMEM, true), CONTEXT2);
+    ok(new Set(MainOptions.MAINMEM, true), CONTEXT2);
     ok(new CreateDB(NAME), CONTEXT2);
-    ok(new Set(Options.MAINMEM, false), CONTEXT2);
+    ok(new Set(MainOptions.MAINMEM, false), CONTEXT2);
     // fail, close database and succeed
     ok(new Check(NAME), CONTEXT2);
     noCloseOk(new DropDB(NAME));

@@ -94,18 +94,18 @@ public final class DialogImport extends BaseXBack {
     add(panel);
     add(Box.createVerticalStrut(12));
 
-    final Options opts = gui.context.options;
+    final MainOptions opts = gui.context.options;
     final StringList parsers = new StringList(PARSING.length);
     for(final String p : PARSING) parsers.add(p.toUpperCase(Locale.ENGLISH));
 
     parser = new BaseXCombo(dial, parsers.toArray());
-    parser.setSelectedItem(opts.get(Options.PARSER).toUpperCase(Locale.ENGLISH));
-    filter = new BaseXTextField(opts.get(Options.CREATEFILTER), dial);
+    parser.setSelectedItem(opts.get(MainOptions.PARSER).toUpperCase(Locale.ENGLISH));
+    filter = new BaseXTextField(opts.get(MainOptions.CREATEFILTER), dial);
     BaseXLayout.setWidth(filter, 200);
 
-    addRaw = new BaseXCheckBox(ADD_RAW_FILES, opts.is(Options.ADDRAW), dial);
-    skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES, opts.is(Options.SKIPCORRUPT), dial);
-    archives = new BaseXCheckBox(PARSE_ARCHIVES, opts.is(Options.ADDARCHIVES), dial);
+    addRaw = new BaseXCheckBox(ADD_RAW_FILES, opts.is(MainOptions.ADDRAW), dial);
+    skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES, opts.is(MainOptions.SKIPCORRUPT), dial);
+    archives = new BaseXCheckBox(PARSE_ARCHIVES, opts.is(MainOptions.ADDARCHIVES), dial);
 
     final BaseXBack p = new BaseXBack(new TableLayout(2, 2, 20, 0));
     p.add(new BaseXLabel(INPUT_FORMAT, false, true).border(0, 0, 6, 0));
@@ -165,7 +165,7 @@ public final class DialogImport extends BaseXBack {
 
     final String type = parser();
     final boolean raw = type.equals(DataText.M_RAW);
-    addRaw.setEnabled(multi && !raw && !gui.context.options.is(Options.MAINMEM));
+    addRaw.setEnabled(multi && !raw && !gui.context.options.is(MainOptions.MAINMEM));
     skipCorrupt.setEnabled(!raw);
 
     if(comp == parser) {
@@ -185,11 +185,11 @@ public final class DialogImport extends BaseXBack {
    */
   void setOptions() {
     final String type = parser();
-    gui.set(Options.PARSER, type);
-    gui.set(Options.CREATEFILTER, filter.getText());
-    gui.set(Options.ADDARCHIVES, archives.isSelected());
-    gui.set(Options.SKIPCORRUPT, skipCorrupt.isSelected());
-    gui.set(Options.ADDRAW, addRaw.isSelected());
+    gui.set(MainOptions.PARSER, type);
+    gui.set(MainOptions.CREATEFILTER, filter.getText());
+    gui.set(MainOptions.ADDARCHIVES, archives.isSelected());
+    gui.set(MainOptions.SKIPCORRUPT, skipCorrupt.isSelected());
+    gui.set(MainOptions.ADDRAW, addRaw.isSelected());
     input.store();
     parsing.setOptions(type);
   }

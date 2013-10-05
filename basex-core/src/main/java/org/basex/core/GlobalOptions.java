@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class GlobalOptions extends AOptions {
+public final class GlobalOptions extends Options {
   /** Indicates if the user's home directory has been chosen as home directory. */
   private static final boolean USERHOME = Prop.HOME.equals(Prop.USERHOME);
 
@@ -95,11 +95,11 @@ public final class GlobalOptions extends AOptions {
     Prop.debug = is(DEBUG);
     final String ph = get(PROXYHOST);
     final String pp = Integer.toString(num(PROXYPORT));
-    AOptions.setSystem("http.proxyHost", ph);
-    AOptions.setSystem("http.proxyPort", pp);
-    AOptions.setSystem("https.proxyHost", ph);
-    AOptions.setSystem("https.proxyPort", pp);
-    AOptions.setSystem("http.nonProxyHosts", get(NONPROXYHOSTS));
+    Options.setSystem("http.proxyHost", ph);
+    Options.setSystem("http.proxyPort", pp);
+    Options.setSystem("https.proxyHost", ph);
+    Options.setSystem("https.proxyPort", pp);
+    Options.setSystem("http.nonProxyHosts", get(NONPROXYHOSTS));
   }
 
   /**

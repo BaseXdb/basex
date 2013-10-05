@@ -164,9 +164,9 @@ public final class QueryContext extends Proc {
   public QueryContext(final Context ctx) {
     context = ctx;
     nodes = ctx.current();
-    inf = ctx.options.is(Options.QUERYINFO) || Prop.debug;
-    sc = new StaticContext(ctx.options.is(Options.XQUERY3));
-    maxCalls = ctx.options.num(Options.TAILCALLS);
+    inf = ctx.options.is(MainOptions.QUERYINFO) || Prop.debug;
+    sc = new StaticContext(ctx.options.is(MainOptions.XQUERY3));
+    maxCalls = ctx.options.num(MainOptions.TAILCALLS);
     modules = new ModuleLoader(ctx);
   }
 
@@ -458,7 +458,7 @@ public final class QueryContext extends Proc {
     // if available, return parameters specified by the query
     if(serialOpts != null) return serialOpts;
     // retrieve global parameters
-    final String serial = context.options.get(Options.SERIALIZER);
+    final String serial = context.options.get(MainOptions.SERIALIZER);
     if(optional && serial.isEmpty()) return null;
     // otherwise, if requested, return default parameters
     return new SerializerOptions(serial);
@@ -536,7 +536,7 @@ public final class QueryContext extends Proc {
    */
   Result execute() throws QueryException {
     // limit number of hits to be returned and displayed
-    int max = context.options.num(Options.MAXHITS);
+    int max = context.options.num(MainOptions.MAXHITS);
     if(max < 0) max = Integer.MAX_VALUE;
 
     // evaluates the query

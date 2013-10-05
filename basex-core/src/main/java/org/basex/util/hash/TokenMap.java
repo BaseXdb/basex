@@ -71,7 +71,7 @@ public class TokenMap extends TokenSet {
       if(!tb.isEmpty()) tb.add(", ");
       if(keys[i] != null) tb.add(keys[i]).add(" = ").add(values[i]);
     }
-    return new TokenBuilder(Util.name(getClass())).add('[').add(tb.finish()).
+    return new TokenBuilder(Util.className(getClass())).add('[').add(tb.finish()).
         add(']').toString();
   }
 }

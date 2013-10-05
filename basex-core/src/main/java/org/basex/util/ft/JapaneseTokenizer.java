@@ -199,7 +199,7 @@ public class JapaneseTokenizer extends Tokenizer {
         else list.add(new Morpheme(srfc, ftr));
       }
     } catch(final Exception ex) {
-      Util.errln(Util.name(this) + ": " + ex);
+      Util.errln(Util.className(this) + ": " + ex);
     }
     tokenList = list;
     tokens = list.iterator();

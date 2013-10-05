@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class GUIOptions extends AOptions {
+public final class GUIOptions extends Options {
   // DATABASE & PROGRAM PATHS =================================================
 
   /** Comment: written to options file. */

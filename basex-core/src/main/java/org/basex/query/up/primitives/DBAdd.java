@@ -24,9 +24,7 @@ public final class DBAdd extends DBNew {
    * @param c database context
    * @param ii input info
    */
-  public DBAdd(final Data d, final NewInput it, final QueryContext c,
-      final InputInfo ii) {
-
+  public DBAdd(final Data d, final NewInput it, final QueryContext c, final InputInfo ii) {
     super(TYPE.DBADD, d, c, ii);
     inputs = new ArrayList<NewInput>();
     inputs.add(it);
@@ -57,6 +55,6 @@ public final class DBAdd extends DBNew {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + inputs + ']';
+    return Util.className(this) + '[' + inputs + ']';
   }
 }

@@ -678,7 +678,17 @@ public final class Token {
   }
 
   /**
-   * Compares several strings for equality.
+   * Compares two strings for equality. The arguments may be {@code null}.
+   * @param str1 first string
+   * @param str2 strings to be compared
+   * @return true if one test is successful
+   */
+  public static boolean eq(final String str1, final String str2) {
+    return str1 == null ? str2 == null : str1.equals(str2);
+  }
+
+  /**
+   * Compares several strings for equality. The arguments may be {@code null}.
    * @param str first string
    * @param strings strings to be compared
    * @return true if one test is successful

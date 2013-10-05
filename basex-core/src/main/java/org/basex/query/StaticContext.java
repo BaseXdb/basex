@@ -127,6 +127,6 @@ public final class StaticContext {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + baseIO() + ']';
+    return Util.className(this) + '[' + baseIO() + ']';
   }
 }

@@ -36,20 +36,20 @@ public final class FTBuilder extends IndexBuilder {
    * @throws IOException IOException
    */
   public FTBuilder(final Data d) throws IOException {
-    super(d, d.meta.options.num(Options.FTINDEXSPLITSIZE));
+    super(d, d.meta.options.num(MainOptions.FTINDEXSPLITSIZE));
     tree = new FTIndexTrees(d.meta.maxlen);
 
-    final Options opts = d.meta.options;
+    final MainOptions opts = d.meta.options;
     final FTOpt fto = new FTOpt();
-    fto.set(FTFlag.DC, opts.is(Options.DIACRITICS));
-    fto.set(FTFlag.CS, opts.is(Options.CASESENS));
-    fto.set(FTFlag.ST, opts.is(Options.STEMMING));
-    fto.sw = new StopWords(d, opts.get(Options.STOPWORDS));
+    fto.set(FTFlag.DC, opts.is(MainOptions.DIACRITICS));
+    fto.set(FTFlag.CS, opts.is(MainOptions.CASESENS));
+    fto.set(FTFlag.ST, opts.is(MainOptions.STEMMING));
+    fto.sw = new StopWords(d, opts.get(MainOptions.STOPWORDS));
     fto.ln = Language.get(opts);
 
     if(!Tokenizer.supportFor(fto.ln))
       throw new BaseXException(NO_TOKENIZER_X, fto.ln);
-    if(opts.is(Options.STEMMING) && !Stemmer.supportFor(fto.ln))
+    if(opts.is(MainOptions.STEMMING) && !Stemmer.supportFor(fto.ln))
       throw new BaseXException(NO_STEMMER_X, fto.ln);
 
     lex = new FTLexer(fto);

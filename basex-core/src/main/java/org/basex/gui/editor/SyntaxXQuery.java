@@ -50,7 +50,7 @@ public final class SyntaxXQuery extends Syntax {
       // add serialization parameters and database options
       addOptions(SerializerOptions.class);
       addOptions(GlobalOptions.class);
-      addOptions(Options.class);
+      addOptions(MainOptions.class);
     } catch(final Exception ex) {
       Util.stack(ex);
     }
@@ -61,10 +61,10 @@ public final class SyntaxXQuery extends Syntax {
    * @param opt option class
    * @throws Exception exception
    */
-  private static void addOptions(final Class<? extends AOptions> opt) throws Exception {
-    for(final Option o : AOptions.options(opt)) {
+  private static void addOptions(final Class<? extends Options> opt) throws Exception {
+    for(final Option o : Options.options(opt)) {
       if(o.value == null) continue;
-      Collections.addAll(FUNC, o.key.toLowerCase(Locale.ENGLISH).split("-"));
+      Collections.addAll(FUNC, o.name.toLowerCase(Locale.ENGLISH).split("-"));
     }
   }
 

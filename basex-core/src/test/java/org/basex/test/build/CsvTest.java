@@ -30,7 +30,7 @@ public final class CsvTest extends SandboxTest {
    */
   @BeforeClass
   public static void before() throws BaseXException {
-    new Set(Options.PARSER, DataText.M_CSV).execute(context);
+    new Set(MainOptions.PARSER, DataText.M_CSV).execute(context);
   }
 
   /**
@@ -47,7 +47,7 @@ public final class CsvTest extends SandboxTest {
    */
   @Before
   public void init() throws BaseXException {
-    new Set(Options.CSVPARSER, "header=true").execute(context);
+    new Set(MainOptions.CSVPARSER, "header=true").execute(context);
   }
 
   /**
@@ -80,7 +80,7 @@ public final class CsvTest extends SandboxTest {
     assertEquals("3", new XQuery("count(//Name)").execute(context));
     assertEquals("2", new XQuery("count(//Email)").execute(context));
 
-    new Set(Options.CSVPARSER, "header=true").execute(context);
+    new Set(MainOptions.CSVPARSER, "header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("3", new XQuery("count(//record)").execute(context));
     assertEquals("true", new XQuery("//text() = 'Picard?'").execute(context));
@@ -92,10 +92,10 @@ public final class CsvTest extends SandboxTest {
    */
   @Test
   public void sep() throws Exception {
-    new Set(Options.CSVPARSER, "separator=tab,header=true").execute(context);
+    new Set(MainOptions.CSVPARSER, "separator=tab,header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("0", new XQuery("count(//Name)").execute(context));
-    new Set(Options.CSVPARSER, "separator=;,header=true").execute(context);
+    new Set(MainOptions.CSVPARSER, "separator=;,header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("0", new XQuery("count(//Name)").execute(context));
   }

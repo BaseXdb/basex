@@ -88,7 +88,7 @@ public abstract class ANode extends Item {
    * @param opts database options
    * @return database node
    */
-  public DBNode dbCopy(final Options opts) {
+  public DBNode dbCopy(final MainOptions opts) {
     final MemData md = new MemData(opts);
     new DataBuilder(md).build(this);
     return new DBNode(md);

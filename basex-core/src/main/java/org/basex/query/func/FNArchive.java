@@ -57,16 +57,20 @@ public final class FNArchive extends StandardFunc {
   /** Value. */
   private static final String VALUE = "value";
 
-  /** Option: format. */
-  private static final byte[] FORMAT = token("format");
-  /** Option: algorithm. */
-  private static final byte[] ALGORITHM = token("algorithm");
   /** Option: algorithm: deflate. */
-  private static final byte[] DEFLATE = token("deflate");
+  private static final String DEFLATE = "deflate";
   /** Option: algorithm: stored. */
-  private static final byte[] STORED = token("stored");
+  private static final String STORED = "stored";
   /** Option: algorithm: unknown. */
-  private static final byte[] UNKNOWN = token("unknown");
+  private static final String UNKNOWN = "unknown";
+
+  /** Archive options. */
+  public static class ArchiveOptions extends Options {
+    /** Archiving format. */
+    public static final Option FORMAT = new Option("format", "zip");
+    /** Archiving algorithm. */
+    public static final Option ALGORITHM = new Option("algorithm", DEFLATE);
+  }
 
   /**
    * Constructor.
@@ -111,18 +115,19 @@ public final class FNArchive extends StandardFunc {
     final Iter entr = ctx.iter(expr[0]);
     final Iter cont = ctx.iter(expr[1]);
     final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
 
-    final byte[] f = map.get(FORMAT);
-    final String format = f != null ? string(lc(f)) : "zip";
-    final ArchiveOut out = ArchiveOut.get(format, info);
+    final ArchiveOptions opts = new ArchiveOptions();
+    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
+
+    final String format = opts.get(ArchiveOptions.FORMAT);
+    final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info);
     // check algorithm
-    final byte[] alg = map.get(ALGORITHM);
+    final String alg = opts.get(ArchiveOptions.ALGORITHM);
     int level = ZipEntry.DEFLATED;
     if(alg != null) {
       if(format.equals("zip") && !eq(alg, STORED, DEFLATE) ||
          format.equals("gzip") && !eq(alg, DEFLATE)) {
-        ARCH_SUPP.thrw(info, ALGORITHM, alg);
+        ARCH_SUPP.thrw(info, ArchiveOptions.ALGORITHM.name, alg);
       }
       if(eq(alg, STORED)) level = ZipEntry.STORED;
       else if(eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;
@@ -185,7 +190,7 @@ public final class FNArchive extends StandardFunc {
     final FElem e = new FElem(Q_OPTIONS).declareNS();
     if(format != null) e.add(new FElem(Q_FORMAT).add(VALUE, format));
     if(level >= 0) {
-      final byte[] lvl = level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN;
+      final String lvl = level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN;
       e.add(new FElem(Q_ALGORITHM).add(VALUE, lvl));
     }
     return e;

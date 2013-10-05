@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class JsonOptions extends AOptions {
+public final class JsonOptions extends Options {
   /** Option: encoding. */
   public static final Option ENCODING = new Option("encoding", Token.UTF8);
   /** Option: parser specification. */
@@ -76,7 +76,7 @@ public final class JsonOptions extends AOptions {
    * @throws IOException I/O exception
    */
   public JsonOptions(final String opts) throws IOException {
-    parse(opts);
+    parse(opts, true);
   }
 
   /**

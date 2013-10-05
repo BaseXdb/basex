@@ -96,7 +96,7 @@ final class DOTData {
       for(int c = 1; c < color.length; c++) {
         final Object o = color[c];
         final byte[] cl = o instanceof byte[] ? (byte[]) o :
-          Token.token(o instanceof Class ? Util.name((Class<?>) o) : o.toString());
+          Token.token(o instanceof Class ? Util.className((Class<?>) o) : o.toString());
         if(Token.eq(cl, s)) return color[0].toString();
       }
     }

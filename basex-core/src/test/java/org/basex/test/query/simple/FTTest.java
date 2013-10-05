@@ -547,32 +547,32 @@ public final class FTTest extends QueryTest {
   @Test
   @Override
   public void test() throws BaseXException {
-    final Options opts = context.options;
+    final MainOptions opts = context.options;
     if(ALL) {
       // testing all kinds of combinations
       for(int a = 0; a < 2; ++a) {
-        opts.set(Options.FTINDEX, a == 0);
+        opts.set(MainOptions.FTINDEX, a == 0);
         super.test();
       }
     } else {
       // single test
       //opts.set(Prop.MAINMEM, true);
-      opts.set(Options.FTINDEX, true);
-      opts.set(Options.STEMMING, true);
-      opts.set(Options.DIACRITICS, true);
-      opts.set(Options.CASESENS, true);
+      opts.set(MainOptions.FTINDEX, true);
+      opts.set(MainOptions.STEMMING, true);
+      opts.set(MainOptions.DIACRITICS, true);
+      opts.set(MainOptions.CASESENS, true);
       super.test();
     }
   }
 
   @Override
   protected String details() {
-    final Options opts = context.options;
+    final MainOptions opts = context.options;
     final StringBuilder sb = new StringBuilder();
-    sb.append(set(Options.FTINDEX, opts)).append(';');
-    sb.append(set(Options.STEMMING, opts)).append(';');
-    sb.append(set(Options.DIACRITICS, opts)).append(';');
-    sb.append(set(Options.CASESENS, opts));
+    sb.append(set(MainOptions.FTINDEX, opts)).append(';');
+    sb.append(set(MainOptions.STEMMING, opts)).append(';');
+    sb.append(set(MainOptions.DIACRITICS, opts)).append(';');
+    sb.append(set(MainOptions.CASESENS, opts));
     return sb.toString();
   }
 
@@ -582,7 +582,7 @@ public final class FTTest extends QueryTest {
    * @param opts options
    * @return string
    */
-  private static String set(final Option option, final AOptions opts) {
+  private static String set(final Option option, final Options opts) {
     return new Set(option, opts.is(option)).toString();
   }
 

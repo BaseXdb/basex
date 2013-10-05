@@ -22,7 +22,7 @@ public abstract class SingleParser extends Parser {
    * @param source input source
    * @param opts database options
    */
-  protected SingleParser(final IO source, final Options opts) {
+  protected SingleParser(final IO source, final MainOptions opts) {
     super(source, opts);
   }
 

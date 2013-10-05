@@ -65,21 +65,21 @@ public final class Util {
   }
 
   /**
-   * Returns the class name of the specified object.
-   * @param o object
+   * Returns the class name of the specified object, excluding its path.
+   * @param obj object
    * @return class name
    */
-  public static String name(final Object o) {
-    return name(o.getClass());
+  public static String className(final Object obj) {
+    return className(obj.getClass());
   }
 
   /**
-   * Returns the name of the specified class.
-   * @param o object
+   * Returns the name of the specified class, excluding its path.
+   * @param clz class
    * @return class name
    */
-  public static String name(final Class<?> o) {
-    return o.getSimpleName();
+  public static String className(final Class<?> clz) {
+    return clz.getSimpleName();
   }
 
   /**

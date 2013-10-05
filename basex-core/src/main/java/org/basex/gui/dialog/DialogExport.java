@@ -74,8 +74,8 @@ public final class DialogExport extends BaseXDialog {
     p.add(pp);
 
     // encoding
-    final Options opts = gui.context.options;
-    final String exporter = opts.get(Options.EXPORTER);
+    final MainOptions opts = gui.context.options;
+    final String exporter = opts.get(MainOptions.EXPORTER);
     final SerializerOptions sopts = new SerializerOptions(exporter);
 
     // encoding and method
@@ -172,7 +172,7 @@ public final class DialogExport extends BaseXDialog {
       try {
         final String par = params.getText();
         Serializer.get(new ArrayOutput(), new SerializerOptions(par));
-        gui.set(Options.EXPORTER, par);
+        gui.set(MainOptions.EXPORTER, par);
       } catch(final IOException ex) {
         ok = false;
         inf = ex.getLocalizedMessage();
@@ -193,7 +193,7 @@ public final class DialogExport extends BaseXDialog {
     final SerializerOptions sp = new SerializerOptions(params.getText());
     sp.set(SerializerOptions.S_METHOD, mth);
     sp.set(SerializerOptions.S_ENCODING, enc);
-    gui.set(Options.EXPORTER, parameters(sp, false));
+    gui.set(MainOptions.EXPORTER, parameters(sp, false));
 
     super.close();
     path.store();
@@ -207,7 +207,7 @@ public final class DialogExport extends BaseXDialog {
    */
   private String parameters(final SerializerOptions sopts, final boolean excl) {
     final String[] ex = !excl ? new String[0] : new String[] {
-        SerializerOptions.S_METHOD.key, SerializerOptions.S_ENCODING.key };
+        SerializerOptions.S_METHOD.name, SerializerOptions.S_ENCODING.name };
     final StringBuilder sb = new StringBuilder();
     for(final String key : sopts) {
       if(Token.eq(key, ex)) continue;

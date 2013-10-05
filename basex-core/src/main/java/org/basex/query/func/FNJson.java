@@ -13,7 +13,6 @@ import org.basex.query.util.json.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Functions for parsing and serializing JSON objects.
@@ -52,12 +51,11 @@ public final class FNJson extends StandardFunc {
    */
   private Item parse(final QueryContext ctx) throws QueryException {
     final byte[] input = checkStr(expr[0], ctx);
-    final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
+    final JsonOptions opts = new JsonOptions();
+    if(expr.length > 1) new FuncOptions(Q_OPTIONS, info).parse(expr[1].item(ctx, info), opts);
 
     try {
-      final JsonConverter conv = JsonConverter.get(options(map), info);
-      return conv.convert(string(input)).item(ctx, info);
+      return JsonConverter.get(opts, info).convert(string(input)).item(ctx, info);
     } catch(final SerializerException ex) {
       throw ex.getCause();
     }
@@ -72,30 +70,13 @@ public final class FNJson extends StandardFunc {
   private Str serialize(final QueryContext ctx) throws QueryException {
     final ANode node = checkNode(expr[0], ctx);
     final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
+    final JsonOptions opts = new JsonOptions();
+    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
 
-    final SerializerOptions opts = new SerializerOptions();
-    opts.set(S_METHOD, M_JSON);
-    opts.set(S_JSON, options(map).toString());
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(S_METHOD, M_JSON);
+    sopts.set(S_JSON, opts.toString());
     // serialize node and remove carriage returns
-    return Str.get(delete(serialize(node.iter(), opts), '\r'));
-  }
-
-  /**
-   * Creates JSON option.
-   * @param map map
-   * @return options
-   */
-  private JsonOptions options(final TokenMap map) {
-    final JsonOptions jopts = new JsonOptions();
-    final byte[] unesc = map.get(token(JsonOptions.UNESCAPE.key));
-    if(unesc != null) jopts.set(JsonOptions.UNESCAPE, Util.yes(string(unesc)));
-
-    final byte[] spec = map.get(token(JsonOptions.SPEC.key));
-    if(spec != null) jopts.set(JsonOptions.SPEC, string(spec));
-
-    final byte[] format = map.get(token(JsonOptions.FORMAT.key));
-    if(format != null) jopts.set(JsonOptions.FORMAT, string(format));
-    return jopts;
+    return Str.get(delete(serialize(node.iter(), sopts), '\r'));
   }
 }

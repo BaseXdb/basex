@@ -39,7 +39,7 @@ public abstract class Benchmark extends SandboxTest {
     session = local ? new LocalSession(context) : createClient();
 
     // create test database
-    session.execute(new Set(Options.QUERYINFO, true));
+    session.execute(new Set(MainOptions.QUERYINFO, true));
   }
 
   /**

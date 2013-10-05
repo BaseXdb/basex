@@ -27,7 +27,7 @@ public abstract class QueryTest extends SandboxTest {
   /** Prepares the tests. */
   @BeforeClass
   public static void startTest() {
-    context.options.set(Options.CACHEQUERY, true);
+    context.options.set(MainOptions.CACHEQUERY, true);
   }
 
   /**
@@ -37,7 +37,7 @@ public abstract class QueryTest extends SandboxTest {
   @Test
   public void test() throws BaseXException {
     final String file = doc.replaceAll("\"", "\\\\\"");
-    final String name = Util.name(QueryTest.class);
+    final String name = Util.className(QueryTest.class);
     final boolean up = this instanceof XQUPTest;
     new CreateDB(name, file).execute(context);
 
@@ -80,7 +80,7 @@ public abstract class QueryTest extends SandboxTest {
             final ValueBuilder vb = (ValueBuilder) val;
             for(final Item i : vb) types.add(i.type.toString()).add(" ");
           } else {
-            types.add(Util.name(val));
+            types.add(Util.className(val));
           }
           s = val.size() != 1 ? "#" + val.size() : "";
           sb.append("\n[F" + s + "] '" + val + "', " + types +
@@ -94,7 +94,7 @@ public abstract class QueryTest extends SandboxTest {
               ((Nodes) cmp).data != null) ? cmp.toString() : "()";
           sb.append("[" + qu[0] + "] " + query + "\n[E] " +
               cp + "\n[F] " +
-              (msg == null ? Util.name(ex) : msg.replaceAll("\r\n?|\n", " ")) + ' ' +
+              (msg == null ? Util.className(ex) : msg.replaceAll("\r\n?|\n", " ")) + ' ' +
               details() + '\n');
           ++fail;
         }

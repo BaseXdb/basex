@@ -6,6 +6,8 @@ import static org.basex.util.Reflect.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
@@ -18,7 +20,6 @@ import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Functions for performing XSLT transformations.
@@ -55,7 +56,7 @@ public final class FNXslt extends StandardFunc {
       while(s != 0 && find(IMPL[s]) == null) s -= 3;
       OFFSET = s;
       // set processor, or use default processor
-      if(s != 0) AOptions.setSystem(fac, IMPL[s]);
+      if(s != 0) Options.setSystem(fac, IMPL[s]);
     }
   }
 
@@ -102,14 +103,17 @@ public final class FNXslt extends StandardFunc {
     checkCreate(ctx);
     final IO in = read(checkItem(expr[0], ctx));
     final IO xsl = read(checkItem(expr[1], ctx));
-    final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(Q_PARAMETERS, info).parse(opt);
+
+    final Options opts = new Options();
+    if(expr.length > 2) {
+      new FuncOptions(Q_PARAMETERS, info).parse(expr[2].item(ctx, info), opts);
+    }
 
     final PrintStream tmp = System.err;
     final ArrayOutput ao = new ArrayOutput();
     try {
       System.setErr(new PrintStream(ao));
-      final byte[] result = transform(in, xsl, map);
+      final byte[] result = transform(in, xsl, opts.free());
       return node ? new DBNode(new IOContent(result), ctx.context.options) : Str.get(result);
     } catch(final IOException ex) {
       System.setErr(tmp);
@@ -152,7 +156,7 @@ public final class FNXslt extends StandardFunc {
    * @return transformed result
    * @throws TransformerException transformer exception
    */
-  private static byte[] transform(final IO in, final IO xsl, final TokenMap par)
+  private static byte[] transform(final IO in, final IO xsl, final HashMap<String, String> par)
       throws TransformerException {
 
     // create transformer
@@ -160,7 +164,8 @@ public final class FNXslt extends StandardFunc {
     final Transformer tr =  tc.newTransformer(xsl.streamSource());
 
     // bind parameters
-    for(final byte[] key : par) tr.setParameter(string(key), string(par.get(key)));
+    for(final Entry<String, String> entry : par.entrySet())
+      tr.setParameter(entry.getKey(), entry.getValue());
 
     // do transformation and return result
     final ArrayOutput ao = new ArrayOutput();

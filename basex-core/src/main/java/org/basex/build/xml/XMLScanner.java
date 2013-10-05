@@ -78,13 +78,13 @@ final class XMLScanner extends Proc {
    * @param frag allow parsing of document fragment
    * @throws IOException I/O exception
    */
-  XMLScanner(final IO f, final Options opts, final boolean frag) throws IOException {
+  XMLScanner(final IO f, final MainOptions opts, final boolean frag) throws IOException {
     input = new XMLInput(f);
     fragment = frag;
 
     try {
       for(int e = 0; e < ENTITIES.length; e += 2) ents.put(ENTITIES[e], ENTITIES[e + 1]);
-      dtd = opts.is(Options.DTD);
+      dtd = opts.is(MainOptions.DTD);
 
       String enc = null;
       // process document declaration...

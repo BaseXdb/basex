@@ -31,7 +31,7 @@ public final class CmdBuilder {
    * @return self instance
    */
   public CmdBuilder init() {
-    init(Util.name(cmd).toUpperCase(Locale.ENGLISH));
+    init(Util.className(cmd).toUpperCase(Locale.ENGLISH));
     return this;
   }
 

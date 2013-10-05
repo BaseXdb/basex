@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
+
 import java.io.*;
 
 import org.basex.build.*;
@@ -11,7 +12,6 @@ import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Functions for converting HTML to XML.
@@ -54,13 +54,12 @@ public final class FNHtml extends StandardFunc {
 
     // bind parameters
     final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
-    final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
-    final TokenBuilder tb = new TokenBuilder();
-    for(final byte[] key : map) tb.add(key).add('=').add(map.get(key)).add(',');
+    final HtmlOptions opts = new HtmlOptions();
+    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
 
     // convert html
     try {
-      return new DBNode(new HtmlParser(io, ctx.context.options, tb.toString()));
+      return new DBNode(new HtmlParser(io, ctx.context.options, opts));
     } catch(final IOException ex) {
       throw BXHL_IO.thrw(info, ex);
     }

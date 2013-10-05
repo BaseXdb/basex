@@ -27,7 +27,7 @@ public final class Get extends AGet {
    * @param option option to be found
    */
   public Get(final Option option) {
-    this(option.key);
+    this(option.name);
   }
 
   /**

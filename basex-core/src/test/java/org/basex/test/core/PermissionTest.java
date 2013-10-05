@@ -22,7 +22,7 @@ import org.junit.*;
  */
 public final class PermissionTest extends SandboxTest {
   /** Name of the database to be renamed. */
-  private static final String RENAMED = Util.name(PermissionTest.class) + 'r';
+  private static final String RENAMED = Util.className(PermissionTest.class) + 'r';
   /** Test repository. **/
   private static final String REPO = "src/test/resources/repo/";
 
@@ -102,8 +102,8 @@ public final class PermissionTest extends SandboxTest {
     no(new InfoIndex(), testSession);
     no(new InfoStorage(), testSession);
     no(new Get("DBPATH"), testSession);
-    ok(new Get(Options.QUERYINFO), testSession);
-    ok(new Set(Options.QUERYINFO, false), testSession);
+    ok(new Get(MainOptions.QUERYINFO), testSession);
+    ok(new Set(MainOptions.QUERYINFO, false), testSession);
 
     // repo Stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
@@ -142,8 +142,8 @@ public final class PermissionTest extends SandboxTest {
     ok(new InfoDB(), testSession);
     ok(new InfoStorage("1", "2"), testSession);
     no(new Get("DBPATH"), testSession);
-    ok(new Get(Options.QUERYINFO), testSession);
-    ok(new Set(Options.QUERYINFO, false), testSession);
+    ok(new Get(MainOptions.QUERYINFO), testSession);
+    ok(new Set(MainOptions.QUERYINFO, false), testSession);
     // XQuery read
     ok(new XQuery("//xml"), testSession);
     ok(new Find(NAME), testSession);

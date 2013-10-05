@@ -28,7 +28,7 @@ public abstract class SandboxTest {
   /** Null output stream. */
   public static final PrintStream NULL = new PrintStream(new NullOutput());
   /** Test name. */
-  public static final String NAME = Util.name(SandboxTest.class);
+  public static final String NAME = Util.className(SandboxTest.class);
   /** Database context. */
   public static Context context;
   /** Clean up files. */

@@ -94,7 +94,7 @@ final class MapList extends IntList {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.name(this) + '[');
+    final StringBuilder sb = new StringBuilder(Util.className(this) + '[');
     for(int i = 0; i < size; ++i) {
       sb.append(i == 0 ? "" : ", ").append(list[i]);
       if(weight != null) sb.append('/').append(weight[i]);

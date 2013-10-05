@@ -77,7 +77,7 @@ public final class Put extends BasicOperation {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + getTargetNode() + ", " + paths.get(0) + ']';
+    return Util.className(this) + '[' + getTargetNode() + ", " + paths.get(0) + ']';
   }
 
   @Override

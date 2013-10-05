@@ -172,7 +172,7 @@ public final class JavaFunc extends JavaMapping {
   @Override
   public String description() {
     final StringBuilder sb = new StringBuilder();
-    if(mth.equals(NEW)) sb.append(NEW).append(' ').append(cls.getSimpleName());
+    if(mth.equals(NEW)) sb.append(NEW).append(' ').append(Util.className(cls));
     else sb.append(name());
     return sb.append("(...)").toString();
   }
@@ -182,7 +182,7 @@ public final class JavaFunc extends JavaMapping {
    * @return string
    */
   private String name() {
-    return cls.getSimpleName() + '.' + mth;
+    return Util.className(cls) + '.' + mth;
   }
 
   @Override

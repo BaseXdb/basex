@@ -106,6 +106,6 @@ public abstract class NodeCopy extends UpdatePrimitive {
 
   @Override
   public final String toString() {
-    return Util.name(this) + '[' + getTargetNode() + ", " + size() + " ops]";
+    return Util.className(this) + '[' + getTargetNode() + ", " + size() + " ops]";
   }
 }

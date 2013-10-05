@@ -54,9 +54,9 @@ public final class IncUpdateTest extends SandboxTest {
    */
   @Before
   public void init() throws Exception {
-    new Set(Options.UPDINDEX, ixupdate).execute(context);
+    new Set(MainOptions.UPDINDEX, ixupdate).execute(context);
     new CreateDB(NAME, "<xml/>").execute(context);
-    new Set(Options.AUTOFLUSH, false).execute(context);
+    new Set(MainOptions.AUTOFLUSH, false).execute(context);
   }
 
   /**

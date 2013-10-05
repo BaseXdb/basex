@@ -14,7 +14,7 @@ import org.junit.*;
  */
 public class DiskDataTest extends MemDataTest {
   /** Test database name. */
-  private final String dbname = Util.name(DiskDataTest.class);
+  private final String dbname = Util.className(DiskDataTest.class);
 
   @Override
   @Before

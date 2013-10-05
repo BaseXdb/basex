@@ -30,8 +30,8 @@ public final class IndexOptimizeTest extends SandboxTest {
   @BeforeClass
   public static void start() throws Exception {
     new DropDB(NAME).execute(context);
-    new Set(Options.FTINDEX, true).execute(context);
-    new Set(Options.QUERYINFO, true).execute(context);
+    new Set(MainOptions.FTINDEX, true).execute(context);
+    new Set(MainOptions.QUERYINFO, true).execute(context);
   }
 
   /**
@@ -140,7 +140,7 @@ public final class IndexOptimizeTest extends SandboxTest {
    */
   @Test
   public void ftTestLang() throws Exception {
-    new Set(Options.LANGUAGE, "de").execute(context);
+    new Set(MainOptions.LANGUAGE, "de").execute(context);
     createDoc();
     new Open(NAME).execute(context);
     check("//text()[. contains text 'test' using language 'de']");
@@ -217,8 +217,8 @@ public final class IndexOptimizeTest extends SandboxTest {
 
       // check if index is used
       qp = new QueryProcessor(plan + "/descendant-or-self::*" +
-          "[self::" + Util.name(ValueAccess.class) +
-          "|self::" + Util.name(FTIndexAccess.class) + "]", context);
+          "[self::" + Util.className(ValueAccess.class) +
+          "|self::" + Util.className(FTIndexAccess.class) + "]", context);
       ao = qp.execute().serialize();
       assertFalse("No index used:\nQuery: " + query + "\nInfo: " + info +
           "\nPlan: " + plan, ao.toString().isEmpty());

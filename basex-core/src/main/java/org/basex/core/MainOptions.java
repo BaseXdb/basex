@@ -8,7 +8,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class Options extends AOptions {
+public final class MainOptions extends Options {
   // General
 
   /** Flag for creating a main memory database. */

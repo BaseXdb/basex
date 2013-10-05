@@ -23,7 +23,7 @@ public final class MemData extends Data {
    * @param ns namespaces
    * @param opts database options
    */
-  public MemData(final PathSummary ps, final Namespaces ns, final Options opts) {
+  public MemData(final PathSummary ps, final Namespaces ns, final MainOptions opts) {
     this(null, null, ps, ns, opts, null, null);
   }
 
@@ -38,7 +38,7 @@ public final class MemData extends Data {
    * @param atv attribute value index
    */
   public MemData(final Names tag, final Names att, final PathSummary ps,
-      final Namespaces ns, final Options opts, final Index txt, final Index atv) {
+      final Namespaces ns, final MainOptions opts, final Index txt, final Index atv) {
 
     meta = new MetaData(opts);
     table = new TableMemAccess(meta);
@@ -69,7 +69,7 @@ public final class MemData extends Data {
    * Constructor, creating a new, empty database.
    * @param opts database options
    */
-  public MemData(final Options opts) {
+  public MemData(final MainOptions opts) {
     this(null, null, opts);
   }
 

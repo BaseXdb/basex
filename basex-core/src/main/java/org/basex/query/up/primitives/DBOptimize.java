@@ -9,7 +9,6 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Update primitive for the optimize function.
@@ -26,16 +25,16 @@ public final class DBOptimize extends DBNew {
    * @param dt data
    * @param ctx database context
    * @param al optimize all database structures flag
-   * @param map index options
+   * @param opts database options
    * @param ii input info
    * @throws QueryException query exception
    */
   public DBOptimize(final Data dt, final QueryContext ctx, final boolean al,
-      final TokenMap map, final InputInfo ii) throws QueryException {
+      final Options opts, final InputInfo ii) throws QueryException {
 
     super(TYPE.DBOPTIMIZE, dt, ctx, ii);
     all = al;
-    options = map;
+    options = opts.free();
     check(false);
   }
 
@@ -50,21 +49,21 @@ public final class DBOptimize extends DBNew {
   @Override
   public void apply() throws QueryException {
     final MetaData meta = data.meta;
-    final Options opts = meta.options;
+    final MainOptions opts = meta.options;
 
-    nprops.put(Options.TEXTINDEX, meta.createtext);
-    nprops.put(Options.ATTRINDEX, meta.createattr);
-    nprops.put(Options.FTINDEX, meta.createftxt);
+    nprops.put(MainOptions.TEXTINDEX, meta.createtext);
+    nprops.put(MainOptions.ATTRINDEX, meta.createattr);
+    nprops.put(MainOptions.FTINDEX,   meta.createftxt);
     initOptions();
     assignOptions();
 
-    final boolean rebuild = opts.num(Options.MAXCATS) != meta.maxcats ||
-        opts.num(Options.MAXLEN) != meta.maxlen;
-    meta.maxcats = opts.num(Options.MAXCATS);
-    meta.maxlen  = opts.num(Options.MAXLEN);
-    meta.createtext = opts.is(Options.TEXTINDEX);
-    meta.createattr = opts.is(Options.ATTRINDEX);
-    meta.createftxt = opts.is(Options.FTINDEX);
+    final boolean rebuild = opts.num(MainOptions.MAXCATS) != meta.maxcats ||
+        opts.num(MainOptions.MAXLEN) != meta.maxlen;
+    meta.maxcats = opts.num(MainOptions.MAXCATS);
+    meta.maxlen  = opts.num(MainOptions.MAXLEN);
+    meta.createtext = opts.is(MainOptions.TEXTINDEX);
+    meta.createattr = opts.is(MainOptions.ATTRINDEX);
+    meta.createftxt = opts.is(MainOptions.FTINDEX);
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, null);

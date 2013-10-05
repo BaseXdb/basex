@@ -126,9 +126,9 @@ public final class Add extends ACreate {
    */
   private boolean cache(final Parser parser) {
     // main memory mode: never write to disk
-    if(options.is(Options.MAINMEM)) return false;
+    if(options.is(MainOptions.MAINMEM)) return false;
     // explicit caching
-    if(options.is(Options.ADDCACHE)) return true;
+    if(options.is(MainOptions.ADDCACHE)) return true;
 
     // create disk instances for large documents
     // (does not work for input streams and directories)

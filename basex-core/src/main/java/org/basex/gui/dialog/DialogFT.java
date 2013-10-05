@@ -54,16 +54,16 @@ final class DialogFT extends BaseXBack {
     dialog = d;
     layout(new TableLayout(create ? 9 : 15, 1));
 
-    final Options opts = d.gui.context.options;
+    final MainOptions opts = d.gui.context.options;
     add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 6, 0));
 
-    final String sw = opts.get(Options.STOPWORDS);
+    final String sw = opts.get(MainOptions.STOPWORDS);
     final String[] cb = { LANGUAGE, STEMMING, CASE_SENSITIVITY, DIACRITICS,
         STOPWORD_LIST };
     final String[] desc = { H_LANGUAGE, H_STEMMING, H_CASE, H_DIACRITICS, H_STOPWORDS };
     final boolean[] val = {
-      !opts.get(Options.LANGUAGE).isEmpty(), opts.is(Options.STEMMING),
-      opts.is(Options.CASESENS), opts.is(Options.DIACRITICS), !sw.isEmpty() };
+      !opts.get(MainOptions.LANGUAGE).isEmpty(), opts.is(MainOptions.STEMMING),
+      opts.is(MainOptions.CASESENS), opts.is(MainOptions.DIACRITICS), !sw.isEmpty() };
 
     final BaseXLabel[] labels = new BaseXLabel[FLAGS];
     for(int f = 0; f < check.length; ++f) {
@@ -150,11 +150,11 @@ final class DialogFT extends BaseXBack {
   void setOptions() {
     final GUI gui = dialog.gui;
     final String lang = language.getSelectedItem().toString();
-    gui.set(Options.LANGUAGE, check[F_LANG].isSelected() ?
+    gui.set(MainOptions.LANGUAGE, check[F_LANG].isSelected() ?
         Language.get(lang.replaceFirst(" \\(.*", "")).toString() : "");
-    gui.set(Options.STEMMING, check[F_STEM].isSelected());
-    gui.set(Options.CASESENS, check[F_CASE].isSelected());
-    gui.set(Options.DIACRITICS, check[F_DIA].isSelected());
-    gui.set(Options.STOPWORDS, check[F_STOP].isSelected() ? swpath.getText() : "");
+    gui.set(MainOptions.STEMMING, check[F_STEM].isSelected());
+    gui.set(MainOptions.CASESENS, check[F_CASE].isSelected());
+    gui.set(MainOptions.DIACRITICS, check[F_DIA].isSelected());
+    gui.set(MainOptions.STOPWORDS, check[F_STOP].isSelected() ? swpath.getText() : "");
   }
 }

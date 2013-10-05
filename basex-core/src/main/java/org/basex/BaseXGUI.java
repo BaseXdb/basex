@@ -62,9 +62,9 @@ public final class BaseXGUI {
     // read options
     final GUIOptions gopts = new GUIOptions();
     // cache results to pass them on to all visualizations
-    context.options.set(Options.CACHEQUERY, true);
+    context.options.set(MainOptions.CACHEQUERY, true);
     // reduce number of results to save memory
-    context.options.set(Options.MAXHITS, gopts.num(GUIOptions.MAXHITS));
+    context.options.set(MainOptions.MAXHITS, gopts.num(GUIOptions.MAXHITS));
 
     // initialize fonts and colors
     GUIConstants.init(gopts);

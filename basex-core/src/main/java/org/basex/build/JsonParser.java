@@ -17,7 +17,7 @@ import org.basex.query.value.item.*;
  * and converts them to XML.
  *
  * <p>The parser provides some options, which can be specified via the
- * {@link Options#JSONPARSER} option.</p>
+ * {@link MainOptions#JSONPARSER} option.</p>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -29,8 +29,8 @@ public final class JsonParser extends XMLParser {
    * @param opts database options
    * @throws IOException I/O exception
    */
-  public JsonParser(final IO source, final Options opts) throws IOException {
-    this(source, opts, opts.get(Options.JSONPARSER));
+  public JsonParser(final IO source, final MainOptions opts) throws IOException {
+    this(source, opts, opts.get(MainOptions.JSONPARSER));
   }
 
   /**
@@ -40,7 +40,7 @@ public final class JsonParser extends XMLParser {
    * @param parser parser options
    * @throws IOException I/O exception
    */
-  public JsonParser(final IO source, final Options opts, final String parser)
+  public JsonParser(final IO source, final MainOptions opts, final String parser)
       throws IOException {
     super(toXML(source, parser), opts);
   }

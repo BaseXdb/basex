@@ -79,9 +79,9 @@ public final class InfoDB extends AInfo {
         info(tb, TEXT_INDEX, Util.flag(meta.textindex));
         info(tb, ATTRIBUTE_INDEX, Util.flag(meta.attrindex));
         info(tb, FULLTEXT_INDEX, Util.flag(meta.ftxtindex));
-        info(tb, Options.UPDINDEX.key, Util.flag(meta.updindex));
-        info(tb, Options.MAXCATS.key, meta.maxcats);
-        info(tb, Options.MAXLEN.key, meta.maxlen);
+        info(tb, MainOptions.UPDINDEX.name, Util.flag(meta.updindex));
+        info(tb, MainOptions.MAXCATS.name, meta.maxcats);
+        info(tb, MainOptions.MAXLEN.name, meta.maxlen);
       }
     }
     return tb.toString();

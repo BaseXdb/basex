@@ -11,7 +11,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.hash.*;
 
 /**
  * This class holds information on a custom RESTXQ response.
@@ -82,10 +81,8 @@ final class RestXqRespBuilder {
         }
       } else if(OUTPUT_SERIAL.eq(n)) {
         // parse output:serialization-parameters
-        sp = FuncParams.serializerProp(n, func.function.info);
-        // loop through single values
-        final TokenMap tm = FuncParams.serializerMap(n, func.function.info);
-        for(final byte[] key : tm) func.output.set(string(key), string(tm.get(key)));
+        sp = FuncOptions.serializer(n, func.function.info);
+        FuncOptions.parse(n, func.output, func.function.info);
       } else {
         func.error(UNEXP_NODE, n);
       }

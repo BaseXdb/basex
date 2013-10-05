@@ -83,7 +83,7 @@ public class DBNode extends ANode {
    * @param opts database options
    * @throws IOException I/O exception
    */
-  public DBNode(final IO input, final Options opts) throws IOException {
+  public DBNode(final IO input, final MainOptions opts) throws IOException {
     this(Parser.xmlParser(input, opts));
   }
 
@@ -224,7 +224,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode dbCopy(final Options opts) {
+  public final DBNode dbCopy(final MainOptions opts) {
     final MemData md = data.inMemory() ? new MemData(data) : new MemData(opts);
     new DataBuilder(md).build(this);
     return new DBNode(md).parent(par);

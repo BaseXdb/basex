@@ -10,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class HtmlOptions extends AOptions {
+public final class HtmlOptions extends Options {
   /** TagSoup option: html. */
   public static final Option HTML = new Option("html", false);
   /** TagSoup option: omit-xml-declaration. */
@@ -48,10 +48,16 @@ public final class HtmlOptions extends AOptions {
 
   /**
    * Constructor.
+   */
+  public HtmlOptions() {
+  }
+
+  /**
+   * Constructor.
    * @param opts options string
    * @throws IOException exception
    */
   public HtmlOptions(final String opts) throws IOException {
-    parse(opts);
+    parse(opts, true);
   }
 }

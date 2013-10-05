@@ -99,6 +99,6 @@ public abstract class Stemmer extends LanguageImpl {
 
   @Override
   public String toString() {
-    return Util.name(this).replace("Stemmer", "");
+    return Util.className(this).replace("Stemmer", "");
   }
 }

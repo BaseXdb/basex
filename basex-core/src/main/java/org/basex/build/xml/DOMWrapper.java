@@ -36,12 +36,12 @@ public final class DOMWrapper extends Parser {
    * @param fn filename
    * @param opts database options
    */
-  public DOMWrapper(final Document doc, final String fn, final Options opts) {
+  public DOMWrapper(final Document doc, final String fn, final MainOptions opts) {
     super(fn, opts);
     root = doc;
     filename = fn;
-    chop = opts.is(Options.CHOP);
-    stripNS = opts.is(Options.STRIPNS);
+    chop = opts.is(MainOptions.CHOP);
+    stripNS = opts.is(MainOptions.STRIPNS);
   }
 
   @Override

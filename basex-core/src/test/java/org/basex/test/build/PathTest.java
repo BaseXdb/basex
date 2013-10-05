@@ -17,11 +17,11 @@ import org.junit.*;
  */
 public final class PathTest extends SandboxTest {
   /** Test database name. */
-  private static final String INPUT = Util.name(PathTest.class);
+  private static final String INPUT = Util.className(PathTest.class);
   /** Test database name. */
-  private static final String WEEK1 = Util.name(PathTest.class) + '2';
+  private static final String WEEK1 = Util.className(PathTest.class) + '2';
   /** Test database name. */
-  private static final String WEEK2 = Util.name(PathTest.class) + '3';
+  private static final String WEEK2 = Util.className(PathTest.class) + '3';
   /** Test file. */
   private static final String INPUTF = "src/test/resources/input.xml";
   /** Test file. */

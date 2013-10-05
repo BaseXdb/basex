@@ -290,7 +290,7 @@ public final class NodeSeqBuilder extends AxisIter {
 
   @Override
   public String toString() {
-    return Util.name(this) + Arrays.toString(Arrays.copyOf(nodes, size));
+    return Util.className(this) + Arrays.toString(Arrays.copyOf(nodes, size));
   }
 
   /**

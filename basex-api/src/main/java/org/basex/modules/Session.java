@@ -87,7 +87,7 @@ public final class Session extends QueryModule {
     final Object o = session().getAttribute(key.toJava());
     if(o == null) return def;
     if(o instanceof Item) return (Item) o;
-    throw SessionErrors.noAttribute(Util.name(o));
+    throw SessionErrors.noAttribute(Util.className(o));
   }
 
   /**

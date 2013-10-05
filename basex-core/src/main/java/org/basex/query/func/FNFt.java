@@ -21,7 +21,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
-import org.basex.util.hash.*;
+import org.basex.util.ft.FTOptions;
 import org.basex.util.list.*;
 
 /**
@@ -35,12 +35,6 @@ public final class FNFt extends StandardFunc {
   private static final QNm Q_OPTIONS = QNm.get("options");
   /** Marker element. */
   private static final byte[] MARK = token("mark");
-  /** Fuzzy option. */
-  private static final byte[] FUZZY = token("fuzzy");
-  /** Wildcards option. */
-  private static final byte[] WILDCARDS = token("wildcards");
-  /** Search mode. */
-  private static final byte[] MODE = token("mode");
 
   /**
    * Constructor.
@@ -175,21 +169,22 @@ public final class FNFt extends StandardFunc {
     final Data data = checkData(ctx);
     final Value terms = ctx.value(expr[1]);
     final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final TokenMap tm = new FuncParams(Q_OPTIONS, info).parse(opt);
-    return search(data, terms, tm, this, ctx);
+    final FTOptions opts = new FTOptions();
+    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
+    return search(data, terms, opts, this, ctx);
   }
 
   /**
    * Performs an index-based search.
    * @param data data reference
    * @param terms query terms
-   * @param map map with full-text options
+   * @param opts full-text options
    * @param fun calling function
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  static Iter search(final Data data, final Value terms, final TokenMap map,
+  static Iter search(final Data data, final Value terms, final FTOptions opts,
       final StandardFunc fun, final QueryContext ctx) throws QueryException {
 
     final InputInfo info = fun.info;
@@ -199,27 +194,17 @@ public final class FNFt extends StandardFunc {
 
     final FTOpt tmp = ctx.ftOpt();
     final FTOpt opt = new FTOpt().copy(data.meta);
-    FTMode m = FTMode.ANY;
-    if(map != null) {
-      for(final byte[] k : map) {
-        final byte[] v = map.get(k);
-        if(eq(k, FUZZY)) {
-          final boolean t = v.length == 0 || Util.yes(string(v));
-          opt.set(FZ, t);
-        } else if(eq(k, WILDCARDS)) {
-          final boolean t = v.length == 0 || Util.yes(string(v));
-          opt.set(WC, t);
-        } else if(eq(k, MODE)) {
-          m = FTMode.get(v);
-          if(m == null) ELMOPTION.thrw(info, v);
-        } else {
-          ELMOPTION.thrw(info, k);
-        }
-      }
+    FTMode mode = FTMode.ANY;
+    if(opts != null) {
+      opt.set(FZ, opts.is(FTOptions.FUZZY));
+      opt.set(WC, opts.is(FTOptions.WILDCARDS));
+      final String md = opts.get(FTOptions.MODE);
+      mode = FTMode.get(md);
+      if(mode == null) ELMOPTION.thrw(info, md);
     }
 
     ctx.ftOpt(opt);
-    final FTWords words = new FTWords(info, ic, terms, m, ctx);
+    final FTWords words = new FTWords(info, ic, terms, mode, ctx);
     ctx.ftOpt(tmp);
     return new FTIndexAccess(info, words, ic).iter(ctx);
   }

@@ -32,14 +32,14 @@ public final class HTTPClient {
   /** Input information. */
   private final InputInfo info;
   /** Database options. */
-  private final Options options;
+  private final MainOptions options;
 
   /**
    * Constructor.
    * @param ii input info
    * @param opts database options
    */
-  public HTTPClient(final InputInfo ii, final Options opts) {
+  public HTTPClient(final InputInfo ii, final MainOptions opts) {
     info = ii;
     options = opts;
   }

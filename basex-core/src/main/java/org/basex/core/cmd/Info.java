@@ -50,7 +50,7 @@ public final class Info extends AInfo {
       tb.add(NL + MAIN_OPTIONS + NL);
       for(final String s : gopts) info(tb, s, gopts.get(s));
     }
-    final Options opts = context.options;
+    final MainOptions opts = context.options;
     tb.add(NL + OPTIONS + NL);
     for(final String s : opts) info(tb, s, opts.get(s));
     return tb.toString();

@@ -60,7 +60,7 @@ final class EditorArea extends Editor {
       public void focusGained(final FocusEvent e) {
         // refresh query path and work directory
         final String path = file.path();
-        gui.context.options.set(Options.QUERYPATH, path);
+        gui.context.options.set(MainOptions.QUERYPATH, path);
         gui.gopts.set(GUIOptions.WORKPATH, file.dirPath());
 
         // reload file if it has been changed
@@ -156,7 +156,7 @@ final class EditorArea extends Editor {
         gui.execute(true, new XQuery(input));
       } else {
         // parse query
-        gui.context.options.set(Options.QUERYPATH, path);
+        gui.context.options.set(MainOptions.QUERYPATH, path);
         final QueryContext qc = new QueryContext(gui.context);
         try {
           if(lib) qc.parseLibrary(input, null);

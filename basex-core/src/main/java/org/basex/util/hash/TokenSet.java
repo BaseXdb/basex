@@ -191,7 +191,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
       if(!tb.isEmpty()) tb.add(", ");
       if(key != null) tb.add(key);
     }
-    return new TokenBuilder(Util.name(getClass())).add('[').add(tb.finish()).
+    return new TokenBuilder(Util.className(getClass())).add('[').add(tb.finish()).
         add(']').toString();
   }
 }

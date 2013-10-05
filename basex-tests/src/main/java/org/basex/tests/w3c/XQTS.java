@@ -23,7 +23,7 @@ public final class XQTS extends W3CTS {
    * Constructor.
    */
   public XQTS() {
-    super(Util.name(XQTS.class));
-    context.options.set(Options.XQUERY3, false);
+    super(Util.className(XQTS.class));
+    context.options.set(MainOptions.XQUERY3, false);
   }
 }

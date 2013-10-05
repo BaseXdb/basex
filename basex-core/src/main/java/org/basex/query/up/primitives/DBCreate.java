@@ -13,7 +13,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Update primitive for the {@link Function#_DB_CREATE} function.
@@ -30,17 +29,17 @@ public final class DBCreate extends DBNew {
    * @param ii input info
    * @param nm name for created database
    * @param in input (ANode and QueryInput references)
-   * @param map index options
+   * @param opts database options
    * @param c query context
    * @throws QueryException query exception
    */
   public DBCreate(final InputInfo ii, final String nm, final List<NewInput> in,
-      final TokenMap map, final QueryContext c) throws QueryException {
+      final Options opts, final QueryContext c) throws QueryException {
 
     super(TYPE.DBCREATE, null, c, ii);
     inputs = in;
     name = nm;
-    options = map;
+    options = opts.free();
     check(true);
   }
 
@@ -97,6 +96,6 @@ public final class DBCreate extends DBNew {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + inputs + ']';
+    return Util.className(this) + '[' + inputs + ']';
   }
 }

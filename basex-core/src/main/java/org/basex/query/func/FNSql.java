@@ -8,6 +8,7 @@ import static org.basex.util.Token.*;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -16,7 +17,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Functions on relational databases.
@@ -60,7 +60,7 @@ public final class FNSql extends StandardFunc {
   /** Name. */
   private static final String NAME = "name";
   /** Auto-commit mode. */
-  private static final byte[] AUTO_COMM = token("autocommit");
+  private static final String AUTO_COMM = "autocommit";
   /** User. */
   private static final String USER = "user";
   /** Password. */
@@ -131,14 +131,15 @@ public final class FNSql extends StandardFunc {
         final String pass = string(checkStr(expr[2], ctx));
         if(expr.length == 4) {
           // connection options
-          final Item opt = checkItem(expr[3], ctx);
-          final TokenMap options = new FuncParams(Q_OPTIONS, info).parse(opt);
+          final Options opts = new Options();
+          new FuncOptions(Q_OPTIONS, info).parse(checkItem(expr[3], ctx), opts);
           // extract auto-commit mode from options
           boolean ac = true;
-          final byte[] commit = options.get(AUTO_COMM);
+          final HashMap<String, String> options = opts.free();
+          final String commit = options.get(AUTO_COMM);
           if(commit != null) {
-            ac = eq(commit, TRUE);
-            options.delete(AUTO_COMM);
+            ac = Util.yes(commit);
+            options.remove(AUTO_COMM);
           }
           // connection properties
           final Properties props = connProps(options);
@@ -164,10 +165,10 @@ public final class FNSql extends StandardFunc {
    * @param options options
    * @return connection properties
    */
-  private static Properties connProps(final TokenMap options) {
+  private static Properties connProps(final HashMap<String, String> options) {
     final Properties props = new Properties();
-    for(final byte[] next : options) {
-      if(next != null) props.setProperty(string(next), string(options.get(next)));
+    for(final Entry<String, String> entry : options.entrySet()) {
+      props.setProperty(entry.getKey(), entry.getValue());
     }
     return props;
   }

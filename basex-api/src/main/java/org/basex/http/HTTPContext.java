@@ -325,8 +325,8 @@ public final class HTTPContext {
 
     // set web application path as home directory and HTTPPATH
     final String webapp = sc.getRealPath("/");
-    AOptions.setSystem(Prop.PATH, webapp);
-    AOptions.setSystem(GlobalOptions.WEBPATH, webapp);
+    Options.setSystem(Prop.PATH, webapp);
+    Options.setSystem(GlobalOptions.WEBPATH, webapp);
 
     // bind all parameters that start with "org.basex." to system properties
     final Enumeration<String> en = sc.getInitParameterNames();
@@ -339,12 +339,12 @@ public final class HTTPContext {
       String k = key;
       String v = val;
       if(key.equals(Prop.DBPREFIX + "httppath")) {
-        k = Prop.DBPREFIX + GlobalOptions.RESTXQPATH.key;
+        k = Prop.DBPREFIX + GlobalOptions.RESTXQPATH.name;
       } else if(key.equals(Prop.DBPREFIX + "mode")) {
-        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.key;
+        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name;
         v = Boolean.toString(v.equals("local"));
       } else if(key.equals(Prop.DBPREFIX + "server")) {
-        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.key;
+        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name;
         v = Boolean.toString(!Boolean.parseBoolean(v));
       }
       k = k.toLowerCase(Locale.ENGLISH);
@@ -358,7 +358,7 @@ public final class HTTPContext {
         Util.debug(k.toUpperCase(Locale.ENGLISH) + ": " + v);
         v = new IOFile(webapp, v).path();
       }
-      AOptions.setSystem(k, v);
+      Options.setSystem(k, v);
     }
 
     // create context, update options

@@ -28,7 +28,7 @@ public class RESTConcurrencyTest {
   /** Socket time-out in (ms). */
   private static final int SOCKET_TIMEOUT = 3000;
   /** Test database name. */
-  private static final String DBNAME = Util.name(RESTConcurrencyTest.class);
+  private static final String DBNAME = Util.className(RESTConcurrencyTest.class);
   /** Context to create and drop the test database. */
   private static final Context CTX = new Context();
   /** BaseX HTTP base URL. */

@@ -72,7 +72,7 @@ public enum Err {
   /** BXCS0002. */
   BXCS_SERIAL(BXCS, 2, "CSV serializer: %."),
   /** BXCS0003. */
-  BXCS_CONFIG(BXCS, 3, "CSV separator must be single character; \"%\" found."),
+  BXCS_CONFSEP(BXCS, 3, "CSV separator must be single character; \"%\" found."),
 
   // Database module
 
@@ -135,6 +135,8 @@ public enum Err {
   BXJS_SERIAL(BXJS, 2, "JSON serializer: %."),
   /** BXJS0003. */
   BXJS_CONFIG(BXJS, 3, "JSON parser configuration: %."),
+  /** BXJS0003. */
+  BXJS_CONFOPT(BXJS, 3, "JSON option \"%\" is unknown."),
 
   // Process module
 
@@ -490,7 +492,7 @@ public enum Err {
   /** FORG0006. */
   STRBINTYPE(FORG, 6, "String or binary type expected, % found"),
   /** FORG0006. */
-  ELMOPTION(FORG, 6, "Unknown option: %."),
+  ELMOPTION(FORG, 6, "Option '%' is invalid."),
 
   /** FORG0008. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
@@ -598,7 +600,7 @@ public enum Err {
   /** SEPM0017. */
   SEROPT(SEPM, 17, "%."),
   /** SEPM0017. */
-  SERWHICH(SEPM, 17, "Unknown serialization parameter: '%'."),
+  SERWHICH(SEPM, 17, "Serialization parameter '%' is invalid."),
 
   /** XPDY0002. */
   NOCTX(XPDY, 2, "No context item defined to evaluate '%'."),
@@ -690,7 +692,7 @@ public enum Err {
   /** XPST0003. */
   TYPEINVALID(XPST, 3, "Expecting type declaration."),
   /** XPST0003. */
-  NODECLFORM(XPST, 3, "Unknown decimal-format property: '%'."),
+  NODECLFORM(XPST, 3, "Decimal-format property '%' is invalid."),
   /** XPST0003. */
   NOTYPESWITCH(XPST, 3, "Incomplete typeswitch expression."),
   /** XPST0003. */

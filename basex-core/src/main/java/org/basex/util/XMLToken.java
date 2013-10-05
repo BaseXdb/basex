@@ -152,12 +152,13 @@ public final class XMLToken {
         final TokenBuilder tb = new TokenBuilder(name.length << 1).add(name, 0, i);
         for(int j = i; j < name.length; j += cl(name, j)) {
           cp = cp(name, j);
-          if(j == 0 ? XMLToken.isNCStartChar(cp) : XMLToken.isNCChar(cp)) {
-            tb.add(cp);
-          } else if(lax) {
-            tb.add('_');
+          final boolean valid = j == 0 ? XMLToken.isNCStartChar(cp) : XMLToken.isNCChar(cp);
+          if(lax) {
+            tb.add(valid ? cp : '_');
           } else if(cp == '_') {
             tb.add('_').add('_');
+          } else if(valid) {
+            tb.add(cp);
           } else if(cp < 0x10000) {
             addEsc(tb, cp);
           } else {
@@ -192,9 +193,10 @@ public final class XMLToken {
   /**
    * Decodes an NCName to a string.
    * @param name name
+   * @param lax lax decoding
    * @return cached QName
    */
-  public static byte[] decode(final byte[] name) {
+  public static byte[] decode(final byte[] name, final boolean lax) {
     // convert name to valid XML representation
     final TokenBuilder tb = new TokenBuilder();
     int uc = 0;
@@ -202,7 +204,9 @@ public final class XMLToken {
     int mode = 0;
     for(int n = 0; n < name.length;) {
       final int cp = cp(name, n);
-      if(mode >= 3) {
+      if(lax) {
+        tb.add(cp == '_' ? ' ' : cp);
+      } else if(mode >= 3) {
         uc = (uc << 4) + cp - (cp >= '0' && cp <= '9' ? '0' : 0x37);
         if(++mode == 7) {
           tb.add(uc);

@@ -25,7 +25,7 @@ public final class Context {
   /** Blocked clients. */
   public final ClientBlocker blocker;
   /** Options. */
-  public final Options options = new Options();
+  public final MainOptions options = new MainOptions();
   /** Global options. */
   public final GlobalOptions globalopts;
   /** Client connections. */

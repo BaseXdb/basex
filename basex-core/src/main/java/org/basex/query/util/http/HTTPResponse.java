@@ -24,14 +24,14 @@ public final class HTTPResponse {
   /** Input information. */
   private final InputInfo info;
   /** Database options. */
-  private final Options options;
+  private final MainOptions options;
 
   /**
    * Constructor.
    * @param ii input info
    * @param opts database options
    */
-  public HTTPResponse(final InputInfo ii, final Options opts) {
+  public HTTPResponse(final InputInfo ii, final MainOptions opts) {
     info = ii;
     options = opts;
   }

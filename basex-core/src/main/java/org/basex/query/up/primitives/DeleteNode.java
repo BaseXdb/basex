@@ -53,7 +53,7 @@ public final class DeleteNode extends UpdatePrimitive {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + getTargetNode() + ']';
+    return Util.className(this) + '[' + getTargetNode() + ']';
   }
 
   @Override

@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.build.*;
 import org.basex.query.util.json.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -37,6 +38,8 @@ public final class JsonDefaultSerializer extends JsonSerializer {
   private final BoolList comma = new BoolList();
   /** Types. */
   private final TokenList types = new TokenList();
+  /** Lax flag. */
+  private final boolean lax;
 
   /**
    * Constructor.
@@ -48,6 +51,8 @@ public final class JsonDefaultSerializer extends JsonSerializer {
       throws IOException {
     super(os, opts);
     for(int t = 0; t < typeCache.length; t++) typeCache[t] = new TokenMap();
+    final JsonOptions jopts = new JsonOptions(opts.get(SerializerOptions.S_JSON));
+    lax = jopts.is(JsonOptions.LAX);
   }
 
   @Override
@@ -86,7 +91,7 @@ public final class JsonDefaultSerializer extends JsonSerializer {
       final byte[] par = types.get(level - 1);
       if(eq(par, T_OBJECT)) {
         print('"');
-        print(XMLToken.decode(elem));
+        print(XMLToken.decode(elem, lax));
         print("\": ");
       } else if(!eq(par, T_ARRAY)) {
         error("Element <%> is typed as \"%\" and cannot be nested",

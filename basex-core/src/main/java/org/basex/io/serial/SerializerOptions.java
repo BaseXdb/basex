@@ -6,7 +6,6 @@ import static org.basex.query.util.Err.*;
 
 import org.basex.core.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This class defines all available serialization parameters.
@@ -14,7 +13,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class SerializerOptions extends AOptions {
+public final class SerializerOptions extends Options {
   /** Undefined flag. */
   static final String UNDEFINED = "\u0001";
 
@@ -81,9 +80,6 @@ public final class SerializerOptions extends AOptions {
   /** Specific serialization parameter. */
   public static final Option S_JSON = new Option("json", "");
 
-  /** Unknown options. */
-  public final StringList unknown = new StringList(0);
-
   /**
    * Constructor.
    */
@@ -97,21 +93,7 @@ public final class SerializerOptions extends AOptions {
    * key/values with the equality character ({@code =}).
    */
   public SerializerOptions(final String string) {
-    final int sl = string.length();
-    int i = 0;
-    while(i < sl) {
-      int k = string.indexOf('=', i);
-      if(k == -1) break;
-      final String key = string.substring(i, k);
-      final StringBuilder val = new StringBuilder();
-      i = k;
-      while(++i < sl) {
-        final char ch = string.charAt(i);
-        if(ch == ',' && (++i == sl || string.charAt(i) != ',')) break;
-        val.append(ch);
-      }
-      if(set(key, val.toString()) == null) unknown.add(key);
-    }
+    parse(string);
   }
 
   /**
@@ -124,7 +106,7 @@ public final class SerializerOptions extends AOptions {
   public String check(final Option option, final String... allowed) throws SerializerException {
     final String val = get(option);
     for(final String a : allowed) if(a.equals(val)) return val;
-    throw error(option.key, val, allowed);
+    throw error(option.name, val, allowed);
   }
 
   /**
@@ -140,7 +122,7 @@ public final class SerializerOptions extends AOptions {
     final String val = get(option);
     if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;
     for(final String a : allowed) if(a.equals(val)) return val;
-    throw SERNOTSUPP.thrwSerial(allowed(option.key, val, allowed));
+    throw SERNOTSUPP.thrwSerial(allowed(option.name, val, allowed));
   }
 
   /**
@@ -150,7 +132,7 @@ public final class SerializerOptions extends AOptions {
    * @throws SerializerException serializer exception
    */
   public boolean yes(final Option option) throws SerializerException {
-    return yes(option.key, get(option));
+    return yes(option.name, get(option));
   }
 
   /**

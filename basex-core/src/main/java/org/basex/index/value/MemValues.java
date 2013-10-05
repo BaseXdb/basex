@@ -90,7 +90,7 @@ public class MemValues extends TokenSet implements Index {
   @Override
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder(LI_STRUCTURE).add(SORTED_LIST).add(NL);
-    final IndexStats stats = new IndexStats(data.meta.options.num(Options.MAXSTAT));
+    final IndexStats stats = new IndexStats(data.meta.options.num(MainOptions.MAXSTAT));
     for(int m = 1; m < size; m++) {
       if(stats.adding(len[m])) stats.add(key(m));
     }

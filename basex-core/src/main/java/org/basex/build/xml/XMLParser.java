@@ -43,7 +43,7 @@ public class XMLParser extends SingleParser {
    * @param opts database options
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO source, final Options opts) throws IOException {
+  public XMLParser(final IO source, final MainOptions opts) throws IOException {
     this(source, opts, false);
   }
 
@@ -54,11 +54,12 @@ public class XMLParser extends SingleParser {
    * @param frag allow parsing of document fragment
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO source, final Options opts, final boolean frag) throws IOException {
+  public XMLParser(final IO source, final MainOptions opts, final boolean frag)
+      throws IOException {
     super(source, opts);
     scanner = new XMLScanner(source, opts, frag);
-    stripNS = opts.is(Options.STRIPNS);
-    chop = opts.is(Options.CHOP);
+    stripNS = opts.is(MainOptions.STRIPNS);
+    chop = opts.is(MainOptions.CHOP);
     chops.push(chop);
     fragment = frag;
   }

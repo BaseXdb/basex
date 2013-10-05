@@ -62,8 +62,8 @@ public final class Language implements Comparable<Language> {
    * @param opts database options
    * @return language code
    */
-  public static Language get(final Options opts) {
-    final Language lang = get(opts.get(Options.LANGUAGE));
+  public static Language get(final MainOptions opts) {
+    final Language lang = get(opts.get(MainOptions.LANGUAGE));
     return lang == null ? get("en") : lang;
   }
 

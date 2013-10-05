@@ -60,7 +60,7 @@ public final class ReplaceValue extends UpdatePrimitive {
 
   @Override
   public String toString() {
-    return Util.info("%[%, %]", Util.name(this), getTargetNode(), value);
+    return Util.info("%[%, %]", Util.className(this), getTargetNode(), value);
   }
 
   /**

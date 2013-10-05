@@ -117,7 +117,7 @@ public final class Prop {
    * @return application path.
    */
   private static String applicationPath() {
-    final ProtectionDomain pd = Options.class.getProtectionDomain();
+    final ProtectionDomain pd = MainOptions.class.getProtectionDomain();
     if(pd == null) return null;
     // code source (may be null)
     final CodeSource cs = pd.getCodeSource();

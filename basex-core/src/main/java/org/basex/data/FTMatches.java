@@ -130,7 +130,7 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(Util.name(this)).append('[').append(sTokenNum).append(']');
+    sb.append(Util.className(this)).append('[').append(sTokenNum).append(']');
     for(final FTMatch m : this) sb.append("\n  ").append(m);
     return sb.toString();
   }

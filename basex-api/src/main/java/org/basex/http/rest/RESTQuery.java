@@ -62,20 +62,20 @@ class RESTQuery extends RESTCode {
     if(item != null) {
       // create main memory instance of the document specified as context node
       final boolean mm = session.execute(
-          new Get(Options.MAINMEM)).split(COLS)[1].equals(TRUE);
-      session.execute(new Set(Options.MAINMEM, true));
-      session.create(Util.name(RESTQuery.class), new ArrayInput(item));
-      if(!mm) session.execute(new Set(Options.MAINMEM, false));
+          new Get(MainOptions.MAINMEM)).split(COLS)[1].equals(TRUE);
+      session.execute(new Set(MainOptions.MAINMEM, true));
+      session.create(Util.className(RESTQuery.class), new ArrayInput(item));
+      if(!mm) session.execute(new Set(MainOptions.MAINMEM, false));
     } else {
       // open addressed database
       open(http);
     }
 
     // send serialization options to the server
-    session.execute(new Set(Options.SERIALIZER, serial(http)));
+    session.execute(new Set(MainOptions.SERIALIZER, serial(http)));
     session.setOutputStream(http.res.getOutputStream());
     // set base path to correctly resolve local references
-    session.execute(new Set(Options.QUERYPATH, path));
+    session.execute(new Set(MainOptions.QUERYPATH, path));
 
     // create query instance and bind http context
     final Query qu = session.query(in);
@@ -102,8 +102,8 @@ class RESTQuery extends RESTCode {
     final TokenBuilder ser = new TokenBuilder(http.serialization);
     if(http.wrapping) {
       if(!ser.isEmpty()) ser.add(',');
-      ser.addExt(SerializerOptions.S_WRAP_PREFIX.key).add('=').add(REST).add(',');
-      ser.addExt(SerializerOptions.S_WRAP_URI.key).add('=').add(RESTURI);
+      ser.addExt(SerializerOptions.S_WRAP_PREFIX.name).add('=').add(REST).add(',');
+      ser.addExt(SerializerOptions.S_WRAP_URI.name).add('=').add(RESTURI);
     }
     return ser.toString();
   }

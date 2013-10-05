@@ -107,10 +107,10 @@ public final class BaseXHTTP {
     }
 
     // request password on command line if only the user was specified
-    if(!AOptions.getSystem(GlobalOptions.USER).isEmpty()) {
-      while(AOptions.getSystem(GlobalOptions.PASSWORD).isEmpty()) {
+    if(!Options.getSystem(GlobalOptions.USER).isEmpty()) {
+      while(Options.getSystem(GlobalOptions.PASSWORD).isEmpty()) {
         Util.out(PASSWORD + COLS);
-        AOptions.setSystem(GlobalOptions.PASSWORD, Util.password());
+        Options.setSystem(GlobalOptions.PASSWORD, Util.password());
       }
     }
 
@@ -176,7 +176,7 @@ public final class BaseXHTTP {
    * @return numeric value
    */
   private static int num(final Option option, final GlobalOptions gopts) {
-    final String val = AOptions.getSystem(option);
+    final String val = Options.getSystem(option);
     return val.isEmpty() ? gopts.num(option) : Token.toInt(val);
   }
 
@@ -187,7 +187,7 @@ public final class BaseXHTTP {
    * @return boolean value
    */
   private static boolean bool(final Option option, final GlobalOptions gopts) {
-    final String val = AOptions.getSystem(option);
+    final String val = Options.getSystem(option);
     return val.isEmpty() ? gopts.is(option) : Boolean.parseBoolean(val);
   }
 
@@ -261,43 +261,43 @@ public final class BaseXHTTP {
       if(arg.dash()) {
         switch(arg.next()) {
           case 'd': // activate debug mode
-            AOptions.setSystem(GlobalOptions.DEBUG, true);
+            Options.setSystem(GlobalOptions.DEBUG, true);
             Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
             daemon = true;
             break;
           case 'e': // parse event port
-            AOptions.setSystem(GlobalOptions.EVENTPORT, arg.number());
+            Options.setSystem(GlobalOptions.EVENTPORT, arg.number());
             break;
           case 'h': // parse HTTP port
             httpPort = arg.number();
             break;
           case 'l': // use local mode
-            AOptions.setSystem(GlobalOptions.HTTPLOCAL, true);
+            Options.setSystem(GlobalOptions.HTTPLOCAL, true);
             break;
           case 'n': // parse host name
-            AOptions.setSystem(GlobalOptions.HOST, arg.string());
+            Options.setSystem(GlobalOptions.HOST, arg.string());
             break;
           case 'p': // parse server port
             final int p = arg.number();
-            AOptions.setSystem(GlobalOptions.PORT, p);
-            AOptions.setSystem(GlobalOptions.SERVERPORT, p);
+            Options.setSystem(GlobalOptions.PORT, p);
+            Options.setSystem(GlobalOptions.SERVERPORT, p);
             break;
           case 'P': // specify password
-            AOptions.setSystem(GlobalOptions.PASSWORD, arg.string());
+            Options.setSystem(GlobalOptions.PASSWORD, arg.string());
             break;
           case 's': // parse stop port
-            AOptions.setSystem(GlobalOptions.STOPPORT, arg.number());
+            Options.setSystem(GlobalOptions.STOPPORT, arg.number());
             break;
           case 'S': // set service flag
             service = !daemon;
             break;
           case 'U': // specify user name
-            AOptions.setSystem(GlobalOptions.USER, arg.string());
+            Options.setSystem(GlobalOptions.USER, arg.string());
             break;
           case 'z': // suppress logging
-            AOptions.setSystem(GlobalOptions.LOG, false);
+            Options.setSystem(GlobalOptions.LOG, false);
             break;
           default:
             arg.usage();
@@ -336,7 +336,7 @@ public final class BaseXHTTP {
    * @return stop file
    */
   private static File stopFile(final int port) {
-    return new File(Prop.TMP, Util.name(BaseXHTTP.class) + port);
+    return new File(Prop.TMP, Util.className(BaseXHTTP.class) + port);
   }
 
   /**

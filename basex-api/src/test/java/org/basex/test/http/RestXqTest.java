@@ -188,9 +188,9 @@ public final class RestXqTest extends HTTPTest {
     getE("declare %R:path('') %output:method('xml','html') function m:f() {'9'};", "");
 
     get("declare %R:path('') function m:f() { <R:response>" +
-        "<output:serialization-parameters>" +
-        "  <output:method value='text'/>" +
-        "    </output:serialization-parameters>" +
+        "  <output:serialization-parameters>" +
+        "    <output:method value='text'/>" +
+        "  </output:serialization-parameters>" +
         "  <http:response status='200'/>" +
         "</R:response>," +
         "<X>1</X> };", "", "1");

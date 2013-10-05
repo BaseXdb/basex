@@ -133,7 +133,7 @@ public final class Args {
    */
   public void usage() throws BaseXException {
     throw new BaseXException(header +
-        "Usage: " + Util.name(obj).toLowerCase(Locale.ENGLISH) + usage);
+        "Usage: " + Util.className(obj).toLowerCase(Locale.ENGLISH) + usage);
   }
 
   @Override

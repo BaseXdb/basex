@@ -100,7 +100,7 @@ public final class FTWords extends FTExpr {
       // choose fast evaluation for default settings
       fast = mode == FTMode.ANY && txt != null && occ == null;
       if(ftt == null)
-        ftt = new FTTokenizer(this, ctx.ftOpt(), ctx.context.options.num(Options.LSERROR));
+        ftt = new FTTokenizer(this, ctx.ftOpt(), ctx.context.options.num(MainOptions.LSERROR));
     }
     return this;
   }

@@ -16,6 +16,7 @@ public final class FNCsvTest extends AdvancedQueryTest {
   /** JSON snippets. */
   private static final String[][] TOXML = {
     { "", "", "<csv/>" },
+    { "", "'x':'y'" },
     { "X", "", "<csv><record><entry>X</entry></record></csv>" },
     { " '\"X\"\"Y\"'", "", "...<entry>X\"Y</entry>" },
     { " '\"X\",Y'", "", "...<entry>X</entry><entry>Y</entry>" },
@@ -29,6 +30,22 @@ public final class FNCsvTest extends AdvancedQueryTest {
 
   /** XML snippets. */
   private static final String[][] TOCSV = {
+    { "<csv/>", "'x':'y'" },
+
+    { "<csv><record><A__>1</A__></record></csv>",
+      "'header':true(),'lax':false()", "A_1" },
+    { "<csv><record><_>1</_></record></csv>",
+      "'header':true(),'lax':false()", "1" },
+    { "<csv><record><A_0020B>1</A_0020B></record></csv>",
+      "'header':'yes','lax':'no'", "A B1" },
+
+    { "<csv><record><A_>1</A_></record></csv>",
+      "'header':true(),'lax':true()", "A 1" },
+    { "<csv><record><_>1</_></record></csv>",
+      "'header':true(),'lax':true()", " 1" },
+    { "<csv><record><A_0020B>1</A_0020B></record></csv>",
+      "'header':'yes','lax':'yes'", "A 0020B1" },
+
     { "<csv/>", "", "" },
 
     { "<csv><record/></csv>", "", "" },
@@ -43,6 +60,9 @@ public final class FNCsvTest extends AdvancedQueryTest {
 
     { "<csv><record><A>1</A></record><record><A>2</A></record></csv>",
       "'header':'yes'", "A12" },
+
+    { "<csv><record><A_B>1</A_B></record></csv>", "'header':'yes'", "A B1" },
+    { "<csv><record><A__B>1</A__B></record></csv>", "'header':true()", "A  B1" },
 
     { "<csv><record><A>1\n2</A></record></csv>", "'header':'yes'", "A\"12\"" },
     { "<csv><record><A>\"</A></record></csv>", "'header':'yes'", "A\"\"\"\"" },
@@ -62,7 +82,7 @@ public final class FNCsvTest extends AdvancedQueryTest {
       final String query = test[1].isEmpty() ? _CSV_PARSE.args(test[0]) :
         _CSV_PARSE.args(test[0], " {" + test[1] + "}");
       if(test.length == 2) {
-        error(query, Err.BXCS_PARSE);
+        error(query, Err.BXCS_PARSE, Err.ELMOPTION);
       } else if(test[2].startsWith("...")) {
         contains(query, test[2].substring(3));
       } else {
@@ -77,7 +97,7 @@ public final class FNCsvTest extends AdvancedQueryTest {
       final String query = test[1].isEmpty() ? _CSV_SERIALIZE.args(test[0]) :
         _CSV_SERIALIZE.args(test[0], " {" + test[1] + "}");
       if(test.length == 2) {
-        error(query, Err.BXCS_CONFIG);
+        error(query, Err.BXCS_CONFSEP, Err.ELMOPTION);
       } else {
         query(query, test[2]);
       }

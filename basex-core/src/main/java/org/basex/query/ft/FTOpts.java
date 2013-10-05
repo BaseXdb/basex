@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FTOptions extends FTExpr {
+public final class FTOpts extends FTExpr {
   /** FTOptions. */
   private final FTOpt opt;
 
@@ -24,7 +24,7 @@ public final class FTOptions extends FTExpr {
    * @param e expression
    * @param o ft options
    */
-  public FTOptions(final InputInfo ii, final FTExpr e, final FTOpt o) {
+  public FTOpts(final InputInfo ii, final FTExpr e, final FTOpt o) {
     super(ii, e);
     opt = o;
   }
@@ -66,6 +66,6 @@ public final class FTOptions extends FTExpr {
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp,
       final IntObjMap<Var> vs) {
-    return new FTOptions(info, expr[0].copy(ctx, scp, vs), new FTOpt().copy(opt));
+    return new FTOpts(info, expr[0].copy(ctx, scp, vs), new FTOpt().copy(opt));
   }
 }

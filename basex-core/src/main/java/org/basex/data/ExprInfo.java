@@ -25,7 +25,7 @@ public abstract class ExprInfo {
    * @return class name
    */
   public byte[] info() {
-    return Token.token(Util.name(this));
+    return Token.token(Util.className(this));
   }
 
   @Override

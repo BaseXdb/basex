@@ -32,6 +32,6 @@ public final class FTSpan {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + string(text) + ']';
+    return Util.className(this) + '[' + string(text) + ']';
   }
 }

@@ -108,24 +108,24 @@ final class DialogParsing extends BaseXBack {
 
     label = new BaseXLabel(" ").border(0, 0, 12, 0).large();
 
-    final Options opts = gui.context.options;
+    final MainOptions opts = gui.context.options;
     try {
-      topts = new TextOptions(opts.get(Options.TEXTPARSER));
+      topts = new TextOptions(opts.get(MainOptions.TEXTPARSER));
     } catch(final IOException ex) { topts = new TextOptions(); }
     try {
-      copts = new CsvOptions(opts.get(Options.CSVPARSER));
+      copts = new CsvOptions(opts.get(MainOptions.CSVPARSER));
     } catch(final IOException ex) { copts = new CsvOptions(); }
     try {
-      jopts = new JsonOptions(opts.get(Options.JSONPARSER));
+      jopts = new JsonOptions(opts.get(MainOptions.JSONPARSER));
     } catch(final IOException ex) { jopts = new JsonOptions(); }
 
-    intparse = new BaseXCheckBox(INT_PARSER, opts.is(Options.INTPARSE), 0, d);
-    dtd = new BaseXCheckBox(PARSE_DTDS, opts.is(Options.DTD), 0, d);
-    chopWS = new BaseXCheckBox(CHOP_WS, opts.is(Options.CHOP), 0, d);
-    stripNS = new BaseXCheckBox(STRIP_NS, opts.is(Options.STRIPNS), 0, d);
-    cfile = new BaseXTextField(opts.get(Options.CATFILE), d);
+    intparse = new BaseXCheckBox(INT_PARSER, opts.is(MainOptions.INTPARSE), 0, d);
+    dtd = new BaseXCheckBox(PARSE_DTDS, opts.is(MainOptions.DTD), 0, d);
+    chopWS = new BaseXCheckBox(CHOP_WS, opts.is(MainOptions.CHOP), 0, d);
+    stripNS = new BaseXCheckBox(STRIP_NS, opts.is(MainOptions.STRIPNS), 0, d);
+    cfile = new BaseXTextField(opts.get(MainOptions.CATFILE), d);
     browsec = new BaseXButton(BROWSE_D, d);
-    usecat = new BaseXCheckBox(USE_CATALOG_FILE, !opts.get(Options.CATFILE).isEmpty(),
+    usecat = new BaseXCheckBox(USE_CATALOG_FILE, !opts.get(MainOptions.CATFILE).isEmpty(),
         0, d);
 
     // json
@@ -140,7 +140,7 @@ final class DialogParsing extends BaseXBack {
     if(Token.eq(s, sa)) jsonformat.setSelectedItem(s);
 
     // html
-    html = new BaseXTextField(opts.get(Options.HTMLPARSER), d);
+    html = new BaseXTextField(opts.get(MainOptions.HTMLPARSER), d);
 
     // text
     textenc = DialogExport.encoding(d, topts.get(TextOptions.ENCODING));
@@ -322,25 +322,25 @@ final class DialogParsing extends BaseXBack {
   public void setOptions(final String type) {
     jopts.set(JsonOptions.ENCODING, jsonenc.getSelectedItem().toString());
     jopts.set(JsonOptions.FORMAT, jsonformat.getSelectedItem().toString());
-    gui.set(Options.JSONPARSER, jopts.toString());
+    gui.set(MainOptions.JSONPARSER, jopts.toString());
 
     topts.set(TextOptions.ENCODING, textenc.getSelectedItem().toString());
     topts.set(TextOptions.LINES, lines.isSelected());
-    gui.set(Options.TEXTPARSER, topts.toString());
+    gui.set(MainOptions.TEXTPARSER, topts.toString());
 
     copts.set(CsvOptions.ENCODING, csven.getSelectedItem().toString());
     copts.set(CsvOptions.HEADER, header.isSelected());
     copts.set(CsvOptions.SEPARATOR, sepcombo.getSelectedIndex() <
       CsvSep.values().length ? sepcombo.getSelectedItem().toString() :
       String.valueOf((int) sepchar.getText().charAt(0)));
-    gui.set(Options.CSVPARSER, copts.toString());
+    gui.set(MainOptions.CSVPARSER, copts.toString());
 
-    gui.set(Options.PARSER, type);
-    gui.set(Options.CHOP, chopWS.isSelected());
-    gui.set(Options.STRIPNS, stripNS.isSelected());
-    gui.set(Options.DTD, dtd.isSelected());
-    gui.set(Options.INTPARSE, intparse.isSelected());
-    gui.set(Options.CATFILE, usecat.isSelected() ? cfile.getText() : "");
-    gui.set(Options.HTMLPARSER, html.getText());
+    gui.set(MainOptions.PARSER, type);
+    gui.set(MainOptions.CHOP, chopWS.isSelected());
+    gui.set(MainOptions.STRIPNS, stripNS.isSelected());
+    gui.set(MainOptions.DTD, dtd.isSelected());
+    gui.set(MainOptions.INTPARSE, intparse.isSelected());
+    gui.set(MainOptions.CATFILE, usecat.isSelected() ? cfile.getText() : "");
+    gui.set(MainOptions.HTMLPARSER, html.getText());
   }
 }

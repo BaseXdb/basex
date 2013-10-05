@@ -52,7 +52,7 @@ public abstract class Formatter extends FormatUtil {
     // check if formatter has already been created
     Formatter form = MAP.get(ln);
     if(form == null) {
-      final String clz = Util.name(Formatter.class) + string(uc(ln));
+      final String clz = Util.className(Formatter.class) + string(uc(ln));
       form = (Formatter) Reflect.get(Reflect.find(clz));
       // instantiation not successful: return default formatter
       if(form == null) form = MAP.get(EN);

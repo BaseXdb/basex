@@ -586,7 +586,7 @@ public class FnHttpTest extends HTTPTest {
   @Test
   public void writeFromResource() throws IOException, QueryException {
     // Create a file form which will be read
-    final File f = new File(Prop.TMP + Util.name(FnHttpTest.class));
+    final File f = new File(Prop.TMP + Util.className(FnHttpTest.class));
     final FileOutputStream out = new FileOutputStream(f);
     out.write(token("test"));
     out.close();

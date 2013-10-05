@@ -1,6 +1,6 @@
 package org.basex.http.webdav.impl;
 
-import org.basex.core.Options;
+import org.basex.core.MainOptions;
 import org.basex.core.Text;
 import org.basex.core.cmd.*;
 import org.basex.http.HTTPContext;
@@ -484,7 +484,7 @@ public final class WebDAVService<T> {
       throws IOException {
 
     final Session session = http.session();
-    session.execute(new Set(Options.CHOP, false));
+    session.execute(new Set(MainOptions.CHOP, false));
     session.add(p, in);
     return factory.file(this, new ResourceMetaData(db, p, timestamp(db), false,
       APP_XML, null));

@@ -61,7 +61,7 @@ public final class Insert extends Update {
     // check target constraints
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
-    if(i == null) UPSEQEMP.thrw(info, Util.name(this));
+    if(i == null) UPSEQEMP.thrw(info, Util.className(this));
     if(!(i instanceof ANode) || t.next() != null)
       (before || after ? UPTRGTYP2 : UPTRGTYP).thrw(info);
 

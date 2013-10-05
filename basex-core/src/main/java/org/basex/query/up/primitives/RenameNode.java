@@ -47,7 +47,7 @@ public final class RenameNode extends UpdatePrimitive {
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + getTargetNode() + ", " + name + ']';
+    return Util.className(this) + '[' + getTargetNode() + ", " + name + ']';
   }
 
   @Override

@@ -209,7 +209,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
+    final TokenBuilder tb = new TokenBuilder(Util.className(this) + '[');
     for(int i = 0; i < size; ++i) {
       if(i != 0) tb.add(", ");
       tb.add(list[i]);
