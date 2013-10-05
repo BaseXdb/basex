@@ -164,7 +164,7 @@ public final class Ann extends ElementList {
         // no global namespaces allowed
         ANNRES.thrw(infos[a], '%', name.string());
       } else if(eq(uri, OUTPUTURI)) {
-        if(Serializer.PROPS.get(string(local)) == null)
+        if(Serializer.OPTIONS.get(string(local)) == null)
           BASX_ANNOT.thrw(infos[a], '%', name.string());
         if(values[a].size() != 1 || !values[a].itemAt(0).type.isStringOrUntyped()) {
           BASX_ANNOTARGS.thrw(infos[a], '%', name.string());

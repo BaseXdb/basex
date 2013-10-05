@@ -64,8 +64,8 @@ public final class BaseXHTTP {
     context = HTTPContext.init();
 
     // create jetty instance and set default context to HTTP path
-    final MainProp mprop = context.mprop;
-    final String webapp = mprop.get(MainProp.WEBPATH);
+    final GlobalOptions gopts = context.globalopts;
+    final String webapp = gopts.get(GlobalOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
     jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
     jetty.setHandler(wac);
@@ -107,10 +107,10 @@ public final class BaseXHTTP {
     }
 
     // request password on command line if only the user was specified
-    if(!AProp.getSystem(MainProp.USER).isEmpty()) {
-      while(AProp.getSystem(MainProp.PASSWORD).isEmpty()) {
+    if(!AOptions.getSystem(GlobalOptions.USER).isEmpty()) {
+      while(AOptions.getSystem(GlobalOptions.PASSWORD).isEmpty()) {
         Util.out(PASSWORD + COLS);
-        AProp.setSystem(MainProp.PASSWORD, Util.password());
+        AOptions.setSystem(GlobalOptions.PASSWORD, Util.password());
       }
     }
 
@@ -125,8 +125,8 @@ public final class BaseXHTTP {
     HTTPContext.init(wac.getServletContext());
 
     // start daemon for stopping web server
-    final int stop = mprop.num(MainProp.STOPPORT);
-    if(stop >= 0) new StopServer(mprop.get(MainProp.SERVERHOST), stop).start();
+    final int stop = gopts.num(GlobalOptions.STOPPORT);
+    if(stop >= 0) new StopServer(gopts.get(GlobalOptions.SERVERHOST), stop).start();
 
     // show info when HTTP server is aborted
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -157,14 +157,14 @@ public final class BaseXHTTP {
    */
   public void stop() throws Exception {
     // notify the jetty monitor to stop
-    final MainProp mprop = context.mprop;
-    final int stop = num(MainProp.STOPPORT, mprop);
+    final GlobalOptions mprop = context.globalopts;
+    final int stop = num(GlobalOptions.STOPPORT, mprop);
     if(stop >= 0) stop(stop);
 
     // server has been started in a separate process and needs to be stopped
-    if(!bool(MainProp.HTTPLOCAL, mprop)) {
-      final int port = num(MainProp.SERVERPORT, mprop);
-      final int eport = num(MainProp.EVENTPORT, mprop);
+    if(!bool(GlobalOptions.HTTPLOCAL, mprop)) {
+      final int port = num(GlobalOptions.SERVERPORT, mprop);
+      final int eport = num(GlobalOptions.EVENTPORT, mprop);
       BaseXServer.stop(port, eport);
     }
   }
@@ -172,23 +172,23 @@ public final class BaseXHTTP {
   /**
    * Returns a numeric value for the specified option.
    * @param option option to be retrieved
-   * @param mprop main properties
+   * @param gopts global options
    * @return numeric value
    */
-  private static int num(final Object[] option, final MainProp mprop) {
-    final String val = AProp.getSystem(option);
-    return val.isEmpty() ? mprop.num(option) : Token.toInt(val);
+  private static int num(final Object[] option, final GlobalOptions gopts) {
+    final String val = AOptions.getSystem(option);
+    return val.isEmpty() ? gopts.num(option) : Token.toInt(val);
   }
 
   /**
    * Returns a boolean value for the specified option.
    * @param option option to be retrieved
-   * @param mprop main properties
+   * @param gopts global options
    * @return boolean value
    */
-  private static boolean bool(final Object[] option, final MainProp mprop) {
-    final String val = AProp.getSystem(option);
-    return val.isEmpty() ? mprop.is(option) : Boolean.parseBoolean(val);
+  private static boolean bool(final Object[] option, final GlobalOptions gopts) {
+    final String val = AOptions.getSystem(option);
+    return val.isEmpty() ? gopts.is(option) : Boolean.parseBoolean(val);
   }
 
   /**
@@ -253,51 +253,51 @@ public final class BaseXHTTP {
    * @throws IOException I/O exception
    */
   private void parseArguments(final String[] args) throws IOException {
-    /* command-line properties not be stored in system properties (instead of
-     * context.mprop). this way, they will not be overwritten by web.xml settings. */
+    /* command-line properties will be stored in system properties;
+     * this way, they will not be overwritten by the settings specified in web.xml. */
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
     boolean daemon = false;
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
           case 'd': // activate debug mode
-            AProp.setSystem(MainProp.DEBUG, true);
+            AOptions.setSystem(GlobalOptions.DEBUG, true);
             Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
             daemon = true;
             break;
           case 'e': // parse event port
-            AProp.setSystem(MainProp.EVENTPORT, arg.number());
+            AOptions.setSystem(GlobalOptions.EVENTPORT, arg.number());
             break;
           case 'h': // parse HTTP port
             httpPort = arg.number();
             break;
           case 'l': // use local mode
-            AProp.setSystem(MainProp.HTTPLOCAL, true);
+            AOptions.setSystem(GlobalOptions.HTTPLOCAL, true);
             break;
           case 'n': // parse host name
-            AProp.setSystem(MainProp.HOST, arg.string());
+            AOptions.setSystem(GlobalOptions.HOST, arg.string());
             break;
           case 'p': // parse server port
             final int p = arg.number();
-            AProp.setSystem(MainProp.PORT, p);
-            AProp.setSystem(MainProp.SERVERPORT, p);
+            AOptions.setSystem(GlobalOptions.PORT, p);
+            AOptions.setSystem(GlobalOptions.SERVERPORT, p);
             break;
           case 'P': // specify password
-            AProp.setSystem(MainProp.PASSWORD, arg.string());
+            AOptions.setSystem(GlobalOptions.PASSWORD, arg.string());
             break;
           case 's': // parse stop port
-            AProp.setSystem(MainProp.STOPPORT, arg.number());
+            AOptions.setSystem(GlobalOptions.STOPPORT, arg.number());
             break;
           case 'S': // set service flag
             service = !daemon;
             break;
           case 'U': // specify user name
-            AProp.setSystem(MainProp.USER, arg.string());
+            AOptions.setSystem(GlobalOptions.USER, arg.string());
             break;
           case 'z': // suppress logging
-            AProp.setSystem(MainProp.LOG, false);
+            AOptions.setSystem(GlobalOptions.LOG, false);
             break;
           default:
             arg.usage();

@@ -5,16 +5,16 @@ import java.awt.*;
 import org.basex.core.*;
 
 /**
- * This class contains properties which are used in the GUI.
+ * This class contains options which are used in the GUI.
  * They are also stored in the project's home directory.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class GUIProp extends AProp {
+public final class GUIOptions extends AOptions {
   // DATABASE & PROGRAM PATHS =================================================
 
-  /** Comment: written to property file. */
+  /** Comment: written to options file. */
   public static final Object[] C_PATHS = { "Paths" };
 
   /** Path to database input. */
@@ -28,7 +28,7 @@ public final class GUIProp extends AProp {
   /** Input paths. */
   public static final Object[] INPUTS = { "INPUTS", new String[0] };
 
-  /** Comment: written to property file. */
+  /** Comment: written to options file. */
   public static final Object[] C_LAYOUT = { "Layout" };
 
   /** Default GUI Font. */
@@ -49,7 +49,7 @@ public final class GUIProp extends AProp {
   /** Paint gradients as background. */
   public static final Object[] GRADIENT = { "GRADIENT", true };
 
-  /** Comment: written to property file. */
+  /** Comment: written to options file. */
   public static final Object[] C_WINDOWS = { "Windows" };
 
   /** Last updated version. */
@@ -120,7 +120,7 @@ public final class GUIProp extends AProp {
   /** Last insertion type. */
   public static final Object[] LASTINSERT = { "LASTINSERT", 1 };
 
-  /** Comment: written to property file. */
+  /** Comment: written to options file. */
   public static final Object[] C_SERVER = { "Server Dialog" };
 
   /** Server: host, used for connecting new clients. */
@@ -136,7 +136,7 @@ public final class GUIProp extends AProp {
   /** Default password. */
   public static final Object[] S_PASSWORD = { "S_PASSWORD", "" };
 
-  /** Comment: written to property file. */
+  /** Comment: written to options file. */
   public static final Object[] C_VISUALIZATIONS = { "Visualizations" };
 
   /** Show attributes in treemap. */
@@ -165,7 +165,7 @@ public final class GUIProp extends AProp {
   /** Maximum number of hits to be displayed (-1: return all hits; default: 250K). */
   public static final Object[] MAXHITS = { "MAXHITS", 250000 };
 
-  /** Comment: written to property file. */
+  /** Comment: written to options file. */
   public static final Object[] C_SEARCH = { "Search" };
 
   /** Search text. */
@@ -185,7 +185,7 @@ public final class GUIProp extends AProp {
   /** Last replaced strings. */
   public static final Object[] REPLACED = { "REPLACED", new String[0] };
 
-  /** Comment: written to property file. */
+  /** Comment: written to options file. */
   public static final Object[] C_HISTORY = { "History" };
 
   /** Last command inputs. */
@@ -198,11 +198,11 @@ public final class GUIProp extends AProp {
   /**
    * Constructor.
    */
-  public GUIProp() {
+  public GUIOptions() {
     super("gui");
     // reset realtime operations
-    set(GUIProp.FILTERRT, false);
-    set(GUIProp.EXECRT, false);
+    set(GUIOptions.FILTERRT, false);
+    set(GUIOptions.EXECRT, false);
     Prop.gui = true;
   }
 }

@@ -48,10 +48,10 @@ public final class DialogNew extends BaseXDialog {
     buttons = okCancel();
 
     db = List.list(main.context);
-    final Prop prop = gui.context.prop;
-    final GUIProp gprop = main.gprop;
+    final Options opts = gui.context.options;
+    final GUIOptions gopts = main.gopts;
 
-    dbname = new BaseXTextField(gprop.get(GUIProp.DBNAME), this);
+    dbname = new BaseXTextField(gopts.get(GUIOptions.DBNAME), this);
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
     pnl.add(new BaseXLabel(NAME_OF_DB + COLS, false, true).border(8, 0, 6, 0));
@@ -65,18 +65,18 @@ public final class DialogNew extends BaseXDialog {
     // index panel
     final BaseXBack indexes = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
 
-    txtindex = new BaseXCheckBox(TEXT_INDEX, prop.is(Prop.TEXTINDEX), 0, this).large();
+    txtindex = new BaseXCheckBox(TEXT_INDEX, opts.is(Options.TEXTINDEX), 0, this).large();
     indexes.add(txtindex);
     indexes.add(new BaseXLabel(H_TEXT_INDEX, true, false));
 
     atvindex = new BaseXCheckBox(ATTRIBUTE_INDEX,
-        prop.is(Prop.ATTRINDEX), 0, this).large();
+        opts.is(Options.ATTRINDEX), 0, this).large();
     indexes.add(atvindex);
     indexes.add(new BaseXLabel(H_ATTR_INDEX, true, false));
 
     // full-text panel
     //final BaseXBack fulltext = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
-    ftxindex = new BaseXCheckBox(FULLTEXT_INDEX, prop.is(Prop.FTINDEX), 0, this).large();
+    ftxindex = new BaseXCheckBox(FULLTEXT_INDEX, opts.is(Options.FTINDEX), 0, this).large();
     indexes.add(ftxindex);
 
     ft = new DialogFT(this, true);
@@ -108,7 +108,7 @@ public final class DialogNew extends BaseXDialog {
     Msg icon = Msg.ERROR;
     if(ok) {
       ok = Databases.validName(nm);
-      if(ok) gui.gprop.set(GUIProp.DBNAME, nm);
+      if(ok) gui.gopts.set(GUIOptions.DBNAME, nm);
 
       if(!ok) {
         // name of database is invalid
@@ -133,9 +133,9 @@ public final class DialogNew extends BaseXDialog {
     if(!ok) return;
 
     super.close();
-    gui.set(Prop.TEXTINDEX, txtindex.isSelected());
-    gui.set(Prop.ATTRINDEX, atvindex.isSelected());
-    gui.set(Prop.FTINDEX,   ftxindex.isSelected());
+    gui.set(Options.TEXTINDEX, txtindex.isSelected());
+    gui.set(Options.ATTRINDEX, atvindex.isSelected());
+    gui.set(Options.FTINDEX,   ftxindex.isSelected());
     general.setOptions();
     ft.setOptions();
   }

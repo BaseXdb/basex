@@ -55,21 +55,21 @@ public final class DirParser extends Parser {
   /**
    * Constructor.
    * @param source source path
-   * @param pr database properties
+   * @param opts database options
    * @param path future database path
    */
-  public DirParser(final IO source, final Prop pr, final IOFile path) {
-    super(source, pr);
+  public DirParser(final IO source, final Options opts, final IOFile path) {
+    super(source, opts);
     final String parent = source.dirPath();
     root = parent.endsWith("/") ? parent : parent + '/';
-    skipCorrupt = prop.is(Prop.SKIPCORRUPT);
-    archives = prop.is(Prop.ADDARCHIVES);
-    addRaw = prop.is(Prop.ADDRAW);
-    dtd = prop.is(Prop.DTD);
-    rawParser = prop.get(Prop.PARSER).toLowerCase(Locale.ENGLISH).equals(DataText.M_RAW);
+    skipCorrupt = options.is(Options.SKIPCORRUPT);
+    archives = options.is(Options.ADDARCHIVES);
+    addRaw = options.is(Options.ADDRAW);
+    dtd = options.is(Options.DTD);
+    rawParser = options.get(Options.PARSER).toLowerCase(Locale.ENGLISH).equals(DataText.M_RAW);
 
     filter = !source.isDir() && !source.isArchive() ? null :
-      Pattern.compile(IOFile.regex(pr.get(Prop.CREATEFILTER)));
+      Pattern.compile(IOFile.regex(opts.get(Options.CREATEFILTER)));
     // choose binary storage if (disk-based) database path is known and
     // if raw parser or "add raw" option were chosen
     rawPath = path != null && (addRaw || rawParser) ? new IOFile(path, M_RAW) : null;
@@ -168,7 +168,7 @@ public final class DirParser extends Parser {
               in = new IOContent(src.read());
               in.name(src.name());
             }
-            parser = Parser.singleParser(in, prop, targ);
+            parser = Parser.singleParser(in, options, targ);
             MemBuilder.build("", parser);
           } catch(final IOException ex) {
             Util.debug(ex);
@@ -179,7 +179,7 @@ public final class DirParser extends Parser {
 
         // parse file
         if(ok) {
-          parser = Parser.singleParser(in, prop, targ);
+          parser = Parser.singleParser(in, options, targ);
           parser.parse(b);
         }
         parser = null;

@@ -34,9 +34,9 @@ public final class BaseXHistory {
   public void store(final String input) {
     if(input == null) return;
     final StringList sl = new StringList(MAX).add(input);
-    for(final String s : gui.gprop.strings(history)) {
+    for(final String s : gui.gopts.strings(history)) {
       if(sl.size() < MAX &&  !input.equals(s)) sl.add(s);
     }
-    gui.gprop.set(history, sl.toArray());
+    gui.gopts.set(history, sl.toArray());
   }
 }

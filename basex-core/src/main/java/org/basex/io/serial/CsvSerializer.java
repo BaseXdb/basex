@@ -30,16 +30,16 @@ public final class CsvSerializer extends OutputSerializer {
   /**
    * Constructor.
    * @param os output stream reference
-   * @param props serialization properties
+   * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  CsvSerializer(final OutputStream os, final SerializerProp props) throws IOException {
-    super(os, props);
+  CsvSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
+    super(os, opts);
 
-    final CsvProp cprop = new CsvProp(props.get(SerializerProp.S_CSV));
-    int s = cprop.separator();
+    final CsvOptions copts = new CsvOptions(opts.get(SerializerOptions.S_CSV));
+    int s = copts.separator();
     separator = s;
-    header = cprop.is(CsvProp.HEADER);
+    header = copts.is(CsvOptions.HEADER);
     headers = header ? new TokenList() : null;
   }
 

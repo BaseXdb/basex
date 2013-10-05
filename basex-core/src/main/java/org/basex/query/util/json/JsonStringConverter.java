@@ -1,7 +1,7 @@
 package org.basex.query.util.json;
 
 import org.basex.build.*;
-import org.basex.build.JsonProp.*;
+import org.basex.build.JsonOptions.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -37,10 +37,10 @@ public final class JsonStringConverter implements JsonHandler {
   public static TokenBuilder print(final String json, final JsonSpec spec,
       final boolean un, final TokenBuilder tb) throws QueryException {
 
-    final JsonProp jprop = new JsonProp();
-    jprop.set(JsonProp.SPEC, spec.toString());
-    jprop.set(JsonProp.UNESCAPE, un);
-    JsonParser.parse(json, jprop, new JsonStringConverter(tb), null);
+    final JsonOptions jopts = new JsonOptions();
+    jopts.set(JsonOptions.SPEC, spec.toString());
+    jopts.set(JsonOptions.UNESCAPE, un);
+    JsonParser.parse(json, jopts, new JsonStringConverter(tb), null);
     return tb;
   }
 

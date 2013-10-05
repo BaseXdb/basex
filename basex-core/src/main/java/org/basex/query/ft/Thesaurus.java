@@ -25,7 +25,7 @@ public final class Thesaurus {
   private final TokenObjMap<ThesNode> nodes = new TokenObjMap<ThesNode>();
   /** Relationships. */
   private static final TokenMap RSHIPS = new TokenMap();
-  /** Database properties. */
+  /** Database context. */
   private final Context ctx;
 
   static {
@@ -109,7 +109,7 @@ public final class Thesaurus {
    */
   private void init(final InputInfo ii) throws QueryException {
     try {
-      final Data data = MemBuilder.build(Parser.xmlParser(file, ctx.prop));
+      final Data data = MemBuilder.build(Parser.xmlParser(file, ctx.options));
       final Nodes result = nodes("//*:entry", new Nodes(0, data));
       for(int n = 0; n < result.size(); ++n) {
         build(new Nodes(result.pres[n], data));

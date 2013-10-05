@@ -46,10 +46,10 @@ public final class FNFtTest extends AdvancedQueryTest {
     query(_FT_SEARCH.args(NAME, "XXX"), "");
 
     // apply index options to query term
-    new Set(Prop.STEMMING, true).execute(context);
+    new Set(Options.STEMMING, true).execute(context);
     new CreateIndex("fulltext").execute(context);
     contains(_FT_SEARCH.args(NAME, "Exercises") + "/..", "<li>Exercise 1</li>");
-    new Set(Prop.STEMMING, false).execute(context);
+    new Set(Options.STEMMING, false).execute(context);
     new CreateIndex(CmdIndex.FULLTEXT).execute(context);
 
     // check match options

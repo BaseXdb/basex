@@ -46,7 +46,7 @@ final class ViewPanel extends BaseXBack implements ViewLayout {
    * Makes the view invisible.
    */
   public void delete() {
-    view.gui.gprop.setObject("SHOW" + view.getName().toUpperCase(Locale.ENGLISH), false);
+    view.gui.gopts.setObject("SHOW" + view.getName().toUpperCase(Locale.ENGLISH), false);
     view.gui.layoutViews();
   }
 

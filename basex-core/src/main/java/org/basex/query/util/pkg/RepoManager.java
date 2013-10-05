@@ -232,7 +232,7 @@ public final class RepoManager {
     final String uriPath = ModuleLoader.uri2path(string(uri));
     if(uriPath == null) BXRE_URI.thrw(info, uri);
 
-    final IOFile rp = new IOFile(ctx.mprop.get(MainProp.REPOPATH));
+    final IOFile rp = new IOFile(ctx.globalopts.get(GlobalOptions.REPOPATH));
     final boolean exists = md(rp, uriPath);
     new IOFile(rp, uriPath + IO.XQMSUFFIX).write(cont);
     return exists;
@@ -253,7 +253,7 @@ public final class RepoManager {
       if(!m.find()) continue;
 
       // copy file to rewritten file path
-      final IOFile rp = new IOFile(repo.context.mprop.get(MainProp.REPOPATH));
+      final IOFile rp = new IOFile(repo.context.globalopts.get(GlobalOptions.REPOPATH));
       final String path = m.group(1).replace('.', '/');
       final boolean exists = md(rp, path);
       new IOFile(rp, path + IO.JARSUFFIX).write(cont);

@@ -74,7 +74,7 @@ public final class DiskBuilder extends Builder {
 
     // drop old database (if available) and create new one
     DropDB.drop(dbname, context);
-    context.mprop.dbpath(dbname).md();
+    context.globalopts.dbpath(dbname).md();
 
     meta = md;
     tags = new Names(md);

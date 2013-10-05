@@ -1,7 +1,7 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-import static org.basex.io.serial.SerializerProp.*;
+import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
@@ -34,7 +34,7 @@ final class QueryListener extends Proc {
   /** Query processor. */
   private QueryProcessor qp;
   /** Serialization options. */
-  private SerializerProp options;
+  private SerializerOptions options;
   /** Parsing flag. */
   private boolean parsed;
   /** Query info. */
@@ -157,7 +157,7 @@ final class QueryListener extends Proc {
         qi.srlz = perf.time();
 
         // generate query info
-        info = qi.toString(qp, po, c, ctx.prop.is(Prop.QUERYINFO));
+        info = qi.toString(qp, po, c, ctx.options.is(Options.QUERYINFO));
 
       } catch(final QueryException ex) {
         throw new BaseXException(ex);

@@ -30,8 +30,8 @@ public final class IndexOptimizeTest extends SandboxTest {
   @BeforeClass
   public static void start() throws Exception {
     new DropDB(NAME).execute(context);
-    new Set(Prop.FTINDEX, true).execute(context);
-    new Set(Prop.QUERYINFO, true).execute(context);
+    new Set(Options.FTINDEX, true).execute(context);
+    new Set(Options.QUERYINFO, true).execute(context);
   }
 
   /**
@@ -140,7 +140,7 @@ public final class IndexOptimizeTest extends SandboxTest {
    */
   @Test
   public void ftTestLang() throws Exception {
-    new Set(Prop.LANGUAGE, "de").execute(context);
+    new Set(Options.LANGUAGE, "de").execute(context);
     createDoc();
     new Open(NAME).execute(context);
     check("//text()[. contains text 'test' using language 'de']");

@@ -68,7 +68,7 @@ public class ClientSession extends Session {
    */
   public ClientSession(final Context context, final String user, final String pass,
       final OutputStream output) throws IOException {
-    this(context.mprop.get(MainProp.HOST), context.mprop.num(MainProp.PORT),
+    this(context.globalopts.get(GlobalOptions.HOST), context.globalopts.num(GlobalOptions.PORT),
         user, pass, output);
   }
 

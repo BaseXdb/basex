@@ -144,7 +144,7 @@ public final class DialogManage extends BaseXDialog {
 
     } else if(cmp == drop) {
       for(final String s : dbs) {
-        if(ctx.mprop.dbexists(s)) cmds.add(new DropDB(s));
+        if(ctx.globalopts.dbexists(s)) cmds.add(new DropDB(s));
       }
       if(!BaseXDialog.confirm(gui, Util.info(DROPPING_DB_X, cmds.size()))) return;
       refresh = true;
@@ -166,7 +166,7 @@ public final class DialogManage extends BaseXDialog {
 
     } else if(cmp == restore) {
       // show warning if existing database would be overwritten
-      if(!gui.context.mprop.dbexists(db) ||
+      if(!gui.context.globalopts.dbexists(db) ||
           BaseXDialog.confirm(gui, OVERWRITE_DB_QUESTION)) cmds.add(new Restore(db));
 
     } else if(cmp == backups) {
@@ -189,7 +189,7 @@ public final class DialogManage extends BaseXDialog {
       doc1.setText(title);
       doc2.setText(BACKUPS + COLS + title);
 
-      boolean active = ctx.mprop.dbexists(db);
+      boolean active = ctx.globalopts.dbexists(db);
       String info = "";
       if(active) {
         // refresh info view
@@ -212,7 +212,7 @@ public final class DialogManage extends BaseXDialog {
       restore.setEnabled(active);
 
       active = false;
-      for(final String d : dbs) active |= ctx.mprop.dbexists(d);
+      for(final String d : dbs) active |= ctx.globalopts.dbexists(d);
       drop.setEnabled(active);
       backup.setEnabled(active);
 
@@ -241,7 +241,7 @@ public final class DialogManage extends BaseXDialog {
   @Override
   public void close() {
     final String db = choice.getValue();
-    if(gui.context.mprop.dbexists(db)) {
+    if(gui.context.globalopts.dbexists(db)) {
       DialogProgress.execute(this, new Open(db));
       dispose();
     }

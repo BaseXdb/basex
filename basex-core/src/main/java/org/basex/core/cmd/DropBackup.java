@@ -48,7 +48,7 @@ public class DropBackup extends ABackup {
    * @return number of dropped backups
    */
   private static int drop(final String db, final Context ctx) {
-    final IOFile dir = ctx.mprop.dbpath();
+    final IOFile dir = ctx.globalopts.dbpath();
     int c = 0;
     for(final IOFile f : dir.children()) {
       final String n = f.name();

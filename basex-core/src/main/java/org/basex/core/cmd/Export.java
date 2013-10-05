@@ -41,7 +41,8 @@ public final class Export extends Command {
   protected boolean run() {
     try {
       final Data data = context.data();
-      export(data, args[0], new SerializerProp(data.meta.prop.get(Prop.EXPORTER)), this);
+      final String export = data.meta.options.get(Options.EXPORTER);
+      export(data, args[0], new SerializerOptions(export), this);
       return info(DB_EXPORTED_X, data.meta.name, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));
@@ -58,12 +59,12 @@ public final class Export extends Command {
    * Files and directories in {@code path} will be possibly overwritten.
    * @param data data reference
    * @param path directory
-   * @param sp serialization properties
-   * @param e calling instance
+   * @param sopts serialization parameters
+   * @param export calling instance
    * @throws IOException I/O exception
    */
-  public static void export(final Data data, final String path, final SerializerProp sp,
-      final Export e) throws IOException {
+  public static void export(final Data data, final String path,
+      final SerializerOptions sopts, final Export export) throws IOException {
 
     final IOFile root = new IOFile(path);
     root.md();
@@ -83,9 +84,9 @@ public final class Export extends Command {
       desc = bin.descendants();
     }
 
-    if(e != null) {
-      e.progPos = 0;
-      e.progSize = il.size() + desc.size();
+    if(export != null) {
+      export.progPos = 0;
+      export.progSize = il.size() + desc.size();
     }
 
     // XML documents
@@ -94,10 +95,10 @@ public final class Export extends Command {
       final int pre = il.get(i);
       // create file path
       final IO f = root.merge(Token.string(data.text(pre, true)));
-      if(e != null) {
-        e.checkStop();
-        e.progFile = f;
-        e.progPos++;
+      if(export != null) {
+        export.checkStop();
+        export.progFile = f;
+        export.progPos++;
       }
       // create dir if necessary
       final IOFile dir = new IOFile(f.dirPath());
@@ -105,7 +106,7 @@ public final class Export extends Command {
 
       // serialize file
       final PrintOutput po = new PrintOutput(unique(exported, f.path()));
-      final Serializer ser = Serializer.get(po, sp);
+      final Serializer ser = Serializer.get(po, sopts);
       ser.serialize(new DBNode(data, pre));
       ser.close();
       po.close();
@@ -114,10 +115,10 @@ public final class Export extends Command {
     // export raw files
     for(final String s : desc) {
       final IOFile f = new IOFile(root.path(), s);
-      if(e != null) {
-        e.checkStop();
-        e.progFile = f;
-        e.progPos++;
+      if(export != null) {
+        export.checkStop();
+        export.progFile = f;
+        export.progPos++;
       }
       final String u = unique(exported, f.path());
       new IOFile(bin, s).copyTo(new IOFile(u));

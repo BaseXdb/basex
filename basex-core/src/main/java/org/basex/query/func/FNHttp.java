@@ -44,6 +44,6 @@ public final class FNHttp extends StandardFunc {
     }
 
     // send HTTP request
-    return new HTTPClient(info, ctx.context.prop).sendRequest(href, request, cache);
+    return new HTTPClient(info, ctx.context.options).sendRequest(href, request, cache);
   }
 }

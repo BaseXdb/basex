@@ -31,7 +31,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
     // create database context
     final String name = getCollectionName(uri);
-    final boolean exists = ctx.mprop.dbexists(name);
+    final boolean exists = ctx.globalopts.dbexists(name);
     return exists ? new BXCollection(name, true, this) : null;
   }
 
@@ -49,7 +49,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
   public String getProperty(final String key) {
     try {
       final String prop = key.toUpperCase(Locale.ENGLISH);
-      return ((Object[]) Prop.class.getField(prop).get(null))[1].toString();
+      return ((Object[]) Options.class.getField(prop).get(null))[1].toString();
     } catch(final Exception ex) {
       return null;
     }
@@ -76,7 +76,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
       final String main = uri.startsWith(XMLDBC) ? uri : XMLDBC + uri;
       if(main.startsWith(XMLDBURI)) {
         final String host = main.substring(XMLDBURI.length());
-        final String lh = LOCALHOST + ':' + ctx.mprop.num(MainProp.SERVERPORT) + '/';
+        final String lh = LOCALHOST + ':' + ctx.globalopts.num(GlobalOptions.SERVERPORT) + '/';
         if(host.startsWith(lh)) return host.substring(lh.length());
       }
     }

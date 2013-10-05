@@ -44,7 +44,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Supported methods. */
   EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
   /** Serialization parameters. */
-  final SerializerProp output;
+  final SerializerOptions output;
   /** Associated function. */
   final StaticFunc function;
   /** Associated module. */
@@ -234,7 +234,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       body = cache(http, null);
       try {
         final String ext = http.contentTypeExt();
-        bind(requestBody, arg, HTTPPayload.value(body, context.context.prop, ct, ext));
+        bind(requestBody, arg, HTTPPayload.value(body, context.context.options, ct, ext));
       } catch(final IOException ex) {
         error(INPUT_CONV, ex);
       }
@@ -526,8 +526,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   private void addMultipart(final IOContent body, final Map<String, Value> pars,
       final String ext) throws IOException, QueryException {
 
-    final Prop prop = context.context.prop;
-    final HTTPPayload hp = new HTTPPayload(body.inputStream(), false, null, prop);
+    final Options opts = context.context.options;
+    final HTTPPayload hp = new HTTPPayload(body.inputStream(), false, null, opts);
     final HashMap<String, Value> map = hp.multiForm(ext);
     for(final Map.Entry<String, Value> entry : map.entrySet()) {
       pars.put(entry.getKey(), entry.getValue());

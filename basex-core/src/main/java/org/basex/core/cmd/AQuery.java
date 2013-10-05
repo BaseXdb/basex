@@ -55,8 +55,8 @@ public abstract class AQuery extends Command {
       err = qe.getMessage();
     } else {
       try {
-        final boolean serial = prop.is(Prop.SERIALIZE);
-        qi.runs = Math.max(1, prop.num(Prop.RUNS));
+        final boolean serial = options.is(Options.SERIALIZE);
+        qi.runs = Math.max(1, options.num(Options.RUNS));
         long hits = 0;
         for(int r = 0; r < qi.runs; ++r) {
           // reuse existing processor instance
@@ -72,7 +72,7 @@ public abstract class AQuery extends Command {
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
           final Serializer ser;
 
-          if(prop.is(Prop.CACHEQUERY)) {
+          if(options.is(Options.CACHEQUERY)) {
             result = qp.execute();
             qi.evlt += p.time();
             ser = qp.getSerializer(po);
@@ -98,9 +98,9 @@ public abstract class AQuery extends Command {
         // dump some query info
         out.flush();
         // remove string list if global locking is used and if query is updating
-        if(mprop.is(MainProp.GLOBALLOCK) && qp.updating)
+        if(globalopts.is(GlobalOptions.GLOBALLOCK) && qp.updating)
           qi.readLocked = qi.writeLocked = null;
-        return info(qi.toString(qp, out, hits, prop.is(Prop.QUERYINFO)));
+        return info(qi.toString(qp, out, hits, options.is(Options.QUERYINFO)));
 
       } catch(final QueryException ex) {
         err = Util.message(ex);
@@ -178,7 +178,7 @@ public abstract class AQuery extends Command {
   private boolean extError(final String err) {
     // will only be evaluated when an error has occurred
     final StringBuilder sb = new StringBuilder();
-    if(prop.is(Prop.QUERYINFO)) {
+    if(options.is(Options.QUERYINFO)) {
       sb.append(info()).append(qp.info()).append(NL).append(ERROR_C).append(NL);
     }
     sb.append(err);
@@ -190,26 +190,26 @@ public abstract class AQuery extends Command {
    * @param c compiled flag
    */
   private void plan(final boolean c) {
-    if(c != prop.is(Prop.COMPPLAN)) return;
+    if(c != options.is(Options.COMPPLAN)) return;
 
     // show dot plan
     BufferOutput bo = null;
     try {
-      if(prop.is(Prop.DOTPLAN)) {
-        final String path = context.prop.get(Prop.QUERYPATH);
+      if(options.is(Options.DOTPLAN)) {
+        final String path = context.options.get(Options.QUERYPATH);
         final String dot = path.isEmpty() ? "plan.dot" :
             new IOFile(path).name().replaceAll("\\..*?$", ".dot");
 
         bo = new BufferOutput(dot);
-        final DOTSerializer d = new DOTSerializer(bo, prop.is(Prop.DOTCOMPACT));
+        final DOTSerializer d = new DOTSerializer(bo, options.is(Options.DOTCOMPACT));
         d.serialize(qp.plan());
         d.close();
 
-        if(prop.is(Prop.DOTDISPLAY))
-          new ProcessBuilder(prop.get(Prop.DOTTY), dot).start();
+        if(options.is(Options.DOTDISPLAY))
+          new ProcessBuilder(options.get(Options.DOTTY), dot).start();
       }
       // show XML plan
-      if(prop.is(Prop.XMLPLAN)) {
+      if(options.is(Options.XMLPLAN)) {
         info(NL + QUERY_PLAN + COL);
         info(qp.plan().serialize().toString());
       }

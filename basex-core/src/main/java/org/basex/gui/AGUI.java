@@ -18,19 +18,19 @@ import org.basex.gui.layout.*;
 public abstract class AGUI extends JFrame {
   /** Database Context. */
   public final Context context;
-  /** GUI properties. */
-  public final GUIProp gprop;
+  /** GUI options. */
+  public final GUIOptions gopts;
 
   /**
    * Default constructor.
    * @param ctx database context
-   * @param gprops gui properties
+   * @param opts gui options
    */
-  AGUI(final Context ctx, final GUIProp gprops) {
+  AGUI(final Context ctx, final GUIOptions opts) {
     setIconImage(BaseXLayout.image("icon"));
     setTitle(null);
     context = ctx;
-    gprop = gprops;
+    gopts = opts;
   }
 
   @Override

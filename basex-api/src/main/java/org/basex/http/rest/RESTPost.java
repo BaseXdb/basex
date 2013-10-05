@@ -41,12 +41,12 @@ public class RESTPost extends RESTCode {
     final Context ctx = http.context();
     DBNode doc;
     try {
-      doc = new DBNode(new IOContent(in), ctx.prop);
+      doc = new DBNode(new IOContent(in), ctx.options);
     } catch(final IOException ex) {
       throw HTTPErr.BAD_REQUEST_X.thrw(ex);
     }
 
-    final SerializerProp sp = new SerializerProp();
+    final SerializerOptions sp = new SerializerOptions();
     QueryProcessor qp;
     RESTCode code;
 

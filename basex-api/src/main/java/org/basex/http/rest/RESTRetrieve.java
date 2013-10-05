@@ -44,9 +44,9 @@ final class RESTRetrieve extends RESTQuery {
     if(http.depth() == 0) {
       // list databases
       final Table table = new Table(session.execute(new List()));
-      final SerializerProp sprop = new SerializerProp(http.serialization);
-      final Serializer ser = Serializer.get(http.res.getOutputStream(), sprop);
-      http.initResponse(sprop);
+      final SerializerOptions sopts = new SerializerOptions(http.serialization);
+      final Serializer ser = Serializer.get(http.res.getOutputStream(), sopts);
+      http.initResponse(sopts);
 
       final FElem el = new FElem(Q_DATABASES).declareNS();
       el.add(RESOURCES, token(table.contents.size()));
@@ -57,9 +57,9 @@ final class RESTRetrieve extends RESTQuery {
       // list database resources
       final Table table = new Table(session.execute(new List(http.db(), http.dbpath())));
       final String serial = http.serialization;
-      final SerializerProp sprop = new SerializerProp(serial);
-      final Serializer ser = Serializer.get(http.res.getOutputStream(), sprop);
-      http.initResponse(sprop);
+      final SerializerOptions sopts = new SerializerOptions(serial);
+      final Serializer ser = Serializer.get(http.res.getOutputStream(), sopts);
+      http.initResponse(sopts);
 
       final FElem el = new FElem(Q_DATABASE).declareNS();
       el.add(NAME, http.db());
@@ -69,14 +69,14 @@ final class RESTRetrieve extends RESTQuery {
       ser.close();
     } else if(isRaw(http)) {
       // retrieve raw file; prefix user parameters with media type
-      final String ct = SerializerProp.S_MEDIA_TYPE[0] + "=" + contentType(http);
-      http.initResponse(new SerializerProp(ct + ',' + http.serialization));
+      final String ct = SerializerOptions.S_MEDIA_TYPE[0] + "=" + contentType(http);
+      http.initResponse(new SerializerOptions(ct + ',' + http.serialization));
       session.setOutputStream(http.res.getOutputStream());
       session.execute(new Retrieve(http.dbpath()));
     } else {
       // retrieve xml file
-      http.initResponse(new SerializerProp(http.serialization));
-      session.execute(new Set(Prop.SERIALIZER, serial(http)));
+      http.initResponse(new SerializerOptions(http.serialization));
+      session.execute(new Set(Options.SERIALIZER, serial(http)));
       session.setOutputStream(http.res.getOutputStream());
       session.query(".").execute();
     }

@@ -157,7 +157,7 @@ final class TreeRects implements TreeConstants {
    * @return text
    */
   byte[] getText(final int pre) {
-    return ViewData.name(view.gui.gprop, nodes.data, pre);
+    return ViewData.name(view.gui.gopts, nodes.data, pre);
   }
 
   /**

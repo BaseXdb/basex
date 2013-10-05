@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import java.util.regex.*;
 
 import org.basex.build.*;
-import org.basex.build.JsonProp.*;
+import org.basex.build.JsonOptions.*;
 import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.data.*;
@@ -129,7 +129,7 @@ public final class QueryContext extends Proc {
   final TokenList modStack = new TokenList();
 
   /** Serializer options. */
-  SerializerProp serProp;
+  SerializerOptions serialOpts;
   /** Initial context value. */
   public MainModule ctxItem;
   /** Module loader. */
@@ -164,9 +164,9 @@ public final class QueryContext extends Proc {
   public QueryContext(final Context ctx) {
     context = ctx;
     nodes = ctx.current();
-    inf = ctx.prop.is(Prop.QUERYINFO) || Prop.debug;
-    sc = new StaticContext(ctx.prop.is(Prop.XQUERY3));
-    maxCalls = ctx.prop.num(Prop.TAILCALLS);
+    inf = ctx.options.is(Options.QUERYINFO) || Prop.debug;
+    sc = new StaticContext(ctx.options.is(Options.XQUERY3));
+    maxCalls = ctx.options.num(Options.TAILCALLS);
     modules = new ModuleLoader(ctx);
   }
 
@@ -214,7 +214,7 @@ public final class QueryContext extends Proc {
     final StringList o = dbOptions;
     for(int s = 0; s < o.size(); s += 2) {
       try {
-        context.prop.set(o.get(s).toUpperCase(Locale.ENGLISH), o.get(s + 1));
+        context.options.set(o.get(s).toUpperCase(Locale.ENGLISH), o.get(s + 1));
       } catch(final Exception ex) {
         BASX_VALUE.thrw(null, o.get(s), o.get(s + 1));
       }
@@ -454,14 +454,14 @@ public final class QueryContext extends Proc {
    *   parameters have been specified
    * @return serialization parameters
    */
-  public SerializerProp serParams(final boolean optional) {
+  public SerializerOptions serParams(final boolean optional) {
     // if available, return parameters specified by the query
-    if(serProp != null) return serProp;
+    if(serialOpts != null) return serialOpts;
     // retrieve global parameters
-    final String serial = context.prop.get(Prop.SERIALIZER);
+    final String serial = context.options.get(Options.SERIALIZER);
     if(optional && serial.isEmpty()) return null;
     // otherwise, if requested, return default parameters
-    return new SerializerProp(serial);
+    return new SerializerOptions(serial);
   }
 
   /**
@@ -498,9 +498,9 @@ public final class QueryContext extends Proc {
     if(closed) return;
     closed = true;
 
-    // reset database properties to initial value
+    // reset database options to initial value
     for(final Entry<String, Object> e : globalOpt.entrySet()) {
-      context.prop.setObject(e.getKey(), e.getValue());
+      context.options.setObject(e.getKey(), e.getValue());
     }
     // close database connections
     resource.close();
@@ -536,7 +536,7 @@ public final class QueryContext extends Proc {
    */
   Result execute() throws QueryException {
     // limit number of hits to be returned and displayed
-    int max = context.prop.num(Prop.MAXHITS);
+    int max = context.options.num(Options.MAXHITS);
     if(max < 0) max = Integer.MAX_VALUE;
 
     // evaluates the query
@@ -545,7 +545,7 @@ public final class QueryContext extends Proc {
     Item it;
 
     // check if all results belong to the database of the input context
-    if(serProp == null && nodes != null) {
+    if(serialOpts == null && nodes != null) {
       final IntList pre = new IntList();
 
       while((it = ir.next()) != null) {
@@ -630,8 +630,8 @@ public final class QueryContext extends Proc {
 
     // convert to json
     if(type.equalsIgnoreCase(M_JSON)) {
-      final JsonProp jp = new JsonProp();
-      jp.set(JsonProp.SPEC, JsonSpec.ECMA_262.toString());
+      final JsonOptions jp = new JsonOptions();
+      jp.set(JsonOptions.SPEC, JsonSpec.ECMA_262.toString());
       return new JsonMapConverter(jp, null).convert(val.toString());
     }
 

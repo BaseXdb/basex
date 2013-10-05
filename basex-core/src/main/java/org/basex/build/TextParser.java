@@ -14,7 +14,7 @@ import org.basex.util.*;
  * and converts them to XML.
  *
  * <p>The parser provides some options, which can be specified via the
- * {@link Prop#TEXTPARSER} option.</p>
+ * {@link Options#TEXTPARSER} option.</p>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -33,15 +33,14 @@ public final class TextParser extends SingleParser {
   /**
    * Constructor.
    * @param source document source
-   * @param pr database properties
+   * @param opts database options
    * @throws IOException I/O exception
    */
-  public TextParser(final IO source, final Prop pr) throws IOException {
-    super(source, pr);
-    // set parser properties
-    final TextProp tp = new TextProp(pr.get(Prop.TEXTPARSER));
-    lines = tp.is(TextProp.LINES);
-    encoding = tp.get(TextProp.ENCODING);
+  public TextParser(final IO source, final Options opts) throws IOException {
+    super(source, opts);
+    final TextOptions tp = new TextOptions(opts.get(Options.TEXTPARSER));
+    lines = tp.is(TextOptions.LINES);
+    encoding = tp.get(TextOptions.ENCODING);
   }
 
   @Override

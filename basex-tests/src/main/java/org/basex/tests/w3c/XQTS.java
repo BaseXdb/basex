@@ -24,6 +24,6 @@ public final class XQTS extends W3CTS {
    */
   public XQTS() {
     super(Util.name(XQTS.class));
-    context.prop.set(Prop.XQUERY3, false);
+    context.options.set(Options.XQUERY3, false);
   }
 }

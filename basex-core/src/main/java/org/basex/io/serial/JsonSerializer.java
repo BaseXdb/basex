@@ -1,7 +1,7 @@
 package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
-import static org.basex.io.serial.SerializerProp.*;
+import static org.basex.io.serial.SerializerOptions.*;
 
 import java.io.*;
 
@@ -14,20 +14,20 @@ import org.basex.build.*;
  * @author Christian Gruen
  */
 public abstract class JsonSerializer extends OutputSerializer {
-  /** JSON props. */
-  protected final JsonProp jprop;
+  /** JSON options. */
+  protected final JsonOptions joptions;
 
   /**
    * Constructor.
    * @param os output stream reference
-   * @param props serialization properties
+   * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  protected JsonSerializer(final OutputStream os, final SerializerProp props)
+  protected JsonSerializer(final OutputStream os, final SerializerOptions opts)
       throws IOException {
 
-    super(os, props);
-    props.set(S_METHOD, M_JSON);
-    jprop = new JsonProp(props.get(SerializerProp.S_JSON));
+    super(os, opts);
+    opts.set(S_METHOD, M_JSON);
+    joptions = new JsonOptions(opts.get(SerializerOptions.S_JSON));
   }
 }

@@ -1,6 +1,5 @@
 package org.basex.test.qt3ts;
 
-import static org.basex.core.Prop.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -48,9 +47,9 @@ public abstract class QT3TestSet {
   @Before
   public void buildUp() throws BaseXException {
     ctx = new Context();
-    new Set(Prop.CHOP, false).execute(ctx);
-    new Set(Prop.INTPARSE, false).execute(ctx);
-    new Set(Prop.XQUERY3, true).execute(ctx);
+    new Set(Options.CHOP, false).execute(ctx);
+    new Set(Options.INTPARSE, false).execute(ctx);
+    new Set(Options.XQUERY3, true).execute(ctx);
     result = null;
   }
 
@@ -64,7 +63,7 @@ public abstract class QT3TestSet {
 
   /** Sets the XQuery version to 1.0. */
   protected void xquery10() {
-    ctx.prop.set(Prop.XQUERY3, false);
+    ctx.options.set(Options.XQUERY3, false);
   }
 
   /**
@@ -323,7 +322,7 @@ public abstract class QT3TestSet {
    * @return result
    */
   private static String normNL(final String in) {
-    return in.replaceAll("\r\n|\r|\n", NL);
+    return in.replaceAll("\r\n|\r|\n", Prop.NL);
   }
 
   /**

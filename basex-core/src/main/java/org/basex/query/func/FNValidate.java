@@ -186,17 +186,17 @@ public final class FNValidate extends StandardFunc {
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
         final Item it = checkItem(expr[0], ctx);
-        SerializerProp sp = null;
+        SerializerOptions sp = null;
 
-        // integrate doctype declaration via serialization properties
+        // integrate doctype declaration via serialization parameters
         if(expr.length > 1) {
-          sp = new SerializerProp();
+          sp = new SerializerOptions();
           final String dtd = string(checkStr(expr[1], ctx));
           IO sc = IO.get(dtd);
           if(!sc.exists()) WHICHRES.thrw(info, dtd);
           tmp = createTmp(sc);
           if(tmp != null) sc = tmp;
-          sp.set(SerializerProp.S_DOCTYPE_SYSTEM, sc.url());
+          sp.set(SerializerOptions.S_DOCTYPE_SYSTEM, sc.url());
         }
 
         final IO in = read(it, ctx, sp);
@@ -256,18 +256,18 @@ public final class FNValidate extends StandardFunc {
    * Returns an input reference (possibly cached) to the first argument.
    * @param it item
    * @param ctx query context
-   * @param sp serializer properties
+   * @param sopts serializer parameters
    * @return item
    * @throws QueryException query exception
    * @throws IOException exception
    */
-  IO read(final Item it, final QueryContext ctx, final SerializerProp sp)
+  IO read(final Item it, final QueryContext ctx, final SerializerOptions sopts)
       throws QueryException, IOException {
 
     if(it.type.isNode()) {
       // return node in string representation
       final ArrayOutput ao = new ArrayOutput();
-      Serializer.get(ao, sp).serialize(it);
+      Serializer.get(ao, sopts).serialize(it);
       final IOContent io = new IOContent(ao.toArray());
       io.name(string(((ANode) it).baseURI()));
       return io;
@@ -277,10 +277,10 @@ public final class FNValidate extends StandardFunc {
       final String path = string(it.string(info));
       IO io = IO.get(path);
       if(!io.exists()) WHICHRES.thrw(info, path);
-      if(sp != null) {
+      if(sopts != null) {
         // add doctype declaration if specified
         final ArrayOutput ao = new ArrayOutput();
-        Serializer.get(ao, sp).serialize(new DBNode(io, ctx.context.prop));
+        Serializer.get(ao, sopts).serialize(new DBNode(io, ctx.context.options));
         io = new IOContent(ao.toArray());
         io.name(path);
       }

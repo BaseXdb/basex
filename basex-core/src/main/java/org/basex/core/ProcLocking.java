@@ -7,11 +7,11 @@ import org.basex.util.list.*;
 
 /**
  * Management of executing read/write processes.
- * Supports multiple readers, limited by {@link MainProp#PARALLEL},
+ * Supports multiple readers, limited by {@link GlobalOptions#PARALLEL},
  * and a single writer (readers/writer lock).
  *
  * Since Version 7.6, this locking class has been replaced by {@link DBLocking}.
- * It can still be activated by setting {@link MainProp#GLOBALLOCK} to {@code true}.
+ * It can still be activated by setting {@link GlobalOptions#GLOBALLOCK} to {@code true}.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -46,7 +46,7 @@ final class ProcLocking implements Locking {
       queue.add(o);
 
       // maximum number of readers
-      final int maxReaders = Math.max(ctx.mprop.num(MainProp.PARALLEL), 1);
+      final int maxReaders = Math.max(ctx.globalopts.num(GlobalOptions.PARALLEL), 1);
 
       while(true) {
         if(!writer && o == queue.get(0)) {

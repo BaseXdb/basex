@@ -27,7 +27,7 @@ public abstract class QueryTest extends SandboxTest {
   /** Prepares the tests. */
   @BeforeClass
   public static void startTest() {
-    context.prop.set(Prop.CACHEQUERY, true);
+    context.options.set(Options.CACHEQUERY, true);
   }
 
   /**

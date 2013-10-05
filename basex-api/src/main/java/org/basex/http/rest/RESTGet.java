@@ -28,7 +28,7 @@ final class RESTGet extends RESTCode {
 
     // parse database options
     final TokenBuilder ser = new TokenBuilder();
-    final SerializerProp sp = new SerializerProp();
+    final SerializerOptions sp = new SerializerOptions();
     for(final Entry<String, String[]> param : http.params().entrySet()) {
       final String key = param.getKey();
       final String[] vals = param.getValue();

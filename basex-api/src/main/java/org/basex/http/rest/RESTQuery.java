@@ -44,7 +44,7 @@ class RESTQuery extends RESTCode {
 
   @Override
   void run(final HTTPContext http) throws IOException {
-    query(input, http, http.context().mprop.get(MainProp.WEBPATH));
+    query(input, http, http.context().globalopts.get(GlobalOptions.WEBPATH));
   }
 
   /**
@@ -62,20 +62,20 @@ class RESTQuery extends RESTCode {
     if(item != null) {
       // create main memory instance of the document specified as context node
       final boolean mm = session.execute(
-          new Get(Prop.MAINMEM)).split(COLS)[1].equals(TRUE);
-      session.execute(new Set(Prop.MAINMEM, true));
+          new Get(Options.MAINMEM)).split(COLS)[1].equals(TRUE);
+      session.execute(new Set(Options.MAINMEM, true));
       session.create(Util.name(RESTQuery.class), new ArrayInput(item));
-      if(!mm) session.execute(new Set(Prop.MAINMEM, false));
+      if(!mm) session.execute(new Set(Options.MAINMEM, false));
     } else {
       // open addressed database
       open(http);
     }
 
     // send serialization options to the server
-    session.execute(new Set(Prop.SERIALIZER, serial(http)));
+    session.execute(new Set(Options.SERIALIZER, serial(http)));
     session.setOutputStream(http.res.getOutputStream());
     // set base path to correctly resolve local references
-    session.execute(new Set(Prop.QUERYPATH, path));
+    session.execute(new Set(Options.QUERYPATH, path));
 
     // create query instance and bind http context
     final Query qu = session.query(in);
@@ -88,7 +88,7 @@ class RESTQuery extends RESTCode {
       if(val.length == 1) qu.bind(e.getKey(), val[0]);
     }
     // initializes the response with query serialization options
-    http.initResponse(new SerializerProp(qu.options()));
+    http.initResponse(new SerializerOptions(qu.options()));
     // run query
     qu.execute();
   }
@@ -102,8 +102,8 @@ class RESTQuery extends RESTCode {
     final TokenBuilder ser = new TokenBuilder(http.serialization);
     if(http.wrapping) {
       if(!ser.isEmpty()) ser.add(',');
-      ser.addExt(SerializerProp.S_WRAP_PREFIX[0]).add('=').add(REST).add(',');
-      ser.addExt(SerializerProp.S_WRAP_URI[0]).add('=').add(RESTURI);
+      ser.addExt(SerializerOptions.S_WRAP_PREFIX[0]).add('=').add(REST).add(',');
+      ser.addExt(SerializerOptions.S_WRAP_URI[0]).add('=').add(RESTURI);
     }
     return ser.toString();
   }

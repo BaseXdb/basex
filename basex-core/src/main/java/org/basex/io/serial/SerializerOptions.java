@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class SerializerProp extends AProp {
+public final class SerializerOptions extends AOptions {
   /** Undefined flag. */
   static final String UNDEFINED = "\u0001";
 
@@ -81,49 +81,55 @@ public final class SerializerProp extends AProp {
   /** Specific serialization parameter. */
   public static final Object[] S_JSON = { "json", "" };
 
-  /** Unknown properties. */
+  /** Unknown options. */
   public final StringList unknown = new StringList(0);
 
   /**
    * Constructor.
    */
-  public SerializerProp() {
+  public SerializerOptions() {
     super();
   }
 
   /**
-   * Constructor, specifying initial properties.
-   * @param s property string. Properties are separated with commas ({@code ,}),
+   * Constructor, specifying initial options.
+   * @param string options string. Options are separated with commas ({@code ,}),
    * key/values with the equality character ({@code =}).
    */
-  public SerializerProp(final String s) {
-    for(final String ser : s.trim().split(",")) {
-      if(ser.isEmpty()) continue;
-      final String[] sprop = ser.split("=", 2);
-      final String key = sprop[0].trim();
-      final String value = set(key, sprop.length < 2 ? "" : sprop[1].trim());
-      if(value == null) unknown.add(key);
+  public SerializerOptions(final String string) {
+    final int sl = string.length();
+    int i = 0;
+    while(i < sl) {
+      int k = string.indexOf('=', i);
+      if(k == -1) break;
+      final String key = string.substring(i, k);
+      final StringBuilder val = new StringBuilder();
+      i = k;
+      while(++i < sl) {
+        final char ch = string.charAt(i);
+        if(ch == ',' && (++i == sl || string.charAt(i) != ',')) break;
+        val.append(ch);
+      }
+      if(set(key, val.toString()) == null) unknown.add(key);
     }
   }
 
   /**
-   * Retrieves a value from the specified property and checks allowed values.
-   * @param key property key
+   * Retrieves a value from the specified option and checks allowed values.
+   * @param key option
    * @param allowed allowed values
    * @return value
    * @throws SerializerException serializer exception
    */
-  public String check(final Object[] key, final String... allowed)
-      throws SerializerException {
-
+  public String check(final Object[] key, final String... allowed) throws SerializerException {
     final String val = get(key);
     for(final String a : allowed) if(a.equals(val)) return val;
     throw error(key[0], val, allowed);
   }
 
   /**
-   * Retrieves a value from the specified property and checks for supported values.
-   * @param key property key
+   * Retrieves a value from the specified option and checks for supported values.
+   * @param key option
    * @param allowed allowed values
    * @return value
    * @throws SerializerException serializer exception
@@ -138,9 +144,9 @@ public final class SerializerProp extends AProp {
   }
 
   /**
-   * Retrieves a value from the specified property and checks for its boolean
+   * Retrieves a value from the specified option and checks for its boolean
    * value.
-   * @param key property key
+   * @param key option
    * @return value
    * @throws SerializerException serializer exception
    */
@@ -157,7 +163,7 @@ public final class SerializerProp extends AProp {
 
   /**
    * Returns an exception string for a wrong key.
-   * @param key property key
+   * @param key option
    * @param found found value
    * @param allowed allowed values
    * @return exception
@@ -170,14 +176,12 @@ public final class SerializerProp extends AProp {
 
   /**
    * Returns a list of allowed keys.
-   * @param key property key
+   * @param key option
    * @param found found value
    * @param allowed allowed values
    * @return exception
    */
-  public static String allowed(final Object key, final String found,
-      final String... allowed) {
-
+  public static String allowed(final Object key, final String found, final String... allowed) {
     final TokenBuilder tb = new TokenBuilder();
     tb.addExt(SERVAL, key, allowed[0]);
     for(int a = 1; a < allowed.length; ++a) tb.addExt(SERVAL2, allowed[a]);

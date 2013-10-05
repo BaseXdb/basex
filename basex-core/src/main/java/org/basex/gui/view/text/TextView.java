@@ -121,12 +121,12 @@ public final class TextView extends View {
 
   @Override
   public boolean visible() {
-    return gui.gprop.is(GUIProp.SHOWTEXT);
+    return gui.gopts.is(GUIOptions.SHOWTEXT);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWTEXT, v);
+    gui.gopts.set(GUIOptions.SHOWTEXT, v);
   }
 
   @Override
@@ -141,7 +141,7 @@ public final class TextView extends View {
   private void setText(final Nodes n) {
     if(visible()) {
       try {
-        final ArrayOutput ao = new ArrayOutput().max(gui.gprop.num(GUIProp.MAXTEXT));
+        final ArrayOutput ao = new ArrayOutput().max(gui.gopts.num(GUIOptions.MAXTEXT));
         if(n != null) n.serialize(Serializer.get(ao));
         setText(ao);
         cmd = null;
@@ -168,7 +168,7 @@ public final class TextView extends View {
     cmd = null;
     ns = null;
 
-    final int mh = gui.context.prop.num(Prop.MAXHITS);
+    final int mh = gui.context.options.num(Options.MAXHITS);
     boolean parse = false;
     if(mh >= 0 && r != null && r.size() >= mh) {
       parse = true;
@@ -201,18 +201,18 @@ public final class TextView extends View {
    */
   void save() {
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
-        gui.gprop.get(GUIProp.WORKPATH), gui).suffix(IO.XMLSUFFIX);
+        gui.gopts.get(GUIOptions.WORKPATH), gui).suffix(IO.XMLSUFFIX);
 
     final IO file = fc.select(Mode.FSAVE);
     if(file == null) return;
-    gui.gprop.set(GUIProp.WORKPATH, file.path());
+    gui.gopts.set(GUIOptions.WORKPATH, file.path());
 
     PrintOutput out = null;
     gui.cursor(CURSORWAIT, true);
-    final Prop prop = gui.context.prop;
-    final int mh = prop.num(Prop.MAXHITS);
-    prop.set(Prop.MAXHITS, -1);
-    prop.set(Prop.CACHEQUERY, false);
+    final Options opts = gui.context.options;
+    final int mh = opts.num(Options.MAXHITS);
+    opts.set(Options.MAXHITS, -1);
+    opts.set(Options.CACHEQUERY, false);
 
     try {
       out = new PrintOutput(file.toString());
@@ -228,8 +228,8 @@ public final class TextView extends View {
       BaseXDialog.error(gui, FILE_NOT_SAVED);
     } finally {
       if(out != null) try { out.close(); } catch(final IOException ignored) { }
-      prop.set(Prop.MAXHITS, mh);
-      prop.set(Prop.CACHEQUERY, true);
+      opts.set(Options.MAXHITS, mh);
+      opts.set(Options.CACHEQUERY, true);
       gui.cursor(CURSORARROW, true);
     }
   }

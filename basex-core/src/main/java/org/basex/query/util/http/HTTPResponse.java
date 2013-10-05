@@ -23,17 +23,17 @@ import org.basex.util.*;
 public final class HTTPResponse {
   /** Input information. */
   private final InputInfo info;
-  /** Database properties. */
-  private final Prop prop;
+  /** Database options. */
+  private final Options options;
 
   /**
    * Constructor.
    * @param ii input info
-   * @param pr database properties
+   * @param opts database options
    */
-  public HTTPResponse(final InputInfo ii, final Prop pr) {
+  public HTTPResponse(final InputInfo ii, final Options opts) {
     info = ii;
-    prop = pr;
+    options = opts;
   }
 
   /**
@@ -71,7 +71,7 @@ public final class HTTPResponse {
 
     // construct <http:body/>
     final boolean st = status != null && Bln.parse(status, info);
-    final HTTPPayload hp = new HTTPPayload(is, st, info, prop);
+    final HTTPPayload hp = new HTTPPayload(is, st, info, options);
     response.add(hp.parse(error, type, utype));
 
     // result

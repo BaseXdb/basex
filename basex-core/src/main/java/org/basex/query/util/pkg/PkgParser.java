@@ -49,7 +49,7 @@ public final class PkgParser {
     try {
       final byte[] content = io.read();
 
-      final DBNode doc = new DBNode(new IOContent(content), repo.context.prop);
+      final DBNode doc = new DBNode(new IOContent(content), repo.context.options);
       final ANode node = childElements(doc).next();
 
       // checks root node

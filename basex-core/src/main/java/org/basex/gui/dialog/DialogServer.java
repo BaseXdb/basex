@@ -83,7 +83,7 @@ public final class DialogServer extends BaseXDialog {
   /** Combobox for log files. */
   private final BaseXCombo logc;
   /** String for log dir. */
-  private final IOFile logd = ctx.mprop.dbpath(".logs");
+  private final IOFile logd = ctx.globalopts.dbpath(".logs");
   /** ClientSession. */
   private ClientSession cs;
   /** Boolean for check is server is running. */
@@ -106,11 +106,12 @@ public final class DialogServer extends BaseXDialog {
     connect = new BaseXButton(CONNECT, this);
     disconnect = new BaseXButton(DISCONNECT, this);
 
-    final GUIProp gprop = gui.gprop;
-    host = new BaseXTextField(gprop.get(GUIProp.S_HOST), this);
-    ports = new BaseXTextField(Integer.toString(gprop.num(GUIProp.S_SERVERPORT)), this);
-    portc = new BaseXTextField(Integer.toString(gprop.num(GUIProp.S_PORT)), this);
-    admuser = new BaseXTextField(gprop.get(GUIProp.S_USER), this);
+    final GUIOptions gopts = gui.gopts;
+    host = new BaseXTextField(gopts.get(GUIOptions.S_HOST), this);
+    ports = new BaseXTextField(Integer.toString(gopts.num(GUIOptions.S_SERVERPORT)),
+        this);
+    portc = new BaseXTextField(Integer.toString(gopts.num(GUIOptions.S_PORT)), this);
+    admuser = new BaseXTextField(gopts.get(GUIOptions.S_USER), this);
     admpass = new BaseXPassword(this);
     infoC = new BaseXLabel(" ").border(12, 0, 0, 0);
 
@@ -261,9 +262,9 @@ public final class DialogServer extends BaseXDialog {
    * @return boolean success
    */
   private boolean ping(final boolean local) {
-    final GUIProp gprop = gui.gprop;
-    return BaseXServer.ping(local ? LOCALHOST : gprop.get(GUIProp.S_HOST),
-      gprop.num(local ? GUIProp.S_SERVERPORT : GUIProp.S_PORT));
+    final GUIOptions gopts = gui.gopts;
+    return BaseXServer.ping(local ? LOCALHOST : gopts.get(GUIOptions.S_HOST),
+      gopts.num(local ? GUIOptions.S_SERVERPORT : GUIOptions.S_PORT));
   }
 
   @Override
@@ -279,10 +280,10 @@ public final class DialogServer extends BaseXDialog {
       if(cmp == start) {
         try {
           final int p = Integer.parseInt(ports.getText());
-          gui.gprop.set(GUIProp.S_SERVERPORT, p);
+          gui.gopts.set(GUIOptions.S_SERVERPORT, p);
           if(host.getText().equals(LOCALHOST)) {
-            gui.gprop.set(GUIProp.S_PORT, p);
-            gui.gprop.set(GUIProp.S_EVENTPORT, p + 1);
+            gui.gopts.set(GUIOptions.S_PORT, p);
+            gui.gopts.set(GUIOptions.S_EVENTPORT, p + 1);
             portc.setText(String.valueOf(p));
           }
           BaseXServer.start(p, "-p", Integer.toString(p), "-e", Integer.toString(p + 1));
@@ -293,8 +294,8 @@ public final class DialogServer extends BaseXDialog {
           icon = Msg.ERROR;
         }
       } else if(cmp == stop) {
-        final int p = gui.gprop.num(GUIProp.S_SERVERPORT);
-        if(running) BaseXServer.stop(p, gui.gprop.num(GUIProp.S_EVENTPORT));
+        final int p = gui.gopts.num(GUIOptions.S_SERVERPORT);
+        if(running) BaseXServer.stop(p, gui.gopts.num(GUIOptions.S_EVENTPORT));
         running = ping(true);
         connected = connected && ping(false);
         if(!connected) msg = Util.info(SRV_STOPPED_PORT_X, p);
@@ -304,10 +305,10 @@ public final class DialogServer extends BaseXDialog {
         final String us = admuser.getText();
         final String hs = host.getText();
         final int pc = Integer.parseInt(portc.getText());
-        gui.gprop.set(GUIProp.S_HOST, hs);
-        gui.gprop.set(GUIProp.S_PORT, pc);
-        gui.gprop.set(GUIProp.S_USER, us);
-        gui.gprop.set(GUIProp.S_PASSWORD, pw);
+        gui.gopts.set(GUIOptions.S_HOST, hs);
+        gui.gopts.set(GUIOptions.S_PORT, pc);
+        gui.gopts.set(GUIOptions.S_USER, us);
+        gui.gopts.set(GUIOptions.S_PASSWORD, pw);
         cs = new ClientSession(hs, pc, us, pw);
         user.setSess(cs);
         dbsP.setSess(cs);

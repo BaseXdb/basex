@@ -545,43 +545,43 @@ public final class FTTest extends QueryTest {
   @Test
   @Override
   public void test() throws BaseXException {
-    final Prop prop = context.prop;
+    final Options opts = context.options;
     if(ALL) {
       // testing all kinds of combinations
       for(int a = 0; a < 2; ++a) {
-        prop.set(Prop.FTINDEX, a == 0);
+        opts.set(Options.FTINDEX, a == 0);
         super.test();
       }
     } else {
       // single test
-      //prop.set(Prop.MAINMEM, true);
-      prop.set(Prop.FTINDEX, true);
-      prop.set(Prop.STEMMING, true);
-      prop.set(Prop.DIACRITICS, true);
-      prop.set(Prop.CASESENS, true);
+      //opts.set(Prop.MAINMEM, true);
+      opts.set(Options.FTINDEX, true);
+      opts.set(Options.STEMMING, true);
+      opts.set(Options.DIACRITICS, true);
+      opts.set(Options.CASESENS, true);
       super.test();
     }
   }
 
   @Override
   protected String details() {
-    final Prop prop = context.prop;
+    final Options opts = context.options;
     final StringBuilder sb = new StringBuilder();
-    sb.append(set(Prop.FTINDEX, prop)).append(';');
-    sb.append(set(Prop.STEMMING, prop)).append(';');
-    sb.append(set(Prop.DIACRITICS, prop)).append(';');
-    sb.append(set(Prop.CASESENS, prop));
+    sb.append(set(Options.FTINDEX, opts)).append(';');
+    sb.append(set(Options.STEMMING, opts)).append(';');
+    sb.append(set(Options.DIACRITICS, opts)).append(';');
+    sb.append(set(Options.CASESENS, opts));
     return sb.toString();
   }
 
   /**
    * Returns a flag string.
    * @param key key
-   * @param prop properties
+   * @param opts options
    * @return string
    */
-  private static String set(final Object[] key, final AProp prop) {
-    return "set " + key[0] + ' ' + prop.is(key);
+  private static String set(final Object[] key, final AOptions opts) {
+    return "set " + key[0] + ' ' + opts.is(key);
   }
 
   /* TABLE REPRESENTATION

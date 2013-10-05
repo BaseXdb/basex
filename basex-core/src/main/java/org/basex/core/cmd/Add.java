@@ -90,12 +90,12 @@ public final class Add extends ACreate {
     // ensure that the final name is not empty
     if(name.isEmpty()) return error(NAME_INVALID_X, name);
 
-    parser = new DirParser(io, prop, data.meta.path);
+    parser = new DirParser(io, options, data.meta.path);
     parser.target(target);
 
     // create random database name for disk-based creation
     final boolean cache = cache(parser);
-    final String db = cache ? context.mprop.random(data.meta.name) : name;
+    final String db = cache ? context.globalopts.random(data.meta.name) : name;
     build = cache ? new DiskBuilder(db, parser, context) : new MemBuilder(db, parser);
 
     Data tmp = null;
@@ -126,9 +126,9 @@ public final class Add extends ACreate {
    */
   private boolean cache(final Parser parser) {
     // main memory mode: never write to disk
-    if(prop.is(Prop.MAINMEM)) return false;
+    if(options.is(Options.MAINMEM)) return false;
     // explicit caching
-    if(prop.is(Prop.ADDCACHE)) return true;
+    if(options.is(Options.ADDCACHE)) return true;
 
     // create disk instances for large documents
     // (does not work for input streams and directories)

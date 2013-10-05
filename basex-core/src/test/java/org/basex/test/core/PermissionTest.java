@@ -62,7 +62,7 @@ public final class PermissionTest extends SandboxTest {
 
       ok(new CreateUser(NAME, Token.md5(NAME)), adminSession);
       ok(new CreateDB(RENAMED), adminSession);
-      server.context.mprop.set(MainProp.REPOPATH, REPO);
+      server.context.globalopts.set(GlobalOptions.REPOPATH, REPO);
       testSession = createClient(NAME, NAME);
 
       ok(new CreateDB(NAME, "<xml/>"), adminSession);
@@ -102,8 +102,8 @@ public final class PermissionTest extends SandboxTest {
     no(new InfoIndex(), testSession);
     no(new InfoStorage(), testSession);
     no(new Get("DBPATH"), testSession);
-    ok(new Get(Prop.QUERYINFO), testSession);
-    ok(new Set(Prop.QUERYINFO, false), testSession);
+    ok(new Get(Options.QUERYINFO), testSession);
+    ok(new Set(Options.QUERYINFO, false), testSession);
 
     // repo Stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
@@ -142,8 +142,8 @@ public final class PermissionTest extends SandboxTest {
     ok(new InfoDB(), testSession);
     ok(new InfoStorage("1", "2"), testSession);
     no(new Get("DBPATH"), testSession);
-    ok(new Get(Prop.QUERYINFO), testSession);
-    ok(new Set(Prop.QUERYINFO, false), testSession);
+    ok(new Get(Options.QUERYINFO), testSession);
+    ok(new Set(Options.QUERYINFO, false), testSession);
     // XQuery read
     ok(new XQuery("//xml"), testSession);
     ok(new Find(NAME), testSession);

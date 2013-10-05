@@ -100,16 +100,16 @@ public abstract class StandardFunc extends Arr {
   /**
    * Serializes the data from the specified iterator.
    * @param ir data to serialize
-   * @param props serialization properties
+   * @param opts serialization parameters
    * @return result
    * @throws QueryException query exception
    */
-  protected byte[] serialize(final Iter ir, final SerializerProp props)
+  protected byte[] serialize(final Iter ir, final SerializerOptions opts)
       throws QueryException {
 
     final ArrayOutput ao = new ArrayOutput();
     try {
-      final Serializer ser = Serializer.get(ao, props);
+      final Serializer ser = Serializer.get(ao, opts);
       for(Item it; (it = ir.next()) != null;) ser.serialize(it);
       ser.close();
     } catch(final SerializerException ex) {
@@ -268,7 +268,7 @@ public abstract class StandardFunc extends Arr {
     for(Item it; (it = ir.next()) != null;) {
       final Data d = it.data();
       if(d != null && !d.inMemory()) {
-        it = ((ANode) it).dbCopy(ctx.context.prop);
+        it = ((ANode) it).dbCopy(ctx.context.options);
       } else if(it instanceof FItem) {
         FIVALUE.thrw(info, it);
       }

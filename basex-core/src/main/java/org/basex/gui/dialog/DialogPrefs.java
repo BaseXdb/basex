@@ -64,9 +64,9 @@ public final class DialogPrefs extends BaseXDialog {
 
     BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
-    final MainProp mprop = gui.context.mprop;
-    final GUIProp gprop = gui.gprop;
-    path = new BaseXTextField(mprop.dbpath().path(), this);
+    final GlobalOptions opts = gui.context.globalopts;
+    final GUIOptions gopts = gui.gopts;
+    path = new BaseXTextField(opts.dbpath().path(), this);
 
     final BaseXButton button = new BaseXButton(BROWSE_D, this);
     button.addActionListener(new ActionListener() {
@@ -84,19 +84,19 @@ public final class DialogPrefs extends BaseXDialog {
     pp.add(new BaseXLabel(GUI_INTERACTIONS + COL, true, true).border(12, 0, 6, 0));
 
     // checkbox for Java look and feel
-    javalook = new BaseXCheckBox(JAVA_LF, gprop.is(GUIProp.JAVALOOK), this);
+    javalook = new BaseXCheckBox(JAVA_LF, gopts.is(GUIOptions.JAVALOOK), this);
     pp.add(javalook);
 
     // checkbox for realtime mouse focus
-    focus = new BaseXCheckBox(RT_FOCUS, gprop.is(GUIProp.MOUSEFOCUS), this);
+    focus = new BaseXCheckBox(RT_FOCUS, gopts.is(GUIOptions.MOUSEFOCUS), this);
     pp.add(focus);
 
     // checkbox for simple file dialog
-    simpfd = new BaseXCheckBox(SIMPLE_FILE_CHOOSER, gprop.is(GUIProp.SIMPLEFD), this);
+    simpfd = new BaseXCheckBox(SIMPLE_FILE_CHOOSER, gopts.is(GUIOptions.SIMPLEFD), this);
     pp.add(simpfd);
 
     // enable only if current document contains name attributes
-    final boolean sn = gprop.is(GUIProp.SHOWNAME);
+    final boolean sn = gopts.is(GUIOptions.SHOWNAME);
     names = new BaseXCheckBox(SHOW_NAME_ATTS, sn, 6, this);
     final Data data = gui.context.data();
     names.setEnabled(data != null && ViewData.nameID(data) != 0);
@@ -119,7 +119,7 @@ public final class DialogPrefs extends BaseXDialog {
     // checkbox for simple file dialog
     pp.add(new BaseXLabel(LANGUAGE_RESTART + COL, true, true).border(16, 0, 6, 0));
     lang = new BaseXCombo(this, LANGS[0]);
-    lang.setSelectedItem(mprop.get(MainProp.LANG));
+    lang.setSelectedItem(opts.get(GlobalOptions.LANG));
     creds = new BaseXLabel(" ");
     p = new BaseXBack(new TableLayout(1, 2, 12, 0));
     p.add(lang);
@@ -136,7 +136,7 @@ public final class DialogPrefs extends BaseXDialog {
   public void action(final Object cmp) {
     creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem().toString()));
     if(cmp == names) {
-      gui.gprop.set(GUIProp.SHOWNAME, names.isSelected());
+      gui.gopts.set(GUIOptions.SHOWNAME, names.isSelected());
       gui.notify.layout();
     }
     final int mh = hitsAsProperty();
@@ -145,31 +145,31 @@ public final class DialogPrefs extends BaseXDialog {
 
   @Override
   public void close() {
-    final MainProp mprop = gui.context.mprop;
-    mprop.set(MainProp.LANG, lang.getSelectedItem().toString());
+    final GlobalOptions opts = gui.context.globalopts;
+    opts.set(GlobalOptions.LANG, lang.getSelectedItem().toString());
 
     // new database path: close existing database
     final String dbpath = path.getText();
-    if(!mprop.get(MainProp.DBPATH).equals(dbpath)) gui.execute(new Close());
-    mprop.set(MainProp.DBPATH, dbpath);
-    mprop.write();
+    if(!opts.get(GlobalOptions.DBPATH).equals(dbpath)) gui.execute(new Close());
+    opts.set(GlobalOptions.DBPATH, dbpath);
+    opts.write();
 
     final int mh = hitsAsProperty();
-    gui.context.prop.set(Prop.MAXHITS, mh);
+    gui.context.options.set(Options.MAXHITS, mh);
 
-    final GUIProp gprop = gui.gprop;
-    gprop.set(GUIProp.MOUSEFOCUS, focus.isSelected());
-    gprop.set(GUIProp.SIMPLEFD, simpfd.isSelected());
-    gprop.set(GUIProp.JAVALOOK, javalook.isSelected());
-    gprop.set(GUIProp.MAXHITS, mh);
-    gprop.write();
+    final GUIOptions gopts = gui.gopts;
+    gopts.set(GUIOptions.MOUSEFOCUS, focus.isSelected());
+    gopts.set(GUIOptions.SIMPLEFD, simpfd.isSelected());
+    gopts.set(GUIOptions.JAVALOOK, javalook.isSelected());
+    gopts.set(GUIOptions.MAXHITS, mh);
+    gopts.write();
     dispose();
   }
 
   @Override
   public void cancel() {
-    final boolean sn = gui.gprop.is(GUIProp.SHOWNAME);
-    gui.gprop.set(GUIProp.SHOWNAME, oldShowNames);
+    final boolean sn = gui.gopts.is(GUIOptions.SHOWNAME);
+    gui.gopts.set(GUIOptions.SHOWNAME, oldShowNames);
     if(sn != oldShowNames) gui.notify.layout();
     super.cancel();
   }
@@ -187,7 +187,7 @@ public final class DialogPrefs extends BaseXDialog {
    * @return maximum number of hits
    */
   private int hitsForSlider() {
-    int mh = gui.gprop.num(Prop.MAXHITS);
+    int mh = gui.gopts.num(Options.MAXHITS);
     if(mh == -1) mh = Integer.MAX_VALUE;
     final int hl = HITS.length - 1;
     int h = -1;

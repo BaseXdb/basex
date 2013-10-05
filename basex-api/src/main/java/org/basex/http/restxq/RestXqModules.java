@@ -95,9 +95,9 @@ public final class RestXqModules {
   private synchronized void cache(final HTTPContext http) throws QueryException {
     // initialize RESTXQ directory (may be relative against WEBPATH)
     if(restxq == null) {
-      final File fl = new File(http.context().mprop.get(MainProp.RESTXQPATH));
+      final File fl = new File(http.context().globalopts.get(GlobalOptions.RESTXQPATH));
       restxq = fl.isAbsolute() ? new IOFile(fl) :
-        new IOFile(http.context().mprop.get(MainProp.WEBPATH), fl.getPath());
+        new IOFile(http.context().globalopts.get(GlobalOptions.WEBPATH), fl.getPath());
     }
     // create new cache
     final HashMap<String, RestXqModule> cache = new HashMap<String, RestXqModule>();

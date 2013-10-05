@@ -56,7 +56,7 @@ public abstract class RESTCode {
     http.wrapping = Util.yes(val);
     if(!http.wrapping && !Util.no(val)) {
       try {
-        SerializerProp.error(WRAP, val, Text.YES, Text.NO);
+        SerializerOptions.error(WRAP, val, Text.YES, Text.NO);
       } catch(final SerializerException ex) {
         HTTPErr.BAD_REQUEST_X.thrw(ex);
       }
@@ -126,7 +126,7 @@ public abstract class RESTCode {
       final boolean force) throws IOException {
 
     final String key = param.getKey().toUpperCase(Locale.ENGLISH);
-    final boolean found = http.context().prop.get(key) != null;
+    final boolean found = http.context().options.get(key) != null;
     if(found || force) http.session().execute(new Set(key, param.getValue()[0]));
     return found;
   }

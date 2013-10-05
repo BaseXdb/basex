@@ -48,8 +48,8 @@ public final class BaseXClient extends BaseX {
   protected Session session() throws IOException {
     if(session == null) {
       // user/password input
-      String user = context.mprop.get(MainProp.USER);
-      String pass = context.mprop.get(MainProp.PASSWORD);
+      String user = context.globalopts.get(GlobalOptions.USER);
+      String pass = context.globalopts.get(GlobalOptions.PASSWORD);
       while(user.isEmpty()) {
         Util.out(USERNAME + COLS);
         user = Util.input();

@@ -94,19 +94,19 @@ public final class FuncParams {
   }
 
   /**
-   * Converts the specified parameters to serialization properties.
+   * Converts the specified output parameter item to serialization parameters.
    * @param it input item
    * @param info input info
-   * @return serialization string
+   * @return serialization parameters
    * @throws QueryException query exception
    */
-  public static SerializerProp serializerProp(final Item it, final InputInfo info)
+  public static SerializerOptions serializerProp(final Item it, final InputInfo info)
       throws QueryException {
     return serializerProp(serializerMap(it, info), info);
   }
 
   /**
-   * Converts the specified parameter item to a map.
+   * Converts the specified output parameter item to a map.
    * @param it input item
    * @param info input info
    * @return serialization string
@@ -118,22 +118,22 @@ public final class FuncParams {
   }
 
   /**
-   * Converts the specified parameters to serialization properties.
+   * Converts the keys and values from the specified map to serialization parameters.
    * @param map map with serialization parameters
    * @param info input info
-   * @return serialization string
+   * @return serialization parameters
    * @throws QueryException query exception
    */
-  public static SerializerProp serializerProp(final TokenMap map, final InputInfo info)
+  public static SerializerOptions serializerProp(final TokenMap map, final InputInfo info)
       throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] key : map) tb.add(key).add('=').add(map.get(key)).add(',');
 
-    final SerializerProp sp = new SerializerProp(tb.toString());
+    final SerializerOptions sp = new SerializerOptions(tb.toString());
     if(!sp.unknown.isEmpty()) SERWHICH.thrw(info, sp.unknown.get(0));
-    final Object[] cm = SerializerProp.S_USE_CHARACTER_MAPS;
-    if(!sp.get(cm).isEmpty()) SERWHICH.thrw(info, AProp.toString(cm));
+    final Object[] cm = SerializerOptions.S_USE_CHARACTER_MAPS;
+    if(!sp.get(cm).isEmpty()) SERWHICH.thrw(info, AOptions.toString(cm));
     return sp;
   }
 }

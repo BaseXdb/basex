@@ -14,7 +14,7 @@ import org.basex.test.*;
 import org.junit.*;
 
 /**
- * Tests for the {@link Prop#ADDRAW} option.
+ * Tests for the {@link Options#ADDRAW} option.
  * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
@@ -30,7 +30,7 @@ public class AddRawOptionTest extends SandboxTest {
    */
   @BeforeClass
   public static void classSetUp() throws BaseXException {
-    new Set(Prop.ADDRAW, true).execute(context);
+    new Set(Options.ADDRAW, true).execute(context);
   }
 
   /**

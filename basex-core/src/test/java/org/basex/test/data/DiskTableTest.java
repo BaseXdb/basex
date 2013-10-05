@@ -43,8 +43,8 @@ public final class DiskTableTest extends SandboxTest {
    */
   @BeforeClass
   public static void setUpBeforeClass() {
-    context.prop.set(Prop.TEXTINDEX, false);
-    context.prop.set(Prop.ATTRINDEX, false);
+    context.options.set(Options.TEXTINDEX, false);
+    context.options.set(Options.ATTRINDEX, false);
   }
 
   /**
@@ -53,7 +53,7 @@ public final class DiskTableTest extends SandboxTest {
    */
   @Before
   public void setUp() throws Exception {
-    final Parser parser = Parser.xmlParser(IO.get(TESTFILE), context.prop);
+    final Parser parser = Parser.xmlParser(IO.get(TESTFILE), context.options);
     data = new DiskBuilder(NAME, parser, context).build();
     size = data.meta.size;
     data.close();

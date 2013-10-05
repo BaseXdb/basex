@@ -42,9 +42,9 @@ public final class Copy extends Command {
     if(!Databases.validName(trg)) return error(NAME_INVALID_X, trg);
 
     // source database does not exist
-    if(!mprop.dbexists(src)) return error(DB_NOT_FOUND_X, src);
+    if(!globalopts.dbexists(src)) return error(DB_NOT_FOUND_X, src);
     // target database already exists
-    if(mprop.dbexists(trg)) return error(DB_EXISTS_X, trg);
+    if(globalopts.dbexists(trg)) return error(DB_EXISTS_X, trg);
 
     // try to copy database
     return copy(src, trg) ? info(DB_COPIED_X, src, perf) : error(DB_NOT_COPIED_X, src);
@@ -57,8 +57,8 @@ public final class Copy extends Command {
    * @return success flag
    */
   private boolean copy(final String source, final String target) {
-    final IOFile src = mprop.dbpath(source);
-    final IOFile trg = mprop.dbpath(target);
+    final IOFile src = globalopts.dbpath(source);
+    final IOFile trg = globalopts.dbpath(target);
 
     // return false if source cannot be opened, or target cannot be created
     final StringList files = src.descendants();

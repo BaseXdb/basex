@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.data.DataText.*;
-import static org.basex.io.serial.SerializerProp.*;
+import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
@@ -56,9 +56,8 @@ public final class FNJson extends StandardFunc {
     final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
     final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
 
-    // create json properties and set options
     try {
-      final JsonConverter conv = JsonConverter.get(props(map), info);
+      final JsonConverter conv = JsonConverter.get(options(map), info);
       return conv.convert(string(input)).item(ctx, info);
     } catch(final SerializerException ex) {
       throw ex.getCause();
@@ -76,30 +75,28 @@ public final class FNJson extends StandardFunc {
     final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
     final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
 
-    // create serialization properties
-    final SerializerProp props = new SerializerProp();
-    props.set(S_METHOD, M_JSON);
-    props.set(S_JSON, props(map).toString());
-
-    // serialize node
-    return Str.get(delete(serialize(node.iter(), props), '\r'));
+    final SerializerOptions opts = new SerializerOptions();
+    opts.set(S_METHOD, M_JSON);
+    opts.set(S_JSON, options(map).toString());
+    // serialize node and remove carriage returns
+    return Str.get(delete(serialize(node.iter(), opts), '\r'));
   }
 
   /**
-   * Creates JSON properties.
+   * Creates JSON option.
    * @param map map
-   * @return properties
+   * @return options
    */
-  private JsonProp props(final TokenMap map) {
-    final JsonProp jprop = new JsonProp();
-    final byte[] unesc = map.get(token(AProp.toString(JsonProp.UNESCAPE)));
-    if(unesc != null) jprop.set(JsonProp.UNESCAPE, Util.yes(string(unesc)));
+  private JsonOptions options(final TokenMap map) {
+    final JsonOptions jopts = new JsonOptions();
+    final byte[] unesc = map.get(token(AOptions.toString(JsonOptions.UNESCAPE)));
+    if(unesc != null) jopts.set(JsonOptions.UNESCAPE, Util.yes(string(unesc)));
 
-    final byte[] spec = map.get(token(AProp.toString(JsonProp.SPEC)));
-    if(spec != null) jprop.set(JsonProp.SPEC, string(spec));
+    final byte[] spec = map.get(token(AOptions.toString(JsonOptions.SPEC)));
+    if(spec != null) jopts.set(JsonOptions.SPEC, string(spec));
 
-    final byte[] format = map.get(token(AProp.toString(JsonProp.FORMAT)));
-    if(format != null) jprop.set(JsonProp.FORMAT, string(format));
-    return jprop;
+    final byte[] format = map.get(token(AOptions.toString(JsonOptions.FORMAT)));
+    if(format != null) jopts.set(JsonOptions.FORMAT, string(format));
+    return jopts;
   }
 }

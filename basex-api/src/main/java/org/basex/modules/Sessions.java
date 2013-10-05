@@ -105,7 +105,7 @@ public final class Sessions extends QueryModule {
     final Data d = it.data();
     if(d != null && !d.inMemory()) {
       // convert database node to main memory data instance
-      it = ((ANode) it).dbCopy(context.context.prop);
+      it = ((ANode) it).dbCopy(context.context.options);
     } else if(it instanceof FItem) {
       throw SessionErrors.functionItem();
     }

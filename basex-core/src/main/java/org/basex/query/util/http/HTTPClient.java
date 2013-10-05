@@ -31,17 +31,17 @@ import org.basex.util.hash.*;
 public final class HTTPClient {
   /** Input information. */
   private final InputInfo info;
-  /** Database properties. */
-  private final Prop prop;
+  /** Database options. */
+  private final Options options;
 
   /**
    * Constructor.
    * @param ii input info
-   * @param pr database properties
+   * @param opts database options
    */
-  public HTTPClient(final InputInfo ii, final Prop pr) {
+  public HTTPClient(final InputInfo ii, final Options opts) {
     info = ii;
-    prop = pr;
+    options = opts;
   }
 
   /**
@@ -60,7 +60,7 @@ public final class HTTPClient {
         if(href == null || href.length == 0) HC_PARAMS.thrw(info);
         final HttpURLConnection conn = openConnection(string(href));
         try {
-          return new HTTPResponse(info, prop).getResponse(conn, Bln.FALSE.string(), null);
+          return new HTTPResponse(info, options).getResponse(conn, Bln.FALSE.string(), null);
         } finally {
           conn.disconnect();
         }
@@ -80,7 +80,7 @@ public final class HTTPClient {
           setRequestContent(conn.getOutputStream(), r);
         }
         final byte[] mt = r.attrs.get(OVERRIDE_MEDIA_TYPE);
-        return new HTTPResponse(info, prop).getResponse(conn, r.attrs.get(STATUS_ONLY),
+        return new HTTPResponse(info, options).getResponse(conn, r.attrs.get(STATUS_ONLY),
             mt == null ? null : string(mt));
       } finally {
         conn.disconnect();
@@ -312,7 +312,7 @@ public final class HTTPClient {
     }
 
     // serialize items according to the parameters
-    final SerializerProp sp = new SerializerProp(tb.toString());
+    final SerializerOptions sp = new SerializerOptions(tb.toString());
     final Serializer ser = Serializer.get(out, sp);
     try {
       payload.serialize(ser);

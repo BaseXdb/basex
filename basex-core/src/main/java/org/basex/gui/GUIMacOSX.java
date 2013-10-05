@@ -14,21 +14,16 @@ import org.basex.gui.layout.*;
  */
 public final class GUIMacOSX {
   /** Native class name. */
-  private static final String C_APPLICATION =
-    "com.apple.eawt.Application";
+  private static final String C_APPLICATION = "com.apple.eawt.Application";
   /** Native class name. */
-  private static final String C_APPLICATION_LISTENER =
-    "com.apple.eawt.ApplicationListener";
+  private static final String C_APPLICATION_LISTENER = "com.apple.eawt.ApplicationListener";
   /** Native class name. */
-  private static final String C_APPLICATION_EVENT =
-    "com.apple.eawt.ApplicationEvent";
+  private static final String C_APPLICATION_EVENT = "com.apple.eawt.ApplicationEvent";
 
   /** System property identifier. */
-  private static final String P_ABOUT_NAME =
-    "com.apple.mrj.application.apple.menu.about.name";
+  private static final String P_ABOUT_NAME = "com.apple.mrj.application.apple.menu.about.name";
   /** System property identifier. */
-  private static final String P_SCREEN_MENU_BAR =
-    "apple.laf.useScreenMenuBar";
+  private static final String P_SCREEN_MENU_BAR = "apple.laf.useScreenMenuBar";
 
   /** Empty class array. */
   private static final Class<?>[] EC = {};

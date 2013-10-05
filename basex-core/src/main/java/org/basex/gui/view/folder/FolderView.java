@@ -146,12 +146,12 @@ public final class FolderView extends View {
 
   @Override
   public boolean visible() {
-    return gui.gprop.is(GUIProp.SHOWFOLDER);
+    return gui.gopts.is(GUIOptions.SHOWFOLDER);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWFOLDER, v);
+    gui.gopts.set(GUIOptions.SHOWFOLDER, v);
   }
 
   @Override
@@ -433,7 +433,7 @@ public final class FolderView extends View {
         return;
       }
 
-      if(right ^ opened[focusPre] && (!ViewData.leaf(gui.gprop, data, focusPre)
+      if(right ^ opened[focusPre] && (!ViewData.leaf(gui.gopts, data, focusPre)
           || data.attSize(focusPre, kind) > 1)) {
         opened[focusPre] = right;
         refreshHeight();

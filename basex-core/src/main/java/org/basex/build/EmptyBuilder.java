@@ -25,7 +25,7 @@ public final class EmptyBuilder extends Builder {
    * @throws IOException I/O exception
    */
   public EmptyBuilder(final IO io, final Context ctx) throws IOException {
-    super("", new XMLParser(io, ctx.prop));
+    super("", new XMLParser(io, ctx.options));
     context = ctx;
   }
 

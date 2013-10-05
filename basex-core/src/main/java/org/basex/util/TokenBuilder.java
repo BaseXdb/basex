@@ -4,8 +4,6 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
-import org.basex.util.list.*;
-
 /**
  * This class serves as an efficient constructor for {@link Token Tokens}.
  * It bears some resemblance to Java's {@link StringBuilder}.
@@ -236,8 +234,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a byte to the token. {@link ByteList} instances should be preferred
-   * for the construction of pure byte arrays.
+   * Adds a single byte to the token.
    * @param value the byte to be added
    * @return self reference
    */

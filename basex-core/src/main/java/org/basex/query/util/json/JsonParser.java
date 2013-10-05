@@ -1,7 +1,7 @@
 package org.basex.query.util.json;
 
 import org.basex.build.*;
-import org.basex.build.JsonProp.*;
+import org.basex.build.JsonOptions.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -37,30 +37,30 @@ public final class JsonParser extends InputParser {
   /**
    * Constructor taking the input string and the spec according to which it is parsed.
    * @param in input string
-   * @param jp json properties
+   * @param opts json options
    * @param ii input info
    * @throws QueryException query exception
    */
-  private JsonParser(final String in, final JsonProp jp, final InputInfo ii)
+  private JsonParser(final String in, final JsonOptions opts, final InputInfo ii)
       throws QueryException {
 
     super(in);
-    spec = jp.spec();
-    unescape = jp.is(JsonProp.UNESCAPE);
+    spec = opts.spec();
+    unescape = opts.is(JsonOptions.UNESCAPE);
     info = ii;
   }
 
   /**
    * Parses the input JSON string and directs the parse events to the given handler.
    * @param json JSON string to parse
-   * @param jp json properties
-   * @param h JSON handler
+   * @param opts json options
+   * @param handler JSON handler
    * @param ii input info
    * @throws QueryException parse exception
    */
-  public static void parse(final String json, final JsonProp jp, final JsonHandler h,
+  public static void parse(final String json, final JsonOptions opts, final JsonHandler handler,
       final InputInfo ii) throws QueryException {
-    new JsonParser(json, jp, ii).parse(h);
+    new JsonParser(json, opts, ii).parse(handler);
   }
 
   /**

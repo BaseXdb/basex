@@ -309,8 +309,8 @@ public final class FNGen extends StandardFunc {
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
     Item it = expr.length > 1 ? expr[1].item(ctx, info) : null;
-    final SerializerProp props = FuncParams.serializerProp(it, info);
-    return Str.get(serialize(expr[0].iter(ctx), props));
+    final SerializerOptions opts = FuncParams.serializerProp(it, info);
+    return Str.get(serialize(expr[0].iter(ctx), opts));
   }
 
   @Override
@@ -355,14 +355,14 @@ public final class FNGen extends StandardFunc {
   public static ANode parseXml(final IO input, final Context ctx, final boolean frag)
       throws IOException {
 
-    final Prop prop = ctx.prop;
-    final boolean chop = prop.is(Prop.CHOP);
+    final Options opts = ctx.options;
+    final boolean chop = opts.is(Options.CHOP);
     try {
-      prop.set(Prop.CHOP, false);
-      return new DBNode(frag || prop.is(Prop.INTPARSE) ?
-        new XMLParser(input, ctx.prop, frag) : new SAXWrapper(input, ctx.prop));
+      opts.set(Options.CHOP, false);
+      return new DBNode(frag || opts.is(Options.INTPARSE) ?
+        new XMLParser(input, ctx.options, frag) : new SAXWrapper(input, ctx.options));
     } finally {
-      prop.set(Prop.CHOP, chop);
+      opts.set(Options.CHOP, chop);
     }
   }
 }

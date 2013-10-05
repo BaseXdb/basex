@@ -15,11 +15,11 @@ import org.basex.util.*;
 public abstract class JsonXMLConverter extends JsonConverter {
   /**
    * Constructor.
-   * @param jp json properties
+   * @param opts json options
    * @param ii input info
    */
-  protected JsonXMLConverter(final JsonProp jp, final InputInfo ii) {
-    super(jp, ii);
+  protected JsonXMLConverter(final JsonOptions opts, final InputInfo ii) {
+    super(opts, ii);
   }
 
   @Override

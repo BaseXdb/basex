@@ -34,7 +34,7 @@ public final class Users {
 
     // try to find permission file in database and home directory
     final String perm = IO.BASEXSUFFIX + "perm";
-    file = new IOFile(ctx.mprop.dbpath(), perm);
+    file = new IOFile(ctx.globalopts.dbpath(), perm);
     if(!file.exists()) file = new IOFile(Prop.HOME, perm);
 
     if(!file.exists()) {

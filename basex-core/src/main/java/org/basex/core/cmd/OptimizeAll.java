@@ -105,20 +105,20 @@ public final class OptimizeAll extends ACreate {
     if(ctx.dbs.pins(m.name) > 1) throw new BaseXException(DB_PINNED_X, m.name);
 
     // find unique temporary database name
-    final String tname = ctx.mprop.random(m.name);
+    final String tname = ctx.globalopts.random(m.name);
 
     // adopt original meta information
-    ctx.prop.set(Prop.CHOP, m.chop);
+    ctx.options.set(Options.CHOP, m.chop);
     // adopt original index options
-    ctx.prop.set(Prop.UPDINDEX, m.updindex);
-    ctx.prop.set(Prop.MAXCATS,  m.maxcats);
-    ctx.prop.set(Prop.MAXLEN,   m.maxlen);
+    ctx.options.set(Options.UPDINDEX, m.updindex);
+    ctx.options.set(Options.MAXCATS,  m.maxcats);
+    ctx.options.set(Options.MAXLEN,   m.maxlen);
     // adopt original full-text index options
-    ctx.prop.set(Prop.STEMMING,   m.stemming);
-    ctx.prop.set(Prop.CASESENS,   m.casesens);
-    ctx.prop.set(Prop.DIACRITICS, m.diacritics);
-    ctx.prop.set(Prop.LANGUAGE,   m.language.toString());
-    ctx.prop.set(Prop.STOPWORDS,  m.stopwords);
+    ctx.options.set(Options.STEMMING,   m.stemming);
+    ctx.options.set(Options.CASESENS,   m.casesens);
+    ctx.options.set(Options.DIACRITICS, m.diacritics);
+    ctx.options.set(Options.LANGUAGE,   m.language.toString());
+    ctx.options.set(Options.STOPWORDS,  m.stopwords);
 
     // build database and index structures
     final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx);
@@ -175,7 +175,7 @@ public final class OptimizeAll extends ACreate {
      * @param c calling command (can be {@code null})
      */
     DBParser(final DiskData d, final OptimizeAll c) {
-      super(d.meta.original.isEmpty() ? null : IO.get(d.meta.original), d.meta.prop);
+      super(d.meta.original.isEmpty() ? null : IO.get(d.meta.original), d.meta.options);
       data = d;
       cmd = c;
     }

@@ -42,9 +42,9 @@ public final class DialogMapLayout extends BaseXDialog {
     p.add(tmp);
 
     // create drop down
-    final GUIProp gprop = gui.gprop;
+    final GUIOptions gopts = gui.gopts;
     border = new BaseXCombo(this, MAP_CHOICES);
-    border.setSelectedIndex(gprop.num(GUIProp.MAPOFFSETS));
+    border.setSelectedIndex(gopts.num(GUIOptions.MAPOFFSETS));
 
     tmp = new BaseXBack(new TableLayout(1, 2, 8, 0));
     tmp.add(new BaseXLabel(OFFSETS + COL));
@@ -55,7 +55,7 @@ public final class DialogMapLayout extends BaseXDialog {
 
     // create slider
     sizeLabel = new BaseXLabel(RATIO + COLS);
-    sizeSlider = new BaseXSlider(0, 100, gprop.num(GUIProp.MAPWEIGHT), this);
+    sizeSlider = new BaseXSlider(0, 100, gopts.num(GUIOptions.MAPWEIGHT), this);
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
 
     tmp = new BaseXBack(new TableLayout(2, 1));
@@ -64,23 +64,23 @@ public final class DialogMapLayout extends BaseXDialog {
     p.add(tmp);
 
     // create checkbox
-    atts = new BaseXCheckBox(SHOW_ATTS, gprop.is(GUIProp.MAPATTS), this);
+    atts = new BaseXCheckBox(SHOW_ATTS, gopts.is(GUIOptions.MAPATTS), this);
     p.add(atts);
 
     set(p, BorderLayout.CENTER);
-    finish(gprop.nums(GUIProp.MAPLAYOUTLOC));
+    finish(gopts.nums(GUIOptions.MAPLAYOUTLOC));
 
-    algo.setSelectedIndex(gprop.num(GUIProp.MAPALGO));
+    algo.setSelectedIndex(gopts.num(GUIOptions.MAPALGO));
   }
 
   @Override
   public void action(final Object cmp) {
-    final GUIProp gprop = gui.gprop;
-    gprop.set(GUIProp.MAPOFFSETS, border.getSelectedIndex());
-    gprop.set(GUIProp.MAPALGO, algo.getSelectedIndex());
-    gprop.set(GUIProp.MAPATTS, atts.isSelected());
+    final GUIOptions gopts = gui.gopts;
+    gopts.set(GUIOptions.MAPOFFSETS, border.getSelectedIndex());
+    gopts.set(GUIOptions.MAPALGO, algo.getSelectedIndex());
+    gopts.set(GUIOptions.MAPATTS, atts.isSelected());
     final int sizeprp = sizeSlider.value();
-    gprop.set(GUIProp.MAPWEIGHT, sizeprp);
+    gopts.set(GUIOptions.MAPWEIGHT, sizeprp);
     sizeLabel.setText(RATIO + COLS + (sizeprp > 45 && sizeprp < 55 ?
       CHILDREN_TEXT_LEN : sizeprp < 45 ?  NUMBER_CHILDREN : TEXT_LENGTH));
 

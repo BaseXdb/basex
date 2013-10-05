@@ -120,7 +120,7 @@ public class FNCryptoTest {
 
     context = new Context();
     // turn off pretty printing
-    new Set(Prop.SERIALIZER, "indent=no").execute(context);
+    new Set(Options.SERIALIZER, "indent=no").execute(context);
   }
 
   /**

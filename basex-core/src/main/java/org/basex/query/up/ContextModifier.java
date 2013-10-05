@@ -55,7 +55,7 @@ public abstract class ContextModifier {
     }
 
     // create temporary mem data instance if not available yet
-    if(tmp == null) tmp = new MemData(data.meta.prop);
+    if(tmp == null) tmp = new MemData(data.meta.options);
     dbp.add(p, tmp);
   }
 
@@ -84,7 +84,7 @@ public abstract class ContextModifier {
     // create temporary mem data instance if not available yet
     if(tmp == null) {
       for(final DatabaseUpdates c : updates) {
-        tmp = new MemData(c.data().meta.prop);
+        tmp = new MemData(c.data().meta.options);
         break;
       }
     }

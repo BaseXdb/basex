@@ -59,7 +59,7 @@ public final class DropDB extends ACreate {
    * @return success flag
    */
   public static synchronized boolean drop(final String db, final Context ctx) {
-    final IOFile dbpath = ctx.mprop.dbpath(db);
+    final IOFile dbpath = ctx.globalopts.dbpath(db);
     return dbpath.exists() && drop(dbpath);
   }
 

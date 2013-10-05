@@ -44,10 +44,10 @@ public abstract class UpdateTest extends SandboxTest {
    */
   @BeforeClass
   public static void setUpBeforeClass() {
-    final Prop prop = context.prop;
-    prop.set(Prop.TEXTINDEX, false);
-    prop.set(Prop.ATTRINDEX, false);
-    prop.set(Prop.MAINMEM, mainmem);
+    final Options opts = context.options;
+    opts.set(Options.TEXTINDEX, false);
+    opts.set(Options.ATTRINDEX, false);
+    opts.set(Options.MAINMEM, mainmem);
   }
 
   /**

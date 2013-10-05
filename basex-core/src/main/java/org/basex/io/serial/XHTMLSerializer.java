@@ -15,11 +15,11 @@ public class XHTMLSerializer extends OutputSerializer {
   /**
    * Constructor, specifying serialization options.
    * @param os output stream reference
-   * @param p serialization properties
+   * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  XHTMLSerializer(final OutputStream os, final SerializerProp p) throws IOException {
-    super(os, p, V10, V11);
+  XHTMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts, V10, V11);
   }
 
   @Override

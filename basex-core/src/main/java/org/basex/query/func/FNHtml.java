@@ -60,7 +60,7 @@ public final class FNHtml extends StandardFunc {
 
     // convert html
     try {
-      return new DBNode(new HtmlParser(io, tb.toString(), ctx.context.prop));
+      return new DBNode(new HtmlParser(io, ctx.context.options, tb.toString()));
     } catch(final IOException ex) {
       throw BXHL_IO.thrw(info, ex);
     }

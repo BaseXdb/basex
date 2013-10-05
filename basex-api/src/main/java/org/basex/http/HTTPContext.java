@@ -14,7 +14,7 @@ import javax.servlet.http.*;
 
 import org.basex.*;
 import org.basex.build.*;
-import org.basex.build.JsonProp.*;
+import org.basex.build.JsonOptions.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
@@ -82,9 +82,9 @@ public final class HTTPContext {
     segments = toSegments(req.getPathInfo());
 
     // adopt servlet-specific credentials or use global ones
-    final MainProp mprop = context().mprop;
-    user = servlet.user != null ? servlet.user : mprop.get(MainProp.USER);
-    pass = servlet.pass != null ? servlet.pass : mprop.get(MainProp.PASSWORD);
+    final GlobalOptions mprop = context().globalopts;
+    user = servlet.user != null ? servlet.user : mprop.get(GlobalOptions.USER);
+    pass = servlet.pass != null ? servlet.pass : mprop.get(GlobalOptions.PASSWORD);
 
     // overwrite credentials with session-specific data
     final String auth = req.getHeader(AUTHORIZATION);
@@ -129,34 +129,34 @@ public final class HTTPContext {
 
   /**
    * Initializes the output. Sets the expected encoding and content type.
-   * @param sprop serialization properties
+   * @param sopts serialization parameters
    */
-  public void initResponse(final SerializerProp sprop) {
+  public void initResponse(final SerializerOptions sopts) {
     // set content type and encoding
-    final String enc = sprop.get(SerializerProp.S_ENCODING);
+    final String enc = sopts.get(SerializerOptions.S_ENCODING);
     res.setCharacterEncoding(enc);
-    final String ct = mediaType(sprop);
+    final String ct = mediaType(sopts);
     res.setContentType(new TokenBuilder(ct).add(CHARSET).add(enc).toString());
   }
 
   /**
-   * Returns the media type defined in the specified serialization properties.
-   * @param sprop serialization properties
+   * Returns the media type defined in the specified serialization parameters.
+   * @param sopts serialization parameters
    * @return media type
    */
-  public static String mediaType(final SerializerProp sprop) {
+  public static String mediaType(final SerializerOptions sopts) {
     // set content type
-    final String type = sprop.get(SerializerProp.S_MEDIA_TYPE);
+    final String type = sopts.get(SerializerOptions.S_MEDIA_TYPE);
     if(!type.isEmpty()) return type;
 
     // determine content type dependent on output method
-    final String mt = sprop.get(SerializerProp.S_METHOD);
+    final String mt = sopts.get(SerializerOptions.S_METHOD);
     if(mt.equals(M_RAW)) return APP_OCTET;
     if(mt.equals(M_XML)) return APP_XML;
     if(eq(mt, M_XHTML, M_HTML)) return TEXT_HTML;
     if(mt.equals(M_JSON)) {
       try {
-        final JsonProp jprop = new JsonProp(sprop.get(SerializerProp.S_JSON));
+        final JsonOptions jprop = new JsonOptions(sopts.get(SerializerOptions.S_JSON));
         if(jprop.format() == JsonFormat.JSONML) return APP_JSONML;
       } catch(final IOException ignored) { }
       return APP_JSON;
@@ -325,8 +325,8 @@ public final class HTTPContext {
 
     // set web application path as home directory and HTTPPATH
     final String webapp = sc.getRealPath("/");
-    AProp.setSystem(Prop.PATH, webapp);
-    AProp.setSystem(MainProp.WEBPATH, webapp);
+    AOptions.setSystem(Prop.PATH, webapp);
+    AOptions.setSystem(GlobalOptions.WEBPATH, webapp);
 
     // bind all parameters that start with "org.basex." to system properties
     final Enumeration<String> en = sc.getInitParameterNames();
@@ -334,22 +334,22 @@ public final class HTTPContext {
       final String key = en.nextElement();
       if(!key.startsWith(Prop.DBPREFIX)) continue;
 
-      // legacy: rewrite obsolete properties. will be removed some versions later
+      // legacy: rewrite obsolete options. will be removed some versions later
       final String val = sc.getInitParameter(key);
       String k = key;
       String v = val;
       if(key.equals(Prop.DBPREFIX + "httppath")) {
-        k = Prop.DBPREFIX + MainProp.RESTXQPATH[0];
+        k = Prop.DBPREFIX + GlobalOptions.RESTXQPATH[0];
       } else if(key.equals(Prop.DBPREFIX + "mode")) {
-        k = Prop.DBPREFIX + MainProp.HTTPLOCAL[0];
+        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL[0];
         v = Boolean.toString(v.equals("local"));
       } else if(key.equals(Prop.DBPREFIX + "server")) {
-        k = Prop.DBPREFIX + MainProp.HTTPLOCAL[0];
+        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL[0];
         v = Boolean.toString(!Boolean.parseBoolean(v));
       }
       k = k.toLowerCase(Locale.ENGLISH);
       if(!k.equals(key) || !v.equals(val)) {
-        Util.errln("Warning! Outdated property: " +
+        Util.errln("Warning! Outdated option: " +
           key + '=' + val + " => " + k + '=' + v);
       }
 
@@ -358,19 +358,19 @@ public final class HTTPContext {
         Util.debug(k.toUpperCase(Locale.ENGLISH) + ": " + v);
         v = new IOFile(webapp, v).path();
       }
-      AProp.setSystem(k, v);
+      AOptions.setSystem(k, v);
     }
 
-    // create context, update property instances
+    // create context, update options
     if(context == null) {
       context = new Context(false);
     } else {
-      context.mprop.setSystem();
-      context.prop.setSystem();
+      context.globalopts.setSystem();
+      context.options.setSystem();
     }
 
     // start server instance
-    if(!context.mprop.is(MainProp.HTTPLOCAL)) new BaseXServer(context);
+    if(!context.globalopts.is(GlobalOptions.HTTPLOCAL)) new BaseXServer(context);
   }
 
   /**

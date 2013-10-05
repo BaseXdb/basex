@@ -416,7 +416,7 @@ public final class FNFile extends StandardFunc {
 
     final File path = check(checkFile(0, ctx));
     final Iter ir = expr[1].iter(ctx);
-    final SerializerProp sp = FuncParams.serializerProp(
+    final SerializerOptions sp = FuncParams.serializerProp(
         expr.length > 2 ? expr[2].item(ctx, info) : null, info);
 
     final PrintOutput out = PrintOutput.get(new FileOutputStream(path, append));

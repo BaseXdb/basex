@@ -35,7 +35,7 @@ public final class SimpleFSParser extends Parser {
    * @param path file path
    * @param pr database properties
    */
-  public SimpleFSParser(final String path, final Prop pr) {
+  public SimpleFSParser(final String path, final Options pr) {
     super(path, pr);
   }
 

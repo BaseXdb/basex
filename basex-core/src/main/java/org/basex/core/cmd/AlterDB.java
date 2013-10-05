@@ -35,9 +35,9 @@ public final class AlterDB extends ACreate {
     if(!Databases.validName(trg)) return error(NAME_INVALID_X, trg);
 
     // database does not exist
-    if(!mprop.dbexists(src)) return error(DB_NOT_FOUND_X, src);
+    if(!globalopts.dbexists(src)) return error(DB_NOT_FOUND_X, src);
     // target database already exists
-    if(mprop.dbexists(trg)) return error(DB_EXISTS_X, trg);
+    if(globalopts.dbexists(trg)) return error(DB_EXISTS_X, trg);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, src);
@@ -63,7 +63,7 @@ public final class AlterDB extends ACreate {
    */
   public static synchronized boolean alter(final String source, final String target,
       final Context ctx) {
-    return ctx.mprop.dbpath(source).rename(ctx.mprop.dbpath(target));
+    return ctx.globalopts.dbpath(source).rename(ctx.globalopts.dbpath(target));
   }
 
   @Override

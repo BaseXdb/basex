@@ -97,7 +97,7 @@ public final class FNZip extends StandardFunc {
   private Str textEntry(final QueryContext ctx) throws QueryException {
     final String enc = expr.length < 3 ? null : string(checkStr(expr[2], ctx));
     final IO io = new IOContent(entry(ctx));
-    final boolean val = ctx.context.prop.is(Prop.CHECKSTRINGS);
+    final boolean val = ctx.context.options.is(Options.CHECKSTRINGS);
     try {
       return Str.get(new NewlineInput(io).encoding(enc).validate(val).content());
     } catch(final IOException ex) {
@@ -115,10 +115,10 @@ public final class FNZip extends StandardFunc {
   private ANode xmlEntry(final QueryContext ctx, final boolean html)
       throws QueryException {
 
-    final Prop prop = ctx.context.prop;
+    final Options opts = ctx.context.options;
     final IO io = new IOContent(entry(ctx));
     try {
-      return new DBNode(html ? new HtmlParser(io, prop) : Parser.xmlParser(io, prop));
+      return new DBNode(html ? new HtmlParser(io, opts) : Parser.xmlParser(io, opts));
     } catch(final IOException ex) {
       throw SAXERR.thrw(info, ex);
     }
@@ -341,9 +341,9 @@ public final class FNZip extends StandardFunc {
   /**
    * Returns serialization parameters.
    * @param node node with parameters
-   * @return properties
+   * @return parameters
    */
-  private static SerializerProp serPar(final ANode node) {
+  private static SerializerOptions serPar(final ANode node) {
     // interpret query parameters
     final TokenBuilder tb = new TokenBuilder();
     final AxisIter ati = node.attributes();
@@ -353,7 +353,7 @@ public final class FNZip extends StandardFunc {
       if(!tb.isEmpty()) tb.add(',');
       tb.add(name).add('=').add(at.string());
     }
-    return new SerializerProp(tb.toString());
+    return new SerializerOptions(tb.toString());
   }
 
   /**

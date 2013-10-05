@@ -31,7 +31,7 @@ public final class SimpleFSExample {
     final String path = ".";
     final String name = "fsexample";
 
-    final Parser parser = new SimpleFSParser(path, ctx.prop);
+    final Parser parser = new SimpleFSParser(path, ctx.options);
     final CreateDB create = new CreateDB(name);
     create.setParser(parser);
     create.execute(ctx);

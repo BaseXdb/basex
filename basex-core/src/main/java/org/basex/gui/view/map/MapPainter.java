@@ -15,17 +15,17 @@ import org.basex.gui.view.*;
 abstract class MapPainter {
   /** Graphics reference. */
   final MapView view;
-  /** Window properties. */
-  final GUIProp prop;
+  /** GUI options. */
+  final GUIOptions gopts;
 
   /**
    * Constructor.
    * @param m map reference
-   * @param pr gui properties
+   * @param opts gui options
    */
-  MapPainter(final MapView m, final GUIProp pr) {
+  MapPainter(final MapView m, final GUIOptions opts) {
     view = m;
-    prop = pr;
+    gopts = opts;
   }
 
   /**

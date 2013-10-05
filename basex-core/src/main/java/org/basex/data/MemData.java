@@ -21,10 +21,10 @@ public final class MemData extends Data {
    * Constructor.
    * @param ps path summary
    * @param ns namespaces
-   * @param pr database properties
+   * @param opts database options
    */
-  public MemData(final PathSummary ps, final Namespaces ns, final Prop pr) {
-    this(null, null, ps, ns, pr, null, null);
+  public MemData(final PathSummary ps, final Namespaces ns, final Options opts) {
+    this(null, null, ps, ns, opts, null, null);
   }
 
   /**
@@ -33,14 +33,14 @@ public final class MemData extends Data {
    * @param att attribute name index
    * @param ps path summary
    * @param ns namespaces
-   * @param pr database properties
+   * @param opts database options
    * @param txt text index
    * @param atv attribute value index
    */
   public MemData(final Names tag, final Names att, final PathSummary ps,
-      final Namespaces ns, final Prop pr, final Index txt, final Index atv) {
+      final Namespaces ns, final Options opts, final Index txt, final Index atv) {
 
-    meta = new MetaData(pr);
+    meta = new MetaData(opts);
     table = new TableMemAccess(meta);
     if(meta.updindex) {
       idmap = new IdPreMap(meta.lastid);
@@ -61,16 +61,16 @@ public final class MemData extends Data {
    * @param data data reference
    */
   public MemData(final Data data) {
-    this(data.tagindex, data.atnindex, data.paths, null, data.meta.prop,
+    this(data.tagindex, data.atnindex, data.paths, null, data.meta.options,
         data.txtindex, data.atvindex);
   }
 
   /**
    * Constructor, creating a new, empty database.
-   * @param pr property reference
+   * @param opts database options
    */
-  public MemData(final Prop pr) {
-    this(null, null, pr);
+  public MemData(final Options opts) {
+    this(null, null, opts);
   }
 
   @Override

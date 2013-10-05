@@ -10,12 +10,12 @@ import org.basex.io.serial.*;
 import org.basex.util.*;
 
 /**
- * This class contains parser properties.
+ * This class contains parser options.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CsvProp extends AProp {
+public final class CsvOptions extends AOptions {
   /** Option: encoding. */
   public static final Object[] ENCODING = { "encoding", Token.UTF8 };
   /** Option: column separator. */
@@ -53,17 +53,17 @@ public final class CsvProp extends AProp {
   /**
    * Constructor.
    */
-  public CsvProp() {
+  public CsvOptions() {
     super();
   }
 
   /**
-   * Constructor, specifying initial properties.
-   * @param s property string
+   * Constructor, specifying initial options.
+   * @param opts options string
    * @throws IOException I/O exception
    */
-  public CsvProp(final String s) throws IOException {
-    parse(s);
+  public CsvOptions(final String opts) throws IOException {
+    parse(opts);
   }
 
   /**

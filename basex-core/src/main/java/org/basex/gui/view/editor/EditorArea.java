@@ -60,8 +60,8 @@ final class EditorArea extends Editor {
       public void focusGained(final FocusEvent e) {
         // refresh query path and work directory
         final String path = file.path();
-        gui.context.prop.set(Prop.QUERYPATH, path);
-        gui.gprop.set(GUIProp.WORKPATH, file.dirPath());
+        gui.context.options.set(Options.QUERYPATH, path);
+        gui.gopts.set(GUIOptions.WORKPATH, file.dirPath());
 
         // reload file if it has been changed
         SwingUtilities.invokeLater(new Runnable() {
@@ -151,12 +151,12 @@ final class EditorArea extends Editor {
       // check if input is/might be an xquery main module
       if(input.isEmpty()) input = "()";
       final boolean lib = QueryProcessor.isLibrary(string(in));
-      if(!lib && (action == Action.EXECUTE || gui.gprop.is(GUIProp.EXECRT))) {
+      if(!lib && (action == Action.EXECUTE || gui.gopts.is(GUIOptions.EXECRT))) {
         // execute query if forced, or if realtime execution is activated
         gui.execute(true, new XQuery(input));
       } else {
         // parse query
-        gui.context.prop.set(Prop.QUERYPATH, path);
+        gui.context.options.set(Options.QUERYPATH, path);
         final QueryContext qc = new QueryContext(gui.context);
         try {
           if(lib) qc.parseLibrary(input, null);

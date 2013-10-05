@@ -110,7 +110,7 @@ public final class FNXslt extends StandardFunc {
     try {
       System.setErr(new PrintStream(ao));
       final byte[] result = transform(in, xsl, map);
-      return node ? new DBNode(new IOContent(result), ctx.context.prop) : Str.get(result);
+      return node ? new DBNode(new IOContent(result), ctx.context.options) : Str.get(result);
     } catch(final IOException ex) {
       System.setErr(tmp);
       throw IOERR.thrw(info, ex);

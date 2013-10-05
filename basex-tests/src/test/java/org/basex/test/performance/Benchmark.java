@@ -34,12 +34,12 @@ public abstract class Benchmark extends SandboxTest {
   @BeforeClass
   public static void init() throws IOException {
     // check if server is (not) running
-    final int sp = context.mprop.num(MainProp.SERVERPORT);
+    final int sp = context.globalopts.num(GlobalOptions.SERVERPORT);
     server = local || BaseXServer.ping(LOCALHOST, sp) ? null : createServer();
     session = local ? new LocalSession(context) : createClient();
 
     // create test database
-    session.execute(new Set(Prop.QUERYINFO, true));
+    session.execute(new Set(Options.QUERYINFO, true));
   }
 
   /**

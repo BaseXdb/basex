@@ -24,8 +24,8 @@ import org.basex.util.ft.*;
 public final class MetaData {
   /** Database path. Set to {@code null} if database is in main memory. */
   public final IOFile path;
-  /** Properties. */
-  public final Prop prop;
+  /** Database options. */
+  public final Options options;
 
   /** Database name. */
   public volatile String name;
@@ -98,11 +98,11 @@ public final class MetaData {
   private volatile int scoring;
 
   /**
-   * Constructor, specifying the database properties.
-   * @param pr database properties
+   * Constructor, specifying the database options.
+   * @param opts database options
    */
-  public MetaData(final Prop pr) {
-    this("", pr, null);
+  public MetaData(final Options opts) {
+    this("", opts, null);
   }
 
   /**
@@ -111,31 +111,31 @@ public final class MetaData {
    * @param ctx database context
    */
   public MetaData(final String db, final Context ctx) {
-    this(db, ctx.prop, ctx.mprop);
+    this(db, ctx.options, ctx.globalopts);
   }
 
   /**
    * Constructor, specifying the database name.
    * @param db name of the database
-   * @param pr database properties
-   * @param mprop main properties
+   * @param opts database options
+   * @param gopts global options
    */
-  private MetaData(final String db, final Prop pr, final MainProp mprop) {
-    path = mprop != null ? mprop.dbpath(db) : null;
-    prop = pr;
+  private MetaData(final String db, final Options opts, final GlobalOptions gopts) {
+    path = gopts != null ? gopts.dbpath(db) : null;
+    options = opts;
     name = db;
-    chop = prop.is(Prop.CHOP);
-    createtext = prop.is(Prop.TEXTINDEX);
-    createattr = prop.is(Prop.ATTRINDEX);
-    createftxt = prop.is(Prop.FTINDEX);
-    diacritics = prop.is(Prop.DIACRITICS);
-    stemming = prop.is(Prop.STEMMING);
-    casesens = prop.is(Prop.CASESENS);
-    updindex = prop.is(Prop.UPDINDEX);
-    maxlen = prop.num(Prop.MAXLEN);
-    maxcats = prop.num(Prop.MAXCATS);
-    stopwords = prop.get(Prop.STOPWORDS);
-    language = Language.get(prop);
+    chop = options.is(Options.CHOP);
+    createtext = options.is(Options.TEXTINDEX);
+    createattr = options.is(Options.ATTRINDEX);
+    createftxt = options.is(Options.FTINDEX);
+    diacritics = options.is(Options.DIACRITICS);
+    stemming = options.is(Options.STEMMING);
+    casesens = options.is(Options.CASESENS);
+    updindex = options.is(Options.UPDINDEX);
+    maxlen = options.num(Options.MAXLEN);
+    maxcats = options.num(Options.MAXCATS);
+    stopwords = options.get(Options.STOPWORDS);
+    language = Language.get(options);
     users = new Users(null);
   }
 
@@ -393,19 +393,19 @@ public final class MetaData {
   }
 
   /**
-   * Writes a boolean property to the specified output.
+   * Writes a boolean option to the specified output.
    * @param out output stream
    * @param k key
-   * @param pr property to write
+   * @param v value
    * @throws IOException I/O exception
    */
-  private static void writeInfo(final DataOutput out, final String k,
-      final boolean pr) throws IOException {
-    writeInfo(out, k, pr ? "1" : "0");
+  private static void writeInfo(final DataOutput out, final String k, final boolean v)
+      throws IOException {
+    writeInfo(out, k, v ? "1" : "0");
   }
 
   /**
-   * Writes a numeric property to the specified output.
+   * Writes a numeric option to the specified output.
    * @param out output stream
    * @param k key
    * @param v value
@@ -417,7 +417,7 @@ public final class MetaData {
   }
 
   /**
-   * Writes a string property to the specified output.
+   * Writes a string option to the specified output.
    * @param out output stream
    * @param k key
    * @param v value

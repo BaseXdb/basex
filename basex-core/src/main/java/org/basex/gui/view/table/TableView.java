@@ -43,7 +43,7 @@ public final class TableView extends View implements Runnable {
    */
   public TableView(final ViewNotifier man) {
     super(TABLEVIEW, man);
-    tdata = new TableData(gui.context, gui.gprop);
+    tdata = new TableData(gui.context, gui.gopts);
     layout(new BorderLayout());
     header = new TableHeader(this);
     add(header, BorderLayout.NORTH);
@@ -119,12 +119,12 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public boolean visible() {
-    return gui.gprop.is(GUIProp.SHOWTABLE);
+    return gui.gopts.is(GUIOptions.SHOWTABLE);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWTABLE, v);
+    gui.gopts.set(GUIOptions.SHOWTABLE, v);
   }
 
   @Override

@@ -42,8 +42,7 @@ public final class GroupBy extends GFLWOR.Clause {
    * @param pst post-grouping variables
    * @param ii input info
    */
-  public GroupBy(final Spec[] gs, final VarRef[] pr, final Var[] pst,
-      final InputInfo ii) {
+  public GroupBy(final Spec[] gs, final VarRef[] pr, final Var[] pst, final InputInfo ii) {
     super(ii, vars(gs, pst));
     specs = gs;
     preExpr = new Expr[pr.length];

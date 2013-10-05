@@ -33,15 +33,15 @@ public class RESTPut extends RESTCode {
     final String ct = http.contentType();
     // choose correct importer
     if(MimeTypes.isJSON(ct)) {
-      session.execute(new Set(Prop.PARSER, DataText.M_JSON));
+      session.execute(new Set(Options.PARSER, DataText.M_JSON));
       if(APP_JSONML.equals(ct))
-        session.execute(new Set(Prop.JSONPARSER, "format=jsonml"));
+        session.execute(new Set(Options.JSONPARSER, "format=jsonml"));
     } else if(TEXT_CSV.equals(ct)) {
-      session.execute(new Set(Prop.PARSER, DataText.M_CSV));
+      session.execute(new Set(Options.PARSER, DataText.M_CSV));
     } else if(TEXT_HTML.equals(ct)) {
-      session.execute(new Set(Prop.PARSER, DataText.M_HTML));
+      session.execute(new Set(Options.PARSER, DataText.M_HTML));
     } else if(ct != null && MimeTypes.isText(ct)) {
-      session.execute(new Set(Prop.PARSER, DataText.M_TEXT));
+      session.execute(new Set(Options.PARSER, DataText.M_TEXT));
     } else if(ct != null && !MimeTypes.isXML(ct)) {
       xml = false;
     }

@@ -44,7 +44,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     ctx = db.ctx;
     try {
       ctx.openDB(open ? Open.open(name, ctx) :
-        CreateDB.create(name, Parser.emptyParser(ctx.prop), ctx));
+        CreateDB.create(name, Parser.emptyParser(ctx.options), ctx));
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
@@ -175,8 +175,8 @@ public final class BXCollection implements Collection, BXXMLDBText {
     final Data md;
     try {
       final Parser p = cont instanceof Document ?
-        new DOMWrapper((Document) cont, id, ctx.prop) :
-        Parser.singleParser(new IOContent((byte[]) cont, id), ctx.prop, "");
+        new DOMWrapper((Document) cont, id, ctx.options) :
+        Parser.singleParser(new IOContent((byte[]) cont, id), ctx.options, "");
       md = MemBuilder.build(id, p);
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ex.getMessage());

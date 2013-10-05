@@ -38,7 +38,7 @@ public final class DOTSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   public DOTSerializer(final OutputStream os, final boolean c) throws IOException {
-    super(os, PROPS);
+    super(os, OPTIONS);
     compact = c;
     print(HEADER);
   }

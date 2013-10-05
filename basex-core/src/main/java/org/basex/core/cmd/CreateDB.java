@@ -72,16 +72,16 @@ public final class CreateDB extends ACreate {
     // create parser instance
     if(io != null) {
       if(!io.exists()) return error(RES_NOT_FOUND_X, io);
-      parser = new DirParser(io, prop, mprop.dbpath(name));
+      parser = new DirParser(io, options, globalopts.dbpath(name));
     } else if(parser == null) {
-      parser = Parser.emptyParser(context.prop);
+      parser = Parser.emptyParser(context.options);
     }
 
     // close open database
     new Close().run(context);
 
     try {
-      if(prop.is(Prop.MAINMEM)) {
+      if(options.is(Options.MAINMEM)) {
         // create main memory instance
         final Data data = proc(new MemBuilder(name, parser)).build();
         context.openDB(data);
@@ -104,7 +104,7 @@ public final class CreateDB extends ACreate {
           data.finishUpdate();
         }
       }
-      if(prop.is(Prop.CREATEONLY)) new Close().run(context);
+      if(options.is(Options.CREATEONLY)) new Close().run(context);
 
       return info(parser.info() + DB_CREATED_X_X, name, perf);
     } catch(final ProcException ex) {
@@ -142,8 +142,8 @@ public final class CreateDB extends ACreate {
     if(!ctx.user.has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
 
     // create main memory database instance
-    final Prop prop = ctx.prop;
-    if(prop.is(Prop.MAINMEM)) return MemBuilder.build(name, parser);
+    final Options opts = ctx.options;
+    if(opts.is(Options.MAINMEM)) return MemBuilder.build(name, parser);
 
     // database is currently locked by another process
     if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
@@ -192,7 +192,7 @@ public final class CreateDB extends ACreate {
       throws IOException {
 
     if(!source.exists()) throw new BaseXException(RES_NOT_FOUND_X, source);
-    return mainMem(new DirParser(source, ctx.prop, null), ctx);
+    return mainMem(new DirParser(source, ctx.options, null), ctx);
   }
 
   /**
@@ -211,11 +211,11 @@ public final class CreateDB extends ACreate {
       throw new BaseXException(RES_NOT_FOUND_X, source);
 
     // default: create a main memory instance
-    if(!ctx.prop.is(Prop.FORCECREATE)) return CreateDB.mainMem(source, ctx);
+    if(!ctx.options.is(Options.FORCECREATE)) return CreateDB.mainMem(source, ctx);
 
     // otherwise, create a persistent database instance
     final String nm = source.dbname();
-    final DirParser dp = new DirParser(source, ctx.prop, ctx.mprop.dbpath(nm));
+    final DirParser dp = new DirParser(source, ctx.options, ctx.globalopts.dbpath(nm));
     return CreateDB.create(nm, dp, ctx);
   }
 

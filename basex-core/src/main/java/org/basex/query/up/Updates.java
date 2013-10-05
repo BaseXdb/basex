@@ -100,7 +100,7 @@ public final class Updates {
     MemData data = fragmentIDs.get(ancID);
     // if data doesn't exist, create a new one
     if(data == null) {
-      data =  (MemData) anc.dbCopy(ctx.context.prop).data;
+      data =  (MemData) anc.dbCopy(ctx.context.options).data;
       // create a mapping between the fragment id and the data reference
       fragmentIDs.put(ancID, data);
     }

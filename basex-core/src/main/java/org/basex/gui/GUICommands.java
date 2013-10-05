@@ -39,8 +39,8 @@ public enum GUICommands implements GUICmd {
       // open file chooser for XML creation
       final DialogNew dialog = new DialogNew(gui);
       if(!dialog.ok()) return;
-      final String in = gui.gprop.get(GUIProp.INPUTPATH);
-      final String db = gui.gprop.get(GUIProp.DBNAME);
+      final String in = gui.gopts.get(GUIOptions.INPUTPATH);
+      final String db = gui.gopts.get(GUIOptions.DBNAME);
       DialogProgress.execute(gui, new CreateDB(db, in.isEmpty() ? null : in));
     }
   },
@@ -360,14 +360,14 @@ public enum GUICommands implements GUICmd {
   C_SHOWEDITOR(EDITOR, "% E", H_EDITOR, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWEDITOR);
+      gui.gopts.invert(GUIOptions.SHOWEDITOR);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWEDITOR));
+      b.setSelected(gui.gopts.is(GUIOptions.SHOWEDITOR));
     }
   },
 
@@ -375,14 +375,14 @@ public enum GUICommands implements GUICmd {
   C_SHOWINFO(QUERY_INFO, "% I", H_QUERY_INFO, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWINFO);
+      gui.gopts.invert(GUIOptions.SHOWINFO);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWINFO));
+      b.setSelected(gui.gopts.is(GUIOptions.SHOWINFO));
     }
   },
 
@@ -400,15 +400,15 @@ public enum GUICommands implements GUICmd {
   C_SHOWBUTTONS(BUTTONS, null, H_BUTTONS, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWBUTTONS);
-      gui.updateControl(gui.buttons, gui.gprop.is(GUIProp.SHOWBUTTONS),
+      gui.gopts.invert(GUIOptions.SHOWBUTTONS);
+      gui.updateControl(gui.buttons, gui.gopts.is(GUIOptions.SHOWBUTTONS),
           BorderLayout.CENTER);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWBUTTONS));
+      b.setSelected(gui.gopts.is(GUIOptions.SHOWBUTTONS));
     }
   },
 
@@ -416,14 +416,14 @@ public enum GUICommands implements GUICmd {
   C_SHOWINPUT(INPUT_BAR, null, H_INPUT_BAR, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.updateControl(gui.nav, gui.gprop.invert(GUIProp.SHOWINPUT),
+      gui.updateControl(gui.nav, gui.gopts.invert(GUIOptions.SHOWINPUT),
           BorderLayout.SOUTH);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWINPUT));
+      b.setSelected(gui.gopts.is(GUIOptions.SHOWINPUT));
     }
   },
 
@@ -431,14 +431,14 @@ public enum GUICommands implements GUICmd {
   C_SHOWSTATUS(STATUS_BAR, null, H_STATUS_BAR, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.updateControl(gui.status, gui.gprop.invert(GUIProp.SHOWSTATUS),
+      gui.updateControl(gui.status, gui.gopts.invert(GUIOptions.SHOWSTATUS),
           BorderLayout.SOUTH);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWSTATUS));
+      b.setSelected(gui.gopts.is(GUIOptions.SHOWSTATUS));
     }
   },
 
@@ -446,14 +446,14 @@ public enum GUICommands implements GUICmd {
   C_SHOWRESULT(RESULT, "% 1", H_RESULT, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWTEXT);
+      gui.gopts.invert(GUIOptions.SHOWTEXT);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWTEXT));
+      b.setSelected(gui.gopts.is(GUIOptions.SHOWTEXT));
     }
   },
 
@@ -461,14 +461,14 @@ public enum GUICommands implements GUICmd {
   C_SHOWMAP(MAP, "% 2", H_MAP, true, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWMAP);
+      gui.gopts.invert(GUIOptions.SHOWMAP);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWMAP));
+      b.setSelected(gui.gopts.is(GUIOptions.SHOWMAP));
     }
   },
 
@@ -476,14 +476,14 @@ public enum GUICommands implements GUICmd {
   C_SHOWTREE(TREE, "% 3", H_TREE, true, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWTREE);
+      gui.gopts.invert(GUIOptions.SHOWTREE);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWTREE));
+      b.setSelected(gui.gopts.is(GUIOptions.SHOWTREE));
     }
   },
 
@@ -491,14 +491,14 @@ public enum GUICommands implements GUICmd {
   C_SHOWFOLDER(FOLDER, "% 4", H_FOLDER, true, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWFOLDER);
+      gui.gopts.invert(GUIOptions.SHOWFOLDER);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWFOLDER));
+      b.setSelected(gui.gopts.is(GUIOptions.SHOWFOLDER));
     }
   },
 
@@ -506,14 +506,14 @@ public enum GUICommands implements GUICmd {
   C_SHOWPLOT(PLOT, "% 5", H_PLOT, true, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWPLOT);
+      gui.gopts.invert(GUIOptions.SHOWPLOT);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWPLOT));
+      b.setSelected(gui.gopts.is(GUIOptions.SHOWPLOT));
     }
   },
 
@@ -521,14 +521,14 @@ public enum GUICommands implements GUICmd {
   C_SHOWTABLE(TABLE, "% 6", H_TABLE, true, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWTABLE);
+      gui.gopts.invert(GUIOptions.SHOWTABLE);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWTABLE));
+      b.setSelected(gui.gopts.is(GUIOptions.SHOWTABLE));
     }
   },
 
@@ -536,14 +536,14 @@ public enum GUICommands implements GUICmd {
   C_SHOWEXPLORE(EXPLORER, "% 7", H_EXPLORER, true, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWEXPLORE);
+      gui.gopts.invert(GUIOptions.SHOWEXPLORE);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWEXPLORE));
+      b.setSelected(gui.gopts.is(GUIOptions.SHOWEXPLORE));
     }
   },
 
@@ -568,7 +568,7 @@ public enum GUICommands implements GUICmd {
   C_RTEXEC(RT_EXECUCTION, null, H_RT_EXECUTION, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.EXECRT);
+      gui.gopts.invert(GUIOptions.EXECRT);
       gui.stop();
       // refresh buttons in input bar
       gui.refreshControls();
@@ -579,7 +579,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.EXECRT));
+      b.setSelected(gui.gopts.is(GUIOptions.EXECRT));
     }
   },
 
@@ -587,7 +587,7 @@ public enum GUICommands implements GUICmd {
   C_RTFILTER(RT_FILTERING, null, H_RT_FILTERING, true, true) {
     @Override
     public void execute(final GUI gui) {
-      final boolean rt = gui.gprop.invert(GUIProp.FILTERRT);
+      final boolean rt = gui.gopts.invert(GUIOptions.FILTERRT);
       gui.stop();
       // refresh buttons in input bar
       gui.refreshControls();
@@ -616,7 +616,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.FILTERRT));
+      b.setSelected(gui.gopts.is(GUIOptions.FILTERRT));
     }
   },
 
@@ -653,7 +653,8 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Shows a preference dialog. */
-  C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% P", H_PREFERENCES, false, false) {
+  C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% P",
+      H_PREFERENCES, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogPrefs(gui);
@@ -749,7 +750,7 @@ public enum GUICommands implements GUICmd {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) &&
+      b.setEnabled(!gui.gopts.is(GUIOptions.FILTERRT) &&
           gui.context.data() != null && !gui.context.root());
     }
   },

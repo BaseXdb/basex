@@ -217,7 +217,7 @@ public class FnHttpTest extends HTTPTest {
         + "<http:header name='hdr2' value='hdr2val'/>"
         + "<http:body media-type='text/xml'>" + "Test body content"
         + "</http:body>" + "</http:request>";
-    final DBNode dbNode = new DBNode(new IOContent(req), ctx.prop);
+    final DBNode dbNode = new DBNode(new IOContent(req), ctx.options);
     final HTTPRequestParser rp = new HTTPRequestParser(null);
     final HTTPRequest r = rp.parse(dbNode.children().next(), null);
 
@@ -249,7 +249,7 @@ public class FnHttpTest extends HTTPTest {
         + "Part3" + "</http:body>" + "</http:multipart>"
         + "</http:request>";
 
-    final DBNode dbNode1 = new DBNode(new IOContent(multiReq), ctx.prop);
+    final DBNode dbNode1 = new DBNode(new IOContent(multiReq), ctx.options);
     final HTTPRequestParser rp = new HTTPRequestParser(null);
     final HTTPRequest r = rp.parse(dbNode1.children().next(), null);
 
@@ -299,7 +299,7 @@ public class FnHttpTest extends HTTPTest {
         + "<http:body media-type='text/plain'/>"
         + "</http:multipart>" + "</http:request>";
 
-    final DBNode dbNode1 = new DBNode(new IOContent(multiReq), ctx.prop);
+    final DBNode dbNode1 = new DBNode(new IOContent(multiReq), ctx.options);
     final ValueBuilder bodies = new ValueBuilder();
     bodies.add(Str.get("Part1"));
     bodies.add(Str.get("Part2"));
@@ -403,7 +403,7 @@ public class FnHttpTest extends HTTPTest {
 
     final Iterator<byte[]> i = falseReqs.iterator();
     while(i.hasNext()) {
-      final DBNode dbNode = new DBNode(new IOContent(i.next()), ctx.prop);
+      final DBNode dbNode = new DBNode(new IOContent(i.next()), ctx.options);
       try {
         final HTTPRequestParser rp = new HTTPRequestParser(null);
         rp.parse(dbNode.children().next(), null);
@@ -451,7 +451,7 @@ public class FnHttpTest extends HTTPTest {
 
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    final HTTPClient hc = new HTTPClient(null, ctx.prop);
+    final HTTPClient hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn.getOutputStream(), req);
     final String expResult = "--boundary42" + CRLF
         + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
@@ -486,7 +486,7 @@ public class FnHttpTest extends HTTPTest {
     req1.bodyContent.add(e1);
     // String item child
     req1.bodyContent.add(Str.get("<b>b</b>"));
-    HTTPClient hc = new HTTPClient(null, ctx.prop);
+    HTTPClient hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals("<a>a</a>&lt;b&gt;b&lt;/b&gt;", fakeConn1.out.toString());
 
@@ -500,7 +500,7 @@ public class FnHttpTest extends HTTPTest {
     req2.bodyContent.add(e2);
     // String item child
     req2.bodyContent.add(Str.get("<b>b</b>"));
-    hc = new HTTPClient(null, ctx.prop);
+    hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals("a<b>b</b>", fakeConn2.out.toString());
 
@@ -515,7 +515,7 @@ public class FnHttpTest extends HTTPTest {
     req3.bodyContent.add(e3);
     // String item child
     req3.bodyContent.add(Str.get("<b>b</b>"));
-    hc = new HTTPClient(null, ctx.prop);
+    hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn3.getOutputStream(), req3);
     assertEquals("a<b>b</b>", fakeConn3.out.toString());
   }
@@ -533,7 +533,7 @@ public class FnHttpTest extends HTTPTest {
     req1.bodyContent.add(new B64(token("dGVzdA==")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    HTTPClient hc = new HTTPClient(null, ctx.prop);
+    HTTPClient hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals(fakeConn1.out.toString(), "dGVzdA==");
 
@@ -544,7 +544,7 @@ public class FnHttpTest extends HTTPTest {
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    hc = new HTTPClient(null, ctx.prop);
+    hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "dGVzdA==");
   }
@@ -562,7 +562,7 @@ public class FnHttpTest extends HTTPTest {
     req1.bodyContent.add(new Hex(token("74657374")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    HTTPClient hc = new HTTPClient(null, ctx.prop);
+    HTTPClient hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals(fakeConn1.out.toString(), "74657374");
 
@@ -573,7 +573,7 @@ public class FnHttpTest extends HTTPTest {
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    hc = new HTTPClient(null, ctx.prop);
+    hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "74657374");
   }
@@ -597,7 +597,7 @@ public class FnHttpTest extends HTTPTest {
     // HTTP connection
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    final HTTPClient hc = new HTTPClient(null, ctx.prop);
+    final HTTPClient hc = new HTTPClient(null, ctx.options);
     hc.setRequestContent(fakeConn.getOutputStream(), req);
 
     // Delete file
@@ -624,7 +624,7 @@ public class FnHttpTest extends HTTPTest {
     conn.contentType = "text/plain; charset=CP1251";
     // set content encoded in CP1251
     conn.content = Charset.forName("CP1251").encode(test).array();
-    final Iter i = new HTTPResponse(null, ctx.prop).getResponse(
+    final Iter i = new HTTPResponse(null, ctx.options).getResponse(
         conn, Bln.FALSE.string(), null);
     // compare results
     assertEquals(test, string(i.get(1).string(null)));
@@ -669,7 +669,7 @@ public class FnHttpTest extends HTTPTest {
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
         + ".... fanciest formatted version of same  "
         + "message  goes  here" + CRLF + "..."  + CRLF + "--boundary42--");
-    final Iter i = new HTTPResponse(null, ctx.prop).getResponse(
+    final Iter i = new HTTPResponse(null, ctx.options).getResponse(
         conn, Bln.FALSE.string(), null);
 
     // Construct expected result
@@ -694,7 +694,7 @@ public class FnHttpTest extends HTTPTest {
         + "<http:body media-type='text/x-whatever'/>"
         + "</http:multipart>" + "</http:response> ";
 
-    final DBNode dbNode = new DBNode(new IOContent(reqItem), ctx.prop);
+    final DBNode dbNode = new DBNode(new IOContent(reqItem), ctx.options);
     resultIter.add(dbNode.children().next());
     resultIter.add(Str.get("...plain text version of message "
         + "goes here....\n\n"));
@@ -758,7 +758,7 @@ public class FnHttpTest extends HTTPTest {
         +  CRLF + "--simple boundary--" + CRLF
         + "This is the epilogue.  It is also to be ignored.");
     // Get response as sequence of XQuery items
-    final Iter i = new HTTPResponse(null, ctx.prop).getResponse(
+    final Iter i = new HTTPResponse(null, ctx.options).getResponse(
         conn, Bln.FALSE.string(), null);
 
     // Construct expected result
@@ -782,7 +782,7 @@ public class FnHttpTest extends HTTPTest {
         + "<http:body media-type='text/plain; charset=us-ascii'/>"
         + "</http:multipart>" + "</http:response>";
 
-    final DBNode dbNode = new DBNode(new IOContent(reqItem), ctx.prop);
+    final DBNode dbNode = new DBNode(new IOContent(reqItem), ctx.options);
     resultIter.add(dbNode.children().next());
     resultIter.add(Str.get("This is implicitly typed plain ASCII text.\n"
         + "It does NOT end with a linebreak.\n"));

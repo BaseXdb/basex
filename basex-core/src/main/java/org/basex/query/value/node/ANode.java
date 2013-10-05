@@ -85,11 +85,11 @@ public abstract class ANode extends Item {
 
   /**
    * Returns a database node representation of the node.
-   * @param prop properties
+   * @param opts database options
    * @return database node
    */
-  public DBNode dbCopy(final Prop prop) {
-    final MemData md = new MemData(prop);
+  public DBNode dbCopy(final Options opts) {
+    final MemData md = new MemData(opts);
     new DataBuilder(md).build(this);
     return new DBNode(md);
   }

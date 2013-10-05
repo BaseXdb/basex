@@ -110,7 +110,7 @@ public class QueryParser extends InputParser {
   /**
    * Constructor.
    * @param in input
-   * @param path file path (if {@code null}, {@link Prop#QUERYPATH} will be assigned)
+   * @param path file path (if {@code null}, {@link Options#QUERYPATH} will be assigned)
    * @param c query context
    * @throws QueryException query exception
    */
@@ -121,12 +121,12 @@ public class QueryParser extends InputParser {
     ctx = c;
 
     // set path to query file
-    final Prop prop = c.context.prop;
-    final String bi = path != null ? path : prop.get(Prop.QUERYPATH);
+    final Options opts = c.context.options;
+    final String bi = path != null ? path : opts.get(Options.QUERYPATH);
     if(!bi.isEmpty()) c.sc.baseURI(bi);
 
     // parse pre-defined external variables
-    final String bind = prop.get(Prop.BINDINGS).trim();
+    final String bind = opts.get(Options.BINDINGS).trim();
     final StringBuilder key = new StringBuilder();
     final StringBuilder val = new StringBuilder();
     boolean first = true;
@@ -553,33 +553,33 @@ public class QueryParser extends InputParser {
       // output declaration
       if(module != null) error(MODOUT);
 
-      if(ctx.serProp == null) {
-        final Prop prop = ctx.context.prop;
-        ctx.serProp = new SerializerProp(prop.get(Prop.SERIALIZER));
+      if(ctx.serialOpts == null) {
+        final Options opts = ctx.context.options;
+        ctx.serialOpts = new SerializerOptions(opts.get(Options.SERIALIZER));
       }
-      if(ctx.serProp.get(key) == null) error(OUTWHICH, key);
+      if(ctx.serialOpts.get(key) == null) error(OUTWHICH, key);
       if(!decl.add("S " + key)) error(OUTDUPL, key);
-      if(key.equals(AProp.toString(SerializerProp.S_PARAMETER_DOCUMENT))) {
+      if(key.equals(AOptions.toString(SerializerOptions.S_PARAMETER_DOCUMENT))) {
         final IO io = IO.get(string(resolvedUri(val).string()));
         try {
-          final ANode node = new DBNode(io, ctx.context.prop).children().next();
-          // check parameters and add values to properties
+          final ANode node = new DBNode(io, ctx.context.options).children().next();
+          // check parameters and add values to serialization parameters
           final InputInfo info = info();
           final TokenMap tm = FuncParams.serializerMap(node, info);
           FuncParams.serializerProp(tm, info);
-          for(final byte[] sk : tm) ctx.serProp.set(string(sk), string(tm.get(sk)));
+          for(final byte[] sk : tm) ctx.serialOpts.set(string(sk), string(tm.get(sk)));
         } catch(final IOException ex) {
           error(OUTDOC, val);
         }
       }
 
-      ctx.serProp.set(key, string(val));
+      ctx.serialOpts.set(key, string(val));
     } else if(ctx.sc.xquery3() && eq(name.uri(), XQURI)) {
       error(DECLOPTION, name);
     } else if(eq(name.uri(), DBURI)) {
       // project-specific declaration
       final String ukey = key.toUpperCase(Locale.ENGLISH);
-      final Object obj = ctx.context.prop.get(ukey);
+      final Object obj = ctx.context.options.get(ukey);
       if(obj == null) error(BASX_OPTIONS, ukey);
       // cache old value (to be reset after query evaluation)
       ctx.globalOpt.put(ukey, obj);
@@ -1772,7 +1772,7 @@ public class QueryParser extends InputParser {
       if(eq(name.prefix(), DB)) {
         // project-specific declaration
         final String key = string(uc(name.local()));
-        final Object obj = ctx.context.prop.get(key);
+        final Object obj = ctx.context.options.get(key);
         if(obj == null) error(BASX_OPTIONS, key);
         el.add(new DBPragma(name, v));
       }

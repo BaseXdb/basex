@@ -1,7 +1,7 @@
 package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
-import static org.basex.io.serial.SerializerProp.*;
+import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
@@ -9,7 +9,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.*;
-import org.basex.build.JsonProp.*;
+import org.basex.build.JsonOptions.*;
 import org.basex.data.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -27,7 +27,7 @@ import org.basex.util.list.*;
  */
 public abstract class Serializer {
   /** Default serialization parameters. */
-  public static final SerializerProp PROPS = new SerializerProp();
+  public static final SerializerOptions OPTIONS = new SerializerOptions();
 
   /** Stack with opened tag names. */
   protected final TokenList tags = new TokenList();
@@ -55,43 +55,43 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   public static XMLSerializer get(final OutputStream os) throws IOException {
-    return new XMLSerializer(os, PROPS);
+    return new XMLSerializer(os, OPTIONS);
   }
 
   /**
    * Returns a specific serializer.
    * @param os output stream reference
-   * @param props serialization properties (can be {@code null})
+   * @param opts serialization parameters (can be {@code null})
    * @return serializer
    * @throws IOException I/O exception
    */
-  public static Serializer get(final OutputStream os, final SerializerProp props)
+  public static Serializer get(final OutputStream os, final SerializerOptions opts)
       throws IOException {
 
-    // no properties given: serialize as XML
-    if(props == null) return get(os);
+    // no parameters given: serialize as XML
+    if(opts == null) return get(os);
 
     // standard types: XHTML, HTML, text
-    final String m = props.check(S_METHOD, METHODS);
-    if(M_XHTML.equals(m)) return new XHTMLSerializer(os, props);
-    if(M_HTML.equals(m)) return new HTMLSerializer(os, props);
-    if(M_TEXT.equals(m)) return new TextSerializer(os, props);
+    final String m = opts.check(S_METHOD, METHODS);
+    if(M_XHTML.equals(m)) return new XHTMLSerializer(os, opts);
+    if(M_HTML.equals(m)) return new HTMLSerializer(os, opts);
+    if(M_TEXT.equals(m)) return new TextSerializer(os, opts);
 
     // serialize as raw data
-    if(M_RAW.equals(m)) return new RawSerializer(os, props);
+    if(M_RAW.equals(m)) return new RawSerializer(os, opts);
 
     // serialize as CSV
-    if(M_CSV.equals(m)) return new CsvSerializer(os, props);
+    if(M_CSV.equals(m)) return new CsvSerializer(os, opts);
 
     // serialize as JSON
     if(M_JSON.equals(m)) {
-      final JsonProp jp = new JsonProp(props.get(S_JSON));
-      return jp.format() == JsonFormat.DEFAULT ? new JsonDefaultSerializer(os, props) :
-        new JsonMLSerializer(os, props);
+      final JsonOptions jp = new JsonOptions(opts.get(S_JSON));
+      return jp.format() == JsonFormat.DEFAULT ? new JsonDefaultSerializer(os, opts) :
+        new JsonMLSerializer(os, opts);
     }
 
     // otherwise, serialize as XML (default)
-    return new XMLSerializer(os, props);
+    return new XMLSerializer(os, opts);
   }
 
   // PUBLIC METHODS =====================================================================

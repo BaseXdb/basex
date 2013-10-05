@@ -22,10 +22,10 @@ public final class Flush extends Command {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    if(!prop.is(Prop.AUTOFLUSH)) {
-      prop.set(Prop.AUTOFLUSH, true);
+    if(!options.is(Options.AUTOFLUSH)) {
+      options.set(Options.AUTOFLUSH, true);
       data.finishUpdate();
-      prop.set(Prop.AUTOFLUSH, false);
+      options.set(Options.AUTOFLUSH, false);
     }
     return info(DB_FLUSHED_X, data.meta.name, perf);
   }

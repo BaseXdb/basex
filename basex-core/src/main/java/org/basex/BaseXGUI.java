@@ -50,7 +50,7 @@ public final class BaseXGUI {
   public BaseXGUI(final String... args) throws BaseXException {
     parseArguments(args);
 
-    // set mac specific properties
+    // set Mac-specific properties
     if(Prop.MAC) {
       try {
         osxGUI = new GUIMacOSX();
@@ -59,23 +59,23 @@ public final class BaseXGUI {
       }
     }
 
-    // read properties
-    final GUIProp gprop = new GUIProp();
+    // read options
+    final GUIOptions gopts = new GUIOptions();
     // cache results to pass them on to all visualizations
-    context.prop.set(Prop.CACHEQUERY, true);
+    context.options.set(Options.CACHEQUERY, true);
     // reduce number of results to save memory
-    context.prop.set(Prop.MAXHITS, gprop.num(GUIProp.MAXHITS));
+    context.options.set(Options.MAXHITS, gopts.num(GUIOptions.MAXHITS));
 
     // initialize fonts and colors
-    GUIConstants.init(gprop);
+    GUIConstants.init(gopts);
 
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         // initialize look and feel
-        init(gprop);
+        init(gopts);
         // open main window
-        final GUI gui = new GUI(context, gprop);
+        final GUI gui = new GUI(context, gopts);
         if(osxGUI != null) osxGUI.init(gui);
 
         // open specified document or database
@@ -90,8 +90,8 @@ public final class BaseXGUI {
             gui.editor.open(io, true);
           } else if(!xml) {
             // only parse first xml file
-            gprop.set(GUIProp.INPUTPATH, io.path());
-            gprop.set(GUIProp.DBNAME, io.dbname());
+            gopts.set(GUIOptions.INPUTPATH, io.path());
+            gopts.set(GUIOptions.DBNAME, io.dbname());
             DialogProgress.execute(gui, new Check(file));
             xml = true;
           }
@@ -110,16 +110,16 @@ public final class BaseXGUI {
 
   /**
    * Initializes the GUI.
-   * @param prop gui properties
+   * @param opts gui options
    */
-  static void init(final GUIProp prop) {
+  static void init(final GUIOptions opts) {
     try {
       // added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
       UIManager.getInstalledLookAndFeels();
       // refresh views when windows are resized
       Toolkit.getDefaultToolkit().setDynamicLayout(true);
       // set specified look & feel
-      if(prop.is(GUIProp.JAVALOOK)) {
+      if(opts.is(GUIOptions.JAVALOOK)) {
         // use non-bold fonts in Java's look & feel
         final UIDefaults def = UIManager.getDefaults();
         final Enumeration<?> en = def.keys();

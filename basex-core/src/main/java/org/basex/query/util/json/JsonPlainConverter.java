@@ -22,16 +22,16 @@ public class JsonPlainConverter extends JsonXMLConverter implements JsonHandler 
 
   /**
    * Constructor.
-   * @param jp json properties
+   * @param opts json options
    * @param ii input info
    */
-  public JsonPlainConverter(final JsonProp jp, final InputInfo ii) {
-    super(jp, ii);
+  public JsonPlainConverter(final JsonOptions opts, final InputInfo ii) {
+    super(opts, ii);
   }
 
   @Override
   public ANode convert(final String in) throws QueryException {
-    JsonParser.parse(in, jprop, this, info);
+    JsonParser.parse(in, jopts, this, info);
     return elem;
   }
 

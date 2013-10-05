@@ -62,18 +62,18 @@ public final class SearchBar extends BaseXBack {
 
     gui = main;
     search = new BaseXTextField(main);
-    search.history(gui, GUIProp.SEARCHED);
+    search.history(gui, GUIOptions.SEARCHED);
     search.setToolTipText(SEARCH);
     search.setPreferredSize(null);
     replace = new BaseXTextField(main);
-    replace.history(gui, GUIProp.REPLACED);
+    replace.history(gui, GUIOptions.REPLACED);
     replace.setToolTipText(REPLACE_WITH);
     replace.setPreferredSize(null);
 
-    regex = onOffButton("s_regex", REGULAR_EXPR, GUIProp.SR_REGEX);
-    mcase = onOffButton("s_case", MATCH_CASE, GUIProp.SR_CASE);
-    word = onOffButton("s_word", WHOLE_WORD, GUIProp.SR_WORD);
-    multi = onOffButton("s_multi", MULTI_LINE, GUIProp.SR_MULTI);
+    regex = onOffButton("s_regex", REGULAR_EXPR, GUIOptions.SR_REGEX);
+    mcase = onOffButton("s_case", MATCH_CASE, GUIOptions.SR_CASE);
+    word = onOffButton("s_word", WHOLE_WORD, GUIOptions.SR_WORD);
+    multi = onOffButton("s_multi", MULTI_LINE, GUIOptions.SR_MULTI);
     rplc  = new BaseXButton(main, "s_replace", REPLACE_ALL);
     cls = new BaseXButton(main, "s_close", CLOSE);
     multi.setEnabled(regex.isSelected());
@@ -94,7 +94,7 @@ public final class SearchBar extends BaseXBack {
       }
       @Override
       public void keyReleased(final KeyEvent e) {
-        main.gprop.set(GUIProp.SR_SEARCH, search.getText());
+        main.gopts.set(GUIOptions.SR_SEARCH, search.getText());
         search();
       }
     });
@@ -111,7 +111,7 @@ public final class SearchBar extends BaseXBack {
     replace.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
-        main.gprop.set(GUIProp.SR_REPLACE, replace.getText());
+        main.gopts.set(GUIOptions.SR_REPLACE, replace.getText());
       }
     });
 
@@ -275,14 +275,14 @@ public final class SearchBar extends BaseXBack {
       final Object[] option) {
 
     final BaseXButton b = new BaseXButton(gui, icon, help);
-    b.setSelected(gui.gprop.is(option));
+    b.setSelected(gui.gopts.is(option));
     b.addKeyListener(escape);
     b.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final boolean sel = !b.isSelected();
         b.setSelected(sel);
-        gui.gprop.set(option, sel);
+        gui.gopts.set(option, sel);
         if(b == regex) {
           multi.setEnabled(sel);
           word.setEnabled(!sel);

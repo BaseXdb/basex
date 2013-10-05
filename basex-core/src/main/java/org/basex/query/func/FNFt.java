@@ -132,7 +132,7 @@ public final class FNFt extends StandardFunc {
             if(it == null) return null;
 
             // copy node to main memory data instance
-            final MemData md = new MemData(ctx.context.prop);
+            final MemData md = new MemData(ctx.context.options);
             final DataBuilder db = new DataBuilder(md);
             db.ftpos(mark, ctx.ftpos, len).build(checkDBNode(it));
 

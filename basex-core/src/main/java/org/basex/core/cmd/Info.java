@@ -46,13 +46,13 @@ public final class Info extends AInfo {
       info(tb, USED_MEM, Performance.getMemory());
     }
     if(context.user.has(Perm.ADMIN)) {
-      final AProp prop = context.mprop;
+      final GlobalOptions gopts = context.globalopts;
       tb.add(NL + MAIN_OPTIONS + NL);
-      for(final String s : prop) info(tb, s, prop.get(s));
+      for(final String s : gopts) info(tb, s, gopts.get(s));
     }
-    final AProp prop = context.prop;
+    final Options opts = context.options;
     tb.add(NL + OPTIONS + NL);
-    for(final String s : prop) info(tb, s, prop.get(s));
+    for(final String s : opts) info(tb, s, opts.get(s));
     return tb.toString();
   }
 }

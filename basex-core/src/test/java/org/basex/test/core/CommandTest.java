@@ -279,7 +279,7 @@ public class CommandTest extends SandboxTest {
   @Test
   public final void get() {
     ok(new Get());
-    ok(new Get(Prop.CHOP));
+    ok(new Get(Options.CHOP));
     no(new Get(NAME2));
   }
 
@@ -538,8 +538,8 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test
   public final void set() {
-    ok(new Set(Prop.CHOP, false));
-    ok(new Set(Prop.CHOP, true));
+    ok(new Set(Options.CHOP, false));
+    ok(new Set(Options.CHOP, true));
     ok(new Set("chop", true));
     ok(new Set("runs", 1));
     no(new Set("runs", true));

@@ -34,7 +34,7 @@ import org.basex.gui.view.map.*;
  *
  * <ul>
  *  <li> add a boolean visibility flag with the view name included
- *    in the {@link GUIProp} class {@link GUIProp#SHOWMAP})</li>
+ *    in the {@link GUIOptions} class {@link GUIOptions#SHOWMAP})</li>
  *  <li> add strings for the menu text and command description in the
  *    {@link Text} class (e.g. {@link Text#MAP} an
  *    {@link Text#H_MAP}).
@@ -283,12 +283,12 @@ public final class GUIConstants {
 
   /**
    * Initializes colors.
-   * @param prop gui properties
+   * @param opts gui options
    */
-  public static void init(final GUIProp prop) {
-    final int r = prop.num(GUIProp.COLORRED);
-    final int g = prop.num(GUIProp.COLORGREEN);
-    final int b = prop.num(GUIProp.COLORBLUE);
+  public static void init(final GUIOptions opts) {
+    final int r = opts.num(GUIOptions.COLORRED);
+    final int g = opts.num(GUIOptions.COLORGREEN);
+    final int b = opts.num(GUIOptions.COLORBLUE);
 
     // calculate color c:
     // c = (255 - expectedColor) * 10 / factor (= GUIRED/BLUE/GREEN)
@@ -314,14 +314,14 @@ public final class GUIConstants {
     color2A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 40);
     color3A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 100);
 
-    final String f = prop.get(GUIProp.FONT);
-    final int type = prop.num(GUIProp.FONTTYPE);
-    fontSize = prop.num(GUIProp.FONTSIZE);
+    final String f = opts.get(GUIOptions.FONT);
+    final int type = opts.num(GUIOptions.FONTTYPE);
+    fontSize = opts.num(GUIOptions.FONTSIZE);
     font  = new Font(f, type, fontSize);
-    mfont = new Font(prop.get(GUIProp.MONOFONT), type, fontSize);
+    mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
     bfont = new Font(f, Font.BOLD, fontSize);
     lfont = new Font(f, type, 18 + (fontSize >> 1));
-    dmfont = new Font(prop.get(GUIProp.MONOFONT), 0, TFONT.getSize() - 1);
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, TFONT.getSize() - 1);
 
     final Container comp = new Container();
     dwidth  = comp.getFontMetrics(dmfont).getWidths();

@@ -26,9 +26,9 @@ public final class CsvConverter {
   /** CSV element. */
   private static final byte[] ENTRY = token("entry");
 
-  /** CSV properties. */
-  protected final CsvProp cprop;
-  /** Column separator (see {@link CsvProp#SEPARATOR}). */
+  /** CSV options. */
+  protected final CsvOptions copts;
+  /** Column separator (see {@link CsvOptions#SEPARATOR}). */
   private final int separator;
 
   /** Root node. */
@@ -48,14 +48,14 @@ public final class CsvConverter {
 
   /**
    * Constructor.
-   * @param cp CSV properties
+   * @param opts CSV options
    * @throws SerializerException serializer exception
    */
-  public CsvConverter(final CsvProp cp) throws SerializerException {
-    cprop = cp;
-    separator = cp.separator();
-    header = cp.is(CsvProp.HEADER);
-    lax = cp.is(CsvProp.LAX);
+  public CsvConverter(final CsvOptions opts) throws SerializerException {
+    copts = opts;
+    separator = opts.separator();
+    header = opts.is(CsvOptions.HEADER);
+    lax = opts.is(CsvOptions.LAX);
   }
 
   /**
@@ -75,7 +75,7 @@ public final class CsvConverter {
    * @throws IOException I/O exception
    */
   public FElem convert(final IO io) throws IOException {
-    return convert(new NewlineInput(io).encoding(cprop.get(CsvProp.ENCODING)));
+    return convert(new NewlineInput(io).encoding(copts.get(CsvOptions.ENCODING)));
   }
 
   /**

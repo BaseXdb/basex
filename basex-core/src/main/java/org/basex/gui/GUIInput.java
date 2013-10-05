@@ -62,9 +62,9 @@ public final class GUIInput extends BaseXTextField {
           } else {
             // store current input in history
             final Data data = main.context.data();
-            final int i = data == null ? 2 : gui.gprop.num(GUIProp.SEARCHMODE);
-            final Object[] options = i == 0 ? GUIProp.SEARCH : i == 1 ?
-              GUIProp.XQUERY : GUIProp.COMMANDS;
+            final int i = data == null ? 2 : gui.gopts.num(GUIOptions.SEARCHMODE);
+            final Object[] options = i == 0 ? GUIOptions.SEARCH : i == 1 ?
+              GUIOptions.XQUERY : GUIOptions.COMMANDS;
             new BaseXHistory(main, options).store(getText());
 
             // evaluate the input
@@ -101,7 +101,7 @@ public final class GUIInput extends BaseXTextField {
           if(modifier(e) || control(e)) return;
           showPopup();
           // skip commands
-          if(gui.gprop.is(GUIProp.EXECRT) && !cmdMode()) main.execute();
+          if(gui.gopts.is(GUIOptions.EXECRT) && !cmdMode()) main.execute();
         }
       }
     });
@@ -119,7 +119,7 @@ public final class GUIInput extends BaseXTextField {
    * @return result of check
    */
   boolean cmdMode() {
-    return gui.gprop.num(GUIProp.SEARCHMODE) == 2 ||
+    return gui.gopts.num(GUIOptions.SEARCHMODE) == 2 ||
       gui.context.data() == null || getText().startsWith("!");
   }
 
@@ -135,7 +135,7 @@ public final class GUIInput extends BaseXTextField {
     if(Character.isLetter(ll) && Character.isLetter(suf.charAt(0))) pre += " ";
     setText(pre + sel);
     showPopup();
-    if(gui.gprop.is(GUIProp.EXECRT) && !cmdMode()) gui.execute();
+    if(gui.gopts.is(GUIOptions.EXECRT) && !cmdMode()) gui.execute();
   }
 
   /**
@@ -143,7 +143,7 @@ public final class GUIInput extends BaseXTextField {
    */
   void showPopup() {
     final String query = getText();
-    final int mode = gui.gprop.num(GUIProp.SEARCHMODE);
+    final int mode = gui.gopts.num(GUIOptions.SEARCHMODE);
     if(cmdMode()) {
       cmdPopup(query);
     } else if(mode == 1 || mode == 0 && query.startsWith("/")) {

@@ -50,21 +50,21 @@ public final class DBOptimize extends DBNew {
   @Override
   public void apply() throws QueryException {
     final MetaData meta = data.meta;
-    final Prop prop = meta.prop;
+    final Options opts = meta.options;
 
-    nprops.put(Prop.TEXTINDEX, meta.createtext);
-    nprops.put(Prop.ATTRINDEX, meta.createattr);
-    nprops.put(Prop.FTINDEX, meta.createftxt);
+    nprops.put(Options.TEXTINDEX, meta.createtext);
+    nprops.put(Options.ATTRINDEX, meta.createattr);
+    nprops.put(Options.FTINDEX, meta.createftxt);
     initOptions();
     assignOptions();
 
-    final boolean rebuild = prop.num(Prop.MAXCATS) != meta.maxcats ||
-        prop.num(Prop.MAXLEN) != meta.maxlen;
-    meta.maxcats = prop.num(Prop.MAXCATS);
-    meta.maxlen  = prop.num(Prop.MAXLEN);
-    meta.createtext = prop.is(Prop.TEXTINDEX);
-    meta.createattr = prop.is(Prop.ATTRINDEX);
-    meta.createftxt = prop.is(Prop.FTINDEX);
+    final boolean rebuild = opts.num(Options.MAXCATS) != meta.maxcats ||
+        opts.num(Options.MAXLEN) != meta.maxlen;
+    meta.maxcats = opts.num(Options.MAXCATS);
+    meta.maxlen  = opts.num(Options.MAXLEN);
+    meta.createtext = opts.is(Options.TEXTINDEX);
+    meta.createattr = opts.is(Options.ATTRINDEX);
+    meta.createftxt = opts.is(Options.FTINDEX);
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, null);

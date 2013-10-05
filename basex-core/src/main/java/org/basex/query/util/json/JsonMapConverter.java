@@ -38,17 +38,17 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
 
   /**
    * Constructor.
-   * @param jp json properties
+   * @param opts json options
    * @param ii input info
    */
-  public JsonMapConverter(final JsonProp jp, final InputInfo ii) {
-    super(jp, ii);
+  public JsonMapConverter(final JsonOptions opts, final InputInfo ii) {
+    super(opts, ii);
   }
 
   @Override
   public Item convert(final String in) throws QueryException {
     stack.clear();
-    JsonParser.parse(in, jprop, this, info);
+    JsonParser.parse(in, jopts, this, info);
     return stack.peek().isEmpty() ? null : (Item) stack.pop();
   }
 

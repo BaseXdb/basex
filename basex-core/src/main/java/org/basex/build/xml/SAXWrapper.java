@@ -45,10 +45,10 @@ public final class SAXWrapper extends SingleParser {
   /**
    * Constructor.
    * @param source sax source
-   * @param pr Properties
+   * @param opts database options
    */
-  public SAXWrapper(final IO source, final Prop pr) {
-    super(source, pr);
+  public SAXWrapper(final IO source, final Options opts) {
+    super(source, opts);
     saxs = new SAXSource(source.inputSource());
   }
 
@@ -61,7 +61,7 @@ public final class SAXWrapper extends SingleParser {
       XMLReader r = saxs.getXMLReader();
       if(r == null) {
         final SAXParserFactory f = SAXParserFactory.newInstance();
-        f.setFeature(EXTDTD, prop.is(Prop.DTD));
+        f.setFeature(EXTDTD, options.is(Options.DTD));
         f.setFeature("http://xml.org/sax/features/use-entity-resolver2", false);
         f.setNamespaceAware(true);
         f.setValidating(false);
@@ -69,8 +69,8 @@ public final class SAXWrapper extends SingleParser {
         r = f.newSAXParser().getXMLReader();
       }
 
-      saxh = new SAXHandler(builder, prop.is(Prop.CHOP), prop.is(Prop.STRIPNS));
-      final String cat = prop.get(Prop.CATFILE);
+      saxh = new SAXHandler(builder, options.is(Options.CHOP), options.is(Options.STRIPNS));
+      final String cat = options.get(Options.CATFILE);
       if(!cat.isEmpty()) CatalogWrapper.set(r, cat);
 
       r.setDTDHandler(saxh);

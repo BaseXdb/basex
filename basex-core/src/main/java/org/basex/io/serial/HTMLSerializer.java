@@ -31,11 +31,11 @@ public class HTMLSerializer extends OutputSerializer {
   /**
    * Constructor, specifying serialization options.
    * @param os output stream reference
-   * @param p serialization properties
+   * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  HTMLSerializer(final OutputStream os, final SerializerProp p) throws IOException {
-    super(os, p, V40, V401, V50);
+  HTMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts, V40, V401, V50);
   }
 
   @Override

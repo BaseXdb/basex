@@ -281,7 +281,7 @@ public final class FNDb extends StandardFunc {
     final String prefix = expr.length == 0 ? null : string(checkStr(expr[0], ctx)) + '-';
 
     final StringList list = ctx.context.databases.backups(prefix);
-    final IOFile dbpath = ctx.context.mprop.dbpath();
+    final IOFile dbpath = ctx.context.globalopts.dbpath();
     return new Iter() {
       int up = -1;
 
@@ -451,7 +451,7 @@ public final class FNDb extends StandardFunc {
     final Data data = checkData(ctx);
     final String path = string(checkStr(expr[1], ctx));
     final Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final SerializerProp sp = FuncParams.serializerProp(it, info);
+    final SerializerOptions sp = FuncParams.serializerProp(it, info);
     try {
       Export.export(data, path, sp, null);
     } catch(final SerializerException ex) {

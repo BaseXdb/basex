@@ -101,9 +101,9 @@ public final class MapView extends View implements Runnable {
     zoomStep = 0;
 
     final Data data = gui.context.data();
-    final GUIProp gprop = gui.gprop;
+    final GUIOptions gopts = gui.gopts;
     if(data != null && visible()) {
-      painter = new MapDefault(this, gprop);
+      painter = new MapDefault(this, gopts);
       mainMap = createImage();
       zoomMap = createImage();
       refreshLayout();
@@ -164,12 +164,12 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public boolean visible() {
-    return gui.gprop.is(GUIProp.SHOWMAP);
+    return gui.gopts.is(GUIOptions.SHOWMAP);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWMAP, v);
+    gui.gopts.set(GUIOptions.SHOWMAP, v);
   }
 
   @Override
@@ -280,7 +280,7 @@ public final class MapView extends View implements Runnable {
     gui.cursor(CURSORWAIT);
 
     initLen();
-    layout = new MapLayout(nodes.data, textLen, gui.gprop);
+    layout = new MapLayout(nodes.data, textLen, gui.gopts);
     layout.makeMap(rect, new MapList(nodes.pres.clone()), 0, (int) nodes.size() - 1);
     // rectangles are copied to avoid synchronization issues
     mainRects = layout.rectangles.copy();
@@ -325,8 +325,8 @@ public final class MapView extends View implements Runnable {
       if(f == null || !f.thumb) return;
     }
 
-    final GUIProp gprop = gui.gprop;
-    if(gprop.num(GUIProp.MAPOFFSETS) == 0) {
+    final GUIOptions gopts = gui.gopts;
+    if(gopts.num(GUIOptions.MAPOFFSETS) == 0) {
       g.setColor(color(32));
       int pre = mainRects.size;
       int par = ViewData.parent(data, f.pre);
@@ -362,7 +362,7 @@ public final class MapView extends View implements Runnable {
       g.setFont(font);
       smooth(g);
       if(data.kind(f.pre) == Data.ELEM) {
-        String tt = Token.string(ViewData.name(gprop, data, f.pre));
+        String tt = Token.string(ViewData.name(gopts, data, f.pre));
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), f.level + 5);
       }
@@ -582,7 +582,7 @@ public final class MapView extends View implements Runnable {
    */
   private void initLen() {
     final Data data = gui.context.data();
-    if(textLen != null || gui.gprop.num(GUIProp.MAPWEIGHT) == 0) return;
+    if(textLen != null || gui.gopts.num(GUIOptions.MAPWEIGHT) == 0) return;
 
     final int size = data.meta.size;
     textLen = new int[size];

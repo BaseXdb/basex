@@ -49,10 +49,10 @@ public abstract class SandboxTest {
    */
   protected static void initContext(final Context ctx) {
     final IOFile sb = sandbox();
-    ctx.mprop.set(MainProp.DBPATH, sb.path() + "/data");
-    ctx.mprop.set(MainProp.WEBPATH, sb.path() + "/webapp");
-    ctx.mprop.set(MainProp.RESTXQPATH, sb.path() + "/webapp");
-    ctx.mprop.set(MainProp.REPOPATH, sb.path() + "/repo");
+    ctx.globalopts.set(GlobalOptions.DBPATH, sb.path() + "/data");
+    ctx.globalopts.set(GlobalOptions.WEBPATH, sb.path() + "/webapp");
+    ctx.globalopts.set(GlobalOptions.RESTXQPATH, sb.path() + "/webapp");
+    ctx.globalopts.set(GlobalOptions.REPOPATH, sb.path() + "/repo");
   }
 
   /**

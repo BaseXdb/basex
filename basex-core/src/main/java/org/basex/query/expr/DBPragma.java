@@ -33,9 +33,9 @@ public final class DBPragma extends Pragma {
 
   @Override
   void init(final QueryContext ctx, final InputInfo info) throws QueryException {
-    old = ctx.context.prop.get(key);
+    old = ctx.context.options.get(key);
     try {
-      ctx.context.prop.set(key.toUpperCase(Locale.ENGLISH), string(value));
+      ctx.context.options.set(key.toUpperCase(Locale.ENGLISH), string(value));
     } catch(final Exception ex) {
       BASX_VALUE.thrw(info, ex.getMessage());
     }
@@ -43,7 +43,7 @@ public final class DBPragma extends Pragma {
 
   @Override
   void finish(final QueryContext ctx) {
-    ctx.context.prop.setObject(key, old);
+    ctx.context.options.setObject(key, old);
   }
 
   @Override

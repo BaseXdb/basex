@@ -23,13 +23,15 @@ import org.basex.util.hash.*;
  */
 public abstract class DBNew extends BasicOperation {
   /** Numeric index options. */
-  protected static final Object[][] N_OPT = { Prop.MAXCATS, Prop.MAXLEN,
-    Prop.INDEXSPLITSIZE, Prop.FTINDEXSPLITSIZE };
+  protected static final Object[][] N_OPT = { Options.MAXCATS, Options.MAXLEN,
+    Options.INDEXSPLITSIZE, Options.FTINDEXSPLITSIZE };
   /** Boolean index options. */
-  protected static final Object[][] B_OPT = { Prop.TEXTINDEX, Prop.ATTRINDEX,
-    Prop.FTINDEX, Prop.STEMMING, Prop.CASESENS, Prop.DIACRITICS,  Prop.UPDINDEX };
+  protected static final Object[][] B_OPT = { Options.TEXTINDEX,
+    Options.ATTRINDEX, Options.FTINDEX, Options.STEMMING,
+    Options.CASESENS, Options.DIACRITICS,  Options.UPDINDEX };
   /** String index options. */
-  protected static final Object[][] S_OPT = { Prop.LANGUAGE, Prop.STOPWORDS };
+  protected static final Object[][] S_OPT =
+    { Options.LANGUAGE, Options.STOPWORDS };
   /** Keys of numeric index options. */
   protected static final byte[][] K_N_OPT = new byte[N_OPT.length][];
   /** Keys of boolean index options. */
@@ -40,9 +42,9 @@ public abstract class DBNew extends BasicOperation {
   static {
     // initialize options arrays
     final int n = N_OPT.length, b = B_OPT.length, s = S_OPT.length;
-    for(int o = 0; o < n; o++) K_N_OPT[o] = lc(token(AProp.toString(N_OPT[o])));
-    for(int o = 0; o < b; o++) K_B_OPT[o] = lc(token(AProp.toString(B_OPT[o])));
-    for(int o = 0; o < s; o++) K_S_OPT[o] = lc(token(AProp.toString(S_OPT[o])));
+    for(int o = 0; o < n; o++) K_N_OPT[o] = lc(token(AOptions.toString(N_OPT[o])));
+    for(int o = 0; o < b; o++) K_B_OPT[o] = lc(token(AOptions.toString(B_OPT[o])));
+    for(int o = 0; o < s; o++) K_S_OPT[o] = lc(token(AOptions.toString(S_OPT[o])));
   }
 
   /** Query context. */
@@ -102,14 +104,14 @@ public abstract class DBNew extends BasicOperation {
     // add document node
     final Context ctx = qc.context;
     if(ni.node != null) {
-      final MemData mdata = (MemData) ni.node.dbCopy(ctx.prop).data;
+      final MemData mdata = (MemData) ni.node.dbCopy(ctx.options).data;
       mdata.update(0, Data.DOC, ni.path);
       return new DataClip(mdata);
     }
 
     // add input
-    final IOFile dbpath = ctx.mprop.dbpath(string(ni.dbname));
-    final Parser p = new DirParser(ni.io, ctx.prop, dbpath).target(string(ni.path));
+    final IOFile dbpath = ctx.globalopts.dbpath(string(ni.dbname));
+    final Parser p = new DirParser(ni.io, ctx.options, dbpath).target(string(ni.path));
     final MemBuilder b = new MemBuilder(dbname, p);
     try {
       return new DataClip(b.build());
@@ -154,28 +156,28 @@ public abstract class DBNew extends BasicOperation {
    * Caches original options and assigns cached options.
    */
   protected void assignOptions() {
-    final Prop prop = qc.context.prop;
+    final Options opts = qc.context.options;
     for(final Object[] key : nprops.keySet()) {
-      oprops.put(key, prop.get(AProp.toString(key)));
+      oprops.put(key, opts.get(AOptions.toString(key)));
     }
-    setProps(nprops);
+    setOptions(nprops);
   }
 
   /**
    * Restores original options.
    */
   protected void resetOptions() {
-    setProps(oprops);
+    setOptions(oprops);
   }
 
   /**
    * Assigns the specified options.
-   * @param props property map
+   * @param map options map
    */
-  private void setProps(final HashMap<Object[], Object> props) {
-    final Prop prop = qc.context.prop;
-    for(final Map.Entry<Object[], Object> e : props.entrySet()) {
-      prop.setObject(AProp.toString(e.getKey()), e.getValue());
+  private void setOptions(final HashMap<Object[], Object> map) {
+    final Options opts = qc.context.options;
+    for(final Map.Entry<Object[], Object> e : map.entrySet()) {
+      opts.setObject(AOptions.toString(e.getKey()), e.getValue());
     }
   }
 }

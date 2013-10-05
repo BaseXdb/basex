@@ -26,11 +26,11 @@ public final class JsonMLSerializer extends JsonSerializer {
   /**
    * Constructor.
    * @param os output stream reference
-   * @param props serialization properties
+   * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  JsonMLSerializer(final OutputStream os, final SerializerProp props) throws IOException {
-    super(os, props);
+  JsonMLSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
+    super(os, opts);
   }
 
   @Override

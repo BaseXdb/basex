@@ -8,7 +8,7 @@ import java.util.*;
 import org.basex.core.*;
 
 /**
- * Evaluates the 'get' command and return the value of a database property.
+ * Evaluates the 'get' command and return the value of a database option.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -23,7 +23,7 @@ public final class Get extends AGet {
 
   /**
    * Default constructor.
-   * @param key property
+   * @param key key to be found (string or option)
    */
   public Get(final Object key) {
     super(Perm.NONE, key == null ? null :
@@ -37,16 +37,16 @@ public final class Get extends AGet {
       // retrieve values of all options
       if(context.user.has(Perm.ADMIN)) {
         out.println(MAIN_OPTIONS + COL);
-        for(final String s : mprop) out.println(s + COLS + mprop.get(s));
+        for(final String s : globalopts) out.println(s + COLS + globalopts.get(s));
       }
       out.println(NL + OPTIONS + COL);
-      for(final String s : prop) out.println(s + COLS + prop.get(s));
+      for(final String s : options) out.println(s + COLS + options.get(s));
     } else {
       // retrieve value of specific option
       final String key = args[0].toUpperCase(Locale.ENGLISH);
-      Object type = prop.get(key);
-      if(type == null && context.user.has(Perm.ADMIN)) type = mprop.get(key);
-      if(type == null) return error(prop.unknown(key));
+      Object type = options.get(key);
+      if(type == null && context.user.has(Perm.ADMIN)) type = globalopts.get(key);
+      if(type == null) return error(options.unknown(key));
       out.println(key + COLS + type);
     }
     return true;

@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 
 /**
  * This class serves as a central database context.
- * It references the currently opened database, properties, client sessions,
+ * It references the currently opened database, options, client sessions,
  * users and other meta data. Next, the instance of this class will be passed on to
  * all operations, as it organizes concurrent data access, ensuring that no
  * process will concurrently write to the same data instances.
@@ -24,10 +24,10 @@ public final class Context {
   public final ClientListener listener;
   /** Blocked clients. */
   public final ClientBlocker blocker;
-  /** Client-related properties. */
-  public final Prop prop = new Prop();
-  /** Main properties. */
-  public final MainProp mprop;
+  /** Options. */
+  public final Options options = new Options();
+  /** Global options. */
+  public final GlobalOptions globalopts;
   /** Client connections. */
   public final Sessions sessions;
   /** Event pool. */
@@ -70,10 +70,10 @@ public final class Context {
 
   /**
    * Default constructor, which is usually called once in the lifetime of a project.
-   * @param file retrieve properties from disk
+   * @param file retrieve options from disk
    */
   public Context(final boolean file) {
-    this(new MainProp(file));
+    this(new GlobalOptions(file));
   }
 
   /**
@@ -84,7 +84,7 @@ public final class Context {
    */
   public Context(final Context ctx, final ClientListener cl) {
     listener = cl;
-    mprop = ctx.mprop;
+    globalopts = ctx.globalopts;
     dbs = ctx.dbs;
     events = ctx.events;
     sessions = ctx.sessions;
@@ -98,17 +98,17 @@ public final class Context {
 
   /**
    * Private constructor.
-   * @param mp main properties
+   * @param gopts main options
    */
-  private Context(final MainProp mp) {
-    mprop = mp;
+  private Context(final GlobalOptions gopts) {
+    globalopts = gopts;
     dbs = new Datas();
     events = new Events();
     sessions = new Sessions();
     blocker = new ClientBlocker();
     databases = new Databases(this);
-    locks = mp.is(MainProp.GLOBALLOCK) || Prop.gui ?
-      new ProcLocking(this) : new DBLocking(mp);
+    locks = gopts.is(GlobalOptions.GLOBALLOCK) || Prop.gui ?
+      new ProcLocking(this) : new DBLocking(gopts);
     users = new Users(this);
     repo = new Repo(this);
     log = new Log(this);
@@ -229,7 +229,7 @@ public final class Context {
     pr.registered(true);
 
     // administrators will not be affected by the timeout
-    if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT) * 1000L);
+    if(!user.has(Perm.ADMIN)) pr.startTimeout(globalopts.num(GlobalOptions.TIMEOUT) * 1000L);
 
     // get touched databases
     final LockResult lr = new LockResult();

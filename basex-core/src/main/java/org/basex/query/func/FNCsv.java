@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.data.DataText.*;
-import static org.basex.io.serial.SerializerProp.*;
+import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
@@ -62,9 +62,8 @@ public class FNCsv extends StandardFunc {
     final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
     final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
 
-    // create csv properties and set options
     try {
-      return new CsvConverter(props(map)).convert(input);
+      return new CsvConverter(options(map)).convert(input);
     } catch(final IOException ex) {
       throw BXCS_PARSE.thrw(info, ex);
     }
@@ -81,28 +80,26 @@ public class FNCsv extends StandardFunc {
     final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
     final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
 
-    // create serialization properties
-    final SerializerProp props = new SerializerProp();
-    props.set(S_METHOD, M_CSV);
-    props.set(S_CSV, props(map).toString());
-
-    // serialize node
-    return Str.get(delete(serialize(node.iter(), props), '\r'));
+    final SerializerOptions opts = new SerializerOptions();
+    opts.set(S_METHOD, M_CSV);
+    opts.set(S_CSV, options(map).toString());
+    // serialize node and remove carriage returns
+    return Str.get(delete(serialize(node.iter(), opts), '\r'));
   }
 
   /**
-   * Creates CSV properties.
+   * Creates CSV options.
    * @param map map
-   * @return properties
+   * @return options
    */
-  private CsvProp props(final TokenMap map) {
-    final CsvProp cprop = new CsvProp();
+  private CsvOptions options(final TokenMap map) {
+    final CsvOptions copts = new CsvOptions();
 
     final byte[] header = map.get(HEADER);
-    if(header != null) cprop.set(CsvProp.HEADER, Util.yes(string(header)));
+    if(header != null) copts.set(CsvOptions.HEADER, Util.yes(string(header)));
 
     final byte[] sep = map.get(SEPARATOR);
-    if(sep != null) cprop.set(CsvProp.SEPARATOR, string(sep));
-    return cprop;
+    if(sep != null) copts.set(CsvOptions.SEPARATOR, string(sep));
+    return copts;
   }
 }

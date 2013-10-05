@@ -30,25 +30,25 @@ public final class DialogColors extends BaseXDialog {
   public DialogColors(final GUI main) {
     super(main, COLOR_SCHEMA, false);
 
-    final GUIProp gprop = gui.gprop;
+    final GUIOptions gopts = gui.gopts;
     final BaseXBack p = new BaseXBack(new TableLayout(3, 2, 16, 8));
 
     p.add(new BaseXLabel(RED));
-    sliderRed = newSlider(gprop.num(GUIProp.COLORRED));
+    sliderRed = newSlider(gopts.num(GUIOptions.COLORRED));
     p.add(sliderRed);
 
     p.add(new BaseXLabel(GREEN));
-    sliderGreen = newSlider(gprop.num(GUIProp.COLORGREEN));
+    sliderGreen = newSlider(gopts.num(GUIOptions.COLORGREEN));
     p.add(sliderGreen);
 
     p.add(new BaseXLabel(BLUE));
-    sliderBlue = newSlider(gprop.num(GUIProp.COLORBLUE));
+    sliderBlue = newSlider(gopts.num(GUIOptions.COLORBLUE));
     p.add(sliderBlue);
 
     set(p, BorderLayout.CENTER);
     set(newButtons(RESET), BorderLayout.SOUTH);
 
-    finish(gprop.nums(GUIProp.COLORSLOC));
+    finish(gopts.nums(GUIOptions.COLORSLOC));
   }
 
   /**
@@ -64,16 +64,16 @@ public final class DialogColors extends BaseXDialog {
 
   @Override
   public void action(final Object comp) {
-    final GUIProp gprop = gui.gprop;
+    final GUIOptions gopts = gui.gopts;
     if(comp instanceof BaseXButton) {
-      sliderRed.value(MAXCOLOR - (Integer) GUIProp.COLORRED[1]);
-      sliderGreen.value(MAXCOLOR - (Integer) GUIProp.COLORGREEN[1]);
-      sliderBlue.value(MAXCOLOR - (Integer) GUIProp.COLORBLUE[1]);
+      sliderRed.value(MAXCOLOR - (Integer) GUIOptions.COLORRED[1]);
+      sliderGreen.value(MAXCOLOR - (Integer) GUIOptions.COLORGREEN[1]);
+      sliderBlue.value(MAXCOLOR - (Integer) GUIOptions.COLORBLUE[1]);
     }
 
-    gprop.set(GUIProp.COLORRED, MAXCOLOR - sliderRed.value());
-    gprop.set(GUIProp.COLORGREEN, MAXCOLOR - sliderGreen.value());
-    gprop.set(GUIProp.COLORBLUE, MAXCOLOR - sliderBlue.value());
+    gopts.set(GUIOptions.COLORRED, MAXCOLOR - sliderRed.value());
+    gopts.set(GUIOptions.COLORGREEN, MAXCOLOR - sliderGreen.value());
+    gopts.set(GUIOptions.COLORBLUE, MAXCOLOR - sliderBlue.value());
     gui.updateLayout();
   }
 }

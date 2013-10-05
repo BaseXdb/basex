@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  * and converts them to XML.
  *
  * <p>The parser provides some options, which can be specified via the
- * {@link Prop#CSVPARSER} option.</p>
+ * {@link Options#CSVPARSER} option.</p>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -23,16 +23,16 @@ public final class CsvParser extends XMLParser {
   /**
    * Constructor.
    * @param source document source
-   * @param pr database properties
+   * @param opts database options
    * @throws IOException I/O exception
    */
-  public CsvParser(final IO source, final Prop pr) throws IOException {
-    super(toXML(source, pr.get(Prop.CSVPARSER)), pr);
+  public CsvParser(final IO source, final Options opts) throws IOException {
+    super(toXML(source, opts.get(Options.CSVPARSER)), opts);
   }
 
   /**
    * Converts a JSON document to XML.
-   * @param io io reference
+   * @param io input
    * @param options parsing options
    * @return parser
    * @throws IOException I/O exception
@@ -40,7 +40,7 @@ public final class CsvParser extends XMLParser {
   private static IO toXML(final IO io, final String options) throws IOException {
     try {
       // convert input to XML and return cached result
-      final Item node = new CsvConverter(new CsvProp(options)).convert(io);
+      final Item node = new CsvConverter(new CsvOptions(options)).convert(io);
       final IOContent xml = new IOContent(node.serialize().toArray());
       xml.name(io.name());
       return xml;

@@ -48,23 +48,23 @@ public final class SyntaxXQuery extends Syntax {
         Collections.addAll(FUNC, s.substring(0, s.indexOf('(')).split(":|-"));
       }
       // add serialization and database parameters
-      addProps(SerializerProp.class);
-      addProps(MainProp.class);
-      addProps(Prop.class);
+      addProps(SerializerOptions.class);
+      addProps(GlobalOptions.class);
+      addProps(Options.class);
     } catch(final Exception ex) {
       Util.stack(ex);
     }
   }
 
   /**
-   * Adds the specified properties.
-   * @param props property class
+   * Adds the specified options.
+   * @param opt option class
    * @throws Exception exception
    */
-  private static void addProps(final Class<? extends AProp> props) throws Exception {
-    for(final Object[] arr : AProp.props(props)) {
+  private static void addProps(final Class<? extends AOptions> opt) throws Exception {
+    for(final Object[] arr : AOptions.options(opt)) {
       if(arr.length < 2) continue;
-      final String key = AProp.toString(arr).toLowerCase(Locale.ENGLISH);
+      final String key = AOptions.toString(arr).toLowerCase(Locale.ENGLISH);
       Collections.addAll(FUNC, key.split("-"));
     }
   }

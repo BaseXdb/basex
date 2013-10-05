@@ -72,7 +72,7 @@ public abstract class ACreate extends Command {
     // update name if not given by the IO reference anyway
     if(io instanceof IOContent || io instanceof IOStream) {
       if(name.endsWith("/")) throw new BaseXException(NAME_INVALID_X, name);
-      io.name(name.isEmpty() ? "" : name + '.' + prop.get(Prop.PARSER));
+      io.name(name.isEmpty() ? "" : name + '.' + options.get(Options.PARSER));
     }
     return io;
   }

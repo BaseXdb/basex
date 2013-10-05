@@ -1,7 +1,7 @@
 package org.basex.query.util.json;
 
 import org.basex.build.*;
-import org.basex.build.JsonProp.*;
+import org.basex.build.JsonOptions.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -14,19 +14,19 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public abstract class JsonConverter {
-  /** JSON properties. */
-  protected final JsonProp jprop;
+  /** JSON options. */
+  protected final JsonOptions jopts;
   /** Input info. */
   protected final InputInfo info;
 
   /**
    * Constructor.
-   * @param jp json properties
+   * @param opts json options
    * @param ii input info
    */
-  protected JsonConverter(final JsonProp jp, final InputInfo ii) {
+  protected JsonConverter(final JsonOptions opts, final InputInfo ii) {
     info = ii;
-    jprop = jp;
+    jopts = opts;
   }
 
   /**
@@ -39,18 +39,18 @@ public abstract class JsonConverter {
 
   /**
    * Returns a {@link JsonConverter} for the given configuration.
-   * @param jprop json properties
+   * @param jopts json options
    * @param ii input info
    * @return a JSON converter
    * @throws SerializerException serializer exception
    */
-  public static JsonConverter get(final JsonProp jprop, final InputInfo ii)
+  public static JsonConverter get(final JsonOptions jopts, final InputInfo ii)
       throws SerializerException {
 
-    final JsonFormat format = jprop.format();
-    if(format == JsonFormat.JSONML) return new JsonMLConverter(jprop, ii);
-    if(format == JsonFormat.PLAIN)  return new JsonPlainConverter(jprop, ii);
-    if(format == JsonFormat.MAP)    return new JsonMapConverter(jprop, ii);
-    return new JsonDefaultConverter(jprop, ii);
+    final JsonFormat format = jopts.format();
+    if(format == JsonFormat.JSONML) return new JsonMLConverter(jopts, ii);
+    if(format == JsonFormat.PLAIN)  return new JsonPlainConverter(jopts, ii);
+    if(format == JsonFormat.MAP)    return new JsonMapConverter(jopts, ii);
+    return new JsonDefaultConverter(jopts, ii);
   }
 }

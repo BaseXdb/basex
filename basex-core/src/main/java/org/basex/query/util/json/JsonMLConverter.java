@@ -27,18 +27,18 @@ public class JsonMLConverter extends JsonXMLConverter {
 
   /**
    * Constructor.
-   * @param jp json properties
+   * @param opts json options
    * @param ii input info
    */
-  public JsonMLConverter(final JsonProp jp, final InputInfo ii) {
-    super(jp, ii);
+  public JsonMLConverter(final JsonOptions opts, final InputInfo ii) {
+    super(opts, ii);
   }
 
   @Override
   public ANode convert(final String in) throws QueryException {
     final JsonMLHandler handler = new JsonMLHandler();
     stack.clear();
-    JsonParser.parse(in, jprop, handler, info);
+    JsonParser.parse(in, jopts, handler, info);
     return stack.pop();
   }
 

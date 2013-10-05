@@ -1,6 +1,6 @@
 package org.basex.core;
 
-import static org.basex.core.Prop.*;
+import static org.basex.core.Prop.NL;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -9,8 +9,9 @@ import java.util.concurrent.locks.*;
 import org.basex.util.list.*;
 
 /**
- * Manage read and write locks on arbitrary strings. Maximum of {@link MainProp#PARALLEL}
- * concurrent transactions are allowed, further will be queued.
+ * Manage read and write locks on arbitrary strings. Maximum of
+ * {@link GlobalOptions#PARALLEL} concurrent transactions are allowed,
+ * further will be queued.
  *
  * This class prevents locking deadlocks by sorting all all strings
  *
@@ -20,7 +21,8 @@ import org.basex.util.list.*;
  * them in parallel by the same thread (it is fine to call arbitrary locking methods by
  * different threads at the same time).
  *
- * This locking can be deactivated by setting {@link MainProp#GLOBALLOCK} to {@code true}.
+ * This locking can be deactivated by setting {@link GlobalOptions#GLOBALLOCK} to
+ * {@code true}.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Jens Erat
@@ -89,14 +91,14 @@ public final class DBLocking implements Locking {
   private final ConcurrentMap<Long, StringList> readLocked =
       new ConcurrentHashMap<Long, StringList>();
   /** BaseX database context. */
-  private final MainProp mprop;
+  private final GlobalOptions gopts;
 
   /**
    * Initialize new Locking instance.
-   * @param mp Main properties, used to read parallel transactions limit.
+   * @param opts global options, used to read parallel transactions limit.
    */
-  public DBLocking(final MainProp mp) {
-    mprop = mp;
+  public DBLocking(final GlobalOptions opts) {
+    gopts = opts;
   }
 
   @Override
@@ -108,7 +110,7 @@ public final class DBLocking implements Locking {
     // Wait in queue if necessary
     synchronized(queue) { // Guard queue and transaction, monitor for waiting in queue
       queue.add(thread);
-      while(transactions >= Math.max(mprop.num(MainProp.PARALLEL), 1)
+      while(transactions >= Math.max(gopts.num(GlobalOptions.PARALLEL), 1)
           || queue.peek() != thread) {
         try {
           queue.wait();
@@ -117,7 +119,7 @@ public final class DBLocking implements Locking {
         }
       }
       final int t = transactions++;
-      assert t <= Math.max(mprop.num(MainProp.PARALLEL), 1);
+      assert t <= Math.max(gopts.num(GlobalOptions.PARALLEL), 1);
       queue.remove(thread);
     }
 

@@ -61,8 +61,8 @@ public final class DialogExport extends BaseXDialog {
     // output label
     BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
-    path = new BaseXTextField(main.gprop.get(GUIProp.INPUTPATH), this);
-    path.history(gui, GUIProp.INPUTS);
+    path = new BaseXTextField(main.gopts.get(GUIOptions.INPUTPATH), this);
+    path.history(gui, GUIOptions.INPUTS);
     pp.add(path);
 
     final BaseXButton browse = new BaseXButton(BROWSE_D, this);
@@ -74,9 +74,9 @@ public final class DialogExport extends BaseXDialog {
     p.add(pp);
 
     // encoding
-    final Prop prop = gui.context.prop;
-    final String exporter = prop.get(Prop.EXPORTER);
-    final SerializerProp sp = new SerializerProp(exporter);
+    final Options opts = gui.context.options;
+    final String exporter = opts.get(Options.EXPORTER);
+    final SerializerOptions sopts = new SerializerOptions(exporter);
 
     // encoding and method
     final String[] methods = new String[DataText.METHODS.length - 1];
@@ -84,19 +84,20 @@ public final class DialogExport extends BaseXDialog {
       methods[m] = DataText.METHODS[m].toUpperCase(Locale.ENGLISH);
     }
     method = new BaseXCombo(this, methods);
-    method.setSelectedItem(sp.get(SerializerProp.S_METHOD).toUpperCase(Locale.ENGLISH));
+    method.setSelectedItem(sopts.get(SerializerOptions.S_METHOD).toUpperCase(
+        Locale.ENGLISH));
 
     encoding = new BaseXCombo(this, ENCODINGS);
-    String enc = sp.get(SerializerProp.S_ENCODING);
+    String enc = sopts.get(SerializerOptions.S_ENCODING);
     boolean f = false;
     for(final String s : ENCODINGS) f |= s.equals(enc);
     if(!f) {
       enc = enc.toUpperCase(Locale.ENGLISH);
       for(final String s : ENCODINGS) f |= s.equals(enc);
     }
-    encoding.setSelectedItem(f ? enc : sp.get(SerializerProp.S_ENCODING));
+    encoding.setSelectedItem(f ? enc : sopts.get(SerializerOptions.S_ENCODING));
 
-    params = new BaseXTextField(parameters(sp, true), this);
+    params = new BaseXTextField(parameters(sopts, true), this);
 
     pp = new BaseXBack(new TableLayout(3, 2, 16, 6)).border(8, 0, 8, 0);
     pp.add(new BaseXLabel(METHOD + COL, true, true));
@@ -166,12 +167,12 @@ public final class DialogExport extends BaseXDialog {
     ok = !pth.isEmpty();
 
     if(ok) {
-      gui.gprop.set(GUIProp.INPUTPATH, pth);
+      gui.gopts.set(GUIOptions.INPUTPATH, pth);
       // validate serialization parameters
       try {
         final String par = params.getText();
-        Serializer.get(new ArrayOutput(), new SerializerProp(par));
-        gui.set(Prop.EXPORTER, par);
+        Serializer.get(new ArrayOutput(), new SerializerOptions(par));
+        gui.set(Options.EXPORTER, par);
       } catch(final IOException ex) {
         ok = false;
         inf = ex.getLocalizedMessage();
@@ -189,10 +190,10 @@ public final class DialogExport extends BaseXDialog {
     // remembers serialization parameters
     final String mth = method.getSelectedItem().toString().toLowerCase(Locale.ENGLISH);
     final String enc = encoding.getSelectedItem().toString();
-    final SerializerProp sp = new SerializerProp(params.getText());
-    sp.set(SerializerProp.S_METHOD, mth);
-    sp.set(SerializerProp.S_ENCODING, enc);
-    gui.set(Prop.EXPORTER, parameters(sp, false));
+    final SerializerOptions sp = new SerializerOptions(params.getText());
+    sp.set(SerializerOptions.S_METHOD, mth);
+    sp.set(SerializerOptions.S_ENCODING, enc);
+    gui.set(Options.EXPORTER, parameters(sp, false));
 
     super.close();
     path.store();
@@ -200,19 +201,19 @@ public final class DialogExport extends BaseXDialog {
 
   /**
    * Create a serialization parameter string.
-   * @param sp serialization properties
+   * @param sopts serialization parameters
    * @param excl exclude method and encoding
    * @return result string
    */
-  private String parameters(final SerializerProp sp, final boolean excl) {
+  private String parameters(final SerializerOptions sopts, final boolean excl) {
     final String[] ex = !excl ? new String[0] : new String[] {
-        AProp.toString(SerializerProp.S_METHOD),
-        AProp.toString(SerializerProp.S_ENCODING) };
+        AOptions.toString(SerializerOptions.S_METHOD),
+        AOptions.toString(SerializerOptions.S_ENCODING) };
     final StringBuilder sb = new StringBuilder();
-    for(final String key : sp) {
+    for(final String key : sopts) {
       if(Token.eq(key, ex)) continue;
-      final Object val = sp.get(key);
-      if(!Serializer.PROPS.get(key).equals(val)) {
+      final Object val = sopts.get(key);
+      if(!Serializer.OPTIONS.get(key).equals(val)) {
         if(sb.length() != 0) sb.append(',');
         sb.append(key).append('=').append(val);
       }

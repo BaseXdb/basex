@@ -34,14 +34,14 @@ public final class DOMWrapper extends Parser {
    * Constructor.
    * @param doc document instance
    * @param fn filename
-   * @param pr database properties
+   * @param opts database options
    */
-  public DOMWrapper(final Document doc, final String fn, final Prop pr) {
-    super(fn, pr);
+  public DOMWrapper(final Document doc, final String fn, final Options opts) {
+    super(fn, opts);
     root = doc;
     filename = fn;
-    chop = pr.is(Prop.CHOP);
-    stripNS = pr.is(Prop.STRIPNS);
+    chop = opts.is(Options.CHOP);
+    stripNS = opts.is(Options.STRIPNS);
   }
 
   @Override

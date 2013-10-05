@@ -61,23 +61,23 @@ public final class HtmlParser extends XMLParser {
   /**
    * Constructor.
    * @param source document source
-   * @param pr database properties
+   * @param opts database options
    * @throws IOException I/O exception
    */
-  public HtmlParser(final IO source, final Prop pr) throws IOException {
-    this(source, pr.get(Prop.HTMLPARSER), pr);
+  public HtmlParser(final IO source, final Options opts) throws IOException {
+    this(source, opts, opts.get(Options.HTMLPARSER));
   }
 
   /**
    * Constructor.
    * @param source document source
-   * @param options options
-   * @param pr database properties
+   * @param opts database options
+   * @param parser options
    * @throws IOException I/O exception
    */
-  public HtmlParser(final IO source, final String options, final Prop pr)
+  public HtmlParser(final IO source, final Options opts, final String parser)
       throws IOException {
-    super(toXML(source, options), pr);
+    super(toXML(source, parser), opts);
   }
 
   /**
@@ -117,59 +117,59 @@ public final class HtmlParser extends XMLParser {
       final Object writer = Reflect.get(WRITER, sw);
 
       // set TagSoup options
-      final HtmlProp props = new HtmlProp(options);
+      final HtmlOptions opts = new HtmlOptions(options);
       String p;
-      if(props.is(HtmlProp.HTML)) {
+      if(opts.is(HtmlOptions.HTML)) {
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
         opt("method", "html");
         opt("omit-xml-declaration", "yes");
       }
-      if(props.is(HtmlProp.NONS)) {
+      if(opts.is(HtmlOptions.NONS)) {
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
       }
-      if(props.is(HtmlProp.OMITXML)) {
+      if(opts.is(HtmlOptions.OMITXML)) {
         opt("omit-xml-declaration", "yes");
       }
-      if(!(p = props.get(HtmlProp.METHOD)).isEmpty()) {
+      if(!(p = opts.get(HtmlOptions.METHOD)).isEmpty()) {
         opt("method", p);
       }
-      if(props.is(HtmlProp.NOBOGONS)) {
+      if(opts.is(HtmlOptions.NOBOGONS)) {
         reader.setFeature(FEATURES + "ignore-bogons", true);
       }
-      if(props.is(HtmlProp.NODEFAULTS)) {
+      if(opts.is(HtmlOptions.NODEFAULTS)) {
         reader.setFeature(FEATURES + "default-attributes", false);
       }
-      if(props.is(HtmlProp.NOCOLONS)) {
+      if(opts.is(HtmlOptions.NOCOLONS)) {
         reader.setFeature(FEATURES + "translate-colons", true);
       }
-      if(props.is(HtmlProp.NORESTART)) {
+      if(opts.is(HtmlOptions.NORESTART)) {
         reader.setFeature(FEATURES + "restart-elements", false);
       }
-      if(props.is(HtmlProp.IGNORABLE)) {
+      if(opts.is(HtmlOptions.IGNORABLE)) {
         reader.setFeature(FEATURES + "ignorable-whitespace", true);
       }
-      if(props.is(HtmlProp.EMPTYBOGONS)) {
+      if(opts.is(HtmlOptions.EMPTYBOGONS)) {
         reader.setFeature(FEATURES + "bogons-empty", true);
       }
-      if(props.is(HtmlProp.ANY)) {
+      if(opts.is(HtmlOptions.ANY)) {
         reader.setFeature(FEATURES + "bogons-empty", false);
       }
-      if(props.is(HtmlProp.NOROOTBOGONS)) {
+      if(opts.is(HtmlOptions.NOROOTBOGONS)) {
         reader.setFeature(FEATURES + "root-bogons", false);
       }
-      if(props.is(HtmlProp.NOCDATA)) {
+      if(opts.is(HtmlOptions.NOCDATA)) {
         reader.setFeature(FEATURES + "cdata-elements", false);
       }
-      if(props.is(HtmlProp.LEXICAL)) {
+      if(opts.is(HtmlOptions.LEXICAL)) {
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
       }
-      if(!(p = props.get(HtmlProp.DOCTYPESYS)).isEmpty()) {
+      if(!(p = opts.get(HtmlOptions.DOCTYPESYS)).isEmpty()) {
         opt("doctype-system", p);
       }
-      if(!(p = props.get(HtmlProp.DOCTYPEPUB)).isEmpty()) {
+      if(!(p = opts.get(HtmlOptions.DOCTYPEPUB)).isEmpty()) {
         opt("doctype-public", p);
       }
-      if(!(p = props.get(HtmlProp.ENCODING)).isEmpty()) {
+      if(!(p = opts.get(HtmlOptions.ENCODING)).isEmpty()) {
         is.setEncoding(p);
       }
       // end TagSoup options

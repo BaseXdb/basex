@@ -66,17 +66,17 @@ public final class JsonDefaultConverter extends JsonXMLConverter {
 
   /**
    * Constructor.
-   * @param jp json properties
+   * @param opts json options
    * @param ii input info
    */
-  public JsonDefaultConverter(final JsonProp jp, final InputInfo ii) {
-    super(jp, ii);
+  public JsonDefaultConverter(final JsonOptions opts, final InputInfo ii) {
+    super(opts, ii);
   }
 
   @Override
   public ANode convert(final String in) throws QueryException {
-    final JsonDefaultHandler handler = new JsonDefaultHandler(jprop.is(JsonProp.LAX));
-    JsonParser.parse(in, jprop, handler, info);
+    final JsonDefaultHandler handler = new JsonDefaultHandler(jopts.is(JsonOptions.LAX));
+    JsonParser.parse(in, jopts, handler, info);
     final ByteList[] types = new ByteList[TYPES.length];
     for(final TypedArray arr : handler.names.values()) {
       if(arr != null) {

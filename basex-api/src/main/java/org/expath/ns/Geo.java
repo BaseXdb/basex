@@ -717,7 +717,7 @@ public class Geo extends QueryModule {
 
     try {
       final IO io = new IOContent(geo);
-      return new DBNode(MemBuilder.build(new XMLParser(io, context.context.prop)));
+      return new DBNode(MemBuilder.build(new XMLParser(io, context.context.options)));
     } catch(final IOException ex) {
       throw Err.IOERR.thrw(null, ex);
     }

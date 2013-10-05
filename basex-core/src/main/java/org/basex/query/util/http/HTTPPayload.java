@@ -10,7 +10,7 @@ import java.net.*;
 import java.util.*;
 
 import org.basex.build.*;
-import org.basex.build.JsonProp.*;
+import org.basex.build.JsonOptions.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -37,21 +37,21 @@ public final class HTTPPayload {
   private final InputStream in;
   /** Input info. */
   private final InputInfo info;
-  /** Database properties. */
-  private final Prop prop;
+  /** Database options. */
+  private final Options options;
 
   /**
    * Constructor.
    * @param is input stream
    * @param st only create status
    * @param ii input info
-   * @param pr database properties
+   * @param opts database options
    */
   public HTTPPayload(final InputStream is, final boolean st, final InputInfo ii,
-      final Prop pr) {
+      final Options opts) {
     in = is;
     info = ii;
-    prop = pr;
+    options = opts;
     payloads = st ? null : new ValueBuilder();
   }
 
@@ -133,7 +133,7 @@ public final class HTTPPayload {
    */
   private Value parse(final byte[] payload, final String ctype) throws QueryException {
     try {
-      return value(new IOContent(payload), prop, ctype, null);
+      return value(new IOContent(payload), options, ctype, null);
     } catch(final IOException ex) {
       throw HC_PARSE.thrw(info, ex);
     }
@@ -325,35 +325,35 @@ public final class HTTPPayload {
   /**
    * Returns an XQuery value for the specified content type.
    * @param in input source
-   * @param prop database properties
+   * @param opts database options
    * @param ctype content type
    * @param ext content type extension (may be {@code null})
    * @return xml parser
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public static Value value(final IO in, final Prop prop, final String ctype,
+  public static Value value(final IO in, final Options opts, final String ctype,
       final String ext) throws IOException, QueryException {
 
     Value val = null;
     if(ctype != null) {
       if(MimeTypes.isJSON(ctype)) {
         final String options = eq(ctype, APP_JSON) ? "" :
-          AProp.toString(JsonProp.FORMAT) + "=" + JsonFormat.JSONML;
-        val = new DBNode(new JsonParser(in, prop, options));
+          AOptions.toString(JsonOptions.FORMAT) + "=" + JsonFormat.JSONML;
+        val = new DBNode(new JsonParser(in, opts, options));
       } else if(TEXT_CSV.equals(ctype)) {
-        val = new DBNode(new CsvParser(in, prop));
+        val = new DBNode(new CsvParser(in, opts));
       } else if(TEXT_HTML.equals(ctype)) {
-        val = new DBNode(new HtmlParser(in, prop));
+        val = new DBNode(new HtmlParser(in, opts));
       } else if(APP_FORM_URLENCODED.equals(ctype)) {
         final String enc = charset(ext);
         val = Str.get(URLDecoder.decode(string(in.read()), enc == null ? UTF8 : enc));
       } else if(MimeTypes.isXML(ctype)) {
-        val = new DBNode(in, prop);
+        val = new DBNode(in, opts);
       } else if(MimeTypes.isText(ctype)) {
         val = Str.get(new TextInput(in).content());
       } else if(MimeTypes.isMultipart(ctype)) {
-        final HTTPPayload hp = new HTTPPayload(in.inputStream(), false, null, prop);
+        final HTTPPayload hp = new HTTPPayload(in.inputStream(), false, null, opts);
         hp.extractParts(concat(DASHES, hp.boundary(ext)), null);
         val = hp.payloads();
       }

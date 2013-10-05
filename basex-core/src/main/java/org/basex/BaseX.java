@@ -25,8 +25,8 @@ public class BaseX extends Main {
   private IntList ops;
   /** Command arguments. */
   private StringList vals;
-  /** Flag for writing properties to disk. */
-  private boolean writeProps;
+  /** Flag for writing options to disk. */
+  private boolean writeOptions;
 
   /**
    * Main method, launching the standalone mode.
@@ -63,14 +63,14 @@ public class BaseX extends Main {
       for(int i = 0; i < ops.size(); i++) {
         final int c = ops.get(i);
         String val = vals.get(i);
-        Object[] prop = null;
+        Object[] opt = null;
 
         if(c == 'b') {
           // set/add variable binding
           if(bind.length() != 0) bind.append(',');
           // commas are escaped by a second comma
           val = bind.append(val.replaceAll(",", ",,")).toString();
-          prop = Prop.BINDINGS;
+          opt = Options.BINDINGS;
         } else if(c == 'c') {
           // evaluate commands
           final IO io = IO.get(val);
@@ -79,28 +79,28 @@ public class BaseX extends Main {
             val = io.string();
             base = io.path();
           }
-          execute(new Set(Prop.QUERYPATH, base), false);
+          execute(new Set(Options.QUERYPATH, base), false);
           execute(val);
-          execute(new Set(Prop.QUERYPATH, ""), false);
+          execute(new Set(Options.QUERYPATH, ""), false);
           console = false;
         } else if(c == 'd') {
           // toggle debug mode
           Prop.debug ^= true;
         } else if(c == 'D') {
           // hidden option: show/hide dot query graph
-          prop = Prop.DOTPLAN;
+          opt = Options.DOTPLAN;
         } else if(c == 'i') {
           // open database or create main memory representation
-          execute(new Set(Prop.MAINMEM, true), false);
+          execute(new Set(Options.MAINMEM, true), false);
           execute(new Check(val), verbose);
-          execute(new Set(Prop.MAINMEM, false), false);
+          execute(new Set(Options.MAINMEM, false), false);
         } else if(c == 'L') {
           // toggle newline separators
           newline ^= true;
           if(serial.length() != 0) serial.append(',');
-          val = serial.append(AProp.toString(SerializerProp.S_ITEM_SEPARATOR)).
+          val = serial.append(AOptions.toString(SerializerOptions.S_ITEM_SEPARATOR)).
               append("=\\n").toString();
-          prop = Prop.SERIALIZER;
+          opt = Options.SERIALIZER;
         } else if(c == 'o') {
           // change output stream
           if(out != System.out) out.close();
@@ -118,46 +118,46 @@ public class BaseX extends Main {
             val = io.string();
             base = io.path();
           }
-          execute(new Set(Prop.QUERYPATH, base), false);
+          execute(new Set(Options.QUERYPATH, base), false);
           execute(new XQuery(val), verbose);
-          execute(new Set(Prop.QUERYPATH, ""), false);
+          execute(new Set(Options.QUERYPATH, ""), false);
           console = false;
         } else if(c == 'r') {
           // hidden option: parse number of runs
-          prop = Prop.RUNS;
+          opt = Options.RUNS;
         } else if(c == 's') {
           // set/add serialization parameter
           if(serial.length() != 0) serial.append(',');
           val = serial.append(val.replaceAll(",", ",,")).toString();
-          prop = Prop.SERIALIZER;
+          opt = Options.SERIALIZER;
         } else if(c == 'u') {
           // (de)activate write-back for updates
-          prop = Prop.WRITEBACK;
+          opt = Options.WRITEBACK;
         } else if(c == 'v') {
           // show/hide verbose mode
           v ^= true;
         } else if(c == 'V') {
           // show/hide query info
           qi ^= true;
-          prop = Prop.QUERYINFO;
+          opt = Options.QUERYINFO;
         } else if(c == 'w') {
           // toggle chopping of whitespaces
-          prop = Prop.CHOP;
+          opt = Options.CHOP;
         } else if(c == 'W') {
-          // hidden option: toggle writing of properties before exit
-          writeProps ^= true;
+          // hidden option: toggle writing of options before exit
+          writeOptions ^= true;
         } else if(c == 'x') {
           // show/hide xml query plan
-          prop = Prop.XMLPLAN;
+          opt = Options.XMLPLAN;
           qp ^= true;
         } else if(c == 'X') {
           // hidden option: show query plan before/after query compilation
-          prop = Prop.COMPPLAN;
+          opt = Options.COMPPLAN;
         } else if(c == 'z') {
           // toggle result serialization
-          prop = Prop.SERIALIZE;
+          opt = Options.SERIALIZE;
         }
-        if(prop != null) execute(new Set(prop, val), false);
+        if(opt != null) execute(new Set(opt, val), false);
         verbose = qi || qp || v;
       }
 
@@ -168,7 +168,7 @@ public class BaseX extends Main {
         console();
       }
 
-      if(writeProps) context.mprop.write();
+      if(writeOptions) context.globalopts.write();
     } finally {
       quit();
     }
@@ -213,16 +213,16 @@ public class BaseX extends Main {
           // client options: need to be set before other options
           if(c == 'n') {
             // set server name
-            context.mprop.set(MainProp.HOST, arg.string());
+            context.globalopts.set(GlobalOptions.HOST, arg.string());
           } else if(c == 'p') {
             // set server port
-            context.mprop.set(MainProp.PORT, arg.number());
+            context.globalopts.set(GlobalOptions.PORT, arg.number());
           } else if(c == 'P') {
             // specify password
-            context.mprop.set(MainProp.PASSWORD, arg.string());
+            context.globalopts.set(GlobalOptions.PASSWORD, arg.string());
           } else if(c == 'U') {
             // specify user name
-            context.mprop.set(MainProp.USER, arg.string());
+            context.globalopts.set(GlobalOptions.USER, arg.string());
           } else {
             arg.usage();
           }

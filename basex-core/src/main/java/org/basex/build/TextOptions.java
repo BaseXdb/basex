@@ -6,12 +6,12 @@ import org.basex.core.*;
 import org.basex.util.*;
 
 /**
- * This class contains parser properties.
+ * This class contains parser options.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class TextProp extends AProp {
+public final class TextOptions extends AOptions {
   /** Parser option: encoding. */
   public static final Object[] ENCODING = { "encoding", Token.UTF8 };
   /** Parser option: line-wise parsing. */
@@ -20,16 +20,16 @@ public final class TextProp extends AProp {
   /**
    * Constructor.
    */
-  public TextProp() {
+  public TextOptions() {
     super();
   }
 
   /**
-   * Constructor, specifying initial properties.
-   * @param s property string
+   * Constructor, specifying initial options.
+   * @param opts options string
    * @throws IOException I/O exception
    */
-  public TextProp(final String s) throws IOException {
-    parse(s);
+  public TextOptions(final String opts) throws IOException {
+    parse(opts);
   }
 }

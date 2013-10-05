@@ -18,11 +18,11 @@ public final class RawSerializer extends TextSerializer {
   /**
    * Constructor, specifying serialization options.
    * @param os output stream reference
-   * @param sp serialization properties
+   * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  RawSerializer(final OutputStream os, final SerializerProp sp) throws IOException {
-    super(os, sp);
+  RawSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts);
   }
 
   @Override

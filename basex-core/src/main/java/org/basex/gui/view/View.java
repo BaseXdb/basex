@@ -24,7 +24,7 @@ public abstract class View extends BaseXPanel {
    */
   protected View(final String name, final ViewNotifier man) {
     super(man.gui);
-    mode(man.gui.gprop.is(GUIProp.GRADIENT) ? Fill.GRADIENT : Fill.PLAIN);
+    mode(man.gui.gopts.is(GUIOptions.GRADIENT) ? Fill.GRADIENT : Fill.PLAIN);
     setFocusable(true);
     setBackground(Color.white);
     setName(name);
@@ -89,7 +89,7 @@ public abstract class View extends BaseXPanel {
 
   @Override
   public void mouseEntered(final MouseEvent e) {
-    if(!gui.updating && gui.gprop.is(GUIProp.MOUSEFOCUS))
+    if(!gui.updating && gui.gopts.is(GUIOptions.MOUSEFOCUS))
       requestFocusInWindow();
   }
 

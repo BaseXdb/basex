@@ -11,12 +11,12 @@ import org.basex.query.*;
 import org.basex.util.*;
 
 /**
- * This class contains parser properties.
+ * This class contains JSON options.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class JsonProp extends AProp {
+public final class JsonOptions extends AOptions {
   /** Option: encoding. */
   public static final Object[] ENCODING = { "encoding", Token.UTF8 };
   /** Option: parser specification. */
@@ -67,18 +67,17 @@ public final class JsonProp extends AProp {
   /**
    * Default constructor.
    */
-  public JsonProp() {
+  public JsonOptions() {
     super();
   }
 
   /**
-   * Constructor, specifying initial properties.
-   * @param s property string. Properties are separated with commas ({@code ,}),
-   * key/values with the equality character ({@code =}).
+   * Constructor, specifying initial options.
+   * @param opts options string
    * @throws IOException I/O exception
    */
-  public JsonProp(final String s) throws IOException {
-    parse(s);
+  public JsonOptions(final String opts) throws IOException {
+    parse(opts);
   }
 
   /**

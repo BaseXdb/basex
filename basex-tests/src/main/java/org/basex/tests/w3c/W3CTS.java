@@ -121,7 +121,7 @@ public abstract class W3CTS {
     input = nm + "Catalog" + IO.XMLSUFFIX;
     testid = nm.substring(0, 4);
     pathlog = testid.toLowerCase(Locale.ENGLISH) + ".log";
-    context.mprop.set(MainProp.DBPATH, sandbox().path() + "/data");
+    context.globalopts.set(GlobalOptions.DBPATH, sandbox().path() + "/data");
   }
 
   /**
@@ -147,7 +147,7 @@ public abstract class W3CTS {
     final String sources = path + "TestSources/";
 
     final Performance perf = new Performance();
-    context.prop.set(Prop.CHOP, false);
+    context.options.set(Options.CHOP, false);
 
     //new Check(path + input).execute(context);
     data = CreateDB.mainMem(new IOFile(path + input), context);
@@ -276,7 +276,7 @@ public abstract class W3CTS {
 
       final String inname = text("*:query/@name", state);
       final IOFile query = new IOFile(queries + pth + inname + IO.XQSUFFIX);
-      context.prop.set(Prop.QUERYPATH, query.path());
+      context.options.set(Options.QUERYPATH, query.path());
       final String in = read(query);
       String er = null;
       ValueBuilder iter = null;
@@ -290,9 +290,9 @@ public abstract class W3CTS {
         curr.root = true;
       }
 
-      context.prop.set(Prop.QUERYINFO, compile);
+      context.options.set(Options.QUERYINFO, compile);
       final QueryProcessor xq = new QueryProcessor(in, context).context(curr);
-      context.prop.set(Prop.QUERYINFO, false);
+      context.options.set(Options.QUERYINFO, false);
 
       final ArrayOutput ao = new ArrayOutput();
       final TokenBuilder files = new TokenBuilder();
@@ -317,8 +317,8 @@ public abstract class W3CTS {
         iter = xq.value().cache();
 
         // serialize query
-        final SerializerProp sp = new SerializerProp();
-        sp.set(SerializerProp.S_INDENT, NO);
+        final SerializerOptions sp = new SerializerOptions();
+        sp.set(SerializerOptions.S_INDENT, NO);
         final Serializer ser = Serializer.get(ao, sp);
         for(Item it; (it = iter.next()) != null;) ser.serialize(it);
         ser.close();

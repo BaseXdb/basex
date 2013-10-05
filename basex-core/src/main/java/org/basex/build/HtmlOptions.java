@@ -5,12 +5,12 @@ import java.io.*;
 import org.basex.core.*;
 
 /**
- * This class contains HTML parsing properties for TagSoup.
+ * This class contains HTML parsing options for TagSoup.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class HtmlProp extends AProp {
+public final class HtmlOptions extends AOptions {
   /** TagSoup option: html. */
   public static final Object[] HTML = { "html", false };
   /** TagSoup option: omit-xml-declaration. */
@@ -48,10 +48,10 @@ public final class HtmlProp extends AProp {
 
   /**
    * Constructor.
-   * @param s properties string
+   * @param opts options string
    * @throws IOException exception
    */
-  public HtmlProp(final String s) throws IOException {
-    parse(s);
+  public HtmlOptions(final String opts) throws IOException {
+    parse(opts);
   }
 }

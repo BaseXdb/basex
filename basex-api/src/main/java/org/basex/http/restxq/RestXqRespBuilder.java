@@ -44,7 +44,7 @@ final class RestXqRespBuilder {
     for(final ANode a : response.attributes()) func.error(UNEXP_NODE, a);
 
     // parse response and serialization parameters
-    SerializerProp sp = func.output;
+    SerializerOptions sp = func.output;
     String cType = null;
     for(final ANode n : response.children()) {
       // process http:response element
@@ -92,7 +92,7 @@ final class RestXqRespBuilder {
     }
 
     // set content type
-    if(cType != null) sp.set(SerializerProp.S_MEDIA_TYPE, cType);
+    if(cType != null) sp.set(SerializerOptions.S_MEDIA_TYPE, cType);
 
     // check next item
     Item item = iter.next();

@@ -50,8 +50,8 @@ final class TableData {
   /** ID of the table root tag. */
   int root;
 
-  /** Window properties. */
-  private final GUIProp gprop;
+  /** GUI options. */
+  private final GUIOptions gopts;
   /** Last query. */
   private String last = "";
 
@@ -74,11 +74,11 @@ final class TableData {
   /**
    * Initializes the table data.
    * @param ctx database context
-   * @param pr gui properties
+   * @param opts gui options
    */
-  TableData(final Context ctx, final GUIProp pr) {
+  TableData(final Context ctx, final GUIOptions opts) {
     context = ctx;
-    gprop = pr;
+    gopts = opts;
   }
 
   /**
@@ -323,7 +323,7 @@ final class TableData {
       elems.add(col.elem);
     }
     final String query = Find.findTable(filters, names, elems,
-        data.tagindex.key(root), gprop.is(GUIProp.FILTERRT) || r);
+        data.tagindex.key(root), gopts.is(GUIOptions.FILTERRT) || r);
     if(query.equals(last)) return null;
     last = query;
     return query;

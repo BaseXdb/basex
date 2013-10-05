@@ -25,9 +25,9 @@ public final class StoreTest extends SandboxTest {
   @BeforeClass
   public static void init() throws Exception {
     // speed up updates and create initial database
-    run(new Set(Prop.TEXTINDEX, false));
-    run(new Set(Prop.ATTRINDEX, false));
-    run(new Set(Prop.AUTOFLUSH, false));
+    run(new Set(Options.TEXTINDEX, false));
+    run(new Set(Options.ATTRINDEX, false));
+    run(new Set(Options.AUTOFLUSH, false));
   }
 
   /**
@@ -37,10 +37,10 @@ public final class StoreTest extends SandboxTest {
   @AfterClass
   public static void finish() throws BaseXException {
     run(new DropDB(NAME));
-    run(new Set(Prop.TEXTINDEX, true));
-    run(new Set(Prop.ATTRINDEX, true));
-    run(new Set(Prop.AUTOFLUSH, true));
-    run(new Set(Prop.UPDINDEX, false));
+    run(new Set(Options.TEXTINDEX, true));
+    run(new Set(Options.ATTRINDEX, true));
+    run(new Set(Options.AUTOFLUSH, true));
+    run(new Set(Options.UPDINDEX, false));
   }
 
   /**
@@ -98,15 +98,15 @@ public final class StoreTest extends SandboxTest {
   }
 
   /**
-   * Tests the {@link Prop#UPDINDEX} and {@link Prop#AUTOFLUSH} flags in combination.
-   * Reaction on a bug (incremental value index was not correctly closed)
+   * Tests the {@link Options#UPDINDEX} and {@link Options#AUTOFLUSH} flags in
+   * combination. Reaction on a bug (incremental value index was not correctly closed)
    * @throws BaseXException database exception
    */
   @Test
   public void updIndexFlush() throws BaseXException {
-    run(new Set(Prop.TEXTINDEX, true));
-    run(new Set(Prop.AUTOFLUSH, false));
-    run(new Set(Prop.UPDINDEX, true));
+    run(new Set(Options.TEXTINDEX, true));
+    run(new Set(Options.AUTOFLUSH, false));
+    run(new Set(Options.UPDINDEX, true));
     run(new CreateDB(NAME));
     final String input = "<a>0</a>";
     run(new Add("a.xml", input));

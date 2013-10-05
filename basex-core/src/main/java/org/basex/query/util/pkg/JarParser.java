@@ -44,7 +44,7 @@ public final class JarParser {
   public JarDesc parse(final IO io) throws QueryException {
     final JarDesc desc = new JarDesc();
     try {
-      final ANode node = new DBNode(io, context.prop).children().next();
+      final ANode node = new DBNode(io, context.options).children().next();
       for(final ANode next : node.children()) {
         final QNm name = next.qname();
         // ignore namespace to improve compatibility

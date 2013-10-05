@@ -212,7 +212,7 @@ public final class XQuery implements Iterable<XdmItem> {
    * @return serialization properties
    * @throws XQueryException exception
    */
-  public SerializerProp serializer() {
+  public SerializerOptions serializer() {
     return qp.ctx.serParams(false);
   }
 

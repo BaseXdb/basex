@@ -5,17 +5,17 @@ import java.util.*;
 import org.basex.io.*;
 
 /**
- * This class assembles admin properties which are used all around the project.
+ * This class defines options which are used all around the project.
  * They are also stored in the project's home directory.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class MainProp extends AProp {
+public final class GlobalOptions extends AOptions {
   /** Indicates if the user's home directory has been chosen as home directory. */
   private static final boolean USERHOME = Prop.HOME.equals(Prop.USERHOME);
 
-  /** Comment: written to property file. */
+  /** Comment: written to options file. */
   public static final Object[] C_GENERAL = { "General Options" };
 
   /** Database path. */
@@ -33,7 +33,7 @@ public final class MainProp extends AProp {
   /** Applied locking algorithm: local (database) vs. global (process) locking. */
   public static final Object[] GLOBALLOCK = { "GLOBALLOCK", false };
 
-  /** Comment: written to property file. */
+  /** Comment: written to options file. */
   public static final Object[] C_CLIENT = { "Client/Server Architecture" };
 
   /** Server: host, used for connecting new clients. */
@@ -69,7 +69,7 @@ public final class MainProp extends AProp {
   /** Log message cut-off. */
   public static final Object[] LOGMSGMAXLEN = { "LOGMSGMAXLEN", 1000 };
 
-  /** Comment: written to property file. */
+  /** Comment: written to options file. */
   public static final Object[] C_HTTP = { "HTTP Services" };
 
   /** Web path. */
@@ -84,21 +84,21 @@ public final class MainProp extends AProp {
 
   /**
    * Constructor, adopting system properties starting with "org.basex.".
-   * @param file if {@code true}, properties will also be read from disk
+   * @param file if {@code true}, options will be read from disk
    */
-  MainProp(final boolean file) {
+  GlobalOptions(final boolean file) {
     super(file ? "" : null);
-    // set some static properties
+    // set some static options
     Prop.language = get(LANG);
     Prop.langkeys = is(LANGKEYS);
     Prop.debug = is(DEBUG);
     final String ph = get(PROXYHOST);
     final String pp = Integer.toString(num(PROXYPORT));
-    AProp.setSystem("http.proxyHost", ph);
-    AProp.setSystem("http.proxyPort", pp);
-    AProp.setSystem("https.proxyHost", ph);
-    AProp.setSystem("https.proxyPort", pp);
-    AProp.setSystem("http.nonProxyHosts", get(NONPROXYHOSTS));
+    AOptions.setSystem("http.proxyHost", ph);
+    AOptions.setSystem("http.proxyPort", pp);
+    AOptions.setSystem("https.proxyHost", ph);
+    AOptions.setSystem("https.proxyPort", pp);
+    AOptions.setSystem("http.nonProxyHosts", get(NONPROXYHOSTS));
   }
 
   /**

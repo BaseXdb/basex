@@ -510,8 +510,8 @@ public abstract class SessionTest extends SandboxTest {
   public void queryOptions() throws IOException {
     final Query query = session.query("declare option output:encoding 'US-ASCII';()");
     query.execute();
-    final SerializerProp sp = new SerializerProp(query.options());
-    assertEquals("US-ASCII", sp.get(SerializerProp.S_ENCODING));
+    final SerializerOptions sp = new SerializerOptions(query.options());
+    assertEquals("US-ASCII", sp.get(SerializerOptions.S_ENCODING));
     query.close();
   }
 

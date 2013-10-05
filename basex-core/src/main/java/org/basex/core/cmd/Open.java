@@ -64,7 +64,7 @@ public final class Open extends Command {
       Data data = ctx.dbs.pin(name);
       if(data == null) {
         // check if database exists
-        if(!ctx.mprop.dbexists(name)) throw new BaseXException(DB_NOT_FOUND_X, name);
+        if(!ctx.globalopts.dbexists(name)) throw new BaseXException(DB_NOT_FOUND_X, name);
         data = new DiskData(name, ctx);
         ctx.dbs.add(data);
       }

@@ -105,14 +105,14 @@ public final class QT3TS {
    * @throws Exception exception
    */
   private void run(final String[] args) throws Exception {
-    ctx.mprop.set(MainProp.DBPATH, sandbox().path() + "/data");
+    ctx.globalopts.set(GlobalOptions.DBPATH, sandbox().path() + "/data");
     parseArguments(args);
     init();
 
     final Performance perf = new Performance();
-    ctx.prop.set(Prop.CHOP, false);
-    ctx.prop.set(Prop.INTPARSE, false);
-    ctx.prop.set(Prop.SERIALIZER, "omit-xml-declaration=no,indent=no");
+    ctx.options.set(Options.CHOP, false);
+    ctx.options.set(Options.INTPARSE, false);
+    ctx.options.set(Options.SERIALIZER, "omit-xml-declaration=no,indent=no");
 
     final XdmValue doc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx).value();
     final String version = asString("*:catalog/@version", doc);
@@ -235,7 +235,7 @@ public final class QT3TS {
 
     // use XQuery 1.0 if XQ10 or XP20 is specified
     if(new XQuery("*:dependency[@type='spec'][matches(@value,'(XQ10)([^+]|$)')]", ctx).
-        context(test).next() != null) ctx.prop.set(Prop.XQUERY3, false);
+        context(test).next() != null) ctx.options.set(Options.XQUERY3, false);
 
     // check if environment is defined in test-case
     QT3Env e = null;
@@ -348,7 +348,7 @@ public final class QT3TS {
     }
 
     // revert to XQuery as default
-    ctx.prop.set(Prop.XQUERY3, true);
+    ctx.options.set(Options.XQUERY3, true);
 
     final String exp = test(result, expected);
     final TokenBuilder tmp = new TokenBuilder();
@@ -363,7 +363,7 @@ public final class QT3TS {
       } else if(result.err != null) {
         res = result.err.getCode() + ": " + result.err.getLocalizedMessage();
       } else {
-        result.sprop.set(SerializerProp.S_OMIT_XML_DECLARATION, "yes");
+        result.sprop.set(SerializerOptions.S_OMIT_XML_DECLARATION, "yes");
         res = serialize(result.value, result.sprop);
       }
     } catch(final XQueryException ex) {
@@ -673,7 +673,7 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String serializationMatches(final XdmValue value, final XdmValue expect,
-      final SerializerProp sprop) {
+      final SerializerOptions sprop) {
 
     final String exp = expect.getString();
     final String flags = asString("@flags", expect);
@@ -697,7 +697,7 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String assertSerializationError(final XdmValue value, final XdmValue expect,
-      final SerializerProp sprop) {
+      final SerializerOptions sprop) {
 
     final String exp = asString('@' + CODE, expect);
     try {
@@ -721,7 +721,7 @@ public final class QT3TS {
    * @return optional expected test suite result
    * @throws IOException I/O exception
    */
-  private String serialize(final XdmValue value, final SerializerProp sprop)
+  private String serialize(final XdmValue value, final SerializerOptions sprop)
       throws IOException {
 
     final ArrayOutput ao = new ArrayOutput();
@@ -871,7 +871,7 @@ public final class QT3TS {
         } else if(c == 'a') {
           all = true;
         } else if(c == 'd') {
-          ctx.mprop.set(MainProp.DEBUG, true);
+          ctx.globalopts.set(GlobalOptions.DEBUG, true);
         } else if(c == 'i') {
           ignoring = true;
         } else if(c == 'e') {
@@ -934,7 +934,7 @@ public final class QT3TS {
    */
   static class QT3Result {
     /** Serialization parameters. */
-    SerializerProp sprop;
+    SerializerOptions sprop;
     /** Query result. */
     XdmValue value;
     /** Query exception. */

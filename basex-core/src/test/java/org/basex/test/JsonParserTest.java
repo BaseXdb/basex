@@ -2,7 +2,7 @@ package org.basex.test;
 
 import static org.junit.Assert.*;
 
-import org.basex.build.JsonProp.*;
+import org.basex.build.JsonOptions.*;
 import org.basex.query.*;
 import org.basex.query.util.json.*;
 import org.basex.util.*;

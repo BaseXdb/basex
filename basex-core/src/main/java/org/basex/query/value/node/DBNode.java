@@ -80,11 +80,11 @@ public class DBNode extends ANode {
   /**
    * Constructor, specifying an XML input reference.
    * @param input input reference
-   * @param prop database properties
+   * @param opts database options
    * @throws IOException I/O exception
    */
-  public DBNode(final IO input, final Prop prop) throws IOException {
-    this(Parser.xmlParser(input, prop));
+  public DBNode(final IO input, final Options opts) throws IOException {
+    this(Parser.xmlParser(input, opts));
   }
 
   /**
@@ -224,15 +224,15 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final DBNode dbCopy(final Prop prop) {
-    final MemData md = data.inMemory() ? new MemData(data) : new MemData(prop);
+  public final DBNode dbCopy(final Options opts) {
+    final MemData md = data.inMemory() ? new MemData(data) : new MemData(opts);
     new DataBuilder(md).build(this);
     return new DBNode(md).parent(par);
   }
 
   @Override
   public final DBNode deepCopy() {
-    return dbCopy(data.meta.prop);
+    return dbCopy(data.meta.options);
   }
 
   @Override

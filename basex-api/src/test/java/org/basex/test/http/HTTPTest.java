@@ -43,7 +43,7 @@ public abstract class HTTPTest extends SandboxTest {
    */
   protected static void init(final String rt, final boolean local) throws Exception {
     initContext(CONTEXT);
-    assertTrue(new IOFile(CONTEXT.mprop.get(MainProp.WEBPATH)).md());
+    assertTrue(new IOFile(CONTEXT.globalopts.get(GlobalOptions.WEBPATH)).md());
     root = rt;
 
     final StringList sl = new StringList();

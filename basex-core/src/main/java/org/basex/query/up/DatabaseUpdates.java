@@ -190,9 +190,10 @@ final class DatabaseUpdates {
     // execute fn:put operations
     for(final Put p : puts.values()) p.apply();
 
-    if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
+    if(data.meta.options.is(Options.WRITEBACK) && !data.meta.original.isEmpty()) {
       try {
-        final SerializerProp sp = new SerializerProp(data.meta.prop.get(Prop.EXPORTER));
+        final String export = data.meta.options.get(Options.EXPORTER);
+        final SerializerOptions sp = new SerializerOptions(export);
         Export.export(data, data.meta.original, sp, null);
       } catch(final IOException ex) {
         UPPUTERR.thrw(null, data.meta.original);

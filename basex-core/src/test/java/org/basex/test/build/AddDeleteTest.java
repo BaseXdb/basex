@@ -100,10 +100,10 @@ public final class AddDeleteTest extends SandboxTest {
     new Add("target", ZIPFILE).execute(context);
     assertEquals(4, docs());
     // do not add archives
-    new Set(Prop.ADDARCHIVES, false).execute(context);
+    new Set(Options.ADDARCHIVES, false).execute(context);
     new Add("", ZIPFILE).execute(context);
     assertEquals(4, docs());
-    new Set(Prop.ADDARCHIVES, true).execute(context);
+    new Set(Options.ADDARCHIVES, true).execute(context);
   }
 
   /**
@@ -233,12 +233,12 @@ public final class AddDeleteTest extends SandboxTest {
     final IOFile io = new IOFile(TEMP);
     io.write(Token.token("<x"));
 
-    new Set(Prop.SKIPCORRUPT, true).execute(context);
+    new Set(Options.SKIPCORRUPT, true).execute(context);
     assertEquals(0, context.data().resources.docs("").size());
     new Add("x", "<x").execute(context);
     new Add("x", CORRUPT).execute(context);
     assertEquals(0, context.data().resources.docs("").size());
-    new Set(Prop.SKIPCORRUPT, false).execute(context);
+    new Set(Options.SKIPCORRUPT, false).execute(context);
 
     try {
       new Add("", "<x").execute(context);

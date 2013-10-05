@@ -149,7 +149,7 @@ public abstract class BaseXDialog extends JDialog {
       final Container par = getParent();
       loc[0] = getX() - par.getX();
       loc[1] = getY() - par.getY();
-      gui.gprop.write();
+      gui.gopts.write();
     }
     super.dispose();
   }

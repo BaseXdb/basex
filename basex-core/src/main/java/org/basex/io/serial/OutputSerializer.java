@@ -2,7 +2,7 @@ package org.basex.io.serial;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-import static org.basex.io.serial.SerializerProp.*;
+import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -68,7 +68,7 @@ public abstract class OutputSerializer extends Serializer {
   /** Item separator. */
   private final byte[] itemsep;
 
-  // project specific properties
+  // project specific parameters
 
   /** Number of spaces to indent. */
   protected final int indents;
@@ -83,16 +83,16 @@ public abstract class OutputSerializer extends Serializer {
   private final boolean wrap;
 
   /**
-   * Constructor, specifying serialization options.
+   * Constructor.
    * @param os output stream reference
-   * @param props serialization properties
+   * @param opts serialization parameters
    * @param versions supported versions
    * @throws IOException I/O exception
    */
-  OutputSerializer(final OutputStream os, final SerializerProp props,
+  OutputSerializer(final OutputStream os, final SerializerOptions opts,
       final String... versions) throws IOException {
 
-    final SerializerProp p = props == null ? PROPS : props;
+    final SerializerOptions p = opts == null ? OPTIONS : opts;
     final String ver = p.supported(S_VERSION, versions);
     final String htmlver = p.supported(S_HTML_VERSION, V40, V401, V50);
     html5 = htmlver.equals(V50) || ver.equals(V50);
@@ -112,7 +112,7 @@ public abstract class OutputSerializer extends Serializer {
     }
     utf8 = enc == UTF8;
 
-    // project specific properties
+    // project specific options
     indents = Math.max(0, toInt(p.get(S_INDENTS)));
     format  = p.yes(S_FORMAT);
     tab     = p.yes(S_TABULATOR) ? '\t' : ' ';

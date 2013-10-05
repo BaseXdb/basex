@@ -13,24 +13,28 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class assembles properties which are used all around the project. They
- * are initially read from and finally written to disk.
+ * This abstract class provides methods for accessing, reading and storing options.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class AProp implements Iterable<String> {
-  /** Cached user properties. */
+public abstract class AOptions implements Iterable<String> {
+  /** Comment in configuration file. */
+  private static final String PROPHEADER = "# " + Prop.NAME + " Options File." + NL;
+  /** Comment in configuration file. */
+  private static final String PROPUSER = "# Local Options";
+
+  /** Options. */
+  protected final TreeMap<String, Object> options = new TreeMap<String, Object>();
+  /** Options, cached from an input file. */
   private final StringBuilder user = new StringBuilder();
-  /** Properties. */
-  protected final TreeMap<String, Object> props = new TreeMap<String, Object>();
-  /** Property file. */
+  /** Options file. */
   private IOFile file;
 
   /**
    * Constructor.
    */
-  public AProp() {
+  public AOptions() {
     this(null);
   }
 
@@ -38,10 +42,10 @@ public abstract class AProp implements Iterable<String> {
    * Constructor, reading options from a configuration file.
    * @param suffix if {@code null}, file parsing will be skipped
    */
-  public AProp(final String suffix) {
+  public AOptions(final String suffix) {
     try {
-      for(final Object[] arr : props(getClass())) {
-        if(arr.length > 1) props.put(toString(arr), arr[1]);
+      for(final Object[] arr : options(getClass())) {
+        if(arr.length > 1) options.put(toString(arr), arr[1]);
       }
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -53,7 +57,7 @@ public abstract class AProp implements Iterable<String> {
   }
 
   /**
-   * Writes the properties to disk.
+   * Writes the options to disk.
    */
   public final synchronized void write() {
     BufferedWriter bw = null;
@@ -61,14 +65,14 @@ public abstract class AProp implements Iterable<String> {
       bw = new BufferedWriter(new FileWriter(file.file()));
       bw.write(PROPHEADER);
 
-      for(final Object[] arr : props(getClass())) {
+      for(final Object[] arr : options(getClass())) {
         final String key = toString(arr);
         if(arr.length == 1) {
           bw.write(NL + "# " + key + NL);
           continue;
         }
 
-        final Object val = props.get(key);
+        final Object val = options.get(key);
         if(val instanceof String[]) {
           final String[] str = (String[]) val;
           bw.write(key + " = " + str.length + NL);
@@ -102,7 +106,7 @@ public abstract class AProp implements Iterable<String> {
    * @return value
    */
   public final synchronized Object get(final String key) {
-    return props.get(key);
+    return options.get(key);
   }
 
   /**
@@ -201,7 +205,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value to be written
    */
   public final synchronized void setObject(final String key, final Object val) {
-    props.put(key, val);
+    options.put(key, val);
   }
 
   /**
@@ -225,7 +229,7 @@ public abstract class AProp implements Iterable<String> {
     } else if(type instanceof String) {
       setObject(key, val);
     } else {
-      Util.notexpected("Unknown property type: " + type.getClass().getSimpleName());
+      Util.notexpected("Unknown option type: " + type.getClass().getSimpleName());
     }
     return v;
   }
@@ -242,7 +246,7 @@ public abstract class AProp implements Iterable<String> {
   }
 
   /**
-   * Inverts a boolean property.
+   * Inverts a boolean option.
    * @param key key
    * @return new value
    */
@@ -253,13 +257,13 @@ public abstract class AProp implements Iterable<String> {
   }
 
   /**
-   * Checks if the specified property has changed.
+   * Checks if the specified option has changed.
    * @param key key
    * @param val new value
    * @return result of check
    */
   public final synchronized boolean sameAs(final Object[] key, final Object val) {
-    return props.get(toString(key)).equals(val);
+    return options.get(toString(key)).equals(val);
   }
 
   /**
@@ -270,16 +274,15 @@ public abstract class AProp implements Iterable<String> {
   public final synchronized String similar(final String key) {
     final byte[] name = token(key);
     final Levenshtein ls = new Levenshtein();
-    for(final String prop : props.keySet()) {
-      if(ls.similar(name, token(prop))) return prop;
+    for(final String opts : options.keySet()) {
+      if(ls.similar(name, token(opts))) return opts;
     }
     return null;
   }
 
   /**
-   * Scans the system properties and initializes the project properties.
-   * All properties starting with {@code org.basex.} will be assigned as properties
-   * and removed from the global system properties.
+   * Scans the system properties and initializes the database options.
+   * All properties starting with {@code org.basex.} will be assigned as options.
    */
   public final void setSystem() {
     // collect parameters that start with "org.basex."
@@ -287,24 +290,24 @@ public abstract class AProp implements Iterable<String> {
     final Properties pr = System.getProperties();
     for(final Object key : pr.keySet()) {
       final String k = key.toString();
-      if(k.startsWith(Prop.DBPREFIX)) sl.add(k);
+      if(k.startsWith(DBPREFIX)) sl.add(k);
     }
     // assign properties
     for(final String key : sl) {
-      final String k = key.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
+      final String k = key.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
       set(k, System.getProperty(key));
     }
   }
 
   @Override
   public final synchronized Iterator<String> iterator() {
-    return props.keySet().iterator();
+    return options.keySet().iterator();
   }
 
   @Override
   public final synchronized String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    for(final Entry<String, Object> e : props.entrySet()) {
+    for(final Entry<String, Object> e : options.entrySet()) {
       if(!tb.isEmpty()) tb.add(',');
       tb.add(e.getKey()).add('=').add(e.getValue().toString().replace(",", ",,"));
     }
@@ -315,7 +318,7 @@ public abstract class AProp implements Iterable<String> {
 
   /**
    * Returns a system property.
-   * @param key {@link Prop} key
+   * @param key {@link Options} key
    * @return value, or empty string
    */
   public static String getSystem(final Object[] key) {
@@ -325,7 +328,7 @@ public abstract class AProp implements Iterable<String> {
   /**
    * Returns a system property. If necessary, the key will
    * be converted to lower-case and prefixed with {@link Prop#DBPREFIX}.
-   * @param key {@link Prop} key
+   * @param key {@link Options} key
    * @return value, or empty string
    */
   public static String getSystem(final String key) {
@@ -337,7 +340,7 @@ public abstract class AProp implements Iterable<String> {
 
   /**
    * Sets a system property if it has not been set before.
-   * @param key {@link Prop} key
+   * @param key {@link Options} key
    * @param val value
    */
   public static void setSystem(final Object[] key, final Object val) {
@@ -357,28 +360,28 @@ public abstract class AProp implements Iterable<String> {
   }
 
   /**
-   * Returns all property objects from the specified property class.
-   * @param clz property class
-   * @return property objects
+   * Returns all options from the specified class.
+   * @param clz options class
+   * @return option instances
    * @throws IllegalAccessException exception
    */
-  public static final Object[][] props(final Class<? extends AProp> clz)
+  public static final Object[][] options(final Class<? extends AOptions> clz)
       throws IllegalAccessException {
 
-    final ArrayList<Object[]> props = new ArrayList<Object[]>();
+    final ArrayList<Object[]> opts = new ArrayList<Object[]>();
     for(final Field f : clz.getFields()) {
       if(!Modifier.isStatic(f.getModifiers())) continue;
       final Object obj = f.get(null);
-      if(obj instanceof Object[]) props.add((Object[]) obj);
+      if(obj instanceof Object[]) opts.add((Object[]) obj);
     }
-    return props.toArray(new Object[props.size()][]);
+    return opts.toArray(new Object[opts.size()][]);
   };
 
   // PROTECTED METHODS ==================================================================
 
   /**
-   * Parses a property string and sets the properties accordingly.
-   * @param string property string
+   * Parses an option string and sets the options accordingly.
+   * @param string options string
    * @throws IOException io exception
    */
   protected final synchronized void parse(final String string) throws IOException {
@@ -407,18 +410,18 @@ public abstract class AProp implements Iterable<String> {
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Reads the configuration file and initializes the project properties.
+   * Reads the configuration file and initializes the options.
    * The file is located in the project home directory.
-   * @param prop property file extension
+   * @param suffix optional suffix of options file
    */
-  private synchronized void read(final String prop) {
-    file = new IOFile(HOME + IO.BASEXSUFFIX + prop);
+  private synchronized void read(final String suffix) {
+    file = new IOFile(HOME + IO.BASEXSUFFIX + suffix);
 
     final StringList read = new StringList();
     final TokenBuilder err = new TokenBuilder();
     boolean local = false;
     if(!file.exists()) {
-      err.addExt("Saving properties in \"%\"..." + NL, file);
+      err.addExt("Saving options in \"%\"..." + NL, file);
     } else {
       BufferedReader br = null;
       try {
@@ -459,18 +462,18 @@ public abstract class AProp implements Iterable<String> {
             continue;
           }
 
-          final Object entry = props.get(key);
+          final Object entry = options.get(key);
           if(entry == null) {
             err.addExt("%: \"%\" not found. " + NL, file, key);
           } else if(entry instanceof String) {
-            props.put(key, val);
+            options.put(key, val);
           } else if(entry instanceof Integer) {
-            props.put(key, Integer.parseInt(val));
+            options.put(key, Integer.parseInt(val));
           } else if(entry instanceof Boolean) {
-            props.put(key, Boolean.parseBoolean(val));
+            options.put(key, Boolean.parseBoolean(val));
           } else if(entry instanceof String[]) {
             if(num == 0) {
-              props.put(key, new String[Integer.parseInt(val)]);
+              options.put(key, new String[Integer.parseInt(val)]);
             } else {
               ((String[]) entry)[num - 1] = val;
             }
@@ -492,10 +495,10 @@ public abstract class AProp implements Iterable<String> {
     try {
       if(err.isEmpty()) {
         boolean ok = true;
-        for(final Object[] arr : props(getClass())) {
+        for(final Object[] arr : options(getClass())) {
           if(arr.length > 1) ok &= read.contains(toString(arr));
         }
-        if(!ok) err.addExt("Saving properties in \"%\"..." + NL, file);
+        if(!ok) err.addExt("Saving options in \"%\"..." + NL, file);
       }
     } catch(final IllegalAccessException ex) {
       Util.notexpected(ex);
@@ -515,11 +518,11 @@ public abstract class AProp implements Iterable<String> {
    */
   private Object get(final Object[] key, final Class<?> c) {
     final String k = toString(key);
-    final Object entry = props.get(k);
-    if(entry == null) Util.notexpected("Property " + k + " not defined.");
+    final Object entry = options.get(k);
+    if(entry == null) Util.notexpected("Option " + k + " not defined.");
 
     final Class<?> cc = entry.getClass();
-    if(c != cc) Util.notexpected("Property '" + k + "' is a " + Util.name(cc));
+    if(c != cc) Util.notexpected("Option '" + k + "' is a " + Util.name(cc));
     return entry;
   }
 

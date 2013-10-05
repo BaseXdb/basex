@@ -40,27 +40,25 @@ public class XMLParser extends SingleParser {
   /**
    * Constructor.
    * @param source document source
-   * @param pr database properties
+   * @param opts database options
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO source, final Prop pr) throws IOException {
-    this(source, pr, false);
+  public XMLParser(final IO source, final Options opts) throws IOException {
+    this(source, opts, false);
   }
 
   /**
    * Constructor.
    * @param source document source
-   * @param pr database properties
+   * @param opts database options
    * @param frag allow parsing of document fragment
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO source, final Prop pr, final boolean frag)
-      throws IOException {
-
-    super(source, pr);
-    scanner = new XMLScanner(source, pr, frag);
-    stripNS = pr.is(Prop.STRIPNS);
-    chop = pr.is(Prop.CHOP);
+  public XMLParser(final IO source, final Options opts, final boolean frag) throws IOException {
+    super(source, opts);
+    scanner = new XMLScanner(source, opts, frag);
+    stripNS = opts.is(Options.STRIPNS);
+    chop = opts.is(Options.CHOP);
     chops.push(chop);
     fragment = frag;
   }

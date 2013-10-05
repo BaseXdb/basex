@@ -129,7 +129,7 @@ public final class TreeView extends View implements TreeConstants {
 
   @Override
   public boolean visible() {
-    final boolean v = gui.gprop.is(GUIProp.SHOWTREE);
+    final boolean v = gui.gopts.is(GUIOptions.SHOWTREE);
     if(!v) {
       sub = null;
       tr = null;
@@ -140,7 +140,7 @@ public final class TreeView extends View implements TreeConstants {
 
   @Override
   public void visible(final boolean v) {
-    gui.gprop.set(GUIProp.SHOWTREE, v);
+    gui.gopts.set(GUIOptions.SHOWTREE, v);
   }
 
   @Override
@@ -1037,8 +1037,8 @@ public final class TreeView extends View implements TreeConstants {
    * @return show attributes has changed
    */
   private boolean showAttsChanged() {
-    final GUIProp gprop = gui.gprop;
-    if(gprop.is(GUIProp.TREEATTS) == showAtts) return false;
+    final GUIOptions gopts = gui.gopts;
+    if(gopts.is(GUIOptions.TREEATTS) == showAtts) return false;
     showAtts =  !showAtts;
     return true;
   }
@@ -1048,8 +1048,8 @@ public final class TreeView extends View implements TreeConstants {
    * @return slim to text has changed
    */
   private boolean slimToTextChanged() {
-    final GUIProp gprop = gui.gprop;
-    if(gprop.is(GUIProp.TREESLIMS) == slimToText) return false;
+    final GUIOptions gopts = gui.gopts;
+    if(gopts.is(GUIOptions.TREESLIMS) == slimToText) return false;
     slimToText = !slimToText;
     return true;
   }

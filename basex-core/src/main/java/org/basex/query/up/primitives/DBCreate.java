@@ -56,7 +56,7 @@ public final class DBCreate extends DBNew {
 
   @Override
   public void prepare(final MemData tmp) throws QueryException {
-    if(inputs != null && !inputs.isEmpty()) addDocs(new MemData(qc.context.prop), name);
+    if(inputs != null && !inputs.isEmpty()) addDocs(new MemData(qc.context.options), name);
   }
 
   @Override
@@ -69,7 +69,7 @@ public final class DBCreate extends DBNew {
     initOptions();
     assignOptions();
     try {
-      data = CreateDB.create(name, Parser.emptyParser(qc.context.prop), qc.context);
+      data = CreateDB.create(name, Parser.emptyParser(qc.context.options), qc.context);
     } catch(final IOException ex) {
       UPDBOPTERR.thrw(info, ex);
     } finally {

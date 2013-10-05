@@ -24,12 +24,12 @@ public final class CollStressTest extends SandboxTest {
     final CreateDB cmd = new CreateDB(NAME);
     cmd.execute(context);
     // Speed up updates and add documents
-    new Set(Prop.AUTOFLUSH, false).execute(context);
-    new Set(Prop.INTPARSE, true).execute(context);
+    new Set(Options.AUTOFLUSH, false).execute(context);
+    new Set(Options.INTPARSE, true).execute(context);
     for(int i = 0; i < SIZE; i++) {
       new Add(Integer.toString(i), "<xml/>").execute(context);
     }
-    new Set(Prop.AUTOFLUSH, true).execute(context);
+    new Set(Options.AUTOFLUSH, true).execute(context);
   }
 
   /**

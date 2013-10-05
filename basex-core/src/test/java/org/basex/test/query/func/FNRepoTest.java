@@ -30,7 +30,7 @@ public class FNRepoTest extends AdvancedQueryTest {
   @Before
   public void setupTest() {
     context = new Context();
-    context.mprop.set(MainProp.REPOPATH, REPO);
+    context.globalopts.set(GlobalOptions.REPOPATH, REPO);
     new IOFile(REPO, PKG3ID).delete();
   }
 

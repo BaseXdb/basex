@@ -84,7 +84,7 @@ public final class List extends Command {
       }
 
       // count number of raw files
-      final IOFile dir = new IOFile(mprop.dbpath(name), M_RAW);
+      final IOFile dir = new IOFile(globalopts.dbpath(name), M_RAW);
       final int bin = dir.descendants().size();
 
       // create entry
@@ -159,7 +159,7 @@ public final class List extends Command {
    */
   public static StringList list(final Context ctx) {
     final StringList db = new StringList();
-    for(final IOFile f : ctx.mprop.dbpath().children()) {
+    for(final IOFile f : ctx.globalopts.dbpath().children()) {
       final String name = f.name();
       if(f.isDir() && !name.startsWith(".")) db.add(name);
     }

@@ -50,9 +50,9 @@ public final class Put extends BasicOperation {
       try {
         final PrintOutput po = new PrintOutput(u);
         try {
-          final SerializerProp pr = new SerializerProp();
+          final SerializerOptions pr = new SerializerOptions();
           // try to reproduce non-chopped documents correctly
-          pr.set(SerializerProp.S_INDENT, node.data.meta.chop ? YES : NO);
+          pr.set(SerializerOptions.S_INDENT, node.data.meta.chop ? YES : NO);
           final Serializer ser = Serializer.get(po, pr);
           ser.serialize(node);
           ser.close();

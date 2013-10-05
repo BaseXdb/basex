@@ -33,8 +33,8 @@ public final class Log {
   /** REQUEST string. */
   public static final String REQUEST = "REQUEST";
 
-  /** Main properties. */
-  private final MainProp mprop;
+  /** Global options. */
+  private final GlobalOptions gopts;
   /** Start date of log. */
   private String start;
   /** Output stream. */
@@ -45,7 +45,7 @@ public final class Log {
    * @param ctx database context
    */
   public Log(final Context ctx) {
-    mprop = ctx.mprop;
+    gopts = ctx.globalopts;
   }
 
   /**
@@ -73,7 +73,7 @@ public final class Log {
    * @param str strings to be written
    */
   public synchronized void write(final Object... str) {
-    if(!mprop.is(MainProp.LOG)) {
+    if(!gopts.is(GlobalOptions.LOG)) {
       close();
       return;
     }
@@ -94,7 +94,7 @@ public final class Log {
       }
 
       // construct log text
-      final int ml = mprop.num(MainProp.LOGMSGMAXLEN);
+      final int ml = gopts.num(GlobalOptions.LOGMSGMAXLEN);
       final TokenBuilder tb = new TokenBuilder(DateTime.format(date, DateTime.TIME));
       for(final Object s : str) {
         tb.add('\t');
@@ -134,7 +134,7 @@ public final class Log {
    */
   public synchronized IOFile dir() {
     // log suffix, plural
-    return mprop.dbpath(IO.LOGSUFFIX + 's');
+    return gopts.dbpath(IO.LOGSUFFIX + 's');
   }
 
   /**

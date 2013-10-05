@@ -17,7 +17,7 @@ import org.basex.query.value.item.*;
  * and converts them to XML.
  *
  * <p>The parser provides some options, which can be specified via the
- * {@link Prop#JSONPARSER} option.</p>
+ * {@link Options#JSONPARSER} option.</p>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -26,43 +26,42 @@ public final class JsonParser extends XMLParser {
   /**
    * Constructor.
    * @param source document source
-   * @param pr database properties
+   * @param opts database options
    * @throws IOException I/O exception
    */
-  public JsonParser(final IO source, final Prop pr) throws IOException {
-    this(source, pr, pr.get(Prop.JSONPARSER));
+  public JsonParser(final IO source, final Options opts) throws IOException {
+    this(source, opts, opts.get(Options.JSONPARSER));
   }
 
   /**
    * Constructor.
    * @param source document source
-   * @param pr database properties
-   * @param options parser options
+   * @param opts database options
+   * @param parser parser options
    * @throws IOException I/O exception
    */
-  public JsonParser(final IO source, final Prop pr, final String options)
+  public JsonParser(final IO source, final Options opts, final String parser)
       throws IOException {
-    super(toXML(source, options), pr);
+    super(toXML(source, parser), opts);
   }
 
   /**
    * Converts a JSON document to XML.
-   * @param io io reference
+   * @param io input
    * @param options parsing options
    * @return parser
    * @throws IOException I/O exception
    */
   private static IO toXML(final IO io, final String options) throws IOException {
-    // set parser properties
-    final JsonProp jprop = new JsonProp(options);
-    final String encoding = jprop.get(JsonProp.ENCODING);
+    final JsonOptions jopts = new JsonOptions(options);
+    final String encoding = jopts.get(JsonOptions.ENCODING);
 
     // parse input, using specified encoding
     final byte[] content = new NewlineInput(io).encoding(encoding).content();
 
     // parse input and convert to XML node
     try {
-      final JsonConverter conv = JsonConverter.get(jprop, null);
+      final JsonConverter conv = JsonConverter.get(jopts, null);
       final Item node = conv.convert(string(content));
 
       // cache XML representation
