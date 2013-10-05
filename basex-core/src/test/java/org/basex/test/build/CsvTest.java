@@ -18,7 +18,7 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CSVTest extends SandboxTest {
+public final class CsvTest extends SandboxTest {
   /** Test CSV file. */
   private static final String FILE = "src/test/resources/input.csv";
   /** Temporary CSV file. */

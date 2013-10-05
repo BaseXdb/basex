@@ -14,12 +14,12 @@ import org.basex.util.list.*;
 
 /**
  * This class serializes data as JSON. The input must conform to the rules
- * defined in the {@link JsonBaseXConverter} class.
+ * defined in the {@link JsonDefaultConverter} class.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class JsonCGSerializer extends JsonSerializer {
+public final class JsonDefaultSerializer extends JsonSerializer {
   /** Plural. */
   private static final byte[] S = { 's' };
   /** Global data type attributes. */
@@ -44,7 +44,8 @@ public final class JsonCGSerializer extends JsonSerializer {
    * @param props serialization properties
    * @throws IOException I/O exception
    */
-  JsonCGSerializer(final OutputStream os, final SerializerProp props) throws IOException {
+  JsonDefaultSerializer(final OutputStream os, final SerializerProp props)
+      throws IOException {
     super(os, props);
     for(int t = 0; t < typeCache.length; t++) typeCache[t] = new TokenMap();
   }

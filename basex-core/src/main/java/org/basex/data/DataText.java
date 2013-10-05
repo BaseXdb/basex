@@ -131,9 +131,8 @@ public interface DataText {
   /** Version. */
   String V50 = "5.0";
 
-  /** Method. */
+  /** Output method. */
   String M_CSV = "csv";
-
   /** Method. */
   String M_XML = "xml";
   /** Method. */
@@ -145,15 +144,9 @@ public interface DataText {
   /** Method. */
   String M_JSON = "json";
   /** Method. */
-  String M_JSONML = "jsonml";
-  /** Method. */
-  String M_PLAIN = "plain";
-  /** Method. */
-  String M_MAP = "map";
-  /** Method. */
   String M_RAW = "raw";
   /** Methods. */
-  String[] METHODS = { M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_JSONML, M_CSV, M_RAW };
+  String[] METHODS = { M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_CSV, M_RAW };
 
   /** Normalization. */
   String NFC = "NFC";

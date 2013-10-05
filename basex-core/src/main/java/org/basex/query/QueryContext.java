@@ -9,8 +9,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.*;
 
-import org.basex.build.file.*;
-import org.basex.build.file.JsonProp.Spec;
+import org.basex.build.*;
+import org.basex.build.JsonProp.*;
 import org.basex.core.*;
 import org.basex.core.Context;
 import org.basex.data.*;
@@ -631,7 +631,7 @@ public final class QueryContext extends Proc {
     // convert to json
     if(type.equalsIgnoreCase(M_JSON)) {
       final JsonProp jp = new JsonProp();
-      jp.set(JsonProp.SPEC, Spec.ECMA_262.desc);
+      jp.set(JsonProp.SPEC, JsonSpec.ECMA_262.toString());
       return new JsonMapConverter(jp, null).convert(val.toString());
     }
 

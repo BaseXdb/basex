@@ -19,87 +19,62 @@ public final class SerializerProp extends AProp {
   static final String UNDEFINED = "\u0001";
 
   /** Serialization parameter: yes/no. */
-  public static final Object[] S_BYTE_ORDER_MARK = {
-    "byte-order-mark", NO };
+  public static final Object[] S_BYTE_ORDER_MARK = { "byte-order-mark", NO };
   /** Serialization parameter: list of QNames. */
   public static final Object[] S_CDATA_SECTION_ELEMENTS = {
     "cdata-section-elements", "" };
   /** Serialization parameter. */
-  public static final Object[] S_DOCTYPE_PUBLIC = {
-    "doctype-public", "" };
+  public static final Object[] S_DOCTYPE_PUBLIC = { "doctype-public", "" };
   /** Serialization parameter. */
-  public static final Object[] S_DOCTYPE_SYSTEM = {
-    "doctype-system", "" };
+  public static final Object[] S_DOCTYPE_SYSTEM = { "doctype-system", "" };
   /** Serialization parameter: valid encoding. */
-  public static final Object[] S_ENCODING = {
-    "encoding", Token.UTF8 };
+  public static final Object[] S_ENCODING = { "encoding", Token.UTF8 };
   /** Serialization parameter: yes/no. */
-  public static final Object[] S_ESCAPE_URI_ATTRIBUTES = {
-    "escape-uri-attributes", NO };
+  public static final Object[] S_ESCAPE_URI_ATTRIBUTES = { "escape-uri-attributes", NO };
   /** Serialization parameter: yes/no. */
-  public static final Object[] S_INCLUDE_CONTENT_TYPE = {
-    "include-content-type", NO };
+  public static final Object[] S_INCLUDE_CONTENT_TYPE = { "include-content-type", NO };
   /** Serialization parameter: yes/no. */
-  public static final Object[] S_INDENT = {
-    "indent", YES };
+  public static final Object[] S_INDENT = { "indent", YES };
   /** Serialization parameter. */
-  public static final Object[] S_SUPPRESS_INDENTATION = {
-    "suppress-indentation", "" };
+  public static final Object[] S_SUPPRESS_INDENTATION = { "suppress-indentation", "" };
   /** Serialization parameter. */
-  public static final Object[] S_MEDIA_TYPE = {
-    "media-type", "" };
+  public static final Object[] S_MEDIA_TYPE = { "media-type", "" };
   /** Serialization parameter: xml/xhtml/html/text. */
-  public static final Object[] S_METHOD = {
-    "method", M_XML };
+  public static final Object[] S_METHOD = { "method", M_XML };
   /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
-  public static final Object[] S_NORMALIZATION_FORM = {
-    "normalization-form", NFC };
+  public static final Object[] S_NORMALIZATION_FORM = { "normalization-form", NFC };
   /** Serialization parameter: yes/no. */
-  public static final Object[] S_OMIT_XML_DECLARATION = {
-    "omit-xml-declaration", YES };
+  public static final Object[] S_OMIT_XML_DECLARATION = { "omit-xml-declaration", YES };
   /** Serialization parameter: yes/no/omit. */
-  public static final Object[] S_STANDALONE = {
-    "standalone", OMIT };
+  public static final Object[] S_STANDALONE = { "standalone", OMIT };
   /** Serialization parameter: yes/no. */
-  public static final Object[] S_UNDECLARE_PREFIXES = {
-    "undeclare-prefixes", NO };
+  public static final Object[] S_UNDECLARE_PREFIXES = { "undeclare-prefixes", NO };
   /** Serialization parameter. */
-  public static final Object[] S_USE_CHARACTER_MAPS = {
-    "use-character-maps", "" };
+  public static final Object[] S_USE_CHARACTER_MAPS = { "use-character-maps", "" };
   /** Serialization parameter. */
-  public static final Object[] S_ITEM_SEPARATOR = {
-    "item-separator", UNDEFINED };
+  public static final Object[] S_ITEM_SEPARATOR = { "item-separator", UNDEFINED };
   /** Serialization parameter: 1.0/1.1. */
-  public static final Object[] S_VERSION = {
-    "version", "" };
+  public static final Object[] S_VERSION = { "version", "" };
   /** Serialization parameter: 4.0/4.01/5.0. */
-  public static final Object[] S_HTML_VERSION = {
-    "html-version", "" };
+  public static final Object[] S_HTML_VERSION = { "html-version", "" };
   /** Parameter document. */
-  public static final Object[] S_PARAMETER_DOCUMENT = {
-    "parameter-document", "" };
+  public static final Object[] S_PARAMETER_DOCUMENT = { "parameter-document", "" };
 
   /** Specific serialization parameter: newline. */
   public static final Object[] S_NEWLINE = {
     "newline", Prop.NL.equals("\r") ? S_CR : Prop.NL.equals("\n") ? S_NL : S_CRNL };
   /** Specific serialization parameter: formatting. */
-  public static final Object[] S_FORMAT = {
-    "format", YES };
+  public static final Object[] S_FORMAT = { "format", YES };
   /** Specific serialization parameter: indent with spaces or tabs. */
-  public static final Object[] S_TABULATOR = {
-    "tabulator", NO };
+  public static final Object[] S_TABULATOR = { "tabulator", NO };
   /** Specific serialization parameter: number of spaces to indent. */
-  public static final Object[] S_INDENTS = {
-    "indents", "2" };
+  public static final Object[] S_INDENTS = { "indents", "2" };
   /** Specific serialization parameter: item separator. */
-  public static final Object[] S_SEPARATOR = {
-    "separator", UNDEFINED };
+  public static final Object[] S_SEPARATOR = { "separator", UNDEFINED };
   /** Specific serialization parameter: prefix of result wrapper. */
-  public static final Object[] S_WRAP_PREFIX = {
-    "wrap-prefix", "" };
+  public static final Object[] S_WRAP_PREFIX = { "wrap-prefix", "" };
   /** Specific serialization parameter: URI of result wrapper. */
-  public static final Object[] S_WRAP_URI = {
-    "wrap-uri", "" };
+  public static final Object[] S_WRAP_URI = { "wrap-uri", "" };
 
   /** Specific serialization parameter. */
   public static final Object[] S_CSV = { "csv", "" };

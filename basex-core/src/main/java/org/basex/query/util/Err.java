@@ -72,7 +72,7 @@ public enum Err {
   /** BXCS0002. */
   BXCS_SERIAL(BXCS, 2, "CSV serializer: %."),
   /** BXCS0003. */
-  BXCS_CONFIG(BXCS, 3, "CSV configuration: separator must be single character."),
+  BXCS_CONFIG(BXCS, 3, "CSV separator must be single character; \"%\" found."),
 
   // Database module
 

@@ -2,8 +2,7 @@ package org.basex.query.util.json;
 
 import java.util.*;
 
-import org.basex.build.file.*;
-import org.basex.build.file.JsonProp.Spec;
+import org.basex.build.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -36,10 +35,6 @@ import org.basex.util.*;
 public final class JsonMapConverter extends JsonConverter implements JsonHandler {
   /** Stack for intermediate values. */
   private final Stack<Value> stack = new Stack<Value>();
-  /** JSON spec. */
-  private final Spec spec;
-  /** Unescape flag. */
-  private final boolean unescape;
 
   /**
    * Constructor.
@@ -47,15 +42,13 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
    * @param ii input info
    */
   public JsonMapConverter(final JsonProp jp, final InputInfo ii) {
-    super(ii);
-    spec = jp.spec();
-    unescape = jp.is(JsonProp.UNESCAPE);
+    super(jp, ii);
   }
 
   @Override
   public Item convert(final String in) throws QueryException {
     stack.clear();
-    JsonParser.parse(in, spec, unescape, this, info);
+    JsonParser.parse(in, jprop, this, info);
     return stack.peek().isEmpty() ? null : (Item) stack.pop();
   }
 

@@ -8,7 +8,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.file.*;
+import org.basex.build.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -62,16 +62,9 @@ public class FNCsv extends StandardFunc {
     final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
     final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
 
-    final boolean header = map.contains(HEADER) && Util.yes(string(map.get(HEADER)));
-    int sep = ',';
-    final byte[] sp = map.get(SEPARATOR);
-    if(sp != null) {
-      final TokenParser tp = new TokenParser(sp);
-      sep = tp.next();
-      if(sep == -1 || tp.next() != -1) BXCS_CONFIG.thrw(info);
-    }
+    // create csv properties and set options
     try {
-      return new CsvConverter(sep, header).convert(input);
+      return new CsvConverter(props(map)).convert(input);
     } catch(final IOException ex) {
       throw BXCS_PARSE.thrw(info, ex);
     }
@@ -88,18 +81,28 @@ public class FNCsv extends StandardFunc {
     final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
     final TokenMap map = new FuncParams(Q_OPTIONS, info).parse(opt);
 
-    // create csv properties and set options
-    final CsvProp cprop = new CsvProp();
-    final byte[] header = map.get(HEADER);
-    if(header != null) cprop.set(CsvProp.HEADER, Util.yes(string(header)));
-    final byte[] sep = map.get(SEPARATOR);
-    if(sep != null) cprop.set(CsvProp.SEPARATOR, string(sep));
-
+    // create serialization properties
     final SerializerProp props = new SerializerProp();
     props.set(S_METHOD, M_CSV);
-    props.set(S_CSV, cprop.toString());
+    props.set(S_CSV, props(map).toString());
 
     // serialize node
     return Str.get(delete(serialize(node.iter(), props), '\r'));
+  }
+
+  /**
+   * Creates CSV properties.
+   * @param map map
+   * @return properties
+   */
+  private CsvProp props(final TokenMap map) {
+    final CsvProp cprop = new CsvProp();
+
+    final byte[] header = map.get(HEADER);
+    if(header != null) cprop.set(CsvProp.HEADER, Util.yes(string(header)));
+
+    final byte[] sep = map.get(SEPARATOR);
+    if(sep != null) cprop.set(CsvProp.SEPARATOR, string(sep));
+    return cprop;
   }
 }

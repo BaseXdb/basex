@@ -538,7 +538,6 @@ public interface QueryText {
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
 
-
   // URIS =====================================================================
 
   /** W3 URI. */

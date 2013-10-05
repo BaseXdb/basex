@@ -6,7 +6,9 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.build.file.*;
+import org.basex.build.*;
+import org.basex.build.CsvProp.*;
+import org.basex.build.JsonProp.*;
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.data.*;
@@ -14,6 +16,7 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.io.*;
+import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -46,10 +49,10 @@ final class DialogParsing extends BaseXBack {
 
   /** JSON options panel. */
   private final BaseXBack jsonopts;
-  /** JSON: Use JsonML format. */
-  private final BaseXCheckBox jsonml;
+  /** JSON: format. */
+  private final BaseXCombo jsonformat;
   /** JSON: encoding. */
-  private final BaseXCombo jencoding;
+  private final BaseXCombo jsonenc;
 
   /** HTML options panel. */
   private final BaseXBack htmlopts;
@@ -67,14 +70,14 @@ final class DialogParsing extends BaseXBack {
   /** CSV: Separator (numeric). */
   private final BaseXTextField sepchar;
   /** CSV: encoding. */
-  private final BaseXCombo cencoding;
+  private final BaseXCombo csven;
 
   /** Text options panel. */
   private final BaseXBack textopts;
   /** Text: Use lines. */
   private final BaseXCheckBox lines;
   /** Text: encoding. */
-  private final BaseXCombo tencoding;
+  private final BaseXCombo textenc;
 
   /** Main panel. */
   private final BaseXBack main;
@@ -125,33 +128,40 @@ final class DialogParsing extends BaseXBack {
     usecat = new BaseXCheckBox(USE_CATALOG_FILE, !prop.get(Prop.CATFILE).isEmpty(), 0, d);
 
     // json
-    jencoding = DialogExport.encoding(d, jprop.get(JsonProp.ENCODING));
-    jsonml = new BaseXCheckBox(PARSE_AS_JSONML,
-        jprop.get(JsonProp.FORMAT).equals(DataText.M_JSONML), 0, d);
+    jsonenc = DialogExport.encoding(d, jprop.get(JsonProp.ENCODING));
+    StringList sl = new StringList();
+    final JsonFormat[] formats = JsonFormat.values();
+    final int fl = formats.length - 1;
+    for(int f = 0; f < fl; f++) sl.add(formats[f].toString());
+    String[] sa = sl.toArray();
+    jsonformat = new BaseXCombo(d, sa);
+    String s = jprop.get(JsonProp.FORMAT);
+    if(Token.eq(s, sa)) jsonformat.setSelectedItem(s);
 
     // html
     html = new BaseXTextField(prop.get(Prop.HTMLPARSER), d);
 
     // text
-    tencoding = DialogExport.encoding(d, tprop.get(TextProp.ENCODING));
+    textenc = DialogExport.encoding(d, tprop.get(TextProp.ENCODING));
     lines = new BaseXCheckBox(SPLIT_INPUT_LINES, tprop.is(TextProp.LINES), 0, d);
 
     // csv
-    cencoding = DialogExport.encoding(d, cprop.get(CsvProp.ENCODING));
+    csven = DialogExport.encoding(d, cprop.get(CsvProp.ENCODING));
     header = new BaseXCheckBox(FIRST_LINE_HEADER, cprop.is(CsvProp.HEADER), 0, d);
 
     separator = new BaseXBack().layout(new TableLayout(1, 2, 6, 0));
-    final StringList sl = new StringList();
-    sl.add(CsvProp.SEPARATORS).add("");
-    sepcombo = new BaseXCombo(d, sl.toArray());
+    sl = new StringList();
+    for(final CsvSep cs : CsvSep.values()) sl.add(cs.toString());
+    sa = sl.toArray();
+    sepcombo = new BaseXCombo(d, sl.add("").toArray());
     separator.add(sepcombo);
 
     String f = "";
-    final String s = cprop.get(CsvProp.SEPARATOR);
-    if(Token.eq(s, CsvProp.SEPARATORS)) {
+    s = cprop.get(CsvProp.SEPARATOR);
+    if(Token.eq(s, sa)) {
       sepcombo.setSelectedItem(s);
     } else {
-      sepcombo.setSelectedIndex(CsvProp.SEPARATORS.length);
+      sepcombo.setSelectedIndex(sa.length);
       final int ch = Token.toInt(s);
       f = ch > 0 ? String.valueOf((char) ch) : "";
     }
@@ -214,15 +224,16 @@ final class DialogParsing extends BaseXBack {
       htmlopts.add(p);
     }
 
-    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    BaseXBack p = new BaseXBack(new TableLayout(2, 2, 8, 4));
     p.add(new BaseXLabel(ENCODING + COL, true, true));
-    p.add(jencoding);
+    p.add(jsonenc);
+    p.add(new BaseXLabel(FORMAT + COL, true, true));
+    p.add(jsonformat);
     jsonopts.add(p);
-    jsonopts.add(jsonml);
 
     p = new BaseXBack(new TableLayout(2, 2, 8, 4));
     p.add(new BaseXLabel(ENCODING + COL, true, true));
-    p.add(cencoding);
+    p.add(csven);
     p.add(new BaseXLabel(SEPARATOR, true, true));
     p.add(separator);
     csvopts.add(p);
@@ -230,7 +241,7 @@ final class DialogParsing extends BaseXBack {
 
     p = new BaseXBack(new TableLayout(1, 2, 8, 4));
     p.add(new BaseXLabel(ENCODING + COL, true, true));
-    p.add(tencoding);
+    p.add(textenc);
     textopts.add(p);
     textopts.add(lines);
 
@@ -292,10 +303,15 @@ final class DialogParsing extends BaseXBack {
     cfile.setEnabled(uc);
     browsec.setEnabled(uc);
 
-    final int s = sepcombo.getSelectedIndex();
-    final boolean customsep = s == CsvProp.SEPARATORS.length;
-    sepchar.setEnabled(customsep);
-    return !customsep || sepchar.getText().length() == 1;
+    final boolean fixedsep = sepcombo.getSelectedIndex() < CsvSep.values().length;
+    sepchar.setEnabled(!fixedsep);
+    if(fixedsep) {
+      cprop.set(CsvProp.SEPARATOR, sepcombo.getSelectedItem().toString());
+      try {
+        sepchar.setText(new TokenBuilder().add(cprop.separator()).toString());
+      } catch(final SerializerException ex) { Util.notexpected(); }
+    }
+    return fixedsep || sepchar.getText().length() == 1;
   }
 
   /**
@@ -303,18 +319,18 @@ final class DialogParsing extends BaseXBack {
    * @param type parsing type
    */
   public void setOptions(final String type) {
-    jprop.set(JsonProp.ENCODING, jencoding.getSelectedItem().toString());
-    jprop.set(JsonProp.FORMAT, jsonml.isSelected() ? DataText.M_JSONML : DataText.M_JSON);
+    jprop.set(JsonProp.ENCODING, jsonenc.getSelectedItem().toString());
+    jprop.set(JsonProp.FORMAT, jsonformat.getSelectedItem().toString());
     gui.set(Prop.JSONPARSER, jprop.toString());
 
-    tprop.set(TextProp.ENCODING, tencoding.getSelectedItem().toString());
+    tprop.set(TextProp.ENCODING, textenc.getSelectedItem().toString());
     tprop.set(TextProp.LINES, lines.isSelected());
     gui.set(Prop.TEXTPARSER, tprop.toString());
 
-    cprop.set(CsvProp.ENCODING, cencoding.getSelectedItem().toString());
+    cprop.set(CsvProp.ENCODING, csven.getSelectedItem().toString());
     cprop.set(CsvProp.HEADER, header.isSelected());
     cprop.set(CsvProp.SEPARATOR, sepcombo.getSelectedIndex() <
-      CsvProp.SEPARATORS.length ? sepcombo.getSelectedItem().toString() :
+      CsvSep.values().length ? sepcombo.getSelectedItem().toString() :
       String.valueOf((int) sepchar.getText().charAt(0)));
     gui.set(Prop.CSVPARSER, cprop.toString());
 

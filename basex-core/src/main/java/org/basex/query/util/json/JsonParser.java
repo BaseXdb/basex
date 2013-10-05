@@ -1,6 +1,7 @@
 package org.basex.query.util.json;
 
-import org.basex.build.file.JsonProp.Spec;
+import org.basex.build.*;
+import org.basex.build.JsonProp.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -27,7 +28,7 @@ public final class JsonParser extends InputParser {
   private final InputInfo info;
 
   /** JSON spec. */
-  private final Spec spec;
+  private final JsonSpec spec;
   /** Unescape flag. */
   private final boolean unescape;
   /** Token builder for string literals. */
@@ -36,29 +37,30 @@ public final class JsonParser extends InputParser {
   /**
    * Constructor taking the input string and the spec according to which it is parsed.
    * @param in input string
-   * @param s JSON spec
-   * @param u unescape flag
+   * @param jp json properties
    * @param ii input info
+   * @throws QueryException query exception
    */
-  private JsonParser(final String in, final Spec s, final boolean u, final InputInfo ii) {
+  private JsonParser(final String in, final JsonProp jp, final InputInfo ii)
+      throws QueryException {
+
     super(in);
-    spec = s != null ? s : Spec.RFC4627;
-    unescape = u;
+    spec = jp.spec();
+    unescape = jp.is(JsonProp.UNESCAPE);
     info = ii;
   }
 
   /**
    * Parses the input JSON string and directs the parse events to the given handler.
    * @param json JSON string to parse
-   * @param sp JSON spec to use
-   * @param unesc unescape flag
+   * @param jp json properties
    * @param h JSON handler
    * @param ii input info
    * @throws QueryException parse exception
    */
-  public static void parse(final String json, final Spec sp, final boolean unesc,
-      final JsonHandler h, final InputInfo ii) throws QueryException {
-    new JsonParser(json, sp, unesc, ii).parse(h);
+  public static void parse(final String json, final JsonProp jp, final JsonHandler h,
+      final InputInfo ii) throws QueryException {
+    new JsonParser(json, jp, ii).parse(h);
   }
 
   /**
@@ -68,7 +70,7 @@ public final class JsonParser extends InputParser {
    */
   private void parse(final JsonHandler h) throws QueryException {
     skipWs();
-    if(spec == Spec.RFC4627 && !(curr() == '{' || curr() == '['))
+    if(spec == JsonSpec.RFC4627 && !(curr() == '{' || curr() == '['))
       throw error("Expected '{' or '[', found %", rest());
     value(h);
     if(more()) throw error("Unexpected trailing content: %", rest());
@@ -111,7 +113,7 @@ public final class JsonParser extends InputParser {
         if(consume("true")) h.booleanLit(TRUE);
         else if(consume("false")) h.booleanLit(FALSE);
         else if(consume("null")) h.nullLit();
-        else if(spec == Spec.LIBERAL && consume("new") &&
+        else if(spec == JsonSpec.LIBERAL && consume("new") &&
             Character.isWhitespace(curr())) constr(h);
         else throw error("Unexpected JSON value: '%'.", rest());
         skipWs();
@@ -128,11 +130,11 @@ public final class JsonParser extends InputParser {
     h.openObject();
     if(!consumeWs('}', false)) {
       do {
-        h.openPair(spec != Spec.LIBERAL || curr() == '"' ? string() : unquoted());
+        h.openPair(spec != JsonSpec.LIBERAL || curr() == '"' ? string() : unquoted());
         consumeWs(':', true);
         value(h);
         h.closePair();
-      } while(consumeWs(',', false) && !(spec == Spec.LIBERAL && curr() == '}'));
+      } while(consumeWs(',', false) && !(spec == JsonSpec.LIBERAL && curr() == '}'));
       consumeWs('}', true);
     }
     h.closeObject();
@@ -151,7 +153,7 @@ public final class JsonParser extends InputParser {
         h.openItem();
         value(h);
         h.closeItem();
-      } while(consumeWs(',', false) && !(spec == Spec.LIBERAL && curr() == ']'));
+      } while(consumeWs(',', false) && !(spec == JsonSpec.LIBERAL && curr() == ']'));
       consumeWs(']', true);
     }
     h.closeArray();
@@ -349,7 +351,7 @@ public final class JsonParser extends InputParser {
           default:
             throw error("Unknown character escape: '\\%'", n);
         }
-      } else if(spec != Spec.LIBERAL && cp <= 0x1F) {
+      } else if(spec != JsonSpec.LIBERAL && cp <= 0x1F) {
         throw error("Non-escaped control character: '\\%'", CTRL[cp]);
       }
 

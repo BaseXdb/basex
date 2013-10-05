@@ -8,7 +8,8 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.file.*;
+import org.basex.build.*;
+import org.basex.build.JsonProp.*;
 import org.basex.data.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -83,15 +84,10 @@ public abstract class Serializer {
     if(M_CSV.equals(m)) return new CsvSerializer(os, props);
 
     // serialize as JSON
-    final boolean jsonml = M_JSONML.equals(m);
-    if(jsonml || M_JSON.equals(m)) {
+    if(M_JSON.equals(m)) {
       final JsonProp jp = new JsonProp(props.get(S_JSON));
-      if(jsonml) {
-        jp.set(JsonProp.FORMAT, M_JSONML);
-        props.set(S_JSON, jp.toString());
-      }
-      return jp.get(JsonProp.FORMAT).equals(M_JSON)
-          ? new JsonCGSerializer(os, props) : new JsonMLSerializer(os, props);
+      return jp.format() == JsonFormat.DEFAULT ? new JsonDefaultSerializer(os, props) :
+        new JsonMLSerializer(os, props);
     }
 
     // otherwise, serialize as XML (default)

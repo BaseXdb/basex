@@ -1083,8 +1083,8 @@ public interface Text {
   /** Full-text index using stopword list. */
   String STOPWORD_LIST = lang("stopword_list");
 
-  /** JsonML information. */
-  String PARSE_AS_JSONML = lang("parse_as_jsonml");
+  /** Format. */
+  String FORMAT = lang("format");
   /** TEXT Lines information. */
   String SPLIT_INPUT_LINES = lang("split_input_lines");
   /** CSV header information. */

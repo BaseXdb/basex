@@ -5,7 +5,6 @@ import static org.basex.core.Text.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.build.file.*;
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.data.*;

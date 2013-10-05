@@ -4,9 +4,10 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.file.*;
+import org.basex.build.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.serial.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -25,6 +26,8 @@ public final class CsvConverter {
   /** CSV element. */
   private static final byte[] ENTRY = token("entry");
 
+  /** CSV properties. */
+  protected final CsvProp cprop;
   /** Column separator (see {@link CsvProp#SEPARATOR}). */
   private final int separator;
 
@@ -35,6 +38,9 @@ public final class CsvConverter {
 
   /** Headers. */
   private final TokenList headers = new TokenList();
+  /** Lax QName conversion. */
+  private final boolean lax;
+
   /** Header flag. */
   private boolean header;
   /** Current column. */
@@ -42,12 +48,14 @@ public final class CsvConverter {
 
   /**
    * Constructor.
-   * @param sep separator character
-   * @param head header flag
+   * @param cp CSV properties
+   * @throws SerializerException serializer exception
    */
-  public CsvConverter(final int sep, final boolean head) {
-    separator = sep;
-    header = head;
+  public CsvConverter(final CsvProp cp) throws SerializerException {
+    cprop = cp;
+    separator = cp.separator();
+    header = cp.is(CsvProp.HEADER);
+    lax = cp.is(CsvProp.LAX);
   }
 
   /**
@@ -61,12 +69,22 @@ public final class CsvConverter {
   }
 
   /**
+   * Converts the specified input to an XML element.
+   * @param io input
+   * @return node
+   * @throws IOException I/O exception
+   */
+  public FElem convert(final IO io) throws IOException {
+    return convert(new NewlineInput(io).encoding(cprop.get(CsvProp.ENCODING)));
+  }
+
+  /**
    * Converts the specified input stream to an XML element.
    * @param input CSV input
    * @return node
    * @throws IOException I/O exception
    */
-  public FElem convert(final NewlineInput input) throws IOException {
+  private FElem convert(final NewlineInput input) throws IOException {
     final TokenBuilder data = new TokenBuilder();
     boolean quoted = false, open = true;
     int ch = -1;
@@ -136,7 +154,7 @@ public final class CsvConverter {
   private void newEntry(final TokenBuilder entry) {
     if(header) {
       // add header
-      headers.add(XMLToken.encode(entry.finish()));
+      headers.add(XMLToken.encode(entry.finish(), lax));
       entry.reset();
     } else {
       byte[] tag = headers.get(col);

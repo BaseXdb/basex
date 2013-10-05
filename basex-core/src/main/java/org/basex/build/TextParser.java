@@ -1,10 +1,9 @@
-package org.basex.build.file;
+package org.basex.build;
 
 import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -12,7 +11,7 @@ import org.basex.util.*;
 
 /**
  * This class parses files in the plain-text format
- * and sends events to the specified database builder.
+ * and converts them to XML.
  *
  * <p>The parser provides some options, which can be specified via the
  * {@link Prop#TEXTPARSER} option.</p>

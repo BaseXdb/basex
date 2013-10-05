@@ -41,7 +41,7 @@ public abstract class AProp implements Iterable<String> {
   public AProp(final String suffix) {
     try {
       for(final Object[] arr : props(getClass())) {
-        if(arr.length > 1) props.put(arr[0].toString(), arr[1]);
+        if(arr.length > 1) props.put(toString(arr), arr[1]);
       }
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -62,7 +62,7 @@ public abstract class AProp implements Iterable<String> {
       bw.write(PROPHEADER);
 
       for(final Object[] arr : props(getClass())) {
-        final String key = arr[0].toString();
+        final String key = toString(arr);
         if(arr.length == 1) {
           bw.write(NL + "# " + key + NL);
           continue;
@@ -156,7 +156,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value to be written
    */
   public final synchronized void set(final Object[] key, final String val) {
-    setObject(key[0].toString(), val);
+    setObject(toString(key), val);
   }
 
   /**
@@ -165,7 +165,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value to be written
    */
   public final synchronized void set(final Object[] key, final int val) {
-    setObject(key[0].toString(), val);
+    setObject(toString(key), val);
   }
 
   /**
@@ -174,7 +174,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value to be written
    */
   public final synchronized void set(final Object[] key, final boolean val) {
-    setObject(key[0].toString(), val);
+    setObject(toString(key), val);
   }
 
   /**
@@ -183,7 +183,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value to be written
    */
   public final synchronized void set(final Object[] key, final String[] val) {
-    setObject(key[0].toString(), val);
+    setObject(toString(key), val);
   }
 
   /**
@@ -192,7 +192,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value to be written
    */
   public final synchronized void set(final Object[] key, final int[] val) {
-    setObject(key[0].toString(), val);
+    setObject(toString(key), val);
   }
 
   /**
@@ -259,7 +259,7 @@ public abstract class AProp implements Iterable<String> {
    * @return result of check
    */
   public final synchronized boolean sameAs(final Object[] key, final Object val) {
-    return props.get(key[0].toString()).equals(val);
+    return props.get(toString(key)).equals(val);
   }
 
   /**
@@ -319,7 +319,7 @@ public abstract class AProp implements Iterable<String> {
    * @return value, or empty string
    */
   public static String getSystem(final Object[] key) {
-    return key.length > 0 ? getSystem(key[0].toString()) : "";
+    return key.length > 0 ? getSystem(toString(key)) : "";
   }
 
   /**
@@ -341,7 +341,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value
    */
   public static void setSystem(final Object[] key, final Object val) {
-    if(key.length > 0) setSystem(key[0].toString(), val);
+    if(key.length > 0) setSystem(toString(key), val);
   }
 
   /**
@@ -493,7 +493,7 @@ public abstract class AProp implements Iterable<String> {
       if(err.isEmpty()) {
         boolean ok = true;
         for(final Object[] arr : props(getClass())) {
-          if(arr.length > 1) ok &= read.contains(arr[0].toString());
+          if(arr.length > 1) ok &= read.contains(toString(arr));
         }
         if(!ok) err.addExt("Saving properties in \"%\"..." + NL, file);
       }
@@ -514,11 +514,21 @@ public abstract class AProp implements Iterable<String> {
    * @return result
    */
   private Object get(final Object[] key, final Class<?> c) {
-    final Object entry = props.get(key[0].toString());
-    if(entry == null) Util.notexpected("Property " + key[0] + " not defined.");
+    final String k = toString(key);
+    final Object entry = props.get(k);
+    if(entry == null) Util.notexpected("Property " + k + " not defined.");
 
     final Class<?> cc = entry.getClass();
-    if(c != cc) Util.notexpected("Property '" + key[0] + "' is a " + Util.name(cc));
+    if(c != cc) Util.notexpected("Property '" + k + "' is a " + Util.name(cc));
     return entry;
+  }
+
+  /**
+   * Returns a string representation of the specified key.
+   * @param key option
+   * @return string representation
+   */
+  public static String toString(final Object[] key) {
+    return key[0].toString();
   }
 }

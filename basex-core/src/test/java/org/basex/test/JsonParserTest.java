@@ -2,10 +2,9 @@ package org.basex.test;
 
 import static org.junit.Assert.*;
 
-import org.basex.build.file.JsonProp.Spec;
+import org.basex.build.JsonProp.*;
 import org.basex.query.*;
 import org.basex.query.util.json.*;
-import org.basex.query.util.json.JsonParser;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -21,8 +20,8 @@ public class JsonParserTest {
 
   /** Tests if the empty JSON string is rejected. */
   public void emptyQuery() {
-    error("", Spec.ECMA_262);
-    error(" \t\r\n", Spec.ECMA_262);
+    error("", JsonSpec.ECMA_262);
+    error(" \t\r\n", JsonSpec.ECMA_262);
   }
 
   /**
@@ -30,38 +29,38 @@ public class JsonParserTest {
    * @throws QueryException query exception
    */
   @Test public void numberTest() throws QueryException {
-    parse("0", Spec.ECMA_262);
-    parse("1", Spec.ECMA_262);
-    parse("-1", Spec.ECMA_262);
-    parse("10", Spec.ECMA_262);
-    parse("1234567890123456789012345678901234567890", Spec.ECMA_262);
-    parse("0.5", Spec.ECMA_262);
-    parse("0.01", Spec.ECMA_262);
-    parse("-0.01", Spec.ECMA_262);
+    parse("0", JsonSpec.ECMA_262);
+    parse("1", JsonSpec.ECMA_262);
+    parse("-1", JsonSpec.ECMA_262);
+    parse("10", JsonSpec.ECMA_262);
+    parse("1234567890123456789012345678901234567890", JsonSpec.ECMA_262);
+    parse("0.5", JsonSpec.ECMA_262);
+    parse("0.01", JsonSpec.ECMA_262);
+    parse("-0.01", JsonSpec.ECMA_262);
     parse("1234567890123456789012345678901234567890" +
-        ".1234567890123456789012345678901234567890", Spec.ECMA_262);
-    parse("0E1", Spec.ECMA_262);
-    parse("0E-1", Spec.ECMA_262);
-    parse("0E+1", Spec.ECMA_262);
-    parse("-0E+1", Spec.ECMA_262);
-    parse("0E00", Spec.ECMA_262);
+        ".1234567890123456789012345678901234567890", JsonSpec.ECMA_262);
+    parse("0E1", JsonSpec.ECMA_262);
+    parse("0E-1", JsonSpec.ECMA_262);
+    parse("0E+1", JsonSpec.ECMA_262);
+    parse("-0E+1", JsonSpec.ECMA_262);
+    parse("0E00", JsonSpec.ECMA_262);
     parse("1234567890123456789012345678901234567890" +
-        "e1234567890123456789012345678901234567890", Spec.ECMA_262);
-    parse("123e-123", Spec.ECMA_262);
-    parse("123.4e-123", Spec.ECMA_262);
-    parse("123.456E0001", Spec.ECMA_262);
-    parse("-123.456E0001", Spec.ECMA_262);
-    parse("[ -123.456E0001, 0 ]", Spec.ECMA_262);
+        "e1234567890123456789012345678901234567890", JsonSpec.ECMA_262);
+    parse("123e-123", JsonSpec.ECMA_262);
+    parse("123.4e-123", JsonSpec.ECMA_262);
+    parse("123.456E0001", JsonSpec.ECMA_262);
+    parse("-123.456E0001", JsonSpec.ECMA_262);
+    parse("[ -123.456E0001, 0 ]", JsonSpec.ECMA_262);
 
-    error("01", Spec.ECMA_262);
-    error("-", Spec.ECMA_262);
-    error("-\u00e4", Spec.ECMA_262);
-    error("0.", Spec.ECMA_262);
-    error("0.\u00e4", Spec.ECMA_262);
-    error("1e", Spec.ECMA_262);
-    error("1e+", Spec.ECMA_262);
-    error("1e+\u00e4", Spec.ECMA_262);
-    error("1e+0\u00e4", Spec.ECMA_262);
+    error("01", JsonSpec.ECMA_262);
+    error("-", JsonSpec.ECMA_262);
+    error("-\u00e4", JsonSpec.ECMA_262);
+    error("0.", JsonSpec.ECMA_262);
+    error("0.\u00e4", JsonSpec.ECMA_262);
+    error("1e", JsonSpec.ECMA_262);
+    error("1e+", JsonSpec.ECMA_262);
+    error("1e+\u00e4", JsonSpec.ECMA_262);
+    error("1e+0\u00e4", JsonSpec.ECMA_262);
   }
 
   /**
@@ -69,38 +68,38 @@ public class JsonParserTest {
    * @throws QueryException query exception
    */
   @Test public void stringTest() throws QueryException {
-    parse("\"\"", Spec.ECMA_262);
-    parse("\"test\"", Spec.ECMA_262);
-    parse("\"\u00e4\"", Spec.ECMA_262);
-    parse("\"\uD834\uDD1E\"", Spec.ECMA_262);
-    parse("\"\uD834\"", Spec.ECMA_262);
-    parse("\"\uD853\uDF5C\"", Spec.ECMA_262);
-    parse("\"\uD853\uFFFF\"", Spec.ECMA_262);
-    parse("\"\uFFFF\"", Spec.ECMA_262);
-    parse("\"\uD853a\"", Spec.ECMA_262);
-    parse("\"\\n\"", Spec.ECMA_262);
-    parse("\"\\b\\f\\t\\r\\n\"", Spec.ECMA_262);
+    parse("\"\"", JsonSpec.ECMA_262);
+    parse("\"test\"", JsonSpec.ECMA_262);
+    parse("\"\u00e4\"", JsonSpec.ECMA_262);
+    parse("\"\uD834\uDD1E\"", JsonSpec.ECMA_262);
+    parse("\"\uD834\"", JsonSpec.ECMA_262);
+    parse("\"\uD853\uDF5C\"", JsonSpec.ECMA_262);
+    parse("\"\uD853\uFFFF\"", JsonSpec.ECMA_262);
+    parse("\"\uFFFF\"", JsonSpec.ECMA_262);
+    parse("\"\uD853a\"", JsonSpec.ECMA_262);
+    parse("\"\\n\"", JsonSpec.ECMA_262);
+    parse("\"\\b\\f\\t\\r\\n\"", JsonSpec.ECMA_262);
     unescape("\"\\b\\f\\t\\r\\n\"", "\"\\\\b\\\\f\\\\t\\\\r\\\\n\"");
-    parse("\"\\u0000\\u001F\"", Spec.ECMA_262);
-    parse("\"\\\"\\\\\"", Spec.ECMA_262);
-    parse("\"\\u000a\"", "\"\\n\"", Spec.ECMA_262);
-    parse("\"\\u000A\"", "\"\\n\"", Spec.ECMA_262);
-    parse("\"\n\"", "\"\\n\"", Spec.LIBERAL);
+    parse("\"\\u0000\\u001F\"", JsonSpec.ECMA_262);
+    parse("\"\\\"\\\\\"", JsonSpec.ECMA_262);
+    parse("\"\\u000a\"", "\"\\n\"", JsonSpec.ECMA_262);
+    parse("\"\\u000A\"", "\"\\n\"", JsonSpec.ECMA_262);
+    parse("\"\n\"", "\"\\n\"", JsonSpec.LIBERAL);
     unescape("\"\\uD853\\uDF5C\"", "\"\\\\uD853\\\\uDF5C\"");
     unescape("\"\\uD853asdf\"", "\"\\\\uD853asdf\"");
     unescape("\"\\uD853\"", "\"\\\\uD853\"");
     unescape("\"\uD853\\t\"", "\"\uD853\\\\t\"");
     unescape("\"\uD853\\uD853\\t\"", "\"\uD853\\\\uD853\\\\t\"");
 
-    error("\"\\u0A", Spec.ECMA_262);
-    error("\"\\uXX0A\"", Spec.ECMA_262);
-    error("\"\\u0 00\"", Spec.ECMA_262);
-    error("\"\\u0:00\"", Spec.ECMA_262);
-    error("\"\\u0_00\"", Spec.ECMA_262);
-    error("\"\\u0~00\"", Spec.ECMA_262);
-    error("\"test", Spec.ECMA_262);
-    error("\"\uD800", Spec.ECMA_262);
-    error("\"\n\"", Spec.ECMA_262);
+    error("\"\\u0A", JsonSpec.ECMA_262);
+    error("\"\\uXX0A\"", JsonSpec.ECMA_262);
+    error("\"\\u0 00\"", JsonSpec.ECMA_262);
+    error("\"\\u0:00\"", JsonSpec.ECMA_262);
+    error("\"\\u0_00\"", JsonSpec.ECMA_262);
+    error("\"\\u0~00\"", JsonSpec.ECMA_262);
+    error("\"test", JsonSpec.ECMA_262);
+    error("\"\uD800", JsonSpec.ECMA_262);
+    error("\"\n\"", JsonSpec.ECMA_262);
   }
 
   /**
@@ -108,23 +107,23 @@ public class JsonParserTest {
    * @throws QueryException query exception
    */
   @Test public void arrayTest() throws QueryException {
-    parse("[ ]", Spec.RFC4627);
-    parse("[]", "[ ]", Spec.RFC4627);
-    parse("[[[[[[42], {}]]]]]", "[ [ [ [ [ [ 42 ], { } ] ] ] ] ]", Spec.RFC4627);
-    parse("[ 1, 2, 3, 4, 5, 6, 7, 8 ]", Spec.RFC4627);
-    parse("[1,2,3,]", "[ 1, 2, 3 ]", Spec.LIBERAL);
+    parse("[ ]", JsonSpec.RFC4627);
+    parse("[]", "[ ]", JsonSpec.RFC4627);
+    parse("[[[[[[42], {}]]]]]", "[ [ [ [ [ [ 42 ], { } ] ] ] ] ]", JsonSpec.RFC4627);
+    parse("[ 1, 2, 3, 4, 5, 6, 7, 8 ]", JsonSpec.RFC4627);
+    parse("[1,2,3,]", "[ 1, 2, 3 ]", JsonSpec.LIBERAL);
 
-    error("[1,2,3,]", Spec.RFC4627);
-    error("[,42]", Spec.RFC4627);
-    error("[1, ", Spec.RFC4627);
+    error("[1,2,3,]", JsonSpec.RFC4627);
+    error("[,42]", JsonSpec.RFC4627);
+    error("[1, ", JsonSpec.RFC4627);
   }
 
   /** Tests for the restrictions in RFC 4627. */
   @Test public void rfc4627() {
-    error("\"test\"", Spec.RFC4627);
-    error("123", Spec.RFC4627);
-    error("true", Spec.RFC4627);
-    error("null", Spec.RFC4627);
+    error("\"test\"", JsonSpec.RFC4627);
+    error("123", JsonSpec.RFC4627);
+    error("true", JsonSpec.RFC4627);
+    error("null", JsonSpec.RFC4627);
   }
 
   /**
@@ -132,13 +131,13 @@ public class JsonParserTest {
    * @throws QueryException query exception
    */
   @Test public void objectTest() throws QueryException {
-    parse("{ }", Spec.RFC4627);
-    parse("{ \"\": 42 }", Spec.RFC4627);
-    parse("{ a : 42, b: 23 }", "{ \"a\": 42, \"b\": 23 }", Spec.LIBERAL);
-    parse("{ \"a\": 1, \"b\": 2, }", "{ \"a\": 1, \"b\": 2 }", Spec.LIBERAL);
+    parse("{ }", JsonSpec.RFC4627);
+    parse("{ \"\": 42 }", JsonSpec.RFC4627);
+    parse("{ a : 42, b: 23 }", "{ \"a\": 42, \"b\": 23 }", JsonSpec.LIBERAL);
+    parse("{ \"a\": 1, \"b\": 2, }", "{ \"a\": 1, \"b\": 2 }", JsonSpec.LIBERAL);
 
-    error("{ a : 42 }", Spec.RFC4627);
-    error("{ \"a\": 42, b: 23 }", Spec.RFC4627);
+    error("{ a : 42 }", JsonSpec.RFC4627);
+    error("{ \"a\": 42, b: 23 }", JsonSpec.RFC4627);
   }
 
   /**
@@ -146,14 +145,14 @@ public class JsonParserTest {
    * @throws QueryException query exception
    */
   @Test public void literals() throws QueryException {
-    parse("true", Spec.ECMA_262);
-    parse("false", Spec.ECMA_262);
-    parse("null", Spec.ECMA_262);
-    parse("true", Spec.LIBERAL);
-    parse("false", Spec.LIBERAL);
-    parse("null", Spec.LIBERAL);
+    parse("true", JsonSpec.ECMA_262);
+    parse("false", JsonSpec.ECMA_262);
+    parse("null", JsonSpec.ECMA_262);
+    parse("true", JsonSpec.LIBERAL);
+    parse("false", JsonSpec.LIBERAL);
+    parse("null", JsonSpec.LIBERAL);
 
-    error("true123", Spec.LIBERAL);
+    error("true123", JsonSpec.LIBERAL);
   }
 
   /**
@@ -161,12 +160,12 @@ public class JsonParserTest {
    * @throws QueryException query exception
    */
   @Test public void constructorTest() throws QueryException {
-    parse("new foo()", Spec.LIBERAL);
-    parse("new Test(1, { })", Spec.LIBERAL);
-    parse("new Foo([ { \"a\": new Test(1, { }) } ])", Spec.LIBERAL);
+    parse("new foo()", JsonSpec.LIBERAL);
+    parse("new Test(1, { })", JsonSpec.LIBERAL);
+    parse("new Foo([ { \"a\": new Test(1, { }) } ])", JsonSpec.LIBERAL);
 
-    error("new ", Spec.LIBERAL);
-    error("newt", Spec.LIBERAL);
+    error("new ", JsonSpec.LIBERAL);
+    error("newt", JsonSpec.LIBERAL);
   }
 
   /**
@@ -174,7 +173,7 @@ public class JsonParserTest {
    * @param json JSON string
    * @param spec specification
    */
-  private void error(final String json, final Spec spec) {
+  private void error(final String json, final JsonSpec spec) {
     try {
       parse(json, spec);
       fail("Should have failed: '" + json + "'");
@@ -189,7 +188,7 @@ public class JsonParserTest {
    * @param spec specification
    * @throws QueryException parse error
    */
-  private void parse(final String json, final Spec spec) throws QueryException {
+  private void parse(final String json, final JsonSpec spec) throws QueryException {
     parse(json, json, spec);
   }
 
@@ -200,7 +199,7 @@ public class JsonParserTest {
    * @param spec specification
    * @throws QueryException parse error
    */
-  private void parse(final String json, final String exp, final Spec spec)
+  private void parse(final String json, final String exp, final JsonSpec spec)
       throws QueryException {
     tb.reset();
     JsonStringConverter.print(json, spec, true, tb);
@@ -216,7 +215,7 @@ public class JsonParserTest {
    */
   private void unescape(final String json, final String exp) throws QueryException {
     tb.reset();
-    JsonStringConverter.print(json, Spec.ECMA_262, false, tb);
+    JsonStringConverter.print(json, JsonSpec.ECMA_262, false, tb);
     assertEquals(exp, tb.toString());
   }
 }

@@ -188,7 +188,6 @@ public class RESTTest extends HTTPTest {
     assertStartsWith(contentType("?query=1&method=text"), TEXT_PLAIN);
     assertStartsWith(contentType("?query=1&method=raw"), APP_OCTET);
     assertStartsWith(contentType("?query=<json+type='object'/>&method=json"), APP_JSON);
-    assertStartsWith(contentType("?query=<json/>&method=jsonml"), APP_JSON);
 
     assertStartsWith(contentType("?query=1&media-type=application/xml"), APP_XML);
     assertStartsWith(contentType("?query=1&media-type=text/html"), TEXT_HTML);

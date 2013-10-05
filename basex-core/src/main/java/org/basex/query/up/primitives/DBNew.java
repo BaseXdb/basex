@@ -40,9 +40,9 @@ public abstract class DBNew extends BasicOperation {
   static {
     // initialize options arrays
     final int n = N_OPT.length, b = B_OPT.length, s = S_OPT.length;
-    for(int o = 0; o < n; o++) K_N_OPT[o] = lc(token(N_OPT[o][0].toString()));
-    for(int o = 0; o < b; o++) K_B_OPT[o] = lc(token(B_OPT[o][0].toString()));
-    for(int o = 0; o < s; o++) K_S_OPT[o] = lc(token(S_OPT[o][0].toString()));
+    for(int o = 0; o < n; o++) K_N_OPT[o] = lc(token(AProp.toString(N_OPT[o])));
+    for(int o = 0; o < b; o++) K_B_OPT[o] = lc(token(AProp.toString(B_OPT[o])));
+    for(int o = 0; o < s; o++) K_S_OPT[o] = lc(token(AProp.toString(S_OPT[o])));
   }
 
   /** Query context. */
@@ -156,7 +156,7 @@ public abstract class DBNew extends BasicOperation {
   protected void assignOptions() {
     final Prop prop = qc.context.prop;
     for(final Object[] key : nprops.keySet()) {
-      oprops.put(key, prop.get(key[0].toString()));
+      oprops.put(key, prop.get(AProp.toString(key)));
     }
     setProps(nprops);
   }
@@ -175,7 +175,7 @@ public abstract class DBNew extends BasicOperation {
   private void setProps(final HashMap<Object[], Object> props) {
     final Prop prop = qc.context.prop;
     for(final Map.Entry<Object[], Object> e : props.entrySet()) {
-      prop.setObject(e.getKey()[0].toString(), e.getValue());
+      prop.setObject(AProp.toString(e.getKey()), e.getValue());
     }
   }
 }

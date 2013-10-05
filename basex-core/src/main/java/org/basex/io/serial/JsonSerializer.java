@@ -2,11 +2,10 @@ package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
 import static org.basex.io.serial.SerializerProp.*;
-import static org.basex.query.util.Err.*;
 
 import java.io.*;
 
-import org.basex.build.file.*;
+import org.basex.build.*;
 
 /**
  * Abstract JSON serializer class.
@@ -29,9 +28,6 @@ public abstract class JsonSerializer extends OutputSerializer {
 
     super(os, props);
     props.set(S_METHOD, M_JSON);
-
     jprop = new JsonProp(props.get(SerializerProp.S_JSON));
-    if(jprop.spec() == null) BXJS_CONFIG.thrwSerial(
-        "Unknown spec '" + jprop.get(JsonProp.SPEC) + "'");
   }
 }

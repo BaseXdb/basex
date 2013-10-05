@@ -9,9 +9,9 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.basex.build.file.*;
+import org.basex.build.*;
+import org.basex.build.JsonProp.*;
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -337,9 +337,9 @@ public final class HTTPPayload {
 
     Value val = null;
     if(ctype != null) {
-      final boolean ml = eq(ctype, APP_JSON);
-      if(ml || Token.eq(ctype, APP_JSON)) {
-        final String options = ml ? JsonProp.FORMAT[0] + "=" + DataText.M_JSONML : "";
+      if(MimeTypes.isJSON(ctype)) {
+        final String options = eq(ctype, APP_JSON) ? "" :
+          AProp.toString(JsonProp.FORMAT) + "=" + JsonFormat.JSONML;
         val = new DBNode(new JsonParser(in, prop, options));
       } else if(TEXT_CSV.equals(ctype)) {
         val = new DBNode(new CsvParser(in, prop));

@@ -9,7 +9,6 @@ import java.util.*;
 import java.util.zip.*;
 
 import org.basex.build.*;
-import org.basex.build.file.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;

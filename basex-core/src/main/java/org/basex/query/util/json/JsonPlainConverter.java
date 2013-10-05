@@ -3,7 +3,7 @@ package org.basex.query.util.json;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
-import org.basex.build.file.*;
+import org.basex.build.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
@@ -31,13 +31,13 @@ public class JsonPlainConverter extends JsonXMLConverter implements JsonHandler 
 
   @Override
   public ANode convert(final String in) throws QueryException {
-    JsonParser.parse(in, spec, unescape, this, info);
+    JsonParser.parse(in, jprop, this, info);
     return elem;
   }
 
   @Override
   public void openObject() {
-    if(elem == null) elem = new FElem(JSON);
+    if(elem == null) elem = new FElem(T_JSON);
     elem.add(T_TYPE, T_OBJECT);
   }
 
@@ -59,7 +59,7 @@ public class JsonPlainConverter extends JsonXMLConverter implements JsonHandler 
 
   @Override
   public void openArray() {
-    if(elem == null) elem = new FElem(JSON);
+    if(elem == null) elem = new FElem(T_JSON);
     elem.add(T_TYPE, T_ARRAY);
   }
 

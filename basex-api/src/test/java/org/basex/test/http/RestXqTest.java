@@ -393,13 +393,13 @@ public final class RestXqTest extends HTTPTest {
    * @param query request
    * @param exp expected result
    * @param request request body
-   * @param param post parameters
+   * @param type content type
    * @throws IOException I/O exception
    */
   private static void post(final String function, final String query, final String exp,
-      final String request, final String param) throws IOException {
+      final String request, final String type) throws IOException {
     install(function);
-    assertEquals(exp, post(query, request, param));
+    assertEquals(exp, post(query, request, type));
   }
 
   /**

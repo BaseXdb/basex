@@ -559,7 +559,7 @@ public class QueryParser extends InputParser {
       }
       if(ctx.serProp.get(key) == null) error(OUTWHICH, key);
       if(!decl.add("S " + key)) error(OUTDUPL, key);
-      if(key.equals(SerializerProp.S_PARAMETER_DOCUMENT[0].toString())) {
+      if(key.equals(AProp.toString(SerializerProp.S_PARAMETER_DOCUMENT))) {
         final IO io = IO.get(string(resolvedUri(val).string()));
         try {
           final ANode node = new DBNode(io, ctx.context.prop).children().next();

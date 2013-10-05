@@ -4,7 +4,9 @@ import static org.basex.io.MimeTypes.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.data.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -30,17 +32,16 @@ public class RESTPut extends RESTCode {
     final InputStream in = http.req.getInputStream();
     final String ct = http.contentType();
     // choose correct importer
-    if(APP_JSON.equals(ct)) {
-      session.execute("set parser json");
-    } else if(APP_JSONML.equals(ct)) {
-      session.execute("set parser json");
-      session.execute("set parseropt jsonml=true");
+    if(MimeTypes.isJSON(ct)) {
+      session.execute(new Set(Prop.PARSER, DataText.M_JSON));
+      if(APP_JSONML.equals(ct))
+        session.execute(new Set(Prop.JSONPARSER, "format=jsonml"));
     } else if(TEXT_CSV.equals(ct)) {
-      session.execute("set parser csv");
+      session.execute(new Set(Prop.PARSER, DataText.M_CSV));
     } else if(TEXT_HTML.equals(ct)) {
-      session.execute("set parser html");
+      session.execute(new Set(Prop.PARSER, DataText.M_HTML));
     } else if(ct != null && MimeTypes.isText(ct)) {
-      session.execute("set parser text");
+      session.execute(new Set(Prop.PARSER, DataText.M_TEXT));
     } else if(ct != null && !MimeTypes.isXML(ct)) {
       xml = false;
     }

@@ -1,4 +1,4 @@
-package org.basex.build.file;
+package org.basex.build;
 
 import java.io.*;
 

@@ -140,23 +140,30 @@ public final class XMLToken {
   /**
    * Encodes a string to a valid NCName.
    * @param name token
+   * @param lax lax encoding (lossy, but better readable)
    * @return valid NCName
    */
-  public static byte[] encode(final byte[] name) {
+  public static byte[] encode(final byte[] name, final boolean lax) {
     if(name.length == 0) return UNDERSCORE;
+
     for(int i = 0, cp; i < name.length; i += cl(name, i)) {
       cp = cp(name, i);
       if(cp == '_' || !(i == 0 ? XMLToken.isNCStartChar(cp) : XMLToken.isNCChar(cp))) {
         final TokenBuilder tb = new TokenBuilder(name.length << 1).add(name, 0, i);
         for(int j = i; j < name.length; j += cl(name, j)) {
           cp = cp(name, j);
-          if(cp == '_') tb.addByte(UNDERSCORE[0]).addByte(UNDERSCORE[0]);
-          else if(j == 0 ? XMLToken.isNCStartChar(cp) :
-            XMLToken.isNCChar(cp)) tb.add(cp);
-          else if(cp < 0x10000) addEsc(tb, cp);
-          else {
+          if(j == 0 ? XMLToken.isNCStartChar(cp) : XMLToken.isNCChar(cp)) {
+            tb.add(cp);
+          } else if(lax) {
+            tb.add('_');
+          } else if(cp == '_') {
+            tb.add('_').add('_');
+          } else if(cp < 0x10000) {
+            addEsc(tb, cp);
+          } else {
             final int r = cp - 0x10000;
-            addEsc(addEsc(tb, (r >>> 10) + 0xD800), (r & 0x3FF) + 0xDC00);
+            addEsc(tb, (r >>> 10) + 0xD800);
+            addEsc(tb, (r & 0x3FF) + 0xDC00);
           }
         }
         return tb.finish();
@@ -169,19 +176,17 @@ public final class XMLToken {
    * Adds the given 16-bit char to the token builder in encoded form.
    * @param tb token builder
    * @param cp char
-   * @return the token builder for convenience
    */
-  private static TokenBuilder addEsc(final TokenBuilder tb, final int cp) {
+  private static void addEsc(final TokenBuilder tb, final int cp) {
     tb.addByte(UNDERSCORE[0]);
     final int a = cp >>> 12;
-    tb.addByte((byte) (a + (a > 9 ? 'A' : '0')));
+    tb.addByte((byte) (a + (a > 9 ? 87 : '0')));
     final int b = cp >>> 8 & 0x0F;
-    tb.addByte((byte) (b + (b > 9 ? 'A' : '0')));
+    tb.addByte((byte) (b + (b > 9 ? 87 : '0')));
     final int c = cp >>> 4 & 0x0F;
-    tb.addByte((byte) (c + (c > 9 ? 'A' : '0')));
+    tb.addByte((byte) (c + (c > 9 ? 87 : '0')));
     final int d = cp & 0x0F;
-    tb.addByte((byte) (d + (d > 9 ? 'A' : '0')));
-    return tb;
+    tb.addByte((byte) (d + (d > 9 ? 87 : '0')));
   }
 
   /**

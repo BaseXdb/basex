@@ -1,17 +1,17 @@
-package org.basex.build.file;
+package org.basex.build;
 
 import java.io.*;
 
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.util.csv.*;
+import org.basex.query.value.item.*;
 
 /**
  * This class parses files in the CSV format
- * and sends events to the specified database builder.
+ * and converts them to XML.
  *
  * <p>The parser provides some options, which can be specified via the
  * {@link Prop#CSVPARSER} option.</p>
@@ -38,16 +38,10 @@ public final class CsvParser extends XMLParser {
    * @throws IOException I/O exception
    */
   private static IO toXML(final IO io, final String options) throws IOException {
-    // get parser properties
-    final CsvProp cprop = new CsvProp(options);
-
-    // parse input and convert to XML node
     try {
-      final CsvConverter conv = new CsvConverter(cprop.separator(),
-          cprop.is(CsvProp.HEADER));
-      final NewlineInput nli = new NewlineInput(io).encoding(cprop.get(CsvProp.ENCODING));
-      // cache XML representation
-      final IOContent xml = new IOContent(conv.convert(nli).serialize().toArray());
+      // convert input to XML and return cached result
+      final Item node = new CsvConverter(new CsvProp(options)).convert(io);
+      final IOContent xml = new IOContent(node.serialize().toArray());
       xml.name(io.name());
       return xml;
     } catch(final QueryException ex) {

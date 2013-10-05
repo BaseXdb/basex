@@ -1,4 +1,4 @@
-package org.basex.build.file;
+package org.basex.build;
 
 import static org.basex.util.Token.*;
 
@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
 
 /**
  * This class parses files in the JSON format
- * and sends events to the specified database builder.
+ * and converts them to XML.
  *
  * <p>The parser provides some options, which can be specified via the
  * {@link Prop#JSONPARSER} option.</p>
@@ -61,12 +61,11 @@ public final class JsonParser extends XMLParser {
     final byte[] content = new NewlineInput(io).encoding(encoding).content();
 
     // parse input and convert to XML node
-    final Item node;
     try {
       final JsonConverter conv = JsonConverter.get(jprop, null);
-      node = conv.convert(string(content));
+      final Item node = conv.convert(string(content));
 
-      // create XML input container from serialized node
+      // cache XML representation
       final IOContent xml = new IOContent(node.serialize().toArray());
       xml.name(io.name());
       return xml;

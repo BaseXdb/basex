@@ -3,7 +3,7 @@ package org.basex.query.util.json;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
-import org.basex.build.file.*;
+import org.basex.build.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
@@ -52,7 +52,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public final class JsonBaseXConverter extends JsonXMLConverter {
+public final class JsonDefaultConverter extends JsonXMLConverter {
   /** Type names. */
   private static final byte[][] NAMES = { T_ARRAY, T_OBJECT, T_STRING, T_NUMBER,
     T_BOOLEAN, NULL };
@@ -69,14 +69,14 @@ public final class JsonBaseXConverter extends JsonXMLConverter {
    * @param jp json properties
    * @param ii input info
    */
-  public JsonBaseXConverter(final JsonProp jp, final InputInfo ii) {
+  public JsonDefaultConverter(final JsonProp jp, final InputInfo ii) {
     super(jp, ii);
   }
 
   @Override
   public ANode convert(final String in) throws QueryException {
-    final JsonCGHandler handler = new JsonCGHandler();
-    JsonParser.parse(in, spec, unescape, handler, info);
+    final JsonDefaultHandler handler = new JsonDefaultHandler(jprop.is(JsonProp.LAX));
+    JsonParser.parse(in, jprop, handler, info);
     final ByteList[] types = new ByteList[TYPES.length];
     for(final TypedArray arr : handler.names.values()) {
       if(arr != null) {
@@ -97,13 +97,23 @@ public final class JsonBaseXConverter extends JsonXMLConverter {
   }
 
   /** JSON handler containing the state of the conversion. */
-  static class JsonCGHandler implements JsonHandler {
+  static class JsonDefaultHandler implements JsonHandler {
     /** Map from element name to a pair of all its nodes and the collective node type. */
     final TokenObjMap<TypedArray> names = new TokenObjMap<TypedArray>();
+    /** Lax QName conversion. */
+    private final boolean lax;
     /** The next element's name. */
     private byte[] name = T_JSON;
     /** The current node. */
     FElem elem;
+
+    /**
+     * Constructor.
+     * @param l lax name conversion
+     */
+    JsonDefaultHandler(final boolean l) {
+      lax = l;
+    }
 
     /**
      * Adds a new element with the given type.
@@ -141,7 +151,7 @@ public final class JsonBaseXConverter extends JsonXMLConverter {
 
     @Override
     public void openPair(final byte[] key) {
-      name = XMLToken.encode(key);
+      name = XMLToken.encode(key, lax);
     }
 
     @Override

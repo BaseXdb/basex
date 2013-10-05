@@ -98,8 +98,8 @@ public class BaseX extends Main {
           // toggle newline separators
           newline ^= true;
           if(serial.length() != 0) serial.append(',');
-          val = serial.append(SerializerProp.S_ITEM_SEPARATOR[0]).append("=\\n").
-              toString();
+          val = serial.append(AProp.toString(SerializerProp.S_ITEM_SEPARATOR)).
+              append("=\\n").toString();
           prop = Prop.SERIALIZER;
         } else if(c == 'o') {
           // change output stream
@@ -128,7 +128,7 @@ public class BaseX extends Main {
         } else if(c == 's') {
           // set/add serialization parameter
           if(serial.length() != 0) serial.append(',');
-          val = serial.append(val).toString();
+          val = serial.append(val.replaceAll(",", ",,")).toString();
           prop = Prop.SERIALIZER;
         } else if(c == 'u') {
           // (de)activate write-back for updates

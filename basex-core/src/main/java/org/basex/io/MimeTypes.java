@@ -82,6 +82,15 @@ public final class MimeTypes {
   }
 
   /**
+   * Checks if the content type is an JSON content type.
+   * @param type content type
+   * @return result of check
+   */
+  public static boolean isJSON(final String type) {
+    return eq(type, APP_JSON, APP_JSONML);
+  }
+
+  /**
    * Checks if the main part of the content type is {@code "text"}.
    * @param type content type
    * @return result of check

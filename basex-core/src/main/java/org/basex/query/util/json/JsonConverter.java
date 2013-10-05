@@ -1,9 +1,8 @@
 package org.basex.query.util.json;
 
-import static org.basex.data.DataText.*;
-import static org.basex.util.Token.*;
-
-import org.basex.build.file.*;
+import org.basex.build.*;
+import org.basex.build.JsonProp.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -15,23 +14,19 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public abstract class JsonConverter {
+  /** JSON properties. */
+  protected final JsonProp jprop;
   /** Input info. */
   protected final InputInfo info;
-  /** The {@code map} conversion format. */
-  public static final byte[] MAP = token("map");
-  /** The {@code jsonml} conversion format. */
-  public static final byte[] JSONML = token("jsonml");
-  /** The {@code plain} conversion format. */
-  public static final byte[] PLAIN = token("plain");
-  /** The {@code json} conversion format. */
-  public static final byte[] JSON = token("json");
 
   /**
    * Constructor.
+   * @param jp json properties
    * @param ii input info
    */
-  protected JsonConverter(final InputInfo ii) {
+  protected JsonConverter(final JsonProp jp, final InputInfo ii) {
     info = ii;
+    jprop = jp;
   }
 
   /**
@@ -47,12 +42,15 @@ public abstract class JsonConverter {
    * @param jprop json properties
    * @param ii input info
    * @return a JSON converter
+   * @throws SerializerException serializer exception
    */
-  public static JsonConverter get(final JsonProp jprop, final InputInfo ii) {
-    final String format = jprop.get(JsonProp.FORMAT);
-    if(format.equals(M_JSONML)) return new JsonMLConverter(jprop, ii);
-    if(format.equals(M_PLAIN))  return new JsonPlainConverter(jprop, ii);
-    if(format.equals(M_MAP))    return new JsonMapConverter(jprop, ii);
-    return new JsonBaseXConverter(jprop, ii);
+  public static JsonConverter get(final JsonProp jprop, final InputInfo ii)
+      throws SerializerException {
+
+    final JsonFormat format = jprop.format();
+    if(format == JsonFormat.JSONML) return new JsonMLConverter(jprop, ii);
+    if(format == JsonFormat.PLAIN)  return new JsonPlainConverter(jprop, ii);
+    if(format == JsonFormat.MAP)    return new JsonMapConverter(jprop, ii);
+    return new JsonDefaultConverter(jprop, ii);
   }
 }

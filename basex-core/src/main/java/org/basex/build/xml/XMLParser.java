@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 
 /**
  * This class parses the tokens that are delivered by the {@link XMLScanner} and
- * sends them to the specified database builder. This class offers a more
+ * sends them to the specified database builder. This class is a more
  * tolerant alternative to Java's internal SAX parser, which is used by the
  * {@link SAXWrapper} class.
  *

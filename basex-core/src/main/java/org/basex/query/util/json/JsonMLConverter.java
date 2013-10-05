@@ -4,8 +4,7 @@ import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
-import org.basex.build.file.*;
-import org.basex.build.file.JsonProp.Spec;
+import org.basex.build.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
@@ -39,7 +38,7 @@ public class JsonMLConverter extends JsonXMLConverter {
   public ANode convert(final String in) throws QueryException {
     final JsonMLHandler handler = new JsonMLHandler();
     stack.clear();
-    JsonParser.parse(in, Spec.RFC4627, true, handler, info);
+    JsonParser.parse(in, jprop, handler, info);
     return stack.pop();
   }
 
