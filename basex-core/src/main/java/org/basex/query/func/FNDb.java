@@ -665,10 +665,8 @@ public final class FNDb extends StandardFunc {
       }
     }
 
-    final Item opt = expr.length > 3 ? expr[3].item(ctx, info) : null;
+    final Options opts = checkOptions(3, Q_OPTIONS, new Options(), ctx);
 
-    final Options opts = new Options();
-    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
     ctx.updates.add(new DBCreate(info, name, inputs, opts, ctx), ctx);
     return null;
   }
@@ -726,11 +724,8 @@ public final class FNDb extends StandardFunc {
   private Item optimize(final QueryContext ctx) throws QueryException {
     final Data data = checkWrite(checkData(ctx), ctx);
     final boolean all = expr.length > 1 && checkBln(expr[1], ctx);
+    final Options opts = checkOptions(2, Q_OPTIONS, new Options(), ctx);
 
-    final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final Options opts = new Options();
-    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
-    // check database options
     ctx.updates.add(new DBOptimize(data, ctx, all, opts, info), ctx);
     return null;
   }

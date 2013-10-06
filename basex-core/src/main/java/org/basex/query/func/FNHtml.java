@@ -50,16 +50,9 @@ public final class FNHtml extends StandardFunc {
    */
   private DBNode parse(final QueryContext ctx) throws QueryException {
     final byte[] in = checkStrBin(checkItem(expr[0], ctx));
-    final IO io = new IOContent(in);
-
-    // bind parameters
-    final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
-    final HtmlOptions opts = new HtmlOptions();
-    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
-
-    // convert html
+    final HtmlOptions opts = checkOptions(1, Q_OPTIONS, new HtmlOptions(), ctx);
     try {
-      return new DBNode(new HtmlParser(io, ctx.context.options, opts));
+      return new DBNode(new HtmlParser(new IOContent(in), ctx.context.options, opts));
     } catch(final IOException ex) {
       throw BXHL_IO.thrw(info, ex);
     }

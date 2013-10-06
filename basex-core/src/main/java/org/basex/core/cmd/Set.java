@@ -36,8 +36,7 @@ public final class Set extends AGet {
   protected boolean run() {
     final String key = args[0].toUpperCase(Locale.ENGLISH), val = args[1];
     try {
-      final String v = options.set(key, val);
-      if(v != null) return info(key + COLS + v);
+      if(options.set(key, val)) return info(key + COLS + options.get(key));
 
       // retrieve values of all options
       if(context.user.has(Perm.ADMIN) && goptions.get(key) != null) {

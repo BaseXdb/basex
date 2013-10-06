@@ -211,6 +211,22 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Parses the options at the specified index.
+   * @param <E> options type
+   * @param i index of options argument
+   * @param qnm QName
+   * @param opts options
+   * @param ctx query context
+   * @return passed on options
+   * @throws QueryException query exception
+   */
+  protected <E extends Options> E checkOptions(final int i, final QNm qnm, final E opts,
+      final QueryContext ctx) throws QueryException {
+    if(i < expr.length) new FuncOptions(qnm, info).parse(expr[i].item(ctx, info), opts);
+    return opts;
+  }
+
+  /**
    * Converts the specified dateTime to milliseconds.
    * @param e expression
    * @param ctx query context

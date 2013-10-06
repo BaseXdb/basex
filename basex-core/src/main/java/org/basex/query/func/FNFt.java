@@ -21,7 +21,6 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
-import org.basex.util.ft.FTOptions;
 import org.basex.util.list.*;
 
 /**
@@ -168,9 +167,7 @@ public final class FNFt extends StandardFunc {
   private Iter search(final QueryContext ctx) throws QueryException {
     final Data data = checkData(ctx);
     final Value terms = ctx.value(expr[1]);
-    final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    final FTOptions opts = new FTOptions();
-    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
+    final FTOptions opts = checkOptions(2, Q_OPTIONS, new FTOptions(), ctx);
     return search(data, terms, opts, this, ctx);
   }
 

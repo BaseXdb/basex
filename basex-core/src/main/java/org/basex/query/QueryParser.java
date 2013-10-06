@@ -558,7 +558,7 @@ public class QueryParser extends InputParser {
         ctx.serialOpts = new SerializerOptions(opts.get(MainOptions.SERIALIZER));
       }
       if(!decl.add("S " + key)) error(OUTDUPL, key);
-      if(ctx.serialOpts.set(key, string(val)) == null) error(OUTWHICH, key);
+      if(!ctx.serialOpts.set(key, string(val))) error(OUTWHICH, key);
 
       if(key.equals(SerializerOptions.S_PARAMETER_DOCUMENT.name)) {
         final IO io = IO.get(string(resolvedUri(val).string()));

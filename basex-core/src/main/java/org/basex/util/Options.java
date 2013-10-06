@@ -209,42 +209,40 @@ public class Options implements Iterable<String> {
   /**
    * Sets the specified value after casting it to the correct type.
    * @param key key
-   * @param val value
-   * @return final value, or {@code null} if the key has not been found
+   * @param value value
+   * @return success flag
    */
-  public final synchronized String set(final String key, final String val) {
-    return set(key, val, false);
+  public final synchronized boolean set(final String key, final String value) {
+    return set(key, value, false);
   }
 
   /**
    * Sets the specified value after casting it to the correct type.
    * @param key key
-   * @param val value
+   * @param value value
    * @param cache cache unknown (free) options
-   * @return final value, or {@code null} if the key has not been found
+   * @return success flag
+   * @throws IllegalArgumentException invalid argument
    */
-  public final synchronized String set(final String key, final String val,
+  public final synchronized boolean set(final String key, final String value,
       final boolean cache) {
-    final Object type = get(key);
-    if(type == null) {
-      if(cache) free.put(key, val);
-      return null;
+
+    final Object val = get(key);
+    if(val == null) {
+      if(cache) free.put(key, value);
+      return false;
     }
 
-    String v = val;
-    if(type instanceof Boolean) {
-      final boolean b = val == null || val.isEmpty() ? !((Boolean) type) : Util.yes(val);
-      setObject(key, b);
-      v = Util.flag(b);
-    } else if(type instanceof Integer) {
-      setObject(key, Integer.parseInt(val));
-      v = String.valueOf(get(key));
-    } else if(type instanceof String) {
-      setObject(key, val);
+    if(val instanceof Boolean) {
+      setObject(key, value == null || value.isEmpty() ? !((Boolean) val) : Util.yes(value));
+    } else if(val instanceof Integer) {
+      setObject(key, Integer.parseInt(value));
+    } else if(val instanceof String) {
+      setObject(key, value);
     } else {
-      throw new IllegalArgumentException("Unknown option type: " + Util.className(type));
+      throw new IllegalArgumentException("Unknown option type: " + Util.className(val));
     }
-    return v;
+    return true;
   }
 
   /**
@@ -441,8 +439,8 @@ public class Options implements Iterable<String> {
         val.append(ch);
       }
       try {
-        if(set(key, val.toString(), true) != null) continue;
-      } catch(final Exception ex) {
+        set(key, val.toString(), true);
+      } catch(final IllegalArgumentException ex) {
         return new BaseXException(Text.INVALID_VALUE_X_X, key, val);
       }
     }

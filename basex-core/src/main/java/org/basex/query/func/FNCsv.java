@@ -54,8 +54,7 @@ public class FNCsv extends StandardFunc {
    */
   private FElem parse(final QueryContext ctx) throws QueryException {
     final byte[] input = checkStr(expr[0], ctx);
-    final CsvOptions opts = new CsvOptions();
-    if(expr.length > 1) new FuncOptions(Q_OPTIONS, info).parse(expr[1].item(ctx, info), opts);
+    final CsvOptions opts = checkOptions(1, Q_OPTIONS, new CsvOptions(), ctx);
 
     try {
       return new CsvConverter(opts).convert(input);
@@ -72,14 +71,11 @@ public class FNCsv extends StandardFunc {
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
     final ANode node = checkNode(expr[0], ctx);
-    final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
-    final CsvOptions opts = new CsvOptions();
-    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
+    final CsvOptions opts = checkOptions(1, Q_OPTIONS, new CsvOptions(), ctx);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(S_METHOD, M_CSV);
     sopts.set(S_CSV, opts.toString());
-    // serialize node and remove carriage returns
     return Str.get(delete(serialize(node.iter(), sopts), '\r'));
   }
 }

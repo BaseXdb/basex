@@ -3,6 +3,7 @@ package org.basex.query.util.archive;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.query.func.*;
 import org.basex.util.*;
 
 /**
@@ -43,7 +44,7 @@ public final class ZIPIn extends ArchiveIn {
 
   @Override
   public String format() {
-    return "zip";
+    return FNArchive.ZIP;
   }
 
   @Override

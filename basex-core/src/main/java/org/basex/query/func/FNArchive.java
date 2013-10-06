@@ -31,6 +31,11 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FNArchive extends StandardFunc {
+  /** Packer format: gzip. */
+  public static final String GZIP = "gzip";
+  /** Packer format: zip. */
+  public static final String ZIP = "zip";
+
   /** Module prefix. */
   private static final String PREFIX = "archive";
   /** QName. */
@@ -67,7 +72,7 @@ public final class FNArchive extends StandardFunc {
   /** Archive options. */
   public static class ArchiveOptions extends Options {
     /** Archiving format. */
-    public static final Option FORMAT = new Option("format", "zip");
+    public static final Option FORMAT = new Option("format", ZIP);
     /** Archiving algorithm. */
     public static final Option ALGORITHM = new Option("algorithm", DEFLATE);
   }
@@ -114,10 +119,7 @@ public final class FNArchive extends StandardFunc {
   private B64 create(final QueryContext ctx) throws QueryException {
     final Iter entr = ctx.iter(expr[0]);
     final Iter cont = ctx.iter(expr[1]);
-    final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-
-    final ArchiveOptions opts = new ArchiveOptions();
-    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
+    final Options opts = checkOptions(2, Q_OPTIONS, new ArchiveOptions(), ctx);;
 
     final String format = opts.get(ArchiveOptions.FORMAT);
     final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info);
@@ -125,8 +127,8 @@ public final class FNArchive extends StandardFunc {
     final String alg = opts.get(ArchiveOptions.ALGORITHM);
     int level = ZipEntry.DEFLATED;
     if(alg != null) {
-      if(format.equals("zip") && !eq(alg, STORED, DEFLATE) ||
-         format.equals("gzip") && !eq(alg, DEFLATE)) {
+      if(format.equals(ZIP)  && !eq(alg, STORED, DEFLATE) ||
+         format.equals(GZIP) && !eq(alg, DEFLATE)) {
         ARCH_SUPP.thrw(info, ArchiveOptions.ALGORITHM.name, alg);
       }
       if(eq(alg, STORED)) level = ZipEntry.STORED;

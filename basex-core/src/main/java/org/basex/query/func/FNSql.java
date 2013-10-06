@@ -131,8 +131,7 @@ public final class FNSql extends StandardFunc {
         final String pass = string(checkStr(expr[2], ctx));
         if(expr.length == 4) {
           // connection options
-          final Options opts = new Options();
-          new FuncOptions(Q_OPTIONS, info).parse(checkItem(expr[3], ctx), opts);
+          final Options opts = checkOptions(3, Q_OPTIONS, new Options(), ctx);
           // extract auto-commit mode from options
           boolean ac = true;
           final HashMap<String, String> options = opts.free();

@@ -172,7 +172,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         // serialization parameters
         final String key = string(local);
         final String val = toString(value, name);
-        if(output.set(key, val) == null) error(info, UNKNOWN_SER, key);
+        if(!output.set(key, val)) error(info, UNKNOWN_SER, key);
       }
       found |= rexq;
     }

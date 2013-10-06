@@ -51,8 +51,7 @@ public final class FNJson extends StandardFunc {
    */
   private Item parse(final QueryContext ctx) throws QueryException {
     final byte[] input = checkStr(expr[0], ctx);
-    final JsonOptions opts = new JsonOptions();
-    if(expr.length > 1) new FuncOptions(Q_OPTIONS, info).parse(expr[1].item(ctx, info), opts);
+    final JsonOptions opts = checkOptions(1, Q_OPTIONS, new JsonOptions(), ctx);
 
     try {
       return JsonConverter.get(opts, info).convert(string(input)).item(ctx, info);
@@ -69,14 +68,11 @@ public final class FNJson extends StandardFunc {
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
     final ANode node = checkNode(expr[0], ctx);
-    final Item opt = expr.length > 1 ? expr[1].item(ctx, info) : null;
-    final JsonOptions opts = new JsonOptions();
-    new FuncOptions(Q_OPTIONS, info).parse(opt, opts);
+    final JsonOptions opts = checkOptions(1, Q_OPTIONS, new JsonOptions(), ctx);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(S_METHOD, M_JSON);
     sopts.set(S_JSON, opts.toString());
-    // serialize node and remove carriage returns
     return Str.get(delete(serialize(node.iter(), sopts), '\r'));
   }
 }

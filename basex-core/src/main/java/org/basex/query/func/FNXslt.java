@@ -103,11 +103,7 @@ public final class FNXslt extends StandardFunc {
     checkCreate(ctx);
     final IO in = read(checkItem(expr[0], ctx));
     final IO xsl = read(checkItem(expr[1], ctx));
-
-    final Options opts = new Options();
-    if(expr.length > 2) {
-      new FuncOptions(Q_PARAMETERS, info).parse(expr[2].item(ctx, info), opts);
-    }
+    final Options opts = checkOptions(2, Q_PARAMETERS, new Options(), ctx);;
 
     final PrintStream tmp = System.err;
     final ArrayOutput ao = new ArrayOutput();
