@@ -428,9 +428,9 @@ public class Options implements Iterable<String> {
     final int sl = string.length();
     int i = 0;
     while(i < sl) {
-      int k = string.indexOf('=', i);
+      final int k = string.indexOf('=', i);
       if(k == -1) break;
-      final String key = string.substring(i, k);
+      final String key = string.substring(i, k).trim();
       final StringBuilder val = new StringBuilder();
       i = k;
       while(++i < sl) {
@@ -444,9 +444,7 @@ public class Options implements Iterable<String> {
         return new BaseXException(Text.INVALID_VALUE_X_X, key, val);
       }
     }
-
-    return free.isEmpty() ? null :
-      new BaseXException(unknown(free.keySet().iterator().next()));
+    return free.isEmpty() ? null : new BaseXException(unknown(free.keySet().iterator().next()));
   }
 
   // PRIVATE METHODS ====================================================================

@@ -308,7 +308,7 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-    Item it = expr.length > 1 ? expr[1].item(ctx, info) : null;
+    final Item it = expr.length > 1 ? expr[1].item(ctx, info) : null;
     final SerializerOptions sopts = FuncOptions.serializer(it, info);
     return Str.get(serialize(expr[0].iter(ctx), sopts));
   }
