@@ -429,8 +429,8 @@ public class DiskValues implements Index {
    * Binary search for key in the {@link #idxr}.
    * <p><em>Important:</em> This method is thread-safe.</p>
    * @param key token to be found
-   * @param first begin of the search interval
-   * @param last end of the search interval
+   * @param first begin of the search interval (inclusive)
+   * @param last end of the search interval (exclusive)
    * @return if the key is found: index of the key else: (-(insertion point) - 1)
    */
   protected int get(final byte[] key, final int first, final int last) {

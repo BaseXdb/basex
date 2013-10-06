@@ -1,6 +1,7 @@
 package org.basex.index.value;
 
 import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -62,12 +63,12 @@ public final class UpdatableDiskValues extends DiskValues {
     final TokenList nkeys = new TokenList(m.size());
     int p = 0;
     for(final byte[] key : allkeys) {
-      p = get(key, p, last);
+      p = get(key, p, s);
       if(p < 0) {
         p = -(p + 1);
         nkeys.add(key);
       } else {
-        appendIds(p, key, diffs(m.get(key)));
+        appendIds(p++, key, diffs(m.get(key)));
       }
     }
 
@@ -76,7 +77,7 @@ public final class UpdatableDiskValues extends DiskValues {
       final byte[] key = nkeys.get(j);
 
       final int ins = -(1 + get(key, 0, i));
-      if(ins < 0) throw new IllegalStateException("Key should not exist");
+      if(ins < 0) throw new IllegalStateException("Key should not exist: '" + string(key) + "'");
 
       // shift all bigger keys to the right
       while(i >= ins) {
