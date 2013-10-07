@@ -261,6 +261,7 @@
           <configuration>
             <source>${compileSource}</source>
             <target>${compileSource}</target>
+            <useIncrementalCompilation>false</useIncrementalCompilation>
           </configuration>
         </plugin>
 
