@@ -76,11 +76,11 @@ public final class UpdatableDiskValues extends DiskValues {
     for(int j = nkeys.size() - 1, i = last, pos = s + j; j >= 0; --j) {
       final byte[] key = nkeys.get(j);
 
-      final int ins = -(1 + get(key, 0, i));
-      if(ins < 0) throw new IllegalStateException("Key should not exist: '" + string(key) + "'");
+      final int in = -(1 + get(key, 0, i));
+      if(in < 0) throw new IllegalStateException("Key should not exist: '" + string(key) + "'");
 
       // shift all bigger keys to the right
-      while(i >= ins) {
+      while(i >= in) {
         idxr.write5(pos * 5L, idxr.read5(i * 5L));
         ctext.put(pos--, ctext.get(i--));
       }
