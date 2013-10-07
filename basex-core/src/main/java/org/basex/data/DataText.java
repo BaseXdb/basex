@@ -193,8 +193,6 @@ public interface DataText {
   byte[] T_JSON = token("json");
   /** Token: type. */
   byte[] T_TYPE = token("type");
-  /** Token: value. */
-  byte[] T_VALUE = token("value");
   /** Token: pair. */
   byte[] T_PAIR = token("pair");
   /** Token: item. */
@@ -210,6 +208,8 @@ public interface DataText {
   byte[] T_ARRAY = token("array");
   /** Token: object. */
   byte[] T_OBJECT = token("object");
+  /** Token: array value. */
+  byte[] T_VALUE = token("_");
 
   /** Comment output. */
   byte[] COMM_O = token("<!--");
