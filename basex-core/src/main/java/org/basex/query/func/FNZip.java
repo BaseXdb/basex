@@ -97,7 +97,7 @@ public final class FNZip extends StandardFunc {
   private Str textEntry(final QueryContext ctx) throws QueryException {
     final String enc = expr.length < 3 ? null : string(checkStr(expr[2], ctx));
     final IO io = new IOContent(entry(ctx));
-    final boolean val = ctx.context.options.is(MainOptions.CHECKSTRINGS);
+    final boolean val = ctx.context.options.bool(MainOptions.CHECKSTRINGS);
     try {
       return Str.get(new NewlineInput(io).encoding(enc).validate(val).content());
     } catch(final IOException ex) {

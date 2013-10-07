@@ -252,7 +252,7 @@ public final class FNConvert extends StandardFunc {
   public static byte[] toString(final InputStream is, final String enc,
       final QueryContext ctx) throws IOException {
 
-    final boolean val = ctx.context.options.is(MainOptions.CHECKSTRINGS);
+    final boolean val = ctx.context.options.bool(MainOptions.CHECKSTRINGS);
     try {
       return new NewlineInput(is).encoding(enc).validate(val).content();
     } finally {

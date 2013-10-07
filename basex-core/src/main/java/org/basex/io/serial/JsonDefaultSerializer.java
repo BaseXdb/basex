@@ -51,8 +51,8 @@ public final class JsonDefaultSerializer extends JsonSerializer {
       throws IOException {
     super(os, opts);
     for(int t = 0; t < typeCache.length; t++) typeCache[t] = new TokenMap();
-    final JsonOptions jopts = new JsonOptions(opts.get(SerializerOptions.S_JSON));
-    lax = jopts.is(JsonOptions.LAX);
+    final JsonOptions jopts = new JsonOptions(opts.string(SerializerOptions.S_JSON));
+    lax = jopts.bool(JsonOptions.LAX);
   }
 
   @Override

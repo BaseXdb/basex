@@ -43,8 +43,8 @@ public final class DiskTableTest extends SandboxTest {
    */
   @BeforeClass
   public static void setUpBeforeClass() {
-    context.options.set(MainOptions.TEXTINDEX, false);
-    context.options.set(MainOptions.ATTRINDEX, false);
+    context.options.bool(MainOptions.TEXTINDEX, false);
+    context.options.bool(MainOptions.ATTRINDEX, false);
   }
 
   /**

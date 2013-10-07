@@ -48,11 +48,11 @@ public final class Info extends AInfo {
     if(context.user.has(Perm.ADMIN)) {
       final GlobalOptions gopts = context.globalopts;
       tb.add(NL + MAIN_OPTIONS + NL);
-      for(final String s : gopts) info(tb, s, gopts.get(s));
+      for(final Option o : gopts) info(tb, o.name, gopts.get(o));
     }
     final MainOptions opts = context.options;
     tb.add(NL + OPTIONS + NL);
-    for(final String s : opts) info(tb, s, opts.get(s));
+    for(final Option o : opts) info(tb, o.name, opts.get(o));
     return tb.toString();
   }
 }

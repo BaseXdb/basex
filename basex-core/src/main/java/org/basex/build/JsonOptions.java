@@ -85,7 +85,7 @@ public final class JsonOptions extends Options {
    * @throws QueryException query exception
    */
   public JsonSpec spec() throws QueryException {
-    final String spec = get(SPEC);
+    final String spec = string(SPEC);
     for(final JsonSpec s : JsonSpec.values()) if(s.desc.equals(spec)) return s;
     throw BXJS_CONFIG.thrw(null, "Unknown spec '" + spec + "'");
   }
@@ -96,7 +96,7 @@ public final class JsonOptions extends Options {
    * @throws SerializerException serializer exception
    */
   public JsonFormat format() throws SerializerException {
-    final String form = get(FORMAT);
+    final String form = string(FORMAT);
     for(final JsonFormat f : JsonFormat.values()) if(f.toString().equals(form)) return f;
     throw BXJS_CONFIG.thrwSerial("Unknown format '" + form + "'");
   }

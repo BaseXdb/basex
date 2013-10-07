@@ -120,12 +120,12 @@ public final class InfoView extends View implements LinkListener {
 
   @Override
   public boolean visible() {
-    return gui.gopts.is(GUIOptions.SHOWINFO);
+    return gui.gopts.bool(GUIOptions.SHOWINFO);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWINFO, v);
+    gui.gopts.bool(GUIOptions.SHOWINFO, v);
   }
 
   @Override
@@ -169,7 +169,7 @@ public final class InfoView extends View implements LinkListener {
     final StringList timings = new StringList(5);
     final IntList times = new IntList(5);
 
-    final int runs = Math.max(1, gui.context.options.num(MainOptions.RUNS));
+    final int runs = Math.max(1, gui.context.options.number(MainOptions.RUNS));
     final String[] split = info.split(NL);
     for(int i = 0; i < split.length; ++i) {
       final String line = split[i];

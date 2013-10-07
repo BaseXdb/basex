@@ -75,9 +75,9 @@ public final class FuncOptions {
         if(!(it instanceof AStr)) FUNCMP.thrw(info, map.description(), AtomType.STR, it.type);
         final Value v = map.get(it, info);
         if(!v.isItem()) FUNCMP.thrw(info, map.description(), AtomType.ITEM, v);
-        final String key = Token.string(it.string(null));
-        final String val = Token.string(((Item) v).string(info));
-        if(!options.set(key, val, true) && options.predefined()) ELMOPTION.thrw(info, key);
+        final String key = string(it.string(null));
+        final String val = string(((Item) v).string(info));
+        if(!options.set(key, val) && options.predefined()) ELMOPTION.thrw(info, key);
       }
     } else {
       if(!test.eq(item)) ELMMAPTYPE.thrw(info, root, item.type);
@@ -95,8 +95,7 @@ public final class FuncOptions {
         final String key = string(qn.local());
         byte[] val = n.attribute(VALUE);
         if(val == null) val = n.string();
-        if(!options.set(key, string(val), true) && options.predefined())
-          ELMOPTION.thrw(info, key);
+        if(!options.set(key, string(val)) && options.predefined()) ELMOPTION.thrw(info, key);
       }
     }
   }

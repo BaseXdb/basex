@@ -389,7 +389,7 @@ public final class FNDbTest extends AdvancedQueryTest {
       query(_DB_CREATE.args(dbname, "()", "()", " { 'updindex':" + b + "() }"));
       query(_DB_INFO.args(dbname) + "//updindex/text()", b ? "ON" : "OFF");
     }
-    assertEquals(context.options.is(MainOptions.UPDINDEX), false);
+    assertEquals(context.options.bool(MainOptions.UPDINDEX), false);
 
     final String[] nopt = { "maxcats", "maxlen", "indexsplitsize", "ftindexsplitsize" };
     for(final String k : nopt) {
@@ -521,7 +521,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     for(final String k : sopt) {
       query(_DB_OPTIMIZE.args(NAME, "false()", " map { '" + k + "':='' }"));
     }
-    assertEquals(context.options.is(MainOptions.TEXTINDEX), true);
+    assertEquals(context.options.bool(MainOptions.TEXTINDEX), true);
 
     error(_DB_OPTIMIZE.args(NAME, "false()", " map { 'xyz':='abc' }"), Err.BASX_OPTIONS);
     error(_DB_OPTIMIZE.args(NAME, "false()", " map { 'updindex':=1 }"), Err.BASX_OPTIONS);

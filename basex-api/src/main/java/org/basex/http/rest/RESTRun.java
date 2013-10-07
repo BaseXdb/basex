@@ -30,7 +30,7 @@ public class RESTRun extends RESTQuery {
   @Override
   void run(final HTTPContext http) throws IOException {
     // get root directory for files
-    final IOFile root = new IOFile(http.context().globalopts.get(GlobalOptions.WEBPATH));
+    final IOFile root = new IOFile(http.context().globalopts.string(GlobalOptions.WEBPATH));
 
     // check if file is not found, is a folder or points to parent folder
     final IOFile io = new IOFile(root, input);

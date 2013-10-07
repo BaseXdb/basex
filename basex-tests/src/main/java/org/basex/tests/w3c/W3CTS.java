@@ -121,7 +121,7 @@ public abstract class W3CTS {
     input = nm + "Catalog" + IO.XMLSUFFIX;
     testid = nm.substring(0, 4);
     pathlog = testid.toLowerCase(Locale.ENGLISH) + ".log";
-    context.globalopts.set(GlobalOptions.DBPATH, sandbox().path() + "/data");
+    context.globalopts.string(GlobalOptions.DBPATH, sandbox().path() + "/data");
   }
 
   /**
@@ -147,7 +147,7 @@ public abstract class W3CTS {
     final String sources = path + "TestSources/";
 
     final Performance perf = new Performance();
-    context.options.set(MainOptions.CHOP, false);
+    context.options.bool(MainOptions.CHOP, false);
 
     //new Check(path + input).execute(context);
     data = CreateDB.mainMem(new IOFile(path + input), context);
@@ -276,7 +276,7 @@ public abstract class W3CTS {
 
       final String inname = text("*:query/@name", state);
       final IOFile query = new IOFile(queries + pth + inname + IO.XQSUFFIX);
-      context.options.set(MainOptions.QUERYPATH, query.path());
+      context.options.string(MainOptions.QUERYPATH, query.path());
       final String in = read(query);
       String er = null;
       ValueBuilder iter = null;
@@ -290,9 +290,9 @@ public abstract class W3CTS {
         curr.root = true;
       }
 
-      context.options.set(MainOptions.QUERYINFO, compile);
+      context.options.bool(MainOptions.QUERYINFO, compile);
       final QueryProcessor xq = new QueryProcessor(in, context).context(curr);
-      context.options.set(MainOptions.QUERYINFO, false);
+      context.options.bool(MainOptions.QUERYINFO, false);
 
       final ArrayOutput ao = new ArrayOutput();
       final TokenBuilder files = new TokenBuilder();
@@ -318,7 +318,7 @@ public abstract class W3CTS {
 
         // serialize query
         final SerializerOptions sp = new SerializerOptions();
-        sp.set(SerializerOptions.S_INDENT, NO);
+        sp.string(SerializerOptions.S_INDENT, NO);
         final Serializer ser = Serializer.get(ao, sp);
         for(Item it; (it = iter.next()) != null;) ser.serialize(it);
         ser.close();

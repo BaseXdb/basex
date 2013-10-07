@@ -57,7 +57,7 @@ public class RESTPost extends RESTCode {
       for(final Item param : qp.value()) {
         final String name = value("data(@name)", param, ctx);
         final String value = value("data(@value)", param, ctx);
-        if(sp.get(name) != null) {
+        if(sp.option(name) != null) {
           ser.add(name).add('=').add(value).add(',');
         } else if(name.equals(WRAP)) {
           wrap(value, http);

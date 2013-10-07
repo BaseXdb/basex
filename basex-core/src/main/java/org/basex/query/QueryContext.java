@@ -70,7 +70,7 @@ public final class QueryContext extends Proc {
   /** Local options (key/value pairs), set by option declarations. */
   public final StringList dbOptions = new StringList();
   /** Global options (will be set after query execution). */
-  public final HashMap<String, Object> globalOpt = new HashMap<String, Object>();
+  public final HashMap<Option, Object> globalOpt = new HashMap<Option, Object>();
 
   /** Current context value. */
   public Value value;
@@ -164,9 +164,9 @@ public final class QueryContext extends Proc {
   public QueryContext(final Context ctx) {
     context = ctx;
     nodes = ctx.current();
-    inf = ctx.options.is(MainOptions.QUERYINFO) || Prop.debug;
-    sc = new StaticContext(ctx.options.is(MainOptions.XQUERY3));
-    maxCalls = ctx.options.num(MainOptions.TAILCALLS);
+    inf = ctx.options.bool(MainOptions.QUERYINFO) || Prop.debug;
+    sc = new StaticContext(ctx.options.bool(MainOptions.XQUERY3));
+    maxCalls = ctx.options.number(MainOptions.TAILCALLS);
     modules = new ModuleLoader(ctx);
   }
 
@@ -214,7 +214,8 @@ public final class QueryContext extends Proc {
     final StringList o = dbOptions;
     for(int s = 0; s < o.size(); s += 2) {
       try {
-        context.options.set(o.get(s).toUpperCase(Locale.ENGLISH), o.get(s + 1));
+        final Option opt = context.options.option(o.get(s).toUpperCase(Locale.ENGLISH));
+        context.options.set(opt, o.get(s + 1));
       } catch(final Exception ex) {
         BASX_VALUE.thrw(null, o.get(s), o.get(s + 1));
       }
@@ -458,7 +459,7 @@ public final class QueryContext extends Proc {
     // if available, return parameters specified by the query
     if(serialOpts != null) return serialOpts;
     // retrieve global parameters
-    final String serial = context.options.get(MainOptions.SERIALIZER);
+    final String serial = context.options.string(MainOptions.SERIALIZER);
     if(optional && serial.isEmpty()) return null;
     // otherwise, if requested, return default parameters
     return new SerializerOptions(serial);
@@ -499,8 +500,8 @@ public final class QueryContext extends Proc {
     closed = true;
 
     // reset database options to their initial values
-    for(final Entry<String, Object> e : globalOpt.entrySet())
-      context.options.setObject(e.getKey(), e.getValue());
+    for(final Entry<Option, Object> e : globalOpt.entrySet())
+      context.options.put(e.getKey(), e.getValue());
 
     // close database connections
     resource.close();
@@ -536,7 +537,7 @@ public final class QueryContext extends Proc {
    */
   Result execute() throws QueryException {
     // limit number of hits to be returned and displayed
-    int max = context.options.num(MainOptions.MAXHITS);
+    int max = context.options.number(MainOptions.MAXHITS);
     if(max < 0) max = Integer.MAX_VALUE;
 
     // evaluates the query
@@ -631,7 +632,7 @@ public final class QueryContext extends Proc {
     // convert to json
     if(type.equalsIgnoreCase(M_JSON)) {
       final JsonOptions jp = new JsonOptions();
-      jp.set(JsonOptions.SPEC, JsonSpec.ECMA_262.toString());
+      jp.string(JsonOptions.SPEC, JsonSpec.ECMA_262.toString());
       return new JsonMapConverter(jp, null).convert(val.toString());
     }
 

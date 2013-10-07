@@ -33,7 +33,7 @@ public final class ViewData {
     final int kind = d.kind(pre);
     if(kind == Data.ATTR) return true;
 
-    final boolean atts = opts.is(GUIOptions.MAPATTS);
+    final boolean atts = opts.bool(GUIOptions.MAPATTS);
     final int last = pre + (atts ? 1 : d.attSize(pre, kind));
     return last == d.meta.size || d.parent(pre, kind) >=
       d.parent(last, d.kind(last));
@@ -107,7 +107,7 @@ public final class ViewData {
   public static byte[] name(final GUIOptions opts, final Data data, final int pre) {
     if(data.kind(pre) == Data.ELEM) {
       final int id = ViewData.nameID(data);
-      if(id != 0 && opts.is(GUIOptions.SHOWNAME)) {
+      if(id != 0 && opts.bool(GUIOptions.SHOWNAME)) {
         final byte[] att = data.attValue(id, pre);
         if(att != null) return att;
       }

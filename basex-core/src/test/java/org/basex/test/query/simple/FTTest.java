@@ -551,16 +551,16 @@ public final class FTTest extends QueryTest {
     if(ALL) {
       // testing all kinds of combinations
       for(int a = 0; a < 2; ++a) {
-        opts.set(MainOptions.FTINDEX, a == 0);
+        opts.bool(MainOptions.FTINDEX, a == 0);
         super.test();
       }
     } else {
       // single test
       //opts.set(Prop.MAINMEM, true);
-      opts.set(MainOptions.FTINDEX, true);
-      opts.set(MainOptions.STEMMING, true);
-      opts.set(MainOptions.DIACRITICS, true);
-      opts.set(MainOptions.CASESENS, true);
+      opts.bool(MainOptions.FTINDEX, true);
+      opts.bool(MainOptions.STEMMING, true);
+      opts.bool(MainOptions.DIACRITICS, true);
+      opts.bool(MainOptions.CASESENS, true);
       super.test();
     }
   }
@@ -583,7 +583,7 @@ public final class FTTest extends QueryTest {
    * @return string
    */
   private static String set(final Option option, final Options opts) {
-    return new Set(option, opts.is(option)).toString();
+    return new Set(option, opts.bool(option)).toString();
   }
 
   /* TABLE REPRESENTATION

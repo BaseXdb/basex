@@ -122,11 +122,11 @@ public class QueryParser extends InputParser {
 
     // set path to query file
     final MainOptions opts = c.context.options;
-    final String bi = path != null ? path : opts.get(MainOptions.QUERYPATH);
+    final String bi = path != null ? path : opts.string(MainOptions.QUERYPATH);
     if(!bi.isEmpty()) c.sc.baseURI(bi);
 
     // parse pre-defined external variables
-    final String bind = opts.get(MainOptions.BINDINGS).trim();
+    final String bind = opts.string(MainOptions.BINDINGS).trim();
     final StringBuilder key = new StringBuilder();
     final StringBuilder val = new StringBuilder();
     boolean first = true;
@@ -555,10 +555,12 @@ public class QueryParser extends InputParser {
 
       if(ctx.serialOpts == null) {
         final MainOptions opts = ctx.context.options;
-        ctx.serialOpts = new SerializerOptions(opts.get(MainOptions.SERIALIZER));
+        ctx.serialOpts = new SerializerOptions(opts.string(MainOptions.SERIALIZER));
       }
       if(!decl.add("S " + key)) error(OUTDUPL, key);
-      if(!ctx.serialOpts.set(key, string(val))) error(OUTWHICH, key);
+      final Option opt = ctx.serialOpts.option(key);
+      if(opt == null) error(OUTWHICH, key);
+      ctx.serialOpts.set(opt, string(val));
 
       if(key.equals(SerializerOptions.S_PARAMETER_DOCUMENT.name)) {
         final IO io = IO.get(string(resolvedUri(val).string()));
@@ -568,10 +570,10 @@ public class QueryParser extends InputParser {
           final InputInfo info = info();
           FuncOptions.parse(node, ctx.serialOpts, info);
 
-          final HashMap<String, String> unknown = ctx.serialOpts.free();
-          if(!unknown.isEmpty()) SERWHICH.thrw(info, unknown.keySet().iterator().next());
+          final HashMap<String, String> free = ctx.serialOpts.free();
+          if(!free.isEmpty()) SERWHICH.thrw(info, free.keySet().iterator().next());
           final Option cm = SerializerOptions.S_USE_CHARACTER_MAPS;
-          if(!ctx.serialOpts.get(cm).isEmpty()) SERWHICH.thrw(info, cm.name);
+          if(!ctx.serialOpts.string(cm).isEmpty()) SERWHICH.thrw(info, cm.name);
         } catch(final IOException ex) {
           error(OUTDOC, val);
         }
@@ -581,12 +583,11 @@ public class QueryParser extends InputParser {
     } else if(eq(name.uri(), DBURI)) {
       // project-specific declaration
       final String ukey = key.toUpperCase(Locale.ENGLISH);
-      final Object obj = ctx.context.options.get(ukey);
-      if(obj == null) error(BASX_OPTIONS, ukey);
+      final Option opt = ctx.context.options.option(ukey);
+      if(opt == null) error(BASX_OPTIONS, ukey);
       // cache old value (to be reset after query evaluation)
-      ctx.globalOpt.put(ukey, obj);
-      ctx.dbOptions.add(key);
-      ctx.dbOptions.add(string(val));
+      ctx.globalOpt.put(opt, ctx.context.options.get(opt));
+      ctx.dbOptions.add(key).add(string(val));
     } else if(eq(name.uri(), QUERYURI)) {
       // Query-specific options
       if(key.equals(READ_LOCK)) {
@@ -1774,9 +1775,9 @@ public class QueryParser extends InputParser {
       if(eq(name.prefix(), DB)) {
         // project-specific declaration
         final String key = string(uc(name.local()));
-        final Object obj = ctx.context.options.get(key);
-        if(obj == null) error(BASX_OPTIONS, key);
-        el.add(new DBPragma(name, v));
+        final Option opt = ctx.context.options.option(key);
+        if(opt == null) error(BASX_OPTIONS, key);
+        el.add(new DBPragma(name, opt, v));
       }
       pos += 2;
     } while(wsConsumeWs(PRAGMA));

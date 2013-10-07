@@ -356,13 +356,13 @@ public final class FNGen extends StandardFunc {
       throws IOException {
 
     final MainOptions opts = ctx.options;
-    final boolean chop = opts.is(MainOptions.CHOP);
+    final boolean chop = opts.bool(MainOptions.CHOP);
     try {
-      opts.set(MainOptions.CHOP, false);
-      return new DBNode(frag || opts.is(MainOptions.INTPARSE) ?
+      opts.bool(MainOptions.CHOP, false);
+      return new DBNode(frag || opts.bool(MainOptions.INTPARSE) ?
         new XMLParser(input, ctx.options, frag) : new SAXWrapper(input, ctx.options));
     } finally {
-      opts.set(MainOptions.CHOP, chop);
+      opts.bool(MainOptions.CHOP, chop);
     }
   }
 }

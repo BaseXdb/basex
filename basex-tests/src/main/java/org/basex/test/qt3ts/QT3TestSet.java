@@ -63,7 +63,7 @@ public abstract class QT3TestSet {
 
   /** Sets the XQuery version to 1.0. */
   protected void xquery10() {
-    ctx.options.set(MainOptions.XQUERY3, false);
+    ctx.options.bool(MainOptions.XQUERY3, false);
   }
 
   /**

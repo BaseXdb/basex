@@ -84,19 +84,19 @@ public final class DialogPrefs extends BaseXDialog {
     pp.add(new BaseXLabel(GUI_INTERACTIONS + COL, true, true).border(12, 0, 6, 0));
 
     // checkbox for Java look and feel
-    javalook = new BaseXCheckBox(JAVA_LF, gopts.is(GUIOptions.JAVALOOK), this);
+    javalook = new BaseXCheckBox(JAVA_LF, gopts.bool(GUIOptions.JAVALOOK), this);
     pp.add(javalook);
 
     // checkbox for realtime mouse focus
-    focus = new BaseXCheckBox(RT_FOCUS, gopts.is(GUIOptions.MOUSEFOCUS), this);
+    focus = new BaseXCheckBox(RT_FOCUS, gopts.bool(GUIOptions.MOUSEFOCUS), this);
     pp.add(focus);
 
     // checkbox for simple file dialog
-    simpfd = new BaseXCheckBox(SIMPLE_FILE_CHOOSER, gopts.is(GUIOptions.SIMPLEFD), this);
+    simpfd = new BaseXCheckBox(SIMPLE_FILE_CHOOSER, gopts.bool(GUIOptions.SIMPLEFD), this);
     pp.add(simpfd);
 
     // enable only if current document contains name attributes
-    final boolean sn = gopts.is(GUIOptions.SHOWNAME);
+    final boolean sn = gopts.bool(GUIOptions.SHOWNAME);
     names = new BaseXCheckBox(SHOW_NAME_ATTS, sn, 6, this);
     final Data data = gui.context.data();
     names.setEnabled(data != null && ViewData.nameID(data) != 0);
@@ -119,7 +119,7 @@ public final class DialogPrefs extends BaseXDialog {
     // checkbox for simple file dialog
     pp.add(new BaseXLabel(LANGUAGE_RESTART + COL, true, true).border(16, 0, 6, 0));
     lang = new BaseXCombo(this, LANGS[0]);
-    lang.setSelectedItem(opts.get(GlobalOptions.LANG));
+    lang.setSelectedItem(opts.string(GlobalOptions.LANG));
     creds = new BaseXLabel(" ");
     p = new BaseXBack(new TableLayout(1, 2, 12, 0));
     p.add(lang);
@@ -136,7 +136,7 @@ public final class DialogPrefs extends BaseXDialog {
   public void action(final Object cmp) {
     creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem().toString()));
     if(cmp == names) {
-      gui.gopts.set(GUIOptions.SHOWNAME, names.isSelected());
+      gui.gopts.bool(GUIOptions.SHOWNAME, names.isSelected());
       gui.notify.layout();
     }
     final int mh = hitsAsProperty();
@@ -146,30 +146,30 @@ public final class DialogPrefs extends BaseXDialog {
   @Override
   public void close() {
     final GlobalOptions opts = gui.context.globalopts;
-    opts.set(GlobalOptions.LANG, lang.getSelectedItem().toString());
+    opts.string(GlobalOptions.LANG, lang.getSelectedItem().toString());
 
     // new database path: close existing database
     final String dbpath = path.getText();
-    if(!opts.get(GlobalOptions.DBPATH).equals(dbpath)) gui.execute(new Close());
-    opts.set(GlobalOptions.DBPATH, dbpath);
+    if(!opts.string(GlobalOptions.DBPATH).equals(dbpath)) gui.execute(new Close());
+    opts.string(GlobalOptions.DBPATH, dbpath);
     opts.write();
 
     final int mh = hitsAsProperty();
-    gui.context.options.set(MainOptions.MAXHITS, mh);
+    gui.context.options.number(MainOptions.MAXHITS, mh);
 
     final GUIOptions gopts = gui.gopts;
-    gopts.set(GUIOptions.MOUSEFOCUS, focus.isSelected());
-    gopts.set(GUIOptions.SIMPLEFD, simpfd.isSelected());
-    gopts.set(GUIOptions.JAVALOOK, javalook.isSelected());
-    gopts.set(GUIOptions.MAXHITS, mh);
+    gopts.bool(GUIOptions.MOUSEFOCUS, focus.isSelected());
+    gopts.bool(GUIOptions.SIMPLEFD, simpfd.isSelected());
+    gopts.bool(GUIOptions.JAVALOOK, javalook.isSelected());
+    gopts.number(GUIOptions.MAXHITS, mh);
     gopts.write();
     dispose();
   }
 
   @Override
   public void cancel() {
-    final boolean sn = gui.gopts.is(GUIOptions.SHOWNAME);
-    gui.gopts.set(GUIOptions.SHOWNAME, oldShowNames);
+    final boolean sn = gui.gopts.bool(GUIOptions.SHOWNAME);
+    gui.gopts.bool(GUIOptions.SHOWNAME, oldShowNames);
     if(sn != oldShowNames) gui.notify.layout();
     super.cancel();
   }
@@ -187,7 +187,7 @@ public final class DialogPrefs extends BaseXDialog {
    * @return maximum number of hits
    */
   private int hitsForSlider() {
-    int mh = gui.gopts.num(MainOptions.MAXHITS);
+    int mh = gui.gopts.number(MainOptions.MAXHITS);
     if(mh == -1) mh = Integer.MAX_VALUE;
     final int hl = HITS.length - 1;
     int h = -1;

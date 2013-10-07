@@ -62,9 +62,9 @@ public final class BaseXGUI {
     // read options
     final GUIOptions gopts = new GUIOptions();
     // cache results to pass them on to all visualizations
-    context.options.set(MainOptions.CACHEQUERY, true);
+    context.options.bool(MainOptions.CACHEQUERY, true);
     // reduce number of results to save memory
-    context.options.set(MainOptions.MAXHITS, gopts.num(GUIOptions.MAXHITS));
+    context.options.number(MainOptions.MAXHITS, gopts.number(GUIOptions.MAXHITS));
 
     // initialize fonts and colors
     GUIConstants.init(gopts);
@@ -90,8 +90,8 @@ public final class BaseXGUI {
             gui.editor.open(io, true);
           } else if(!xml) {
             // only parse first xml file
-            gopts.set(GUIOptions.INPUTPATH, io.path());
-            gopts.set(GUIOptions.DBNAME, io.dbname());
+            gopts.string(GUIOptions.INPUTPATH, io.path());
+            gopts.string(GUIOptions.DBNAME, io.dbname());
             DialogProgress.execute(gui, new Check(file));
             xml = true;
           }
@@ -119,7 +119,7 @@ public final class BaseXGUI {
       // refresh views when windows are resized
       Toolkit.getDefaultToolkit().setDynamicLayout(true);
       // set specified look & feel
-      if(opts.is(GUIOptions.JAVALOOK)) {
+      if(opts.bool(GUIOptions.JAVALOOK)) {
         // use non-bold fonts in Java's look & feel
         final UIDefaults def = UIManager.getDefaults();
         final Enumeration<?> en = def.keys();

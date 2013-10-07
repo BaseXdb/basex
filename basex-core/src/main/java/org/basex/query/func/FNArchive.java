@@ -121,10 +121,10 @@ public final class FNArchive extends StandardFunc {
     final Iter cont = ctx.iter(expr[1]);
     final Options opts = checkOptions(2, Q_OPTIONS, new ArchiveOptions(), ctx);;
 
-    final String format = opts.get(ArchiveOptions.FORMAT);
+    final String format = opts.string(ArchiveOptions.FORMAT);
     final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info);
     // check algorithm
-    final String alg = opts.get(ArchiveOptions.ALGORITHM);
+    final String alg = opts.string(ArchiveOptions.ALGORITHM);
     int level = ZipEntry.DEFLATED;
     if(alg != null) {
       if(format.equals(ZIP)  && !eq(alg, STORED, DEFLATE) ||

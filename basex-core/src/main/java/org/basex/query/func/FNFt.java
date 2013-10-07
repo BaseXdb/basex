@@ -193,9 +193,9 @@ public final class FNFt extends StandardFunc {
     final FTOpt opt = new FTOpt().copy(data.meta);
     FTMode mode = FTMode.ANY;
     if(opts != null) {
-      opt.set(FZ, opts.is(FTOptions.FUZZY));
-      opt.set(WC, opts.is(FTOptions.WILDCARDS));
-      final String md = opts.get(FTOptions.MODE);
+      opt.set(FZ, opts.bool(FTOptions.FUZZY));
+      opt.set(WC, opts.bool(FTOptions.WILDCARDS));
+      final String md = opts.string(FTOptions.MODE);
       mode = FTMode.get(md);
       if(mode == null) ELMOPTION.thrw(info, md);
     }

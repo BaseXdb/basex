@@ -95,7 +95,7 @@ public final class SearchBar extends BaseXBack {
       }
       @Override
       public void keyReleased(final KeyEvent e) {
-        main.gopts.set(GUIOptions.SR_SEARCH, search.getText());
+        main.gopts.string(GUIOptions.SR_SEARCH, search.getText());
         search();
       }
     });
@@ -112,7 +112,7 @@ public final class SearchBar extends BaseXBack {
     replace.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
-        main.gopts.set(GUIOptions.SR_REPLACE, replace.getText());
+        main.gopts.string(GUIOptions.SR_REPLACE, replace.getText());
       }
     });
 
@@ -276,14 +276,14 @@ public final class SearchBar extends BaseXBack {
       final Option option) {
 
     final BaseXButton b = new BaseXButton(gui, icon, help);
-    b.setSelected(gui.gopts.is(option));
+    b.setSelected(gui.gopts.bool(option));
     b.addKeyListener(escape);
     b.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final boolean sel = !b.isSelected();
         b.setSelected(sel);
-        gui.gopts.set(option, sel);
+        gui.gopts.bool(option, sel);
         if(b == regex) {
           multi.setEnabled(sel);
           word.setEnabled(!sel);

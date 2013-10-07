@@ -38,8 +38,8 @@ public final class FTIndexQueryTest extends SandboxTest {
   /** Static initialization. */
   @BeforeClass
   public static void setUpClass() {
-    context.options.set(MainOptions.FTINDEX, false);
-    CTX_IX.options.set(MainOptions.FTINDEX, true);
+    context.options.bool(MainOptions.FTINDEX, false);
+    CTX_IX.options.bool(MainOptions.FTINDEX, true);
     initContext(CTX_IX);
   }
 

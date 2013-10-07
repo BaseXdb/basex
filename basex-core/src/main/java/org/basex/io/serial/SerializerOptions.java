@@ -104,7 +104,7 @@ public final class SerializerOptions extends Options {
    * @throws SerializerException serializer exception
    */
   public String check(final Option option, final String... allowed) throws SerializerException {
-    final String val = get(option);
+    final String val = string(option);
     for(final String a : allowed) if(a.equals(val)) return val;
     throw error(option.name, val, allowed);
   }
@@ -119,7 +119,7 @@ public final class SerializerOptions extends Options {
   public String supported(final Option option, final String... allowed)
       throws SerializerException {
 
-    final String val = get(option);
+    final String val = string(option);
     if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;
     for(final String a : allowed) if(a.equals(val)) return val;
     throw SERNOTSUPP.thrwSerial(allowed(option.name, val, allowed));
@@ -132,7 +132,7 @@ public final class SerializerOptions extends Options {
    * @throws SerializerException serializer exception
    */
   public boolean yes(final Option option) throws SerializerException {
-    return yes(option.name, get(option));
+    return yes(option.name, string(option));
   }
 
   /**

@@ -39,7 +39,7 @@ final class MapLayout {
     gopts = opts;
     off = GUIConstants.fontSize + 4;
 
-    switch(gopts.num(GUIOptions.MAPOFFSETS)) {
+    switch(gopts.number(GUIOptions.MAPOFFSETS)) {
       // no title, small border
       case 1 :
         layout = new MapRect(0, 2, 0, 2); break;
@@ -57,7 +57,7 @@ final class MapLayout {
         layout = new MapRect(0, 0, 0, 0); break;
     }
 
-    switch(gopts.num(GUIOptions.MAPALGO)) {
+    switch(gopts.number(GUIOptions.MAPALGO)) {
       // select method to construct this treemap
       // may should be placed in makeMap to define different method for
       // different levels
@@ -77,7 +77,7 @@ final class MapLayout {
   private MapList children(final int par) {
     final MapList list = new MapList();
     final int last = par + ViewData.size(data, par);
-    final boolean atts = gopts.is(GUIOptions.MAPATTS);
+    final boolean atts = gopts.bool(GUIOptions.MAPATTS);
     int p = par + (atts ? 1 : data.attSize(par, data.kind(par)));
     while(p < last) {
       list.add(p);
@@ -106,7 +106,7 @@ final class MapLayout {
       } else {
         nn = l.get(ne) - l.get(ns) + ViewData.size(data, l.get(ne));
       }
-      l.initWeights(textLen, nn, data, gopts.num(GUIOptions.MAPWEIGHT));
+      l.initWeights(textLen, nn, data, gopts.number(GUIOptions.MAPWEIGHT));
 
       // call recursion for next deeper levels
       final MapRects rects = algo.calcMap(r, l, ns, ne);

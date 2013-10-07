@@ -74,12 +74,12 @@ public final class BaseXServer extends Main implements Runnable {
   public BaseXServer(final Context ctx, final String... args) throws IOException {
     super(args, ctx);
     final GlobalOptions gopts = context.globalopts;
-    final int port = gopts.num(GlobalOptions.SERVERPORT);
-    final int eport = gopts.num(GlobalOptions.EVENTPORT);
+    final int port = gopts.number(GlobalOptions.SERVERPORT);
+    final int eport = gopts.number(GlobalOptions.EVENTPORT);
     // check if ports are distinct
     if(port == eport) throw new BaseXException(PORT_TWICE_X, port);
 
-    final String host = gopts.get(GlobalOptions.SERVERHOST);
+    final String host = gopts.string(GlobalOptions.SERVERHOST);
     final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
 
     if(service) {
@@ -148,7 +148,7 @@ public final class BaseXServer extends Main implements Runnable {
           quit();
         } else {
           // drop inactive connections
-          final long ka = context.globalopts.num(GlobalOptions.KEEPALIVE) * 1000L;
+          final long ka = context.globalopts.number(GlobalOptions.KEEPALIVE) * 1000L;
           if(ka > 0) {
             final long ms = System.currentTimeMillis();
             for(final ClientListener cs : context.sessions) {
@@ -157,7 +157,7 @@ public final class BaseXServer extends Main implements Runnable {
           }
           final ClientListener cl = new ClientListener(s, context, this);
           // start authentication timeout
-          final long to = context.globalopts.num(GlobalOptions.KEEPALIVE) * 1000L;
+          final long to = context.globalopts.number(GlobalOptions.KEEPALIVE) * 1000L;
           if(to > 0) {
             cl.auth.schedule(new TimerTask() {
               @Override
@@ -240,22 +240,22 @@ public final class BaseXServer extends Main implements Runnable {
             daemon = true;
             break;
           case 'e': // parse event port
-            context.globalopts.set(GlobalOptions.EVENTPORT, arg.number());
+            context.globalopts.number(GlobalOptions.EVENTPORT, arg.number());
             break;
           case 'i': // activate interactive mode
             console = true;
             break;
           case 'n': // parse host the server is bound to
-            context.globalopts.set(GlobalOptions.SERVERHOST, arg.string());
+            context.globalopts.string(GlobalOptions.SERVERHOST, arg.string());
             break;
           case 'p': // parse server port
-            context.globalopts.set(GlobalOptions.SERVERPORT, arg.number());
+            context.globalopts.number(GlobalOptions.SERVERPORT, arg.number());
             break;
           case 'S': // set service flag
             service = !daemon;
             break;
           case 'z': // suppress logging
-            context.globalopts.set(GlobalOptions.LOG, false);
+            context.globalopts.bool(GlobalOptions.LOG, false);
             break;
           default:
             arg.usage();
@@ -276,7 +276,7 @@ public final class BaseXServer extends Main implements Runnable {
    */
   public void stop() throws IOException {
     final GlobalOptions gopts = context.globalopts;
-    stop(gopts.num(GlobalOptions.SERVERPORT), gopts.num(GlobalOptions.EVENTPORT));
+    stop(gopts.number(GlobalOptions.SERVERPORT), gopts.number(GlobalOptions.EVENTPORT));
   }
 
   // STATIC METHODS ===========================================================

@@ -666,7 +666,6 @@ public final class FNDb extends StandardFunc {
     }
 
     final Options opts = checkOptions(3, Q_OPTIONS, new Options(), ctx);
-
     ctx.updates.add(new DBCreate(info, name, inputs, opts, ctx), ctx);
     return null;
   }
@@ -725,7 +724,6 @@ public final class FNDb extends StandardFunc {
     final Data data = checkWrite(checkData(ctx), ctx);
     final boolean all = expr.length > 1 && checkBln(expr[1], ctx);
     final Options opts = checkOptions(2, Q_OPTIONS, new Options(), ctx);
-
     ctx.updates.add(new DBOptimize(data, ctx, all, opts, info), ctx);
     return null;
   }

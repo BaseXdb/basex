@@ -124,17 +124,17 @@ public final class MetaData {
     path = gopts != null ? gopts.dbpath(db) : null;
     options = opts;
     name = db;
-    chop = options.is(MainOptions.CHOP);
-    createtext = options.is(MainOptions.TEXTINDEX);
-    createattr = options.is(MainOptions.ATTRINDEX);
-    createftxt = options.is(MainOptions.FTINDEX);
-    diacritics = options.is(MainOptions.DIACRITICS);
-    stemming = options.is(MainOptions.STEMMING);
-    casesens = options.is(MainOptions.CASESENS);
-    updindex = options.is(MainOptions.UPDINDEX);
-    maxlen = options.num(MainOptions.MAXLEN);
-    maxcats = options.num(MainOptions.MAXCATS);
-    stopwords = options.get(MainOptions.STOPWORDS);
+    chop = options.bool(MainOptions.CHOP);
+    createtext = options.bool(MainOptions.TEXTINDEX);
+    createattr = options.bool(MainOptions.ATTRINDEX);
+    createftxt = options.bool(MainOptions.FTINDEX);
+    diacritics = options.bool(MainOptions.DIACRITICS);
+    stemming = options.bool(MainOptions.STEMMING);
+    casesens = options.bool(MainOptions.CASESENS);
+    updindex = options.bool(MainOptions.UPDINDEX);
+    maxlen = options.number(MainOptions.MAXLEN);
+    maxcats = options.number(MainOptions.MAXCATS);
+    stopwords = options.string(MainOptions.STOPWORDS);
     language = Language.get(options);
     users = new Users(null);
   }

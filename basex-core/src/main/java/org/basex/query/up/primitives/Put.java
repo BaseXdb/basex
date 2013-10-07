@@ -52,7 +52,7 @@ public final class Put extends BasicOperation {
         try {
           final SerializerOptions pr = new SerializerOptions();
           // try to reproduce non-chopped documents correctly
-          pr.set(SerializerOptions.S_INDENT, node.data.meta.chop ? YES : NO);
+          pr.string(SerializerOptions.S_INDENT, node.data.meta.chop ? YES : NO);
           final Serializer ser = Serializer.get(po, pr);
           ser.serialize(node);
           ser.close();

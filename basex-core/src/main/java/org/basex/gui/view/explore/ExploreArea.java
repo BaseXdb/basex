@@ -274,7 +274,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
     String qu = tb.toString();
     final boolean root = gui.context.root();
-    final boolean rt = gui.gopts.is(GUIOptions.FILTERRT);
+    final boolean rt = gui.gopts.bool(GUIOptions.FILTERRT);
     if(!qu.isEmpty() && !rt && !root) qu = '.' + qu;
 
     String simple = all.getText().trim();

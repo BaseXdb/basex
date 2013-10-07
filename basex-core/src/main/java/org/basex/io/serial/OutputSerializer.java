@@ -103,8 +103,8 @@ public abstract class OutputSerializer extends Serializer {
     saomit = sa.equals(OMIT);
     opts.check(S_NORMALIZATION_FORM, NFC, DataText.NONE);
 
-    final String maps = opts.get(S_USE_CHARACTER_MAPS);
-    final String enc = normEncoding(opts.get(S_ENCODING));
+    final String maps = opts.string(S_USE_CHARACTER_MAPS);
+    final String enc = normEncoding(opts.string(S_ENCODING));
     try {
       encoding = Charset.forName(enc);
     } catch(final Exception ex) {
@@ -113,21 +113,21 @@ public abstract class OutputSerializer extends Serializer {
     utf8 = enc == UTF8;
 
     // project specific options
-    indents = Math.max(0, toInt(opts.get(S_INDENTS)));
+    indents = Math.max(0, toInt(opts.string(S_INDENTS)));
     format  = opts.yes(S_FORMAT);
     tab     = opts.yes(S_TABULATOR) ? '\t' : ' ';
-    wPre    = token(opts.get(S_WRAP_PREFIX));
+    wPre    = token(opts.string(S_WRAP_PREFIX));
     wrap    = wPre.length != 0;
     final String eol = opts.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
     nl = utf8(token(eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n"), enc);
-    String s = opts.get(S_ITEM_SEPARATOR);
-    if(s.equals(UNDEFINED)) s = opts.get(S_SEPARATOR);
+    String s = opts.string(S_ITEM_SEPARATOR);
+    if(s.equals(UNDEFINED)) s = opts.string(S_SEPARATOR);
     itemsep = s.equals(UNDEFINED) ? null : token(s.indexOf('\\') != -1 ?
       s.replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t") : s);
 
-    docsys  = opts.get(S_DOCTYPE_SYSTEM);
-    docpub  = opts.get(S_DOCTYPE_PUBLIC);
-    media   = opts.get(S_MEDIA_TYPE);
+    docsys  = opts.string(S_DOCTYPE_SYSTEM);
+    docpub  = opts.string(S_DOCTYPE_PUBLIC);
+    media   = opts.string(S_MEDIA_TYPE);
     escape  = opts.yes(S_ESCAPE_URI_ATTRIBUTES);
     content = opts.yes(S_INCLUDE_CONTENT_TYPE);
     undecl  = opts.yes(S_UNDECLARE_PREFIXES);
@@ -152,7 +152,7 @@ public abstract class OutputSerializer extends Serializer {
       }
     }
 
-    final String supp = opts.get(S_SUPPRESS_INDENTATION);
+    final String supp = opts.string(S_SUPPRESS_INDENTATION);
     if(!supp.isEmpty()) {
       for(final String c : supp.split("\\s+")) {
         if(!c.isEmpty()) suppress.add(c);
@@ -163,7 +163,7 @@ public abstract class OutputSerializer extends Serializer {
     final boolean html = this instanceof HTMLSerializer;
     final boolean xml = this instanceof XMLSerializer || this instanceof XHTMLSerializer;
     if(xml || html) {
-      final String cdse = opts.get(S_CDATA_SECTION_ELEMENTS);
+      final String cdse = opts.string(S_CDATA_SECTION_ELEMENTS);
       for(final String c : cdse.split("\\s+")) {
         if(c.isEmpty()) continue;
         if(!html || c.contains(":") && (!html5 || !c.contains("html:"))) cdata.add(c);
@@ -178,7 +178,7 @@ public abstract class OutputSerializer extends Serializer {
           print(DOCDECL1);
           print(ver);
           print(DOCDECL2);
-          print(opts.get(S_ENCODING));
+          print(opts.string(S_ENCODING));
           if(!saomit) {
             print(DOCDECL3);
             print(sa);
@@ -193,7 +193,7 @@ public abstract class OutputSerializer extends Serializer {
     // open results element
     if(wrap) {
       startElement(concat(wPre, COLON, T_RESULTS));
-      namespace(wPre, token(opts.get(S_WRAP_URI)));
+      namespace(wPre, token(opts.string(S_WRAP_URI)));
     }
   }
 

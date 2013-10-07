@@ -34,7 +34,7 @@ public abstract class Benchmark extends SandboxTest {
   @BeforeClass
   public static void init() throws IOException {
     // check if server is (not) running
-    final int sp = context.globalopts.num(GlobalOptions.SERVERPORT);
+    final int sp = context.globalopts.number(GlobalOptions.SERVERPORT);
     server = local || BaseXServer.ping(LOCALHOST, sp) ? null : createServer();
     session = local ? new LocalSession(context) : createClient();
 

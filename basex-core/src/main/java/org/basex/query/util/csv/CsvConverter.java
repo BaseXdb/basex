@@ -54,8 +54,8 @@ public final class CsvConverter {
   public CsvConverter(final CsvOptions opts) throws SerializerException {
     copts = opts;
     separator = opts.separator();
-    header = opts.is(CsvOptions.HEADER);
-    lax = opts.is(CsvOptions.LAX);
+    header = opts.bool(CsvOptions.HEADER);
+    lax = opts.bool(CsvOptions.LAX);
   }
 
   /**
@@ -75,7 +75,7 @@ public final class CsvConverter {
    * @throws IOException I/O exception
    */
   public FElem convert(final IO io) throws IOException {
-    return convert(new NewlineInput(io).encoding(copts.get(CsvOptions.ENCODING)));
+    return convert(new NewlineInput(io).encoding(copts.string(CsvOptions.ENCODING)));
   }
 
   /**

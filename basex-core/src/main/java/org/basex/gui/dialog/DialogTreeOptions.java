@@ -30,22 +30,22 @@ public final class DialogTreeOptions extends BaseXDialog {
     final GUIOptions gopts = gui.gopts;
 
     // create checkbox
-    slim = new BaseXCheckBox(ADJUST_NODES, gopts.is(GUIOptions.TREESLIMS), this);
+    slim = new BaseXCheckBox(ADJUST_NODES, gopts.bool(GUIOptions.TREESLIMS), this);
     p.add(slim);
 
     // create checkbox
-    atts = new BaseXCheckBox(SHOW_ATTS, gopts.is(GUIOptions.TREEATTS), this);
+    atts = new BaseXCheckBox(SHOW_ATTS, gopts.bool(GUIOptions.TREEATTS), this);
     p.add(atts);
 
     set(p, BorderLayout.CENTER);
-    finish(gopts.nums(GUIOptions.MAPLAYOUTLOC));
+    finish(gopts.numbers(GUIOptions.MAPLAYOUTLOC));
   }
 
   @Override
   public void action(final Object cmp) {
     final GUIOptions gopts = gui.gopts;
-    gopts.set(GUIOptions.TREESLIMS, slim.isSelected());
-    gopts.set(GUIOptions.TREEATTS, atts.isSelected());
+    gopts.bool(GUIOptions.TREESLIMS, slim.isSelected());
+    gopts.bool(GUIOptions.TREEATTS, atts.isSelected());
     gui.notify.layout();
   }
 }

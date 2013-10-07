@@ -213,16 +213,16 @@ public class BaseX extends Main {
           // client options: need to be set before other options
           if(c == 'n') {
             // set server name
-            context.globalopts.set(GlobalOptions.HOST, arg.string());
+            context.globalopts.string(GlobalOptions.HOST, arg.string());
           } else if(c == 'p') {
             // set server port
-            context.globalopts.set(GlobalOptions.PORT, arg.number());
+            context.globalopts.number(GlobalOptions.PORT, arg.number());
           } else if(c == 'P') {
             // specify password
-            context.globalopts.set(GlobalOptions.PASSWORD, arg.string());
+            context.globalopts.string(GlobalOptions.PASSWORD, arg.string());
           } else if(c == 'U') {
             // specify user name
-            context.globalopts.set(GlobalOptions.USER, arg.string());
+            context.globalopts.string(GlobalOptions.USER, arg.string());
           } else {
             arg.usage();
           }

@@ -35,7 +35,7 @@ final class MapDefault extends MapPainter {
     final Data data = view.gui.context.data();
     final int fsz = GUIConstants.fontSize;
 
-    final int off = gopts.num(GUIOptions.MAPOFFSETS);
+    final int off = gopts.number(GUIOptions.MAPOFFSETS);
     final int rs = rects.size;
     for(int ri = 0; ri < rs; ++ri) {
       // get rectangle information

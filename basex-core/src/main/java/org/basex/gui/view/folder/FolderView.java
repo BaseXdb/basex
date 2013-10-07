@@ -146,12 +146,12 @@ public final class FolderView extends View {
 
   @Override
   public boolean visible() {
-    return gui.gopts.is(GUIOptions.SHOWFOLDER);
+    return gui.gopts.bool(GUIOptions.SHOWFOLDER);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWFOLDER, v);
+    gui.gopts.bool(GUIOptions.SHOWFOLDER, v);
   }
 
   @Override

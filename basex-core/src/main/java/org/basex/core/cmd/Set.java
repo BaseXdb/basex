@@ -35,14 +35,18 @@ public final class Set extends AGet {
   @Override
   protected boolean run() {
     final String key = args[0].toUpperCase(Locale.ENGLISH), val = args[1];
+    final Option opt = options.option(key);
     try {
-      if(options.set(key, val)) return info(key + COLS + options.get(key));
-
-      // retrieve values of all options
-      if(context.user.has(Perm.ADMIN) && goptions.get(key) != null) {
+      // set value and return info string with new value
+      if(opt != null) {
+        options.set(opt, val);
+        return info(key + COLS + options.get(opt));
+      }
+      // check if the unknown option is a global, read-only option
+      if(context.user.has(Perm.ADMIN) && goptions.option(key) != null) {
         return error(Text.GLOBAL_OPTION_X, key);
       }
-      return error(options.unknown(key));
+      return error(options.error(key));
     } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
       return error(INVALID_VALUE_X_X, key, val);

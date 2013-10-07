@@ -105,14 +105,14 @@ public final class QT3TS {
    * @throws Exception exception
    */
   private void run(final String[] args) throws Exception {
-    ctx.globalopts.set(GlobalOptions.DBPATH, sandbox().path() + "/data");
+    ctx.globalopts.string(GlobalOptions.DBPATH, sandbox().path() + "/data");
     parseArguments(args);
     init();
 
     final Performance perf = new Performance();
-    ctx.options.set(MainOptions.CHOP, false);
-    ctx.options.set(MainOptions.INTPARSE, false);
-    ctx.options.set(MainOptions.SERIALIZER, "omit-xml-declaration=no,indent=no");
+    ctx.options.bool(MainOptions.CHOP, false);
+    ctx.options.bool(MainOptions.INTPARSE, false);
+    ctx.options.string(MainOptions.SERIALIZER, "omit-xml-declaration=no,indent=no");
 
     final XdmValue doc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx).value();
     final String version = asString("*:catalog/@version", doc);
@@ -235,7 +235,7 @@ public final class QT3TS {
 
     // use XQuery 1.0 if XQ10 or XP20 is specified
     if(new XQuery("*:dependency[@type='spec'][matches(@value,'(XQ10)([^+]|$)')]", ctx).
-        context(test).next() != null) ctx.options.set(MainOptions.XQUERY3, false);
+        context(test).next() != null) ctx.options.bool(MainOptions.XQUERY3, false);
 
     // check if environment is defined in test-case
     QT3Env e = null;
@@ -348,7 +348,7 @@ public final class QT3TS {
     }
 
     // revert to XQuery as default
-    ctx.options.set(MainOptions.XQUERY3, true);
+    ctx.options.bool(MainOptions.XQUERY3, true);
 
     final String exp = test(result, expected);
     final TokenBuilder tmp = new TokenBuilder();
@@ -363,7 +363,7 @@ public final class QT3TS {
       } else if(result.err != null) {
         res = result.err.getCode() + ": " + result.err.getLocalizedMessage();
       } else {
-        result.sprop.set(SerializerOptions.S_OMIT_XML_DECLARATION, "yes");
+        result.sprop.string(SerializerOptions.S_OMIT_XML_DECLARATION, "yes");
         res = serialize(result.value, result.sprop);
       }
     } catch(final XQueryException ex) {
@@ -871,7 +871,7 @@ public final class QT3TS {
         } else if(c == 'a') {
           all = true;
         } else if(c == 'd') {
-          ctx.globalopts.set(GlobalOptions.DEBUG, true);
+          ctx.globalopts.bool(GlobalOptions.DEBUG, true);
         } else if(c == 'i') {
           ignoring = true;
         } else if(c == 'e') {

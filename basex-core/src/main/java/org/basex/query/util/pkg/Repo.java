@@ -119,7 +119,7 @@ public final class Repo {
    */
   private Repo init() {
     if(path == null) {
-      path = new IOFile(context.globalopts.get(GlobalOptions.REPOPATH));
+      path = new IOFile(context.globalopts.string(GlobalOptions.REPOPATH));
       for(final IOFile dir : path.children()) {
         if(dir.isDir()) readPkg(dir);
       }

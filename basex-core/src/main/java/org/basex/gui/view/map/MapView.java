@@ -164,12 +164,12 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public boolean visible() {
-    return gui.gopts.is(GUIOptions.SHOWMAP);
+    return gui.gopts.bool(GUIOptions.SHOWMAP);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWMAP, v);
+    gui.gopts.bool(GUIOptions.SHOWMAP, v);
   }
 
   @Override
@@ -326,7 +326,7 @@ public final class MapView extends View implements Runnable {
     }
 
     final GUIOptions gopts = gui.gopts;
-    if(gopts.num(GUIOptions.MAPOFFSETS) == 0) {
+    if(gopts.number(GUIOptions.MAPOFFSETS) == 0) {
       g.setColor(color(32));
       int pre = mainRects.size;
       int par = ViewData.parent(data, f.pre);
@@ -582,7 +582,7 @@ public final class MapView extends View implements Runnable {
    */
   private void initLen() {
     final Data data = gui.context.data();
-    if(textLen != null || gui.gopts.num(GUIOptions.MAPWEIGHT) == 0) return;
+    if(textLen != null || gui.gopts.number(GUIOptions.MAPWEIGHT) == 0) return;
 
     final int size = data.meta.size;
     textLen = new int[size];

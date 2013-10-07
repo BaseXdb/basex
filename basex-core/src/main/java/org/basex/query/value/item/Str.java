@@ -71,7 +71,7 @@ public class Str extends AStr {
       throws QueryException {
 
     final byte[] bytes = Token.token(v.toString());
-    if(ctx.context.options.is(MainOptions.CHECKSTRINGS)) {
+    if(ctx.context.options.bool(MainOptions.CHECKSTRINGS)) {
       final int bl = bytes.length;
       for(int b = 0; b < bl; b += Token.cl(bytes, b)) {
         final int cp = Token.cp(bytes, b);

@@ -68,8 +68,8 @@ public class ClientSession extends Session {
    */
   public ClientSession(final Context context, final String user, final String pass,
       final OutputStream output) throws IOException {
-    this(context.globalopts.get(GlobalOptions.HOST), context.globalopts.num(GlobalOptions.PORT),
-        user, pass, output);
+    this(context.globalopts.string(GlobalOptions.HOST),
+         context.globalopts.number(GlobalOptions.PORT), user, pass, output);
   }
 
   /**
@@ -80,8 +80,8 @@ public class ClientSession extends Session {
    * @param pass password
    * @throws IOException I/O exception
    */
-  public ClientSession(final String host, final int port, final String user,
-      final String pass) throws IOException {
+  public ClientSession(final String host, final int port, final String user, final String pass)
+      throws IOException {
     this(host, port, user, pass, null);
   }
 
@@ -96,8 +96,8 @@ public class ClientSession extends Session {
    * be returned as strings.
    * @throws IOException I/O exception
    */
-  public ClientSession(final String host, final int port, final String user,
-      final String pass, final OutputStream output) throws IOException {
+  public ClientSession(final String host, final int port, final String user, final String pass,
+      final OutputStream output) throws IOException {
 
     super(output);
     ehost = host;
@@ -173,9 +173,7 @@ public class ClientSession extends Session {
    * @param notifier event notification
    * @throws IOException I/O exception
    */
-  public void watch(final String name, final EventNotifier notifier)
-      throws IOException {
-
+  public void watch(final String name, final EventNotifier notifier) throws IOException {
     sout.write(ServerCmd.WATCH.code);
     if(esocket == null) {
       sout.flush();
@@ -276,8 +274,8 @@ public class ClientSession extends Session {
    * @param strings string arguments
    * @throws IOException I/O exception
    */
-  protected void send(final ServerCmd cmd, final InputStream input,
-      final String... strings) throws IOException {
+  protected void send(final ServerCmd cmd, final InputStream input, final String... strings)
+      throws IOException {
 
     sout.write(cmd.code);
     for(final String s : strings) send(s);

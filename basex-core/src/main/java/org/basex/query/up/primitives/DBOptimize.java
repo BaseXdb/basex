@@ -57,13 +57,13 @@ public final class DBOptimize extends DBNew {
     initOptions();
     assignOptions();
 
-    final boolean rebuild = opts.num(MainOptions.MAXCATS) != meta.maxcats ||
-        opts.num(MainOptions.MAXLEN) != meta.maxlen;
-    meta.maxcats = opts.num(MainOptions.MAXCATS);
-    meta.maxlen  = opts.num(MainOptions.MAXLEN);
-    meta.createtext = opts.is(MainOptions.TEXTINDEX);
-    meta.createattr = opts.is(MainOptions.ATTRINDEX);
-    meta.createftxt = opts.is(MainOptions.FTINDEX);
+    final boolean rebuild = opts.number(MainOptions.MAXCATS) != meta.maxcats ||
+        opts.number(MainOptions.MAXLEN) != meta.maxlen;
+    meta.maxcats = opts.number(MainOptions.MAXCATS);
+    meta.maxlen  = opts.number(MainOptions.MAXLEN);
+    meta.createtext = opts.bool(MainOptions.TEXTINDEX);
+    meta.createattr = opts.bool(MainOptions.ATTRINDEX);
+    meta.createftxt = opts.bool(MainOptions.FTINDEX);
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, null);

@@ -44,7 +44,7 @@ final class RESTGet extends RESTCode {
       } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
         item = Token.token(val);
-      } else if(sp.get(key) != null) {
+      } else if(sp.option(key) != null) {
         // serialization parameters
         for(final String v : vals) ser.add(key).add('=').add(v).add(',');
       } else if(!parseOption(http, param, false)) {

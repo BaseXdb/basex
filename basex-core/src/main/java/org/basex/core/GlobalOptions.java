@@ -90,16 +90,16 @@ public final class GlobalOptions extends Options {
   GlobalOptions(final boolean file) {
     super(file ? "" : null);
     // set some static options
-    Prop.language = get(LANG);
-    Prop.langkeys = is(LANGKEYS);
-    Prop.debug = is(DEBUG);
-    final String ph = get(PROXYHOST);
-    final String pp = Integer.toString(num(PROXYPORT));
-    Options.setSystem("http.proxyHost", ph);
-    Options.setSystem("http.proxyPort", pp);
-    Options.setSystem("https.proxyHost", ph);
-    Options.setSystem("https.proxyPort", pp);
-    Options.setSystem("http.nonProxyHosts", get(NONPROXYHOSTS));
+    Prop.language = string(LANG);
+    Prop.langkeys = bool(LANGKEYS);
+    Prop.debug = bool(DEBUG);
+    final String ph = string(PROXYHOST);
+    final String pp = Integer.toString(number(PROXYPORT));
+    setSystem("http.proxyHost", ph);
+    setSystem("http.proxyPort", pp);
+    setSystem("https.proxyHost", ph);
+    setSystem("https.proxyPort", pp);
+    setSystem("http.nonProxyHosts", string(NONPROXYHOSTS));
   }
 
   /**
@@ -108,7 +108,7 @@ public final class GlobalOptions extends Options {
    * @return database directory
    */
   public IOFile dbpath(final String db) {
-    return new IOFile(get(DBPATH), db);
+    return new IOFile(string(DBPATH), db);
   }
 
   /**
@@ -129,7 +129,7 @@ public final class GlobalOptions extends Options {
    * @return database filename
    */
   public IOFile dbpath() {
-    return new IOFile(get(DBPATH));
+    return new IOFile(string(DBPATH));
   }
 
   /**

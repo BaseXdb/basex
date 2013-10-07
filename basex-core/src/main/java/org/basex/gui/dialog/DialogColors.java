@@ -34,21 +34,21 @@ public final class DialogColors extends BaseXDialog {
     final BaseXBack p = new BaseXBack(new TableLayout(3, 2, 16, 8));
 
     p.add(new BaseXLabel(RED));
-    sliderRed = newSlider(gopts.num(GUIOptions.COLORRED));
+    sliderRed = newSlider(gopts.number(GUIOptions.COLORRED));
     p.add(sliderRed);
 
     p.add(new BaseXLabel(GREEN));
-    sliderGreen = newSlider(gopts.num(GUIOptions.COLORGREEN));
+    sliderGreen = newSlider(gopts.number(GUIOptions.COLORGREEN));
     p.add(sliderGreen);
 
     p.add(new BaseXLabel(BLUE));
-    sliderBlue = newSlider(gopts.num(GUIOptions.COLORBLUE));
+    sliderBlue = newSlider(gopts.number(GUIOptions.COLORBLUE));
     p.add(sliderBlue);
 
     set(p, BorderLayout.CENTER);
     set(newButtons(RESET), BorderLayout.SOUTH);
 
-    finish(gopts.nums(GUIOptions.COLORSLOC));
+    finish(gopts.numbers(GUIOptions.COLORSLOC));
   }
 
   /**
@@ -71,9 +71,9 @@ public final class DialogColors extends BaseXDialog {
       sliderBlue.value(MAXCOLOR - (Integer) GUIOptions.COLORBLUE.value);
     }
 
-    gopts.set(GUIOptions.COLORRED, MAXCOLOR - sliderRed.value());
-    gopts.set(GUIOptions.COLORGREEN, MAXCOLOR - sliderGreen.value());
-    gopts.set(GUIOptions.COLORBLUE, MAXCOLOR - sliderBlue.value());
+    gopts.number(GUIOptions.COLORRED, MAXCOLOR - sliderRed.value());
+    gopts.number(GUIOptions.COLORGREEN, MAXCOLOR - sliderGreen.value());
+    gopts.number(GUIOptions.COLORBLUE, MAXCOLOR - sliderBlue.value());
     gui.updateLayout();
   }
 }

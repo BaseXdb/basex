@@ -27,7 +27,7 @@ public final class CsvParser extends XMLParser {
    * @throws IOException I/O exception
    */
   public CsvParser(final IO source, final MainOptions opts) throws IOException {
-    super(toXML(source, opts.get(MainOptions.CSVPARSER)), opts);
+    super(toXML(source, opts.string(MainOptions.CSVPARSER)), opts);
   }
 
   /**

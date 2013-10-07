@@ -104,7 +104,7 @@ public final class PlotView extends View {
 
     Box box = new Box(BoxLayout.X_AXIS);
     xLog = new BaseXCheckBox(PLOTLOG, false, gui);
-    xLog.setSelected(gui.gopts.is(GUIOptions.PLOTXLOG));
+    xLog.setSelected(gui.gopts.bool(GUIOptions.PLOTXLOG));
     xLog.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -112,17 +112,17 @@ public final class PlotView extends View {
         refreshUpdate();
       }
     });
-    dots = new BaseXSlider(-6, 6, gui.gopts.num(GUIOptions.PLOTDOTS), gui,
+    dots = new BaseXSlider(-6, 6, gui.gopts.number(GUIOptions.PLOTDOTS), gui,
         new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        gui.gopts.set(GUIOptions.PLOTDOTS, dots.value());
+        gui.gopts.number(GUIOptions.PLOTDOTS, dots.value());
         refreshLayout();
       }
     });
     BaseXLayout.setWidth(dots, 40);
     yLog = new BaseXCheckBox(PLOTLOG, false, gui);
-    yLog.setSelected(gui.gopts.is(GUIOptions.PLOTYLOG));
+    yLog.setSelected(gui.gopts.bool(GUIOptions.PLOTYLOG));
     yLog.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -157,8 +157,8 @@ public final class PlotView extends View {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final String item = (String) itemCombo.getSelectedItem();
-        plotData.xAxis.log = gui.gopts.is(GUIOptions.PLOTXLOG);
-        plotData.yAxis.log = gui.gopts.is(GUIOptions.PLOTYLOG);
+        plotData.xAxis.log = gui.gopts.bool(GUIOptions.PLOTXLOG);
+        plotData.yAxis.log = gui.gopts.bool(GUIOptions.PLOTYLOG);
         if(plotData.setItem(item)) {
           plotChanged = true;
           markingChanged = true;
@@ -226,7 +226,7 @@ public final class PlotView extends View {
       final boolean markedSub) {
 
     final int size = Math.max(1, fontSize +
-        gui.gopts.num(GUIOptions.PLOTDOTS) - (focus ? 2 : marked || markedSub ? 4 : 6));
+        gui.gopts.number(GUIOptions.PLOTDOTS) - (focus ? 2 : marked || markedSub ? 4 : 6));
     final BufferedImage img = new BufferedImage(size, size, Transparency.TRANSLUCENT);
 
     final Graphics g = img.getGraphics();
@@ -334,7 +334,7 @@ public final class PlotView extends View {
         if(!x.isEmpty() && !y.isEmpty()) label += " | ";
         label += y.length() > 16 ? y.substring(0, 14) + ".." : y;
         final int xa = calcCoordinate(true, x1) + 15;
-        int ya = calcCoordinate(false, y1) + gui.gopts.num(GUIOptions.PLOTDOTS);
+        int ya = calcCoordinate(false, y1) + gui.gopts.number(GUIOptions.PLOTDOTS);
         final int ww = getWidth();
 
         final int id = ViewData.nameID(data);
@@ -346,7 +346,7 @@ public final class PlotView extends View {
           if(ol > 1) name = ol + "x: " + name + ", ...";
           final int lw = BaseXLayout.width(g, label);
           if(ya < MARGIN[0] + textH && xa < w - lw) {
-            ya += 2 * textH - gui.gopts.num(GUIOptions.PLOTDOTS);
+            ya += 2 * textH - gui.gopts.number(GUIOptions.PLOTDOTS);
           }
           if(xa > w - lw)
             BaseXLayout.drawTooltip(g, name + COLS + label, xa, ya, ww, 10);
@@ -799,9 +799,9 @@ public final class PlotView extends View {
     // all plot data is recalculated, assignments stay the same
     plotData.refreshItems(nextContext != null && more && rightClick ?
         nextContext : gui.context.current(), !more || !rightClick);
-    plotData.xAxis.log = gui.gopts.is(GUIOptions.PLOTXLOG);
+    plotData.xAxis.log = gui.gopts.bool(GUIOptions.PLOTXLOG);
     plotData.xAxis.refreshAxis();
-    plotData.yAxis.log = gui.gopts.is(GUIOptions.PLOTYLOG);
+    plotData.yAxis.log = gui.gopts.bool(GUIOptions.PLOTYLOG);
     plotData.yAxis.refreshAxis();
 
     nextContext = null;
@@ -869,12 +869,12 @@ public final class PlotView extends View {
 
   @Override
   public boolean visible() {
-    return gui.gopts.is(GUIOptions.SHOWPLOT);
+    return gui.gopts.bool(GUIOptions.SHOWPLOT);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWPLOT, v);
+    gui.gopts.bool(GUIOptions.SHOWPLOT, v);
   }
 
   @Override

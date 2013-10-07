@@ -72,7 +72,7 @@ public final class CsvOptions extends Options {
    */
   public int separator() throws SerializerException {
     // set separator
-    final String sep = get(SEPARATOR);
+    final String sep = string(SEPARATOR);
     final String val = sep.toLowerCase(Locale.ENGLISH);
     for(final CsvSep s : CsvSep.values()) {
       if(val.equals(s.toString())) return s.ch;

@@ -115,14 +115,14 @@ public abstract class RESTCode {
    * @param http HTTP context
    * @param param current parameter
    * @param force force execution
-   * @return success flag
+   * @return success flag, indicates if value was found
    * @throws IOException I/O exception
    */
   static boolean parseOption(final HTTPContext http, final Entry<String, String[]> param,
       final boolean force) throws IOException {
 
     final String key = param.getKey().toUpperCase(Locale.ENGLISH);
-    final boolean found = http.context().options.get(key) != null;
+    final boolean found = http.context().options.option(key) != null;
     if(found || force) http.session().execute(new Set(key, param.getValue()[0]));
     return found;
   }

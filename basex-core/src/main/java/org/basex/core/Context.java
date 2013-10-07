@@ -107,7 +107,7 @@ public final class Context {
     sessions = new Sessions();
     blocker = new ClientBlocker();
     databases = new Databases(this);
-    locks = gopts.is(GlobalOptions.GLOBALLOCK) || Prop.gui ?
+    locks = gopts.bool(GlobalOptions.GLOBALLOCK) || Prop.gui ?
       new ProcLocking(this) : new DBLocking(gopts);
     users = new Users(this);
     repo = new Repo(this);
@@ -229,7 +229,7 @@ public final class Context {
     pr.registered(true);
 
     // administrators will not be affected by the timeout
-    if(!user.has(Perm.ADMIN)) pr.startTimeout(globalopts.num(GlobalOptions.TIMEOUT) * 1000L);
+    if(!user.has(Perm.ADMIN)) pr.startTimeout(globalopts.number(GlobalOptions.TIMEOUT) * 1000L);
 
     // get touched databases
     final LockResult lr = new LockResult();

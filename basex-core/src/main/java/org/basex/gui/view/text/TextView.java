@@ -121,12 +121,12 @@ public final class TextView extends View {
 
   @Override
   public boolean visible() {
-    return gui.gopts.is(GUIOptions.SHOWTEXT);
+    return gui.gopts.bool(GUIOptions.SHOWTEXT);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gopts.set(GUIOptions.SHOWTEXT, v);
+    gui.gopts.bool(GUIOptions.SHOWTEXT, v);
   }
 
   @Override
@@ -141,7 +141,7 @@ public final class TextView extends View {
   private void setText(final Nodes n) {
     if(visible()) {
       try {
-        final ArrayOutput ao = new ArrayOutput().max(gui.gopts.num(GUIOptions.MAXTEXT));
+        final ArrayOutput ao = new ArrayOutput().max(gui.gopts.number(GUIOptions.MAXTEXT));
         if(n != null) n.serialize(Serializer.get(ao));
         setText(ao);
         cmd = null;
@@ -168,7 +168,7 @@ public final class TextView extends View {
     cmd = null;
     ns = null;
 
-    final int mh = gui.context.options.num(MainOptions.MAXHITS);
+    final int mh = gui.context.options.number(MainOptions.MAXHITS);
     boolean parse = false;
     if(mh >= 0 && r != null && r.size() >= mh) {
       parse = true;
@@ -201,18 +201,18 @@ public final class TextView extends View {
    */
   void save() {
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
-        gui.gopts.get(GUIOptions.WORKPATH), gui).suffix(IO.XMLSUFFIX);
+        gui.gopts.string(GUIOptions.WORKPATH), gui).suffix(IO.XMLSUFFIX);
 
     final IO file = fc.select(Mode.FSAVE);
     if(file == null) return;
-    gui.gopts.set(GUIOptions.WORKPATH, file.path());
+    gui.gopts.string(GUIOptions.WORKPATH, file.path());
 
     PrintOutput out = null;
     gui.cursor(CURSORWAIT, true);
     final MainOptions opts = gui.context.options;
-    final int mh = opts.num(MainOptions.MAXHITS);
-    opts.set(MainOptions.MAXHITS, -1);
-    opts.set(MainOptions.CACHEQUERY, false);
+    final int mh = opts.number(MainOptions.MAXHITS);
+    opts.number(MainOptions.MAXHITS, -1);
+    opts.bool(MainOptions.CACHEQUERY, false);
 
     try {
       out = new PrintOutput(file.toString());
@@ -228,8 +228,8 @@ public final class TextView extends View {
       BaseXDialog.error(gui, FILE_NOT_SAVED);
     } finally {
       if(out != null) try { out.close(); } catch(final IOException ignored) { }
-      opts.set(MainOptions.MAXHITS, mh);
-      opts.set(MainOptions.CACHEQUERY, true);
+      opts.number(MainOptions.MAXHITS, mh);
+      opts.bool(MainOptions.CACHEQUERY, true);
       gui.cursor(CURSORARROW, true);
     }
   }

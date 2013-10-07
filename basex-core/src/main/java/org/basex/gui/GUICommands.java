@@ -39,8 +39,8 @@ public enum GUICommands implements GUICmd {
       // open file chooser for XML creation
       final DialogNew dialog = new DialogNew(gui);
       if(!dialog.ok()) return;
-      final String in = gui.gopts.get(GUIOptions.INPUTPATH);
-      final String db = gui.gopts.get(GUIOptions.DBNAME);
+      final String in = gui.gopts.string(GUIOptions.INPUTPATH);
+      final String db = gui.gopts.string(GUIOptions.DBNAME);
       DialogProgress.execute(gui, new CreateDB(db, in.isEmpty() ? null : in));
     }
   },
@@ -367,7 +367,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.SHOWEDITOR));
+      b.setSelected(gui.gopts.bool(GUIOptions.SHOWEDITOR));
     }
   },
 
@@ -382,7 +382,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.SHOWINFO));
+      b.setSelected(gui.gopts.bool(GUIOptions.SHOWINFO));
     }
   },
 
@@ -401,14 +401,14 @@ public enum GUICommands implements GUICmd {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWBUTTONS);
-      gui.updateControl(gui.buttons, gui.gopts.is(GUIOptions.SHOWBUTTONS),
+      gui.updateControl(gui.buttons, gui.gopts.bool(GUIOptions.SHOWBUTTONS),
           BorderLayout.CENTER);
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.SHOWBUTTONS));
+      b.setSelected(gui.gopts.bool(GUIOptions.SHOWBUTTONS));
     }
   },
 
@@ -423,7 +423,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.SHOWINPUT));
+      b.setSelected(gui.gopts.bool(GUIOptions.SHOWINPUT));
     }
   },
 
@@ -438,7 +438,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.SHOWSTATUS));
+      b.setSelected(gui.gopts.bool(GUIOptions.SHOWSTATUS));
     }
   },
 
@@ -453,7 +453,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.SHOWTEXT));
+      b.setSelected(gui.gopts.bool(GUIOptions.SHOWTEXT));
     }
   },
 
@@ -468,7 +468,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.SHOWMAP));
+      b.setSelected(gui.gopts.bool(GUIOptions.SHOWMAP));
     }
   },
 
@@ -483,7 +483,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.SHOWTREE));
+      b.setSelected(gui.gopts.bool(GUIOptions.SHOWTREE));
     }
   },
 
@@ -498,7 +498,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.SHOWFOLDER));
+      b.setSelected(gui.gopts.bool(GUIOptions.SHOWFOLDER));
     }
   },
 
@@ -513,7 +513,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.SHOWPLOT));
+      b.setSelected(gui.gopts.bool(GUIOptions.SHOWPLOT));
     }
   },
 
@@ -528,7 +528,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.SHOWTABLE));
+      b.setSelected(gui.gopts.bool(GUIOptions.SHOWTABLE));
     }
   },
 
@@ -543,7 +543,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.SHOWEXPLORE));
+      b.setSelected(gui.gopts.bool(GUIOptions.SHOWEXPLORE));
     }
   },
 
@@ -579,7 +579,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.EXECRT));
+      b.setSelected(gui.gopts.bool(GUIOptions.EXECRT));
     }
   },
 
@@ -616,7 +616,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      b.setSelected(gui.gopts.is(GUIOptions.FILTERRT));
+      b.setSelected(gui.gopts.bool(GUIOptions.FILTERRT));
     }
   },
 
@@ -750,7 +750,7 @@ public enum GUICommands implements GUICmd {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(!gui.gopts.is(GUIOptions.FILTERRT) &&
+      b.setEnabled(!gui.gopts.bool(GUIOptions.FILTERRT) &&
           gui.context.data() != null && !gui.context.root());
     }
   },

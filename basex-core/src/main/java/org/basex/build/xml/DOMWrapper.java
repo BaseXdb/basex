@@ -40,8 +40,8 @@ public final class DOMWrapper extends Parser {
     super(fn, opts);
     root = doc;
     filename = fn;
-    chop = opts.is(MainOptions.CHOP);
-    stripNS = opts.is(MainOptions.STRIPNS);
+    chop = opts.bool(MainOptions.CHOP);
+    stripNS = opts.bool(MainOptions.STRIPNS);
   }
 
   @Override

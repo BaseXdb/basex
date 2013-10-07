@@ -123,12 +123,12 @@ public final class GUI extends AGUI {
 
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
-    final int[] ps = gopts.nums(GUIOptions.GUILOC);
-    final int[] sz = gopts.nums(GUIOptions.GUISIZE);
+    final int[] ps = gopts.numbers(GUIOptions.GUILOC);
+    final int[] sz = gopts.numbers(GUIOptions.GUISIZE);
     final int x = Math.max(0, Math.min(scr.width - sz[0], ps[0]));
     final int y = Math.max(0, Math.min(scr.height - sz[1], ps[1]));
     setBounds(x, y, sz[0], sz[1]);
-    if(gopts.is(GUIOptions.MAXSTATE)) {
+    if(gopts.bool(GUIOptions.MAXSTATE)) {
       setExtendedState(MAXIMIZED_HORIZ);
       setExtendedState(MAXIMIZED_VERT);
       setExtendedState(MAXIMIZED_BOTH);
@@ -155,7 +155,7 @@ public final class GUI extends AGUI {
     b.add(hits);
 
     buttons.add(b, BorderLayout.EAST);
-    if(gopts.is(GUIOptions.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
+    if(gopts.bool(GUIOptions.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
 
     nav = new BaseXBack(new BorderLayout(5, 0)).border(2, 2, 0, 2);
 
@@ -166,9 +166,9 @@ public final class GUI extends AGUI {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final int s = mode.getSelectedIndex();
-        if(s == gopts.num(GUIOptions.SEARCHMODE) || !mode.isEnabled()) return;
+        if(s == gopts.number(GUIOptions.SEARCHMODE) || !mode.isEnabled()) return;
 
-        gopts.set(GUIOptions.SEARCHMODE, s);
+        gopts.number(GUIOptions.SEARCHMODE, s);
         input.setText("");
         refreshControls();
       }
@@ -190,7 +190,7 @@ public final class GUI extends AGUI {
             pop.setVisible(false);
           }
         };
-        final int i = context.data() == null ? 2 : gopts.num(GUIOptions.SEARCHMODE);
+        final int i = context.data() == null ? 2 : gopts.number(GUIOptions.SEARCHMODE);
         final String[] hs = gopts.strings(i == 0 ? GUIOptions.SEARCH : i == 1 ?
             GUIOptions.XQUERY : GUIOptions.COMMANDS);
         for(final String en : hs) {
@@ -223,7 +223,7 @@ public final class GUI extends AGUI {
     b.add(filter);
     nav.add(b, BorderLayout.EAST);
 
-    if(gopts.is(GUIOptions.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
+    if(gopts.bool(GUIOptions.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
     top.add(control, BorderLayout.NORTH);
 
     // create views
@@ -243,7 +243,7 @@ public final class GUI extends AGUI {
 
     // add status bar
     status = new GUIStatus(this);
-    if(gopts.is(GUIOptions.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
+    if(gopts.bool(GUIOptions.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     add(top);
@@ -269,10 +269,10 @@ public final class GUI extends AGUI {
     if(!editor.confirm()) return;
 
     final boolean max = getExtendedState() == MAXIMIZED_BOTH;
-    gopts.set(GUIOptions.MAXSTATE, max);
+    gopts.bool(GUIOptions.MAXSTATE, max);
     if(!max) {
-      gopts.set(GUIOptions.GUILOC, new int[] { getX(), getY() });
-      gopts.set(GUIOptions.GUISIZE, new int[] { getWidth(), getHeight() });
+      gopts.numbers(GUIOptions.GUILOC, new int[] { getX(), getY() });
+      gopts.numbers(GUIOptions.GUISIZE, new int[] { getWidth(), getHeight() });
     }
     super.dispose();
     gopts.write();
@@ -297,10 +297,10 @@ public final class GUI extends AGUI {
         if(!info.visible()) GUICommands.C_SHOWINFO.execute(this);
         info.setInfo(Util.message(ex), null, false, true);
       }
-    } else if(gopts.num(GUIOptions.SEARCHMODE) == 1 || in.startsWith("/")) {
+    } else if(gopts.number(GUIOptions.SEARCHMODE) == 1 || in.startsWith("/")) {
       xquery(in, false);
     } else {
-      execute(false, new Find(in, gopts.is(GUIOptions.FILTERRT)));
+      execute(false, new Find(in, gopts.bool(GUIOptions.FILTERRT)));
     }
   }
 
@@ -373,7 +373,7 @@ public final class GUI extends AGUI {
 
       final Data data = context.data();
       // reset current context if realtime filter is activated
-      if(gopts.is(GUIOptions.FILTERRT) && data != null && !context.root())
+      if(gopts.bool(GUIOptions.FILTERRT) && data != null && !context.root())
         context.update();
 
       // remember current command and context nodes
@@ -381,7 +381,7 @@ public final class GUI extends AGUI {
       command = cmd;
 
       // execute command and cache result
-      final ArrayOutput ao = new ArrayOutput().max(gopts.num(GUIOptions.MAXTEXT));
+      final ArrayOutput ao = new ArrayOutput().max(gopts.number(GUIOptions.MAXTEXT));
       updating = cmd.updating(context);
 
       // updates the query editor
@@ -436,7 +436,7 @@ public final class GUI extends AGUI {
           if(nodes == null) nodes = context.current();
         } else if(result != null) {
           // check if result has changed
-          final boolean flt = gopts.is(GUIOptions.FILTERRT);
+          final boolean flt = gopts.bool(GUIOptions.FILTERRT);
           final Nodes nd = context.current();
           if(flt || nd != null && !nd.sameAs(current)) {
             // refresh context if at least one node was found
@@ -507,7 +507,7 @@ public final class GUI extends AGUI {
   * @param val value
   */
  private void set(final Options options, final Option opt, final Object val) {
-   if(!options.sameAs(opt, val)) {
+   if(!options.get(opt).equals(val)) {
      final Set cmd = new Set(opt, val);
      cmd.run(context);
      info.setInfo(cmd.info(), cmd, true, false);
@@ -582,16 +582,16 @@ public final class GUI extends AGUI {
 
     filter.setEnabled(marked != null && marked.size() != 0);
 
-    final boolean inf = gopts.is(GUIOptions.SHOWINFO);
-    context.options.set(MainOptions.QUERYINFO, inf);
-    context.options.set(MainOptions.XMLPLAN, inf);
+    final boolean inf = gopts.bool(GUIOptions.SHOWINFO);
+    context.options.bool(MainOptions.QUERYINFO, inf);
+    context.options.bool(MainOptions.XMLPLAN, inf);
 
     final Data data = context.data();
     final int t = mode.getSelectedIndex();
-    final int s = data == null ? 2 : gopts.num(GUIOptions.SEARCHMODE);
+    final int s = data == null ? 2 : gopts.number(GUIOptions.SEARCHMODE);
 
     mode.setEnabled(data != null);
-    go.setEnabled(s == 2 || !gopts.is(GUIOptions.EXECRT));
+    go.setEnabled(s == 2 || !gopts.bool(GUIOptions.EXECRT));
 
     if(s != t) {
       mode.setSelectedIndex(s);
@@ -602,7 +602,7 @@ public final class GUI extends AGUI {
     toolbar.refresh();
     menu.refresh();
 
-    final int i = context.data() == null ? 2 : gopts.num(GUIOptions.SEARCHMODE);
+    final int i = context.data() == null ? 2 : gopts.number(GUIOptions.SEARCHMODE);
     final Option options = i == 0 ? GUIOptions.SEARCH : i == 1 ?
       GUIOptions.XQUERY : GUIOptions.COMMANDS;
     hist.setEnabled(gopts.strings(options).length != 0);
@@ -613,7 +613,7 @@ public final class GUI extends AGUI {
    * @param n number of results
    */
   private void setResults(final long n) {
-    int mh = context.options.num(MainOptions.MAXHITS);
+    int mh = context.options.number(MainOptions.MAXHITS);
     if(mh < 0) mh = Integer.MAX_VALUE;
     hits.setText(Util.info(RESULTS_X, (n >= mh ? "\u2265" : "") + n));
   }
@@ -650,17 +650,17 @@ public final class GUI extends AGUI {
       fullscr.removeAll();
       fullscr.dispose();
       fullscr = null;
-      if(!gopts.is(GUIOptions.SHOWBUTTONS))
+      if(!gopts.bool(GUIOptions.SHOWBUTTONS))
         control.add(buttons, BorderLayout.CENTER);
-      if(!gopts.is(GUIOptions.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
-      if(!gopts.is(GUIOptions.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
+      if(!gopts.bool(GUIOptions.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
+      if(!gopts.bool(GUIOptions.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
       setJMenuBar(menu);
       add(top);
     }
 
-    gopts.set(GUIOptions.SHOWBUTTONS, !full);
-    gopts.set(GUIOptions.SHOWINPUT, !full);
-    gopts.set(GUIOptions.SHOWSTATUS, !full);
+    gopts.bool(GUIOptions.SHOWBUTTONS, !full);
+    gopts.bool(GUIOptions.SHOWINPUT, !full);
+    gopts.bool(GUIOptions.SHOWSTATUS, !full);
     fullscreen = full;
 
     GraphicsEnvironment.getLocalGraphicsEnvironment().
@@ -675,11 +675,11 @@ public final class GUI extends AGUI {
    * Checks for a new version and shows a confirmation dialog.
    */
   void checkVersion() {
-    final Version disk = new Version(gopts.get(GUIOptions.UPDATEVERSION));
+    final Version disk = new Version(gopts.string(GUIOptions.UPDATEVERSION));
     final Version used = new Version(Prop.VERSION.replaceAll(" .*", ""));
     if(disk.compareTo(used) < 0) {
       // update version option to latest used version
-      gopts.set(GUIOptions.UPDATEVERSION, used.toString());
+      gopts.string(GUIOptions.UPDATEVERSION, used.toString());
     } else {
       try {
         final String page = Token.string(new IOUrl(VERSION_URL).read());
@@ -692,7 +692,7 @@ public final class GUI extends AGUI {
             BaseXDialog.browse(this, UPDATE_URL);
           } else {
             // don't show update dialog anymore if it has been rejected once
-            gopts.set(GUIOptions.UPDATEVERSION, latest.toString());
+            gopts.string(GUIOptions.UPDATEVERSION, latest.toString());
           }
         }
       } catch(final Exception ex) {

@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.*;
+
 /**
  * This class contains a single option definition.
  *
@@ -13,7 +15,7 @@ public final class Option {
   public final Object value;
 
   /**
-   * Constructor for comment options.
+   * Constructor for options without value (used for commenting option files).
    * @param k key
    */
   public Option(final String k) {
@@ -22,17 +24,17 @@ public final class Option {
   }
 
   /**
-   * Constructor for boolean options.
+   * Constructor for option with boolean value.
    * @param k key
    * @param v value
    */
-  public Option(final String k, final boolean v) {
+  public Option(final String k, final Boolean v) {
     name = k;
     value = v;
   }
 
   /**
-   * Constructor for string options.
+   * Constructor for option with string value.
    * @param k key
    * @param v value
    */
@@ -42,17 +44,17 @@ public final class Option {
   }
 
   /**
-   * Constructor for numeric options.
+   * Constructor for option with integer value.
    * @param k key
    * @param v value
    */
-  public Option(final String k, final int v) {
+  public Option(final String k, final Integer v) {
     name = k;
     value = v;
   }
 
   /**
-   * Constructor for integer array options.
+   * Constructor for option with integer array value.
    * @param k key
    * @param v value
    */
@@ -62,7 +64,7 @@ public final class Option {
   }
 
   /**
-   * Constructor for string array options.
+   * Constructor for option with string value value.
    * @param k key
    * @param v value
    */
@@ -73,6 +75,12 @@ public final class Option {
 
   @Override
   public String toString() {
-    return value == null ? name : name + '=' + value;
+    final StringBuilder sb = new StringBuilder(name);
+    if(value != null) {
+      sb.append('=').append(
+        value instanceof String[] ? Arrays.asList((String[]) value) :
+        value instanceof int[] ? Arrays.asList((int[]) value) : value);
+    }
+    return sb.toString();
   }
 }

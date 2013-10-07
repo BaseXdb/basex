@@ -44,7 +44,7 @@ class RESTQuery extends RESTCode {
 
   @Override
   void run(final HTTPContext http) throws IOException {
-    query(input, http, http.context().globalopts.get(GlobalOptions.WEBPATH));
+    query(input, http, http.context().globalopts.string(GlobalOptions.WEBPATH));
   }
 
   /**

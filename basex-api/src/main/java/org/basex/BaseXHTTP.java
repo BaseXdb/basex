@@ -65,7 +65,7 @@ public final class BaseXHTTP {
 
     // create jetty instance and set default context to HTTP path
     final GlobalOptions gopts = context.globalopts;
-    final String webapp = gopts.get(GlobalOptions.WEBPATH);
+    final String webapp = gopts.string(GlobalOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
     jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
     jetty.setHandler(wac);
@@ -125,8 +125,8 @@ public final class BaseXHTTP {
     HTTPContext.init(wac.getServletContext());
 
     // start daemon for stopping web server
-    final int stop = gopts.num(GlobalOptions.STOPPORT);
-    if(stop >= 0) new StopServer(gopts.get(GlobalOptions.SERVERHOST), stop).start();
+    final int stop = gopts.number(GlobalOptions.STOPPORT);
+    if(stop >= 0) new StopServer(gopts.string(GlobalOptions.SERVERHOST), stop).start();
 
     // show info when HTTP server is aborted
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -177,7 +177,7 @@ public final class BaseXHTTP {
    */
   private static int num(final Option option, final GlobalOptions gopts) {
     final String val = Options.getSystem(option);
-    return val.isEmpty() ? gopts.num(option) : Token.toInt(val);
+    return val.isEmpty() ? gopts.number(option) : Token.toInt(val);
   }
 
   /**
@@ -188,7 +188,7 @@ public final class BaseXHTTP {
    */
   private static boolean bool(final Option option, final GlobalOptions gopts) {
     final String val = Options.getSystem(option);
-    return val.isEmpty() ? gopts.is(option) : Boolean.parseBoolean(val);
+    return val.isEmpty() ? gopts.bool(option) : Boolean.parseBoolean(val);
   }
 
   /**

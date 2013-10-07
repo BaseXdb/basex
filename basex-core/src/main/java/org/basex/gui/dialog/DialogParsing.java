@@ -110,45 +110,45 @@ final class DialogParsing extends BaseXBack {
 
     final MainOptions opts = gui.context.options;
     try {
-      topts = new TextOptions(opts.get(MainOptions.TEXTPARSER));
+      topts = new TextOptions(opts.string(MainOptions.TEXTPARSER));
     } catch(final IOException ex) { topts = new TextOptions(); }
     try {
-      copts = new CsvOptions(opts.get(MainOptions.CSVPARSER));
+      copts = new CsvOptions(opts.string(MainOptions.CSVPARSER));
     } catch(final IOException ex) { copts = new CsvOptions(); }
     try {
-      jopts = new JsonOptions(opts.get(MainOptions.JSONPARSER));
+      jopts = new JsonOptions(opts.string(MainOptions.JSONPARSER));
     } catch(final IOException ex) { jopts = new JsonOptions(); }
 
-    intparse = new BaseXCheckBox(INT_PARSER, opts.is(MainOptions.INTPARSE), 0, d);
-    dtd = new BaseXCheckBox(PARSE_DTDS, opts.is(MainOptions.DTD), 0, d);
-    chopWS = new BaseXCheckBox(CHOP_WS, opts.is(MainOptions.CHOP), 0, d);
-    stripNS = new BaseXCheckBox(STRIP_NS, opts.is(MainOptions.STRIPNS), 0, d);
-    cfile = new BaseXTextField(opts.get(MainOptions.CATFILE), d);
+    intparse = new BaseXCheckBox(INT_PARSER, opts.bool(MainOptions.INTPARSE), 0, d);
+    dtd = new BaseXCheckBox(PARSE_DTDS, opts.bool(MainOptions.DTD), 0, d);
+    chopWS = new BaseXCheckBox(CHOP_WS, opts.bool(MainOptions.CHOP), 0, d);
+    stripNS = new BaseXCheckBox(STRIP_NS, opts.bool(MainOptions.STRIPNS), 0, d);
+    cfile = new BaseXTextField(opts.string(MainOptions.CATFILE), d);
     browsec = new BaseXButton(BROWSE_D, d);
-    usecat = new BaseXCheckBox(USE_CATALOG_FILE, !opts.get(MainOptions.CATFILE).isEmpty(),
+    usecat = new BaseXCheckBox(USE_CATALOG_FILE, !opts.string(MainOptions.CATFILE).isEmpty(),
         0, d);
 
     // json
-    jsonenc = DialogExport.encoding(d, jopts.get(JsonOptions.ENCODING));
+    jsonenc = DialogExport.encoding(d, jopts.string(JsonOptions.ENCODING));
     StringList sl = new StringList();
     final JsonFormat[] formats = JsonFormat.values();
     final int fl = formats.length - 1;
     for(int f = 0; f < fl; f++) sl.add(formats[f].toString());
     String[] sa = sl.toArray();
     jsonformat = new BaseXCombo(d, sa);
-    String s = jopts.get(JsonOptions.FORMAT);
+    String s = jopts.string(JsonOptions.FORMAT);
     if(Token.eq(s, sa)) jsonformat.setSelectedItem(s);
 
     // html
-    html = new BaseXTextField(opts.get(MainOptions.HTMLPARSER), d);
+    html = new BaseXTextField(opts.string(MainOptions.HTMLPARSER), d);
 
     // text
-    textenc = DialogExport.encoding(d, topts.get(TextOptions.ENCODING));
-    lines = new BaseXCheckBox(SPLIT_INPUT_LINES, topts.is(TextOptions.LINES), 0, d);
+    textenc = DialogExport.encoding(d, topts.string(TextOptions.ENCODING));
+    lines = new BaseXCheckBox(SPLIT_INPUT_LINES, topts.bool(TextOptions.LINES), 0, d);
 
     // csv
-    csven = DialogExport.encoding(d, copts.get(CsvOptions.ENCODING));
-    header = new BaseXCheckBox(FIRST_LINE_HEADER, copts.is(CsvOptions.HEADER), 0, d);
+    csven = DialogExport.encoding(d, copts.string(CsvOptions.ENCODING));
+    header = new BaseXCheckBox(FIRST_LINE_HEADER, copts.bool(CsvOptions.HEADER), 0, d);
 
     separator = new BaseXBack().layout(new TableLayout(1, 2, 6, 0));
     sl = new StringList();
@@ -158,7 +158,7 @@ final class DialogParsing extends BaseXBack {
     separator.add(sepcombo);
 
     String f = "";
-    s = copts.get(CsvOptions.SEPARATOR);
+    s = copts.string(CsvOptions.SEPARATOR);
     if(Token.eq(s, sa)) {
       sepcombo.setSelectedItem(s);
     } else {
@@ -260,7 +260,7 @@ final class DialogParsing extends BaseXBack {
   void catchoose() {
     final GUIOptions gopts = gui.gopts;
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
-        gopts.get(GUIOptions.INPUTPATH), gui).filter(XML_DOCUMENTS, IO.XMLSUFFIX);
+        gopts.string(GUIOptions.INPUTPATH), gui).filter(XML_DOCUMENTS, IO.XMLSUFFIX);
 
     final IO file = fc.select(Mode.FDOPEN);
     if(file != null) cfile.setText(file.path());
@@ -307,7 +307,7 @@ final class DialogParsing extends BaseXBack {
     final boolean fixedsep = sepcombo.getSelectedIndex() < CsvSep.values().length;
     sepchar.setEnabled(!fixedsep);
     if(fixedsep) {
-      copts.set(CsvOptions.SEPARATOR, sepcombo.getSelectedItem().toString());
+      copts.string(CsvOptions.SEPARATOR, sepcombo.getSelectedItem().toString());
       try {
         sepchar.setText(new TokenBuilder().add(copts.separator()).toString());
       } catch(final SerializerException ex) { Util.notexpected(); }
@@ -320,17 +320,17 @@ final class DialogParsing extends BaseXBack {
    * @param type parsing type
    */
   public void setOptions(final String type) {
-    jopts.set(JsonOptions.ENCODING, jsonenc.getSelectedItem().toString());
-    jopts.set(JsonOptions.FORMAT, jsonformat.getSelectedItem().toString());
+    jopts.string(JsonOptions.ENCODING, jsonenc.getSelectedItem().toString());
+    jopts.string(JsonOptions.FORMAT, jsonformat.getSelectedItem().toString());
     gui.set(MainOptions.JSONPARSER, jopts.toString());
 
-    topts.set(TextOptions.ENCODING, textenc.getSelectedItem().toString());
-    topts.set(TextOptions.LINES, lines.isSelected());
+    topts.string(TextOptions.ENCODING, textenc.getSelectedItem().toString());
+    topts.bool(TextOptions.LINES, lines.isSelected());
     gui.set(MainOptions.TEXTPARSER, topts.toString());
 
-    copts.set(CsvOptions.ENCODING, csven.getSelectedItem().toString());
-    copts.set(CsvOptions.HEADER, header.isSelected());
-    copts.set(CsvOptions.SEPARATOR, sepcombo.getSelectedIndex() <
+    copts.string(CsvOptions.ENCODING, csven.getSelectedItem().toString());
+    copts.bool(CsvOptions.HEADER, header.isSelected());
+    copts.string(CsvOptions.SEPARATOR, sepcombo.getSelectedIndex() <
       CsvSep.values().length ? sepcombo.getSelectedItem().toString() :
       String.valueOf((int) sepchar.getText().charAt(0)));
     gui.set(MainOptions.CSVPARSER, copts.toString());

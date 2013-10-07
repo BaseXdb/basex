@@ -99,8 +99,8 @@ public final class FTWords extends FTExpr {
       if(query.isValue()) txt = tokens(ctx);
       // choose fast evaluation for default settings
       fast = mode == FTMode.ANY && txt != null && occ == null;
-      if(ftt == null)
-        ftt = new FTTokenizer(this, ctx.ftOpt(), ctx.context.options.num(MainOptions.LSERROR));
+      if(ftt == null) ftt = new FTTokenizer(this, ctx.ftOpt(),
+          ctx.context.options.number(MainOptions.LSERROR));
     }
     return this;
   }

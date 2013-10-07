@@ -155,7 +155,7 @@ public abstract class DBNew extends BasicOperation {
    */
   protected void assignOptions() {
     final MainOptions opts = qc.context.options;
-    for(final Option option : nprops.keySet()) oprops.put(option, opts.get(option.name));
+    for(final Option option : nprops.keySet()) oprops.put(option, opts.get(option));
     setOptions(nprops);
   }
 
@@ -172,8 +172,6 @@ public abstract class DBNew extends BasicOperation {
    */
   private void setOptions(final HashMap<Option, Object> map) {
     final MainOptions opts = qc.context.options;
-    for(final Map.Entry<Option, Object> e : map.entrySet()) {
-      opts.setObject(e.getKey().name, e.getValue());
-    }
+    for(final Map.Entry<Option, Object> e : map.entrySet()) opts.put(e.getKey(), e.getValue());
   }
 }

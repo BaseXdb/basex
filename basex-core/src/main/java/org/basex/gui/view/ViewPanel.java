@@ -3,6 +3,7 @@ package org.basex.gui.view;
 import java.awt.*;
 import java.util.*;
 
+import org.basex.gui.*;
 import org.basex.gui.layout.*;
 
 /**
@@ -46,7 +47,8 @@ final class ViewPanel extends BaseXBack implements ViewLayout {
    * Makes the view invisible.
    */
   public void delete() {
-    view.gui.gopts.setObject("SHOW" + view.getName().toUpperCase(Locale.ENGLISH), false);
+    final GUIOptions gopts = view.gui.gopts;
+    gopts.put(gopts.option("SHOW" + view.getName().toUpperCase(Locale.ENGLISH)), false);
     view.gui.layoutViews();
   }
 

@@ -71,8 +71,8 @@ public final class FNJson extends StandardFunc {
     final JsonOptions opts = checkOptions(1, Q_OPTIONS, new JsonOptions(), ctx);
 
     final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(S_METHOD, M_JSON);
-    sopts.set(S_JSON, opts.toString());
+    sopts.string(S_METHOD, M_JSON);
+    sopts.string(S_JSON, opts.toString());
     return Str.get(delete(serialize(node.iter(), sopts), '\r'));
   }
 }

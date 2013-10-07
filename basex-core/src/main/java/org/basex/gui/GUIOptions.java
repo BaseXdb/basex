@@ -202,8 +202,8 @@ public final class GUIOptions extends Options {
   public GUIOptions() {
     super("gui");
     // reset realtime operations
-    set(GUIOptions.FILTERRT, false);
-    set(GUIOptions.EXECRT, false);
+    bool(GUIOptions.FILTERRT, false);
+    bool(GUIOptions.EXECRT, false);
     Prop.gui = true;
   }
 }

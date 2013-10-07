@@ -37,10 +37,10 @@ public final class CsvSerializer extends OutputSerializer {
    */
   CsvSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
     super(os, opts);
-    final CsvOptions copts = new CsvOptions(opts.get(SerializerOptions.S_CSV));
+    final CsvOptions copts = new CsvOptions(opts.string(SerializerOptions.S_CSV));
     separator = copts.separator();
-    header = copts.is(CsvOptions.HEADER);
-    lax = copts.is(CsvOptions.LAX);
+    header = copts.bool(CsvOptions.HEADER);
+    lax = copts.bool(CsvOptions.LAX);
     headers = header ? new TokenList() : null;
   }
 

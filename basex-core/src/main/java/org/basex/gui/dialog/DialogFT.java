@@ -57,13 +57,13 @@ final class DialogFT extends BaseXBack {
     final MainOptions opts = d.gui.context.options;
     add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 6, 0));
 
-    final String sw = opts.get(MainOptions.STOPWORDS);
+    final String sw = opts.string(MainOptions.STOPWORDS);
     final String[] cb = { LANGUAGE, STEMMING, CASE_SENSITIVITY, DIACRITICS,
         STOPWORD_LIST };
     final String[] desc = { H_LANGUAGE, H_STEMMING, H_CASE, H_DIACRITICS, H_STOPWORDS };
     final boolean[] val = {
-      !opts.get(MainOptions.LANGUAGE).isEmpty(), opts.is(MainOptions.STEMMING),
-      opts.is(MainOptions.CASESENS), opts.is(MainOptions.DIACRITICS), !sw.isEmpty() };
+      !opts.string(MainOptions.LANGUAGE).isEmpty(), opts.bool(MainOptions.STEMMING),
+      opts.bool(MainOptions.CASESENS), opts.bool(MainOptions.DIACRITICS), !sw.isEmpty() };
 
     final BaseXLabel[] labels = new BaseXLabel[FLAGS];
     for(int f = 0; f < check.length; ++f) {
@@ -98,7 +98,7 @@ final class DialogFT extends BaseXBack {
     add(Box.createVerticalStrut(4));
     final BaseXBack b3 = new BaseXBack(new TableLayout(1, 2, 8, 0));
     swpath = new BaseXTextField(sw.isEmpty()
-        ? d.gui.gopts.get(GUIOptions.DATAPATH) : sw, d);
+        ? d.gui.gopts.string(GUIOptions.DATAPATH) : sw, d);
     b3.add(swpath);
 
     swbrowse = new BaseXButton(BROWSE_D, d);
@@ -119,11 +119,11 @@ final class DialogFT extends BaseXBack {
   void chooseStop() {
     final GUIOptions gopts = dialog.gui.gopts;
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
-        gopts.get(GUIOptions.DATAPATH), dialog.gui);
+        gopts.string(GUIOptions.DATAPATH), dialog.gui);
     final IO file = fc.select(Mode.FOPEN);
     if(file != null) {
       swpath.setText(file.path());
-      gopts.set(GUIOptions.DATAPATH, file.path());
+      gopts.string(GUIOptions.DATAPATH, file.path());
     }
   }
 
@@ -141,7 +141,7 @@ final class DialogFT extends BaseXBack {
     final String sw = swpath.getText().trim();
     final IO file = IO.get(sw);
     final boolean exists = !sw.isEmpty() && file.exists();
-    if(exists) dialog.gui.gopts.set(GUIOptions.DATAPATH, sw);
+    if(exists) dialog.gui.gopts.string(GUIOptions.DATAPATH, sw);
   }
 
   /**

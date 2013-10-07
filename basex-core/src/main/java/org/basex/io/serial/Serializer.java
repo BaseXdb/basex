@@ -85,7 +85,7 @@ public abstract class Serializer {
 
     // serialize as JSON
     if(M_JSON.equals(m)) {
-      final JsonOptions jopts = new JsonOptions(opts.get(S_JSON));
+      final JsonOptions jopts = new JsonOptions(opts.string(S_JSON));
       return jopts.format() == JsonFormat.JSONML ? new JsonMLSerializer(os, opts) :
         new JsonDefaultSerializer(os, opts);
     }

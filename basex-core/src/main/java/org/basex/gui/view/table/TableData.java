@@ -323,7 +323,7 @@ final class TableData {
       elems.add(col.elem);
     }
     final String query = Find.findTable(filters, names, elems,
-        data.tagindex.key(root), gopts.is(GUIOptions.FILTERRT) || r);
+        data.tagindex.key(root), gopts.bool(GUIOptions.FILTERRT) || r);
     if(query.equals(last)) return null;
     last = query;
     return query;

@@ -58,8 +58,8 @@ public class XMLParser extends SingleParser {
       throws IOException {
     super(source, opts);
     scanner = new XMLScanner(source, opts, frag);
-    stripNS = opts.is(MainOptions.STRIPNS);
-    chop = opts.is(MainOptions.CHOP);
+    stripNS = opts.bool(MainOptions.STRIPNS);
+    chop = opts.bool(MainOptions.CHOP);
     chops.push(chop);
     fragment = frag;
   }
