@@ -231,7 +231,7 @@ public class BaseX extends Main {
         }
       } else {
         v = arg.string().trim();
-        // interpret as commands if input ends with command script suffix
+        // interpret as command file if input string ends with command script suffix
         c = v.endsWith(IO.BXSSUFFIX) ? 'c' : 'Q';
       }
       if(v != null) {
