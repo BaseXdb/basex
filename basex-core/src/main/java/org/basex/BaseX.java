@@ -231,8 +231,8 @@ public class BaseX extends Main {
         }
       } else {
         v = arg.string().trim();
-        // interpret at commands if input starts with < or ends with command script suffix
-        c = v.startsWith("<") || v.endsWith(IO.BXSSUFFIX) ? 'c' : 'Q';
+        // interpret as commands if input ends with command script suffix
+        c = v.endsWith(IO.BXSSUFFIX) ? 'c' : 'Q';
       }
       if(v != null) {
         ops.add(c);
