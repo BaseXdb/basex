@@ -3,6 +3,22 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.7.2 (October 7, 2013) ----------------------------------------
+
+ XQUERY
+ - CSV Module and serialization added
+ - JSON serializer updated (more to follow)
+ - update checks in modify clause fixed
+ - parsing of new map syntax fixed (ignoring spaces)
+ - tail call handling in built-in higher order functions fixed
+
+ API
+ - Russian translation added (thanks to Oleksandr Shpak, Max Shamaev)
+ - command-line arguments starting with '<' are interpreted as XQuery
+
+ INDEXING
+ - bug fixed in updatable index structure
+
 VERSION 7.7.1 (September 16, 2013) -------------------------------------
 
  XQUERY
