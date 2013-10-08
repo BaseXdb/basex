@@ -5,8 +5,8 @@ import static org.basex.core.Text.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
-import org.basex.util.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.base.Collection;
 
@@ -49,9 +49,8 @@ public final class BXDatabase implements Database, BXXMLDBText {
   @Override
   public String getProperty(final String key) {
     try {
-      final String prop = key.toUpperCase(Locale.ENGLISH);
-      return ((Option) MainOptions.class.getField(prop).get(null)).value.toString();
-    } catch(final Exception ex) {
+      return Get.get(key.toUpperCase(Locale.ENGLISH), ctx);
+    } catch(final BaseXException ex) {
       return null;
     }
   }

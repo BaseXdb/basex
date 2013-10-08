@@ -11,6 +11,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
+import org.basex.util.Option.Type;
 
 /**
  * This class defines syntax highlighting for XQuery files.
@@ -63,8 +64,8 @@ public final class SyntaxXQuery extends Syntax {
    */
   private static void addOptions(final Class<? extends Options> opt) throws Exception {
     for(final Option o : Options.options(opt)) {
-      if(o.value == null) continue;
-      Collections.addAll(FUNC, o.name.toLowerCase(Locale.ENGLISH).split("-"));
+      if(o.type != Type.COMMENT)
+        Collections.addAll(FUNC, o.name.toLowerCase(Locale.ENGLISH).split("-"));
     }
   }
 

@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.util.Option.Type;
 import org.basex.util.list.*;
 
 /**
@@ -51,7 +52,7 @@ public class Options implements Iterable<Option> {
   public Options(final String suffix) {
     try {
       for(final Option opt : options(getClass())) {
-        if(opt.value != null) {
+        if(opt.type != Type.COMMENT) {
           values.put(opt.name, opt.value);
           options.put(opt.name, opt);
         }
@@ -73,27 +74,27 @@ public class Options implements Iterable<Option> {
     try {
       bw = new BufferedWriter(new FileWriter(file.file()));
       for(final Option opt : options(getClass())) {
-        if(opt.value == null) {
-          bw.write(NL + "# " + opt.name + NL);
-          continue;
-        }
-
-        final Object val = values.get(opt.name);
-        if(val instanceof String[]) {
-          final String[] str = (String[]) val;
-          bw.write(opt.name + " = " + str.length + NL);
-          final int is = str.length;
-          for(int i = 0; i < is; ++i) {
-            if(str[i] != null) bw.write(opt.name + (i + 1) + " = " + str[i] + NL);
-          }
-        } else if(val instanceof int[]) {
-          final int[] num = (int[]) val;
-          final int ns = num.length;
-          for(int i = 0; i < ns; ++i) {
-            bw.write(opt.name + i + " = " + num[i] + NL);
-          }
-        } else {
-          bw.write(opt.name + " = " + val + NL);
+        final Object value = get(opt);
+        switch(opt.type) {
+          case COMMENT:
+            bw.write(NL + "# " + opt.name + NL);
+            break;
+          case BOOLEAN:
+          case NUMBER:
+          case STRING:
+            bw.write(opt.name + " = " + (value == null ? "" : value) + NL);
+            break;
+          case NUMBERS:
+            final int[] ints = (int[]) value;
+            final int is = ints == null ? 0 : ints.length;
+            for(int i = 0; i < is; ++i) bw.write(opt.name + i + " = " + ints[i] + NL);
+            break;
+          case STRINGS:
+            final String[] strings = (String[]) value;
+            final int ss = strings == null ? 0 : strings.length;
+            bw.write(opt.name + " = " + ss + NL);
+            for(int i = 0; i < ss; ++i) bw.write(opt.name + (i + 1) + " = " + strings[i] + NL);
+            break;
         }
       }
       bw.write(NL + PROPUSER + NL);
@@ -125,13 +126,21 @@ public class Options implements Iterable<Option> {
   }
 
   /**
+   * Checks if a value was set for the specified option.
+   * @param option option
+   * @return result of check
+   */
+  public final synchronized boolean contains(final Option option) {
+    return get(option) != null;
+  }
+
+  /**
    * Assigns a value to an option.
    * @param option option
    * @param value value to be assigned
    */
   public final synchronized void put(final Option option, final Object value) {
-    if(values.put(option.name, value) == null)
-      Util.notexpected("Option \"" + option.name + "\" not defined.");
+    values.put(option.name, value);
   }
 
   /**
@@ -140,7 +149,7 @@ public class Options implements Iterable<Option> {
    * @return value
    */
   public final synchronized String string(final Option option) {
-    return (String) get(option, String.class);
+    return (String) get(option, Type.STRING);
   }
 
   /**
@@ -149,7 +158,7 @@ public class Options implements Iterable<Option> {
    * @return value
    */
   public final synchronized int number(final Option option) {
-    return (Integer) get(option, Integer.class);
+    return (Integer) get(option, Type.NUMBER);
   }
 
   /**
@@ -158,7 +167,7 @@ public class Options implements Iterable<Option> {
    * @return value
    */
   public final synchronized boolean bool(final Option option) {
-    return (Boolean) get(option, Boolean.class);
+    return (Boolean) get(option, Type.BOOLEAN);
   }
 
   /**
@@ -167,7 +176,7 @@ public class Options implements Iterable<Option> {
    * @return value
    */
   public final synchronized String[] strings(final Option option) {
-    return (String[]) get(option, String[].class);
+    return (String[]) get(option, Type.STRINGS);
   }
 
   /**
@@ -176,7 +185,7 @@ public class Options implements Iterable<Option> {
    * @return value
    */
   public final synchronized int[] numbers(final Option option) {
-    return (int[]) get(option, int[].class);
+    return (int[]) get(option, Type.NUMBERS);
   }
 
   /**
@@ -250,33 +259,35 @@ public class Options implements Iterable<Option> {
    * @throws IllegalArgumentException invalid argument
    */
   public final synchronized void set(final Option option, final String value) {
-    final Object type = option.value;
-    if(type instanceof Boolean) {
-      // toggle boolean if no value was specified
-      final boolean empty = value == null || value.isEmpty();
-      put(option, empty ? !((Boolean) get(option)) : Util.yes(value));
-    } else if(type instanceof Integer) {
-      put(option, Integer.parseInt(value));
-    } else if(type instanceof String) {
-      put(option, value);
-    } else if(type instanceof String[]) {
-      // add value to array
-      String[] ss = (String[]) get(option);
-      if(ss == null) ss = new String[0];
-      final StringList sl = new StringList(ss.length + 1);
-      for(final String s : ss) sl.add(s);
-      sl.add(value);
-      put(option, sl.toArray());
-    } else if(type instanceof int[]) {
-      // add value to array
-      int[] ii = (int[]) get(option);
-      if(ii == null) ii = new int[0];
-      final IntList il = new IntList(ii.length + 1);
-      for(final int i : ii) il.add(i);
-      il.add(Integer.parseInt(value));
-      put(option, il.toArray());
-    } else {
-      Util.notexpected("Unknown option type: " + Util.className(type));
+    switch(option.type) {
+      case COMMENT:
+        break;
+      case BOOLEAN:
+        // toggle boolean if no value was specified
+        final boolean empty = value == null || value.isEmpty();
+        put(option, empty ? !((Boolean) get(option)) : Util.yes(value));
+        break;
+      case NUMBER:
+        put(option, Integer.parseInt(value));
+        break;
+      case STRING:
+        put(option, value);
+        break;
+      case NUMBERS:
+        int[] ii = (int[]) get(option);
+        if(ii == null) ii = new int[0];
+        final IntList il = new IntList(ii.length + 1);
+        for(final int i : ii) il.add(i);
+        il.add(Integer.parseInt(value));
+        put(option, il.toArray());
+        break;
+      case STRINGS:
+        String[] ss = (String[]) get(option);
+        if(ss == null) ss = new String[0];
+        final StringList sl = new StringList(ss.length + 1);
+        for(final String s : ss) sl.add(s);
+        sl.add(value);
+        put(option, sl.toArray());
     }
   }
 
@@ -498,44 +509,54 @@ public class Options implements Iterable<Option> {
           }
 
           final String val = line.substring(d + 1).trim();
-          String key = line.substring(0, d).trim();
+          String name = line.substring(0, d).trim();
 
           // extract numeric value in key
           int num = 0;
-          final int ss = key.length();
+          final int ss = name.length();
           for(int s = 0; s < ss; ++s) {
-            if(Character.isDigit(key.charAt(s))) {
-              num = Integer.parseInt(key.substring(s));
-              key = key.substring(0, s);
+            if(Character.isDigit(name.charAt(s))) {
+              num = Integer.parseInt(name.substring(s));
+              name = name.substring(0, s);
               break;
             }
           }
           // cache local options as system properties
           if(local) {
-            setSystem(key, val);
+            setSystem(name, val);
             continue;
           }
 
-          final Object entry = values.get(key);
-          if(entry == null) {
-            err.addExt("%: \"%\" not found. " + NL, file, key);
-          } else if(entry instanceof String) {
-            values.put(key, val);
-          } else if(entry instanceof Integer) {
-            values.put(key, Integer.parseInt(val));
-          } else if(entry instanceof Boolean) {
-            values.put(key, Boolean.parseBoolean(val));
-          } else if(entry instanceof String[]) {
-            if(num == 0) {
-              values.put(key, new String[Integer.parseInt(val)]);
-            } else {
-              ((String[]) entry)[num - 1] = val;
+          final Option opt = options.get(name);
+          if(opt == null) {
+            err.addExt("%: \"%\" not found. " + NL, file, name);
+          } else {
+            switch(opt.type) {
+              case BOOLEAN:
+                values.put(name, Boolean.parseBoolean(val));
+                break;
+              case COMMENT:
+                break;
+              case NUMBER:
+                values.put(name, Integer.parseInt(val));
+                break;
+              case NUMBERS:
+                ((int[]) get(opt))[num] = Integer.parseInt(val);
+                break;
+              case STRING:
+                put(opt, val);
+                break;
+              case STRINGS:
+                if(num == 0) {
+                  values.put(name, new String[Integer.parseInt(val)]);
+                } else {
+                  ((String[]) get(opt))[num - 1] = val;
+                }
+                break;
             }
-          } else if(entry instanceof int[]) {
-            ((int[]) entry)[num] = Integer.parseInt(val);
           }
           // add key for final check
-          read.add(key);
+          read.add(name);
         }
       } catch(final Exception ex) {
         err.addExt("% could not be parsed." + NL, file);
@@ -550,7 +571,7 @@ public class Options implements Iterable<Option> {
       if(err.isEmpty()) {
         boolean ok = true;
         for(final Option opt : options(getClass())) {
-          if(ok && opt.value != null) ok = read.contains(opt.name);
+          if(ok && opt.type != Type.COMMENT) ok = read.contains(opt.name);
         }
         if(!ok) err.addExt("Saving options in \"%\"..." + NL, file);
       }
@@ -565,30 +586,29 @@ public class Options implements Iterable<Option> {
   }
 
   /**
-   * Retrieves the value of the specified option. Throws an error if value cannot be read.
-   * @param opt option
-   * @param c expected type
+   * Retrieves the value of the specified option. Throws an error if the value cannot be read.
+   * @param option option
+   * @param type expected type
    * @return result
    */
-  private Object get(final Option opt, final Class<?> c) {
-    final Object entry = values.get(opt.name);
-    if(entry == null) Util.notexpected("Option " + opt.name + " not defined.");
+  private Object get(final Option option, final Type type) {
+    final String name = option.name;
+    if(options.get(name) != option) Util.notexpected("Option '" + name + "' not defined.");
 
-    final Class<?> cc = entry.getClass();
-    if(c != cc) Util.notexpected("Option '" + opt.name + "' is of type " + Util.className(cc));
-    return entry;
+    if(type != option.type) Util.notexpected("Option '" + name + "' is of type " + option.type);
+    return values.get(name);
   }
 
   /**
-   * Returns a key similar to the specified string, or {@code null}.
-   * @param key key to be found
-   * @return similar key
+   * Returns an option name similar to the specified string, or {@code null}.
+   * @param name name to be found
+   * @return similar name
    */
-  private String similar(final String key) {
-    final byte[] name = token(key);
+  private String similar(final String name) {
+    final byte[] nm = token(name);
     final Levenshtein ls = new Levenshtein();
     for(final String opts : values.keySet()) {
-      if(ls.similar(name, token(opts))) return opts;
+      if(ls.similar(nm, token(opts))) return opts;
     }
     return null;
   }

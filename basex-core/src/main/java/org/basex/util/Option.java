@@ -3,7 +3,7 @@ package org.basex.util;
 import java.util.*;
 
 /**
- * This class contains a single option definition.
+ * Single option, stored in {@link Options} instances.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
@@ -13,73 +13,110 @@ public final class Option {
   public final String name;
   /** Default value. */
   public final Object value;
+  /** Type. */
+  public final Type type;
+
+  /** Option type. */
+  public enum Type {
+    /** String.  */ STRING,
+    /** Strings. */ STRINGS,
+    /** Number.  */ NUMBER,
+    /** Numbers. */ NUMBERS,
+    /** Boolean. */ BOOLEAN,
+    /** Comment. */ COMMENT
+  };
 
   /**
-   * Constructor for options without value (used for commenting option files).
-   * @param k key
+   * Option without default value.
+   * @param n name
+   * @param t type
    */
-  public Option(final String k) {
-    name = k;
-    value = null;
+  public Option(final String n, final Type t) {
+    this(n, null, t);
   }
 
   /**
-   * Constructor for option with boolean value.
-   * @param k key
+   * Option with string value.
+   * @param n name
    * @param v value
    */
-  public Option(final String k, final Boolean v) {
-    name = k;
-    value = v;
+  public Option(final String n, final String v) {
+    this(n, v, Type.STRING);
   }
 
   /**
-   * Constructor for option with string value.
-   * @param k key
+   * Option with string value value.
+   * @param n name
    * @param v value
    */
-  public Option(final String k, final String v) {
-    name = k;
-    value = v;
+  public Option(final String n, final String[] v) {
+    this(n, v, Type.STRINGS);
   }
 
   /**
-   * Constructor for option with integer value.
-   * @param k key
+   * Option with integer value.
+   * @param n name
    * @param v value
    */
-  public Option(final String k, final Integer v) {
-    name = k;
-    value = v;
+  public Option(final String n, final Integer v) {
+    this(n, v, Type.NUMBER);
   }
 
   /**
-   * Constructor for option with integer array value.
-   * @param k key
+   * Option with integer array value.
+   * @param n name
    * @param v value
    */
-  public Option(final String k, final int[] v) {
-    name = k;
-    value = v;
+  public Option(final String n, final int[] v) {
+    this(n, v, Type.NUMBERS);
   }
 
   /**
-   * Constructor for option with string value value.
-   * @param k key
+   * Option with boolean value.
+   * @param n name
    * @param v value
    */
-  public Option(final String k, final String[] v) {
+  public Option(final String n, final Boolean v) {
+    this(n, v, Type.BOOLEAN);
+  }
+
+  /**
+   * Commenting option.
+   * @param n name
+   */
+  public Option(final String n) {
+    this(n, null, Type.COMMENT);
+  }
+
+  /**
+   * Private constructor.
+   * @param k key
+   * @param v value
+   * @param t type
+   */
+  private Option(final String k, final Object v, final Type t) {
     name = k;
     value = v;
+    type = t;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(name);
-    if(value != null) {
-      sb.append('=').append(
-        value instanceof String[] ? Arrays.asList((String[]) value) :
-        value instanceof int[] ? Arrays.asList((int[]) value) : value);
+    switch(type) {
+      case COMMENT:
+        break;
+      case STRING:
+      case BOOLEAN:
+      case NUMBER:
+        sb.append('=').append(value);
+        break;
+      case NUMBERS:
+        sb.append('=').append(Arrays.asList((int[]) value));
+        break;
+      case STRINGS:
+        sb.append('=').append(Arrays.asList((String[]) value));
+        break;
     }
     return sb.toString();
   }
