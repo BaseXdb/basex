@@ -126,7 +126,7 @@ public final class FTIndex implements Index {
 
     // fuzzy search
     if(opt.is(FZ)) {
-      final int k = data.meta.options.number(MainOptions.LSERROR);
+      final int k = data.meta.options.get(MainOptions.LSERROR);
       return fuzzy(tok, k == 0 ? tok.length >> 2 : k);
     }
 
@@ -233,7 +233,7 @@ public final class FTIndex implements Index {
     final long l = inX.length() + inY.length() + inZ.length();
     tb.add(LI_SIZE + Performance.format(l, true) + NL);
 
-    final IndexStats stats = new IndexStats(data.meta.options.number(MainOptions.MAXSTAT));
+    final IndexStats stats = new IndexStats(data.meta.options.get(MainOptions.MAXSTAT));
     addOccs(stats);
     stats.print(tb);
     return tb.finish();

@@ -11,11 +11,10 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.test.*;
-import org.basex.util.*;
 import org.junit.*;
 import org.junit.runner.*;
 import org.junit.runners.*;
-import org.junit.runners.Parameterized.*;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This class tests database locking inside BaseX. For this purpose, two queries are
@@ -76,7 +75,6 @@ public final class LockingTest extends SandboxTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    Options.setSystem(GlobalOptions.GLOBALLOCK, false);
     server = createServer();
     final CountDownLatch latch = new CountDownLatch(2);
     new Client(new CreateDB(NAME, DOC), null, latch);

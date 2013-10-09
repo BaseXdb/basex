@@ -46,7 +46,7 @@ final class ProcLocking implements Locking {
       queue.add(o);
 
       // maximum number of readers
-      final int maxReaders = Math.max(ctx.globalopts.number(GlobalOptions.PARALLEL), 1);
+      final int maxReaders = Math.max(ctx.globalopts.get(GlobalOptions.PARALLEL), 1);
 
       while(true) {
         if(!writer && o == queue.get(0)) {

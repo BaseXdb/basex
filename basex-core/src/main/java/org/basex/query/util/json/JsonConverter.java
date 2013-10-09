@@ -2,7 +2,6 @@ package org.basex.query.util.json;
 
 import org.basex.build.*;
 import org.basex.build.JsonOptions.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -42,10 +41,10 @@ public abstract class JsonConverter {
    * @param jopts json options
    * @param ii input info
    * @return a JSON converter
-   * @throws SerializerException serializer exception
+   * @throws QueryIOException query I/O exception
    */
   public static JsonConverter get(final JsonOptions jopts, final InputInfo ii)
-      throws SerializerException {
+      throws QueryIOException {
 
     final JsonFormat format = jopts.format();
     if(format == JsonFormat.JSONML) return new JsonMLConverter(jopts, ii);

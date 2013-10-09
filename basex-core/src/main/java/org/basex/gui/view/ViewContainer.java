@@ -66,7 +66,7 @@ public final class ViewContainer extends BaseXBack {
     for(int i = 0; i < v.length; ++i) views[i] = new ViewPanel(v[i]);
     gui = main;
     // build layout or use default if something goes wrong
-    if(!buildLayout(gui.gopts.string(GUIOptions.VIEWS)) && !buildLayout(VIEWS)) {
+    if(!buildLayout(gui.gopts.get(GUIOptions.VIEWS)) && !buildLayout(VIEWS)) {
       Util.errln(Util.className(this) + ": could not build layout \"%\"", VIEWS);
     }
   }
@@ -87,7 +87,7 @@ public final class ViewContainer extends BaseXBack {
     layout.createView(this);
     validate();
     repaint();
-    gui.gopts.string(GUIOptions.VIEWS, layout.layoutString(true));
+    gui.gopts.set(GUIOptions.VIEWS, layout.layoutString(true));
     layoutString = ls;
   }
 
@@ -101,7 +101,7 @@ public final class ViewContainer extends BaseXBack {
     final int hh = Math.max(220, Math.min(700, h));
     final Insets i = getInsets();
 
-    if(gui.gopts.bool(GUIOptions.GRADIENT)) {
+    if(gui.gopts.get(GUIOptions.GRADIENT)) {
       BaseXLayout.fill(g, WHITE, color1, i.left, i.top, w - i.right, h - i.bottom);
     }
     if(w < 150 || h < 160) return;

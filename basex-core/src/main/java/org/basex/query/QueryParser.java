@@ -37,6 +37,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * Parser for XQuery expressions.
@@ -92,7 +93,7 @@ public class QueryParser extends InputParser {
   /** Name of current module. */
   private QNm module;
 
-  /** Alternative error output. */
+  /** Alternative error code. */
   private Err alter;
   /** Function name of alternative error. */
   private QNm alterFunc;
@@ -122,11 +123,11 @@ public class QueryParser extends InputParser {
 
     // set path to query file
     final MainOptions opts = c.context.options;
-    final String bi = path != null ? path : opts.string(MainOptions.QUERYPATH);
+    final String bi = path != null ? path : opts.get(MainOptions.QUERYPATH);
     if(!bi.isEmpty()) c.sc.baseURI(bi);
 
     // parse pre-defined external variables
-    final String bind = opts.string(MainOptions.BINDINGS).trim();
+    final String bind = opts.get(MainOptions.BINDINGS).trim();
     final StringBuilder key = new StringBuilder();
     final StringBuilder val = new StringBuilder();
     boolean first = true;
@@ -545,24 +546,30 @@ public class QueryParser extends InputParser {
    */
   private void optionDecl() throws QueryException {
     skipWS();
-    final QNm name = eQName(QNAMEINV, ctx.sc.xquery3() ? XQURI : URICHECK);
+    final QNm qnm = eQName(QNAMEINV, ctx.sc.xquery3() ? XQURI : URICHECK);
     final byte[] val = stringLiteral();
-    final String key = string(name.local());
+    final String name = string(qnm.local());
 
-    if(ctx.sc.xquery3() && eq(name.uri(), OUTPUTURI)) {
+    if(ctx.sc.xquery3() && eq(qnm.uri(), OUTPUTURI)) {
       // output declaration
       if(module != null) error(MODOUT);
 
       if(ctx.serialOpts == null) {
         final MainOptions opts = ctx.context.options;
-        ctx.serialOpts = new SerializerOptions(opts.string(MainOptions.SERIALIZER));
+        try {
+          ctx.serialOpts = new SerializerOptions(opts.get(MainOptions.SERIALIZER));
+        } catch(final IOException ex) {
+          ctx.serialOpts = new SerializerOptions();
+        }
       }
-      if(!decl.add("S " + key)) error(OUTDUPL, key);
-      final Option opt = ctx.serialOpts.option(key);
-      if(opt == null) error(OUTWHICH, key);
-      ctx.serialOpts.set(opt, string(val));
+      if(!decl.add("S " + name)) error(OUTDUPL, name);
+      try {
+        ctx.serialOpts.assign(name, string(val));
+      } catch(final BaseXException ex) {
+        error(OUTWHICH, name);
+      }
 
-      if(key.equals(SerializerOptions.S_PARAMETER_DOCUMENT.name)) {
+      if(name.equals(SerializerOptions.S_PARAMETER_DOCUMENT.name())) {
         final IO io = IO.get(string(resolvedUri(val).string()));
         try {
           final ANode node = new DBNode(io, ctx.context.options).children().next();
@@ -572,32 +579,32 @@ public class QueryParser extends InputParser {
 
           final HashMap<String, String> free = ctx.serialOpts.free();
           if(!free.isEmpty()) SERWHICH.thrw(info, free.keySet().iterator().next());
-          final Option cm = SerializerOptions.S_USE_CHARACTER_MAPS;
-          if(!ctx.serialOpts.string(cm).isEmpty()) SERWHICH.thrw(info, cm.name);
+          final StringOption cm = SerializerOptions.S_USE_CHARACTER_MAPS;
+          if(!ctx.serialOpts.get(cm).isEmpty()) SERWHICH.thrw(info, cm.name());
         } catch(final IOException ex) {
           error(OUTDOC, val);
         }
       }
-    } else if(ctx.sc.xquery3() && eq(name.uri(), XQURI)) {
-      error(DECLOPTION, name);
-    } else if(eq(name.uri(), DBURI)) {
+    } else if(ctx.sc.xquery3() && eq(qnm.uri(), XQURI)) {
+      error(DECLOPTION, qnm);
+    } else if(eq(qnm.uri(), DBURI)) {
       // project-specific declaration
-      final String ukey = key.toUpperCase(Locale.ENGLISH);
+      final String ukey = name.toUpperCase(Locale.ENGLISH);
       final Option opt = ctx.context.options.option(ukey);
       if(opt == null) error(BASX_OPTIONS, ukey);
       // cache old value (to be reset after query evaluation)
-      ctx.globalOpt.put(opt, ctx.context.options.get(opt));
-      ctx.dbOptions.add(key).add(string(val));
-    } else if(eq(name.uri(), QUERYURI)) {
-      // Query-specific options
-      if(key.equals(READ_LOCK)) {
+      ctx.staticOpts.put(opt, ctx.context.options.get(opt));
+      ctx.tempOpts.add(name).add(string(val));
+    } else if(eq(qnm.uri(), QUERYURI)) {
+      // query-specific options
+      if(name.equals(READ_LOCK)) {
         for(final byte[] lock : split(val, ','))
           ctx.readLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
-      } else if(key.equals(WRITE_LOCK)) {
+      } else if(name.equals(WRITE_LOCK)) {
         for(final byte[] lock : split(val, ','))
           ctx.writeLocks.add(DBLocking.USER_PREFIX + string(lock).trim());
       } else {
-        error(BASX_OPTIONS, key);
+        error(BASX_OPTIONS, name);
       }
     }
     // ignore unknown options

@@ -38,9 +38,9 @@ public final class TextParser extends SingleParser {
    */
   public TextParser(final IO source, final MainOptions opts) throws IOException {
     super(source, opts);
-    final TextOptions tp = new TextOptions(opts.string(MainOptions.TEXTPARSER));
-    lines = tp.bool(TextOptions.LINES);
-    encoding = tp.string(TextOptions.ENCODING);
+    final TextOptions tp = new TextOptions(opts.get(MainOptions.TEXTPARSER));
+    lines = tp.get(TextOptions.LINES);
+    encoding = tp.get(TextOptions.ENCODING);
   }
 
   @Override

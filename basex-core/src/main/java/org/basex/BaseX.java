@@ -12,6 +12,7 @@ import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This is the starter class for the stand-alone console mode.
@@ -98,7 +99,7 @@ public class BaseX extends Main {
           // toggle newline separators
           newline ^= true;
           if(serial.length() != 0) serial.append(',');
-          val = serial.append(SerializerOptions.S_ITEM_SEPARATOR.name).
+          val = serial.append(SerializerOptions.S_ITEM_SEPARATOR.name()).
               append("=\\n").toString();
           opt = MainOptions.SERIALIZER;
         } else if(c == 'o') {
@@ -213,16 +214,16 @@ public class BaseX extends Main {
           // client options: need to be set before other options
           if(c == 'n') {
             // set server name
-            context.globalopts.string(GlobalOptions.HOST, arg.string());
+            context.globalopts.set(GlobalOptions.HOST, arg.string());
           } else if(c == 'p') {
             // set server port
-            context.globalopts.number(GlobalOptions.PORT, arg.number());
+            context.globalopts.set(GlobalOptions.PORT, arg.number());
           } else if(c == 'P') {
             // specify password
-            context.globalopts.string(GlobalOptions.PASSWORD, arg.string());
+            context.globalopts.set(GlobalOptions.PASSWORD, arg.string());
           } else if(c == 'U') {
             // specify user name
-            context.globalopts.string(GlobalOptions.USER, arg.string());
+            context.globalopts.set(GlobalOptions.USER, arg.string());
           } else {
             arg.usage();
           }

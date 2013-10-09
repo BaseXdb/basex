@@ -2,49 +2,49 @@ package org.basex.build;
 
 import java.io.*;
 
-import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
- * This class contains HTML parsing options for TagSoup.
+ * Options for parsing and serializing HTML documents with TagSoup.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class HtmlOptions extends Options {
   /** TagSoup option: html. */
-  public static final Option HTML = new Option("html", false);
+  public static final BooleanOption HTML = new BooleanOption("html", false);
   /** TagSoup option: omit-xml-declaration. */
-  public static final Option OMITXML = new Option("omit-xml-declaration", false);
+  public static final BooleanOption OMITXML = new BooleanOption("omit-xml-declaration", false);
   /** TagSoup option: method (html). */
-  public static final Option METHOD = new Option("method", "xml");
+  public static final StringOption METHOD = new StringOption("method", "xml");
   /** TagSoup option: nons. */
-  public static final Option NONS = new Option("nons", true);
+  public static final BooleanOption NONS = new BooleanOption("nons", true);
   /** TagSoup option: nobogons. */
-  public static final Option NOBOGONS = new Option("nobogons", false);
+  public static final BooleanOption NOBOGONS = new BooleanOption("nobogons", false);
   /** TagSoup option: nodefaults. */
-  public static final Option NODEFAULTS = new Option("nodefaults", false);
+  public static final BooleanOption NODEFAULTS = new BooleanOption("nodefaults", false);
   /** TagSoup option: nocolons. */
-  public static final Option NOCOLONS = new Option("nocolons", false);
+  public static final BooleanOption NOCOLONS = new BooleanOption("nocolons", false);
   /** TagSoup option: norestart. */
-  public static final Option NORESTART = new Option("norestart", false);
+  public static final BooleanOption NORESTART = new BooleanOption("norestart", false);
   /** TagSoup option: nobogons. */
-  public static final Option IGNORABLE = new Option("ignorable", false);
+  public static final BooleanOption IGNORABLE = new BooleanOption("ignorable", false);
   /** TagSoup option: emptybogons. */
-  public static final Option EMPTYBOGONS = new Option("emptybogons", false);
+  public static final BooleanOption EMPTYBOGONS = new BooleanOption("emptybogons", false);
   /** TagSoup option: any. */
-  public static final Option ANY = new Option("any", false);
+  public static final BooleanOption ANY = new BooleanOption("any", false);
   /** TagSoup option: norootbogons. */
-  public static final Option NOROOTBOGONS = new Option("norootbogons", false);
+  public static final BooleanOption NOROOTBOGONS = new BooleanOption("norootbogons", false);
   /** TagSoup option: nocdata. */
-  public static final Option NOCDATA = new Option("nocdata", false);
+  public static final BooleanOption NOCDATA = new BooleanOption("nocdata", false);
   /** TagSoup option: lexical. */
-  public static final Option LEXICAL = new Option("lexical", false);
+  public static final BooleanOption LEXICAL = new BooleanOption("lexical", false);
   /** TagSoup option: doctype-system=systemid. */
-  public static final Option DOCTYPESYS = new Option("doctype-system", "");
+  public static final StringOption DOCTYPESYS = new StringOption("doctype-system", "");
   /** TagSoup option: doctype-public=publicid. */
-  public static final Option DOCTYPEPUB = new Option("doctype-public", "");
+  public static final StringOption DOCTYPEPUB = new StringOption("doctype-public", "");
   /** TagSoup option: encoding=encoding. */
-  public static final Option ENCODING = new Option("encoding", "");
+  public static final StringOption ENCODING = new StringOption("encoding", "");
 
   /**
    * Constructor.
@@ -58,6 +58,6 @@ public final class HtmlOptions extends Options {
    * @throws IOException exception
    */
   public HtmlOptions(final String opts) throws IOException {
-    parse(opts, true);
+    super(opts);
   }
 }

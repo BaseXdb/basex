@@ -286,9 +286,9 @@ public final class GUIConstants {
    * @param opts gui options
    */
   public static void init(final GUIOptions opts) {
-    final int r = opts.number(GUIOptions.COLORRED);
-    final int g = opts.number(GUIOptions.COLORGREEN);
-    final int b = opts.number(GUIOptions.COLORBLUE);
+    final int r = opts.get(GUIOptions.COLORRED);
+    final int g = opts.get(GUIOptions.COLORGREEN);
+    final int b = opts.get(GUIOptions.COLORBLUE);
 
     // calculate color c:
     // c = (255 - expectedColor) * 10 / factor (= GUIRED/BLUE/GREEN)
@@ -314,14 +314,14 @@ public final class GUIConstants {
     color2A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 40);
     color3A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 100);
 
-    final String f = opts.string(GUIOptions.FONT);
-    final int type = opts.number(GUIOptions.FONTTYPE);
-    fontSize = opts.number(GUIOptions.FONTSIZE);
+    final String f = opts.get(GUIOptions.FONT);
+    final int type = opts.get(GUIOptions.FONTTYPE);
+    fontSize = opts.get(GUIOptions.FONTSIZE);
     font  = new Font(f, type, fontSize);
-    mfont = new Font(opts.string(GUIOptions.MONOFONT), type, fontSize);
+    mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
     bfont = new Font(f, Font.BOLD, fontSize);
     lfont = new Font(f, type, 18 + (fontSize >> 1));
-    dmfont = new Font(opts.string(GUIOptions.MONOFONT), 0, TFONT.getSize() - 1);
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, TFONT.getSize() - 1);
 
     final Container comp = new Container();
     dwidth  = comp.getFontMetrics(dmfont).getWidths();

@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Evaluates the 'info' command and returns general database information.
@@ -48,11 +49,11 @@ public final class Info extends AInfo {
     if(context.user.has(Perm.ADMIN)) {
       final GlobalOptions gopts = context.globalopts;
       tb.add(NL + MAIN_OPTIONS + NL);
-      for(final Option o : gopts) info(tb, o.name, gopts.get(o));
+      for(final Option o : gopts) info(tb, o.name(), gopts.get(o));
     }
     final MainOptions opts = context.options;
     tb.add(NL + OPTIONS + NL);
-    for(final Option o : opts) info(tb, o.name, opts.get(o));
+    for(final Option o : opts) info(tb, o.name(), opts.get(o));
     return tb.toString();
   }
 }

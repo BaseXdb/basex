@@ -7,6 +7,7 @@ import static org.basex.util.ft.FTFlag.*;
 
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -193,11 +194,11 @@ public final class FNFt extends StandardFunc {
     final FTOpt opt = new FTOpt().copy(data.meta);
     FTMode mode = FTMode.ANY;
     if(opts != null) {
-      opt.set(FZ, opts.bool(FTOptions.FUZZY));
-      opt.set(WC, opts.bool(FTOptions.WILDCARDS));
-      final String md = opts.string(FTOptions.MODE);
+      opt.set(FZ, opts.get(FTOptions.FUZZY));
+      opt.set(WC, opts.get(FTOptions.WILDCARDS));
+      final String md = opts.get(FTOptions.MODE);
       mode = FTMode.get(md);
-      if(mode == null) ELMOPTION.thrw(info, md);
+      if(mode == null) INVALIDOPT.thrw(info, Util.info(Text.INVALID_VALUE_X_X, "mode", md));
     }
 
     ctx.ftOpt(opt);

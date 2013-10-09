@@ -62,15 +62,15 @@ public final class DirParser extends Parser {
     super(source, opts);
     final String parent = source.dirPath();
     root = parent.endsWith("/") ? parent : parent + '/';
-    skipCorrupt = options.bool(MainOptions.SKIPCORRUPT);
-    archives = options.bool(MainOptions.ADDARCHIVES);
-    addRaw = options.bool(MainOptions.ADDRAW);
-    dtd = options.bool(MainOptions.DTD);
-    rawParser = options.string(MainOptions.PARSER).toLowerCase(Locale.ENGLISH).
+    skipCorrupt = options.get(MainOptions.SKIPCORRUPT);
+    archives = options.get(MainOptions.ADDARCHIVES);
+    addRaw = options.get(MainOptions.ADDRAW);
+    dtd = options.get(MainOptions.DTD);
+    rawParser = options.get(MainOptions.PARSER).toLowerCase(Locale.ENGLISH).
         equals(DataText.M_RAW);
 
     filter = !source.isDir() && !source.isArchive() ? null :
-      Pattern.compile(IOFile.regex(opts.string(MainOptions.CREATEFILTER)));
+      Pattern.compile(IOFile.regex(opts.get(MainOptions.CREATEFILTER)));
     // choose binary storage if (disk-based) database path is known and
     // if raw parser or "add raw" option were chosen
     rawPath = path != null && (addRaw || rawParser) ? new IOFile(path, M_RAW) : null;

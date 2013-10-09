@@ -2,21 +2,21 @@ package org.basex.util.ft;
 
 import java.io.*;
 
-import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
- * This class contains parser options.
+ * Full-text options.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class FTOptions extends Options {
   /** Option: fuzzy. */
-  public static final Option FUZZY = new Option("fuzzy", false);
+  public static final BooleanOption FUZZY = new BooleanOption("fuzzy", false);
   /** Option: wildcards. */
-  public static final Option WILDCARDS = new Option("wildcards", false);
+  public static final BooleanOption WILDCARDS = new BooleanOption("wildcards", false);
   /** Option: wildcards. */
-  public static final Option MODE = new Option("mode", "any");
+  public static final StringOption MODE = new StringOption("mode", "any");
 
   /**
    * Constructor.
@@ -31,6 +31,6 @@ public final class FTOptions extends Options {
    * @throws IOException I/O exception
    */
   public FTOptions(final String opts) throws IOException {
-    parse(opts, true);
+    super(opts);
   }
 }

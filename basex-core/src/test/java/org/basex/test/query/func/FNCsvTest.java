@@ -82,7 +82,7 @@ public final class FNCsvTest extends AdvancedQueryTest {
       final String query = test[1].isEmpty() ? _CSV_PARSE.args(test[0]) :
         _CSV_PARSE.args(test[0], " {" + test[1] + "}");
       if(test.length == 2) {
-        error(query, Err.BXCS_PARSE, Err.ELMOPTION);
+        error(query, Err.BXCS_CONFSEP, Err.INVALIDOPT);
       } else if(test[2].startsWith("...")) {
         contains(query, test[2].substring(3));
       } else {
@@ -97,7 +97,7 @@ public final class FNCsvTest extends AdvancedQueryTest {
       final String query = test[1].isEmpty() ? _CSV_SERIALIZE.args(test[0]) :
         _CSV_SERIALIZE.args(test[0], " {" + test[1] + "}");
       if(test.length == 2) {
-        error(query, Err.BXCS_CONFSEP, Err.ELMOPTION);
+        error(query, Err.BXCS_CONFSEP, Err.INVALIDOPT);
       } else {
         query(query, test[2]);
       }

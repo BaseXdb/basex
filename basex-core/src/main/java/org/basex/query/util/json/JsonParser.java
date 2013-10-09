@@ -46,7 +46,7 @@ public final class JsonParser extends InputParser {
 
     super(in);
     spec = opts.spec();
-    unescape = opts.bool(JsonOptions.UNESCAPE);
+    unescape = opts.get(JsonOptions.UNESCAPE);
     info = ii;
   }
 

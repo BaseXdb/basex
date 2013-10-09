@@ -66,8 +66,8 @@ public final class FNFtTest extends AdvancedQueryTest {
         "Exercise 1");
 
     // check buggy options
-    error(_FT_SEARCH.args(NAME, "x", " { 'x':'y' }"), Err.ELMOPTION);
-    error(_FT_SEARCH.args(NAME, "x", " { 'mode':'' }"), Err.ELMOPTION);
+    error(_FT_SEARCH.args(NAME, "x", " { 'x':'y' }"), Err.INVALIDOPT);
+    error(_FT_SEARCH.args(NAME, "x", " { 'mode':'' }"), Err.INVALIDOPT);
     error(_FT_SEARCH.args(NAME, "x", " 1"), Err.ELMMAPTYPE);
   }
 

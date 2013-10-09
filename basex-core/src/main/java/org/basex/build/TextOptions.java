@@ -1,20 +1,20 @@
 package org.basex.build;
 
-import java.io.*;
-
+import org.basex.core.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
- * This class contains parser options.
+ * Options for parsing and serializing text documents.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class TextOptions extends Options {
   /** Parser option: encoding. */
-  public static final Option ENCODING = new Option("encoding", Token.UTF8);
+  public static final StringOption ENCODING = new StringOption("encoding", Token.UTF8);
   /** Parser option: line-wise parsing. */
-  public static final Option LINES = new Option("lines", true);
+  public static final BooleanOption LINES = new BooleanOption("lines", true);
 
   /**
    * Constructor.
@@ -26,9 +26,9 @@ public final class TextOptions extends Options {
   /**
    * Constructor, specifying initial options.
    * @param opts options string
-   * @throws IOException I/O exception
+   * @throws BaseXException database exception
    */
-  public TextOptions(final String opts) throws IOException {
-    parse(opts, true);
+  public TextOptions(final String opts) throws BaseXException {
+    super(opts);
   }
 }

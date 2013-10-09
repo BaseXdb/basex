@@ -13,6 +13,7 @@ import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.server.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.nio.*;
 import org.eclipse.jetty.server.ssl.*;
@@ -65,7 +66,7 @@ public final class BaseXHTTP {
 
     // create jetty instance and set default context to HTTP path
     final GlobalOptions gopts = context.globalopts;
-    final String webapp = gopts.string(GlobalOptions.WEBPATH);
+    final String webapp = gopts.get(GlobalOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
     jetty = (Server) new XmlConfiguration(initJetty(webapp).inputStream()).configure();
     jetty.setHandler(wac);
@@ -125,8 +126,8 @@ public final class BaseXHTTP {
     HTTPContext.init(wac.getServletContext());
 
     // start daemon for stopping web server
-    final int stop = gopts.number(GlobalOptions.STOPPORT);
-    if(stop >= 0) new StopServer(gopts.string(GlobalOptions.SERVERHOST), stop).start();
+    final int stop = gopts.get(GlobalOptions.STOPPORT);
+    if(stop >= 0) new StopServer(gopts.get(GlobalOptions.SERVERHOST), stop).start();
 
     // show info when HTTP server is aborted
     Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -175,9 +176,9 @@ public final class BaseXHTTP {
    * @param gopts global options
    * @return numeric value
    */
-  private static int num(final Option option, final GlobalOptions gopts) {
+  private static int num(final NumberOption option, final GlobalOptions gopts) {
     final String val = Options.getSystem(option);
-    return val.isEmpty() ? gopts.number(option) : Token.toInt(val);
+    return val.isEmpty() ? gopts.get(option) : Token.toInt(val);
   }
 
   /**
@@ -186,9 +187,9 @@ public final class BaseXHTTP {
    * @param gopts global options
    * @return boolean value
    */
-  private static boolean bool(final Option option, final GlobalOptions gopts) {
+  private static boolean bool(final BooleanOption option, final GlobalOptions gopts) {
     final String val = Options.getSystem(option);
-    return val.isEmpty() ? gopts.bool(option) : Boolean.parseBoolean(val);
+    return val.isEmpty() ? gopts.get(option) : Boolean.parseBoolean(val);
   }
 
   /**

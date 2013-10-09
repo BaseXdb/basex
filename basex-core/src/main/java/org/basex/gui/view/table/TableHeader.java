@@ -167,7 +167,7 @@ final class TableHeader extends BaseXPanel {
     } else {
       moveC = -1;
       if(mouseX < w) cursor = CURSORTEXT;
-      if(gui.gopts.bool(GUIOptions.MOUSEFOCUS)) {
+      if(gui.gopts.get(GUIOptions.MOUSEFOCUS)) {
         final int c = tdata.column(w, mouseX);
         if(c != -1) filter(c);
       }

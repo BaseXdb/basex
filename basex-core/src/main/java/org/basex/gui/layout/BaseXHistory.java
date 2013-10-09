@@ -1,8 +1,8 @@
 package org.basex.gui.layout;
 
 import org.basex.gui.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This class remembers previous text inputs of a GUI component.
@@ -16,14 +16,14 @@ public final class BaseXHistory {
   /** GUI reference. */
   final GUI gui;
   /** History option. */
-  final Option history;
+  final StringsOption history;
 
   /**
    * Constructor.
    * @param main main window
    * @param option option
    */
-  public BaseXHistory(final GUI main, final Option option) {
+  public BaseXHistory(final GUI main, final StringsOption option) {
     history = option;
     gui = main;
   }
@@ -35,9 +35,9 @@ public final class BaseXHistory {
   public void store(final String input) {
     if(input == null) return;
     final StringList sl = new StringList(MAX).add(input);
-    for(final String s : gui.gopts.strings(history)) {
+    for(final String s : gui.gopts.get(history)) {
       if(sl.size() < MAX &&  !input.equals(s)) sl.add(s);
     }
-    gui.gopts.strings(history, sl.toArray());
+    gui.gopts.set(history, sl.toArray());
   }
 }

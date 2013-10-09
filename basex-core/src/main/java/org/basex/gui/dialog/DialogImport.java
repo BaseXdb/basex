@@ -73,8 +73,8 @@ public final class DialogImport extends BaseXBack {
     // add options
     add(new BaseXLabel(FILE_OR_DIR + COL, true, true).border(0, 0, 6, 0));
 
-    final String in = gui.gopts.string(GUIOptions.INPUTPATH);
-    input = new BaseXTextField(gui.gopts.string(GUIOptions.INPUTPATH), dial);
+    final String in = gui.gopts.get(GUIOptions.INPUTPATH);
+    input = new BaseXTextField(gui.gopts.get(GUIOptions.INPUTPATH), dial);
     input.history(gui, GUIOptions.INPUTS);
 
     final IO io = IO.get(in);
@@ -99,14 +99,14 @@ public final class DialogImport extends BaseXBack {
     for(final String p : PARSING) parsers.add(p.toUpperCase(Locale.ENGLISH));
 
     parser = new BaseXCombo(dial, parsers.toArray());
-    parser.setSelectedItem(opts.string(MainOptions.PARSER).toUpperCase(Locale.ENGLISH));
-    filter = new BaseXTextField(opts.string(MainOptions.CREATEFILTER), dial);
+    parser.setSelectedItem(opts.get(MainOptions.PARSER).toUpperCase(Locale.ENGLISH));
+    filter = new BaseXTextField(opts.get(MainOptions.CREATEFILTER), dial);
     BaseXLayout.setWidth(filter, 200);
 
-    addRaw = new BaseXCheckBox(ADD_RAW_FILES, opts.bool(MainOptions.ADDRAW), dial);
+    addRaw = new BaseXCheckBox(ADD_RAW_FILES, opts.get(MainOptions.ADDRAW), dial);
     skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES,
-        opts.bool(MainOptions.SKIPCORRUPT), dial);
-    archives = new BaseXCheckBox(PARSE_ARCHIVES, opts.bool(MainOptions.ADDARCHIVES), dial);
+        opts.get(MainOptions.SKIPCORRUPT), dial);
+    archives = new BaseXCheckBox(PARSE_ARCHIVES, opts.get(MainOptions.ADDARCHIVES), dial);
 
     final BaseXBack p = new BaseXBack(new TableLayout(2, 2, 20, 0));
     p.add(new BaseXLabel(INPUT_FORMAT, false, true).border(0, 0, 6, 0));
@@ -137,12 +137,12 @@ public final class DialogImport extends BaseXBack {
    * @return file chooser
    */
   IOFile inputFile() {
-    final String path = gui.gopts.string(GUIOptions.INPUTPATH);
+    final String path = gui.gopts.get(GUIOptions.INPUTPATH);
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, path, gui);
     fc.textFilters();
     fc.filter(ZIP_ARCHIVES, IO.ZIPSUFFIXES);
     final IOFile file = fc.select(Mode.FDOPEN);
-    if(file != null) gui.gopts.string(GUIOptions.INPUTPATH, file.path());
+    if(file != null) gui.gopts.set(GUIOptions.INPUTPATH, file.path());
     return file;
   }
 
@@ -157,7 +157,7 @@ public final class DialogImport extends BaseXBack {
 
     final String in = input.getText().trim();
     final IO io = IO.get(in);
-    gui.gopts.string(GUIOptions.INPUTPATH, in);
+    gui.gopts.set(GUIOptions.INPUTPATH, in);
 
     boolean multi = io.isDir() || io.isArchive();
     archives.setEnabled(multi);
@@ -166,7 +166,7 @@ public final class DialogImport extends BaseXBack {
 
     final String type = parser();
     final boolean raw = type.equals(DataText.M_RAW);
-    addRaw.setEnabled(multi && !raw && !gui.context.options.bool(MainOptions.MAINMEM));
+    addRaw.setEnabled(multi && !raw && !gui.context.options.get(MainOptions.MAINMEM));
     skipCorrupt.setEnabled(!raw);
 
     if(comp == parser) {

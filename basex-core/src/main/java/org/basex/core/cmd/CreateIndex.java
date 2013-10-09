@@ -46,11 +46,11 @@ public final class CreateIndex extends ACreate {
         break;
       case FULLTEXT:
         data.meta.createftxt = true;
-        data.meta.stemming = options.bool(MainOptions.STEMMING);
-        data.meta.casesens = options.bool(MainOptions.CASESENS);
-        data.meta.diacritics = options.bool(MainOptions.DIACRITICS);
+        data.meta.stemming = options.get(MainOptions.STEMMING);
+        data.meta.casesens = options.get(MainOptions.CASESENS);
+        data.meta.diacritics = options.get(MainOptions.DIACRITICS);
         data.meta.language = Language.get(options);
-        data.meta.stopwords = options.string(MainOptions.STOPWORDS);
+        data.meta.stopwords = options.get(MainOptions.STOPWORDS);
         index = IndexType.FULLTEXT;
         break;
       default:

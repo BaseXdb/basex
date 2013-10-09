@@ -76,7 +76,7 @@ public class DiskValues implements Index {
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(LI_STRUCTURE + SORTED_LIST + NL);
-    final IndexStats stats = new IndexStats(data.meta.options.number(MainOptions.MAXSTAT));
+    final IndexStats stats = new IndexStats(data.meta.options.get(MainOptions.MAXSTAT));
 
     synchronized(monitor) {
       final long l = idxl.length() + idxr.length();

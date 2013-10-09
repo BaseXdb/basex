@@ -12,6 +12,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.io.serial.*;
+import org.basex.query.*;
 import org.basex.server.*;
 
 /**
@@ -54,7 +55,7 @@ public abstract class RESTCode {
   static void wrap(final String val, final HTTPContext http) throws HTTPException {
     try {
       http.wrapping = SerializerOptions.yes(WRAP, val);
-    } catch(final SerializerException ex) {
+    } catch(final QueryIOException ex) {
       HTTPErr.BAD_REQUEST_X.thrw(ex);
     }
   }

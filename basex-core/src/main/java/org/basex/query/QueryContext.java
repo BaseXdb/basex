@@ -33,6 +33,7 @@ import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This class organizes both static and dynamic properties that are specific to a
@@ -67,10 +68,10 @@ public final class QueryContext extends Proc {
   public HashMap<String, IO> stop;
   /** Cached thesaurus files. */
   public HashMap<String, IO> thes;
-  /** Local options (key/value pairs), set by option declarations. */
-  public final StringList dbOptions = new StringList();
-  /** Global options (will be set after query execution). */
-  public final HashMap<Option, Object> globalOpt = new HashMap<Option, Object>();
+  /** Global database options (will be reassigned after query execution). */
+  public final HashMap<Option, Object> staticOpts = new HashMap<Option, Object>();
+  /** Temporary query options (key/value pairs), supplied by option declarations. */
+  public final StringList tempOpts = new StringList();
 
   /** Current context value. */
   public Value value;
@@ -164,9 +165,9 @@ public final class QueryContext extends Proc {
   public QueryContext(final Context ctx) {
     context = ctx;
     nodes = ctx.current();
-    inf = ctx.options.bool(MainOptions.QUERYINFO) || Prop.debug;
-    sc = new StaticContext(ctx.options.bool(MainOptions.XQUERY3));
-    maxCalls = ctx.options.number(MainOptions.TAILCALLS);
+    inf = ctx.options.get(MainOptions.QUERYINFO) || Prop.debug;
+    sc = new StaticContext(ctx.options.get(MainOptions.XQUERY3));
+    maxCalls = ctx.options.get(MainOptions.TAILCALLS);
     modules = new ModuleLoader(ctx);
   }
 
@@ -190,8 +191,7 @@ public final class QueryContext extends Proc {
    * @return name of module
    * @throws QueryException query exception
    */
-  public LibraryModule parseLibrary(final String qu, final String path)
-      throws QueryException {
+  public LibraryModule parseLibrary(final String qu, final String path) throws QueryException {
     query = qu;
     return new QueryParser(qu, path, this).parseLibrary(true);
   }
@@ -211,12 +211,11 @@ public final class QueryContext extends Proc {
    */
   public void compile() throws QueryException {
     // set database options
-    final StringList o = dbOptions;
+    final StringList o = tempOpts;
     for(int s = 0; s < o.size(); s += 2) {
       try {
-        final Option opt = context.options.option(o.get(s).toUpperCase(Locale.ENGLISH));
-        context.options.set(opt, o.get(s + 1));
-      } catch(final Exception ex) {
+        context.options.assign(o.get(s).toUpperCase(Locale.ENGLISH), o.get(s + 1));
+      } catch(final BaseXException ex) {
         BASX_VALUE.thrw(null, o.get(s), o.get(s + 1));
       }
     }
@@ -454,12 +453,13 @@ public final class QueryContext extends Proc {
    * @param optional if {@code true}, a {@code null} reference is returned if no
    *   parameters have been specified
    * @return serialization parameters
+   * @throws BaseXException database exception
    */
-  public SerializerOptions serParams(final boolean optional) {
+  public SerializerOptions serParams(final boolean optional) throws BaseXException {
     // if available, return parameters specified by the query
     if(serialOpts != null) return serialOpts;
     // retrieve global parameters
-    final String serial = context.options.string(MainOptions.SERIALIZER);
+    final String serial = context.options.get(MainOptions.SERIALIZER);
     if(optional && serial.isEmpty()) return null;
     // otherwise, if requested, return default parameters
     return new SerializerOptions(serial);
@@ -499,8 +499,8 @@ public final class QueryContext extends Proc {
     if(closed) return;
     closed = true;
 
-    // reset database options to their initial values
-    for(final Entry<Option, Object> e : globalOpt.entrySet())
+    // reassign original database options
+    for(final Entry<Option, Object> e : staticOpts.entrySet())
       context.options.put(e.getKey(), e.getValue());
 
     // close database connections
@@ -537,7 +537,7 @@ public final class QueryContext extends Proc {
    */
   Result execute() throws QueryException {
     // limit number of hits to be returned and displayed
-    int max = context.options.number(MainOptions.MAXHITS);
+    int max = context.options.get(MainOptions.MAXHITS);
     if(max < 0) max = Integer.MAX_VALUE;
 
     // evaluates the query
@@ -632,7 +632,7 @@ public final class QueryContext extends Proc {
     // convert to json
     if(type.equalsIgnoreCase(M_JSON)) {
       final JsonOptions jp = new JsonOptions();
-      jp.string(JsonOptions.SPEC, JsonSpec.ECMA_262.toString());
+      jp.set(JsonOptions.SPEC, JsonSpec.ECMA_262.toString());
       return new JsonMapConverter(jp, null).convert(val.toString());
     }
 
@@ -667,8 +667,7 @@ public final class QueryContext extends Proc {
    * @param ii input info
    * @throws QueryException exception
    */
-  public void set(final Var vr, final Value vl, final InputInfo ii)
-      throws QueryException {
+  public void set(final Var vr, final Value vl, final InputInfo ii) throws QueryException {
     stack.set(vr, vl, this, ii);
   }
 

@@ -84,7 +84,7 @@ final class XMLScanner extends Proc {
 
     try {
       for(int e = 0; e < ENTITIES.length; e += 2) ents.put(ENTITIES[e], ENTITIES[e + 1]);
-      dtd = opts.bool(MainOptions.DTD);
+      dtd = opts.get(MainOptions.DTD);
 
       String enc = null;
       // process document declaration...

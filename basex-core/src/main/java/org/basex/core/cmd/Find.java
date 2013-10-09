@@ -41,7 +41,7 @@ public final class Find extends AQuery {
     final String query = find(args[0], context, root);
     final boolean ok = query(query);
     final StringBuilder sb = new StringBuilder();
-    if(options.bool(MainOptions.QUERYINFO)) {
+    if(options.get(MainOptions.QUERYINFO)) {
       sb.append(NL).append(QUERY_CC).append(NL).append(query).append(NL);
     }
     sb.append(info());

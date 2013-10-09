@@ -58,6 +58,8 @@ public class FNCsv extends StandardFunc {
 
     try {
       return new CsvConverter(opts).convert(input);
+    } catch(final QueryIOException ex) {
+      throw ex.getCause(info);
     } catch(final IOException ex) {
       throw BXCS_PARSE.thrw(info, ex);
     }
@@ -74,8 +76,8 @@ public class FNCsv extends StandardFunc {
     final CsvOptions opts = checkOptions(1, Q_OPTIONS, new CsvOptions(), ctx);
 
     final SerializerOptions sopts = new SerializerOptions();
-    sopts.string(S_METHOD, M_CSV);
-    sopts.string(S_CSV, opts.toString());
+    sopts.set(S_METHOD, M_CSV);
+    sopts.set(S_CSV, opts.toString());
     return Str.get(delete(serialize(node.iter(), sopts), '\r'));
   }
 }

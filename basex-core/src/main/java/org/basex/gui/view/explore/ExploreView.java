@@ -66,7 +66,7 @@ public final class ExploreView extends View {
   @Override
   public void refreshMark() {
     final Nodes marked = gui.context.marked;
-    filter.setEnabled(!gui.gopts.bool(GUIOptions.FILTERRT) &&
+    filter.setEnabled(!gui.gopts.get(GUIOptions.FILTERRT) &&
         marked != null && marked.size() != 0);
   }
 
@@ -86,12 +86,12 @@ public final class ExploreView extends View {
 
   @Override
   public boolean visible() {
-    return gui.gopts.bool(GUIOptions.SHOWEXPLORE);
+    return gui.gopts.get(GUIOptions.SHOWEXPLORE);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gopts.bool(GUIOptions.SHOWEXPLORE, v);
+    gui.gopts.set(GUIOptions.SHOWEXPLORE, v);
   }
 
   @Override

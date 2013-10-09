@@ -1,19 +1,17 @@
-package org.basex.io.serial;
+package org.basex.query;
 
 import java.io.*;
 
-import org.basex.query.*;
 import org.basex.util.*;
 
 /**
- * This class indicates exceptions during the serialization of a query.
- * This exception contains a {@link QueryException}, which can later be
- * unwrapped.
+ * This class indicates exceptions during the I/O operations of a query.
+ * The exception contains a {@link QueryException}, which can later be unwrapped.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class SerializerException extends IOException {
+public final class QueryIOException extends IOException {
   /** Wrapped query exception. */
   private final QueryException exception;
 
@@ -21,7 +19,7 @@ public final class SerializerException extends IOException {
    * Default constructor.
    * @param qe query exception
    */
-  public SerializerException(final QueryException qe) {
+  public QueryIOException(final QueryException qe) {
     super(Util.message(qe));
     exception = qe;
   }

@@ -105,7 +105,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   boolean inline(final QueryContext ctx) {
     return expr.isValue() ||
-        expr.exprSize() < ctx.context.options.number(MainOptions.INLINELIMIT) &&
+        expr.exprSize() < ctx.context.options.get(MainOptions.INLINELIMIT) &&
         !(compiling || has(Flag.NDT) || has(Flag.CTX) || selfRecursive());
   }
 

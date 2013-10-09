@@ -38,7 +38,7 @@ final class TableContent extends BaseXBack {
     tdata = d;
     gui = scr.gui;
     layout(new BorderLayout());
-    mode(gui.gopts.bool(GUIOptions.GRADIENT) ? Fill.GRADIENT : Fill.NONE);
+    mode(gui.gopts.get(GUIOptions.GRADIENT) ? Fill.GRADIENT : Fill.NONE);
     add(scroll, BorderLayout.EAST);
   }
 

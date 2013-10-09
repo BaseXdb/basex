@@ -1,9 +1,11 @@
 package org.basex.core;
 
+import static org.basex.core.Prop.*;
+
 import java.util.*;
 
 import org.basex.io.*;
-import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * This class defines options which are used all around the project.
@@ -17,89 +19,89 @@ public final class GlobalOptions extends Options {
   private static final boolean USERHOME = Prop.HOME.equals(Prop.USERHOME);
 
   /** Comment: written to options file. */
-  public static final Option C_GENERAL = new Option("General Options");
+  public static final Comment C_GENERAL = new Comment("General Options");
 
   /** Database path. */
-  public static final Option DBPATH = new Option("DBPATH",
+  public static final StringOption DBPATH = new StringOption("DBPATH",
     Prop.HOME + (USERHOME ? Prop.NAME + "Data" : "data"));
   /** Package repository path. */
-  public static final Option REPOPATH = new Option("REPOPATH",
+  public static final StringOption REPOPATH = new StringOption("REPOPATH",
     Prop.HOME + (USERHOME ? Prop.NAME + "Repo" : "repo"));
   /** Debug mode. */
-  public static final Option DEBUG = new Option("DEBUG", false);
+  public static final BooleanOption DEBUG = new BooleanOption("DEBUG", false);
   /** Language name. */
-  public static final Option LANG = new Option("LANG", Prop.language);
+  public static final StringOption LANG = new StringOption("LANG", Prop.language);
   /** Flag to include key names in the language strings. */
-  public static final Option LANGKEYS = new Option("LANGKEYS", false);
+  public static final BooleanOption LANGKEYS = new BooleanOption("LANGKEYS", false);
   /** Applied locking algorithm: local (database) vs. global (process) locking. */
-  public static final Option GLOBALLOCK = new Option("GLOBALLOCK", false);
+  public static final BooleanOption GLOBALLOCK = new BooleanOption("GLOBALLOCK", false);
 
   /** Comment: written to options file. */
-  public static final Option C_CLIENT = new Option("Client/Server Architecture");
+  public static final Comment C_CLIENT = new Comment("Client/Server Architecture");
 
   /** Server: host, used for connecting new clients. */
-  public static final Option HOST = new Option("HOST", Text.LOCALHOST);
+  public static final StringOption HOST = new StringOption("HOST", Text.LOCALHOST);
   /** Server: port, used for connecting new clients. */
-  public static final Option PORT = new Option("PORT", 1984);
+  public static final NumberOption PORT = new NumberOption("PORT", 1984);
   /** Server: port, used for binding the server. */
-  public static final Option SERVERPORT = new Option("SERVERPORT", 1984);
+  public static final NumberOption SERVERPORT = new NumberOption("SERVERPORT", 1984);
   /** Server: port, used for sending events. */
-  public static final Option EVENTPORT = new Option("EVENTPORT", 1985);
+  public static final NumberOption EVENTPORT = new NumberOption("EVENTPORT", 1985);
   /** Default user. */
-  public static final Option USER = new Option("USER", "");
+  public static final StringOption USER = new StringOption("USER", "");
   /** Default password. */
-  public static final Option PASSWORD = new Option("PASSWORD", "");
+  public static final StringOption PASSWORD = new StringOption("PASSWORD", "");
 
   /** Server: host, used for binding the server. Empty string for wildcard.*/
-  public static final Option SERVERHOST = new Option("SERVERHOST", "");
+  public static final StringOption SERVERHOST = new StringOption("SERVERHOST", "");
   /** Server: proxy host. */
-  public static final Option PROXYHOST = new Option("PROXYHOST", "");
+  public static final StringOption PROXYHOST = new StringOption("PROXYHOST", "");
   /** Server: proxy port. */
-  public static final Option PROXYPORT = new Option("PROXYPORT", 80);
+  public static final NumberOption PROXYPORT = new NumberOption("PROXYPORT", 80);
   /** Server: non-proxy host. */
-  public static final Option NONPROXYHOSTS = new Option("NONPROXYHOSTS", "");
+  public static final StringOption NONPROXYHOSTS = new StringOption("NONPROXYHOSTS", "");
 
   /** Timeout (seconds) for processing client requests; deactivated if set to 0. */
-  public static final Option TIMEOUT = new Option("TIMEOUT", 30);
+  public static final NumberOption TIMEOUT = new NumberOption("TIMEOUT", 30);
   /** Keep alive time of clients; deactivated if set to 0. */
-  public static final Option KEEPALIVE = new Option("KEEPALIVE", 600);
+  public static final NumberOption KEEPALIVE = new NumberOption("KEEPALIVE", 600);
   /** Defines the number of parallel readers. */
-  public static final Option PARALLEL = new Option("PARALLEL", 8);
+  public static final NumberOption PARALLEL = new NumberOption("PARALLEL", 8);
   /** Logging flag. */
-  public static final Option LOG = new Option("LOG", true);
+  public static final BooleanOption LOG = new BooleanOption("LOG", true);
   /** Log message cut-off. */
-  public static final Option LOGMSGMAXLEN = new Option("LOGMSGMAXLEN", 1000);
+  public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
 
   /** Comment: written to options file. */
-  public static final Option C_HTTP = new Option("HTTP Services");
+  public static final Comment C_HTTP = new Comment("HTTP Services");
 
   /** Web path. */
-  public static final Option WEBPATH = new Option("WEBPATH",
+  public static final StringOption WEBPATH = new StringOption("WEBPATH",
     Prop.HOME + (USERHOME ? Prop.NAME + "Web" : "webapp"));
   /** RESTXQ path (relative to web path). */
-  public static final Option RESTXQPATH = new Option("RESTXQPATH", "");
+  public static final StringOption RESTXQPATH = new StringOption("RESTXQPATH", "");
   /** Local (embedded) mode. */
-  public static final Option HTTPLOCAL = new Option("HTTPLOCAL", false);
+  public static final BooleanOption HTTPLOCAL = new BooleanOption("HTTPLOCAL", false);
   /** Port for stopping the web server. */
-  public static final Option STOPPORT = new Option("STOPPORT", 8985);
+  public static final NumberOption STOPPORT = new NumberOption("STOPPORT", 8985);
 
   /**
    * Constructor, adopting system properties starting with "org.basex.".
    * @param file if {@code true}, options will be read from disk
    */
   GlobalOptions(final boolean file) {
-    super(file ? "" : null);
+    super(file ? new IOFile(HOME + IO.BASEXSUFFIX) : null);
     // set some static options
-    Prop.language = string(LANG);
-    Prop.langkeys = bool(LANGKEYS);
-    Prop.debug = bool(DEBUG);
-    final String ph = string(PROXYHOST);
-    final String pp = Integer.toString(number(PROXYPORT));
+    Prop.language = get(LANG);
+    Prop.langkeys = get(LANGKEYS);
+    Prop.debug = get(DEBUG);
+    final String ph = get(PROXYHOST);
+    final String pp = Integer.toString(get(PROXYPORT));
     setSystem("http.proxyHost", ph);
     setSystem("http.proxyPort", pp);
     setSystem("https.proxyHost", ph);
     setSystem("https.proxyPort", pp);
-    setSystem("http.nonProxyHosts", string(NONPROXYHOSTS));
+    setSystem("http.nonProxyHosts", get(NONPROXYHOSTS));
   }
 
   /**
@@ -108,7 +110,7 @@ public final class GlobalOptions extends Options {
    * @return database directory
    */
   public IOFile dbpath(final String db) {
-    return new IOFile(string(DBPATH), db);
+    return new IOFile(get(DBPATH), db);
   }
 
   /**
@@ -129,7 +131,7 @@ public final class GlobalOptions extends Options {
    * @return database filename
    */
   public IOFile dbpath() {
-    return new IOFile(string(DBPATH));
+    return new IOFile(get(DBPATH));
   }
 
   /**

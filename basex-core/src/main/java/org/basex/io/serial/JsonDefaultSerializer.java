@@ -51,8 +51,8 @@ public final class JsonDefaultSerializer extends JsonSerializer {
       throws IOException {
     super(os, opts);
     for(int t = 0; t < typeCache.length; t++) typeCache[t] = new TokenMap();
-    final JsonOptions jopts = new JsonOptions(opts.string(SerializerOptions.S_JSON));
-    lax = jopts.bool(JsonOptions.LAX);
+    final JsonOptions jopts = new JsonOptions(opts.get(SerializerOptions.S_JSON));
+    lax = jopts.get(JsonOptions.LAX);
   }
 
   @Override
@@ -208,6 +208,6 @@ public final class JsonDefaultSerializer extends JsonSerializer {
    * @throws IOException I/O exception
    */
   private static void error(final String msg, final Object... ext) throws IOException {
-    throw BXJS_SERIAL.thrwSerial(Util.inf(msg, ext));
+    throw BXJS_SERIAL.thrwIO(Util.inf(msg, ext));
   }
 }

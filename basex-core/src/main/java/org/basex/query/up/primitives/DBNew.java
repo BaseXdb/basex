@@ -14,6 +14,7 @@ import org.basex.data.atomic.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Update primitive for adding documents to databases.
@@ -31,19 +32,19 @@ public abstract class DBNew extends BasicOperation {
     MainOptions.UPDINDEX };
   /** String index options. */
   protected static final Option[] S_OPT = { MainOptions.LANGUAGE, MainOptions.STOPWORDS };
-  /** Keys of numeric index options. */
+  /** Names of numeric index options. */
   protected static final String[] K_N_OPT = new String[N_OPT.length];
-  /** Keys of boolean index options. */
+  /** Names of boolean index options. */
   protected static final String[] K_B_OPT = new String[B_OPT.length];
-  /** Keys of numeric index options. */
+  /** NAmes of numeric index options. */
   protected static final String[] K_S_OPT = new String[S_OPT.length];
 
   static {
     // initialize options arrays
     final int n = N_OPT.length, b = B_OPT.length, s = S_OPT.length;
-    for(int o = 0; o < n; o++) K_N_OPT[o] = N_OPT[o].name.toLowerCase(Locale.ENGLISH);
-    for(int o = 0; o < b; o++) K_B_OPT[o] = B_OPT[o].name.toLowerCase(Locale.ENGLISH);
-    for(int o = 0; o < s; o++) K_S_OPT[o] = S_OPT[o].name.toLowerCase(Locale.ENGLISH);
+    for(int o = 0; o < n; o++) K_N_OPT[o] = N_OPT[o].name().toLowerCase(Locale.ENGLISH);
+    for(int o = 0; o < b; o++) K_B_OPT[o] = B_OPT[o].name().toLowerCase(Locale.ENGLISH);
+    for(int o = 0; o < s; o++) K_S_OPT[o] = S_OPT[o].name().toLowerCase(Locale.ENGLISH);
   }
 
   /** Query context. */

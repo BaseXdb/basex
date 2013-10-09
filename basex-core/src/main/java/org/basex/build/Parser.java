@@ -104,7 +104,7 @@ public abstract class Parser extends Proc {
   public static SingleParser xmlParser(final IO in, final MainOptions options)
       throws IOException {
     // use internal or default XML parser
-    return options.bool(MainOptions.INTPARSE) ? new XMLParser(in, options) :
+    return options.get(MainOptions.INTPARSE) ? new XMLParser(in, options) :
       new SAXWrapper(in, options);
   }
 
@@ -120,7 +120,7 @@ public abstract class Parser extends Proc {
       final String target) throws IOException {
 
     // use file specific parser
-    final String parser = options.string(MainOptions.PARSER).toLowerCase(Locale.ENGLISH);
+    final String parser = options.get(MainOptions.PARSER).toLowerCase(Locale.ENGLISH);
     final SingleParser p;
     if(parser.equals(DataText.M_HTML)) {
       p = new HtmlParser(in, options);

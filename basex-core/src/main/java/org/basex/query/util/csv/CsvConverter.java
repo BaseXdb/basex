@@ -7,7 +7,7 @@ import java.io.*;
 import org.basex.build.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.io.serial.*;
+import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -49,13 +49,13 @@ public final class CsvConverter {
   /**
    * Constructor.
    * @param opts CSV options
-   * @throws SerializerException serializer exception
+   * @throws QueryIOException query I/O exception
    */
-  public CsvConverter(final CsvOptions opts) throws SerializerException {
+  public CsvConverter(final CsvOptions opts) throws QueryIOException {
     copts = opts;
     separator = opts.separator();
-    header = opts.bool(CsvOptions.HEADER);
-    lax = opts.bool(CsvOptions.LAX);
+    header = opts.get(CsvOptions.HEADER);
+    lax = opts.get(CsvOptions.LAX);
   }
 
   /**
@@ -75,7 +75,7 @@ public final class CsvConverter {
    * @throws IOException I/O exception
    */
   public FElem convert(final IO io) throws IOException {
-    return convert(new NewlineInput(io).encoding(copts.string(CsvOptions.ENCODING)));
+    return convert(new NewlineInput(io).encoding(copts.get(CsvOptions.ENCODING)));
   }
 
   /**

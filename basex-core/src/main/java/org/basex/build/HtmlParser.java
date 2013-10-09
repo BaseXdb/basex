@@ -65,7 +65,7 @@ public final class HtmlParser extends XMLParser {
    * @throws IOException I/O exception
    */
   public HtmlParser(final IO source, final MainOptions opts) throws IOException {
-    this(source, opts, new HtmlOptions(opts.string(MainOptions.HTMLPARSER)));
+    this(source, opts, new HtmlOptions(opts.get(MainOptions.HTMLPARSER)));
   }
 
   /**
@@ -118,57 +118,57 @@ public final class HtmlParser extends XMLParser {
 
       // set TagSoup options
       String p;
-      if(opts.bool(HtmlOptions.HTML)) {
+      if(opts.get(HtmlOptions.HTML)) {
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
         opt("method", "html");
         opt("omit-xml-declaration", "yes");
       }
-      if(opts.bool(HtmlOptions.NONS)) {
+      if(opts.get(HtmlOptions.NONS)) {
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
       }
-      if(opts.bool(HtmlOptions.OMITXML)) {
+      if(opts.get(HtmlOptions.OMITXML)) {
         opt("omit-xml-declaration", "yes");
       }
-      if(!(p = opts.string(HtmlOptions.METHOD)).isEmpty()) {
+      if(!(p = opts.get(HtmlOptions.METHOD)).isEmpty()) {
         opt("method", p);
       }
-      if(opts.bool(HtmlOptions.NOBOGONS)) {
+      if(opts.get(HtmlOptions.NOBOGONS)) {
         reader.setFeature(FEATURES + "ignore-bogons", true);
       }
-      if(opts.bool(HtmlOptions.NODEFAULTS)) {
+      if(opts.get(HtmlOptions.NODEFAULTS)) {
         reader.setFeature(FEATURES + "default-attributes", false);
       }
-      if(opts.bool(HtmlOptions.NOCOLONS)) {
+      if(opts.get(HtmlOptions.NOCOLONS)) {
         reader.setFeature(FEATURES + "translate-colons", true);
       }
-      if(opts.bool(HtmlOptions.NORESTART)) {
+      if(opts.get(HtmlOptions.NORESTART)) {
         reader.setFeature(FEATURES + "restart-elements", false);
       }
-      if(opts.bool(HtmlOptions.IGNORABLE)) {
+      if(opts.get(HtmlOptions.IGNORABLE)) {
         reader.setFeature(FEATURES + "ignorable-whitespace", true);
       }
-      if(opts.bool(HtmlOptions.EMPTYBOGONS)) {
+      if(opts.get(HtmlOptions.EMPTYBOGONS)) {
         reader.setFeature(FEATURES + "bogons-empty", true);
       }
-      if(opts.bool(HtmlOptions.ANY)) {
+      if(opts.get(HtmlOptions.ANY)) {
         reader.setFeature(FEATURES + "bogons-empty", false);
       }
-      if(opts.bool(HtmlOptions.NOROOTBOGONS)) {
+      if(opts.get(HtmlOptions.NOROOTBOGONS)) {
         reader.setFeature(FEATURES + "root-bogons", false);
       }
-      if(opts.bool(HtmlOptions.NOCDATA)) {
+      if(opts.get(HtmlOptions.NOCDATA)) {
         reader.setFeature(FEATURES + "cdata-elements", false);
       }
-      if(opts.bool(HtmlOptions.LEXICAL)) {
+      if(opts.get(HtmlOptions.LEXICAL)) {
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
       }
-      if(!(p = opts.string(HtmlOptions.DOCTYPESYS)).isEmpty()) {
+      if(!(p = opts.get(HtmlOptions.DOCTYPESYS)).isEmpty()) {
         opt("doctype-system", p);
       }
-      if(!(p = opts.string(HtmlOptions.DOCTYPEPUB)).isEmpty()) {
+      if(!(p = opts.get(HtmlOptions.DOCTYPEPUB)).isEmpty()) {
         opt("doctype-public", p);
       }
-      if(!(p = opts.string(HtmlOptions.ENCODING)).isEmpty()) {
+      if(!(p = opts.get(HtmlOptions.ENCODING)).isEmpty()) {
         is.setEncoding(p);
       }
       // end TagSoup options

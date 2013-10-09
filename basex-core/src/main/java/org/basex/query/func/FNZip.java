@@ -97,7 +97,7 @@ public final class FNZip extends StandardFunc {
   private Str textEntry(final QueryContext ctx) throws QueryException {
     final String enc = expr.length < 3 ? null : string(checkStr(expr[2], ctx));
     final IO io = new IOContent(entry(ctx));
-    final boolean val = ctx.context.options.bool(MainOptions.CHECKSTRINGS);
+    final boolean val = ctx.context.options.get(MainOptions.CHECKSTRINGS);
     try {
       return Str.get(new NewlineInput(io).encoding(enc).validate(val).content());
     } catch(final IOException ex) {
@@ -327,7 +327,7 @@ public final class FNZip extends StandardFunc {
                   ser.serialize(DataBuilder.stripNS(n, ZIPURI, ctx.context));
                 } while((n = ch.next()) != null);
                 ser.close();
-              } catch(final SerializerException ex) {
+              } catch(final QueryIOException ex) {
                 throw ex.getCause(info);
               }
             }
@@ -342,8 +342,9 @@ public final class FNZip extends StandardFunc {
    * Returns serialization parameters.
    * @param node node with parameters
    * @return parameters
+   * @throws BaseXException database exception
    */
-  private static SerializerOptions serPar(final ANode node) {
+  private static SerializerOptions serPar(final ANode node) throws BaseXException {
     // interpret query parameters
     final TokenBuilder tb = new TokenBuilder();
     final AxisIter ati = node.attributes();

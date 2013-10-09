@@ -25,6 +25,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * Standard (built-in) functions.
@@ -112,7 +113,7 @@ public abstract class StandardFunc extends Arr {
       final Serializer ser = Serializer.get(ao, opts);
       for(Item it; (it = ir.next()) != null;) ser.serialize(it);
       ser.close();
-    } catch(final SerializerException ex) {
+    } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     } catch(final IOException ex) {
       SERANY.thrw(info, ex);

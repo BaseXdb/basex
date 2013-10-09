@@ -37,10 +37,10 @@ public final class CsvSerializer extends OutputSerializer {
    */
   CsvSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
     super(os, opts);
-    final CsvOptions copts = new CsvOptions(opts.string(SerializerOptions.S_CSV));
+    final CsvOptions copts = new CsvOptions(opts.get(SerializerOptions.S_CSV));
     separator = copts.separator();
-    header = copts.bool(CsvOptions.HEADER);
-    lax = copts.bool(CsvOptions.LAX);
+    header = copts.get(CsvOptions.HEADER);
+    lax = copts.get(CsvOptions.LAX);
     headers = header ? new TokenList() : null;
   }
 
@@ -170,6 +170,6 @@ public final class CsvSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   private static void error(final String msg) throws IOException {
-    throw BXCS_SERIAL.thrwSerial(msg);
+    throw BXCS_SERIAL.thrwIO(msg);
   }
 }

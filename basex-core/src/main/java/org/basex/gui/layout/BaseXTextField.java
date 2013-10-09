@@ -9,7 +9,7 @@ import javax.swing.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
-import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Project specific text field implementation.
@@ -98,7 +98,7 @@ public class BaseXTextField extends JTextField {
    * @param gui gui reference
    * @param option option
    */
-  public void history(final GUI gui, final Option option) {
+  public void history(final GUI gui, final StringsOption option) {
     history = new BaseXHistory(gui, option);
     addKeyListener(new KeyAdapter() {
       @Override
@@ -107,7 +107,7 @@ public class BaseXTextField extends JTextField {
           store();
         } else if(NEXTLINE.is(e) || PREVLINE.is(e)) {
           final boolean next = NEXTLINE.is(e);
-          final String[] qu = gui.gopts.strings(option);
+          final String[] qu = gui.gopts.get(option);
           if(qu.length == 0) return;
           hist = next ? Math.min(qu.length - 1, hist + 1) : Math.max(0, hist - 1);
           setText(qu[hist]);

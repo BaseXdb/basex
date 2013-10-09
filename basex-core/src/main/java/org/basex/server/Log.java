@@ -73,7 +73,7 @@ public final class Log {
    * @param str strings to be written
    */
   public synchronized void write(final Object... str) {
-    if(!gopts.bool(GlobalOptions.LOG)) {
+    if(!gopts.get(GlobalOptions.LOG)) {
       close();
       return;
     }
@@ -94,7 +94,7 @@ public final class Log {
       }
 
       // construct log text
-      final int ml = gopts.number(GlobalOptions.LOGMSGMAXLEN);
+      final int ml = gopts.get(GlobalOptions.LOGMSGMAXLEN);
       final TokenBuilder tb = new TokenBuilder(DateTime.format(date, DateTime.TIME));
       for(final Object s : str) {
         tb.add('\t');

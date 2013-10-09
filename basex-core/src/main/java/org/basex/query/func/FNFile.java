@@ -424,7 +424,7 @@ public final class FNFile extends StandardFunc {
       final Serializer ser = Serializer.get(out, sopts);
       for(Item it; (it = ir.next()) != null;) ser.serialize(it);
       ser.close();
-    } catch(final SerializerException ex) {
+    } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     } finally {
       out.close();

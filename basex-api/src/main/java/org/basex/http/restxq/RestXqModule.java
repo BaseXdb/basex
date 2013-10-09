@@ -42,9 +42,9 @@ final class RestXqModule {
    * Checks the module for RESTXQ annotations.
    * @param http http context
    * @return {@code true} if module contains relevant annotations
-   * @throws QueryException query exception
+   * @throws Exception exception (including unexpected ones)
    */
-  boolean parse(final HTTPContext http) throws QueryException {
+  boolean parse(final HTTPContext http) throws Exception {
     functions.clear();
 
     // loop through all functions
@@ -93,8 +93,8 @@ final class RestXqModule {
    * @param error optional error reference
    * @throws Exception exception
    */
-  void process(final HTTPContext http, final RestXqFunction func,
-      final QueryException error) throws Exception {
+  void process(final HTTPContext http, final RestXqFunction func, final QueryException error)
+      throws Exception {
 
     // create new XQuery instance
     final QueryContext qc = parseModule(http);

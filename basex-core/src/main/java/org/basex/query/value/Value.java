@@ -170,7 +170,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
       final ValueIter vi = iter();
       for(Item it; (it = vi.next()) != null;) ser.serialize(it);
       ser.close();
-    } catch(final SerializerException ex) {
+    } catch(final QueryIOException ex) {
       throw ex.getCause(null);
     } catch(final IOException ex) {
       SERANY.thrw(null, ex);

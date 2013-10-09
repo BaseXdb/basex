@@ -3,7 +3,7 @@ package org.basex.query.util;
 
 import static org.basex.query.util.Err.ErrType.*;
 
-import org.basex.io.serial.*;
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
@@ -29,7 +29,7 @@ public enum Err {
   /** BASX0002. */
   BASX_OPTIONS(BASX, 2, "Unknown database option '%'."),
   /** BASX0002. */
-  BASX_VALUE(BASX, 2, "Database option '%' has invalid value '%'."),
+  BASX_VALUE(BASX, 2, "Database option '%' cannot be set to '%'."),
   /** BASX0003. */
   BASX_RESTXQ(BASX, 3, "%"),
   /** BASX0004. */
@@ -492,7 +492,9 @@ public enum Err {
   /** FORG0006. */
   STRBINTYPE(FORG, 6, "String or binary type expected, % found"),
   /** FORG0006. */
-  ELMOPTION(FORG, 6, "Option '%' is invalid."),
+  INVALIDOPT(FORG, 6, "%."),
+  /** FORG0006. */
+  INVALIDOPTX(FORG, 6, Text.UNKNOWN_OPTION_X),
 
   /** FORG0008. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
@@ -1141,14 +1143,13 @@ public enum Err {
   }
 
   /**
-   * Throws a serializer exception. Might be merged with {@link #thrw} in
-   * future.
+   * Throws a query I/O exception without {@link InputInfo} reference.
    * @param ext extended info
-   * @return serializer exception (indicates that an error is raised)
-   * @throws SerializerException serializer exception
+   * @return query I/O exception (indicates that an error is raised)
+   * @throws QueryIOException query I/O exception
    */
-  public SerializerException thrwSerial(final Object... ext) throws SerializerException {
-    throw new SerializerException(new QueryException(null, this, ext));
+  public QueryIOException thrwIO(final Object... ext) throws QueryIOException {
+    throw new QueryIOException(new QueryException(null, this, ext));
   }
 
   /**

@@ -3,7 +3,7 @@ package org.basex.test.query.simple;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.test.query.*;
-import org.basex.util.*;
+import org.basex.util.options.*;
 import org.junit.*;
 
 /**
@@ -551,16 +551,16 @@ public final class FTTest extends QueryTest {
     if(ALL) {
       // testing all kinds of combinations
       for(int a = 0; a < 2; ++a) {
-        opts.bool(MainOptions.FTINDEX, a == 0);
+        opts.set(MainOptions.FTINDEX, a == 0);
         super.test();
       }
     } else {
       // single test
       //opts.set(Prop.MAINMEM, true);
-      opts.bool(MainOptions.FTINDEX, true);
-      opts.bool(MainOptions.STEMMING, true);
-      opts.bool(MainOptions.DIACRITICS, true);
-      opts.bool(MainOptions.CASESENS, true);
+      opts.set(MainOptions.FTINDEX, true);
+      opts.set(MainOptions.STEMMING, true);
+      opts.set(MainOptions.DIACRITICS, true);
+      opts.set(MainOptions.CASESENS, true);
       super.test();
     }
   }
@@ -582,8 +582,8 @@ public final class FTTest extends QueryTest {
    * @param opts options
    * @return string
    */
-  private static String set(final Option option, final Options opts) {
-    return new Set(option, opts.bool(option)).toString();
+  private static String set(final BooleanOption option, final Options opts) {
+    return new Set(option, opts.get(option)).toString();
   }
 
   /* TABLE REPRESENTATION

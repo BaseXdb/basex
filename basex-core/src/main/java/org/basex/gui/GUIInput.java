@@ -12,8 +12,8 @@ import org.basex.core.parse.*;
 import org.basex.data.*;
 import org.basex.gui.layout.*;
 import org.basex.query.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This class offers a text field for keyword and XQuery input.
@@ -63,8 +63,8 @@ public final class GUIInput extends BaseXTextField {
           } else {
             // store current input in history
             final Data data = main.context.data();
-            final int i = data == null ? 2 : gui.gopts.number(GUIOptions.SEARCHMODE);
-            final Option options = i == 0 ? GUIOptions.SEARCH : i == 1 ?
+            final int i = data == null ? 2 : gui.gopts.get(GUIOptions.SEARCHMODE);
+            final StringsOption options = i == 0 ? GUIOptions.SEARCH : i == 1 ?
               GUIOptions.XQUERY : GUIOptions.COMMANDS;
             new BaseXHistory(main, options).store(getText());
 
@@ -102,7 +102,7 @@ public final class GUIInput extends BaseXTextField {
           if(modifier(e) || control(e)) return;
           showPopup();
           // skip commands
-          if(gui.gopts.bool(GUIOptions.EXECRT) && !cmdMode()) main.execute();
+          if(gui.gopts.get(GUIOptions.EXECRT) && !cmdMode()) main.execute();
         }
       }
     });
@@ -120,7 +120,7 @@ public final class GUIInput extends BaseXTextField {
    * @return result of check
    */
   boolean cmdMode() {
-    return gui.gopts.number(GUIOptions.SEARCHMODE) == 2 ||
+    return gui.gopts.get(GUIOptions.SEARCHMODE) == 2 ||
       gui.context.data() == null || getText().startsWith("!");
   }
 
@@ -136,7 +136,7 @@ public final class GUIInput extends BaseXTextField {
     if(Character.isLetter(ll) && Character.isLetter(suf.charAt(0))) pre += " ";
     setText(pre + sel);
     showPopup();
-    if(gui.gopts.bool(GUIOptions.EXECRT) && !cmdMode()) gui.execute();
+    if(gui.gopts.get(GUIOptions.EXECRT) && !cmdMode()) gui.execute();
   }
 
   /**
@@ -144,7 +144,7 @@ public final class GUIInput extends BaseXTextField {
    */
   void showPopup() {
     final String query = getText();
-    final int mode = gui.gopts.number(GUIOptions.SEARCHMODE);
+    final int mode = gui.gopts.get(GUIOptions.SEARCHMODE);
     if(cmdMode()) {
       cmdPopup(query);
     } else if(mode == 1 || mode == 0 && query.startsWith("/")) {

@@ -3,9 +3,11 @@ package org.basex.query.expr;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Pragma for database options.
@@ -34,9 +36,9 @@ public final class DBPragma extends Pragma {
   void init(final QueryContext ctx, final InputInfo info) throws QueryException {
     old = ctx.context.options.get(option);
     try {
-      ctx.context.options.set(option, string(value));
-    } catch(final Exception ex) {
-      BASX_VALUE.thrw(info, ex.getMessage());
+      ctx.context.options.assign(option.name(), string(value));
+    } catch(final BaseXException ex) {
+      BASX_VALUE.thrw(info, option.name(), value);
     }
   }
 

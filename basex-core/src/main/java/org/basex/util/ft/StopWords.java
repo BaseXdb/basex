@@ -33,7 +33,7 @@ public final class StopWords extends TokenSet {
    * @throws IOException I/O exception
    */
   public StopWords(final Data data, final String file) throws IOException {
-    if(!data.meta.options.string(MainOptions.STOPWORDS).isEmpty()) read(IO.get(file), false);
+    if(!data.meta.options.get(MainOptions.STOPWORDS).isEmpty()) read(IO.get(file), false);
     final DataOutput out = new DataOutput(data.meta.dbfile(DATASWL));
     write(out);
     out.close();

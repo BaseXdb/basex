@@ -196,7 +196,7 @@ public final class FNValidate extends StandardFunc {
           if(!sc.exists()) WHICHRES.thrw(info, dtd);
           tmp = createTmp(sc);
           if(tmp != null) sc = tmp;
-          sp.string(SerializerOptions.S_DOCTYPE_SYSTEM, sc.url());
+          sp.set(SerializerOptions.S_DOCTYPE_SYSTEM, sc.url());
         }
 
         final IO in = read(it, ctx, sp);

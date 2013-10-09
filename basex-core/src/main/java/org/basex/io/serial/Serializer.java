@@ -85,7 +85,7 @@ public abstract class Serializer {
 
     // serialize as JSON
     if(M_JSON.equals(m)) {
-      final JsonOptions jopts = new JsonOptions(opts.string(S_JSON));
+      final JsonOptions jopts = new JsonOptions(opts.get(S_JSON));
       return jopts.format() == JsonFormat.JSONML ? new JsonMLSerializer(os, opts) :
         new JsonDefaultSerializer(os, opts);
     }
@@ -105,11 +105,11 @@ public abstract class Serializer {
     openResult();
     if(item instanceof ANode) {
       final Type type = item.type;
-      if(type == NodeType.ATT) SERATTR.thrwSerial(item);
-      if(type == NodeType.NSP) SERNS.thrwSerial(item);
+      if(type == NodeType.ATT) SERATTR.thrwIO(item);
+      if(type == NodeType.NSP) SERNS.thrwIO(item);
       serialize((ANode) item);
     } else if(item instanceof FItem) {
-      SERFUNC.thrwSerial(item.description());
+      SERFUNC.thrwIO(item.description());
     } else {
       finishElement();
       atomic(item);
@@ -364,7 +364,7 @@ public abstract class Serializer {
     final Data data = node.data;
     int p = node.pre;
     int k = data.kind(p);
-    if(k == Data.ATTR) SERATTR.thrwSerial(node);
+    if(k == Data.ATTR) SERATTR.thrwIO(node);
 
     boolean doc = false;
     final TokenSet nsp = data.nspaces.size() != 0 ? new TokenSet() : null;

@@ -46,7 +46,7 @@ public final class ValueIndexBuilder extends IndexBuilder {
    * @param txt value type (text/attribute)
    */
   public ValueIndexBuilder(final Data d, final boolean txt) {
-    super(d, d.meta.options.number(MainOptions.INDEXSPLITSIZE));
+    super(d, d.meta.options.get(MainOptions.INDEXSPLITSIZE));
     text = txt;
   }
 

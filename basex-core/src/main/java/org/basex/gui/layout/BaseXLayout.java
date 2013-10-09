@@ -44,7 +44,7 @@ public final class BaseXLayout {
   static void focus(final Component cont) {
     final GUI gui = gui(cont);
     if(gui == null) return;
-    if(gui.gopts.bool(GUIOptions.MOUSEFOCUS) && cont.isEnabled())
+    if(gui.gopts.get(GUIOptions.MOUSEFOCUS) && cont.isEnabled())
       cont.requestFocusInWindow();
   }
 
@@ -232,7 +232,7 @@ public final class BaseXLayout {
           if(INPUTBAR.is(e)) gui.input.requestFocusInWindow();
 
           // change font size
-          final int fs = gui.gopts.number(GUIOptions.FONTSIZE);
+          final int fs = gui.gopts.get(GUIOptions.FONTSIZE);
           int nfs = fs;
           if(INCFONT1.is(e) || INCFONT2.is(e)) {
             nfs = fs + 1;
@@ -242,7 +242,7 @@ public final class BaseXLayout {
             nfs = 13;
           }
           if(fs != nfs) {
-            gui.gopts.number(GUIOptions.FONTSIZE, nfs);
+            gui.gopts.set(GUIOptions.FONTSIZE, nfs);
             gui.updateLayout();
           }
         }

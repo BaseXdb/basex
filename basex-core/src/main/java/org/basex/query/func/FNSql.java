@@ -17,6 +17,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Functions on relational databases.
@@ -231,7 +232,7 @@ public final class FNSql extends StandardFunc {
     ANode params = null;
     if(expr.length > 1) {
       params = (ANode) checkType(checkItem(expr[1], ctx), NodeType.ELM);
-      if(!params.qname().eq(Q_PARAMETERS)) ELMOPTION.thrw(info, params.qname());
+      if(!params.qname().eq(Q_PARAMETERS)) INVALIDOPTX.thrw(info, params.qname().local());
       c = countParams(params);
     }
 
@@ -271,7 +272,7 @@ public final class FNSql extends StandardFunc {
     int i = 0;
     for(ANode next; (next = params.next()) != null;) {
       // Check name
-      if(!next.qname().eq(Q_PARAMETER)) ELMOPTION.thrw(info, next.qname());
+      if(!next.qname().eq(Q_PARAMETER)) INVALIDOPTX.thrw(info, next.qname().local());
       final AxisIter attrs = next.attributes();
       byte[] paramType = null;
       boolean isNull = false;

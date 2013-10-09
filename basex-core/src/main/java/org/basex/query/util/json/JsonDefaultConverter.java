@@ -75,7 +75,7 @@ public final class JsonDefaultConverter extends JsonXMLConverter {
 
   @Override
   public ANode convert(final String in) throws QueryException {
-    final JsonDefaultHandler handler = new JsonDefaultHandler(jopts.bool(JsonOptions.LAX));
+    final JsonDefaultHandler handler = new JsonDefaultHandler(jopts.get(JsonOptions.LAX));
     JsonParser.parse(in, jopts, handler, info);
     final ByteList[] types = new ByteList[TYPES.length];
     for(final TypedArray arr : handler.names.values()) {

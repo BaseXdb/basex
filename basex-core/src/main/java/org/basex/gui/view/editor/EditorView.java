@@ -184,7 +184,7 @@ public final class EditorView extends View {
         for(final EditorArea ea : editors()) opened.add(ea.file.path());
 
         final StringList files = new StringList(HISTORY);
-        final StringList all = new StringList(gui.gopts.strings(GUIOptions.EDITOR));
+        final StringList all = new StringList(gui.gopts.get(GUIOptions.EDITOR));
         final int fl = Math.min(all.size(), e == null ? HISTORY : HISTCOMP);
         for(int f = 0; f < fl; f++) files.add(all.get(f));
 
@@ -261,9 +261,9 @@ public final class EditorView extends View {
   @Override
   public void refreshMark() {
     final EditorArea edit = getEditor();
-    go.setEnabled(edit.script || !gui.gopts.bool(GUIOptions.EXECRT));
+    go.setEnabled(edit.script || !gui.gopts.get(GUIOptions.EXECRT));
     final Nodes m = gui.context.marked;
-    filter.setEnabled(!gui.gopts.bool(GUIOptions.FILTERRT) && m != null && m.size() != 0);
+    filter.setEnabled(!gui.gopts.get(GUIOptions.FILTERRT) && m != null && m.size() != 0);
   }
 
   @Override
@@ -284,12 +284,12 @@ public final class EditorView extends View {
 
   @Override
   public boolean visible() {
-    return gui.gopts.bool(GUIOptions.SHOWEDITOR);
+    return gui.gopts.get(GUIOptions.SHOWEDITOR);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gopts.bool(GUIOptions.SHOWEDITOR, v);
+    gui.gopts.set(GUIOptions.SHOWEDITOR, v);
   }
 
   @Override
@@ -303,7 +303,7 @@ public final class EditorView extends View {
   public void open() {
     // open file chooser for XML creation
     final BaseXFileChooser fc = new BaseXFileChooser(OPEN,
-        gui.gopts.string(GUIOptions.WORKPATH), gui);
+        gui.gopts.get(GUIOptions.WORKPATH), gui);
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
     fc.textFilters();
@@ -335,8 +335,7 @@ public final class EditorView extends View {
   public boolean saveAs() {
     // open file chooser for XML creation
     final EditorArea edit = getEditor();
-    final String path = edit.opened() ? edit.file.path() :
-      gui.gopts.string(GUIOptions.WORKPATH);
+    final String path = edit.opened() ? edit.file.path() : gui.gopts.get(GUIOptions.WORKPATH);
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS, path, gui);
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
@@ -398,17 +397,17 @@ public final class EditorView extends View {
     String path = null;
     if(file != null) {
       path = file.path();
-      gui.gopts.string(GUIOptions.WORKPATH, file.dirPath());
+      gui.gopts.set(GUIOptions.WORKPATH, file.dirPath());
       paths.add(path);
       tabs.setToolTipTextAt(tabs.getSelectedIndex(), path);
     }
-    final String[] old = gui.gopts.strings(GUIOptions.EDITOR);
+    final String[] old = gui.gopts.get(GUIOptions.EDITOR);
     for(int p = 0; paths.size() < HISTORY && p < old.length; p++) {
       final IO fl = IO.get(old[p]);
       if(fl.exists() && !fl.eq(file)) paths.add(fl.path());
     }
     // store sorted history
-    gui.gopts.strings(GUIOptions.EDITOR, paths.toArray());
+    gui.gopts.set(GUIOptions.EDITOR, paths.toArray());
     hist.setEnabled(!paths.isEmpty());
   }
 
@@ -691,7 +690,7 @@ public final class EditorView extends View {
     int c = 0;
     while(++c < bl.size() && bl.get(c));
     // create io reference
-    return new IOFile(gui.gopts.string(GUIOptions.WORKPATH), FILE + (c == 1 ? "" : c));
+    return new IOFile(gui.gopts.get(GUIOptions.WORKPATH), FILE + (c == 1 ? "" : c));
   }
 
   /**

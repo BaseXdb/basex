@@ -51,7 +51,7 @@ public final class DialogNew extends BaseXDialog {
     final MainOptions opts = gui.context.options;
     final GUIOptions gopts = main.gopts;
 
-    dbname = new BaseXTextField(gopts.string(GUIOptions.DBNAME), this);
+    dbname = new BaseXTextField(gopts.get(GUIOptions.DBNAME), this);
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
     pnl.add(new BaseXLabel(NAME_OF_DB + COLS, false, true).border(8, 0, 6, 0));
@@ -65,19 +65,19 @@ public final class DialogNew extends BaseXDialog {
     // index panel
     final BaseXBack indexes = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
 
-    txtindex = new BaseXCheckBox(TEXT_INDEX, opts.bool(MainOptions.TEXTINDEX), 0, this).large();
+    txtindex = new BaseXCheckBox(TEXT_INDEX, opts.get(MainOptions.TEXTINDEX), 0, this).large();
     indexes.add(txtindex);
     indexes.add(new BaseXLabel(H_TEXT_INDEX, true, false));
 
     atvindex = new BaseXCheckBox(ATTRIBUTE_INDEX,
-        opts.bool(MainOptions.ATTRINDEX), 0, this).large();
+        opts.get(MainOptions.ATTRINDEX), 0, this).large();
     indexes.add(atvindex);
     indexes.add(new BaseXLabel(H_ATTR_INDEX, true, false));
 
     // full-text panel
     //final BaseXBack fulltext = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
     ftxindex = new BaseXCheckBox(FULLTEXT_INDEX,
-        opts.bool(MainOptions.FTINDEX), 0, this).large();
+        opts.get(MainOptions.FTINDEX), 0, this).large();
     indexes.add(ftxindex);
 
     ft = new DialogFT(this, true);
@@ -109,7 +109,7 @@ public final class DialogNew extends BaseXDialog {
     Msg icon = Msg.ERROR;
     if(ok) {
       ok = Databases.validName(nm);
-      if(ok) gui.gopts.string(GUIOptions.DBNAME, nm);
+      if(ok) gui.gopts.set(GUIOptions.DBNAME, nm);
 
       if(!ok) {
         // name of database is invalid

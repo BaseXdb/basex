@@ -4,16 +4,19 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * This class parses options specified in function arguments.
@@ -46,57 +49,58 @@ public final class FuncOptions {
   }
 
   /**
-   * Parses the options in the specified item.
+   * Extracts options from the specified item.
    * @param it item to be converted
    * @param options options
    * @throws QueryException query exception
    */
   public void parse(final Item it, final Options options) throws QueryException {
-    parse(it, options, false);
+    parse(it, options, Err.INVALIDOPT);
   }
 
   /**
-   * Adopts the parameters from the specified item.
+   * Extracts options from the specified item.
    * @param item item to be parsed
    * @param options options
-   * @param ignore ignore unknown parameters
+   * @param error raise error if parameter is unknown
    * @throws QueryException query exception
    */
-  public void parse(final Item item, final Options options, final boolean ignore)
+  public void parse(final Item item, final Options options, final Err error)
       throws QueryException {
 
     if(item == null) return;
-
-    // XQuery map: convert to internal map
-    if(item instanceof Map) {
-      final Map map = (Map) item;
-      final ValueIter vi = map.keys().iter();
-      for(Item it; (it = vi.next()) != null;) {
-        if(!(it instanceof AStr)) FUNCMP.thrw(info, map.description(), AtomType.STR, it.type);
-        final Value v = map.get(it, info);
-        if(!v.isItem()) FUNCMP.thrw(info, map.description(), AtomType.ITEM, v);
-        final String key = string(it.string(null));
-        final String val = string(((Item) v).string(info));
-        if(!options.set(key, val) && options.predefined()) ELMOPTION.thrw(info, key);
-      }
-    } else {
-      if(!test.eq(item)) ELMMAPTYPE.thrw(info, root, item.type);
-
-      // interpret options
-      final AxisIter ai = ((ANode) item).children();
-      for(ANode n; (n = ai.next()) != null;) {
-        if(n.type != NodeType.ELM) continue;
-        final QNm qn = n.qname();
-        if(!eq(qn.uri(), root.uri())) {
-          if(ignore) continue;
-          ELMOPTION.thrw(info, n);
+    try {
+      // XQuery map: convert to internal map
+      if(item instanceof Map) {
+        final Map map = (Map) item;
+        final ValueIter vi = map.keys().iter();
+        for(Item it; (it = vi.next()) != null;) {
+          if(!(it instanceof AStr)) FUNCMP.thrw(info, map.description(), AtomType.STR, it.type);
+          final Value v = map.get(it, info);
+          if(!v.isItem()) FUNCMP.thrw(info, map.description(), AtomType.ITEM, v);
+          final String key = string(it.string(null));
+          final String val = string(((Item) v).string(info));
+          options.assign(key, val);
         }
-        // retrieve key from element name and value from "value" attribute or text node
-        final String key = string(qn.local());
-        byte[] val = n.attribute(VALUE);
-        if(val == null) val = n.string();
-        if(!options.set(key, string(val)) && options.predefined()) ELMOPTION.thrw(info, key);
+      } else {
+        if(!test.eq(item)) ELMMAPTYPE.thrw(info, root, item.type);
+
+        // interpret options
+        final AxisIter ai = ((ANode) item).children();
+        for(ANode n; (n = ai.next()) != null;) {
+          if(n.type != NodeType.ELM) continue;
+          final QNm qn = n.qname();
+          final String name = string(qn.local());
+          // ignore elements in other namespace
+          if(eq(qn.uri(), root.uri())) {
+            // retrieve key from element name and value from "value" attribute or text node
+            final byte[] val = n.attribute(VALUE);
+            options.assign(name, string(val == null ? n.string() : val));
+          }
+        }
       }
+    } catch(final BaseXException ex) {
+      error.thrw(info, ex);
     }
   }
 
@@ -109,10 +113,7 @@ public final class FuncOptions {
    */
   public static SerializerOptions serializer(final Item it, final InputInfo info)
       throws QueryException {
-
-    final SerializerOptions sopts = new SerializerOptions();
-    parse(it, sopts, info);
-    return sopts;
+    return parse(it, new SerializerOptions(), info);
   }
 
   /**
@@ -120,10 +121,12 @@ public final class FuncOptions {
    * @param it input item
    * @param sopts serialization parameters
    * @param info input info
+   * @return serialization parameters
    * @throws QueryException query exception
    */
-  public static void parse(final Item it, final SerializerOptions sopts, final InputInfo info)
-      throws QueryException {
-    new FuncOptions(Q_SPARAM, info).parse(it, sopts, true);
+  public static SerializerOptions parse(final Item it, final SerializerOptions sopts,
+      final InputInfo info) throws QueryException {
+    new FuncOptions(Q_SPARAM, info).parse(it, sopts, Err.SEROPT);
+    return sopts;
   }
 }

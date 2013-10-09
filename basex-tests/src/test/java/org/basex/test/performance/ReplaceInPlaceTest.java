@@ -28,9 +28,9 @@ public final class ReplaceInPlaceTest extends SandboxTest {
    */
   @Test
   public void run() throws Exception {
-    context.options.bool(MainOptions.TEXTINDEX, false);
-    context.options.bool(MainOptions.ATTRINDEX, false);
-    context.options.bool(MainOptions.AUTOFLUSH, false);
+    context.options.set(MainOptions.TEXTINDEX, false);
+    context.options.set(MainOptions.ATTRINDEX, false);
+    context.options.set(MainOptions.AUTOFLUSH, false);
 
     // create test database
     new CreateDB(NAME, "<X>" +

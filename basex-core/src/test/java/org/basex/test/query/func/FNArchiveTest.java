@@ -51,25 +51,27 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     // name must not be empty
     error(_ARCHIVE_CREATE.args("<archive:entry/>", ""), Err.ARCH_EMPTY);
     // invalid compression level
-    error(_ARCHIVE_CREATE.args("<archive:entry compression-level='x'>X</archive:entry>",
-        ""), Err.ARCH_LEVEL);
-    error(_ARCHIVE_CREATE.args("<archive:entry compression-level='10'>X</archive:entry>",
-        ""), Err.ARCH_LEVEL);
+    error(_ARCHIVE_CREATE.args("<archive:entry compression-level='x'>X</archive:entry>", ""),
+        Err.ARCH_LEVEL);
+    error(_ARCHIVE_CREATE.args("<archive:entry compression-level='10'>X</archive:entry>", ""),
+        Err.ARCH_LEVEL);
     // invalid modification date
-    error(_ARCHIVE_CREATE.args("<archive:entry last-modified='2020'>X</archive:entry>",
-        ""), Err.ARCH_DATETIME);
+    error(_ARCHIVE_CREATE.args("<archive:entry last-modified='2020'>X</archive:entry>", ""),
+        Err.ARCH_DATETIME);
     // content must be string or binary
-    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", " 123"),
-        Err.STRBINTYPE);
+    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", " 123"), Err.STRBINTYPE);
     // wrong encoding
     error(_ARCHIVE_CREATE.args("<archive:entry encoding='x'>X</archive:entry>", ""),
         Err.ARCH_ENCODING);
     // errors while converting a string
     error(_ARCHIVE_CREATE.args("<archive:entry encoding='US-ASCII'>X</archive:entry>",
         "\u00fc"), Err.ARCH_ENCODE);
-    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
-        " { 'format':'rar' }"), Err.ARCH_UNKNOWN);
     // format not supported
+    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "", " { 'format':'rar' }"),
+        Err.ARCH_UNKNOWN);
+    // unknown option
+    error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "", " { 'x':'y' }"),
+        Err.INVALIDOPT);
     error(_ARCHIVE_CREATE.args("<archive:entry>X</archive:entry>", "",
         "<archive:options><archive:format value='rar'/></archive:options>"),
         Err.ARCH_UNKNOWN);

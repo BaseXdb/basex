@@ -108,17 +108,17 @@ public final class OptimizeAll extends ACreate {
     final String tname = ctx.globalopts.random(m.name);
 
     // adopt original meta information
-    ctx.options.bool(MainOptions.CHOP, m.chop);
+    ctx.options.set(MainOptions.CHOP, m.chop);
     // adopt original index options
-    ctx.options.bool(MainOptions.UPDINDEX, m.updindex);
-    ctx.options.number(MainOptions.MAXCATS,  m.maxcats);
-    ctx.options.number(MainOptions.MAXLEN,   m.maxlen);
+    ctx.options.set(MainOptions.UPDINDEX, m.updindex);
+    ctx.options.set(MainOptions.MAXCATS,  m.maxcats);
+    ctx.options.set(MainOptions.MAXLEN,   m.maxlen);
     // adopt original full-text index options
-    ctx.options.bool(MainOptions.STEMMING,   m.stemming);
-    ctx.options.bool(MainOptions.CASESENS,   m.casesens);
-    ctx.options.bool(MainOptions.DIACRITICS, m.diacritics);
-    ctx.options.string(MainOptions.LANGUAGE,   m.language.toString());
-    ctx.options.string(MainOptions.STOPWORDS,  m.stopwords);
+    ctx.options.set(MainOptions.STEMMING,   m.stemming);
+    ctx.options.set(MainOptions.CASESENS,   m.casesens);
+    ctx.options.set(MainOptions.DIACRITICS, m.diacritics);
+    ctx.options.set(MainOptions.LANGUAGE,   m.language.toString());
+    ctx.options.set(MainOptions.STOPWORDS,  m.stopwords);
 
     // build database and index structures
     final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx);

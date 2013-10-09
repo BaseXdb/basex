@@ -5,6 +5,7 @@ import static org.basex.query.util.Err.*;
 
 import java.io.*;
 
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -50,10 +51,10 @@ public class XMLSerializer extends OutputSerializer {
 
   /**
    * Checks if document serialization is valid.
-   * @throws SerializerException serializer exception
+   * @throws QueryIOException query I/O exception
    */
-  private void check() throws SerializerException {
-    if(!saomit) SERSA.thrwSerial();
-    if(docsys != null) SERDT.thrwSerial();
+  private void check() throws QueryIOException {
+    if(!saomit) SERSA.thrwIO();
+    if(docsys != null) SERDT.thrwIO();
   }
 }

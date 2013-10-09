@@ -80,8 +80,10 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param uf associated user function
    * @param qc query context
    * @param m associated module
+   * @throws Exception exception
    */
-  RestXqFunction(final StaticFunc uf, final QueryContext qc, final RestXqModule m) {
+  RestXqFunction(final StaticFunc uf, final QueryContext qc, final RestXqModule m)
+      throws Exception {
     function = uf;
     context = qc;
     module = m;
@@ -170,9 +172,11 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
         }
       } else if(eq(uri, QueryText.OUTPUTURI)) {
         // serialization parameters
-        final Option opt = output.option(string(local));
-        if(opt == null) error(info, UNKNOWN_SER, local);
-        output.set(opt, toString(value, name));
+        try {
+          output.assign(string(local), toString(value, name));
+        } catch(final BaseXException ex) {
+          error(info, UNKNOWN_SER, local);
+        }
       }
       found |= rexq;
     }

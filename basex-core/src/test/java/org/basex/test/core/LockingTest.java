@@ -151,7 +151,7 @@ public final class LockingTest extends SandboxTest {
   @Test
   public void parallelTransactionLimitTest() throws InterruptedException {
     final CountDownLatch latch =
-        new CountDownLatch(Math.max(gopts.number(GlobalOptions.PARALLEL), 1));
+        new CountDownLatch(Math.max(gopts.get(GlobalOptions.PARALLEL), 1));
     // Container for (maximum number allowed transactions) + 1 testers
     final LockTester[] testers = (LockTester[]) Array.newInstance(
         LockTester.class, (int) (latch.getCount() + 1));

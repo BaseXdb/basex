@@ -51,22 +51,22 @@ public final class DialogFonts extends BaseXDialog {
     p.add(size);
 
     final GUIOptions gopts = gui.gopts;
-    font.setValue(gopts.string(GUIOptions.FONT));
-    font2.setValue(gopts.string(GUIOptions.MONOFONT));
-    type.setValue(FONT_TYPES[gopts.number(GUIOptions.FONTTYPE)]);
-    size.setValue(Integer.toString(gui.gopts.number(GUIOptions.FONTSIZE)));
+    font.setValue(gopts.get(GUIOptions.FONT));
+    font2.setValue(gopts.get(GUIOptions.MONOFONT));
+    type.setValue(FONT_TYPES[gopts.get(GUIOptions.FONTTYPE)]);
+    size.setValue(Integer.toString(gui.gopts.get(GUIOptions.FONTSIZE)));
 
     set(p, BorderLayout.CENTER);
-    finish(gopts.numbers(GUIOptions.FONTSLOC));
+    finish(gopts.get(GUIOptions.FONTSLOC));
   }
 
   @Override
   public void action(final Object cmp) {
     final GUIOptions gopts = gui.gopts;
-    gopts.string(GUIOptions.FONT, font.getValue());
-    gopts.string(GUIOptions.MONOFONT, font2.getValue());
-    gopts.number(GUIOptions.FONTTYPE, type.getIndex());
-    gopts.number(GUIOptions.FONTSIZE, size.getNum());
+    gopts.set(GUIOptions.FONT, font.getValue());
+    gopts.set(GUIOptions.MONOFONT, font2.getValue());
+    gopts.set(GUIOptions.FONTTYPE, type.getIndex());
+    gopts.set(GUIOptions.FONTSIZE, size.getNum());
     font.setFont(font.getValue(), type.getIndex());
     font2.setFont(font2.getValue(), type.getIndex());
     gui.updateLayout();

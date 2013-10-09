@@ -110,7 +110,7 @@ public final class DBLocking implements Locking {
     // Wait in queue if necessary
     synchronized(queue) { // Guard queue and transaction, monitor for waiting in queue
       queue.add(thread);
-      while(transactions >= Math.max(gopts.number(GlobalOptions.PARALLEL), 1)
+      while(transactions >= Math.max(gopts.get(GlobalOptions.PARALLEL), 1)
           || queue.peek() != thread) {
         try {
           queue.wait();
@@ -119,7 +119,7 @@ public final class DBLocking implements Locking {
         }
       }
       final int t = transactions++;
-      assert t <= Math.max(gopts.number(GlobalOptions.PARALLEL), 1);
+      assert t <= Math.max(gopts.get(GlobalOptions.PARALLEL), 1);
       queue.remove(thread);
     }
 

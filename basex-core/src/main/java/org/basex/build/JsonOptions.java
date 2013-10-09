@@ -2,30 +2,30 @@ package org.basex.build;
 
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
 import java.util.*;
 
-import org.basex.io.serial.*;
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
- * This class contains JSON options.
+ * Options for parsing and serializing JSON documents.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class JsonOptions extends Options {
   /** Option: encoding. */
-  public static final Option ENCODING = new Option("encoding", Token.UTF8);
+  public static final StringOption ENCODING = new StringOption("encoding", Token.UTF8);
   /** Option: parser specification. */
-  public static final Option SPEC = new Option("spec", JsonSpec.RFC4627.desc);
+  public static final StringOption SPEC = new StringOption("spec", JsonSpec.RFC4627.desc);
   /** Option: unescape special characters. */
-  public static final Option UNESCAPE = new Option("unescape", true);
+  public static final BooleanOption UNESCAPE = new BooleanOption("unescape", true);
   /** Option: JSON format (default, jsonml, plain, map). */
-  public static final Option FORMAT = new Option("format", "default");
+  public static final StringOption FORMAT = new StringOption("format", "default");
   /** Option: lax conversion of names to QNames. */
-  public static final Option LAX = new Option("lax", false);
+  public static final BooleanOption LAX = new BooleanOption("lax", false);
 
   /** JSON specs. */
   public static enum JsonSpec {
@@ -73,10 +73,10 @@ public final class JsonOptions extends Options {
   /**
    * Constructor, specifying initial options.
    * @param opts options string
-   * @throws IOException I/O exception
+   * @throws BaseXException database exception
    */
-  public JsonOptions(final String opts) throws IOException {
-    parse(opts, true);
+  public JsonOptions(final String opts) throws BaseXException {
+    super(opts);
   }
 
   /**
@@ -85,7 +85,7 @@ public final class JsonOptions extends Options {
    * @throws QueryException query exception
    */
   public JsonSpec spec() throws QueryException {
-    final String spec = string(SPEC);
+    final String spec = get(SPEC);
     for(final JsonSpec s : JsonSpec.values()) if(s.desc.equals(spec)) return s;
     throw BXJS_CONFIG.thrw(null, "Unknown spec '" + spec + "'");
   }
@@ -93,11 +93,11 @@ public final class JsonOptions extends Options {
   /**
    * Returns the specification.
    * @return spec
-   * @throws SerializerException serializer exception
+   * @throws QueryIOException query I/O exception
    */
-  public JsonFormat format() throws SerializerException {
-    final String form = string(FORMAT);
+  public JsonFormat format() throws QueryIOException {
+    final String form = get(FORMAT);
     for(final JsonFormat f : JsonFormat.values()) if(f.toString().equals(form)) return f;
-    throw BXJS_CONFIG.thrwSerial("Unknown format '" + form + "'");
+    throw BXJS_CONFIG.thrwIO("Unknown format '" + form + "'");
   }
 }

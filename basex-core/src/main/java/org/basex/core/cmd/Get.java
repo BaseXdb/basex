@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Evaluates the 'get' command and return the value of a database option.
@@ -27,7 +27,7 @@ public final class Get extends AGet {
    * @param option option to be found
    */
   public Get(final Option option) {
-    this(option.name);
+    this(option.name());
   }
 
   /**
@@ -44,10 +44,10 @@ public final class Get extends AGet {
       // retrieve values of all options
       if(context.user.has(Perm.ADMIN)) {
         out.println(MAIN_OPTIONS + COL);
-        for(final Option o : goptions) out.println(o.name + COLS + goptions.get(o));
+        for(final Option o : goptions) out.println(o.name() + COLS + goptions.get(o));
       }
       out.println(NL + OPTIONS + COL);
-      for(final Option o : options) out.println(o.name + COLS + options.get(o));
+      for(final Option o : options) out.println(o.name() + COLS + options.get(o));
     } else {
       // retrieve value of specific option
       final String name = args[0].toUpperCase(Locale.ENGLISH);
@@ -75,6 +75,6 @@ public final class Get extends AGet {
       opt = opts.option(name);
     }
     if(opt == null) throw new BaseXException(ctx.options.error(name));
-    return opt.value.toString();
+    return opts.get(opt).toString();
   }
 }

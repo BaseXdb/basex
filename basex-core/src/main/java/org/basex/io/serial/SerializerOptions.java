@@ -5,7 +5,9 @@ import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * This class defines all available serialization parameters.
@@ -18,67 +20,76 @@ public final class SerializerOptions extends Options {
   static final String UNDEFINED = "\u0001";
 
   /** Serialization parameter: yes/no. */
-  public static final Option S_BYTE_ORDER_MARK = new Option("byte-order-mark", NO);
+  public static final StringOption S_BYTE_ORDER_MARK = new StringOption("byte-order-mark", NO);
   /** Serialization parameter: list of QNames. */
-  public static final Option S_CDATA_SECTION_ELEMENTS =
-      new Option("cdata-section-elements", "");
+  public static final StringOption S_CDATA_SECTION_ELEMENTS =
+      new StringOption("cdata-section-elements", "");
   /** Serialization parameter. */
-  public static final Option S_DOCTYPE_PUBLIC = new Option("doctype-public", "");
+  public static final StringOption S_DOCTYPE_PUBLIC = new StringOption("doctype-public", "");
   /** Serialization parameter. */
-  public static final Option S_DOCTYPE_SYSTEM = new Option("doctype-system", "");
+  public static final StringOption S_DOCTYPE_SYSTEM = new StringOption("doctype-system", "");
   /** Serialization parameter: valid encoding. */
-  public static final Option S_ENCODING = new Option("encoding", Token.UTF8);
+  public static final StringOption S_ENCODING = new StringOption("encoding", Token.UTF8);
   /** Serialization parameter: yes/no. */
-  public static final Option S_ESCAPE_URI_ATTRIBUTES = new Option("escape-uri-attributes", NO);
+  public static final StringOption S_ESCAPE_URI_ATTRIBUTES =
+      new StringOption("escape-uri-attributes", NO);
   /** Serialization parameter: yes/no. */
-  public static final Option S_INCLUDE_CONTENT_TYPE = new Option("include-content-type", NO);
+  public static final StringOption S_INCLUDE_CONTENT_TYPE =
+      new StringOption("include-content-type", NO);
   /** Serialization parameter: yes/no. */
-  public static final Option S_INDENT = new Option("indent", YES);
+  public static final StringOption S_INDENT = new StringOption("indent", YES);
   /** Serialization parameter. */
-  public static final Option S_SUPPRESS_INDENTATION = new Option("suppress-indentation", "");
+  public static final StringOption S_SUPPRESS_INDENTATION =
+      new StringOption("suppress-indentation", "");
   /** Serialization parameter. */
-  public static final Option S_MEDIA_TYPE = new Option("media-type", "");
+  public static final StringOption S_MEDIA_TYPE = new StringOption("media-type", "");
   /** Serialization parameter: xml/xhtml/html/text. */
-  public static final Option S_METHOD = new Option("method", M_XML);
+  public static final StringOption S_METHOD = new StringOption("method", M_XML);
   /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
-  public static final Option S_NORMALIZATION_FORM = new Option("normalization-form", NFC);
+  public static final StringOption S_NORMALIZATION_FORM =
+      new StringOption("normalization-form", NFC);
   /** Serialization parameter: yes/no. */
-  public static final Option S_OMIT_XML_DECLARATION = new Option("omit-xml-declaration", YES);
+  public static final StringOption S_OMIT_XML_DECLARATION =
+      new StringOption("omit-xml-declaration", YES);
   /** Serialization parameter: yes/no/omit. */
-  public static final Option S_STANDALONE = new Option("standalone", OMIT);
+  public static final StringOption S_STANDALONE = new StringOption("standalone", OMIT);
   /** Serialization parameter: yes/no. */
-  public static final Option S_UNDECLARE_PREFIXES = new Option("undeclare-prefixes", NO);
+  public static final StringOption S_UNDECLARE_PREFIXES =
+      new StringOption("undeclare-prefixes", NO);
   /** Serialization parameter. */
-  public static final Option S_USE_CHARACTER_MAPS = new Option("use-character-maps", "");
+  public static final StringOption S_USE_CHARACTER_MAPS =
+      new StringOption("use-character-maps", "");
   /** Serialization parameter. */
-  public static final Option S_ITEM_SEPARATOR = new Option("item-separator", UNDEFINED);
+  public static final StringOption S_ITEM_SEPARATOR =
+      new StringOption("item-separator", UNDEFINED);
   /** Serialization parameter: 1.0/1.1. */
-  public static final Option S_VERSION = new Option("version", "");
+  public static final StringOption S_VERSION = new StringOption("version", "");
   /** Serialization parameter: 4.0/4.01/5.0. */
-  public static final Option S_HTML_VERSION = new Option("html-version", "");
+  public static final StringOption S_HTML_VERSION = new StringOption("html-version", "");
   /** Parameter document. */
-  public static final Option S_PARAMETER_DOCUMENT = new Option("parameter-document", "");
+  public static final StringOption S_PARAMETER_DOCUMENT =
+      new StringOption("parameter-document", "");
 
   /** Specific serialization parameter: newline. */
-  public static final Option S_NEWLINE = new Option(
+  public static final StringOption S_NEWLINE = new StringOption(
     "newline", Prop.NL.equals("\r") ? S_CR : Prop.NL.equals("\n") ? S_NL : S_CRNL);
   /** Specific serialization parameter: formatting. */
-  public static final Option S_FORMAT = new Option("format", YES);
+  public static final StringOption S_FORMAT = new StringOption("format", YES);
   /** Specific serialization parameter: indent with spaces or tabs. */
-  public static final Option S_TABULATOR = new Option("tabulator", NO);
+  public static final StringOption S_TABULATOR = new StringOption("tabulator", NO);
   /** Specific serialization parameter: number of spaces to indent. */
-  public static final Option S_INDENTS = new Option("indents", "2");
+  public static final StringOption S_INDENTS = new StringOption("indents", "2");
   /** Specific serialization parameter: item separator. */
-  public static final Option S_SEPARATOR = new Option("separator", UNDEFINED);
+  public static final StringOption S_SEPARATOR = new StringOption("separator", UNDEFINED);
   /** Specific serialization parameter: prefix of result wrapper. */
-  public static final Option S_WRAP_PREFIX = new Option("wrap-prefix", "");
+  public static final StringOption S_WRAP_PREFIX = new StringOption("wrap-prefix", "");
   /** Specific serialization parameter: URI of result wrapper. */
-  public static final Option S_WRAP_URI = new Option("wrap-uri", "");
+  public static final StringOption S_WRAP_URI = new StringOption("wrap-uri", "");
 
   /** Specific serialization parameter. */
-  public static final Option S_CSV = new Option("csv", "");
+  public static final StringOption S_CSV = new StringOption("csv", "");
   /** Specific serialization parameter. */
-  public static final Option S_JSON = new Option("json", "");
+  public static final StringOption S_JSON = new StringOption("json", "");
 
   /**
    * Constructor.
@@ -89,11 +100,12 @@ public final class SerializerOptions extends Options {
 
   /**
    * Constructor, specifying initial options.
-   * @param string options string. Options are separated with commas ({@code ,}),
+   * @param opts options string. Options are separated with commas ({@code ,}),
    * key/values with the equality character ({@code =}).
+   * @throws BaseXException database exception
    */
-  public SerializerOptions(final String string) {
-    parse(string);
+  public SerializerOptions(final String opts) throws BaseXException {
+    super(opts);
   }
 
   /**
@@ -101,12 +113,14 @@ public final class SerializerOptions extends Options {
    * @param option option
    * @param allowed allowed values
    * @return value
-   * @throws SerializerException serializer exception
+   * @throws QueryIOException query I/O exception
    */
-  public String check(final Option option, final String... allowed) throws SerializerException {
-    final String val = string(option);
+  public String check(final StringOption option, final String... allowed)
+      throws QueryIOException {
+
+    final String val = get(option);
     for(final String a : allowed) if(a.equals(val)) return val;
-    throw error(option.name, val, allowed);
+    throw error(option.name(), val, allowed);
   }
 
   /**
@@ -114,25 +128,25 @@ public final class SerializerOptions extends Options {
    * @param option option
    * @param allowed allowed values
    * @return value
-   * @throws SerializerException serializer exception
+   * @throws QueryIOException query I/O exception
    */
-  public String supported(final Option option, final String... allowed)
-      throws SerializerException {
+  public String supported(final StringOption option, final String... allowed)
+      throws QueryIOException {
 
-    final String val = string(option);
+    final String val = get(option);
     if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;
     for(final String a : allowed) if(a.equals(val)) return val;
-    throw SERNOTSUPP.thrwSerial(allowed(option.name, val, allowed));
+    throw SERNOTSUPP.thrwIO(allowed(option.name(), val, allowed));
   }
 
   /**
    * Retrieves a value from the specified option and checks for its boolean value.
    * @param option option
    * @return value
-   * @throws SerializerException serializer exception
+   * @throws QueryIOException query I/O exception
    */
-  public boolean yes(final Option option) throws SerializerException {
-    return yes(option.name, string(option));
+  public boolean yes(final StringOption option) throws QueryIOException {
+    return yes(option.name(), get(option));
   }
 
   /**
@@ -140,9 +154,9 @@ public final class SerializerOptions extends Options {
    * @param key key
    * @param value value
    * @return result of check
-   * @throws SerializerException serializer exception
+   * @throws QueryIOException query I/O exception
    */
-  public static boolean yes(final String key, final String value) throws SerializerException {
+  public static boolean yes(final String key, final String value) throws QueryIOException {
     if(Util.yes(value)) return true;
     if(Util.no(value)) return false;
     throw error(key, value, YES, NO);
@@ -154,11 +168,11 @@ public final class SerializerOptions extends Options {
    * @param found found value
    * @param allowed allowed values
    * @return exception
-   * @throws SerializerException serializer exception
+   * @throws QueryIOException query I/O exception
    */
-  public static SerializerException error(final String name, final String found,
-      final String... allowed) throws SerializerException {
-    throw SEROPT.thrwSerial(allowed(name, found, allowed));
+  public static QueryIOException error(final String name, final String found,
+      final String... allowed) throws QueryIOException {
+    throw SEROPT.thrwIO(allowed(name, found, allowed));
   }
 
   /**

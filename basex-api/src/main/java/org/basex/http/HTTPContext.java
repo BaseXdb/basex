@@ -21,6 +21,7 @@ import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This class bundles context-based information on a single HTTP operation.
@@ -83,8 +84,8 @@ public final class HTTPContext {
 
     // adopt servlet-specific credentials or use global ones
     final GlobalOptions mprop = context().globalopts;
-    user = servlet.user != null ? servlet.user : mprop.string(GlobalOptions.USER);
-    pass = servlet.pass != null ? servlet.pass : mprop.string(GlobalOptions.PASSWORD);
+    user = servlet.user != null ? servlet.user : mprop.get(GlobalOptions.USER);
+    pass = servlet.pass != null ? servlet.pass : mprop.get(GlobalOptions.PASSWORD);
 
     // overwrite credentials with session-specific data
     final String auth = req.getHeader(AUTHORIZATION);
@@ -133,7 +134,7 @@ public final class HTTPContext {
    */
   public void initResponse(final SerializerOptions sopts) {
     // set content type and encoding
-    final String enc = sopts.string(SerializerOptions.S_ENCODING);
+    final String enc = sopts.get(SerializerOptions.S_ENCODING);
     res.setCharacterEncoding(enc);
     final String ct = mediaType(sopts);
     res.setContentType(new TokenBuilder(ct).add(CHARSET).add(enc).toString());
@@ -146,17 +147,17 @@ public final class HTTPContext {
    */
   public static String mediaType(final SerializerOptions sopts) {
     // set content type
-    final String type = sopts.string(SerializerOptions.S_MEDIA_TYPE);
+    final String type = sopts.get(SerializerOptions.S_MEDIA_TYPE);
     if(!type.isEmpty()) return type;
 
     // determine content type dependent on output method
-    final String mt = sopts.string(SerializerOptions.S_METHOD);
+    final String mt = sopts.get(SerializerOptions.S_METHOD);
     if(mt.equals(M_RAW)) return APP_OCTET;
     if(mt.equals(M_XML)) return APP_XML;
     if(eq(mt, M_XHTML, M_HTML)) return TEXT_HTML;
     if(mt.equals(M_JSON)) {
       try {
-        final JsonOptions jprop = new JsonOptions(sopts.string(SerializerOptions.S_JSON));
+        final JsonOptions jprop = new JsonOptions(sopts.get(SerializerOptions.S_JSON));
         if(jprop.format() == JsonFormat.JSONML) return APP_JSONML;
       } catch(final IOException ignored) { }
       return APP_JSON;
@@ -339,12 +340,12 @@ public final class HTTPContext {
       String k = key;
       String v = val;
       if(key.equals(Prop.DBPREFIX + "httppath")) {
-        k = Prop.DBPREFIX + GlobalOptions.RESTXQPATH.name;
+        k = Prop.DBPREFIX + GlobalOptions.RESTXQPATH.name();
       } else if(key.equals(Prop.DBPREFIX + "mode")) {
-        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name;
+        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name();
         v = Boolean.toString(v.equals("local"));
       } else if(key.equals(Prop.DBPREFIX + "server")) {
-        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name;
+        k = Prop.DBPREFIX + GlobalOptions.HTTPLOCAL.name();
         v = Boolean.toString(!Boolean.parseBoolean(v));
       }
       k = k.toLowerCase(Locale.ENGLISH);
@@ -370,7 +371,7 @@ public final class HTTPContext {
     }
 
     // start server instance
-    if(!context.globalopts.bool(GlobalOptions.HTTPLOCAL)) new BaseXServer(context);
+    if(!context.globalopts.get(GlobalOptions.HTTPLOCAL)) new BaseXServer(context);
   }
 
   /**

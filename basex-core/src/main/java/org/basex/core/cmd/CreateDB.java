@@ -81,7 +81,7 @@ public final class CreateDB extends ACreate {
     new Close().run(context);
 
     try {
-      if(options.bool(MainOptions.MAINMEM)) {
+      if(options.get(MainOptions.MAINMEM)) {
         // create main memory instance
         final Data data = proc(new MemBuilder(name, parser)).build();
         context.openDB(data);
@@ -104,7 +104,7 @@ public final class CreateDB extends ACreate {
           data.finishUpdate();
         }
       }
-      if(options.bool(MainOptions.CREATEONLY)) new Close().run(context);
+      if(options.get(MainOptions.CREATEONLY)) new Close().run(context);
 
       return info(parser.info() + DB_CREATED_X_X, name, perf);
     } catch(final ProcException ex) {
@@ -143,7 +143,7 @@ public final class CreateDB extends ACreate {
 
     // create main memory database instance
     final MainOptions opts = ctx.options;
-    if(opts.bool(MainOptions.MAINMEM)) return MemBuilder.build(name, parser);
+    if(opts.get(MainOptions.MAINMEM)) return MemBuilder.build(name, parser);
 
     // database is currently locked by another process
     if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
@@ -211,7 +211,7 @@ public final class CreateDB extends ACreate {
       throw new BaseXException(RES_NOT_FOUND_X, source);
 
     // default: create a main memory instance
-    if(!ctx.options.bool(MainOptions.FORCECREATE)) return CreateDB.mainMem(source, ctx);
+    if(!ctx.options.get(MainOptions.FORCECREATE)) return CreateDB.mainMem(source, ctx);
 
     // otherwise, create a persistent database instance
     final String nm = source.dbname();

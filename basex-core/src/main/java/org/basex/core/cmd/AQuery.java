@@ -55,8 +55,8 @@ public abstract class AQuery extends Command {
       err = qe.getMessage();
     } else {
       try {
-        final boolean serial = options.bool(MainOptions.SERIALIZE);
-        qi.runs = Math.max(1, options.number(MainOptions.RUNS));
+        final boolean serial = options.get(MainOptions.SERIALIZE);
+        qi.runs = Math.max(1, options.get(MainOptions.RUNS));
         long hits = 0;
         for(int r = 0; r < qi.runs; ++r) {
           // reuse existing processor instance
@@ -72,7 +72,7 @@ public abstract class AQuery extends Command {
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
           final Serializer ser;
 
-          if(options.bool(MainOptions.CACHEQUERY)) {
+          if(options.get(MainOptions.CACHEQUERY)) {
             result = qp.execute();
             qi.evlt += p.time();
             ser = qp.getSerializer(po);
@@ -98,9 +98,9 @@ public abstract class AQuery extends Command {
         // dump some query info
         out.flush();
         // remove string list if global locking is used and if query is updating
-        if(goptions.bool(GlobalOptions.GLOBALLOCK) && qp.updating)
+        if(goptions.get(GlobalOptions.GLOBALLOCK) && qp.updating)
           qi.readLocked = qi.writeLocked = null;
-        return info(qi.toString(qp, out, hits, options.bool(MainOptions.QUERYINFO)));
+        return info(qi.toString(qp, out, hits, options.get(MainOptions.QUERYINFO)));
 
       } catch(final QueryException ex) {
         err = Util.message(ex);
@@ -178,7 +178,7 @@ public abstract class AQuery extends Command {
   private boolean extError(final String err) {
     // will only be evaluated when an error has occurred
     final StringBuilder sb = new StringBuilder();
-    if(options.bool(MainOptions.QUERYINFO)) {
+    if(options.get(MainOptions.QUERYINFO)) {
       sb.append(info()).append(qp.info()).append(NL).append(ERROR_C).append(NL);
     }
     sb.append(err);
@@ -190,26 +190,26 @@ public abstract class AQuery extends Command {
    * @param c compiled flag
    */
   private void plan(final boolean c) {
-    if(c != options.bool(MainOptions.COMPPLAN)) return;
+    if(c != options.get(MainOptions.COMPPLAN)) return;
 
     // show dot plan
     BufferOutput bo = null;
     try {
-      if(options.bool(MainOptions.DOTPLAN)) {
-        final String path = context.options.string(MainOptions.QUERYPATH);
+      if(options.get(MainOptions.DOTPLAN)) {
+        final String path = context.options.get(MainOptions.QUERYPATH);
         final String dot = path.isEmpty() ? "plan.dot" :
             new IOFile(path).name().replaceAll("\\..*?$", ".dot");
 
         bo = new BufferOutput(dot);
-        final DOTSerializer d = new DOTSerializer(bo, options.bool(MainOptions.DOTCOMPACT));
+        final DOTSerializer d = new DOTSerializer(bo, options.get(MainOptions.DOTCOMPACT));
         d.serialize(qp.plan());
         d.close();
 
-        if(options.bool(MainOptions.DOTDISPLAY))
-          new ProcessBuilder(options.string(MainOptions.DOTTY), dot).start();
+        if(options.get(MainOptions.DOTDISPLAY))
+          new ProcessBuilder(options.get(MainOptions.DOTTY), dot).start();
       }
       // show XML plan
-      if(options.bool(MainOptions.XMLPLAN)) {
+      if(options.get(MainOptions.XMLPLAN)) {
         info(NL + QUERY_PLAN + COL);
         info(qp.plan().serialize().toString());
       }

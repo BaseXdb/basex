@@ -36,8 +36,8 @@ final class RestXqRespBuilder {
    * @param http http context
    * @throws Exception exception (including unexpected ones)
    */
-  void build(final ANode response, final RestXqFunction func,
-      final Iter iter, final HTTPContext http) throws Exception {
+  void build(final ANode response, final RestXqFunction func, final Iter iter,
+      final HTTPContext http) throws Exception {
 
     // don't allow attributes
     for(final ANode a : response.attributes()) func.error(UNEXP_NODE, a);
@@ -89,7 +89,7 @@ final class RestXqRespBuilder {
     }
 
     // set content type
-    if(cType != null) sp.string(SerializerOptions.S_MEDIA_TYPE, cType);
+    if(cType != null) sp.set(SerializerOptions.S_MEDIA_TYPE, cType);
 
     // check next item
     Item item = iter.next();

@@ -205,7 +205,7 @@ public final class DiskData extends Data {
   @Override
   public synchronized void finishUpdate() {
     // skip all flush operations if auto flush is off, or file has already been closed
-    if(!meta.options.bool(MainOptions.AUTOFLUSH) || closed) return;
+    if(!meta.options.get(MainOptions.AUTOFLUSH) || closed) return;
 
     try {
       write();

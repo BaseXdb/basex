@@ -8,7 +8,6 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -52,10 +51,10 @@ public final class RestXqModules {
    * Returns {@code null} if no function matches.
    * @param http HTTP context
    * @param error error code (optional)
-   * @throws QueryException query exception
    * @return function
+   * @throws Exception exception (including unexpected ones)
    */
-  RestXqFunction find(final HTTPContext http, final QNm error) throws QueryException {
+  RestXqFunction find(final HTTPContext http, final QNm error) throws Exception {
     cache(http);
     // collect all functions
     final ArrayList<RestXqFunction> list = new ArrayList<RestXqFunction>();
@@ -90,14 +89,14 @@ public final class RestXqModules {
   /**
    * Updates the module cache. Parses new modules and discards obsolete ones.
    * @param http http context
-   * @throws QueryException query exception
+   * @throws Exception exception (including unexpected ones)
    */
-  private synchronized void cache(final HTTPContext http) throws QueryException {
+  private synchronized void cache(final HTTPContext http) throws Exception {
     // initialize RESTXQ directory (may be relative against WEBPATH)
     if(restxq == null) {
-      final File fl = new File(http.context().globalopts.string(GlobalOptions.RESTXQPATH));
+      final File fl = new File(http.context().globalopts.get(GlobalOptions.RESTXQPATH));
       restxq = fl.isAbsolute() ? new IOFile(fl) :
-        new IOFile(http.context().globalopts.string(GlobalOptions.WEBPATH), fl.getPath());
+        new IOFile(http.context().globalopts.get(GlobalOptions.WEBPATH), fl.getPath());
     }
     // create new cache
     final HashMap<String, RestXqModule> cache = new HashMap<String, RestXqModule>();
@@ -110,10 +109,10 @@ public final class RestXqModules {
    * @param root root path
    * @param http http context
    * @param cache cached modules
-   * @throws QueryException query exception
+   * @throws Exception exception (including unexpected ones)
    */
   private synchronized void cache(final HTTPContext http, final IOFile root,
-      final HashMap<String, RestXqModule> cache) throws QueryException {
+      final HashMap<String, RestXqModule> cache) throws Exception {
 
     for(final IOFile file : root.children()) {
       if(file.isDir()) {

@@ -38,8 +38,8 @@ public final class JsonStringConverter implements JsonHandler {
       final boolean un, final TokenBuilder tb) throws QueryException {
 
     final JsonOptions jopts = new JsonOptions();
-    jopts.string(JsonOptions.SPEC, spec.toString());
-    jopts.bool(JsonOptions.UNESCAPE, un);
+    jopts.set(JsonOptions.SPEC, spec.toString());
+    jopts.set(JsonOptions.UNESCAPE, un);
     JsonParser.parse(json, jopts, new JsonStringConverter(tb), null);
     return tb;
   }

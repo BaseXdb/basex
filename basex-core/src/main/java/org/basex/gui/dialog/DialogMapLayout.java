@@ -44,7 +44,7 @@ public final class DialogMapLayout extends BaseXDialog {
     // create drop down
     final GUIOptions gopts = gui.gopts;
     border = new BaseXCombo(this, MAP_CHOICES);
-    border.setSelectedIndex(gopts.number(GUIOptions.MAPOFFSETS));
+    border.setSelectedIndex(gopts.get(GUIOptions.MAPOFFSETS));
 
     tmp = new BaseXBack(new TableLayout(1, 2, 8, 0));
     tmp.add(new BaseXLabel(OFFSETS + COL));
@@ -55,7 +55,7 @@ public final class DialogMapLayout extends BaseXDialog {
 
     // create slider
     sizeLabel = new BaseXLabel(RATIO + COLS);
-    sizeSlider = new BaseXSlider(0, 100, gopts.number(GUIOptions.MAPWEIGHT), this);
+    sizeSlider = new BaseXSlider(0, 100, gopts.get(GUIOptions.MAPWEIGHT), this);
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
 
     tmp = new BaseXBack(new TableLayout(2, 1));
@@ -64,23 +64,23 @@ public final class DialogMapLayout extends BaseXDialog {
     p.add(tmp);
 
     // create checkbox
-    atts = new BaseXCheckBox(SHOW_ATTS, gopts.bool(GUIOptions.MAPATTS), this);
+    atts = new BaseXCheckBox(SHOW_ATTS, gopts.get(GUIOptions.MAPATTS), this);
     p.add(atts);
 
     set(p, BorderLayout.CENTER);
-    finish(gopts.numbers(GUIOptions.MAPLAYOUTLOC));
+    finish(gopts.get(GUIOptions.MAPLAYOUTLOC));
 
-    algo.setSelectedIndex(gopts.number(GUIOptions.MAPALGO));
+    algo.setSelectedIndex(gopts.get(GUIOptions.MAPALGO));
   }
 
   @Override
   public void action(final Object cmp) {
     final GUIOptions gopts = gui.gopts;
-    gopts.number(GUIOptions.MAPOFFSETS, border.getSelectedIndex());
-    gopts.number(GUIOptions.MAPALGO, algo.getSelectedIndex());
-    gopts.bool(GUIOptions.MAPATTS, atts.isSelected());
+    gopts.set(GUIOptions.MAPOFFSETS, border.getSelectedIndex());
+    gopts.set(GUIOptions.MAPALGO, algo.getSelectedIndex());
+    gopts.set(GUIOptions.MAPATTS, atts.isSelected());
     final int sizeprp = sizeSlider.value();
-    gopts.number(GUIOptions.MAPWEIGHT, sizeprp);
+    gopts.set(GUIOptions.MAPWEIGHT, sizeprp);
     sizeLabel.setText(RATIO + COLS + (sizeprp > 45 && sizeprp < 55 ?
       CHILDREN_TEXT_LEN : sizeprp < 45 ?  NUMBER_CHILDREN : TEXT_LENGTH));
 

@@ -2,27 +2,28 @@ package org.basex.build;
 
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
 import java.util.*;
 
-import org.basex.io.serial.*;
+import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
- * This class contains parser options.
+ * Options for parsing and serializing CSV data.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class CsvOptions extends Options {
   /** Option: encoding. */
-  public static final Option ENCODING = new Option("encoding", Token.UTF8);
+  public static final StringOption ENCODING = new StringOption("encoding", Token.UTF8);
   /** Option: column separator. */
-  public static final Option SEPARATOR = new Option("separator", "comma");
+  public static final StringOption SEPARATOR = new StringOption("separator", "comma");
   /** Option: header line. */
-  public static final Option HEADER = new Option("header", false);
+  public static final BooleanOption HEADER = new BooleanOption("header", false);
   /** Option: lax conversion of strings to QNames. */
-  public static final Option LAX = new Option("lax", true);
+  public static final BooleanOption LAX = new BooleanOption("lax", true);
 
   /** CSV separators. */
   public static enum CsvSep {
@@ -59,25 +60,23 @@ public final class CsvOptions extends Options {
   /**
    * Constructor, specifying initial options.
    * @param opts options string
-   * @throws IOException I/O exception
+   * @throws BaseXException database exception
    */
-  public CsvOptions(final String opts) throws IOException {
-    parse(opts, true);
+  public CsvOptions(final String opts) throws BaseXException {
+    super(opts);
   }
 
   /**
    * Returns the separator character.
    * @return separator
-   * @throws SerializerException serializer exception
+   * @throws QueryIOException query I/O exception
    */
-  public int separator() throws SerializerException {
+  public int separator() throws QueryIOException {
     // set separator
-    final String sep = string(SEPARATOR);
+    final String sep = get(SEPARATOR);
     final String val = sep.toLowerCase(Locale.ENGLISH);
-    for(final CsvSep s : CsvSep.values()) {
-      if(val.equals(s.toString())) return s.ch;
-    }
-    if(sep.length() != 1) BXCS_CONFSEP.thrwSerial(sep);
+    for(final CsvSep s : CsvSep.values()) if(val.equals(s.toString())) return s.ch;
+    if(sep.length() != 1) BXCS_CONFSEP.thrwIO(sep);
     return sep.charAt(0);
   }
 }

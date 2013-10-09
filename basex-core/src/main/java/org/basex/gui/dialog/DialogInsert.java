@@ -72,7 +72,7 @@ public final class DialogInsert extends BaseXDialog {
       }
     };
 
-    final int lkind = gui.gopts.number(GUIOptions.LASTINSERT);
+    final int lkind = gui.gopts.get(GUIOptions.LASTINSERT);
     radio = new BaseXRadio[NODE_KINDS.length];
     for(int i = 1; i < NODE_KINDS.length; ++i) {
       radio[i] = new BaseXRadio(NODE_KINDS[i], false, this);
@@ -133,7 +133,7 @@ public final class DialogInsert extends BaseXDialog {
     for(int i = 1; i < NODE_KINDS.length; ++i) {
       if(radio[i].isSelected()) kind = i;
     }
-    gui.gopts.number(GUIOptions.LASTINSERT, kind);
+    gui.gopts.set(GUIOptions.LASTINSERT, kind);
 
     String msg = null;
     ok = kind != Data.TEXT || input2.getText().length != 0;

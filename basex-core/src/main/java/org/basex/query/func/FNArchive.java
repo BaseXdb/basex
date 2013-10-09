@@ -23,6 +23,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * Functions on archives.
@@ -72,9 +73,9 @@ public final class FNArchive extends StandardFunc {
   /** Archive options. */
   public static class ArchiveOptions extends Options {
     /** Archiving format. */
-    public static final Option FORMAT = new Option("format", ZIP);
+    public static final StringOption FORMAT = new StringOption("format", ZIP);
     /** Archiving algorithm. */
-    public static final Option ALGORITHM = new Option("algorithm", DEFLATE);
+    public static final StringOption ALGORITHM = new StringOption("algorithm", DEFLATE);
   }
 
   /**
@@ -121,15 +122,15 @@ public final class FNArchive extends StandardFunc {
     final Iter cont = ctx.iter(expr[1]);
     final Options opts = checkOptions(2, Q_OPTIONS, new ArchiveOptions(), ctx);;
 
-    final String format = opts.string(ArchiveOptions.FORMAT);
+    final String format = opts.get(ArchiveOptions.FORMAT);
     final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info);
     // check algorithm
-    final String alg = opts.string(ArchiveOptions.ALGORITHM);
+    final String alg = opts.get(ArchiveOptions.ALGORITHM);
     int level = ZipEntry.DEFLATED;
     if(alg != null) {
       if(format.equals(ZIP)  && !eq(alg, STORED, DEFLATE) ||
          format.equals(GZIP) && !eq(alg, DEFLATE)) {
-        ARCH_SUPP.thrw(info, ArchiveOptions.ALGORITHM.name, alg);
+        ARCH_SUPP.thrw(info, ArchiveOptions.ALGORITHM.name(), alg);
       }
       if(eq(alg, STORED)) level = ZipEntry.STORED;
       else if(eq(alg, DEFLATE)) level = ZipEntry.DEFLATED;

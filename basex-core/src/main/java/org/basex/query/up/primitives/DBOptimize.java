@@ -9,6 +9,7 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Update primitive for the optimize function.
@@ -57,13 +58,13 @@ public final class DBOptimize extends DBNew {
     initOptions();
     assignOptions();
 
-    final boolean rebuild = opts.number(MainOptions.MAXCATS) != meta.maxcats ||
-        opts.number(MainOptions.MAXLEN) != meta.maxlen;
-    meta.maxcats = opts.number(MainOptions.MAXCATS);
-    meta.maxlen  = opts.number(MainOptions.MAXLEN);
-    meta.createtext = opts.bool(MainOptions.TEXTINDEX);
-    meta.createattr = opts.bool(MainOptions.ATTRINDEX);
-    meta.createftxt = opts.bool(MainOptions.FTINDEX);
+    final boolean rebuild = opts.get(MainOptions.MAXCATS) != meta.maxcats ||
+        opts.get(MainOptions.MAXLEN) != meta.maxlen;
+    meta.maxcats = opts.get(MainOptions.MAXCATS);
+    meta.maxlen  = opts.get(MainOptions.MAXLEN);
+    meta.createtext = opts.get(MainOptions.TEXTINDEX);
+    meta.createattr = opts.get(MainOptions.ATTRINDEX);
+    meta.createftxt = opts.get(MainOptions.FTINDEX);
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, null);

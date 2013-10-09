@@ -30,7 +30,7 @@ public final class JsonParser extends XMLParser {
    * @throws IOException I/O exception
    */
   public JsonParser(final IO source, final MainOptions opts) throws IOException {
-    this(source, opts, opts.string(MainOptions.JSONPARSER));
+    this(source, opts, opts.get(MainOptions.JSONPARSER));
   }
 
   /**
@@ -54,7 +54,7 @@ public final class JsonParser extends XMLParser {
    */
   private static IO toXML(final IO io, final String options) throws IOException {
     final JsonOptions jopts = new JsonOptions(options);
-    final String encoding = jopts.string(JsonOptions.ENCODING);
+    final String encoding = jopts.get(JsonOptions.ENCODING);
 
     // parse input, using specified encoding
     final byte[] content = new NewlineInput(io).encoding(encoding).content();

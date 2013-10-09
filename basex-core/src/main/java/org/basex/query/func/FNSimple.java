@@ -209,7 +209,7 @@ public final class FNSimple extends StandardFunc {
             break;
           }
         }
-        if(!found) ELMOPTION.thrw(info, key);
+        if(!found) INVALIDOPTX.thrw(info, key);
       }
     }
     return cmp.deep(ctx.iter(expr[0]), ctx.iter(expr[1]));

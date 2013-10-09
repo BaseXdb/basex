@@ -11,7 +11,7 @@ import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.editor.Editor.SearchDir;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
-import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * This panel provides search and replace facilities.
@@ -95,7 +95,7 @@ public final class SearchBar extends BaseXBack {
       }
       @Override
       public void keyReleased(final KeyEvent e) {
-        main.gopts.string(GUIOptions.SR_SEARCH, search.getText());
+        main.gopts.set(GUIOptions.SR_SEARCH, search.getText());
         search();
       }
     });
@@ -112,7 +112,7 @@ public final class SearchBar extends BaseXBack {
     replace.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
-        main.gopts.string(GUIOptions.SR_REPLACE, replace.getText());
+        main.gopts.set(GUIOptions.SR_REPLACE, replace.getText());
       }
     });
 
@@ -273,17 +273,17 @@ public final class SearchBar extends BaseXBack {
    * @return button
    */
   private BaseXButton onOffButton(final String icon, final String help,
-      final Option option) {
+      final BooleanOption option) {
 
     final BaseXButton b = new BaseXButton(gui, icon, help);
-    b.setSelected(gui.gopts.bool(option));
+    b.setSelected(gui.gopts.get(option));
     b.addKeyListener(escape);
     b.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final boolean sel = !b.isSelected();
         b.setSelected(sel);
-        gui.gopts.bool(option, sel);
+        gui.gopts.set(option, sel);
         if(b == regex) {
           multi.setEnabled(sel);
           word.setEnabled(!sel);

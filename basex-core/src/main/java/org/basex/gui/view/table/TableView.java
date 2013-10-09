@@ -119,12 +119,12 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public boolean visible() {
-    return gui.gopts.bool(GUIOptions.SHOWTABLE);
+    return gui.gopts.get(GUIOptions.SHOWTABLE);
   }
 
   @Override
   public void visible(final boolean v) {
-    gui.gopts.bool(GUIOptions.SHOWTABLE, v);
+    gui.gopts.set(GUIOptions.SHOWTABLE, v);
   }
 
   @Override

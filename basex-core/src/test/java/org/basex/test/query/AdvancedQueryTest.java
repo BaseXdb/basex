@@ -112,7 +112,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       sb.append(query + "\n[E]");
       for(final Err e : error) sb.append(" " + e);
       fail(sb.append("\n[F] " + res).toString());
-    } catch(final SerializerException ex) {
+    } catch(final QueryIOException ex) {
       check(query, ex.getCause(), error);
     } catch(final QueryException ex) {
       check(query, ex, error);

@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Evaluates the 'set' command and modifies database options.
@@ -20,7 +21,7 @@ public final class Set extends AGet {
    * @param value value to set (optional, depending on the option)
    */
   public Set(final Option option, final Object value) {
-    this(option.name, value);
+    this(option.name(), value);
   }
 
   /**
@@ -34,22 +35,19 @@ public final class Set extends AGet {
 
   @Override
   protected boolean run() {
-    final String key = args[0].toUpperCase(Locale.ENGLISH), val = args[1];
-    final Option opt = options.option(key);
+    final String name = args[0].toUpperCase(Locale.ENGLISH), val = args[1];
+    // check if the option is a global, read-only option
+    if(context.user.has(Perm.ADMIN) && goptions.option(name) != null)
+      return error(Text.GLOBAL_OPTION_X, name);
+
+    final Option opt = options.option(name);
     try {
       // set value and return info string with new value
-      if(opt != null) {
-        options.set(opt, val);
-        return info(key + COLS + options.get(opt));
-      }
-      // check if the unknown option is a global, read-only option
-      if(context.user.has(Perm.ADMIN) && goptions.option(key) != null) {
-        return error(Text.GLOBAL_OPTION_X, key);
-      }
-      return error(options.error(key));
-    } catch(final IllegalArgumentException ex) {
+      options.assign(name, val);
+      return info(name + COLS + options.get(opt));
+    } catch(final BaseXException ex) {
       Util.debug(ex);
-      return error(INVALID_VALUE_X_X, key, val);
+      return error(Util.message(ex));
     }
   }
 }

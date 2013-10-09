@@ -27,7 +27,7 @@ public abstract class JsonSerializer extends OutputSerializer {
       throws IOException {
 
     super(os, opts);
-    opts.string(S_METHOD, M_JSON);
-    joptions = new JsonOptions(opts.string(SerializerOptions.S_JSON));
+    opts.set(S_METHOD, M_JSON);
+    joptions = new JsonOptions(opts.get(SerializerOptions.S_JSON));
   }
 }

@@ -105,7 +105,7 @@ public final class DOTSerializer extends OutputSerializer {
     try {
       print(norm(it.string(null)), ITEM);
     } catch(final QueryException ex) {
-      throw new SerializerException(ex);
+      throw new QueryIOException(ex);
     }
   }
 

@@ -13,6 +13,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Update primitive for the {@link Function#_DB_CREATE} function.

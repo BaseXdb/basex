@@ -20,6 +20,7 @@ import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Functions for performing XSLT transformations.
