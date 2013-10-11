@@ -5,7 +5,7 @@
   <!-- Artifact information -->
   <groupId>org.basex</groupId>
   <artifactId>basex-parent</artifactId>
-  <version>7.8-SNAPSHOT</version>
+  <version>7.8</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -178,11 +178,12 @@
     </mailingList>
   </mailingLists>
 
+  <!--<developerConnection>scm:git:git@github.com:BaseXdb/basex.git</developerConnection>-->
   <scm>
     <connection>scm:git:git://github.com/BaseXdb/basex.git</connection>
-    <!---<developerConnection>scm:git:git@github.com:BaseXdb/basex.git</developerConnection>-->
     <developerConnection>scm:git:file:///d:/basex/code/basex</developerConnection>
     <url>https://github.com/BaseXdb/basex</url>
+    <tag>7.8</tag>
   </scm>
 
   <repositories>
