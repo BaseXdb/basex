@@ -139,11 +139,13 @@ public final class XMLToken {
 
   /**
    * Encodes a string to a valid NCName.
-   * @param name token
+   * @param nm token to be encoded
    * @param lax lax encoding (lossy, but better readable)
    * @return valid NCName
    */
-  public static byte[] encode(final byte[] name, final boolean lax) {
+  public static byte[] encode(final byte[] nm, final boolean lax) {
+    // lax encoding: trim whitespaces
+    final byte[] name = lax ? trim(nm) : nm;
     if(name.length == 0) return UNDERSCORE;
 
     for(int i = 0, cp; i < name.length; i += cl(name, i)) {
@@ -152,12 +154,14 @@ public final class XMLToken {
         final TokenBuilder tb = new TokenBuilder(name.length << 1).add(name, 0, i);
         for(int j = i; j < name.length; j += cl(name, j)) {
           cp = cp(name, j);
-          final boolean valid = j == 0 ? XMLToken.isNCStartChar(cp) : XMLToken.isNCChar(cp);
           if(lax) {
-            tb.add(valid ? cp : '_');
+            final boolean nc = XMLToken.isNCChar(cp);
+            // prefix invalid start chars (numbers, dashes, dots) with underscore
+            if(j == 0 && nc && !XMLToken.isNCStartChar(cp)) tb.add('_');
+            tb.add(nc ? cp : '_');
           } else if(cp == '_') {
             tb.add('_').add('_');
-          } else if(valid) {
+          } else if(j == 0 ? XMLToken.isNCStartChar(cp) : XMLToken.isNCChar(cp)) {
             tb.add(cp);
           } else if(cp < 0x10000) {
             addEsc(tb, cp);
@@ -241,6 +245,6 @@ public final class XMLToken {
     } else if(mode > 0 && !tb.isEmpty()) {
       tb.add('?');
     }
-    return tb.finish();
+    return tb.trim().finish();
   }
 }
