@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <!-- Artifact information -->
@@ -213,21 +212,45 @@
     </repository>
   </repositories>
 
-  <distributionManagement>
-    <repository>
-      <id>basex.mvn</id>
-      <name>BaseX Maven Repository</name>
-      <url>ftp://basex.org/</url> <!-- TODO: fix the path; use sftp or ssh -->
-    </repository>
-  </distributionManagement>
-
   <prerequisites>
     <maven>3.0.0</maven>
   </prerequisites>
 
   <ciManagement><!-- TODO --></ciManagement>
   <pluginRepositories><!-- TODO --></pluginRepositories>
-  <profiles><!-- TODO --></profiles>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.4</version>
+            <inherited>true</inherited>
+            <executions>
+              <execution>
+                <id>create-executable-jar</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <descriptorRefs>
+                <descriptorRef>src</descriptorRef>
+              </descriptorRefs>
+              <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 
 
@@ -300,6 +323,17 @@
               </goals>
             </execution>
           </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.4.1</version>
+          <configuration>
+            <tagNameFormat>@{project.version}</tagNameFormat>
+            <releaseProfiles>release</releaseProfiles>
+            <scmCommentPrefix>Release: </scmCommentPrefix>
+          </configuration>
         </plugin>
 
         <plugin>
@@ -431,11 +465,6 @@
     </pluginManagement>
 
     <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ftp</artifactId>
-        <version>2.4</version>
-      </extension>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
