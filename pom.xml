@@ -216,11 +216,6 @@
 
   <distributionManagement>
     <repository>
-      <id>basex.mvn</id>
-      <name>BaseX Maven Repository</name>
-      <url>ftp://basex.org/</url>
-    </repository>
-    <repository>
       <id>basex.mvn.ssh</id>
       <name>BaseX Maven Repository</name>
       <url>scp://basex.org/</url>
@@ -479,11 +474,6 @@
     </pluginManagement>
 
     <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ftp</artifactId>
-        <version>2.4</version>
-      </extension>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
