@@ -180,7 +180,8 @@
 
   <scm>
     <connection>scm:git:git://github.com/BaseXdb/basex.git</connection>
-    <developerConnection>scm:git:git@github.com:BaseXdb/basex.git</developerConnection>
+    <!---<developerConnection>scm:git:git@github.com:BaseXdb/basex.git</developerConnection>-->
+    <developerConnection>scm:git:file:///d:/basex/code/basex</developerConnection>
     <url>https://github.com/BaseXdb/basex</url>
   </scm>
 
