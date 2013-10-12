@@ -3,7 +3,6 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
@@ -27,7 +26,7 @@ import org.basex.util.list.*;
  */
 public final class FTWords extends FTExpr {
   /** All matches. */
-  FTMatches matches = new FTMatches(0);
+  FTMatches matches = new FTMatches();
   /** Flag for first evaluation. */
   boolean first;
   /** Search mode; default: {@link FTMode#ANY}. */
@@ -44,8 +43,8 @@ public final class FTWords extends FTExpr {
   /** Single string. */
   private TokenList txt;
 
-  /** Current token number. */
-  private int tokNum;
+  /** Query position. */
+  private int pos;
   /** Fast evaluation. */
   private boolean fast;
 
@@ -98,16 +97,15 @@ public final class FTWords extends FTExpr {
       if(query.isValue()) txt = tokens(ctx);
       // choose fast evaluation for default settings
       fast = mode == FTMode.ANY && txt != null && occ == null;
-      if(ftt == null) ftt = new FTTokenizer(this, ctx.ftOpt(),
-          ctx.context.options.get(MainOptions.LSERROR));
+      if(ftt == null) ftt = new FTTokenizer(this, ctx);
     }
     return this;
   }
 
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    if(tokNum == 0) tokNum = ++ctx.ftPos;
-    matches.reset(tokNum);
+    if(pos == 0) pos = ++ctx.ftPos;
+    matches.reset(pos);
 
     final int c = contains(ctx);
     if(c == 0) matches.size(0);
@@ -192,7 +190,7 @@ public final class FTWords extends FTExpr {
     final FTTokens tokens = ftt.cache(lex.get());
 
     return new FTIndexIterator() {
-      int pre = -1, pos;
+      int pre = -1, ps;
 
       @Override
       public int pre() {
@@ -203,7 +201,7 @@ public final class FTWords extends FTExpr {
         while(++pre < data.meta.size) {
           if(data.kind(pre) != Data.TEXT) continue;
           input.init(data.text(pre, true));
-          matches.reset(pos);
+          matches.reset(ps);
           try {
             if(ftt.contains(tokens, input) != 0) return true;
           } catch(final QueryException ignore) {
@@ -218,7 +216,7 @@ public final class FTWords extends FTExpr {
       }
       @Override
       public void pos(final int p) {
-        pos = p;
+        ps = p;
       }
       @Override
       public int size() {
@@ -437,7 +435,7 @@ public final class FTWords extends FTExpr {
     if(txt != null) ftw.txt = txt.copy();
     ftw.ictx = ictx;
     ftw.first = first;
-    ftw.tokNum = tokNum;
+    ftw.pos = pos;
     ftw.fast = fast;
     return ftw;
   }

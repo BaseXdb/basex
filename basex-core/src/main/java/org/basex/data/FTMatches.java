@@ -14,19 +14,25 @@ import org.basex.util.list.*;
 public final class FTMatches extends ElementList implements Iterable<FTMatch> {
   /** Full-text matches. */
   public FTMatch[] match = {};
-  /** Query position. */
+  /** Position of a token in the query. */
   public int pos;
+
+  /**
+   * Constructor.
+   */
+  public FTMatches() {
+  }
 
   /**
    * Constructor.
    * @param p query position
    */
   public FTMatches(final int p) {
-    reset(p);
+    pos = p;
   }
 
   /**
-   * Resets the match counter.
+   * Resets the match container.
    * @param p query position
    */
   public void reset(final int p) {

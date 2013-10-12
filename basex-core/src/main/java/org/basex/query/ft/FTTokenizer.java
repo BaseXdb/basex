@@ -4,6 +4,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -18,32 +19,39 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class FTTokenizer {
-  /** Wildcard object cache. */
-  final TokenObjMap<FTWildcard> wcCache = new TokenObjMap<FTWildcard>();
-  /** Levenshtein reference. */
-  final Levenshtein ls = new Levenshtein();
-  /** Calling expression. */
-  final FTWords words;
   /** Full-text options. */
   final FTOpt opt;
-  /** Levenshtein error. */
-  final int lserr;
 
+  /** Wildcard object cache. */
+  private final TokenObjMap<FTWildcard> wcCache = new TokenObjMap<FTWildcard>();
+  /** Token cache. */
+  private final TokenObjMap<FTTokens> cache = new TokenObjMap<FTTokens>();
   /** Token comparator. */
   private final TokenComparator cmp;
-  /** Cache. */
-  private final TokenObjMap<FTTokens> cache = new TokenObjMap<FTTokens>();
+  /** Levenshtein reference. */
+  private final Levenshtein ls;
+  /** Calling expression. */
+  private final FTWords words;
+
+  /**
+   * Constructor.
+   * @param w full-text words
+   * @param ctx query context
+   */
+  public FTTokenizer(final FTWords w, final QueryContext ctx) {
+    this(w, ctx.ftOpt(), new Levenshtein(ctx.context.options.get(MainOptions.LSERROR)));
+  }
 
   /**
    * Constructor.
    * @param w full-text words
    * @param o full-text options
-   * @param lsr Levenshtein error
+   * @param l Levenshtein distance calculation
    */
-  public FTTokenizer(final FTWords w, final FTOpt o, final int lsr) {
+  public FTTokenizer(final FTWords w, final FTOpt o, final Levenshtein l) {
     words = w;
     opt = o;
-    lserr = lsr;
+    ls = l;
 
     cmp = new TokenComparator() {
       @Override
@@ -63,7 +71,7 @@ final class FTTokenizer {
           // it is always equal to the corresponding input token:
           opt.sw != null && opt.sw.contains(qu) ||
           // fuzzy search:
-          (opt.is(FZ) ? ls.similar(in, qu, lserr) :
+          (opt.is(FZ) ? ls.similar(in, qu) :
           // wild-card search:
           ftw != null ? ftw.match(in) :
           // simple search:
@@ -150,6 +158,6 @@ final class FTTokenizer {
    * @return copy
    */
   protected FTTokenizer copy(final FTWords ftw) {
-    return new FTTokenizer(ftw, opt, lserr);
+    return new FTTokenizer(ftw, opt, ls);
   }
 }

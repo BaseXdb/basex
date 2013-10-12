@@ -90,7 +90,7 @@ public final class QueryContext extends Proc {
   private FTOpt ftOpt;
   /** Full-text position data (needed for highlighting full-text results). */
   public FTPosData ftPosData;
-  /** Full-text token counter (needed for highlighting full-text results). */
+  /** Full-text token positions (needed for highlighting full-text results). */
   public int ftPos;
 
   /** Current Date. */

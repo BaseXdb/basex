@@ -414,7 +414,7 @@ public final class FTIndex implements Index {
     final int size = ftc.pre.size();
 
     return new FTIndexIterator() {
-      final FTMatches all = new FTMatches(0);
+      final FTMatches all = new FTMatches();
       int pos, pre, c;
 
       @Override

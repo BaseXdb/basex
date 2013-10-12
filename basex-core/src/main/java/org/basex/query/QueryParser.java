@@ -3230,8 +3230,7 @@ public class QueryParser extends InputParser {
     // check if specified language is not available
     if(fto.ln == null) fto.ln = Language.def();
     if(!Tokenizer.supportFor(fto.ln)) error(FTNOTOK, fto.ln);
-    if(fto.is(ST) && fto.sd == null && !Stemmer.supportFor(fto.ln))
-      error(FTNOSTEM, fto.ln);
+    if(fto.is(ST) && fto.sd == null && !Stemmer.supportFor(fto.ln)) error(FTNOSTEM, fto.ln);
 
     // consume weight option
     if(wsConsumeWs(WEIGHT)) expr = new FTWeight(info(), expr, enclosed(NOENCLEXPR));

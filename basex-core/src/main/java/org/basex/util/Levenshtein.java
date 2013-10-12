@@ -14,8 +14,26 @@ import static org.basex.util.Token.*;
 public final class Levenshtein {
   /** Maximum token size. */
   private static final int MAX = 50;
+
+  /** Default number of allowed errors; dynamic calculation if value is 0. */
+  public final int error;
   /** Matrix for calculating Levenshtein distance. */
   private int[][] matrix;
+
+  /**
+   * Constructor.
+   */
+  public Levenshtein() {
+    this(0);
+  }
+
+  /**
+   * Constructor.
+   * @param err allowed errors
+   */
+  public Levenshtein(final int err) {
+    error = err;
+  }
 
   /**
    * Compares two character arrays for similarity.
@@ -24,7 +42,7 @@ public final class Levenshtein {
    * @return true if the arrays are similar
    */
   public boolean similar(final byte[] token, final byte[] sub) {
-    return similar(token, sub, 0);
+    return similar(token, sub, error);
   }
 
   /**
