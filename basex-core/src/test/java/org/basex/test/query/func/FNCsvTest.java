@@ -39,10 +39,10 @@ public final class FNCsvTest extends AdvancedQueryTest {
     { "<csv><record><A_0020B>1</A_0020B></record></csv>",
       "'header':'yes','lax':'no'", "A B1" },
 
-    { "<csv><record><A_>1</A_></record></csv>",
-      "'header':true(),'lax':true()", "A 1" },
+    { "<csv><record><_A_>1</_A_></record></csv>",
+      "'header':true(),'lax':true()", "A1" },
     { "<csv><record><_>1</_></record></csv>",
-      "'header':true(),'lax':true()", " 1" },
+      "'header':true(),'lax':true()", "1" },
     { "<csv><record><A_0020B>1</A_0020B></record></csv>",
       "'header':'yes','lax':'yes'", "A 0020B1" },
 

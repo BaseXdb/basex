@@ -200,11 +200,11 @@ public final class FNFt extends StandardFunc {
       mode = FTMode.get(md);
       if(mode == null) INVALIDOPT.thrw(info, Util.info(Text.INVALID_VALUE_X_X, "mode", md));
     }
-
     ctx.ftOpt(opt);
     FTExpr expr = new FTWords(info, ic, terms, mode, ctx);
+    ctx.ftOpt(tmp);
 
-    if(opts.contains(FTOptions.DISTANCE)) {
+    if(opts != null && opts.contains(FTOptions.DISTANCE)) {
       try {
         final FTDistanceOptions ftdo = new FTDistanceOptions(opts.get(FTOptions.DISTANCE));
         expr = new FTDistance(info, expr, new Expr[] {
@@ -214,7 +214,6 @@ public final class FNFt extends StandardFunc {
         INVALIDOPT.thrw(info, ex);
       }
     }
-    ctx.ftOpt(tmp);
     return new FTIndexAccess(info, expr, ic).iter(ctx);
   }
 
