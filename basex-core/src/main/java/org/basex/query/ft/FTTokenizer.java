@@ -139,7 +139,7 @@ final class FTTokenizer {
       ++c;
     }
 
-    words.matches.sTokenNum++;
+    words.matches.pos++;
     words.first = false;
     return c;
   }

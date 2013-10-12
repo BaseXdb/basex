@@ -556,7 +556,6 @@ public final class FTTest extends QueryTest {
       }
     } else {
       // single test
-      //opts.set(Prop.MAINMEM, true);
       opts.set(MainOptions.FTINDEX, true);
       opts.set(MainOptions.STEMMING, true);
       opts.set(MainOptions.DIACRITICS, true);
@@ -569,20 +568,20 @@ public final class FTTest extends QueryTest {
   protected String details() {
     final MainOptions opts = context.options;
     final StringBuilder sb = new StringBuilder();
-    sb.append(set(MainOptions.FTINDEX, opts)).append(';');
-    sb.append(set(MainOptions.STEMMING, opts)).append(';');
-    sb.append(set(MainOptions.DIACRITICS, opts)).append(';');
-    sb.append(set(MainOptions.CASESENS, opts));
+    sb.append(set(opts, MainOptions.FTINDEX)).append(';');
+    sb.append(set(opts, MainOptions.STEMMING)).append(';');
+    sb.append(set(opts, MainOptions.DIACRITICS)).append(';');
+    sb.append(set(opts, MainOptions.CASESENS));
     return sb.toString();
   }
 
   /**
    * Returns a flag string.
-   * @param option option
    * @param opts options
+   * @param option option
    * @return string
    */
-  private static String set(final BooleanOption option, final Options opts) {
+  private static String set(final Options opts, final BooleanOption option) {
     return new Set(option, opts.get(option)).toString();
   }
 

@@ -3298,7 +3298,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr[] ftRange(final boolean i) throws QueryException {
-    final Expr[] occ = { Int.get(1), Int.get(Long.MAX_VALUE)};
+    final Expr[] occ = { Int.get(1), Int.get(Long.MAX_VALUE) };
     if(wsConsumeWs(EXACTLY)) {
       occ[0] = ftAdditive(i);
       occ[1] = occ[0];

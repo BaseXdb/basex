@@ -72,8 +72,8 @@ public final class FTWords extends FTExpr {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public FTWords(final InputInfo ii, final IndexContext ic, final Value t,
-      final FTMode m, final QueryContext ctx) throws QueryException {
+  public FTWords(final InputInfo ii, final IndexContext ic, final Value t, final FTMode m,
+      final QueryContext ctx) throws QueryException {
 
     super(ii);
     query = t;
@@ -89,8 +89,7 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTWords compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public FTWords compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     if(occ != null) for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].compile(ctx, scp);
 
     // compile only once
@@ -107,107 +106,107 @@ public final class FTWords extends FTExpr {
 
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    if(tokNum == 0) tokNum = ++ctx.ftoknum;
+    if(tokNum == 0) tokNum = ++ctx.ftPos;
     matches.reset(tokNum);
 
     final int c = contains(ctx);
     if(c == 0) matches.size(0);
 
     // scoring: include number of tokens for calculations
-    return new FTNode(matches, c == 0 ? 0 : Scoring.word(c, ctx.fttoken.count()));
+    return new FTNode(matches, c == 0 ? 0 : Scoring.word(c, ctx.ftToken.count()));
   }
 
   @Override
   public FTIter iter(final QueryContext ctx) {
     final Data data = ictx.data;
     return new FTIter() {
-      /** Index iterator. */
-      FTIndexIterator iat;
-      /** Text length. */
+      FTIndexIterator ftiter;
       int len;
 
       @Override
       public FTNode next() throws QueryException {
-        if(iat == null) {
+        if(ftiter == null) {
           final FTLexer lex = new FTLexer(ftt.opt);
 
           // index iterator tree
-          FTIndexIterator ia;
+          FTIndexIterator ii;
           // number of distinct tokens
-          int t  = 0;
+          int t = 0;
           // loop through unique tokens
-          final TokenSet ts = unique(txt != null ? txt : tokens(ctx));
-          for(final byte[] k : ts) {
+          for(final byte[] k : unique(txt != null ? txt : tokens(ctx))) {
             lex.init(k);
-            ia = null;
-            int d = 0;
+            ii = null;
             if(!lex.hasNext()) return null;
+
+            int d = 0;
             do {
               final byte[] tok = lex.nextToken();
               t += tok.length;
               if(ftt.opt.sw != null && ftt.opt.sw.contains(tok)) {
                 ++d;
               } else {
-                final FTIndexIterator ir = lex.get().length > data.meta.maxlen ?
-                    scan(lex) : (FTIndexIterator) data.iter(lex);
-                if(ia == null) {
-                  ia = ir;
+                final FTIndexIterator ir = lex.get().length > data.meta.maxlen ? scan(lex) :
+                  (FTIndexIterator) data.iter(lex);
+                ir.pos(++ctx.ftPos);
+                if(ii == null) {
+                  ii = ir;
                 } else {
-                  ia = FTIndexIterator.intersect(ia, ir, ++d);
+                  ii = FTIndexIterator.intersect(ii, ir, ++d);
                   d = 0;
                 }
               }
             } while(lex.hasNext());
+
             // create or combine iterator
-            if(iat == null) {
+            if(ftiter == null) {
               len = t;
-              iat = ia;
+              ftiter = ii;
             } else if(mode == FTMode.ALL || mode == FTMode.ALL_WORDS) {
-              if(ia.size() == 0) return null;
+              if(ii.size() == 0) return null;
               len += t;
-              iat = FTIndexIterator.intersect(ia, iat, 0);
+              ftiter = FTIndexIterator.intersect(ftiter, ii, 0);
             } else {
-              if(ia.size() == 0) continue;
+              if(ii.size() == 0) continue;
               len = Math.max(t, len);
-              iat = FTIndexIterator.union(ia, iat);
+              ftiter = FTIndexIterator.union(ftiter, ii);
             }
-            iat.tokenNum(++ctx.ftoknum);
           }
         }
+
         // [CG] XQuery, Full-Text: check scoring in index-based model
-        return iat == null || !iat.more() ? null : new FTNode(iat.matches(),
-            data, iat.next(), len, iat.size(), -1);
+        return ftiter == null || !ftiter.more() ? null :
+          new FTNode(ftiter.matches(), data, ftiter.pre(), len, ftiter.size(), -1);
       }
     };
   }
 
   /**
-   * Returns scan-based iterator.
+   * Returns a scan-based iterator.
    * @param lex lexer, including the queried value
    * @return node iterator
    * @throws QueryException query exception
    */
   FTIndexIterator scan(final FTLexer lex) throws QueryException {
     final Data data = ictx.data;
-    final FTLexer intok = new FTLexer(ftt.opt);
-    final FTTokens qtok = ftt.cache(lex.get());
+    final FTLexer input = new FTLexer(ftt.opt);
+    final FTTokens tokens = ftt.cache(lex.get());
 
     return new FTIndexIterator() {
-      int pre = -1;
+      int pre = -1, pos;
 
       @Override
-      public int next() {
+      public int pre() {
         return pre;
       }
       @Override
       public boolean more() {
         while(++pre < data.meta.size) {
           if(data.kind(pre) != Data.TEXT) continue;
-          intok.init(data.text(pre, true));
-          matches.reset(0);
+          input.init(data.text(pre, true));
+          matches.reset(pos);
           try {
-            if(ftt.contains(qtok, intok) != 0) return true;
-          } catch(final QueryException ex) {
+            if(ftt.contains(tokens, input) != 0) return true;
+          } catch(final QueryException ignore) {
             // ignore exceptions
           }
         }
@@ -216,6 +215,10 @@ public final class FTWords extends FTExpr {
       @Override
       public FTMatches matches() {
         return matches;
+      }
+      @Override
+      public void pos(final int p) {
+        pos = p;
       }
       @Override
       public int size() {
@@ -250,7 +253,7 @@ public final class FTWords extends FTExpr {
    */
   private int contains(final QueryContext ctx) throws QueryException {
     first = true;
-    final FTLexer lexer = ftt.lexer(ctx.fttoken);
+    final FTLexer lexer = ftt.lexer(ctx.ftToken);
 
     // use faster evaluation for default options
     int num = 0;
@@ -414,8 +417,8 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTExpr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
 
     boolean change = occ != null && inlineAll(ctx, scp, occ, v, e);
     final Expr q = query.inline(ctx, scp, v, e);
@@ -427,13 +430,10 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
-
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final FTWords ftw = new FTWords(info, query.copy(ctx, scp, vs), mode,
         occ == null ? null : Arr.copyAll(ctx, scp, vs, occ));
     if(ftt != null) ftw.ftt = ftt.copy(ftw);
-    if(matches != null) ftw.matches = matches.copy();
     if(txt != null) ftw.txt = txt.copy();
     ftw.ictx = ictx;
     ftw.first = first;
@@ -445,6 +445,20 @@ public final class FTWords extends FTExpr {
   @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), occ, query);
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return super.accept(visitor) && query.accept(visitor) &&
+        (occ == null || visitAll(visitor, occ));
+  }
+
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    if(occ != null) for(final Expr o : occ) sz += o.exprSize();
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz + query.exprSize();
   }
 
   @Override
@@ -469,24 +483,7 @@ public final class FTWords extends FTExpr {
         break;
       default:
     }
-
-    if(occ != null) {
-      sb.append(OCCURS + ' ' + occ[0] + ' ' + TO + ' ' + occ[1] + ' ' + TIMES);
-    }
+    if(occ != null) sb.append(OCCURS + ' ' + occ[0] + ' ' + TO + ' ' + occ[1] + ' ' + TIMES);
     return sb.toString();
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return super.accept(visitor) && query.accept(visitor) &&
-        (occ == null || visitAll(visitor, occ));
-  }
-
-  @Override
-  public int exprSize() {
-    int sz = 1;
-    if(occ != null) for(final Expr o : occ) sz += o.exprSize();
-    for(final Expr e : expr) sz += e.exprSize();
-    return sz + query.exprSize();
   }
 }

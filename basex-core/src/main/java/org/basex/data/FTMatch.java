@@ -32,16 +32,16 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
 
   /**
    * Adds a all matches of a full-text match.
-   * @param mtc match to be added
+   * @param m match to be added
    * @return self reference
    */
-  public FTMatch add(final FTMatch mtc) {
-    for(final FTStringMatch m : mtc) add(m);
+  public FTMatch add(final FTMatch m) {
+    for(final FTStringMatch sm : m) add(sm);
     return this;
   }
 
   /**
-   * Adds a string match.
+   * Adds a single string match.
    * @param m match to be added
    * @return self reference
    */
@@ -53,12 +53,12 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
 
   /**
    * Checks if the full-text match is not part of the specified match.
-   * @param mtc match to be checked
+   * @param m match to be checked
    * @return result of check
    */
-  public boolean notin(final FTMatch mtc) {
+  public boolean notin(final FTMatch m) {
     for(final FTStringMatch s : this) {
-      for(final FTStringMatch m : mtc) if(!s.in(m)) return true;
+      for(final FTStringMatch sm : m) if(!s.in(sm)) return true;
     }
     return false;
   }
@@ -68,28 +68,15 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
    * @return result of check
    */
   boolean match() {
-    for(final FTStringMatch s : this) if(s.ex) return false;
+    for(final FTStringMatch s : this) if(s.exclude) return false;
     return true;
   }
 
   /**
-   * Sorts the matches.
+   * Sorts the matches by their start and end positions.
    */
   public void sort() {
     Arrays.sort(match, 0, size, null);
-  }
-
-  /**
-   * Creates a deep copy of this container.
-   * @return copy
-   */
-  protected FTMatch copy() {
-    final FTMatch ftm = new FTMatch();
-    ftm.size = size;
-    ftm.match = match.clone();
-    for(int i = 0; i < ftm.match.length; i++)
-      if(ftm.match[i] != null) ftm.match[i] = ftm.match[i].copy();
-    return ftm;
   }
 
   @Override
@@ -99,8 +86,10 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.className(this));
-    for(final FTStringMatch s : this) sb.append(' ').append(s);
-    return sb.toString();
+    final StringBuilder sb = new StringBuilder();
+    for(final FTStringMatch s : this) {
+      sb.append(sb.length() != 0 ? ", " : "").append(s);
+    }
+    return Util.className(this) + ' ' + sb;
   }
 }

@@ -30,8 +30,7 @@ public final class FTOpts extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     final FTOpt tmp = ctx.ftOpt();
     ctx.ftOpt(opt.copy(tmp));
     if(opt.sw != null && ctx.value != null && ctx.value.data() != null)
@@ -64,8 +63,7 @@ public final class FTOpts extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new FTOpts(info, expr[0].copy(ctx, scp, vs), new FTOpt().copy(opt));
   }
 }

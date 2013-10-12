@@ -44,7 +44,7 @@ public final class RangeAccess extends IndexAccess {
       final IndexIterator it = ictx.data.iter(ind);
       @Override
       public ANode next() {
-        return it.more() ? new DBNode(ictx.data, it.next(), kind) : null;
+        return it.more() ? new DBNode(ictx.data, it.pre(), kind) : null;
       }
     };
   }

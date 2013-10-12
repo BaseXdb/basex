@@ -32,16 +32,16 @@ public final class FTNode extends DBNode {
    * @param a full-text matches
    * @param d data reference
    * @param p pre value
-   * @param tol token length
-   * @param tis total size indexed results
+   * @param l token length
+   * @param tis number of indexed results
    * @param s score value out of the index
    */
-  public FTNode(final FTMatches a, final Data d, final int p, final int tol,
-      final int tis, final double s) {
+  public FTNode(final FTMatches a, final Data d, final int p, final int l, final int tis,
+      final double s) {
 
     super(d, p, null, NodeType.TXT);
     all = a;
-    tl = tol;
+    tl = l;
     is = tis;
     if(s != -1) score = s;
   }

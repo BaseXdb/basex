@@ -30,9 +30,8 @@ public final class FTDistance extends FTFilter {
    * @param u unit
    */
   public FTDistance(final InputInfo ii, final FTExpr e, final Expr[] d, final FTUnit u) {
-    super(ii, e);
+    super(ii, e, u);
     dist = d;
-    unit = u;
   }
 
   @Override
@@ -42,39 +41,37 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     for(int d = 0; d < dist.length; d++) dist[d] = dist[d].compile(ctx, scp);
     return super.compile(ctx, scp);
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final FTLexer lex) throws QueryException {
+  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex)
+      throws QueryException {
 
     final long min = checkItr(dist[0], ctx);
     final long max = checkItr(dist[1], ctx);
     mtc.sort();
 
     final FTMatch match = new FTMatch();
-    FTStringMatch sm = null;
-    FTStringMatch f = null;
-    for(final FTStringMatch m : mtc) {
-      if(m.ex) {
-        match.add(m);
+    FTStringMatch last = null, first = null;
+    for(final FTStringMatch sm : mtc) {
+      if(sm.exclude) {
+        match.add(sm);
       } else {
-        if(sm != null) {
-          final int d = pos(m.s, lex) - pos(sm.e, lex) - 1;
-          if(d < min || d > max) return false;
+        if(first == null) {
+          first = sm;
         } else {
-          f = m;
+          final int d = pos(sm.start, lex) - pos(last.end, lex) - 1;
+          if(d < min || d > max) return false;
         }
-        sm = m;
+        last = sm;
       }
     }
-    f.e = sm.e;
+    first.end = last.end;
     mtc.reset();
-    mtc.add(f);
+    mtc.add(first);
     mtc.add(match);
     return true;
   }
@@ -97,15 +94,14 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public FTExpr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     return inlineAll(ctx, scp, expr, v, e) | inlineAll(ctx, scp, dist, v, e)
         ? optimize(ctx, scp) : null;
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new FTDistance(info, expr[0].copy(ctx, scp, vs),
         Arr.copyAll(ctx, scp, vs, dist), unit);
   }
@@ -117,8 +113,7 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public String toString() {
-    return super.toString() + DISTANCE + PAR1 +
-      dist[0] + '-' + dist[1] + ' ' + unit + PAR2;
+    return super.toString() + DISTANCE + PAR1 + dist[0] + '-' + dist[1] + ' ' + unit + PAR2;
   }
 
   @Override

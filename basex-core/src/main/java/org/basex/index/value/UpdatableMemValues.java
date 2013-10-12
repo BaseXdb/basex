@@ -38,7 +38,7 @@ public final class UpdatableMemValues extends MemValues {
           @Override
           public boolean more() { return p < s; }
           @Override
-          public int next() {
+          public int pre() {
             while(more() && data.kind(pres[p++]) != k);
             return pres[p - 1];
           }

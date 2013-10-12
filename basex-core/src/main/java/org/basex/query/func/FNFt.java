@@ -74,12 +74,12 @@ public final class FNFt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item count(final QueryContext ctx) throws QueryException {
-    final FTPosData tmp = ctx.ftpos;
-    ctx.ftpos = new FTPosData();
+    final FTPosData tmp = ctx.ftPosData;
+    ctx.ftPosData = new FTPosData();
     final Iter ir = ctx.iter(expr[0]);
     for(Item it; (it = ir.next()) != null;) checkDBNode(it);
-    final int s = ctx.ftpos.size();
-    ctx.ftpos = tmp;
+    final int s = ctx.ftPosData.size();
+    ctx.ftPosData = tmp;
     return Int.get(s);
   }
 
@@ -118,9 +118,9 @@ public final class FNFt extends StandardFunc {
             if(it != null) return it;
             vi = null;
           }
-          final FTPosData tmp = ctx.ftpos;
+          final FTPosData tmp = ctx.ftPosData;
           try {
-            ctx.ftpos = ftd;
+            ctx.ftPosData = ftd;
             if(ir == null) ir = ctx.iter(expr[0]);
             final Item it = ir.next();
             if(it == null) return null;
@@ -128,13 +128,13 @@ public final class FNFt extends StandardFunc {
             // copy node to main memory data instance
             final MemData md = new MemData(ctx.context.options);
             final DataBuilder db = new DataBuilder(md);
-            db.ftpos(mark, ctx.ftpos, len).build(checkDBNode(it));
+            db.ftpos(mark, ctx.ftPosData, len).build(checkDBNode(it));
 
             final IntList il = new IntList();
             for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) il.add(p);
             vi = DBNodeSeq.get(il, md, false, false).iter();
           } finally {
-            ctx.ftpos = tmp;
+            ctx.ftPosData = tmp;
           }
         }
       }
@@ -202,9 +202,20 @@ public final class FNFt extends StandardFunc {
     }
 
     ctx.ftOpt(opt);
-    final FTWords words = new FTWords(info, ic, terms, mode, ctx);
+    FTExpr expr = new FTWords(info, ic, terms, mode, ctx);
+
+    if(opts.contains(FTOptions.DISTANCE)) {
+      try {
+        final FTDistanceOptions ftdo = new FTDistanceOptions(opts.get(FTOptions.DISTANCE));
+        expr = new FTDistance(info, expr, new Expr[] {
+            Int.get(ftdo.get(FTDistanceOptions.MIN)), Int.get(ftdo.get(FTDistanceOptions.MAX))
+        }, ftdo.unit());
+      } catch(final BaseXException ex) {
+        INVALIDOPT.thrw(info, ex);
+      }
+    }
     ctx.ftOpt(tmp);
-    return new FTIndexAccess(info, words, ic).iter(ctx);
+    return new FTIndexAccess(info, expr, ic).iter(ctx);
   }
 
   /**

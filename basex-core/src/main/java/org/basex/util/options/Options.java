@@ -171,7 +171,7 @@ public class Options implements Iterable<Option> {
    * @param option option to be found
    * @return value
    */
-  public final synchronized int get(final NumberOption option) {
+  public final synchronized Integer get(final NumberOption option) {
     return (Integer) get((Option) option);
   }
 
@@ -180,7 +180,7 @@ public class Options implements Iterable<Option> {
    * @param option option to be found
    * @return value
    */
-  public final synchronized boolean get(final BooleanOption option) {
+  public final synchronized Boolean get(final BooleanOption option) {
     return (Boolean) get((Option) option);
   }
 

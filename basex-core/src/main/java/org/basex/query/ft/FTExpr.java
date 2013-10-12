@@ -37,16 +37,14 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     final int es = expr.length;
     for(int e = 0; e < es; e++) expr[e] = expr[e].compile(ctx, scp);
     return this;
   }
 
   @Override
-  public FTExpr optimize(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public FTExpr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     return this;
   }
 
@@ -57,8 +55,7 @@ public abstract class FTExpr extends ParseExpr {
    * @throws QueryException query exception
    */
   @Override
-  public abstract FTNode item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException;
+  public abstract FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException;
 
   /**
    * This method is called by the index-based full-text evaluation.
@@ -87,8 +84,8 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public FTExpr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     return inlineAll(ctx, scp, expr, v, e) ? optimize(ctx, scp) : null;
   }
 
@@ -121,6 +118,13 @@ public abstract class FTExpr extends ParseExpr {
     return visitAll(visitor, expr);
   }
 
+  @Override
+  public int exprSize() {
+    int sz = 1;
+    for(final Expr e : expr) sz += e.exprSize();
+    return sz;
+  }
+
   /**
    * Prints the array with the specified separator.
    * @param sep separator
@@ -131,12 +135,5 @@ public abstract class FTExpr extends ParseExpr {
     final int es = expr.length;
     for(int e = 0; e < es; e++) sb.append(e != 0 ? sep.toString() : "").append(expr[e]);
     return sb.toString();
-  }
-
-  @Override
-  public int exprSize() {
-    int sz = 1;
-    for(final Expr e : expr) sz += e.exprSize();
-    return sz;
   }
 }

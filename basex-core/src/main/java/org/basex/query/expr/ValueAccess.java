@@ -75,7 +75,7 @@ public final class ValueAccess extends IndexAccess {
 
       @Override
       public ANode next() {
-        return ii.more() ? new DBNode(data, ii.next(), kind) : null;
+        return ii.more() ? new DBNode(data, ii.pre(), kind) : null;
       }
     };
   }
@@ -93,7 +93,7 @@ public final class ValueAccess extends IndexAccess {
       int pre = -1;
 
       @Override
-      public int next() {
+      public int pre() {
         return pre;
       }
       @Override

@@ -47,7 +47,7 @@ public final class FTIndexAccess extends Simple {
         final FTNode it = ir.next();
         if(it != null) {
           // cache entry for visualizations or ft:mark/ft:extract
-          if(ctx.ftpos != null) ctx.ftpos.add(it.data, it.pre, it.all);
+          if(ctx.ftPosData != null) ctx.ftPosData.add(it.data, it.pre, it.all);
           // assign scoring, if not done yet
           it.score();
           // remove matches reference to save memory
@@ -74,8 +74,8 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     return ftexpr.inline(ctx, scp, v, e) == null ? null : optimize(ctx, scp);
   }
 
@@ -100,6 +100,11 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
+  public int exprSize() {
+    return ftexpr.exprSize() + 1;
+  }
+
+  @Override
   public String toString() {
     Expr e = ftexpr;
     if(ftexpr instanceof FTWords) {
@@ -107,10 +112,5 @@ public final class FTIndexAccess extends Simple {
       if(f.mode == FTMode.ANY && f.occ == null) e = f.query;
     }
     return Function._DB_FULLTEXT.get(info, Str.get(ictx.data.meta.name), e).toString();
-  }
-
-  @Override
-  public int exprSize() {
-    return ftexpr.exprSize() + 1;
   }
 }

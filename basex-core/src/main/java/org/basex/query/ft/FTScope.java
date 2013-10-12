@@ -29,20 +29,17 @@ public final class FTScope extends FTFilter {
    * @param s same flag
    */
   public FTScope(final InputInfo ii, final FTExpr e, final FTUnit u, final boolean s) {
-    super(ii, e);
-    unit = u;
+    super(ii, e, u);
     same = s;
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final FTLexer lex) {
-
+  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex) {
     if(same) {
       int s = -1;
       for(final FTStringMatch sm : mtc) {
-        if(sm.ex) continue;
-        final int p = pos(sm.s, lex);
+        if(sm.exclude) continue;
+        final int p = pos(sm.start, lex);
         if(s == -1) s = p;
         else if(s != p) return false;
       }
@@ -51,19 +48,18 @@ public final class FTScope extends FTFilter {
     int c = 0;
     final BoolList bl = new BoolList();
     for(final FTStringMatch sm : mtc) {
-      if(sm.ex) continue;
+      if(sm.exclude) continue;
       c++;
-      final int p = pos(sm.s, lex);
+      final int p = pos(sm.start, lex);
       final int s = bl.size();
-      if(p < s && bl.get(p) && p == pos(sm.e, lex)) return false;
+      if(p < s && bl.get(p) && p == pos(sm.end, lex)) return false;
       bl.set(p, true);
     }
     return c > 1;
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new FTScope(info, expr[0].copy(ctx, scp, vs), unit, same);
   }
 

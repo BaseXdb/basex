@@ -39,8 +39,8 @@ final class FTContainsIndex extends FTContains {
   @Override
   public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Iter ir = expr.iter(ctx);
-    final FTLexer tmp = ctx.fttoken;
-    ctx.fttoken = lex;
+    final FTLexer tmp = ctx.ftToken;
+    ctx.ftToken = lex;
 
     // create index iterator
     if(fti == null) {
@@ -60,11 +60,11 @@ final class FTContainsIndex extends FTContains {
     if(n == null) fti = null;
 
     // cache entry for visualizations or ft:mark/ft:extract
-    if(found && ctx.ftpos != null && !not) {
-      ctx.ftpos.add(ftn.data, ftn.pre, ftn.all);
+    if(found && ctx.ftPosData != null && !not) {
+      ctx.ftPosData.add(ftn.data, ftn.pre, ftn.all);
     }
 
-    ctx.fttoken = tmp;
+    ctx.ftToken = tmp;
     return Bln.get(found ? 1 : 0);
   }
 

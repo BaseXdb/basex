@@ -21,7 +21,7 @@ import org.basex.util.options.*;
 /**
  * This class parses options specified in function arguments.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FuncOptions {
@@ -73,14 +73,11 @@ public final class FuncOptions {
       // XQuery map: convert to internal map
       if(item instanceof Map) {
         final Map map = (Map) item;
-        final ValueIter vi = map.keys().iter();
-        for(Item it; (it = vi.next()) != null;) {
+        for(final Item it : map.keys()) {
           if(!(it instanceof AStr)) FUNCMP.thrw(info, map.description(), AtomType.STR, it.type);
-          final Value v = map.get(it, info);
-          if(!v.isItem()) FUNCMP.thrw(info, map.description(), AtomType.ITEM, v);
-          final String key = string(it.string(null));
-          final String val = string(((Item) v).string(info));
-          options.assign(key, val);
+          final Value val = map.get(it, info);
+          if(!val.isItem()) FUNCMP.thrw(info, map.description(), AtomType.ITEM, val);
+          options.assign(string(it.string(null)), value(val));
         }
       } else {
         if(!test.eq(item)) ELMMAPTYPE.thrw(info, root, item.type);
@@ -102,6 +99,29 @@ public final class FuncOptions {
     } catch(final BaseXException ex) {
       error.thrw(info, ex);
     }
+  }
+
+  /**
+   * Returns a string representation of the specified value. The specified value may be
+   * another map or an atomic value that can be converted to a string.
+   * @param value value
+   * @return string representation
+   * @throws QueryException query exception
+   */
+  private String value(final Value value) throws QueryException {
+    if(value instanceof Map) {
+      final Map m = (Map) value;
+      final TokenBuilder tb = new TokenBuilder();
+      for(final Item i : m.keys()) {
+        if(!(i instanceof AStr)) FUNCMP.thrw(info, m.description(), AtomType.STR, i.type);
+        final Value vl = m.get(i, info);
+        if(!vl.isItem()) FUNCMP.thrw(info, m.description(), AtomType.ITEM, vl);
+        final String s = string(((Item) vl).string(info));
+        tb.add(i.string(info)).add('=').add(s.replace(",", ",,")).add(',');
+      }
+      return tb.toString();
+    }
+    return string(((Item) value).string(info));
   }
 
   /**

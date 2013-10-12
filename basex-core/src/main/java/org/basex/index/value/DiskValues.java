@@ -381,12 +381,12 @@ public class DiskValues implements Index {
 
   /**
    * Returns an iterator for the specified id list.
-   * @param ids id list
+   * @param pres pre values
    * @return iterator
    */
-  protected static IndexIterator iter(final IntList ids) {
+  protected static IndexIterator iter(final IntList pres) {
     return new IndexIterator() {
-      final int s = ids.size();
+      final int s = pres.size();
       int p = -1;
 
       @Override
@@ -395,8 +395,8 @@ public class DiskValues implements Index {
       }
 
       @Override
-      public int next() {
-        return ids.get(p);
+      public int pre() {
+        return pres.get(p);
       }
 
       @Override

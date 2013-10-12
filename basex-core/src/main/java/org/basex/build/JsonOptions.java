@@ -87,7 +87,7 @@ public final class JsonOptions extends Options {
   public JsonSpec spec() throws QueryException {
     final String spec = get(SPEC);
     for(final JsonSpec s : JsonSpec.values()) if(s.desc.equals(spec)) return s;
-    throw BXJS_CONFIG.thrw(null, "Unknown spec '" + spec + "'");
+    throw BXJS_CONFIG.thrw(null, "Spec '" + spec + "' is not supported.");
   }
 
   /**
@@ -98,6 +98,6 @@ public final class JsonOptions extends Options {
   public JsonFormat format() throws QueryIOException {
     final String form = get(FORMAT);
     for(final JsonFormat f : JsonFormat.values()) if(f.toString().equals(form)) return f;
-    throw BXJS_CONFIG.thrwIO("Unknown format '" + form + "'");
+    throw BXJS_CONFIG.thrwIO("Format '" + form + "' is not supported.");
   }
 }

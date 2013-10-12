@@ -31,8 +31,7 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
     boolean not = true;
     for(final FTExpr e : expr) not &= e instanceof FTNot;
@@ -97,9 +96,7 @@ public final class FTOr extends FTExpr {
    * @param i2 second item
    */
   static void or(final FTNode i1, final FTNode i2) {
-    final FTMatches all = new FTMatches(
-        (byte) Math.max(i1.all.sTokenNum, i2.all.sTokenNum));
-
+    final FTMatches all = new FTMatches((byte) Math.max(i1.all.pos, i2.all.pos));
     for(final FTMatch m : i1.all) all.add(m);
     for(final FTMatch m : i2.all) all.add(m);
     i1.score(Scoring.or(i1.score(), i2.score()));
@@ -120,8 +117,7 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new FTOr(info, Arr.copyAll(ctx, scp, vs, expr));
   }
 

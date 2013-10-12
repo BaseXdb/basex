@@ -1,7 +1,6 @@
 package org.basex.util.ft;
 
-import java.io.*;
-
+import org.basex.core.*;
 import org.basex.util.options.*;
 
 /**
@@ -17,6 +16,8 @@ public final class FTOptions extends Options {
   public static final BooleanOption WILDCARDS = new BooleanOption("wildcards", false);
   /** Option: wildcards. */
   public static final StringOption MODE = new StringOption("mode", "any");
+  /** Option: distance. */
+  public static final StringOption DISTANCE = new StringOption("distance");
 
   /**
    * Constructor.
@@ -28,9 +29,9 @@ public final class FTOptions extends Options {
   /**
    * Constructor, specifying initial options.
    * @param opts options string
-   * @throws IOException I/O exception
+   * @throws BaseXException database exception
    */
-  public FTOptions(final String opts) throws IOException {
+  public FTOptions(final String opts) throws BaseXException {
     super(opts);
   }
 }

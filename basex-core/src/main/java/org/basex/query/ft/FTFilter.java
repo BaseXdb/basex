@@ -16,36 +16,44 @@ import org.basex.util.ft.*;
  */
 public abstract class FTFilter extends FTExpr {
   /** Optional unit. */
-  FTUnit unit = FTUnit.WORD;
+  protected final FTUnit unit;
 
   /**
    * Constructor.
    * @param ii input info
    * @param e expression
    */
-  FTFilter(final InputInfo ii, final FTExpr e) {
+  protected FTFilter(final InputInfo ii, final FTExpr e) {
+    this(ii, e, FTUnit.WORD);
+  }
+
+  /**
+   * Constructor.
+   * @param ii input info
+   * @param e expression
+   * @param u unit
+   */
+  protected FTFilter(final InputInfo ii, final FTExpr e, final FTUnit u) {
     super(ii, e);
+    unit = u;
   }
 
   @Override
-  public final FTNode item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public final FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final FTNode it = expr[0].item(ctx, info);
-    filter(ctx, it, ctx.fttoken);
+    filter(ctx, it, ctx.ftToken);
     return it;
   }
 
   @Override
   public final FTIter iter(final QueryContext ctx) throws QueryException {
     final FTIter ir = expr[0].iter(ctx);
-
     return new FTIter() {
       @Override
       public FTNode next() throws QueryException {
         FTNode it;
         while((it = ir.next()) != null) {
-          if(filter(ctx, it, content() ?
-              new FTLexer().init(it.string(info)) : null)) break;
+          if(filter(ctx, it, content() ? new FTLexer().init(it.string(info)) : null)) break;
         }
         return it;
       }
@@ -60,8 +68,8 @@ public abstract class FTFilter extends FTExpr {
    * @return result of check
    * @throws QueryException query exception
    */
-  final boolean filter(final QueryContext ctx, final FTNode item,
-      final FTLexer lex) throws QueryException {
+  final boolean filter(final QueryContext ctx, final FTNode item, final FTLexer lex)
+      throws QueryException {
 
     final FTMatches all = item.all;
     for(int a = 0; a < all.size(); a++) {
@@ -78,8 +86,8 @@ public abstract class FTFilter extends FTExpr {
    * @return result of check
    * @throws QueryException query exception
    */
-  protected abstract boolean filter(final QueryContext ctx, final FTMatch m,
-      final FTLexer ft) throws QueryException;
+  protected abstract boolean filter(final QueryContext ctx, final FTMatch m, final FTLexer ft)
+      throws QueryException;
 
   /**
    * Checks if the filter requires the whole text node to be parsed.

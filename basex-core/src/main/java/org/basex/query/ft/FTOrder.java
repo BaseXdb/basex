@@ -27,24 +27,19 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex) {
-    int p = 0, s = 0;
-    boolean f = true;
-    for(final FTStringMatch sm : mtc) {
-      if(sm.ex) continue;
-      if(f) {
-        if(p == sm.q) continue;
-        p = sm.q;
-      }
-      f = s <= sm.s;
-      if(f) s = sm.s;
+  protected boolean filter(final QueryContext ctx, final FTMatch match, final FTLexer lex) {
+    int pos = 0, start = 0;
+    for(final FTStringMatch sm : match) {
+      if(sm.exclude || pos == sm.pos) continue;
+      if(start > sm.start) return false;
+      pos = sm.pos;
+      start = sm.start;
     }
-    return f;
+    return true;
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new FTOrder(info, expr[0].copy(ctx, scp, vs));
   }
 

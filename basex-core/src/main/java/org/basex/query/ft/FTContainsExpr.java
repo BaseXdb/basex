@@ -22,7 +22,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FTContainsExpr extends FTContains {
-
   /**
    * Constructor.
    * @param e expression
@@ -36,10 +35,10 @@ public final class FTContainsExpr extends FTContains {
   @Override
   public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Iter iter = expr.iter(ctx);
-    final FTLexer tmp = ctx.fttoken;
+    final FTLexer tmp = ctx.ftToken;
     double s = 0;
 
-    ctx.fttoken = lex;
+    ctx.ftToken = lex;
     for(Item it; (it = iter.next()) != null;) {
       lex.init(it.string(info));
       final FTNode item = ftexpr.item(ctx, info);
@@ -52,13 +51,13 @@ public final class FTContainsExpr extends FTContains {
       s = Scoring.and(s, d);
 
       // cache entry for visualizations or ft:mark/ft:extract
-      if(d > 0 && ctx.ftpos != null && it instanceof DBNode) {
+      if(d > 0 && ctx.ftPosData != null && it instanceof DBNode) {
         final DBNode node = (DBNode) it;
-        ctx.ftpos.add(node.data, node.pre, item.all);
+        ctx.ftPosData.add(node.data, node.pre, item.all);
       }
     }
 
-    ctx.fttoken = tmp;
+    ctx.ftToken = tmp;
     return Bln.get(s);
   }
 

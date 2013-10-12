@@ -492,7 +492,7 @@ public enum Err {
   /** FORG0006. */
   STRBINTYPE(FORG, 6, "String or binary type expected, % found"),
   /** FORG0006. */
-  INVALIDOPT(FORG, 6, "%."),
+  INVALIDOPT(FORG, 6, "%"),
   /** FORG0006. */
   INVALIDOPTX(FORG, 6, Text.UNKNOWN_OPTION_X),
 

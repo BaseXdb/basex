@@ -132,7 +132,7 @@ public final class FTIndex implements Index {
 
     // return cached or new result
     final IndexEntry e = entry(tok);
-    return e.size > 0 ? iter(e.pointer, e.size, inZ) : FTIndexIterator.FTEMPTY;
+    return e.size > 0 ? iter(e.pointer, e.size, inZ, tok) : FTIndexIterator.FTEMPTY;
   }
 
   /**
@@ -337,7 +337,7 @@ public final class FTIndex implements Index {
       while(i < tp.length && r == -1) r = tp[i++];
       while(p < r) {
         if(ls.similar(inY.readBytes(p, s), token, k)) {
-          it = FTIndexIterator.union(iter(pointer(p, s), size(p, s), inZ), it);
+          it = FTIndexIterator.union(iter(pointer(p, s), size(p, s), inZ, token), it);
         }
         p += s + ENTRY;
       }
@@ -381,7 +381,7 @@ public final class FTIndex implements Index {
         i += ti + ENTRY;
       }
     }
-    return iter(new FTCache(pr, ps));
+    return iter(new FTCache(pr, ps), token);
   }
 
   /**
@@ -389,9 +389,11 @@ public final class FTIndex implements Index {
    * @param off offset on entries
    * @param size number of id/pos entries
    * @param da data source
+   * @param token index token
    * @return iterator
    */
-  private FTIndexIterator iter(final long off, final int size, final DataAccess da) {
+  private FTIndexIterator iter(final long off, final int size, final DataAccess da,
+      final byte[] token) {
     da.cursor(off);
     final IntList pr = new IntList(size);
     final IntList ps = new IntList(size);
@@ -399,25 +401,26 @@ public final class FTIndex implements Index {
       pr.add(da.readNum());
       ps.add(da.readNum());
     }
-    return iter(new FTCache(pr, ps));
+    return iter(new FTCache(pr, ps), token);
   }
 
   /**
    * Returns an iterator for an index entry.
    * @param ftc id cache
+   * @param token index token
    * @return iterator
    */
-  private synchronized FTIndexIterator iter(final FTCache ftc) {
+  private synchronized FTIndexIterator iter(final FTCache ftc, final byte[] token) {
     final int size = ftc.pre.size();
 
     return new FTIndexIterator() {
-      final FTMatches all = new FTMatches(toknum);
-      int pre, c;
+      final FTMatches all = new FTMatches(0);
+      int pos, pre, c;
 
       @Override
       public synchronized boolean more() {
         if(c == size) return false;
-        all.reset(toknum);
+        all.reset(pos);
         pre = ftc.pre.get(ftc.order[c]);
         all.or(ftc.pos.get(ftc.order[c++]));
         while(c < size && pre == ftc.pre.get(ftc.order[c])) {
@@ -432,8 +435,13 @@ public final class FTIndex implements Index {
       }
 
       @Override
-      public synchronized int next() {
+      public synchronized int pre() {
         return pre;
+      }
+
+      @Override
+      public void pos(final int p) {
+        pos = p;
       }
 
       @Override
@@ -443,7 +451,7 @@ public final class FTIndex implements Index {
 
       @Override
       public String toString() {
-        return Integer.toString(size);
+        return new TokenBuilder(token).add('(').addExt(size).add("x)").toString();
       }
     };
   }

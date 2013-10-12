@@ -14,23 +14,23 @@ import org.basex.util.list.*;
 public final class FTMatches extends ElementList implements Iterable<FTMatch> {
   /** Full-text matches. */
   public FTMatch[] match = {};
-  /** Current number of tokens. */
-  public int sTokenNum;
+  /** Query position. */
+  public int pos;
 
   /**
    * Constructor.
-   * @param s sets the token number
+   * @param p query position
    */
-  public FTMatches(final int s) {
-    reset(s);
+  public FTMatches(final int p) {
+    reset(p);
   }
 
   /**
    * Resets the match counter.
-   * @param s sets the token number
+   * @param p query position
    */
-  public void reset(final int s) {
-    sTokenNum = s;
+  public void reset(final int p) {
+    pos = p;
     size = 0;
   }
 
@@ -48,7 +48,7 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
    * @param e end position
    */
   public void or(final int s, final int e) {
-    add(new FTMatch(1).add(new FTStringMatch(s, e, sTokenNum)));
+    add(new FTMatch(1).add(new FTStringMatch(s, e, pos)));
   }
 
   /**
@@ -57,7 +57,7 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
    * @param e end position
    */
   public void and(final int s, final int e) {
-    final FTStringMatch sm = new FTStringMatch(s, e, sTokenNum);
+    final FTStringMatch sm = new FTStringMatch(s, e, pos);
     for(final FTMatch m : this) m.add(sm);
   }
 
@@ -96,11 +96,11 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
   public boolean phrase(final FTMatches all, final int dis) {
     int a = 0, b = 0, c = 0;
     while(a < size && b < all.size) {
-      final int e = all.match[b].match[0].s;
-      final int d = e - match[a].match[0].e - dis;
+      final int e = all.match[b].match[0].start;
+      final int d = e - match[a].match[0].end - dis;
       if(d == 0) {
         match[c] = match[a];
-        match[c++].match[0].e = e;
+        match[c++].match[0].end = e;
       }
       if(d >= 0) ++a;
       if(d <= 0) ++b;
@@ -114,23 +114,10 @@ public final class FTMatches extends ElementList implements Iterable<FTMatch> {
     return new ArrayIterator<FTMatch>(match, size);
   }
 
-  /**
-   * Creates a deep copy of this container.
-   * @return copy
-   */
-  public FTMatches copy() {
-    final FTMatches ftm = new FTMatches(sTokenNum);
-    ftm.size = size;
-    ftm.match = match.clone();
-    for(int i = 0; i < ftm.match.length; i++)
-      if(ftm.match[i] != null) ftm.match[i] = ftm.match[i].copy();
-    return ftm;
-  }
-
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(Util.className(this)).append('[').append(sTokenNum).append(']');
+    sb.append(Util.className(this)).append('[').append(pos).append(']');
     for(final FTMatch m : this) sb.append("\n  ").append(m);
     return sb.toString();
   }

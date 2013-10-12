@@ -39,8 +39,7 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     weight = weight.compile(ctx, scp);
     return super.compile(ctx, scp);
   }
@@ -101,8 +100,8 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     boolean change = inlineAll(ctx, scp, expr, v, e);
     final Expr w = weight.inline(ctx, scp, v, e);
     if(w != null) {
@@ -113,19 +112,13 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new FTWeight(info, expr[0].copy(ctx, scp, vs), weight.copy(ctx, scp, vs));
   }
 
   @Override
   public void plan(final FElem plan) {
     addPlan(plan, planElem(), weight, expr[0]);
-  }
-
-  @Override
-  public String toString() {
-    return expr[0] + " " + QueryText.WEIGHT + ' ' + weight;
   }
 
   @Override
@@ -138,5 +131,10 @@ public final class FTWeight extends FTExpr {
     int sz = 1;
     for(final FTExpr e : expr) sz += e.exprSize();
     return sz + weight.exprSize();
+  }
+
+  @Override
+  public String toString() {
+    return expr[0] + " " + QueryText.WEIGHT + ' ' + weight;
   }
 }

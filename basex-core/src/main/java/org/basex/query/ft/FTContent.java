@@ -30,27 +30,25 @@ public final class FTContent extends FTFilter {
    * @param s start flag
    * @param e end flag
    */
-  public FTContent(final InputInfo ii, final FTExpr ex, final boolean s,
-      final boolean e) {
+  public FTContent(final InputInfo ii, final FTExpr ex, final boolean s, final boolean e) {
     super(ii, ex);
     start = s;
     end = e;
   }
 
   @Override
-  protected boolean filter(final QueryContext ctx, final FTMatch mtc,
-      final FTLexer lex) {
+  protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex) {
     if(start) {
-      for(final FTStringMatch sm : mtc) if(sm.s == 0) return true;
+      for(final FTStringMatch sm : mtc) if(sm.start == 0) return true;
     } else if(end) {
       final int p = lex.count() - 1;
-      for(final FTStringMatch sm : mtc) if(sm.e == p) return true;
+      for(final FTStringMatch sm : mtc) if(sm.end == p) return true;
     } else {
       final int s = lex.count();
       final boolean[] bl = new boolean[s];
       for(final FTStringMatch sm : mtc) {
-        if(sm.g) continue;
-        for(int p = sm.s; p <= sm.e; ++p) bl[p] = true;
+        if(sm.gaps) continue;
+        for(int p = sm.start; p <= sm.end; ++p) bl[p] = true;
       }
       for(final boolean b : bl) if(!b) return false;
       return true;
@@ -64,8 +62,7 @@ public final class FTContent extends FTFilter {
   }
 
   @Override
-  public FTExpr copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new FTContent(info, expr[0].copy(ctx, scp, vs), start, end);
   }
 

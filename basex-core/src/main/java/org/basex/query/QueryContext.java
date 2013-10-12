@@ -85,13 +85,13 @@ public final class QueryContext extends Proc {
   /** Available collations. */
   public TokenObjMap<Collation> collations;
   /** Current full-text token. */
-  public FTLexer fttoken;
+  public FTLexer ftToken;
   /** Current full-text options. */
   private FTOpt ftOpt;
-  /** Full-text position data (needed for highlighting of full-text results). */
-  public FTPosData ftpos;
-  /** Full-text token counter (needed for highlighting of full-text results). */
-  public byte ftoknum;
+  /** Full-text position data (needed for highlighting full-text results). */
+  public FTPosData ftPosData;
+  /** Full-text token counter (needed for highlighting full-text results). */
+  public int ftPos;
 
   /** Current Date. */
   public Item date;
@@ -235,7 +235,7 @@ public final class QueryContext extends Proc {
       }
     } else if(nodes != null) {
       // add full-text container reference
-      if(nodes.ftpos != null) ftpos = new FTPosData();
+      if(nodes.ftpos != null) ftPosData = new FTPosData();
       // cache the initial context nodes
       resource.compile(nodes);
     }
@@ -558,7 +558,7 @@ public final class QueryContext extends Proc {
       final int ps = pre.size();
       if(it == null || ps == max) {
         // all nodes have been processed: return GUI-friendly nodeset
-        return ps == 0 ? vb : new Nodes(pre.toArray(), nodes.data, ftpos);
+        return ps == 0 ? vb : new Nodes(pre.toArray(), nodes.data, ftPosData);
       }
 
       // otherwise, add nodes to standard iterator

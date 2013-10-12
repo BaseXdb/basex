@@ -9,16 +9,11 @@ import java.util.*;
  * @author Christian Gruen
  */
 public enum FTMode {
-  /** All option. */
-  ALL,
-  /** All words option. */
-  ALL_WORDS,
-  /** Any option. */
-  ANY,
-  /** Any words option. */
-  ANY_WORD,
-  /** Phrase search. */
-  PHRASE;
+  /** All option. */ ALL,
+  /** All words option. */ ALL_WORDS,
+  /** Any option. */ ANY,
+  /** Any word option. */ ANY_WORD,
+  /** Phrase search. */ PHRASE;
 
   /**
    * Returns the specified mode, or {@code null}.

@@ -37,7 +37,7 @@ public final class FTPosData {
     final IntSet set = new IntSet();
     for(final FTMatch m : all) {
       for(final FTStringMatch sm : m) {
-        for(int s = sm.s; s <= sm.e; ++s) set.add(s);
+        for(int s = sm.start; s <= sm.end; ++s) set.add(s);
       }
     }
 
