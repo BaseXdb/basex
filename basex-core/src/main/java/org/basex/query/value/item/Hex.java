@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * HexBinary item ({@code xs:hexBinary}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Hex extends Bin {

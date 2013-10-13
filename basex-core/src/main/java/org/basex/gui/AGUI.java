@@ -12,7 +12,7 @@ import org.basex.gui.layout.*;
 /**
  * Abstract class for GUI windows.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class AGUI extends JFrame {

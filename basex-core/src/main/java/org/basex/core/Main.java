@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * This is the abstract main class for the starter classes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Main {

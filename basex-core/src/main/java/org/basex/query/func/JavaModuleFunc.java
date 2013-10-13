@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Java function binding.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class JavaModuleFunc extends JavaMapping {
@@ -41,8 +41,7 @@ public final class JavaModuleFunc extends JavaMapping {
   }
 
   @Override
-  protected Object eval(final Value[] vals, final QueryContext ctx)
-      throws QueryException {
+  protected Object eval(final Value[] vals, final QueryContext ctx) throws QueryException {
 
     // assign context if module is inheriting {@link QueryModule}
     if(module instanceof QueryModule) ((QueryModule) module).context = ctx;

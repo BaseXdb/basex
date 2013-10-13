@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * General FLWOR expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class GFLWOR extends ParseExpr {
@@ -242,8 +242,7 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    * @throws QueryException query exception
    */
-  private boolean inlineLets(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  private boolean inlineLets(final QueryContext ctx, final VarScope scp) throws QueryException {
 
     boolean change = false, thisRound;
     do {
@@ -293,8 +292,7 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    * @throws QueryException query exception
    */
-  private boolean unnestFLWR(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  private boolean unnestFLWR(final QueryContext ctx, final VarScope scp) throws QueryException {
     boolean change = false, thisRound;
     do {
       thisRound = false;
@@ -589,8 +587,7 @@ public final class GFLWOR extends ParseExpr {
    * @return {@code true} if the GFLWOR expression has to stay
    * @throws QueryException query exception if the whole expression fails
    */
-  private boolean clauseError(final QueryException qe, final int idx)
-      throws QueryException {
+  private boolean clauseError(final QueryException qe, final int idx) throws QueryException {
 
     final ListIterator<Clause> iter = clauses.listIterator(idx);
     while(iter.hasPrevious()) {
@@ -669,7 +666,7 @@ public final class GFLWOR extends ParseExpr {
   /**
    * Evaluator for FLWOR clauses.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   interface Eval {
@@ -687,7 +684,7 @@ public final class GFLWOR extends ParseExpr {
   /**
    * A FLWOR clause.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   public abstract static class Clause extends ParseExpr {
@@ -724,8 +721,7 @@ public final class GFLWOR extends ParseExpr {
     abstract Eval eval(final Eval sub);
 
     @Override
-    public abstract Clause compile(QueryContext ctx, final VarScope scp)
-        throws QueryException;
+    public abstract Clause compile(QueryContext ctx, final VarScope scp) throws QueryException;
 
     @Override
     public abstract Clause optimize(final QueryContext ctx, final VarScope scp)

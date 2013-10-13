@@ -11,7 +11,7 @@ import org.basex.util.*;
  * Evaluates the 'execute' command and runs a command script.
  * This command can be used to run multiple commands as a single transaction.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class Execute extends Command {

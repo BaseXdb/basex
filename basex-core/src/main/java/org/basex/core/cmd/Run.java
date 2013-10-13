@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Evaluates the 'run' command and processes an input file.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Run extends Execute {

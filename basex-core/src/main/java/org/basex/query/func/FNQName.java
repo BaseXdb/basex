@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * QName functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNQName extends StandardFunc {
@@ -115,8 +115,7 @@ public final class FNQName extends StandardFunc {
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Item prefixFromQName(final QueryContext ctx, final Item it)
-      throws QueryException {
+  private Item prefixFromQName(final QueryContext ctx, final Item it) throws QueryException {
 
     if(it == null) return null;
     final QNm nm = checkQNm(it, ctx);

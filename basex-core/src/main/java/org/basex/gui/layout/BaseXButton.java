@@ -15,7 +15,7 @@ import org.basex.gui.*;
 /**
  * Project specific button implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class BaseXButton extends JButton {
@@ -87,8 +87,8 @@ public class BaseXButton extends JButton {
    * @return button
    */
   public static BaseXButton command(final GUICmd cmd, final GUI gui) {
-    final BaseXButton button = new BaseXButton(gui,
-        cmd.toString().toLowerCase(Locale.ENGLISH), cmd.help());
+    final BaseXButton button = new BaseXButton(gui, cmd.toString().toLowerCase(Locale.ENGLISH),
+        cmd.help());
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

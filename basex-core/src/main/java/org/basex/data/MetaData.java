@@ -18,7 +18,7 @@ import org.basex.util.ft.*;
 /**
  * This class provides meta information on a database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class MetaData {
@@ -411,8 +411,8 @@ public final class MetaData {
    * @param v value
    * @throws IOException I/O exception
    */
-  private static void writeInfo(final DataOutput out, final String k,
-      final long v) throws IOException {
+  private static void writeInfo(final DataOutput out, final String k, final long v)
+      throws IOException {
     writeInfo(out, k, Long.toString(v));
   }
 
@@ -423,8 +423,8 @@ public final class MetaData {
    * @param v value
    * @throws IOException I/O exception
    */
-  private static void writeInfo(final DataOutput out, final String k,
-      final String v) throws IOException {
+  private static void writeInfo(final DataOutput out, final String k, final String v)
+      throws IOException {
     out.writeToken(token(k));
     out.writeToken(token(v));
   }

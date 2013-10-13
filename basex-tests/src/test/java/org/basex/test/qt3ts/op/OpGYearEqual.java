@@ -6,7 +6,7 @@ import org.basex.test.qt3ts.QT3TestSet;
 /**
  * Tests for the gYear-equal() function.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")
@@ -538,7 +538,7 @@ public class OpGYearEqual extends QT3TestSet {
   @org.junit.Test
   public void opGYearEqual1() {
     final XQuery query = new XQuery(
-      "(xs:gYear(\"2005-12:00\") eq xs:gYear(\"2005+12:00\"))",
+      "(xs:gYear(\"2005-13:00\") eq xs:gYear(\"2005+12:00\"))",
       ctx);
     try {
       result = new QT3Result(query.value());

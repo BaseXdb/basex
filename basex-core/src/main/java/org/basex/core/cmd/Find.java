@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Find extends AQuery {
@@ -121,8 +121,8 @@ public final class Find extends AQuery {
    * @param root root flag
    * @return query
    */
-  public static String findTable(final StringList filter, final TokenList cols,
-      final BoolList elem, final byte[] tag, final boolean root) {
+  public static String findTable(final StringList filter, final TokenList cols, final BoolList elem,
+      final byte[] tag, final boolean root) {
 
     final TokenBuilder tb = new TokenBuilder();
     final int is = filter.size();

@@ -8,7 +8,7 @@ import org.basex.util.list.*;
 /**
  * Stores an integer array of pre values and their corresponding weights.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Joerg Hauser
  */
 final class MapList extends IntList {
@@ -43,8 +43,7 @@ final class MapList extends IntList {
    * @param data reference
    * @param w weight
    */
-  void initWeights(final int[] textLen, final int nchildren, final Data data,
-      final int w) {
+  void initWeights(final int[] textLen, final int nchildren, final Data data, final int w) {
     weight = new double[size];
 
     // only children

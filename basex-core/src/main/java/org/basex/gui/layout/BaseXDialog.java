@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * This superclass in inherited by all dialog windows.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXDialog extends JDialog {
@@ -201,9 +201,7 @@ public abstract class BaseXDialog extends JDialog {
    * @param label button label
    * @param enabled enabled/disabled
    */
-  public static void enableOK(final JComponent panel, final String label,
-      final boolean enabled) {
-
+  public static void enableOK(final JComponent panel, final String label, final boolean enabled) {
     for(final Component c : panel.getComponents()) {
       if(!(c instanceof JComponent)) {
       } else if(c instanceof BaseXButton) {

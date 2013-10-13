@@ -7,7 +7,7 @@ import org.basex.util.Util;
 /**
  * The query stack, containing local variable bindings of all active scopes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public class QueryStack {

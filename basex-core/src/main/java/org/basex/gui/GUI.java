@@ -36,7 +36,7 @@ import org.basex.util.options.*;
  * This class is the main window of the GUI. It is the central instance
  * for user interactions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class GUI extends AGUI {
@@ -317,8 +317,7 @@ public final class GUI extends AGUI {
     final Namespaces ns = data.nspaces;
     String in = qu.trim().isEmpty() ? "()" : qu;
     final int u = ns.uri(Token.EMPTY, 0, data);
-    if(u != 0) in = Util.info("declare default element namespace \"%\"; %",
-        ns.uri(u), in);
+    if(u != 0) in = Util.info("declare default element namespace \"%\"; %", ns.uri(u), in);
     execute(edit, new XQuery(in));
   }
 
@@ -516,8 +515,7 @@ public final class GUI extends AGUI {
     if(n == 0 && n2 == 2) {
       views.border(0);
     } else {
-      views.setBorder(new CompoundBorder(new EmptyBorder(3, 1, 3, 1),
-          new EtchedBorder()));
+      views.setBorder(new CompoundBorder(new EmptyBorder(3, 1, 3, 1), new EtchedBorder()));
     }
   }
 
@@ -536,9 +534,7 @@ public final class GUI extends AGUI {
    * @param show true if component is visible
    * @param layout component layout
    */
-  public void updateControl(final JComponent comp, final boolean show,
-      final String layout) {
-
+  public void updateControl(final JComponent comp, final boolean show, final String layout) {
     if(comp == status) {
       if(!show) top.remove(comp);
       else top.add(comp, layout);

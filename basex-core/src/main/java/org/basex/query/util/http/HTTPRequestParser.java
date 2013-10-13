@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Request parser.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class HTTPRequestParser {
@@ -193,8 +193,7 @@ public final class HTTPRequestParser {
    * @param bodyAttrs body attributes
    * @throws QueryException query exception
    */
-  private void checkBody(final ANode body, final TokenMap bodyAttrs)
-      throws QueryException {
+  private void checkBody(final ANode body, final TokenMap bodyAttrs) throws QueryException {
 
     // @media-type is mandatory
     if(bodyAttrs.get(MEDIA_TYPE) == null)

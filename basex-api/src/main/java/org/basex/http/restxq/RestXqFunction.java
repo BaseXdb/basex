@@ -33,7 +33,7 @@ import org.basex.util.list.*;
 /**
  * This class represents a single RESTXQ function.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class RestXqFunction implements Comparable<RestXqFunction> {
@@ -338,8 +338,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return resulting variable
    * @throws QueryException query exception
    */
-  private QNm checkVariable(final String tmp, final boolean[] declared)
-      throws QueryException {
+  private QNm checkVariable(final String tmp, final boolean[] declared) throws QueryException {
     return checkVariable(tmp, AtomType.ITEM, declared);
   }
 

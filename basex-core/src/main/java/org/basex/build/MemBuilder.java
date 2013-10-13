@@ -9,7 +9,7 @@ import org.basex.io.*;
  * This class creates a database instance in main memory.
  * The storage layout is described in the {@link Data} class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class MemBuilder extends Builder {
@@ -109,8 +109,7 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  protected void addAttr(final int nm, final byte[] value, final int dist,
-      final int uri) {
+  protected void addAttr(final int nm, final byte[] value, final int dist, final int uri) {
     data.attr(meta.size, dist, nm, value, uri, false);
     data.insert(meta.size);
   }

@@ -18,7 +18,7 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * This test class performs some incremental updates.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 @RunWith(Parameterized.class)
@@ -172,8 +172,7 @@ public final class IncUpdateTest extends SandboxTest {
    * @param result query result
    * @throws QueryException database exception
    */
-  protected static void query(final String query, final Object result)
-      throws QueryException {
+  protected static void query(final String query, final Object result) throws QueryException {
     assertEquals(result.toString(), query(query));
   }
 }

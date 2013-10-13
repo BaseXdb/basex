@@ -12,7 +12,7 @@ import org.junit.*;
 /**
  * Test class for the BufferInput method.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BufferInputTest {
@@ -108,8 +108,7 @@ public final class BufferInputTest {
    * @param input input string
    * @throws IOException I/O exception
    */
-  private static void encoding(final String enc, final String input)
-      throws IOException {
+  private static void encoding(final String enc, final String input) throws IOException {
 
     final byte[] utf8 = Token.token(input);
     final IO io = new IOContent(input.getBytes(enc));

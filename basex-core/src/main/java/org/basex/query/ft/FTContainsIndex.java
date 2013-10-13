@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Sequential FTContains expression with index access.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Sebastian Gath
  */
 final class FTContainsIndex extends FTContains {

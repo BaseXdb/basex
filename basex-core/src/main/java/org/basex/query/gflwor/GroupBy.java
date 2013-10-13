@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
 /**
  * The GFLWOR {@code group by} expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class GroupBy extends GFLWOR.Clause {
@@ -185,8 +185,7 @@ public final class GroupBy extends GFLWOR.Clause {
    * @return {@code true} if the compare as equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  boolean eq(final Item[] as, final Item[] bs, final Collation[] coll)
-      throws QueryException {
+  boolean eq(final Item[] as, final Item[] bs, final Collation[] coll) throws QueryException {
 
     for(int i = 0; i < as.length; i++) {
       final Item a = as[i], b = bs[i];
@@ -223,8 +222,7 @@ public final class GroupBy extends GFLWOR.Clause {
   }
 
   @Override
-  public GroupBy optimize(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public GroupBy optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     for(int i = 0; i < preExpr.length; i++) {
       final SeqType it = preExpr[i].type();
       post[i].refineType(it.withOcc(it.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE),
@@ -318,7 +316,7 @@ public final class GroupBy extends GFLWOR.Clause {
   /**
    * Grouping spec.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   public static final class Spec extends Single {
@@ -389,7 +387,7 @@ public final class GroupBy extends GFLWOR.Clause {
   /**
    * A group of tuples of post-grouping variables.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   private static final class Group {

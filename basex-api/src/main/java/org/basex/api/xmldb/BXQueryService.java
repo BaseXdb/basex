@@ -13,7 +13,7 @@ import org.xmldb.api.modules.*;
 /**
  * Abstract QueryService definition for the XMLDB:API.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class BXQueryService implements XPathQueryService, BXXMLDBText {
@@ -111,9 +111,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
    * @return resource set
    * @throws XMLDBException exception
    */
-  private BXResourceSet query(final Nodes nodes, final String query)
-      throws XMLDBException {
-
+  private BXResourceSet query(final Nodes nodes, final String query) throws XMLDBException {
     // creates a query instance
     final QueryProcessor qp = new QueryProcessor(query, coll.ctx).context(nodes);
     try {

@@ -12,7 +12,7 @@ import org.basex.util.list.*;
  * Evaluates the 'rename' command and renames resources or directories
  * in a collection.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Rename extends ACreate {
@@ -75,9 +75,7 @@ public final class Rename extends ACreate {
    * @param trg target path
    * @return new name
    */
-  public static String target(final Data data, final int pre, final String src,
-      final String trg) {
-
+  public static String target(final Data data, final int pre, final String src, final String trg) {
     // source references a file
     final String path = string(data.text(pre, true));
     if(Prop.CASE ? path.equals(src) : path.equalsIgnoreCase(src)) return trg;

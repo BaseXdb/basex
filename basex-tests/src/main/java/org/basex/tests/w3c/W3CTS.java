@@ -637,8 +637,7 @@ public abstract class W3CTS {
    * @param msg message
    * @throws IOException I/O exception
    */
-  private void addLog(final String pth, final String nm, final String msg)
-      throws IOException {
+  private void addLog(final String pth, final String nm, final String msg) throws IOException {
 
     if(reporting) {
       final File file = new File(results + pth);
@@ -731,8 +730,7 @@ public abstract class W3CTS {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  protected void parse(final QueryProcessor qp, final Nodes root)
-      throws QueryException { }
+  protected void parse(final QueryProcessor qp, final Nodes root) throws QueryException { }
 
   /**
    * Returns all query states.

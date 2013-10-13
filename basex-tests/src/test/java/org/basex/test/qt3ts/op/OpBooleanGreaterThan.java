@@ -6,7 +6,7 @@ import org.basex.test.qt3ts.QT3TestSet;
 /**
  * Tests for the boolean-greater-than() function.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

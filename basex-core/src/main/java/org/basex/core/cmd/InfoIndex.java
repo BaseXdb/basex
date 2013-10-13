@@ -15,7 +15,7 @@ import org.basex.util.*;
  * Evaluates the 'info index' command and returns information on the indexes
  * of the currently opened database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class InfoIndex extends AInfo {
@@ -72,12 +72,9 @@ public final class InfoIndex extends AInfo {
       case TAG:       return info(ELEMENTS, IndexType.TAG, data, true);
       case ATTNAME:   return info(ATTRIBUTES, IndexType.ATTNAME, data, true);
       case PATH:      return info(PATH_INDEX, IndexType.PATH, data, true);
-      case TEXT:      return info(TEXT_INDEX, IndexType.TEXT, data,
-          data.meta.textindex);
-      case ATTRIBUTE: return info(ATTRIBUTE_INDEX, IndexType.ATTRIBUTE, data,
-          data.meta.attrindex);
-      case FULLTEXT:  return info(FULLTEXT_INDEX, IndexType.FULLTEXT, data,
-          data.meta.ftxtindex);
+      case TEXT:      return info(TEXT_INDEX, IndexType.TEXT, data, data.meta.textindex);
+      case ATTRIBUTE: return info(ATTRIBUTE_INDEX, IndexType.ATTRIBUTE, data, data.meta.attrindex);
+      case FULLTEXT:  return info(FULLTEXT_INDEX, IndexType.FULLTEXT, data, data.meta.ftxtindex);
       default:        return Token.token(LI + NOT_AVAILABLE);
     }
   }
@@ -90,8 +87,8 @@ public final class InfoIndex extends AInfo {
    * @param avl states if index is available
    * @return information
    */
-  private static byte[] info(final String ds, final IndexType it,
-      final Data data, final boolean avl) {
+  private static byte[] info(final String ds, final IndexType it, final Data data,
+      final boolean avl) {
 
     final TokenBuilder tb = new TokenBuilder(ds).add(NL);
     if(avl) tb.add(data.info(it));

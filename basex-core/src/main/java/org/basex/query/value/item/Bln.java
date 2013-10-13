@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Boolean item ({@code xs:boolean}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Bln extends Item {
@@ -129,8 +129,7 @@ public final class Bln extends Item {
    * @return result of check
    * @throws QueryException query exception
    */
-  public static boolean parse(final byte[] str, final InputInfo ii)
-      throws QueryException {
+  public static boolean parse(final byte[] str, final InputInfo ii) throws QueryException {
 
     final byte[] s = Token.trim(str);
     if(Token.eq(s, Token.TRUE) || Token.eq(s, Token.ONE)) return true;

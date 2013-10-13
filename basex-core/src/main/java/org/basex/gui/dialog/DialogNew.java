@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Dialog window for specifying options for creating a new database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogNew extends BaseXDialog {
@@ -69,15 +69,13 @@ public final class DialogNew extends BaseXDialog {
     indexes.add(txtindex);
     indexes.add(new BaseXLabel(H_TEXT_INDEX, true, false));
 
-    atvindex = new BaseXCheckBox(ATTRIBUTE_INDEX,
-        opts.get(MainOptions.ATTRINDEX), 0, this).large();
+    atvindex = new BaseXCheckBox(ATTRIBUTE_INDEX, opts.get(MainOptions.ATTRINDEX), 0, this).large();
     indexes.add(atvindex);
     indexes.add(new BaseXLabel(H_ATTR_INDEX, true, false));
 
     // full-text panel
     //final BaseXBack fulltext = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
-    ftxindex = new BaseXCheckBox(FULLTEXT_INDEX,
-        opts.get(MainOptions.FTINDEX), 0, this).large();
+    ftxindex = new BaseXCheckBox(FULLTEXT_INDEX, opts.get(MainOptions.FTINDEX), 0, this).large();
     indexes.add(ftxindex);
 
     ft = new DialogFT(this, true);

@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Parses the jar descriptors and performs schema checks.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class JarParser {

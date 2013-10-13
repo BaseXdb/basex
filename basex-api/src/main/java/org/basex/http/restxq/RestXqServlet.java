@@ -12,7 +12,7 @@ import org.basex.query.*;
  * <p>The implementation is based on Adam Retter's paper presented at XMLPrague 2012,
  * titled "RESTful XQuery - Standardised XQuery 3.0 Annotations for REST".</p>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class RestXqServlet extends BaseXServlet {

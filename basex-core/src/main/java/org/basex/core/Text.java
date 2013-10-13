@@ -11,7 +11,7 @@ import org.basex.core.parse.Commands.*;
  * throughout the project. If this class is called first, the Strings
  * are initialized by the {@link Lang} class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public interface Text {
@@ -268,8 +268,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPOPEN = {
-    '[' + C_NAME + "] ([" + C_PATH + "])", lang("c_open1"), lang("c_open2",
-        C_NAME, C_PATH)
+    '[' + C_NAME + "] ([" + C_PATH + "])", lang("c_open1"), lang("c_open2", C_NAME, C_PATH)
   };
   /** Command help. */
   String[] HELPINFO = {
@@ -280,8 +279,7 @@ public interface Text {
     LI + lang("c_info22") + NL +
     LI + CmdInfo.DATABASE + ": " + lang("c_info23") + NL +
     LI + CmdInfo.INDEX + ": " + lang("c_info24") + NL +
-    LI + CmdInfo.STORAGE + " [start end] | [" + C_QUERY + "]: " +
-      lang("c_info25")
+    LI + CmdInfo.STORAGE + " [start end] | [" + C_QUERY + "]: " + lang("c_info25")
   };
   /** Command help. */
   String[] HELPCLOSE = {
@@ -289,8 +287,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPLIST = {
-    "([" + C_NAME + "] ([" + C_PATH + "]))", lang("c_list1"), lang("c_list2",
-        C_NAME, C_PATH)
+    "([" + C_NAME + "] ([" + C_PATH + "]))", lang("c_list1"), lang("c_list2", C_NAME, C_PATH)
   };
   /** Command help. */
   String[] HELPDROP = {
@@ -1260,7 +1257,7 @@ public interface Text {
   String MEMUSED_C = USED_MEM + COLS;
 
   /** Copyright info. */
-  String COPYRIGHT = "\u00A9 2005-12 " + Prop.ENTITY;
+  String COPYRIGHT = "\u00A9 2005-13 " + Prop.ENTITY;
   /** License info. */
   String LICENSE = lang("license");
   /** Developer info. */

@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * are to be added or closed. The builder implementation decides whether
  * the nodes are stored on disk or kept in memory.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Builder extends Proc {
@@ -236,8 +236,7 @@ public abstract class Builder extends Proc {
    * @param uri namespace uri reference
    * @throws IOException I/O exception
    */
-  protected abstract void addAttr(int nm, byte[] value, int dist, int uri)
-      throws IOException;
+  protected abstract void addAttr(int nm, byte[] value, int dist, int uri) throws IOException;
 
   /**
    * Adds a text node to the database.
@@ -265,8 +264,7 @@ public abstract class Builder extends Proc {
    * @param nsp namespaces
    * @throws IOException I/O exception
    */
-  private void addElem(final byte[] name, final Atts att, final Atts nsp)
-      throws IOException {
+  private void addElem(final byte[] name, final Atts att, final Atts nsp) throws IOException {
 
     // get tag reference
     int n = tags.index(name, null, true);
@@ -322,8 +320,7 @@ public abstract class Builder extends Proc {
    * @param msg message
    * @throws IOException I/O exception
    */
-  private void limit(final int value, final int limit, final String msg)
-      throws IOException {
+  private void limit(final int value, final int limit, final String msg) throws IOException {
     if(value >= limit) throw new BuildException(msg, parser.detail(), limit);
   }
 

@@ -13,7 +13,7 @@ import org.basex.util.*;
  * determined by Java, or statically resolved by requesting the mappings in
  * the {@code mime.txt} project file.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class MimeTypes {

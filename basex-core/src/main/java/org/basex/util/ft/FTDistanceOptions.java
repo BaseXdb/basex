@@ -9,7 +9,7 @@ import org.basex.util.options.*;
 /**
  * Full-text distance options.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FTDistanceOptions extends Options {

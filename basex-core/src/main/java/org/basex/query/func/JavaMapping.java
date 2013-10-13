@@ -30,7 +30,7 @@ import org.w3c.dom.Text;
  * This class contains common methods for executing Java code and mapping
  * Java objects to XQuery values.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class JavaMapping extends Arr {
@@ -92,8 +92,7 @@ public abstract class JavaMapping extends Arr {
    * @return value
    * @throws QueryException query exception
    */
-  public static Value toValue(final Object obj, final QueryContext ctx)
-      throws QueryException {
+  public static Value toValue(final Object obj, final QueryContext ctx) throws QueryException {
 
     if(obj == null) return Empty.SEQ;
     if(obj instanceof Value) return (Value) obj;

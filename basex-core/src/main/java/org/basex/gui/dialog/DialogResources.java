@@ -21,7 +21,7 @@ import org.basex.gui.layout.TreeNode;
  * content including raw files and documents. The search field allows to
  * quickly access specific files/documents.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public class DialogResources extends BaseXBack {
@@ -182,16 +182,15 @@ public class DialogResources extends BaseXBack {
     // check if there's a directory
     // create a folder if there's either a raw or document folder
     if(data.resources.isDir(filterPath)) {
-      root.add(new TreeFolder(TreeFolder.name(filterPath),
-          TreeFolder.path(filterPath), tree, data));
+      root.add(new TreeFolder(TreeFolder.name(filterPath), TreeFolder.path(filterPath),
+          tree, data));
       cmax--;
     }
 
     // now add the actual files (if there are any)
     final byte[] name = TreeFolder.name(filterPath);
     final byte[] sub = TreeFolder.path(filterPath);
-    final TreeFolder f = new TreeFolder(TreeFolder.name(sub), TreeFolder.path(sub),
-        tree, data);
+    final TreeFolder f = new TreeFolder(TreeFolder.name(sub), TreeFolder.path(sub), tree, data);
     cmax = f.addLeaves(name, cmax, root);
 
     // add dummy node if maximum number of nodes is exceeded
@@ -231,7 +230,7 @@ public class DialogResources extends BaseXBack {
 
   /**
    * Custom tree cell renderer to distinguish between raw and xml leaf nodes.
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Lukas Kircher
    */
   private static final class TreeNodeRenderer extends DefaultTreeCellRenderer {
@@ -251,9 +250,9 @@ public class DialogResources extends BaseXBack {
     }
 
     @Override
-    public Component getTreeCellRendererComponent(final JTree tree,
-        final Object val, final boolean sel, final boolean exp,
-        final boolean leaf, final int row, final boolean focus) {
+    public Component getTreeCellRendererComponent(final JTree tree, final Object val,
+        final boolean sel, final boolean exp, final boolean leaf, final int row,
+        final boolean focus) {
 
       super.getTreeCellRendererComponent(tree, val, sel, exp, leaf, row, focus);
       if(leaf) {

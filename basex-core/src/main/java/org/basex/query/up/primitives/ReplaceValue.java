@@ -26,7 +26,7 @@ import org.basex.util.*;
  *
  * <p>If T is a text node and the new text value is empty, T is deleted.</p>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class ReplaceValue extends UpdatePrimitive {

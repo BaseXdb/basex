@@ -13,7 +13,7 @@ import org.basex.util.*;
  * values can also be retrieved via enhanced for (for-each) loops. Note, however, that
  * using the {@link #next()} method will give you better performance.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class ValueIter extends Iter implements Iterable<Item> {

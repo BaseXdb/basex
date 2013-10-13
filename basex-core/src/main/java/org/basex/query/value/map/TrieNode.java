@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Abstract superclass of all trie nodes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 abstract class TrieNode {
@@ -106,8 +106,7 @@ abstract class TrieNode {
    * @return bound value if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  abstract Value get(int hash, Item key, int lvl, final InputInfo ii)
-      throws QueryException;
+  abstract Value get(int hash, Item key, int lvl, final InputInfo ii) throws QueryException;
 
   /**
    * Checks if the given key exists in the map.
@@ -142,8 +141,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final Leaf o, final int lvl, final InputInfo ii)
-      throws QueryException;
+  abstract TrieNode add(final Leaf o, final int lvl, final InputInfo ii) throws QueryException;
 
   /**
    * Add an overflow list to this node, if the key isn't already used.
@@ -153,8 +151,7 @@ abstract class TrieNode {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode add(final List o, final int lvl, final InputInfo ii)
-      throws QueryException;
+  abstract TrieNode add(final List o, final int lvl, final InputInfo ii) throws QueryException;
 
   /**
    * Add all bindings of the given branch to this node for which the key isn't
@@ -220,8 +217,7 @@ abstract class TrieNode {
    * @return {@code true} if both values are deep equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  static boolean deep(final Value a, final Value b, final InputInfo ii)
-      throws QueryException {
+  static boolean deep(final Value a, final Value b, final InputInfo ii) throws QueryException {
     return a.size() == b.size() && Compare.deep(a, b, ii);
   }
 
@@ -233,8 +229,7 @@ abstract class TrieNode {
    * @return {@code true} if both items are equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  static boolean eq(final Item a, final Item b, final InputInfo ii)
-      throws QueryException {
+  static boolean eq(final Item a, final Item b, final InputInfo ii) throws QueryException {
     return a.comparable(b) && a.eq(b, null, ii);
   }
 

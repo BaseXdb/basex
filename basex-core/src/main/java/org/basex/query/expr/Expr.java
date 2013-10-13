@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
  * Abstract class for representing XQuery expressions.
  * Expression are divided into {@link ParseExpr} and {@link Value} classes.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {
@@ -103,8 +103,7 @@ public abstract class Expr extends ExprInfo {
    * @return item
    * @throws QueryException query exception
    */
-  public abstract Item ebv(final QueryContext ctx, final InputInfo ii)
-      throws QueryException;
+  public abstract Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException;
 
   /**
    * Performs a predicate test and returns the item if test was successful.
@@ -113,8 +112,7 @@ public abstract class Expr extends ExprInfo {
    * @return item
    * @throws QueryException query exception
    */
-  public abstract Item test(final QueryContext ctx, final InputInfo ii)
-      throws QueryException;
+  public abstract Item test(final QueryContext ctx, final InputInfo ii) throws QueryException;
 
   /**
    * Tests if this is an empty sequence. This function is only overwritten
@@ -211,8 +209,8 @@ public abstract class Expr extends ExprInfo {
    * @return resulting expression in something changed, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public abstract Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException;
+  public abstract Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
+      final Expr e) throws QueryException;
 
   /**
    * Inlines the given expression into all elements of the given array.

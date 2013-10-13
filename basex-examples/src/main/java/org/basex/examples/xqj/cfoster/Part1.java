@@ -11,7 +11,7 @@ import net.xqj.basex.*;
  *
  * Part 1: Setting up your environment.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  */
 public final class Part1 extends Main {
   /**

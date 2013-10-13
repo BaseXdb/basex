@@ -24,7 +24,7 @@ import org.basex.util.list.*;
 /**
  * Dialog window for displaying information about the server.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Andreas Weiler
  */
 public final class DialogServer extends BaseXDialog {
@@ -108,8 +108,7 @@ public final class DialogServer extends BaseXDialog {
 
     final GUIOptions gopts = gui.gopts;
     host = new BaseXTextField(gopts.get(GUIOptions.S_HOST), this);
-    ports = new BaseXTextField(Integer.toString(gopts.get(GUIOptions.S_SERVERPORT)),
-        this);
+    ports = new BaseXTextField(Integer.toString(gopts.get(GUIOptions.S_SERVERPORT)), this);
     portc = new BaseXTextField(Integer.toString(gopts.get(GUIOptions.S_PORT)), this);
     admuser = new BaseXTextField(gopts.get(GUIOptions.S_USER), this);
     admpass = new BaseXPassword(this);

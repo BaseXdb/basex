@@ -7,7 +7,7 @@ import org.junit.*;
 /**
  * Annotations tests.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class AnnotationsTest extends AdvancedQueryTest {

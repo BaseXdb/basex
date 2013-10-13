@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * This index class retrieves range values from the index.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class RangeAccess extends IndexAccess {

@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * Axis step expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class AxisStep extends Step {

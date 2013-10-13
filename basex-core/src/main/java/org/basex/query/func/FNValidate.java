@@ -30,7 +30,7 @@ import org.xml.sax.helpers.*;
 /**
  * Functions for validating documents.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Michael Seiferle
  * @author Marco Lettere (greedy/verbose validation)
  */

@@ -10,7 +10,7 @@ import javax.swing.tree.*;
 /**
  * Project specific tree implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class BaseXTree extends JTree {

@@ -14,7 +14,7 @@ import org.junit.*;
 /**
  * Tests adding files/folders/zip files/urls to collections.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Michael Seiferle
  */
 public final class AddDeleteTest extends SandboxTest {

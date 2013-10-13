@@ -23,7 +23,7 @@ import org.basex.util.list.*;
 /**
  * Parsing options dialog.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class DialogParsing extends BaseXBack {

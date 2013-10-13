@@ -27,7 +27,7 @@ import org.basex.util.*;
 /**
  * Generating functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNGen extends StandardFunc {
@@ -200,8 +200,7 @@ public final class FNGen extends StandardFunc {
    * @return content
    * @throws QueryException query exception
    */
-  private Item unparsedText(final QueryContext ctx, final boolean check)
-      throws QueryException {
+  private Item unparsedText(final QueryContext ctx, final boolean check) throws QueryException {
 
     checkCreate(ctx);
     final byte[] path = checkStr(expr[0], ctx);
@@ -288,8 +287,7 @@ public final class FNGen extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private ANode parseXml(final QueryContext ctx, final boolean frag)
-      throws QueryException {
+  private ANode parseXml(final QueryContext ctx, final boolean frag) throws QueryException {
 
     final Item item = expr[0].item(ctx, info);
     if(item == null) return null;

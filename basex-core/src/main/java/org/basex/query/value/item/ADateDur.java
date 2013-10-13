@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Abstract super class for dates and durations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class ADateDur extends Item {

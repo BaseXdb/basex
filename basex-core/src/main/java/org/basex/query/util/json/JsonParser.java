@@ -11,7 +11,7 @@ import static org.basex.util.Token.*;
 /**
  * A JSON parser generating parse events similar to a SAX XML parser.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class JsonParser extends InputParser {
@@ -420,8 +420,7 @@ public final class JsonParser extends InputParser {
    * @return build exception
    * @throws QueryException query exception
    */
-  private QueryException error(final String msg, final Object... ext)
-      throws QueryException {
+  private QueryException error(final String msg, final Object... ext) throws QueryException {
     final int[] lc = new InputInfo(this).lineCol();
     throw BXJS_PARSE.thrw(info, lc[0], lc[1], Util.inf(msg, ext));
   }

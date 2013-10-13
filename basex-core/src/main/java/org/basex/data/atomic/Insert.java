@@ -5,7 +5,7 @@ import org.basex.data.*;
 /**
  * Atomic insert that inserts a given insertion sequence data instance into a database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 final class Insert extends BasicUpdate {

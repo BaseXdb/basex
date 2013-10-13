@@ -19,7 +19,7 @@ import org.basex.gui.view.table.TableData.TableCol;
 /**
  * This is the header of the table view.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class TableHeader extends BaseXPanel {
@@ -114,12 +114,11 @@ final class TableHeader extends BaseXPanel {
       g.setFont(bfont);
 
       final int off = clicked ? 1 : 0;
-      BaseXLayout.chopString(g, tdata.cols[n].name, (int) x + 4 + off, 2 + off,
-          (int) cw, fsz);
+      BaseXLayout.chopString(g, tdata.cols[n].name, (int) x + 4 + off, 2 + off, (int) cw, fsz);
 
       if(n == tdata.sortCol) {
-        if(tdata.asc) g.fillPolygon(new int[] { (int) ce - 9 + off,
-            (int) ce - 3 + off, (int) ce - 6 + off },
+        if(tdata.asc) g.fillPolygon(new int[] { (int) ce - 9 + off, (int) ce - 3 + off,
+            (int) ce - 6 + off },
             new int[] { 4 + off, 4 + off, 8 + off }, 3);
         else g.fillPolygon(new int[] { (int) ce - 9 + off, (int) ce - 3 + off,
             (int) ce - 6 + off }, new int[] { 8 + off, 8 + off, 4 + off }, 3);
@@ -144,8 +143,8 @@ final class TableHeader extends BaseXPanel {
     smooth(g);
 
     int o = header && clicked ? 1 : 0;
-    g.fillPolygon(new int[] { (int) x + o + 4, (int) x + o + bs - 4,
-        (int) x + o + bs / 2 }, new int[] { o + 6, o + 6, o + bs - 3 }, 3);
+    g.fillPolygon(new int[] { (int) x + o + 4, (int) x + o + bs - 4, (int) x + o + bs / 2 },
+        new int[] { o + 6, o + 6, o + bs - 3 }, 3);
 
     o = !header && clicked ? 1 : 0;
     final byte[] reset = { 'x' };

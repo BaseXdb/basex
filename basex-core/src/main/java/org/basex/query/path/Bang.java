@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Map ("bang") operator. Only occurs as argument of the {@link MixedPath} expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Bang extends Single {

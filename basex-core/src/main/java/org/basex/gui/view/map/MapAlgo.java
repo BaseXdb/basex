@@ -3,7 +3,7 @@ package org.basex.gui.view.map;
 /**
  * Interface MapAlgorithms need to implement.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Joerg Hauser
  */
 abstract class MapAlgo {
@@ -38,6 +38,5 @@ abstract class MapAlgo {
    * @param ne end array position
    * @return rectangles
    */
-  abstract MapRects calcMap(final MapRect r, final MapList l, final int ns,
-      final int ne);
+  abstract MapRects calcMap(final MapRect r, final MapList l, final int ns, final int ne);
 }

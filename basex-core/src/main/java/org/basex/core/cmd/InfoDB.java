@@ -14,7 +14,7 @@ import org.basex.util.*;
  * Evaluates the 'info database' command and returns information on the
  * currently opened database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class InfoDB extends AInfo {
@@ -45,8 +45,8 @@ public final class InfoDB extends AInfo {
    * @param create create permissions
    * @return info string
    */
-  public static String db(final MetaData meta, final boolean bold,
-      final boolean index, final boolean create) {
+  public static String db(final MetaData meta, final boolean bold, final boolean index,
+      final boolean create) {
 
     final TokenBuilder tb = new TokenBuilder();
     final String header = (bold ?

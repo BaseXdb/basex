@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Functions on maps.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class FNMap extends StandardFunc {
@@ -114,8 +114,7 @@ public final class FNMap extends StandardFunc {
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean contains(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  private boolean contains(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return map(ctx).contains(expr[1].item(ctx, ii), ii);
   }
 

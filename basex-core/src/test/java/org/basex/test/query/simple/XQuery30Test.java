@@ -5,7 +5,7 @@ import org.basex.test.query.*;
 /**
  * XQuery 3.0 tests (former: 1.1).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class XQuery30Test extends QueryTest {

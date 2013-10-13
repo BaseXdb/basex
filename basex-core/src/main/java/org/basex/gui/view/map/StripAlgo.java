@@ -3,7 +3,7 @@ package org.basex.gui.view.map;
 /**
  * StripLayout algorithm.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Joerg Hauser
  */
 final class StripAlgo extends MapAlgo {
@@ -44,8 +44,7 @@ final class StripAlgo extends MapAlgo {
         h = h > 0 ? h : 1;
 
         if(yy <= yy + hh)
-          tmp.add(new MapRect((int) xx, (int) y, width, h, ml.get(i),
-              r.level));
+          tmp.add(new MapRect((int) xx, (int) y, width, h, ml.get(i), r.level));
         else break;
         y += h;
       }
@@ -66,8 +65,7 @@ final class StripAlgo extends MapAlgo {
         weight = 0;
         // sometimes there has to be one rectangles to fill the left space
         if(ne == ni) {
-          row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-              ml.get(ni), r.level));
+          row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh, ml.get(ni), r.level));
           break;
         }
       } else {

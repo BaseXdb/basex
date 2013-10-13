@@ -11,7 +11,7 @@ import org.basex.io.*;
 /**
  * Dummy parser for parsing XML input.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class EmptyBuilder extends Builder {
@@ -49,8 +49,8 @@ public final class EmptyBuilder extends Builder {
   }
 
   @Override
-  protected void addElem(final int dist, final int nm, final int asize,
-      final int uri, final boolean ne) throws IOException {
+  protected void addElem(final int dist, final int nm, final int asize, final int uri,
+      final boolean ne) throws IOException {
     meta.size++;
   }
 

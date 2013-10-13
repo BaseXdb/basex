@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 /**
  * Sequence of items of type {@link Int xs:float}, containing at least two of them.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FltSeq extends NativeSeq {

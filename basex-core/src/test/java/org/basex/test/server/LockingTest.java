@@ -21,7 +21,7 @@ import org.junit.runners.Parameterized.Parameters;
  * forced to be executed in parallel. If this fails, locking prevents these queries to
  * run in parallel.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Jens Erat
  */
 @RunWith(Parameterized.class)

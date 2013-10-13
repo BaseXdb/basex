@@ -6,7 +6,7 @@ import org.basex.test.qt3ts.QT3TestSet;
 /**
  * Tests for the anyURI-greater-than operator (not actually defined as such in F+O).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

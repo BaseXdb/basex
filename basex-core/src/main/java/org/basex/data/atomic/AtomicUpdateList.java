@@ -38,7 +38,7 @@ import org.basex.util.hash.*;
  *      on the same node.</li>
  * </ul>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class AtomicUpdateList {
@@ -82,8 +82,7 @@ public final class AtomicUpdateList {
    * @param clip insertion sequence data clip
    * @param attr insert attribute if true or a node of any other kind if false
    */
-  public void addInsert(final int pre, final int par, final DataClip clip,
-      final boolean attr) {
+  public void addInsert(final int pre, final int par, final DataClip clip, final boolean attr) {
     add(attr ? new InsertAttr(pre, par, clip) : new Insert(pre, par, clip), true);
   }
 
@@ -451,8 +450,7 @@ public final class AtomicUpdateList {
    * @param beforeUpdates calculate PRE value before or after updates
    * @return PRE value
    */
-  private static int c(final List<BasicUpdate> l, final int index,
-      final boolean beforeUpdates) {
+  private static int c(final List<BasicUpdate> l, final int index, final boolean beforeUpdates) {
     final BasicUpdate u = l.get(index);
     return u.preOfAffectedNode + (beforeUpdates ? u.accumulatedShifts : 0);
   }

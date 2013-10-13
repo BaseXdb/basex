@@ -14,7 +14,7 @@ import org.basex.query.value.node.*;
 /**
  * This class contains all full-text options.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FTOpt extends ExprInfo {

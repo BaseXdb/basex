@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Sequence, containing at least two items.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Seq extends Value {
@@ -73,14 +73,12 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public final Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     throw SEQCAST.thrw(ii, this);
   }
 
   @Override
-  public final Item test(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public final Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return ebv(ctx, ii);
   }
 

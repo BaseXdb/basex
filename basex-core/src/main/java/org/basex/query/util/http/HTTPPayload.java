@@ -275,9 +275,7 @@ public final class HTTPPayload {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public HashMap<String, Value> multiForm(final String ext)
-      throws IOException, QueryException {
-
+  public HashMap<String, Value> multiForm(final String ext) throws IOException, QueryException {
     // parse boundary, create helper arrays
     final byte[] bound = concat(DASHES, boundary(ext)), last = concat(bound, DASHES);
 

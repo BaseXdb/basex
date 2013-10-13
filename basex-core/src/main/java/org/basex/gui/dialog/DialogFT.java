@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Full-text creation dialog.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class DialogFT extends BaseXBack {
@@ -58,8 +58,7 @@ final class DialogFT extends BaseXBack {
     add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 6, 0));
 
     final String sw = opts.get(MainOptions.STOPWORDS);
-    final String[] cb = { LANGUAGE, STEMMING, CASE_SENSITIVITY, DIACRITICS,
-        STOPWORD_LIST };
+    final String[] cb = { LANGUAGE, STEMMING, CASE_SENSITIVITY, DIACRITICS, STOPWORD_LIST };
     final String[] desc = { H_LANGUAGE, H_STEMMING, H_CASE, H_DIACRITICS, H_STOPWORDS };
     final boolean[] val = {
       !opts.get(MainOptions.LANGUAGE).isEmpty(), opts.get(MainOptions.STEMMING),
@@ -117,8 +116,8 @@ final class DialogFT extends BaseXBack {
    */
   void chooseStop() {
     final GUIOptions gopts = dialog.gui.gopts;
-    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
-        gopts.get(GUIOptions.DATAPATH), dialog.gui);
+    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR, gopts.get(GUIOptions.DATAPATH),
+        dialog.gui);
     final IO file = fc.select(Mode.FOPEN);
     if(file != null) {
       swpath.setText(file.path());

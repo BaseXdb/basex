@@ -19,7 +19,7 @@ import org.junit.rules.*;
  * Tests {@link UpdatePrimitiveComparator} that creates an order on update primitives
  * and is part of the XQuery Update Facility implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {

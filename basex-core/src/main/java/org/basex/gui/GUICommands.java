@@ -25,7 +25,7 @@ import org.basex.util.list.*;
  * This enumeration encapsulates all commands that are triggered by
  * GUI operations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public enum GUICommands implements GUICmd {
@@ -300,8 +300,7 @@ public enum GUICommands implements GUICmd {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      b.setEnabled(updatable(gui.context.marked,
-          Data.ATTR, Data.PI, Data.COMM, Data.TEXT));
+      b.setEnabled(updatable(gui.context.marked, Data.ATTR, Data.PI, Data.COMM, Data.TEXT));
     }
   },
 
@@ -401,8 +400,7 @@ public enum GUICommands implements GUICmd {
     @Override
     public void execute(final GUI gui) {
       gui.gopts.invert(GUIOptions.SHOWBUTTONS);
-      gui.updateControl(gui.buttons, gui.gopts.get(GUIOptions.SHOWBUTTONS),
-          BorderLayout.CENTER);
+      gui.updateControl(gui.buttons, gui.gopts.get(GUIOptions.SHOWBUTTONS), BorderLayout.CENTER);
     }
 
     @Override
@@ -416,8 +414,7 @@ public enum GUICommands implements GUICmd {
   C_SHOWINPUT(INPUT_BAR, null, H_INPUT_BAR, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.updateControl(gui.nav, gui.gopts.invert(GUIOptions.SHOWINPUT),
-          BorderLayout.SOUTH);
+      gui.updateControl(gui.nav, gui.gopts.invert(GUIOptions.SHOWINPUT), BorderLayout.SOUTH);
     }
 
     @Override
@@ -431,8 +428,7 @@ public enum GUICommands implements GUICmd {
   C_SHOWSTATUS(STATUS_BAR, null, H_STATUS_BAR, false, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.updateControl(gui.status, gui.gopts.invert(GUIOptions.SHOWSTATUS),
-          BorderLayout.SOUTH);
+      gui.updateControl(gui.status, gui.gopts.invert(GUIOptions.SHOWSTATUS), BorderLayout.SOUTH);
     }
 
     @Override
@@ -548,8 +544,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Fullscreen mode. */
-  C_FULL(FULLSCREEN, Prop.MAC ? "% shift F" : "F11", H_FULLSCREEN,
-      false, true) {
+  C_FULL(FULLSCREEN, Prop.MAC ? "% shift F" : "F11", H_FULLSCREEN, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.fullscreen();
@@ -653,8 +648,7 @@ public enum GUICommands implements GUICmd {
   },
 
   /** Shows a preference dialog. */
-  C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% P",
-      H_PREFERENCES, false, false) {
+  C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% P", H_PREFERENCES, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogPrefs(gui);
@@ -800,8 +794,7 @@ public enum GUICommands implements GUICmd {
    * @param d requires a database to be opened
    * @param c displays a checkbox, indicating the current selection state
    */
-  GUICommands(final String l, final String k, final String h, final boolean d,
-      final boolean c) {
+  GUICommands(final String l, final String k, final String h, final boolean d, final boolean c) {
     label = l;
     key = k;
     help = BaseXLayout.addShortcut(h, k);
@@ -835,9 +828,7 @@ public enum GUICommands implements GUICmd {
    * @return result of check
    */
   static boolean updatable(final Nodes n, final int... no) {
-    if(n == null || (no.length == 0 ? n.size() < 1 : n.size() != 1))
-      return false;
-
+    if(n == null || (no.length == 0 ? n.size() < 1 : n.size() != 1)) return false;
     final int k = n.data.kind(n.pres[0]);
     for(final int i : no) if(k == i) return false;
     return true;
@@ -859,7 +850,6 @@ public enum GUICommands implements GUICmd {
    * @return function string
    */
   static String openPre(final Nodes n, final int i) {
-    return Function._DB_OPEN_PRE.get(Str.get(n.data.meta.name),
-        Int.get(n.pres[i])).toString();
+    return Function._DB_OPEN_PRE.get(Str.get(n.data.meta.name), Int.get(n.pres[i])).toString();
   }
 }

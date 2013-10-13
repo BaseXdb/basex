@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
 /**
  * the GFLWOR {@code window} clause.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class Window extends GFLWOR.Clause {
@@ -353,7 +353,7 @@ public final class Window extends GFLWOR.Clause {
   /**
    * A window {@code start} of {@code end} condition.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   public static final class Condition extends Single {
@@ -540,7 +540,7 @@ public final class Window extends GFLWOR.Clause {
   /**
    * Evaluator for the Window clause.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   abstract class WindowEval implements Eval {
@@ -584,7 +584,7 @@ public final class Window extends GFLWOR.Clause {
   /**
    * Evaluator for the Tumbling Window clause.
    *
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   abstract class TumblingEval extends WindowEval {

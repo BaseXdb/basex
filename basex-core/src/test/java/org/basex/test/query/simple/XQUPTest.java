@@ -5,7 +5,7 @@ import org.basex.test.query.*;
 /**
  * XQuery Update Tests.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class XQUPTest extends QueryTest {

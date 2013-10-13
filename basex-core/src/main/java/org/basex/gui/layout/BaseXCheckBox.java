@@ -8,7 +8,7 @@ import javax.swing.*;
 /**
  * Project specific CheckBox implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BaseXCheckBox extends JCheckBox {
@@ -29,9 +29,7 @@ public final class BaseXCheckBox extends JCheckBox {
    * @param dist distance to next component
    * @param win parent window
    */
-  public BaseXCheckBox(final String label, final boolean sel, final int dist,
-      final Window win) {
-
+  public BaseXCheckBox(final String label, final boolean sel, final int dist, final Window win) {
     super(label, sel);
     setOpaque(false);
     setMargin(new Insets(0, 0, dist, 0));

@@ -13,7 +13,7 @@ import org.w3c.dom.*;
 /**
  * PI node fragment.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FPI extends FNode {
@@ -84,8 +84,7 @@ public final class FPI extends FNode {
    * @return token
    * @throws QueryException query exception
    */
-  public static byte[] parse(final byte[] atom, final InputInfo ii)
-      throws QueryException {
+  public static byte[] parse(final byte[] atom, final InputInfo ii) throws QueryException {
 
     if(contains(atom, CLOSE)) CPICONT.thrw(ii, atom);
     return atom;

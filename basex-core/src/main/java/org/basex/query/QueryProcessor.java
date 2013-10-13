@@ -19,7 +19,7 @@ import org.basex.query.value.node.*;
 /**
  * This class is an entry point for evaluating XQuery implementations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class QueryProcessor extends Proc {
@@ -123,8 +123,7 @@ public final class QueryProcessor extends Proc {
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryProcessor bind(final String name, final Object value)
-      throws QueryException {
+  public QueryProcessor bind(final String name, final Object value) throws QueryException {
     return bind(name, value, null);
   }
 
@@ -146,8 +145,7 @@ public final class QueryProcessor extends Proc {
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryProcessor context(final Object value, final String type)
-      throws QueryException {
+  public QueryProcessor context(final Object value, final String type) throws QueryException {
     ctx.context(value, type);
     return this;
   }
@@ -171,8 +169,7 @@ public final class QueryProcessor extends Proc {
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryProcessor namespace(final String prefix, final String uri)
-      throws QueryException {
+  public QueryProcessor namespace(final String prefix, final String uri) throws QueryException {
     ctx.sc.namespace(prefix, uri);
     return this;
   }

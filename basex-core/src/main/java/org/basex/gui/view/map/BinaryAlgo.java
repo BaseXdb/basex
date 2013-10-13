@@ -3,7 +3,7 @@ package org.basex.gui.view.map;
 /**
  * Binary layout algorithm.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Joerg Hauser
  */
 final class BinaryAlgo extends MapAlgo {
@@ -21,8 +21,8 @@ final class BinaryAlgo extends MapAlgo {
    * @param sumweight weight of this recursion level
    * @return rectangles
    */
-  private static MapRects calcMap(final MapRect r, final MapList ml,
-      final int ns, final int ne, final double sumweight) {
+  private static MapRects calcMap(final MapRect r, final MapList ml, final int ns, final int ne,
+      final double sumweight) {
 
     if(ne - ns == 0) {
       final MapRects rects = new MapRects();

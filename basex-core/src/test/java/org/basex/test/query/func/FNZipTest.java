@@ -16,7 +16,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the ZIP Module.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNZipTest extends AdvancedQueryTest {
@@ -152,8 +152,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @return parameter string
    * @throws IOException I/O Exception
    */
-  private static String paramsPrefix(final String name, final String entry)
-      throws IOException {
+  private static String paramsPrefix(final String name, final String entry) throws IOException {
     return "<zip:file xmlns:zip='http://expath.org/ns/zip' href='" +
         new File(TMPZIP).getCanonicalPath() + "'>" +
         "<zip:entry name='" + name + "'>" + entry + "</zip:entry></zip:file>";
@@ -192,8 +191,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @param data expected file contents
    * @throws IOException I/O exception
    */
-  private static void checkEntry(final String file, final byte[] data)
-      throws IOException {
+  private static void checkEntry(final String file, final byte[] data) throws IOException {
 
     ZipFile zf = null;
     try {

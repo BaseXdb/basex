@@ -24,7 +24,7 @@ import org.basex.util.list.*;
 /**
  * Functions on files and directories.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  * @author Christian Gruen
  */
@@ -601,8 +601,7 @@ public final class FNFile extends StandardFunc {
    * @return boolean value
    * @throws QueryException query exception
    */
-  private boolean optionalBool(final int i, final QueryContext ctx)
-      throws QueryException {
+  private boolean optionalBool(final int i, final QueryContext ctx) throws QueryException {
     return i < expr.length && checkBln(expr[i], ctx);
   }
 

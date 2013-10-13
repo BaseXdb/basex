@@ -8,7 +8,7 @@ import org.junit.Test;
 /**
  * Tests for the {@link StringList} implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  */
 public class StringListTest {
 

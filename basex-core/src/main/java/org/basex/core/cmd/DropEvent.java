@@ -8,7 +8,7 @@ import org.basex.core.parse.Commands.*;
 /**
  * Evaluates the 'drop event' command and drops an existing event.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Roman Raedle
  * @author Andreas Weiler
  */

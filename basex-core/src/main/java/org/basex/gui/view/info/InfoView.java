@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * This view displays query information.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class InfoView extends View implements LinkListener {
@@ -140,8 +140,7 @@ public final class InfoView extends View implements LinkListener {
    * @param ok indicates if evaluation was successful
    * @param reset clear text area when method is called next time
    */
-  public void setInfo(final String info, final Command cmd, final boolean ok,
-      final boolean reset) {
+  public void setInfo(final String info, final Command cmd, final boolean ok, final boolean reset) {
     setInfo(info, cmd, null, ok, reset);
   }
 
@@ -153,8 +152,8 @@ public final class InfoView extends View implements LinkListener {
    * @param ok indicates if evaluation was successful
    * @param reset clear text area when method is called next time
    */
-  public void setInfo(final String info, final Command cmd, final String time,
-      final boolean ok, final boolean reset) {
+  public void setInfo(final String info, final Command cmd, final String time, final boolean ok,
+      final boolean reset) {
 
     final StringList eval = new StringList(1);
     final StringList comp = new StringList(1);

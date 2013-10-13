@@ -11,7 +11,7 @@ import org.basex.gui.GUIConstants.Fill;
 /**
  * DoubleSlider implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BaseXDSlider extends BaseXPanel {
@@ -282,8 +282,7 @@ public final class BaseXDSlider extends BaseXPanel {
    * @param val value
    * @return new value
    */
-  private static double limit(final double mn, final double mx,
-      final double val) {
+  private static double limit(final double mn, final double mx, final double val) {
     return Math.max(mn, Math.min(mx, val));
   }
 

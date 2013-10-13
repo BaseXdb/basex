@@ -5,7 +5,7 @@ import org.basex.data.*;
 /**
  * Data container with start and end offset.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DataClip {

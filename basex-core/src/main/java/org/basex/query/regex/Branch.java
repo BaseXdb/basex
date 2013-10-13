@@ -3,7 +3,7 @@ package org.basex.query.regex;
 /**
  * A branch of a regular expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public class Branch extends RegExp {

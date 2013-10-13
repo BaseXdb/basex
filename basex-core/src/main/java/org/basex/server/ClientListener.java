@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Server-side client session in the client-server architecture.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */
@@ -281,8 +281,7 @@ public final class ClientListener extends Thread {
    * @param msg event message
    * @throws IOException I/O exception
    */
-  public synchronized void notify(final byte[] name, final byte[] msg)
-      throws IOException {
+  public synchronized void notify(final byte[] name, final byte[] msg) throws IOException {
 
     last = System.currentTimeMillis();
     eout.print(name);

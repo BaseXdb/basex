@@ -42,7 +42,7 @@ import org.basex.util.options.*;
 /**
  * Parser for XQuery expressions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class QueryParser extends InputParser {
@@ -165,8 +165,7 @@ public class QueryParser extends InputParser {
    * @param val value
    * @throws QueryException query exception
    */
-  private void bind(final StringBuilder key, final StringBuilder val)
-      throws QueryException {
+  private void bind(final StringBuilder key, final StringBuilder val) throws QueryException {
 
     final String k = key.toString().trim();
     if(!k.isEmpty()) ctx.bind(k, new Atm(val.toString()), null);
@@ -2351,8 +2350,7 @@ public class QueryParser extends InputParser {
    * @return array of arguments, place-holders '?' are represented as {@code null} entries
    * @throws QueryException query exception
    */
-  private int[] argumentList(final ExprList args, final Object name)
-      throws QueryException {
+  private int[] argumentList(final ExprList args, final Object name) throws QueryException {
 
     int[] holes = null;
     if(!wsConsume(PAR2)) {

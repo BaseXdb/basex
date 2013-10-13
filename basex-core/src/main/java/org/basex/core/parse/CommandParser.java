@@ -11,7 +11,7 @@ import org.basex.util.*;
  * This is a parser for command strings, creating {@link Command} instances.
  * Several commands can be formulated in one string and separated by semicolons.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CommandParser extends InputParser {
@@ -72,8 +72,7 @@ public final class CommandParser extends InputParser {
    * @return commands
    * @throws QueryException query exception
    */
-  private Command[] parse(final boolean single, final boolean suggest)
-      throws QueryException {
+  private Command[] parse(final boolean single, final boolean suggest) throws QueryException {
 
     final ArrayList<Command> cmds = new ArrayList<Command>();
     parser.parse(cmds, single, suggest);

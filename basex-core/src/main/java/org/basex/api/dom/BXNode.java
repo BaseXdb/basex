@@ -14,7 +14,7 @@ import org.w3c.dom.*;
 /**
  * DOM - Node implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class BXNode implements Node {
@@ -26,8 +26,7 @@ public abstract class BXNode implements Node {
   };
   /** Node name mapping (see {@link Data} interface). */
   private static final String[] NAMES = {
-    "#document", null, "#text", null, "#comment", null, "#cdata-section",
-    "#document-fragment"
+    "#document", null, "#text", null, "#comment", null, "#cdata-section", "#document-fragment"
   };
   /** Node reference. */
   protected final ANode node;

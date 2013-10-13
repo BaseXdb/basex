@@ -16,7 +16,7 @@ import org.basex.io.out.*;
  * The class is implemented by the {@link ClientSession} and
  * {@link LocalSession} classes.</p>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Session {
@@ -65,8 +65,7 @@ public abstract class Session {
    * @param input xml input
    * @throws IOException I/O exception
    */
-  public abstract void create(final String name, final InputStream input)
-    throws IOException;
+  public abstract void create(final String name, final InputStream input) throws IOException;
 
   /**
    * Adds a document to the opened database.
@@ -74,8 +73,7 @@ public abstract class Session {
    * @param input xml input
    * @throws IOException I/O exception
    */
-  public abstract void add(final String path, final InputStream input)
-      throws IOException;
+  public abstract void add(final String path, final InputStream input) throws IOException;
 
   /**
    * Replaces a document in an open database.
@@ -83,8 +81,7 @@ public abstract class Session {
    * @param input new content
    * @throws IOException I/O exception
    */
-  public abstract void replace(final String path, final InputStream input)
-      throws IOException;
+  public abstract void replace(final String path, final InputStream input) throws IOException;
 
   /**
    * Stores raw data in an open database.
@@ -92,8 +89,7 @@ public abstract class Session {
    * @param input binary input
    * @throws IOException I/O exception
    */
-  public abstract void store(final String path, final InputStream input)
-      throws IOException;
+  public abstract void store(final String path, final InputStream input) throws IOException;
 
   /**
    * Returns command info as a string, regardless of whether an output stream
@@ -144,8 +140,7 @@ public abstract class Session {
    * @param os output stream
    * @throws IOException I/O exception
    */
-  protected abstract void execute(final String cmd, final OutputStream os)
-    throws IOException;
+  protected abstract void execute(final String cmd, final OutputStream os) throws IOException;
 
   /**
    * Executes a command and prints the result to the specified output stream.
@@ -153,6 +148,5 @@ public abstract class Session {
    * @param os output stream
    * @throws IOException I/O exception
    */
-  protected abstract void execute(final Command cmd, final OutputStream os)
-    throws IOException;
+  protected abstract void execute(final Command cmd, final OutputStream os) throws IOException;
 }

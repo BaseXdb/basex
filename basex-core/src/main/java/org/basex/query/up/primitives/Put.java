@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * Fn:put operation primitive.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class Put extends BasicOperation {

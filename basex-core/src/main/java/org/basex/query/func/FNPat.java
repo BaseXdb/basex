@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * String pattern functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNPat extends StandardFunc {
@@ -102,8 +102,7 @@ public final class FNPat extends StandardFunc {
    * @return function result
    * @throws QueryException query exception
    */
-  private Item analyzeString(final byte[] val, final QueryContext ctx)
-      throws QueryException {
+  private Item analyzeString(final byte[] val, final QueryContext ctx) throws QueryException {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     if(p.matcher("").matches()) REGROUP.thrw(info);

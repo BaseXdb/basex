@@ -5,7 +5,7 @@ import static javax.servlet.http.HttpServletResponse.*;
 /**
  * This class contains all query error messages.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public enum HTTPErr {

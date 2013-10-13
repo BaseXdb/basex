@@ -13,7 +13,7 @@ import org.basex.util.*;
  * for textual content in a compressed memory structure.
  * The table mapping is documented in {@link Data}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class MemData extends Data {
@@ -61,8 +61,8 @@ public final class MemData extends Data {
    * @param data data reference
    */
   public MemData(final Data data) {
-    this(data.tagindex, data.atnindex, data.paths, null, data.meta.options,
-        data.txtindex, data.atvindex);
+    this(data.tagindex, data.atnindex, data.paths, null, data.meta.options, data.txtindex,
+        data.atvindex);
   }
 
   /**

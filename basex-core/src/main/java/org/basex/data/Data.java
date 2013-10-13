@@ -62,7 +62,7 @@ import org.basex.util.list.*;
  * NOTE: the class is not thread-safe. It is imperative that all read/write accesses
  * are synchronized over a single context's read/write lock.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Data {
@@ -462,9 +462,7 @@ public abstract class Data {
    * @param name new tag, attribute or pi name
    * @param uri uri
    */
-  public final void update(final int pre, final int kind, final byte[] name,
-      final byte[] uri) {
-
+  public final void update(final int pre, final int kind, final byte[] name, final byte[] uri) {
     meta.update();
 
     if(kind == PI) {
@@ -555,8 +553,8 @@ public abstract class Data {
         case ELEM:
           // add element
           byte[] nm = data.name(spre, kind);
-          elem(dist, tagindex.index(nm, null, false), data.attSize(spre, kind),
-              ssize, nspaces.uri(nm, true), false);
+          elem(dist, tagindex.index(nm, null, false), data.attSize(spre, kind), ssize,
+              nspaces.uri(nm, true), false);
           break;
         case TEXT:
         case COMM:
@@ -567,8 +565,8 @@ public abstract class Data {
         case ATTR:
           // add attribute
           nm = data.name(spre, kind);
-          attr(pre, dist, atnindex.index(nm, null, false),
-              data.text(spre, false), nspaces.uri(nm, false), false);
+          attr(pre, dist, atnindex.index(nm, null, false), data.text(spre, false),
+              nspaces.uri(nm, false), false);
           break;
       }
     }
@@ -760,8 +758,8 @@ public abstract class Data {
             }
           }
           byte[] nm = data.name(spre, kind);
-          elem(dist, tagindex.index(nm, null, false), data.attSize(spre, kind),
-              ssize, nspaces.uri(nm, true), ne);
+          elem(dist, tagindex.index(nm, null, false), data.attSize(spre, kind), ssize,
+              nspaces.uri(nm, true), ne);
           preStack.push(pre);
           break;
         case TEXT:
@@ -778,14 +776,14 @@ public abstract class Data {
           // check if prefix of attribute has already been declared, otherwise
           // add declaration to parent node
           if(data.nsFlag(spre) && nsScope.get(attPref) == null) {
-            nspaces.add(nsPre, preStack.isEmpty() ? -1 : preStack.peek(),
-                attPref, data.nspaces.uri(data.uri(spre, kind)), this);
+            nspaces.add(nsPre, preStack.isEmpty() ? -1 : preStack.peek(), attPref,
+                                                  data.nspaces.uri(data.uri(spre, kind)), this);
             // save pre value to set ns flag later for this node. can't be done
             // here as direct table access would interfere with the buffer
             flagPres.add(nsPre);
           }
-          attr(pre, dist, atnindex.index(nm, null, false),
-              data.text(spre, false), nspaces.uri(nm, false), false);
+          attr(pre, dist, atnindex.index(nm, null, false), data.text(spre, false),
+              nspaces.uri(nm, false), false);
           break;
       }
     }
@@ -954,8 +952,8 @@ public abstract class Data {
    * @param uri namespace uri reference
    * @param ne namespace flag
    */
-  public final void elem(final int dist, final int name, final int asize,
-      final int size, final int uri, final boolean ne) {
+  public final void elem(final int dist, final int name, final int asize, final int size,
+      final int uri, final boolean ne) {
 
     // build and insert new entry
     final int i = newID();
@@ -974,9 +972,7 @@ public abstract class Data {
    * @param value string value
    * @param kind node kind
    */
-  public final void text(final int pre, final int dist, final byte[] value,
-      final int kind) {
-
+  public final void text(final int pre, final int dist, final byte[] value, final int kind) {
     // build and insert new entry
     final int i = newID();
     final long v = index(pre, i, value, kind);
@@ -995,8 +991,8 @@ public abstract class Data {
    * @param uri namespace uri reference
    * @param ne namespace flag (only {@code true} if this is a stand-alone attribute)
    */
-  public final void attr(final int pre, final int dist, final int name,
-      final byte[] value, final int uri, final boolean ne) {
+  public final void attr(final int pre, final int dist, final int name, final byte[] value,
+      final int uri, final boolean ne) {
 
     // add attribute to text storage
     final int i = newID();
@@ -1051,8 +1047,7 @@ public abstract class Data {
    * @param kind node kind
    * @return reference
    */
-  protected abstract long index(final int pre, final int id, final byte[] value,
-      final int kind);
+  protected abstract long index(final int pre, final int id, final byte[] value, final int kind);
 
   /** Notify the index structures that an update operation is started. */
   void indexBegin() { }

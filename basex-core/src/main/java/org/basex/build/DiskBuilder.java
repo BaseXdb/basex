@@ -20,7 +20,7 @@ import org.basex.util.*;
  * This class creates a database instance on disk.
  * The storage layout is described in the {@link Data} class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DiskBuilder extends Builder {
@@ -68,8 +68,7 @@ public final class DiskBuilder extends Builder {
 
     // calculate optimized output buffer sizes to reduce disk fragmentation
     final Runtime rt = Runtime.getRuntime();
-    int bs = (int) Math.min(md.filesize, Math.min(1 << 22,
-        rt.maxMemory() - rt.freeMemory() >> 2));
+    int bs = (int) Math.min(md.filesize, Math.min(1 << 22, rt.maxMemory() - rt.freeMemory() >> 2));
     bs = Math.max(IO.BLOCKSIZE, bs - bs % IO.BLOCKSIZE);
 
     // drop old database (if available) and create new one
@@ -143,8 +142,8 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  protected void addElem(final int dist, final int nm, final int asize,
-      final int uri, final boolean ne) throws IOException {
+  protected void addElem(final int dist, final int nm, final int asize, final int uri,
+      final boolean ne) throws IOException {
 
     tout.write1(asize << 3 | Data.ELEM);
     tout.write2((ne ? 1 << 15 : 0) | nm);
@@ -157,8 +156,8 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  protected void addAttr(final int nm, final byte[] value, final int dist,
-      final int uri) throws IOException {
+  protected void addAttr(final int nm, final byte[] value, final int dist, final int uri)
+      throws IOException {
 
     tout.write1(dist << 3 | Data.ATTR);
     tout.write2(nm);

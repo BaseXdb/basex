@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Inner node of a {@link Map}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 final class Branch extends TrieNode {
@@ -90,8 +90,7 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  Value get(final int h, final Item k, final int l, final InputInfo ii)
-      throws QueryException {
+  Value get(final int h, final Item k, final int l, final InputInfo ii) throws QueryException {
     final int key = key(h, l);
     final TrieNode sub = kids[key];
     return sub == null ? null : sub.get(h, k, l + 1, ii);
@@ -122,8 +121,7 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  TrieNode addAll(final TrieNode o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) throws QueryException {
     return o.add(this, l, ii);
   }
 

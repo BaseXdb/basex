@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
 /**
  * General comparison.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CmpG extends Cmp {
@@ -278,8 +278,7 @@ public final class CmpG extends Cmp {
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean eval(final Item a, final Item b, final Collation coll)
-      throws QueryException {
+  private boolean eval(final Item a, final Item b, final Collation coll) throws QueryException {
     final Type ta = a.type, tb = b.type;
     if(!(a instanceof FItem || b instanceof FItem) &&
         (ta == tb || ta.isUntyped() || tb.isUntyped() ||

@@ -19,7 +19,7 @@ import org.xml.sax.*;
  * TagSoup was written by John Cowan and is based on the Apache 2.0 License:
  * {@code http://home.ccil.org/~cowan/XML/tagsoup/}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class HtmlParser extends XMLParser {
@@ -35,12 +35,10 @@ public final class HtmlParser extends XMLParser {
   /** HTML reader. */
   private static final Class<?> READER = Reflect.find(PCLASS);
   /** HTML writer. */
-  private static final Constructor<?> WRITER =
-      Reflect.find(Reflect.find(WCLASS), Writer.class);
+  private static final Constructor<?> WRITER = Reflect.find(Reflect.find(WCLASS), Writer.class);
   /** XML writer output property method. */
   private static final Method METHOD = Reflect.method(
-      Reflect.find(WCLASS), "setOutputProperty",
-      new Class[] { String.class, String.class });
+    Reflect.find(WCLASS), "setOutputProperty", new Class[] { String.class, String.class });
 
   /**
    * Checks if a CatalogResolver is available.

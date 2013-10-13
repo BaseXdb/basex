@@ -25,7 +25,7 @@ import org.basex.util.options.*;
 /**
  * Functions for performing XSLT transformations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNXslt extends StandardFunc {
@@ -98,8 +98,7 @@ public final class FNXslt extends StandardFunc {
    * @return item
    * @throws QueryException query exception
    */
-  private Item transform(final QueryContext ctx, final boolean node)
-      throws QueryException {
+  private Item transform(final QueryContext ctx, final boolean node) throws QueryException {
 
     checkCreate(ctx);
     final IO in = read(checkItem(expr[0], ctx));

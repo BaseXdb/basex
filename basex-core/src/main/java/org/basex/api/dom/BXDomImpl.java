@@ -6,7 +6,7 @@ import org.w3c.dom.*;
 /**
  * DOM - implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BXDomImpl implements DOMImplementation {
@@ -22,14 +22,12 @@ public final class BXDomImpl implements DOMImplementation {
   }
 
   @Override
-  public BXDoc createDocument(final String nsURI, final String qn,
-      final DocumentType doctype) {
+  public BXDoc createDocument(final String nsURI, final String qn, final DocumentType doctype) {
     throw Util.notimplemented();
   }
 
   @Override
-  public DocumentType createDocumentType(final String qn, final String pid,
-      final String sid) {
+  public DocumentType createDocumentType(final String qn, final String pid, final String sid) {
     throw Util.notimplemented();
   }
 

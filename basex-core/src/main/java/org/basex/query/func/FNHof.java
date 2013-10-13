@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * Implementation-specific functions on functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class FNHof extends StandardFunc {

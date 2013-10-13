@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * This interface contains tree view constants.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Wolfgang Miller
  */
 interface TreeConstants {

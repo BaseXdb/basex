@@ -10,7 +10,7 @@ import org.junit.*;
 /**
  * This class tests XQuery functions placed in the {@link FNGen} class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNGenTest extends AdvancedQueryTest {

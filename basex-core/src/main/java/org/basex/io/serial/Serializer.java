@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * This is an interface for serializing XQuery values.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Serializer {
@@ -241,8 +241,7 @@ public abstract class Serializer {
    * @param value value
    * @throws IOException I/O exception
    */
-  protected abstract void attribute(final byte[] name, final byte[] value)
-      throws IOException;
+  protected abstract void attribute(final byte[] name, final byte[] value) throws IOException;
 
   /**
    * Starts an element.
@@ -289,8 +288,7 @@ public abstract class Serializer {
    * @param value value
    * @throws IOException I/O exception
    */
-  protected abstract void finishPi(final byte[] name, final byte[] value)
-      throws IOException;
+  protected abstract void finishPi(final byte[] name, final byte[] value) throws IOException;
 
   /**
    * Serializes an atomic value.

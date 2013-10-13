@@ -7,7 +7,7 @@ import java.util.*;
  * This class assembles some reflection methods. Most exceptions are caught and replaced
  * by a {@code null} value.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Reflect {

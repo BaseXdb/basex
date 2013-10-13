@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
 /**
  * Abstract axis step expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Step extends Preds {
@@ -62,8 +62,7 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
 
     // return empty sequence if test will yield no results
     if(!test.compile(ctx)) return Empty.SEQ;

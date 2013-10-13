@@ -32,7 +32,7 @@ import org.basex.util.list.*;
 /**
  * This view allows the input and evaluation of queries and documents.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class EditorView extends View {
@@ -302,8 +302,7 @@ public final class EditorView extends View {
    */
   public void open() {
     // open file chooser for XML creation
-    final BaseXFileChooser fc = new BaseXFileChooser(OPEN,
-        gui.gopts.get(GUIOptions.WORKPATH), gui);
+    final BaseXFileChooser fc = new BaseXFileChooser(OPEN, gui.gopts.get(GUIOptions.WORKPATH), gui);
     fc.filter(XQUERY_FILES, IO.XQSUFFIXES);
     fc.filter(BXS_FILES, IO.BXSSUFFIX);
     fc.textFilters();
@@ -754,8 +753,7 @@ public final class EditorView extends View {
    */
   private boolean confirm(final EditorArea edit) {
     if(edit.modified && (edit.opened() || edit.getText().length != 0)) {
-      final Boolean ok = BaseXDialog.yesNoCancel(gui,
-          Util.info(CLOSE_FILE_X, edit.file.name()));
+      final Boolean ok = BaseXDialog.yesNoCancel(gui, Util.info(CLOSE_FILE_X, edit.file.name()));
       if(ok == null || ok && !save()) return false;
     }
     return true;

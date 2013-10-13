@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'list' command and shows all available databases.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class List extends Command {

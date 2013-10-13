@@ -12,7 +12,7 @@ import org.basex.test.qt3ts.QT3TestSet;
  *             Because the tests have been generated to use non-capturing groups, they require
  *             support for XPath 3.0 regular expressions..
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

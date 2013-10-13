@@ -7,7 +7,7 @@ import org.basex.test.qt3ts.QT3TestSet;
  * Tests for the ValueComp (value comparison) production.
  *       See also tests for the individual operators..
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

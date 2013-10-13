@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * Evaluates the 'create db' command and creates a new database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CreateDB extends ACreate {
@@ -135,8 +135,8 @@ public final class CreateDB extends ACreate {
    * @return new database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data create(final String name, final Parser parser,
-      final Context ctx) throws IOException {
+  public static synchronized Data create(final String name, final Parser parser, final Context ctx)
+      throws IOException {
 
     // check permissions
     if(!ctx.user.has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
@@ -203,8 +203,8 @@ public final class CreateDB extends ACreate {
    * @return data reference
    * @throws IOException I/O exception
    */
-  public static synchronized Data create(final IO source, final boolean single,
-      final Context ctx) throws IOException {
+  public static synchronized Data create(final IO source, final boolean single, final Context ctx)
+      throws IOException {
 
     // check if input is an existing file
     if(!source.exists() || single && source.isDir())

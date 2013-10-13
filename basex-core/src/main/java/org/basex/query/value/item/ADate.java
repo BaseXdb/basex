@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Abstract super class for date items.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class ADate extends ADateDur {
@@ -101,8 +101,7 @@ public abstract class ADate extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  final void date(final byte[] d, final String e, final InputInfo ii)
-      throws QueryException {
+  final void date(final byte[] d, final String e, final InputInfo ii) throws QueryException {
 
     final Matcher mt = DATE.matcher(Token.string(d).trim());
     if(!mt.matches()) dateErr(d, e, ii);
@@ -124,8 +123,7 @@ public abstract class ADate extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  final void time(final byte[] d, final String e, final InputInfo ii)
-      throws QueryException {
+  final void time(final byte[] d, final String e, final InputInfo ii) throws QueryException {
 
     final Matcher mt = TIME.matcher(Token.string(d).trim());
     if(!mt.matches()) dateErr(d, e, ii);
@@ -182,8 +180,7 @@ public abstract class ADate extends ADateDur {
    * @param ii input info
    * @throws QueryException query exception
    */
-  final void calc(final YMDur dur, final boolean p, final InputInfo ii)
-      throws QueryException {
+  final void calc(final YMDur dur, final boolean p, final InputInfo ii) throws QueryException {
 
     final long m = p ? dur.mon : -dur.mon;
     final long mn = mon + m;

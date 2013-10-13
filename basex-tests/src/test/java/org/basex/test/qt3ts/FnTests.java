@@ -9,7 +9,7 @@ import org.basex.test.qt3ts.fn.*;
 /**
  * Test suite for the "fn" test group.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 @RunWith(Suite.class)

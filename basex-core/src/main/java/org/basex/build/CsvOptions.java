@@ -12,7 +12,7 @@ import org.basex.util.options.*;
 /**
  * Options for parsing and serializing CSV data.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CsvOptions extends Options {

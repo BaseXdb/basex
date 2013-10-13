@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Decimal item ({@code xs:decimal}).
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Dec extends ANum {
@@ -129,8 +129,7 @@ public final class Dec extends ANum {
    * @return double value
    * @throws QueryException query exception
    */
-  public static BigDecimal parse(final double val, final InputInfo ii)
-      throws QueryException {
+  public static BigDecimal parse(final double val, final InputInfo ii) throws QueryException {
     if(Double.isNaN(val) || Double.isInfinite(val)) Err.value(ii, AtomType.DEC, val);
     return BigDecimal.valueOf(val);
   }
@@ -142,8 +141,7 @@ public final class Dec extends ANum {
    * @return double value
    * @throws QueryException query exception
    */
-  public static BigDecimal parse(final byte[] val, final InputInfo ii)
-      throws QueryException {
+  public static BigDecimal parse(final byte[] val, final InputInfo ii) throws QueryException {
     if(contains(val, 'e') || contains(val, 'E')) FUNCAST.thrw(ii, AtomType.DEC, val);
 
     try {

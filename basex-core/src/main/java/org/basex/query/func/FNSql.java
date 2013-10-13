@@ -22,7 +22,7 @@ import org.basex.util.options.*;
 /**
  * Functions on relational databases.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class FNSql extends StandardFunc {
@@ -301,8 +301,7 @@ public final class FNSql extends StandardFunc {
    * @throws QueryException query exception
    */
   private void setParam(final int index, final PreparedStatement stmt,
-      final byte[] paramType, final String value, final boolean isNull)
-      throws QueryException {
+      final byte[] paramType, final String value, final boolean isNull) throws QueryException {
     try {
       if(eq(BOOL, paramType)) {
         if(isNull) stmt.setNull(index, Types.BOOLEAN);

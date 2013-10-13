@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * An XQuery main module.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public class MainModule extends StaticScope {

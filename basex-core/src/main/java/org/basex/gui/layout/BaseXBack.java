@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Panel background, extending the {@link JPanel}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class BaseXBack extends JPanel {

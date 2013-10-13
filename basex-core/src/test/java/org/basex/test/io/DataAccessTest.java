@@ -22,7 +22,7 @@ import org.junit.*;
  * <p>Write operations are tested by writing a value at a specified random
  * position.</p>
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
 public class DataAccessTest {
@@ -393,8 +393,7 @@ public class DataAccessTest {
    * @param bytes unsigned bytes
    * @throws IOException I/O exception
    */
-  private static void write(final RandomAccessFile out, final int[] bytes)
-      throws IOException {
+  private static void write(final RandomAccessFile out, final int[] bytes) throws IOException {
     for(final int b : bytes)
       out.write(b);
   }

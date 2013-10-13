@@ -23,7 +23,7 @@ import org.basex.util.list.*;
 /**
  * Functions for converting data to other formats.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNConvert extends StandardFunc {
@@ -107,8 +107,7 @@ public final class FNConvert extends StandardFunc {
    * @return string representation of the given number
    * @throws QueryException query exception
    */
-  private Str integerToBase(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  private Str integerToBase(final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     final long num = checkItr(expr[0], ctx), base = checkItr(expr[1], ctx);
     if(base < 2 || base > 36) INVBASE.thrw(ii, base);

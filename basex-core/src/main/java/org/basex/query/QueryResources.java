@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * This class provides access to resources used by an XQuery expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class QueryResources {
@@ -149,8 +149,7 @@ public final class QueryResources {
    * @return collection
    * @throws QueryException query exception
    */
-  public Value collection(final String input, final InputInfo info)
-      throws QueryException {
+  public Value collection(final String input, final InputInfo info) throws QueryException {
 
     // merge input with base directory
     final IO base = ctx.sc.baseIO();
@@ -212,8 +211,7 @@ public final class QueryResources {
    * @param paths documents paths
    * @throws QueryException query exception
    */
-  public void addCollection(final String name, final String[] paths)
-     throws QueryException {
+  public void addCollection(final String name, final String[] paths) throws QueryException {
 
     final int ns = paths.length;
     final DBNode[] nodes = new DBNode[ns];

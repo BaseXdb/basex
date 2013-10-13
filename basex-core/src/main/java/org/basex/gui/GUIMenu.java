@@ -16,7 +16,7 @@ import org.basex.util.*;
  * The menu structure is defined in {@link GUIConstants#MENUBAR} and
  * {@link GUIConstants#MENUITEMS}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class GUIMenu extends JMenuBar {
@@ -82,9 +82,7 @@ public final class GUIMenu extends JMenuBar {
    * @param mnem assigned mnenomics
    * @return menu item
    */
-  public static JMenuItem newItem(final GUICmd cmd, final GUI gui,
-      final StringBuilder mnem) {
-
+  public static JMenuItem newItem(final GUICmd cmd, final GUI gui, final StringBuilder mnem) {
     final String desc = cmd.label();
     final JMenuItem item = cmd.checked() ?
         new JCheckBoxMenuItem(desc) : new JMenuItem(desc);

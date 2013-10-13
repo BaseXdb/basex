@@ -5,7 +5,7 @@ import org.basex.query.QueryException;
 /**
  * A handler for events from a {@link JsonParser}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public interface JsonHandler {

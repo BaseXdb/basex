@@ -11,7 +11,7 @@ import org.xmldb.api.modules.*;
  * so creating a new collection creates a new database as well, and the
  * specified collection reference is reset every time a database is created.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class BXCollectionManagementService implements

@@ -12,7 +12,7 @@ import org.junit.*;
 /**
  * This class tests if string range queries are correctly evaluated with(out) the index.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class StringRangeTest extends QueryPlanTest {

@@ -10,7 +10,7 @@ import org.w3c.dom.*;
 /**
  * DOM - Document implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BXDoc extends BXNode implements Document {
@@ -118,8 +118,7 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   @Override
-  public BXNList getElementsByTagNameNS(final String namespaceURI,
-      final String localName) {
+  public BXNList getElementsByTagNameNS(final String namespaceURI, final String localName) {
     throw Util.notimplemented();
   }
 

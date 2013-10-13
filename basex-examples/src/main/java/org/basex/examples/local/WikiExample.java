@@ -8,7 +8,7 @@ import org.basex.core.cmd.*;
  * documents, and how XQuery can be used to locally update the document and
  * perform full-text requests.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  */
 public final class WikiExample {
   /**

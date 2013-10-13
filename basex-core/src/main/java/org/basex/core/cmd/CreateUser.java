@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Evaluates the 'create user' command and creates a new user.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class CreateUser extends AUser {
@@ -46,8 +46,8 @@ public final class CreateUser extends AUser {
    * @param ctx database context
    * @throws BaseXException database exception
    */
-  public static void create(final String user, final String pass,
-      final Context ctx) throws BaseXException {
+  public static void create(final String user, final String pass, final Context ctx)
+      throws BaseXException {
 
     if(!Databases.validName(user)) throw new BaseXException(NAME_INVALID_X, user);
     if(!isMD5(pass)) throw new BaseXException(PW_NOT_VALID);

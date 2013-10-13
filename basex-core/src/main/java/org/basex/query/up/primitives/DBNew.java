@@ -19,7 +19,7 @@ import org.basex.util.options.*;
 /**
  * Update primitive for adding documents to databases.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class DBNew extends BasicOperation {

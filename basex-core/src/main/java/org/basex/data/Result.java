@@ -8,7 +8,7 @@ import org.basex.io.serial.*;
 /**
  * This is an interface for query results.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public interface Result {

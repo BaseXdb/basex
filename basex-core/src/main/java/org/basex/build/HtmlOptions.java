@@ -7,7 +7,7 @@ import org.basex.util.options.*;
 /**
  * Options for parsing and serializing HTML documents with TagSoup.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class HtmlOptions extends Options {

@@ -16,7 +16,7 @@ import static java.util.regex.Pattern.*;
 /**
  * A parser for XSD regular expressions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

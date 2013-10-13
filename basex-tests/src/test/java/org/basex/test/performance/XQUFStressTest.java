@@ -7,7 +7,7 @@ import org.junit.*;
 /**
  * Performs bulk updates with standalone version.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class XQUFStressTest extends SandboxTest {

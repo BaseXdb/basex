@@ -17,7 +17,7 @@ import org.basex.io.*;
 /**
  * Dialog window for changing some project's preferences.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogPrefs extends BaseXDialog {
@@ -72,8 +72,8 @@ public final class DialogPrefs extends BaseXDialog {
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final IOFile file = new BaseXFileChooser(CHOOSE_DIR, path.getText(),
-            gui).select(Mode.DOPEN);
+        final IOFile file = new BaseXFileChooser(CHOOSE_DIR, path.getText(), gui).
+            select(Mode.DOPEN);
         if(file != null) path.setText(file.dirPath());
       }
     });

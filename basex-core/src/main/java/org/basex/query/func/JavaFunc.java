@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Java function binding.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class JavaFunc extends JavaMapping {
@@ -41,8 +41,7 @@ public final class JavaFunc extends JavaMapping {
   }
 
   @Override
-  protected Object eval(final Value[] args, final QueryContext ctx)
-      throws QueryException {
+  protected Object eval(final Value[] args, final QueryContext ctx) throws QueryException {
 
     try {
       return mth.equals(NEW) ? constructor(args) : method(args, ctx);

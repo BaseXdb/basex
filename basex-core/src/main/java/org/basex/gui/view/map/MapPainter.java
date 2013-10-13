@@ -9,7 +9,7 @@ import org.basex.gui.view.*;
 /**
  * Provides an interface for data specific TreeMap visualizations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 abstract class MapPainter {
@@ -52,8 +52,7 @@ abstract class MapPainter {
    * @param r rectangle array
    * @param scale scale boarders using this factor
    */
-  abstract void drawRectangles(final Graphics g, final MapRects r,
-      final float scale);
+  abstract void drawRectangles(final Graphics g, final MapRects r, final float scale);
 
   /**
    * Returns the content for the specified pre value.

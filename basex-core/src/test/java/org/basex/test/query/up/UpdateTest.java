@@ -14,7 +14,7 @@ import org.junit.*;
 /**
  * General test of the XQuery Update Facility implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class UpdateTest extends AdvancedQueryTest {

@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * A single binding of a {@link Map}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 final class Leaf extends TrieNode {
@@ -66,8 +66,7 @@ final class Leaf extends TrieNode {
   }
 
   @Override
-  Value get(final int h, final Item k, final int l, final InputInfo ii)
-      throws QueryException {
+  Value get(final int h, final Item k, final int l, final InputInfo ii) throws QueryException {
     return h == hash && eq(key, k, ii) ? value : null;
   }
 
@@ -84,8 +83,7 @@ final class Leaf extends TrieNode {
   }
 
   @Override
-  TrieNode addAll(final TrieNode o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) throws QueryException {
     return o.add(this, l, ii);
   }
 

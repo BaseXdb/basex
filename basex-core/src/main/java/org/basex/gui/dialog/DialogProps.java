@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Database properties dialog.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogProps extends BaseXDialog {
@@ -177,8 +177,8 @@ public final class DialogProps extends BaseXDialog {
     }
 
     final Data data = gui.context.data();
-    final boolean[] val = { true, true, true, data.meta.textindex,
-        data.meta.attrindex, data.meta.ftxtindex };
+    final boolean[] val = { true, true, true, data.meta.textindex, data.meta.attrindex,
+        data.meta.ftxtindex };
     for(int i = 0; i < il.size(); i++) {
       final int idx = il.get(i);
       if(updated.contains(idx)) continue;

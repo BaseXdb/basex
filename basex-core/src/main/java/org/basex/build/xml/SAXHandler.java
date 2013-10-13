@@ -15,7 +15,7 @@ import org.xml.sax.helpers.*;
 /**
  * SAX Parser wrapper.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class SAXHandler extends DefaultHandler implements LexicalHandler {
@@ -60,8 +60,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   }
 
   @Override
-  public void startElement(final String uri, final String ln, final String qn,
-      final Attributes at) throws SAXException {
+  public void startElement(final String uri, final String ln, final String qn, final Attributes at)
+      throws SAXException {
 
     try {
       finishText();
@@ -95,9 +95,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   }
 
   @Override
-  public void endElement(final String uri, final String ln, final String qn)
-      throws SAXException {
-
+  public void endElement(final String uri, final String ln, final String qn) throws SAXException {
     try {
       finishText();
       builder.closeElem();

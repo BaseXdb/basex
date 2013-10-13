@@ -29,7 +29,7 @@ import org.basex.util.list.*;
  * This is a parser for command strings, creating {@link Command} instances.
  * Several commands can be formulated in one string and separated by semicolons.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class StringParser extends CmdParser {
@@ -461,8 +461,7 @@ public final class StringParser extends CmdParser {
    * @param prefix user input
    * @return completions
    */
-  private static <T extends Enum<T>> Enum<?>[] startWith(final Class<T> en,
-      final String prefix) {
+  private static <T extends Enum<T>> Enum<?>[] startWith(final Class<T> en, final String prefix) {
     Enum<?>[] list = new Enum<?>[0];
     final String t = prefix == null ? "" : prefix.toUpperCase(Locale.ENGLISH);
     for(final Enum<?> e : en.getEnumConstants()) {

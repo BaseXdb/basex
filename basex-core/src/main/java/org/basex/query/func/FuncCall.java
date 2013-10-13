@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * An XQuery function call, either static or dynamic.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public abstract class FuncCall extends Arr {
@@ -43,8 +43,7 @@ public abstract class FuncCall extends Arr {
   abstract Value[] evalArgs(final QueryContext ctx) throws QueryException;
 
   @Override
-  public final Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public final Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return (Item) invoke(evalFunc(ctx), evalArgs(ctx), true, tailCall, ctx, info);
   }
 

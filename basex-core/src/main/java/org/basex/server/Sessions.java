@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * This class organizes all currently opened database sessions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Sessions extends CopyOnWriteArrayList<ClientListener> {

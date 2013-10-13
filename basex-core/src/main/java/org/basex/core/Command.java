@@ -18,7 +18,7 @@ import org.xml.sax.*;
  * implementations. It evaluates queries that are sent by the GUI, the client or
  * the standalone version.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Command extends Proc {
@@ -73,8 +73,7 @@ public abstract class Command extends Proc {
    * @param os output stream reference
    * @throws BaseXException command exception
    */
-  public final void execute(final Context ctx, final OutputStream os)
-      throws BaseXException {
+  public final void execute(final Context ctx, final OutputStream os) throws BaseXException {
     if(!exec(ctx, os)) throw new BaseXException(info());
   }
 

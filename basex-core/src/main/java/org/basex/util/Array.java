@@ -8,7 +8,7 @@ import org.basex.util.list.*;
  * This class provides convenience methods for handling arrays
  * and serves as an extension to the {@link Arrays} class of Java.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Array {

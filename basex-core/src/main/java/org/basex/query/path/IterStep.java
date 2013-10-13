@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative step expression without numeric predicates.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class IterStep extends Step {

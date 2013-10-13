@@ -4,7 +4,7 @@ package org.basex.core;
  * Info listener, receiving and handling information generated during the evaluation
  * of a command or query.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public interface InfoListener {

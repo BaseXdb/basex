@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Parser for formatting integers in dates and times.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DateFormat extends FormatParser {

@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * This class provides access to statically available functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class Functions extends TokenSet {

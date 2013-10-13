@@ -26,7 +26,7 @@ import org.basex.util.list.*;
 /**
  * Functions on zip files.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNZip extends StandardFunc {
@@ -112,8 +112,7 @@ public final class FNZip extends StandardFunc {
    * @return binary result
    * @throws QueryException query exception
    */
-  private ANode xmlEntry(final QueryContext ctx, final boolean html)
-      throws QueryException {
+  private ANode xmlEntry(final QueryContext ctx, final boolean html) throws QueryException {
 
     final MainOptions opts = ctx.context.options;
     final IO io = new IOContent(entry(ctx));

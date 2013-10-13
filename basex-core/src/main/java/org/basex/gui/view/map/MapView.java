@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * This view is a TreeMap implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Joerg Hauser
  * @author Bastian Lemke
@@ -375,8 +375,7 @@ public final class MapView extends View implements Runnable {
         final byte[] text = MapPainter.content(data, f);
         // calculate tooltip
         final int[][] info = new FTLexer().init(text).info();
-        final TokenList tl = MapRenderer.calculateToolTip(f, info, mouseX, mouseY,
-            getWidth(), g);
+        final TokenList tl = MapRenderer.calculateToolTip(f, info, mouseX, mouseY, getWidth(), g);
         final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());
         // draw calculated tooltip
         MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl, fontSize);
@@ -397,8 +396,7 @@ public final class MapView extends View implements Runnable {
     if(img == null) return;
     final MapRect r = new MapRect(0, 0, getWidth(), getHeight());
     zoom(r, zi);
-    g.drawImage(img, r.x, r.y, r.x + r.w, r.y + r.h, 0, 0, getWidth(),
-        getHeight(), this);
+    g.drawImage(img, r.x, r.y, r.x + r.w, r.y + r.h, 0, 0, getWidth(), getHeight(), this);
   }
 
   /**
@@ -485,8 +483,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(gui.updating || ++dragTol < 8 || mainRects.sorted != mainRects.list)
-      return;
+    if(gui.updating || ++dragTol < 8 || mainRects.sorted != mainRects.list) return;
 
     // refresh mouse focus
     int mx = mouseX;

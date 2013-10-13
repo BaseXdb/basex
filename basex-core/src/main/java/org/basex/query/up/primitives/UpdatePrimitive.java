@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Base class for all update primitives.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public abstract class UpdatePrimitive extends Operation {

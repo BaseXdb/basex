@@ -5,7 +5,7 @@ import org.basex.data.*;
 /**
  * Database node with full-text positions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FTPosNode extends DBNode {

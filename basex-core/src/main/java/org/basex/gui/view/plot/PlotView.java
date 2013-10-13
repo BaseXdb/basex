@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * A scatter plot visualization of the database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class PlotView extends View {
@@ -112,8 +112,7 @@ public final class PlotView extends View {
         refreshUpdate();
       }
     });
-    dots = new BaseXSlider(-6, 6, gui.gopts.get(GUIOptions.PLOTDOTS), gui,
-        new ActionListener() {
+    dots = new BaseXSlider(-6, 6, gui.gopts.get(GUIOptions.PLOTDOTS), gui, new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         gui.gopts.set(GUIOptions.PLOTDOTS, dots.value());
@@ -398,8 +397,7 @@ public final class PlotView extends View {
     if(!drawSubNodes) {
       while(i < m.length) {
         final int pi = plotData.findPre(m[i]);
-        if(pi > -1) drawItem(gi, plotData.xAxis.co[pi], plotData.yAxis.co[pi],
-            false, true, false);
+        if(pi > -1) drawItem(gi, plotData.xAxis.co[pi], plotData.yAxis.co[pi], false, true, false);
         ++i;
       }
       return;
@@ -413,8 +411,7 @@ public final class PlotView extends View {
     int k = plotData.findPre(m[0]);
 
     if(k > -1) {
-      drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false,
-          true, false);
+      drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false, true, false);
       ++k;
     } else {
       k = -k;
@@ -429,12 +426,10 @@ public final class PlotView extends View {
       final int b = p[k];
       final int ns = data.size(a, data.kind(a)) - 1;
       if(a == b) {
-        drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false,
-            true, false);
+        drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false, true, false);
         ++k;
       } else if(a + ns >= b) {
-        if(a < b) drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k],
-            false, false, true);
+        if(a < b) drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false, false, true);
         ++k;
       } else {
         ++i;
@@ -452,8 +447,8 @@ public final class PlotView extends View {
    * @param marked item is marked
    * @param sub item is a child of a marked node
    */
-  private void drawItem(final Graphics g, final double x, final double y,
-      final boolean focus, final boolean marked, final boolean sub) {
+  private void drawItem(final Graphics g, final double x, final double y, final boolean focus,
+      final boolean marked, final boolean sub) {
     final int x1 = calcCoordinate(true, x);
     final int y1 = calcCoordinate(false, y);
 
@@ -538,8 +533,7 @@ public final class PlotView extends View {
           int j = 0;
           // find value for given plot position
           while(j < axis.co.length && axis.co[j] != op) ++j;
-          drawCaptionAndGrid(g, drawX,
-              string(axis.getValue(plotData.pres[j])), op);
+          drawCaptionAndGrid(g, drawX, string(axis.getValue(plotData.pres[j])), op);
           // increase to next optimum caption position
           op += capRange;
         }
@@ -582,8 +576,7 @@ public final class PlotView extends View {
           a = -1;
           while(a >= axis.min) {
             if(a <= axis.max && adequateDistance(drawX, a, 0)) {
-              drawCaptionAndGrid(g, drawX, BaseXLayout.value(a),
-                  axis.calcPosition(a));
+              drawCaptionAndGrid(g, drawX, BaseXLayout.value(a), axis.calcPosition(a));
             }
             final int lim = (int) (-1 * Math.pow(10, l + 1));
             double last = a;
@@ -592,8 +585,7 @@ public final class PlotView extends View {
               if(adequateDistance(drawX, last, b) &&
                   adequateDistance(drawX, lim, b) &&
                   b < axis.max) {
-                drawIntermediateGridLine(g, drawX, axis.calcPosition(b),
-                    BaseXLayout.value(b));
+                drawIntermediateGridLine(g, drawX, axis.calcPosition(b), BaseXLayout.value(b));
                 last = b;
               }
               b += a;
@@ -614,8 +606,7 @@ public final class PlotView extends View {
           a = 1;
           while(a <= axis.max) {
             if(a >= axis.min && adequateDistance(drawX, a, 0)) {
-              drawCaptionAndGrid(g, drawX, BaseXLayout.value(a),
-                  axis.calcPosition(a));
+              drawCaptionAndGrid(g, drawX, BaseXLayout.value(a), axis.calcPosition(a));
             }
             final int lim = (int) Math.pow(10, l + 1);
             double last = a;
@@ -662,8 +653,7 @@ public final class PlotView extends View {
    * @param b second point
    * @return a and b have adequate distance
    */
-  private boolean adequateDistance(final boolean drawX, final double a,
-      final double b) {
+  private boolean adequateDistance(final boolean drawX, final double a, final double b) {
     final double t = drawX ? 1.8d : 1.3d;
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
     return Math.abs(calcCoordinate(drawX, axis.calcPosition(a)) -
@@ -677,8 +667,8 @@ public final class PlotView extends View {
    * @param caption given caption string
    * @param d relative position in plot view depending on axis
    */
-  private void drawCaptionAndGrid(final Graphics g, final boolean drawX,
-      final String caption, final double d) {
+  private void drawCaptionAndGrid(final Graphics g, final boolean drawX, final String caption,
+      final double d) {
     String cap = caption;
     // if label is too long, it is is chopped to the first characters
     if(cap.length() > MAXL) cap = cap.substring(0, CUTOFF) + "..";
@@ -714,8 +704,8 @@ public final class PlotView extends View {
    * @param imgW image width
    * @return buffered image
    */
-  private BufferedImage createCaptionImage(final Graphics g, final String caption,
-      final boolean im, final int imgW) {
+  private BufferedImage createCaptionImage(final Graphics g, final String caption, final boolean im,
+      final int imgW) {
 
     final int textH = g.getFontMetrics().getHeight();
     final int fs = fontSize;
@@ -740,8 +730,8 @@ public final class PlotView extends View {
    * @param d relative position of grid line
    * @param caption caption to draw. if cap = null, no caption is drawn
    */
-  private void drawIntermediateGridLine(final Graphics g, final boolean drawX,
-      final double d, final String caption) {
+  private void drawIntermediateGridLine(final Graphics g, final boolean drawX, final double d,
+      final String caption) {
     String cap = caption;
     final int pos = calcCoordinate(drawX, d);
     final int h = getHeight();

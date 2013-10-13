@@ -30,7 +30,7 @@ import org.basex.util.options.*;
 /**
  * Standard (built-in) functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class StandardFunc extends Arr {
@@ -50,16 +50,14 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     // compile all arguments
     super.compile(ctx, scp);
     return optimize(ctx, scp);
   }
 
   @Override
-  public final Expr optimize(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public final Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     // skip context-based or non-deterministic functions, and non-values
     return optPre(has(Flag.CTX) || has(Flag.NDT) || !allAreValues() ? opt(ctx) :
       sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);

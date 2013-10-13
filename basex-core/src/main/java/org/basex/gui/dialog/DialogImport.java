@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * Panel for importing new database resources.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public final class DialogImport extends BaseXBack {
@@ -61,9 +61,7 @@ public final class DialogImport extends BaseXBack {
    * @param panel feature panel
    * @param parse parsing dialog
    */
-  public DialogImport(final BaseXDialog dial, final BaseXBack panel,
-      final DialogParsing parse) {
-
+  public DialogImport(final BaseXDialog dial, final BaseXBack panel, final DialogParsing parse) {
     gui = dial.gui;
     parsing = parse;
 
@@ -104,8 +102,7 @@ public final class DialogImport extends BaseXBack {
     BaseXLayout.setWidth(filter, 200);
 
     addRaw = new BaseXCheckBox(ADD_RAW_FILES, opts.get(MainOptions.ADDRAW), dial);
-    skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES,
-        opts.get(MainOptions.SKIPCORRUPT), dial);
+    skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES, opts.get(MainOptions.SKIPCORRUPT), dial);
     archives = new BaseXCheckBox(PARSE_ARCHIVES, opts.get(MainOptions.ADDARCHIVES), dial);
 
     final BaseXBack p = new BaseXBack(new TableLayout(2, 2, 20, 0));

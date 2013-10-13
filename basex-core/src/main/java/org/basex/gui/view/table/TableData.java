@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * This is a container for the table data.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class TableData {
@@ -322,8 +322,8 @@ final class TableData {
       names.add(col.name);
       elems.add(col.elem);
     }
-    final String query = Find.findTable(filters, names, elems,
-        data.tagindex.key(root), gopts.get(GUIOptions.FILTERRT) || r);
+    final String query = Find.findTable(filters, names, elems, data.tagindex.key(root),
+        gopts.get(GUIOptions.FILTERRT) || r);
     if(query.equals(last)) return null;
     last = query;
     return query;

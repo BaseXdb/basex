@@ -22,7 +22,7 @@ import org.basex.util.*;
  * Abstract parse expression. All non-value expressions are derived from
  * this class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class ParseExpr extends Expr {
@@ -84,8 +84,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public final Item ebv(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public final Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     final Item it;
     if(type().zeroOrOne()) {
@@ -100,8 +99,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public final Item test(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public final Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     final Item it = ebv(ctx, info);
     return (it instanceof ANum ? it.dbl(info) == ctx.pos : it.bool(info)) ? it : null;
@@ -200,8 +198,7 @@ public abstract class ParseExpr extends Expr {
    * @return boolean
    * @throws QueryException query exception
    */
-  public final boolean checkBln(final Expr e, final QueryContext ctx)
-      throws QueryException {
+  public final boolean checkBln(final Expr e, final QueryContext ctx) throws QueryException {
 
     final Item it = checkNoEmpty(e.item(ctx, info), AtomType.BLN);
     final Type ip = it.type;
@@ -217,8 +214,7 @@ public abstract class ParseExpr extends Expr {
    * @return double
    * @throws QueryException query exception
    */
-  public final double checkDbl(final Expr e, final QueryContext ctx)
-      throws QueryException {
+  public final double checkDbl(final Expr e, final QueryContext ctx) throws QueryException {
 
     final Item it = checkNoEmpty(e.item(ctx, info), AtomType.DBL);
     if(it.type.isNumberOrUntyped()) return it.dbl(info);
@@ -258,8 +254,7 @@ public abstract class ParseExpr extends Expr {
    * @return boolean
    * @throws QueryException query exception
    */
-  public final ANode checkNode(final Expr e, final QueryContext ctx)
-      throws QueryException {
+  public final ANode checkNode(final Expr e, final QueryContext ctx) throws QueryException {
     return checkNode(checkItem(e, ctx));
   }
 
@@ -294,8 +289,7 @@ public abstract class ParseExpr extends Expr {
    * @return collator, or {@code null} (default collation)
    * @throws QueryException query exception
    */
-  public final Collation checkColl(final Expr e, final QueryContext ctx)
-      throws QueryException {
+  public final Collation checkColl(final Expr e, final QueryContext ctx) throws QueryException {
     return Collation.get(e == null ? null : checkStr(e, ctx), ctx, info, WHICHCOLL);
   }
 
@@ -307,8 +301,7 @@ public abstract class ParseExpr extends Expr {
    * @return string representation
    * @throws QueryException query exception
    */
-  public final byte[] checkStr(final Expr e, final QueryContext ctx)
-      throws QueryException {
+  public final byte[] checkStr(final Expr e, final QueryContext ctx) throws QueryException {
     return checkStr(checkItem(e, ctx));
   }
 
@@ -372,8 +365,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  public final Item checkItem(final Expr e, final QueryContext ctx)
-      throws QueryException {
+  public final Item checkItem(final Expr e, final QueryContext ctx) throws QueryException {
     return checkNoEmpty(e.item(ctx, info));
   }
 
@@ -384,8 +376,7 @@ public abstract class ParseExpr extends Expr {
    * @return binary item
    * @throws QueryException query exception
    */
-  public final Bin checkBinary(final Expr e, final QueryContext ctx)
-      throws QueryException {
+  public final Bin checkBinary(final Expr e, final QueryContext ctx) throws QueryException {
 
     final Item it = checkItem(e, ctx);
     if(it instanceof Bin) return (Bin) it;
@@ -412,8 +403,7 @@ public abstract class ParseExpr extends Expr {
    * @return specified item
    * @throws QueryException query exception
    */
-  public final QNm checkQNm(final Expr e, final QueryContext ctx)
-      throws QueryException {
+  public final QNm checkQNm(final Expr e, final QueryContext ctx) throws QueryException {
 
     final Item it = checkItem(e, ctx);
     if(it.type == AtomType.QNM) return (QNm) it;
@@ -429,8 +419,7 @@ public abstract class ParseExpr extends Expr {
    * @return function item
    * @throws QueryException query exception
    */
-  public FItem checkFunc(final Expr e, final QueryContext ctx)
-      throws QueryException {
+  public FItem checkFunc(final Expr e, final QueryContext ctx) throws QueryException {
     return (FItem) checkType(checkItem(e, ctx), FuncType.ANY_FUN);
   }
 
@@ -478,8 +467,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  public final byte[] checkEStr(final Expr e, final QueryContext ctx)
-      throws QueryException {
+  public final byte[] checkEStr(final Expr e, final QueryContext ctx) throws QueryException {
     return checkEStr(e.item(ctx, info));
   }
 
@@ -511,8 +499,7 @@ public abstract class ParseExpr extends Expr {
    * @return data reference
    * @throws QueryException query exception
    */
-  public final Data checkWrite(final Data data, final QueryContext ctx)
-      throws QueryException {
+  public final Data checkWrite(final Data data, final QueryContext ctx) throws QueryException {
 
     if(!ctx.context.perm(Perm.WRITE, data.meta)) BASX_PERM.thrw(info, Perm.WRITE);
     return data;

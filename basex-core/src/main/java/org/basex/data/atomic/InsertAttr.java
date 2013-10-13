@@ -5,7 +5,7 @@ import org.basex.data.*;
 /**
  * Atomic update operation that inserts an attribute into a database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 final class InsertAttr extends BasicUpdate {

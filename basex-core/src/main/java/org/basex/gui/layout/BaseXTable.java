@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Project specific CheckBox implementation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BaseXTable extends JTable {
@@ -107,9 +107,8 @@ public final class BaseXTable extends JTable {
    */
   final class CellRenderer extends DefaultTableCellRenderer {
     @Override
-    public Component getTableCellRendererComponent(final JTable tab,
-        final Object val, final boolean sel, final boolean foc,
-        final int row, final int col) {
+    public Component getTableCellRendererComponent(final JTable tab, final Object val,
+        final boolean sel, final boolean foc, final int row, final int col) {
 
       if(val instanceof Boolean) {
         final JCheckBox box = new JCheckBox();

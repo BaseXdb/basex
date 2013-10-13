@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  * for textual content in a compressed disk structure.
  * The table mapping is documented in {@link Data}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */
@@ -101,8 +101,8 @@ public final class DiskData extends Data {
    * @param n namespaces
    * @throws IOException I/O Exception
    */
-  public DiskData(final MetaData md, final Names nm, final Names at,
-      final PathSummary ps, final Namespaces n) throws IOException {
+  public DiskData(final MetaData md, final Names nm, final Names at, final PathSummary ps,
+      final Namespaces n) throws IOException {
 
     meta = md;
     tagindex = nm;

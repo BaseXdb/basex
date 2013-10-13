@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Evaluates the 'repo install' command.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class RepoInstall extends ARepo {

@@ -7,7 +7,7 @@ import javax.servlet.http.*;
 /**
  * This class bundles context-based information on a single HTTP operation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class SessionListener implements HttpSessionListener {

@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Aggregating functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNAggr extends StandardFunc {
@@ -81,8 +81,7 @@ public final class FNAggr extends StandardFunc {
    * @return summed up item
    * @throws QueryException query exception
    */
-  private Item sum(final Iter iter, final Item it, final boolean avg)
-      throws QueryException {
+  private Item sum(final Iter iter, final Item it, final boolean avg) throws QueryException {
 
     Item rs = it.type.isUntyped() ? Dbl.get(it.string(info), info) : it;
     final boolean n = rs instanceof ANum;

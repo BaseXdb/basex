@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * Manages a two-way-map of all available databases and backups. Used for locking.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Jens Erat
  */
 public final class Databases {

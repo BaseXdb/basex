@@ -6,7 +6,7 @@ import org.basex.test.qt3ts.QT3TestSet;
 /**
  * Tests for the unordered() function. (Note: many of these tests will only work if unordered() is implemented as a no-op. The tests are therefore incorrect. I'm leaving them as such until someone cares to challenge the results - Michael Kay 2011-06-30 .
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 @SuppressWarnings("all")

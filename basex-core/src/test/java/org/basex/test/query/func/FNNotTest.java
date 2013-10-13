@@ -5,7 +5,7 @@ import org.basex.test.query.*;
 /**
  * XQuery functions tests.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNNotTest extends QueryTest {
@@ -133,10 +133,8 @@ public final class FNNotTest extends QueryTest {
       { "not  7", bool(false), "not((<X>b</X>,<X>a</X>) <= <X>a</X>)" },
       { "not  8", bool(false), "not((<X>b</X>,<X>a</X>) >= <X>a</X>)" },
       { "not  9", bool(true), "not(not(<X/>))" },
-      { "not 10", bool(false, true),
-        "for $b in (true(),false()) return not($b)" },
-      { "not 11", bool(true, false),
-        "for $b in (true(),false()) return not(not($b))" },
+      { "not 10", bool(false, true), "for $b in (true(),false()) return not($b)" },
+      { "not 11", bool(true, false), "for $b in (true(),false()) return not(not($b))" },
     };
   }
 }

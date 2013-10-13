@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Formatter for decimal numbers.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DecFormatter extends FormatUtil {

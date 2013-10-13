@@ -18,7 +18,7 @@ import org.basex.util.options.*;
 /**
  * This class offers a text field for keyword and XQuery input.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Andreas Weiler
  */
@@ -242,8 +242,7 @@ public final class GUIInput extends BaseXTextField {
     ComboPopup(final JComboBox combo) {
       super(combo);
       final int h = combo.getMaximumRowCount();
-      setPreferredSize(new Dimension(getPreferredSize().width,
-          getPopupHeightForRowCount(h) + 2));
+      setPreferredSize(new Dimension(getPreferredSize().width, getPopupHeightForRowCount(h) + 2));
     }
   }
 }

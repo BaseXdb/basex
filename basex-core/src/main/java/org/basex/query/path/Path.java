@@ -24,7 +24,7 @@ import org.basex.util.*;
 /**
  * Path expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Path extends ParseExpr {
@@ -79,8 +79,7 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     if(root != null) setRoot(ctx, root.compile(ctx, scp));
 
     final Value v = ctx.value;

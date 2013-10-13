@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  * tolerant alternative to Java's internal SAX parser, which is used by the
  * {@link SAXWrapper} class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class XMLParser extends SingleParser {
@@ -54,8 +54,7 @@ public class XMLParser extends SingleParser {
    * @param frag allow parsing of document fragment
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO source, final MainOptions opts, final boolean frag)
-      throws IOException {
+  public XMLParser(final IO source, final MainOptions opts, final boolean frag) throws IOException {
     super(source, opts);
     scanner = new XMLScanner(source, opts, frag);
     stripNS = opts.get(MainOptions.STRIPNS);

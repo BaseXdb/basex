@@ -23,7 +23,7 @@ import org.basex.util.*;
 /**
  * REST-based evaluation of POST operations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class RESTPost extends RESTCode {

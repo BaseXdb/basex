@@ -11,7 +11,7 @@ import org.junit.*;
 /**
  * Tests for {@link IndexCache}.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
  */
 public final class IndexCacheTest {

@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * Abstract class for user commands.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 abstract class AUser extends Command {
@@ -97,8 +97,7 @@ abstract class AUser extends Command {
   private String[] users(final String name) {
     final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) :
       name.replaceAll("([" + Databases.REGEXCHARS + "])", "\\\\$1");
-    return context.users.find(Pattern.compile(pat,
-        Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE));
+    return context.users.find(Pattern.compile(pat, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE));
   }
 
   @Override

@@ -10,7 +10,7 @@ import java.util.jar.*;
  * does not offer a fine and easy way to delete open jars:
  * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5041014
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Rositsa Shadura
  */

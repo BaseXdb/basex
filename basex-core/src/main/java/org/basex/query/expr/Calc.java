@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Calculation.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public enum Calc {
@@ -234,8 +234,7 @@ public enum Calc {
    * @return result type
    * @throws QueryException query exception
    */
-  public abstract Item ev(final InputInfo ii, final Item a, final Item b)
-    throws QueryException;
+  public abstract Item ev(final InputInfo ii, final Item a, final Item b) throws QueryException;
 
   /**
    * Returns the numeric type with the highest precedence.
@@ -295,9 +294,7 @@ public enum Calc {
    * @param b second item
    * @throws QueryException query exception
    */
-  final void checkNum(final InputInfo ii, final Item a, final Item b)
-      throws QueryException {
-
+  final void checkNum(final InputInfo ii, final Item a, final Item b) throws QueryException {
     if(!a.type.isNumberOrUntyped()) errNum(ii, a);
     if(!b.type.isNumberOrUntyped()) errNum(ii, b);
   }

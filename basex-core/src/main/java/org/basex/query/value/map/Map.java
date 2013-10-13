@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * The map item.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class Map extends FItem {
@@ -169,8 +169,7 @@ public final class Map extends FItem {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map insert(final Item k, final Value v, final InputInfo ii)
-      throws QueryException {
+  public Map insert(final Item k, final Value v, final InputInfo ii) throws QueryException {
 
     final Item key = key(k, ii);
     if(key == null) return this;

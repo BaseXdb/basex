@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * Functions for converting HTML to XML.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNHtml extends StandardFunc {

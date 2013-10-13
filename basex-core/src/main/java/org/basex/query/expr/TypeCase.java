@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * Case expression for typeswitch.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class TypeCase extends Single {
@@ -41,8 +41,7 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public TypeCase compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public TypeCase compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     return compile(ctx, scp, null);
   }
 

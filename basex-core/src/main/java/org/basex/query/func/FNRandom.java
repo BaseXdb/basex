@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Random functions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Dirk Kirsten
  */
 public final class FNRandom extends StandardFunc {

@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  * Package validator. This class executes some essential checks before the
  * installation of a package.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
 public final class PkgValidator {
@@ -188,8 +188,7 @@ public final class PkgValidator {
    * @return result
    * @throws QueryException query exception
    */
-  private boolean isInstalled(final Component comp, final byte[] name)
-      throws QueryException {
+  private boolean isInstalled(final Component comp, final byte[] name) throws QueryException {
 
     // get packages in which the module's namespace is found
     final TokenSet pkgs = repo.nsDict().get(comp.uri);

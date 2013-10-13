@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * This class contains all query error messages.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public enum Err {
@@ -73,6 +73,8 @@ public enum Err {
   BXCS_SERIAL(BXCS, 2, "CSV serializer: %."),
   /** BXCS0003. */
   BXCS_CONFSEP(BXCS, 3, "CSV separator must be single character; \"%\" found."),
+  /** BXCS0003. */
+  BXCS_CONFIG(BXJS, 3, "CSV configuration: %."),
 
   // Database module
 
@@ -134,7 +136,7 @@ public enum Err {
   /** BXJS0002. */
   BXJS_SERIAL(BXJS, 2, "JSON serializer: %."),
   /** BXJS0003. */
-  BXJS_CONFIG(BXJS, 3, "JSON parser configuration: %."),
+  BXJS_CONFIG(BXJS, 3, "JSON configuration: %."),
   /** BXJS0003. */
   BXJS_CONFOPT(BXJS, 3, "JSON option \"%\" is unknown."),
 
@@ -1137,8 +1139,7 @@ public enum Err {
    * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public QueryException thrw(final InputInfo ii, final Object... ext)
-      throws QueryException {
+  public QueryException thrw(final InputInfo ii, final Object... ext) throws QueryException {
     throw new QueryException(ii, this, ext);
   }
 
@@ -1154,7 +1155,7 @@ public enum Err {
 
   /**
    * Error types.
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Leo Woerteler
    */
   public enum ErrType {
@@ -1337,8 +1338,7 @@ public enum Err {
    * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static QueryException number(final ParseExpr e, final Item it)
-      throws QueryException {
+  public static QueryException number(final ParseExpr e, final Item it) throws QueryException {
     throw NONUMBER.thrw(e.info, e.description(), it.type);
   }
 

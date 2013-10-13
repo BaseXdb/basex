@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * This class assembles utility methods for painting rectangle contents.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
@@ -36,8 +36,7 @@ final class MapRenderer {
    * @param fs font size
    * @return last height that was occupied
    */
-  static int calcHeight(final Graphics g, final MapRect r, final byte[] s,
-      final int fs) {
+  static int calcHeight(final Graphics g, final MapRect r, final byte[] s, final int fs) {
     return drawText(g, r, s, false, fs);
   }
 
@@ -49,8 +48,7 @@ final class MapRenderer {
    * @param s text to be drawn
    * @param fs font size
    */
-  static void drawText(final Graphics g, final MapRect r, final byte[] s,
-      final int fs) {
+  static void drawText(final Graphics g, final MapRect r, final byte[] s, final int fs) {
     drawText(g, r, s, true, fs);
   }
 
@@ -63,8 +61,8 @@ final class MapRenderer {
    * @param fs font size
    * @return height of the text
    */
-  private static int drawText(final Graphics g, final MapRect r,
-      final byte[] s, final boolean draw, final int fs) {
+  private static int drawText(final Graphics g, final MapRect r, final byte[] s, final boolean draw,
+      final int fs) {
 
     // limit string to given space
     final int[] cw = fontWidths(g.getFont());
@@ -144,9 +142,7 @@ final class MapRenderer {
    * @param s text to be drawn
    * @param fs font size
    */
-  static void drawThumbnails(final Graphics g, final MapRect r, final byte[] s,
-      final int fs) {
-
+  static void drawThumbnails(final Graphics g, final MapRect r, final byte[] s, final int fs) {
     // thumbnail width
     final double ffmax = 0.25;
     final double ffmin = 0.14;
@@ -404,8 +400,8 @@ final class MapRenderer {
    * @param draw boolean for drawing (used for calculating the height)
    * @return heights
    */
-  private static int drawToken(final Graphics g, final MapRect r,
-      final int[][] data, final boolean draw) {
+  private static int drawToken(final Graphics g, final MapRect r, final int[][] data,
+      final boolean draw) {
 
     final double xx = r.x;
     final double ww = r.w;
@@ -481,8 +477,8 @@ final class MapRenderer {
    * @param yy int y-value of the cursor
    * @return boolean
    */
-  private static boolean inRect(final double rx, final int ry,
-      final double rw, final int rh, final int xx, final int yy) {
+  private static boolean inRect(final double rx, final int ry, final double rw, final int rh,
+      final int xx, final int yy) {
     return xx >= rx && xx <= rx + rw && yy >= ry && yy <= ry + rh;
   }
 
@@ -496,8 +492,8 @@ final class MapRenderer {
    * @param g Graphics
    * @return token list
    */
-  static TokenList calculateToolTip(final MapRect r, final int[][] data,
-      final int x, final int y, final int w, final Graphics g) {
+  static TokenList calculateToolTip(final MapRect r, final int[][] data, final int x, final int y,
+      final int w, final Graphics g) {
 
     // rectangle is empty - don't need a tooltip
     if(r.thumbf == 0) return null;
@@ -691,8 +687,8 @@ final class MapRenderer {
    * @param tl token list
    * @param fs font size
    */
-  static void drawToolTip(final Graphics g, final int x, final int y,
-      final MapRect mr, final TokenList tl, final int fs) {
+  static void drawToolTip(final Graphics g, final int x, final int y, final MapRect mr,
+      final TokenList tl, final int fs) {
 
     if(tl == null || tl.isEmpty()) return;
     final int[] cw = fontWidths(g.getFont());

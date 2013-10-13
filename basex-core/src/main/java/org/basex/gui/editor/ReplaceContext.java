@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * This class summarizes the result of a replacement.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class ReplaceContext {
@@ -36,9 +36,7 @@ final class ReplaceContext {
    * @param end end offset
    * @return resulting end marker
    */
-  int[] replace(final SearchContext sc, final byte[] txt, final int start,
-      final int end) {
-
+  int[] replace(final SearchContext sc, final byte[] txt, final int start, final int end) {
     final int os = txt.length;
     search = sc;
     if(sc.search.isEmpty()) {

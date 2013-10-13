@@ -11,7 +11,7 @@ import org.basex.server.*;
 /**
  * REST-based evaluation of DELETE operations.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class RESTDelete extends RESTCode {

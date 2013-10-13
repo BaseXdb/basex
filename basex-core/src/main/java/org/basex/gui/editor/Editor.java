@@ -24,7 +24,7 @@ import org.basex.util.*;
  * This class provides a text viewer and editor, using the
  * {@link Renderer} class to render the text.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class Editor extends BaseXPanel {

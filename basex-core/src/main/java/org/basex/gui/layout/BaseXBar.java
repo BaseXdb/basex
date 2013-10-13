@@ -11,7 +11,7 @@ import org.basex.util.*;
  * This is a scrollbar implementation, supporting arbitrary
  * panel heights without increasing the memory consumption.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BaseXBar extends BaseXPanel {
@@ -151,10 +151,9 @@ public final class BaseXBar extends BaseXPanel {
     smooth(g);
 
     // draw scroll buttons
-    drawButton(g, new int[][] { { 0, 6, 3 }, { 6, 6, 0 } },
-        0, button && up);
-    drawButton(g, new int[][] { { 0, 6, 3 }, { 0, 0, 6 } },
-        Math.max(SIZE, hh - ww), button && down);
+    drawButton(g, new int[][] { { 0, 6, 3 }, { 6, 6, 0 } }, 0, button && up);
+    drawButton(g, new int[][] { { 0, 6, 3 }, { 0, 0, 6 } }, Math.max(SIZE, hh - ww),
+        button && down);
 
     // paint scrollbar lines
     g.setColor(GUIConstants.GRAY);
@@ -169,8 +168,7 @@ public final class BaseXBar extends BaseXPanel {
    * @param y vertical start value
    * @param focus focus flag
    */
-  private void drawButton(final Graphics g, final int[][] pol, final int y,
-      final boolean focus) {
+  private void drawButton(final Graphics g, final int[][] pol, final int y, final boolean focus) {
     BaseXLayout.drawCell(g, 0, ww, y, y + ww, focus);
     for(int i = 0; i < pol[0].length; ++i) {
       pol[0][i] += SIZE / 2 - 3;
@@ -199,8 +197,7 @@ public final class BaseXBar extends BaseXPanel {
         // scroll up/down/move slider
         animated = moving;
         while(animated) {
-          if(moving) step = Math.max(0, Math.min(STEPS.length - 1,
-              step + (down ? 1 : -1)));
+          if(moving) step = Math.max(0, Math.min(STEPS.length - 1, step + (down ? 1 : -1)));
           else step += step < STEPS.length / 2 ? 1 : -1;
           int offset = STEPS[step];
 

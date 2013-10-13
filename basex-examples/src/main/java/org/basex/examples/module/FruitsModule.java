@@ -8,7 +8,7 @@ import org.basex.util.*;
  * This is a simple demo module called by {link {@link FruitsExample}.
  * It is derived from the {@link QueryModule} class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  */
 public class FruitsModule extends QueryModule {
   /** Fruits array. */

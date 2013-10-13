@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Abstract filter expression.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class Filter extends Preds {
@@ -49,8 +49,7 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final Expr compile(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public final Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     // invalidate current context value (will be overwritten by filter)
     final Value cv = ctx.value;
     try {
@@ -131,8 +130,7 @@ public abstract class Filter extends Preds {
       throws QueryException;
 
   @Override
-  public final Expr optimize(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public final Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     // invalidate current context value (will be overwritten by filter)
     final Value cv = ctx.value;
     try {

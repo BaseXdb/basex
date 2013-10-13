@@ -14,7 +14,7 @@ import org.junit.*;
 /**
  * This class contains RESTXQ API tests.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class RestXqTest extends HTTPTest {
@@ -449,8 +449,7 @@ public final class RestXqTest extends HTTPTest {
    * @param query request
    * @throws IOException I/O exception
    */
-  private static void headE(final String function, final String query)
-      throws IOException {
+  private static void headE(final String function, final String query) throws IOException {
 
     install(function);
     try {

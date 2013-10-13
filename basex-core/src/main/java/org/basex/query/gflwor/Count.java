@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * GFLWOR {@code count} clause.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class Count extends GFLWOR.Clause {
@@ -77,8 +77,7 @@ public final class Count extends GFLWOR.Clause {
   }
 
   @Override
-  public Count optimize(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public Count optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     return this;
   }
 

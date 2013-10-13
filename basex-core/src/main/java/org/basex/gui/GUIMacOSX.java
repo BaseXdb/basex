@@ -9,7 +9,7 @@ import org.basex.gui.layout.*;
 /**
  * Sets some Mac OS X specific interface options.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Bastian Lemke
  */
 public final class GUIMacOSX {
@@ -99,8 +99,8 @@ public final class GUIMacOSX {
    */
   class AppInvocationHandler implements InvocationHandler {
     @Override
-    public Object invoke(final Object proxy, final Method method,
-        final Object[] args) throws Throwable {
+    public Object invoke(final Object proxy, final Method method, final Object[] args)
+        throws Throwable {
       final Object obj = args[0];
       /*
        * Get the name of the method and call the method of this object that has

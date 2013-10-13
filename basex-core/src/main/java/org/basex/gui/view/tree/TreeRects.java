@@ -9,7 +9,7 @@ import org.basex.gui.view.*;
 /**
  * This class stores the rectangles.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Wolfgang Miller
  */
 final class TreeRects implements TreeConstants {
@@ -37,8 +37,8 @@ final class TreeRects implements TreeConstants {
    * @param slim slim to text
    * @return tree distance
    */
-  double generateRects(final TreeSubtree sub, final Graphics g, final int ds,
-      final int dw, final boolean slim) {
+  double generateRects(final TreeSubtree sub, final Graphics g, final int ds, final int dw,
+      final boolean slim) {
 
     final int[] roots = nodes.pres;
     final int rl = roots.length;
@@ -61,8 +61,8 @@ final class TreeRects implements TreeConstants {
    * @param dw draw width
    * @param slim slim to text
    */
-  private void generateRects(final TreeSubtree sub, final Graphics g, final int rn,
-      final int ds, final double dw, final boolean slim) {
+  private void generateRects(final TreeSubtree sub, final Graphics g, final int rn, final int ds,
+      final double dw, final boolean slim) {
 
     final int h = sub.subtreeHeight(rn);
     rects[rn] = new TreeRect[h][];
@@ -84,8 +84,7 @@ final class TreeRects implements TreeConstants {
    * @param ds draw start
    * @param w the width
    */
-  private void bigRectangle(final int rn, final int lv, final int ds,
-      final double w) {
+  private void bigRectangle(final int rn, final int lv, final int ds, final double w) {
     rects[rn][lv] = new TreeRect[1];
     rects[rn][lv][0] = new TreeRect((int) (w * rn) + BORDER_PADDING + ds,
         (int) w - BORDER_PADDING);
@@ -189,8 +188,7 @@ final class TreeRects implements TreeConstants {
    * @param x x position
    * @return pre value
    */
-  int getPrePerXPos(final TreeSubtree sub, final int rn, final int lv,
-      final int x) {
+  int getPrePerXPos(final TreeSubtree sub, final int rn, final int lv, final int x) {
     final TreeRect r = getTreeRectsPerLevel(rn, lv)[0];
     final double ratio = (x - r.x) / (double) r.w;
     final int idx = (int) (ratio * sub.levelSize(rn, lv));
@@ -205,9 +203,7 @@ final class TreeRects implements TreeConstants {
    * @param pre the pre value to be found
    * @return the rectangle containing the given pre value, {@code null} else
    */
-  TreeRect searchRect(final TreeSubtree sub, final int rn, final int lv,
-      final int pre) {
-
+  TreeRect searchRect(final TreeSubtree sub, final int rn, final int lv, final int pre) {
     final int i = sub.searchPreArrayPos(rn, lv, pre);
     return i < 0 ? null : bigRect(sub, rn, lv) ? rects[rn][lv][0] : rects[rn][lv][i];
   }

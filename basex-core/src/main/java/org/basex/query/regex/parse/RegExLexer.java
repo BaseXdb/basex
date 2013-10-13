@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * A simple lexer for XML Schema regular expressions.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public class RegExLexer implements TokenManager, RegExParserConstants {

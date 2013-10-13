@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  * This class provides access to attribute values and text contents stored on
  * disk. The data structure is described in the {@link ValueIndexBuilder} class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public class DiskValues implements Index {
@@ -60,8 +60,7 @@ public class DiskValues implements Index {
    * @param pref file prefix
    * @throws IOException I/O Exception
    */
-  protected DiskValues(final Data d, final boolean txt, final String pref)
-      throws IOException {
+  protected DiskValues(final Data d, final boolean txt, final String pref) throws IOException {
     data = d;
     text = txt;
     idxl = new DataAccess(d.meta.dbfile(pref + 'l'));

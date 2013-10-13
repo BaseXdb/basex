@@ -3,7 +3,7 @@ package org.basex.gui.view.map;
 /**
  * Squarified layout algorithm.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Joerg Hauser
  */
 final class SquarifiedAlgo extends MapAlgo {
@@ -44,8 +44,7 @@ final class SquarifiedAlgo extends MapAlgo {
             (int) (ml.weight[i] / weight * ww);
           w = w > 0 ? w : 1;
           if(x + w <= xx + ww)
-            tmp.add(new MapRect((int) x, (int) yy, w, height, ml.get(i),
-                r.level));
+            tmp.add(new MapRect((int) x, (int) yy, w, height, ml.get(i), r.level));
           else break;
           x += w;
         }
@@ -66,8 +65,7 @@ final class SquarifiedAlgo extends MapAlgo {
           weight = 0;
           // sometimes there has to be one rectangles to fill the left space
           if(ne == ni) {
-            row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-                ml.get(ni), r.level));
+            row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh, ml.get(ni), r.level));
             break;
           }
         } else {
@@ -87,8 +85,7 @@ final class SquarifiedAlgo extends MapAlgo {
             (int) (ml.weight[i] / weight * hh);
           h = h > 0 ? h : 1;
           if(y + h <= yy + hh)
-            tmp.add(new MapRect((int) xx, (int) y, width, h, ml.get(i),
-                r.level));
+            tmp.add(new MapRect((int) xx, (int) y, width, h, ml.get(i), r.level));
           else break;
           y += h;
         }
@@ -109,8 +106,7 @@ final class SquarifiedAlgo extends MapAlgo {
           weight = 0;
           // sometimes there has to be one rectangles to fill the left space
           if(ne == ni) {
-            row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
-                ml.get(ni), r.level));
+            row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh, ml.get(ni), r.level));
             break;
           }
         } else {

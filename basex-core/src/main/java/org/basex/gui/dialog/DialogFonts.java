@@ -10,7 +10,7 @@ import org.basex.gui.layout.*;
 /**
  * Dialog window for changing the used fonts.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class DialogFonts extends BaseXDialog {

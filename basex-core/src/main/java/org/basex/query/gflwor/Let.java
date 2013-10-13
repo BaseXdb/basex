@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * FLWOR {@code let} clause, binding an expression to a variable.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
 public final class Let extends GFLWOR.Clause {
@@ -196,8 +196,7 @@ public final class Let extends GFLWOR.Clause {
    * @return inlineable expression
    * @throws QueryException query exception
    */
-  public Expr inlineExpr(final QueryContext ctx, final VarScope scp)
-      throws QueryException {
+  public Expr inlineExpr(final QueryContext ctx, final VarScope scp) throws QueryException {
     return score ? Function._FT_SCORE.get(expr).optimize(ctx, scp)
                  : var.checked(expr, ctx, scp, info);
   }

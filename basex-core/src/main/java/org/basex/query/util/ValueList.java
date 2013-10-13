@@ -9,7 +9,7 @@ import org.basex.util.list.*;
 /**
  * This is a simple container for values.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class ValueList extends ElementList {

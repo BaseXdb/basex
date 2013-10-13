@@ -6,7 +6,7 @@ import org.basex.gui.view.*;
 /**
  * View rectangle.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 final class MapRect extends ViewRect implements Comparable<MapRect> {
@@ -46,8 +46,7 @@ final class MapRect extends ViewRect implements Comparable<MapRect> {
    * @param p rectangle pre value
    * @param l level
    */
-  MapRect(final int xx, final int yy, final int ww, final int hh,
-      final int p, final int l) {
+  MapRect(final int xx, final int yy, final int ww, final int hh, final int p, final int l) {
     this(xx, yy, ww, hh);
     pre = p;
     level = l;

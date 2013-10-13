@@ -11,7 +11,7 @@ import org.junit.*;
 /**
  * Tests the command-line arguments of the starter class.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXTest extends MainTest {

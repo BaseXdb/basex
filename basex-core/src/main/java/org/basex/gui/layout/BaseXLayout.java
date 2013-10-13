@@ -24,7 +24,7 @@ import org.basex.util.*;
  * This class provides static layout and paint helper methods which are used all over
  * the GUI.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class BaseXLayout {
@@ -92,8 +92,7 @@ public final class BaseXLayout {
    * @param dnd drag and drop handler
    */
   public static void addDrop(final JComponent comp, final DropHandler dnd) {
-    comp.setDropTarget(new DropTarget(comp,
-        DnDConstants.ACTION_COPY_OR_MOVE, null, true, null) {
+    comp.setDropTarget(new DropTarget(comp, DnDConstants.ACTION_COPY_OR_MOVE, null, true, null) {
       @Override
       public synchronized void drop(final DropTargetDropEvent dtde) {
         dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
@@ -148,7 +147,7 @@ public final class BaseXLayout {
 
   /**
    * Drag and drop handler.
-   * @author BaseX Team 2005-12, BSD License
+   * @author BaseX Team 2005-13, BSD License
    * @author Christian Gruen
    */
   public interface DropHandler {
@@ -385,8 +384,7 @@ public final class BaseXLayout {
    * @param w panel width
    * @param y vertical position
    */
-  public static void drawCenter(final Graphics g, final String text,
-      final int w, final int y) {
+  public static void drawCenter(final Graphics g, final String text, final int w, final int y) {
     g.drawString(text, (w - width(g, text)) / 2, y);
   }
 
@@ -399,8 +397,8 @@ public final class BaseXLayout {
    * @param w width
    * @param c color color depth
    */
-  public static void drawTooltip(final Graphics g, final String tt,
-      final int x, final int y, final int w, final int c) {
+  public static void drawTooltip(final Graphics g, final String tt, final int x, final int y,
+      final int w, final int c) {
     final int tw = width(g, tt);
     final int th = g.getFontMetrics().getHeight();
     final int xx = Math.min(w - tw - 8, x);
@@ -430,8 +428,8 @@ public final class BaseXLayout {
    * @param w width
    * @param fs font size
    */
-  public static void chopString(final Graphics g, final byte[] s,
-      final int x, final int y, final int w, final int fs) {
+  public static void chopString(final Graphics g, final byte[] s, final int x, final int y,
+      final int w, final int fs) {
 
     if(w < 12) return;
     final int[] cw = fontWidths(g.getFont());

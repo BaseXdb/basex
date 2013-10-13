@@ -11,7 +11,7 @@ import org.basex.util.options.*;
  * This class defines options which are used all around the project.
  * They are also stored in the project's home directory.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class GlobalOptions extends Options {

@@ -16,7 +16,7 @@ import org.junit.*;
 /**
  * This class tests the functions of the Database Module in a client/server environment.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
 public final class FNDbServerTest extends AdvancedQueryTest {
@@ -108,9 +108,7 @@ public final class FNDbServerTest extends AdvancedQueryTest {
    * @throws IOException I/O exception
    * @throws InterruptedException interrupted exception
    */
-  private void runTwoClients(final Command cmd)
-      throws IOException, InterruptedException {
-
+  private void runTwoClients(final Command cmd) throws IOException, InterruptedException {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
     final Client[] clients = new Client[NUM];

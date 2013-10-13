@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * This view provides standard GUI components to browse the currently opened database.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Bastian Lemke
  */
@@ -149,8 +149,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param pos position
    * @param itr integer flag
    */
-  private void addSlider(final double min, final double max, final int pos,
-      final boolean itr) {
+  private void addSlider(final double min, final double max, final int pos, final boolean itr) {
     final BaseXDSlider sl = new BaseXDSlider(min, max, gui, this);
     BaseXLayout.setWidth(sl, COMPW + BaseXDSlider.LABELW);
     sl.itr = itr;

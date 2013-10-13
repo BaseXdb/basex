@@ -376,8 +376,7 @@ public final class WebDAVService<T> {
    * @return new folder resource
    * @throws IOException I/O exception
    */
-  public T createFolder(final String db, final String p, final String n)
-      throws IOException {
+  public T createFolder(final String db, final String p, final String n) throws IOException {
 
     deleteDummy(db, p);
     final String newFolder = p + SEP + n;
@@ -480,8 +479,7 @@ public final class WebDAVService<T> {
    * @return object representing the newly added XML
    * @throws IOException I/O exception
    */
-  private T addXML(final String db, final String p, final InputStream in)
-      throws IOException {
+  private T addXML(final String db, final String p, final InputStream in) throws IOException {
 
     final Session session = http.session();
     session.execute(new Set(MainOptions.CHOP, false));
@@ -498,8 +496,7 @@ public final class WebDAVService<T> {
    * @return object representing the newly added file
    * @throws IOException I/O exception
    */
-  private T store(final String db, final String p, final InputStream in)
-      throws IOException {
+  private T store(final String db, final String p, final InputStream in) throws IOException {
 
     http.session().store(p, in);
     return factory.file(this, metaData(db, p));
@@ -513,8 +510,7 @@ public final class WebDAVService<T> {
    * @return object representing the newly added file
    * @throws IOException I/O exception
    */
-  private T addFile(final String db, final String p, final InputStream in)
-      throws IOException {
+  private T addFile(final String db, final String p, final InputStream in) throws IOException {
 
     // use 4MB as buffer input
     final BufferInput bi = new BufferInput(in, 1 << 22);

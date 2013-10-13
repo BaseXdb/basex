@@ -3,7 +3,7 @@ package org.basex.gui.view.map;
 /**
  * SplitLayout algorithm.
  *
- * @author BaseX Team 2005-12, BSD License
+ * @author BaseX Team 2005-13, BSD License
  * @author Joerg Hauser
  */
 final class SplitAlgo extends MapAlgo {
@@ -22,8 +22,8 @@ final class SplitAlgo extends MapAlgo {
    * @param sw weight of this recursion level
    * @return rectangles
    */
-  private static MapRects calcMap(final MapRect r, final MapList ml,
-      final int ns, final int ne, final double sw) {
+  private static MapRects calcMap(final MapRect r, final MapList ml, final int ns, final int ne,
+      final double sw) {
 
     if(ne - ns == 0) {
       final MapRects rects = new MapRects();
@@ -58,8 +58,7 @@ final class SplitAlgo extends MapAlgo {
     }
 
     if(ww > 0 && hh > 0 && sw - w > 0 && ni + 1 <= ne)
-      rects.add(calcMap(new MapRect(xx, yy, ww, hh, 0, r.level),
-      ml, ni + 1, ne, sw - w));
+      rects.add(calcMap(new MapRect(xx, yy, ww, hh, 0, r.level), ml, ni + 1, ne, sw - w));
 
     return rects;
   }
