@@ -197,7 +197,7 @@ public final class InfoView extends View implements LinkListener {
           line.startsWith(PRINTED_CC) || line.startsWith(READ_LOCKING_CC) ||
           line.startsWith(WRITE_LOCKING_CC)) {
         result.add(LI + line);
-      } else if(line.startsWith(ERROR_C)) {
+      } else if(line.startsWith(ERROR + COL)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) {
           final Pattern p = Pattern.compile(STOPPED_AT + "(.*)" + COL);
           final Matcher m = p.matcher(split[i]);
@@ -208,7 +208,7 @@ public final class InfoView extends View implements LinkListener {
           }
           err.add(split[i]);
         }
-      } else if(line.startsWith(STACK_TRACE_C)) {
+      } else if(line.startsWith(STACK_TRACE + COL)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) {
           final TokenBuilder tb = new TokenBuilder();
           final String sp = split[i].replaceAll("<.*", "");
@@ -241,15 +241,15 @@ public final class InfoView extends View implements LinkListener {
     }
 
     add(COMMAND + COL, command);
-    add(ERROR_C, err);
-    add(STACK_TRACE_C, stack);
-    add(EVALUATING + COLS, eval);
-    add(COMPILING + COLS, comp);
-    add(QUERY + COLS, origqu);
-    add(OPTIMIZED_QUERY + COLS, optqu);
-    add(RESULT + COLS, result);
-    add(TIMING + COLS, timings);
-    add(QUERY_PLAN + COLS, plan);
+    add(ERROR + COL, err);
+    add(STACK_TRACE + COL, stack);
+    add(EVALUATING + COL, eval);
+    add(COMPILING + COL, comp);
+    add(QUERY + COL, origqu);
+    add(OPTIMIZED_QUERY + COL, optqu);
+    add(RESULT + COL, result);
+    add(TIMING + COL, timings);
+    add(QUERY_PLAN + COL, plan);
     if(inf != null) text.add(inf).nline();
     changed = true;
     clear = reset;

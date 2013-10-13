@@ -147,6 +147,8 @@ public final class FNClient extends StandardFunc {
         vb.add(cq.type().castString(result, ctx, info));
       }
       return vb.value();
+    } catch(final QueryIOException ex) {
+      throw ex.getCause(info);
     } catch(final BaseXException ex) {
       final Matcher m = QUERYPAT.matcher(ex.getMessage());
       if(m.find()) {

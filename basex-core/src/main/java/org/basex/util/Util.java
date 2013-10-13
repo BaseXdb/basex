@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import static org.basex.core.Text.*;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;

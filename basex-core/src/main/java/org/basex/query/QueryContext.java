@@ -630,10 +630,14 @@ public final class QueryContext extends Proc {
       return val instanceof Expr ? (Expr) val : JavaMapping.toValue(val, this);
 
     // convert to json
-    if(type.equalsIgnoreCase(M_JSON)) {
-      final JsonOptions jp = new JsonOptions();
-      jp.set(JsonOptions.SPEC, JsonSpec.ECMA_262.toString());
-      return new JsonMapConverter(jp, null).convert(val.toString());
+    try {
+      if(type.equalsIgnoreCase(M_JSON)) {
+        final JsonOptions jp = new JsonOptions();
+        jp.set(JsonOptions.SPEC, JsonSpec.ECMA_262.toString());
+        return new JsonMapConverter(jp).convert(val.toString());
+      }
+    } catch(final QueryIOException ex) {
+      throw ex.getCause();
     }
 
     // convert to the specified type

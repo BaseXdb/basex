@@ -4,7 +4,6 @@ import org.basex.build.*;
 import org.basex.build.JsonOptions.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Interface for converters from JSON to XQuery values.
@@ -15,16 +14,12 @@ import org.basex.util.*;
 public abstract class JsonConverter {
   /** JSON options. */
   protected final JsonOptions jopts;
-  /** Input info. */
-  protected final InputInfo info;
 
   /**
    * Constructor.
    * @param opts json options
-   * @param ii input info
    */
-  protected JsonConverter(final JsonOptions opts, final InputInfo ii) {
-    info = ii;
+  protected JsonConverter(final JsonOptions opts) {
     jopts = opts;
   }
 
@@ -32,24 +27,21 @@ public abstract class JsonConverter {
    * Converts the given JSON string into an XQuery value.
    * @param in the JSON string
    * @return the result
-   * @throws QueryException parse exception
+   * @throws QueryIOException query I/O exception
    */
-  public abstract Item convert(final String in) throws QueryException;
+  public abstract Item convert(final String in) throws QueryIOException;
 
   /**
    * Returns a {@link JsonConverter} for the given configuration.
    * @param jopts json options
-   * @param ii input info
    * @return a JSON converter
    * @throws QueryIOException query I/O exception
    */
-  public static JsonConverter get(final JsonOptions jopts, final InputInfo ii)
-      throws QueryIOException {
-
+  public static JsonConverter get(final JsonOptions jopts) throws QueryIOException {
     final JsonFormat format = jopts.format();
-    if(format == JsonFormat.JSONML) return new JsonMLConverter(jopts, ii);
-    if(format == JsonFormat.PLAIN)  return new JsonPlainConverter(jopts, ii);
-    if(format == JsonFormat.MAP)    return new JsonMapConverter(jopts, ii);
-    return new JsonDefaultConverter(jopts, ii);
+    if(format == JsonFormat.JSONML)     return new JsonMLConverter(jopts);
+    if(format == JsonFormat.ATTRIBUTES) return new JsonAttsConverter(jopts);
+    if(format == JsonFormat.MAP)        return new JsonMapConverter(jopts);
+    return new JsonDirectConverter(jopts);
   }
 }

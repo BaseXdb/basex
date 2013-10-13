@@ -32,4 +32,22 @@ public final class BaseXCombo extends JComboBox {
       }
     });
   }
+
+  @Override
+  public String getSelectedItem() {
+    final Object o = super.getSelectedItem();
+    return o == null ? null : o.toString();
+  }
+
+  @Override
+  public void setSelectedItem(final Object object) {
+    final ComboBoxModel m = getModel();
+    final int s = m.getSize();
+    for(int i = 0; i < s; i++) {
+      if(m.getElementAt(i).equals(object)) {
+        super.setSelectedItem(object);
+        return;
+      }
+    }
+  }
 }

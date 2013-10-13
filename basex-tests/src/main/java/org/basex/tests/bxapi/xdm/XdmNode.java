@@ -54,8 +54,8 @@ final class XdmNode extends XdmItem {
   public String toString() {
     try {
       return node.serialize().toString();
-    } catch(final QueryException ex) {
-      throw Util.notexpected(ex.getMessage());
+    } catch(final QueryIOException ex) {
+      throw Util.notexpected(ex);
     }
   }
 

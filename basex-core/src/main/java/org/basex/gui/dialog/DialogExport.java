@@ -90,8 +90,7 @@ public final class DialogExport extends BaseXDialog {
       methods[m] = DataText.METHODS[m].toUpperCase(Locale.ENGLISH);
     }
     method = new BaseXCombo(this, methods);
-    method.setSelectedItem(sopts.get(SerializerOptions.S_METHOD).toUpperCase(
-        Locale.ENGLISH));
+    method.setSelectedItem(sopts.get(SerializerOptions.S_METHOD).toUpperCase(Locale.ENGLISH));
 
     encoding = new BaseXCombo(this, ENCODINGS);
     String enc = sopts.get(SerializerOptions.S_ENCODING);
@@ -191,8 +190,8 @@ public final class DialogExport extends BaseXDialog {
     if(!ok) return;
 
     // remembers serialization parameters
-    final String mth = method.getSelectedItem().toString().toLowerCase(Locale.ENGLISH);
-    final String enc = encoding.getSelectedItem().toString();
+    final String mth = method.getSelectedItem().toLowerCase(Locale.ENGLISH);
+    final String enc = encoding.getSelectedItem();
     try {
       final SerializerOptions sp = new SerializerOptions(params.getText());
       sp.set(SerializerOptions.S_METHOD, mth);

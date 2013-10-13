@@ -155,7 +155,7 @@ public final class PlotView extends View {
     itemCombo.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final String item = (String) itemCombo.getSelectedItem();
+        final String item = itemCombo.getSelectedItem();
         plotData.xAxis.log = gui.gopts.get(GUIOptions.PLOTXLOG);
         plotData.yAxis.log = gui.gopts.get(GUIOptions.PLOTYLOG);
         if(plotData.setItem(item)) {
@@ -200,7 +200,7 @@ public final class PlotView extends View {
    * @param cb combo box
    */
   void setAxis(final PlotAxis ax, final BaseXCombo cb) {
-    final String cs = (String) cb.getSelectedItem();
+    final String cs = cb.getSelectedItem();
     if(!ax.setAxis(cs)) return;
     plotChanged = true;
     markingChanged = true;

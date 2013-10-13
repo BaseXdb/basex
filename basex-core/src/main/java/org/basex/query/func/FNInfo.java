@@ -88,7 +88,11 @@ public final class FNInfo extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         final Item it = ir.next();
-        if(it != null) dump(it.serialize().toArray(), s, ctx);
+        if(it != null) try {
+          dump(it.serialize().toArray(), s, ctx);
+        } catch(final QueryIOException ex) {
+          throw ex.getCause(info);
+        }
         return it;
       }
     };

@@ -37,15 +37,15 @@ public final class CsvParser extends XMLParser {
    * @return parser
    * @throws IOException I/O exception
    */
-  private static IO toXML(final IO io, final String options) throws IOException {
+  public static IO toXML(final IO io, final String options) throws IOException {
     try {
       // convert input to XML and return cached result
       final Item node = new CsvConverter(new CsvOptions(options)).convert(io);
       final IOContent xml = new IOContent(node.serialize().toArray());
       xml.name(io.name());
       return xml;
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
+    } catch(final QueryIOException ex) {
+      throw new BaseXException(ex.getLocalizedMessage());
     }
   }
 }

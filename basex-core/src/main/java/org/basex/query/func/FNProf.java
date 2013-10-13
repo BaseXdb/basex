@@ -90,7 +90,11 @@ public final class FNProf extends StandardFunc {
     final Iter ir = expr[0].iter(ctx);
     final byte[] s = expr.length > 1 ? checkStr(expr[1], ctx) : null;
     for(Item it; (it = ir.next()) != null;) {
-      FNInfo.dump(it.serialize().toArray(), s, ctx);
+      try {
+        FNInfo.dump(it.serialize().toArray(), s, ctx);
+      } catch(final QueryIOException ex) {
+        throw ex.getCause(info);
+      }
     }
     return null;
   }

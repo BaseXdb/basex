@@ -147,7 +147,7 @@ final class DialogFT extends BaseXBack {
    */
   void setOptions() {
     final GUI gui = dialog.gui;
-    final String lang = language.getSelectedItem().toString();
+    final String lang = language.getSelectedItem();
     gui.set(MainOptions.LANGUAGE, check[F_LANG].isSelected() ?
         Language.get(lang.replaceFirst(" \\(.*", "")).code() : "");
     gui.set(MainOptions.STEMMING, check[F_STEM].isSelected());

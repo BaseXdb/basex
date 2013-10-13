@@ -233,7 +233,7 @@ public final class QueryException extends Exception {
     if(code.length != 0) tb.add('[').add(code).add("] ");
     tb.add(getLocalizedMessage());
     if(!stack.isEmpty()) {
-      tb.add(NL).add(NL).add(STACK_TRACE_C);
+      tb.add(NL).add(NL).add(STACK_TRACE).add(COL);
       for(final InputInfo ii : stack) tb.add(NL).add(LI).add(ii.toString());
     }
     return tb.toString();

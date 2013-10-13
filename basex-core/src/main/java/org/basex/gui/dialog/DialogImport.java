@@ -27,7 +27,7 @@ import org.basex.util.list.*;
 public final class DialogImport extends BaseXBack {
   /** Available parsers. */
   private static final String[] PARSING = {
-    DataText.M_XML, DataText.M_JSON, DataText.M_HTML,
+    DataText.M_XML, DataText.M_HTML, DataText.M_JSON,
     DataText.M_CSV, DataText.M_TEXT, DataText.M_RAW
   };
 
@@ -117,7 +117,7 @@ public final class DialogImport extends BaseXBack {
     add(archives);
 
     // add info label
-    info = new BaseXLabel(" ").border(24, 0, 6, 0);
+    info = new BaseXLabel(" ").border(32, 0, 6, 0);
     add(info);
   }
 
@@ -189,7 +189,7 @@ public final class DialogImport extends BaseXBack {
     gui.set(MainOptions.SKIPCORRUPT, skipCorrupt.isSelected());
     gui.set(MainOptions.ADDRAW, addRaw.isSelected());
     input.store();
-    parsing.setOptions(type);
+    parsing.setOptions();
   }
 
   /**
@@ -206,7 +206,7 @@ public final class DialogImport extends BaseXBack {
 
   /**
    * Chooses the correct input type.
-   * @param in input
+   * @param in input path
    */
   void setType(final String in) {
     // get file path, update input path and database name
@@ -249,7 +249,7 @@ public final class DialogImport extends BaseXBack {
    * @return type
    */
   String parser() {
-    return parser.getSelectedItem().toString().toLowerCase(Locale.ENGLISH);
+    return parser.getSelectedItem().toLowerCase(Locale.ENGLISH);
   }
 
   /**

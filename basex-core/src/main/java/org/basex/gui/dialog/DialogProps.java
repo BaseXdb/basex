@@ -225,7 +225,7 @@ public final class DialogProps extends BaseXDialog {
           cmd = new CreateIndex(TYPES[i]);
           ft.setOptions();
         }
-        infos[i].setText(Token.token(PLEASE_WAIT_D));
+        infos[i].setText(PLEASE_WAIT_D);
         DialogProgress.execute(this, cmd);
         return;
       }

@@ -74,7 +74,6 @@ public final class DialogNew extends BaseXDialog {
     indexes.add(new BaseXLabel(H_ATTR_INDEX, true, false));
 
     // full-text panel
-    //final BaseXBack fulltext = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
     ftxindex = new BaseXCheckBox(FULLTEXT_INDEX, opts.get(MainOptions.FTINDEX), 0, this).large();
     indexes.add(ftxindex);
 
@@ -89,6 +88,8 @@ public final class DialogNew extends BaseXDialog {
     set(buttons, BorderLayout.SOUTH);
 
     action(general.parser);
+    general.setType(general.input());
+
     finish(null);
   }
 

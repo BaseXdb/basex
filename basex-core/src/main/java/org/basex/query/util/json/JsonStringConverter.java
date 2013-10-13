@@ -32,85 +32,85 @@ public final class JsonStringConverter implements JsonHandler {
    * @param un unescape flag
    * @param tb token builder
    * @return the token builder
-   * @throws QueryException parse exception
+   * @throws QueryIOException query I/O exception
    */
   public static TokenBuilder print(final String json, final JsonSpec spec,
-      final boolean un, final TokenBuilder tb) throws QueryException {
+      final boolean un, final TokenBuilder tb) throws QueryIOException {
 
     final JsonOptions jopts = new JsonOptions();
     jopts.set(JsonOptions.SPEC, spec.toString());
     jopts.set(JsonOptions.UNESCAPE, un);
-    JsonParser.parse(json, jopts, new JsonStringConverter(tb), null);
+    JsonParser.parse(json, jopts, new JsonStringConverter(tb));
     return tb;
   }
 
   @Override
-  public void openObject() throws QueryException {
+  public void openObject() {
     tb.add("{ ");
     first = true;
   }
 
   @Override
-  public void openPair(final byte[] key) throws QueryException {
+  public void openPair(final byte[] key) {
     if(!first) tb.add(", ");
     stringLit(key);
     tb.add(": ");
   }
 
   @Override
-  public void closePair() throws QueryException {
+  public void closePair() {
     first = false;
   }
 
   @Override
-  public void closeObject() throws QueryException {
+  public void closeObject() {
     tb.add(first ? "}" : " }");
   }
 
   @Override
-  public void openArray() throws QueryException {
+  public void openArray() {
     tb.add("[ ");
     first = true;
   }
 
   @Override
-  public void openItem() throws QueryException {
+  public void openItem() {
     if(!first) tb.add(", ");
   }
 
   @Override
-  public void closeItem() throws QueryException {
+  public void closeItem() {
     first = false;
   }
 
   @Override
-  public void closeArray() throws QueryException {
+  public void closeArray() {
     tb.add(first ? "]" : " ]");
   }
 
   @Override
-  public void openConstr(final byte[] name) throws QueryException {
+  public void openConstr(final byte[] name) {
     tb.add("new ").add(name).addByte((byte) '(');
     first = true;
   }
 
   @Override
-  public void openArg() throws QueryException {
+  public void openArg() {
     if(!first) tb.add(", ");
   }
 
   @Override
-  public void closeArg() throws QueryException {
+  public void closeArg() {
     first = false;
   }
 
   @Override
-  public void closeConstr() throws QueryException {
+  public void closeConstr() {
     tb.addByte((byte) ')');
   }
 
   @Override
-  public void numberLit(final byte[] value) throws QueryException {
+  public void numberLit(final byte[] value) {
     tb.add(value);
   }
 
@@ -155,12 +155,12 @@ public final class JsonStringConverter implements JsonHandler {
   }
 
   @Override
-  public void nullLit() throws QueryException {
+  public void nullLit() {
     tb.add(Token.NULL);
   }
 
   @Override
-  public void booleanLit(final byte[] b) throws QueryException {
+  public void booleanLit(final byte[] b) {
     tb.add(b);
   }
 }

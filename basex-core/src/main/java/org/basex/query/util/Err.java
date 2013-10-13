@@ -72,9 +72,7 @@ public enum Err {
   /** BXCS0002. */
   BXCS_SERIAL(BXCS, 2, "CSV serializer: %."),
   /** BXCS0003. */
-  BXCS_CONFSEP(BXCS, 3, "CSV separator must be single character; \"%\" found."),
-  /** BXCS0003. */
-  BXCS_CONFIG(BXJS, 3, "CSV configuration: %."),
+  BXCS_CONFIG(BXJS, 3, "CSV: %."),
 
   // Database module
 
@@ -136,9 +134,7 @@ public enum Err {
   /** BXJS0002. */
   BXJS_SERIAL(BXJS, 2, "JSON serializer: %."),
   /** BXJS0003. */
-  BXJS_CONFIG(BXJS, 3, "JSON configuration: %."),
-  /** BXJS0003. */
-  BXJS_CONFOPT(BXJS, 3, "JSON option \"%\" is unknown."),
+  BXJS_CONFIG(BXJS, 3, "JSON: %."),
 
   // Process module
 

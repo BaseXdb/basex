@@ -52,7 +52,7 @@ public final class EditorView extends View {
       Pattern.DOTALL);
   /** Error tooltip pattern. */
   private static final Pattern ERRORTT = Pattern.compile(
-      "^.*\r?\n" + STOPPED_AT + "|\r?\n" + STACK_TRACE_C + ".*", Pattern.DOTALL);
+      "^.*\r?\n" + STOPPED_AT + "|\r?\n" + STACK_TRACE + COL + ".*", Pattern.DOTALL);
 
   /** Search bar. */
   final SearchBar search;

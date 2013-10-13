@@ -24,6 +24,9 @@ public final class CsvOptions extends Options {
   public static final BooleanOption HEADER = new BooleanOption("header", false);
   /** Option: lax conversion of strings to QNames. */
   public static final BooleanOption LAX = new BooleanOption("lax", true);
+  /** Option: JSON format (default, attributes). */
+  public static final StringOption FORMAT = new StringOption("format",
+      CsvFormat.DIRECT.toString());
 
   /** CSV separators. */
   public static enum CsvSep {
@@ -43,6 +46,17 @@ public final class CsvOptions extends Options {
     private CsvSep(final int c) {
       ch = c;
     }
+
+    @Override
+    public String toString() {
+      return super.toString().toLowerCase(Locale.ENGLISH);
+    }
+  }
+
+  /** CSV formats. */
+  public static enum CsvFormat {
+    /** Default.    */ DIRECT,
+    /** Attributes. */ ATTRIBUTES;
 
     @Override
     public String toString() {
@@ -76,7 +90,19 @@ public final class CsvOptions extends Options {
     final String sep = get(SEPARATOR);
     final String val = sep.toLowerCase(Locale.ENGLISH);
     for(final CsvSep s : CsvSep.values()) if(val.equals(s.toString())) return s.ch;
-    if(sep.length() != 1) BXCS_CONFSEP.thrwIO(sep);
+    if(sep.length() != 1) BXCS_CONFIG.thrwIO(
+        Util.info("Separator must be single character; \"%\" found", sep));
     return sep.charAt(0);
+  }
+
+  /**
+   * Returns the specification.
+   * @return spec
+   * @throws QueryIOException query I/O exception
+   */
+  public CsvFormat format() throws QueryIOException {
+    final String form = get(FORMAT);
+    for(final CsvFormat f : CsvFormat.values()) if(f.toString().equals(form)) return f;
+    throw BXCS_CONFIG.thrwIO("Format '" + form + "' is not supported");
   }
 }

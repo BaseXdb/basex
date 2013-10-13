@@ -230,7 +230,7 @@ public final class FNValidate extends StandardFunc {
         Util.debug(e);
         e = e.getCause();
       }
-      return Str.get(Text.FATAL_C + ex.getLocalizedMessage());
+      return Str.get(Text.FATAL + Text.COL + ex.getLocalizedMessage());
     } finally {
       if(v.tmp != null) v.tmp.delete();
     }
@@ -296,17 +296,17 @@ public final class FNValidate extends StandardFunc {
 
     @Override
     public void fatalError(final SAXParseException ex) {
-      error(ex, Text.FATAL_C);
+      error(ex, Text.FATAL + Text.COL);
     }
 
     @Override
     public void error(final SAXParseException ex) {
-      error(ex, Text.ERROR_C);
+      error(ex, Text.ERROR + Text.COL);
     }
 
     @Override
     public void warning(final SAXParseException ex) {
-      error(ex, Text.WARNING_C);
+      error(ex, Text.WARNING + Text.COL);
     }
 
     /**

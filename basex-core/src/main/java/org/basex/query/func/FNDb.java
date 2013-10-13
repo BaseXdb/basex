@@ -801,12 +801,14 @@ public final class FNDb extends StandardFunc {
    */
   private Item event(final QueryContext ctx) throws QueryException {
     final byte[] name = checkStr(expr[0], ctx);
-    final ArrayOutput ao = ctx.value(expr[1]).serialize();
-    // throw exception if event is unknown
-    if(!ctx.context.events.notify(ctx.context, name, ao.toArray())) {
-      BXDB_EVENT.thrw(info, name);
+    try {
+      final ArrayOutput ao = ctx.value(expr[1]).serialize();
+      // throw exception if event is unknown
+      if(!ctx.context.events.notify(ctx.context, name, ao.toArray())) BXDB_EVENT.thrw(info, name);
+      return null;
+    } catch(final QueryIOException ex) {
+      throw ex.getCause(info);
     }
-    return null;
   }
 
   /**

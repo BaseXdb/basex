@@ -26,8 +26,8 @@ public class ClientQuery extends Query {
    * @param os output stream
    * @throws IOException I/O exception
    */
-  public ClientQuery(final String query, final ClientSession session,
-      final OutputStream os) throws IOException {
+  public ClientQuery(final String query, final ClientSession session, final OutputStream os)
+      throws IOException {
 
     cs = session;
     id = cs.exec(ServerCmd.QUERY, query, null);

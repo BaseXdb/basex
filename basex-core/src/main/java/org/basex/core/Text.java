@@ -808,12 +808,10 @@ public interface Text {
   String ENTRIES = '(' + lang("entries_%") + ')';
   /** "Error". */
   String ERROR = lang("error");
-  /** "Error:". */
-  String ERROR_C = ERROR + COLS;
-  /** "Fatal:". */
-  String FATAL_C = "Fatal" + COLS;
-  /** "Warning:". */
-  String WARNING_C = "Warning" + COLS;
+  /** "Fatal". */
+  String FATAL = "Fatal";
+  /** "Warning". */
+  String WARNING = "Warning";
 
   // MENU ENTRIES =============================================================
 
@@ -1046,7 +1044,7 @@ public interface Text {
   String BXS_FILES = "Command Scripts";
 
   /** "Stack Trace". */
-  String STACK_TRACE_C = "Stack Trace" + COL;
+  String STACK_TRACE = "Stack Trace";
 
   /** Dialog title for database options. */
   String CREATE_DATABASE = lang("create_database");
@@ -1082,12 +1080,20 @@ public interface Text {
 
   /** Format. */
   String FORMAT = lang("format");
-  /** TEXT Lines information. */
+  /** Split input lines. */
   String SPLIT_INPUT_LINES = lang("split_input_lines");
-  /** CSV header information. */
+  /** Treat first line as header. */
   String FIRST_LINE_HEADER = lang("first_line_header");
-  /** CSV Separator information. */
+  /** Separator. */
   String SEPARATOR = lang("separator") + COL;
+  /** Lax name conversion. */
+  String LAX_NAME_CONVERSION = lang("lax_name_conversion");
+  /** Store types in root. */
+  String STORE_TYPES_ROOT = lang("store_types_root");
+  /** Specification. */
+  String SPECIFICATION = lang("specification");
+  /** Unescape characters. */
+  String UNESCAPE_CHARS = lang("unescape_chars");
 
   /** General info. */
   String GENERAL = lang("general");

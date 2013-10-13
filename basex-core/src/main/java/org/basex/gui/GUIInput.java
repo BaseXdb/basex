@@ -128,13 +128,12 @@ public final class GUIInput extends BaseXTextField {
    * Completes the input with the current combobox choice.
    */
   void completeInput() {
-    final Object sel = box.getSelectedItem();
-    if(sel == null) return;
-    final String suf = sel.toString();
+    final String suf = box.getSelectedItem();
+    if(suf == null) return;
     final int pl = pre.length();
     final int ll = pl > 0 ? pre.charAt(pl - 1) : ' ';
     if(Character.isLetter(ll) && Character.isLetter(suf.charAt(0))) pre += " ";
-    setText(pre + sel);
+    setText(pre + suf);
     showPopup();
     if(gui.gopts.get(GUIOptions.EXECRT) && !cmdMode()) gui.execute();
   }

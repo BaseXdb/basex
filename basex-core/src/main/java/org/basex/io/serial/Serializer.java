@@ -33,7 +33,7 @@ public abstract class Serializer {
   protected final TokenList tags = new TokenList();
   /** Current level. */
   protected int level;
-  /** Current tag. */
+  /** Current element name. */
   protected byte[] elem;
   /** Undeclare prefixes. */
   protected boolean undecl;

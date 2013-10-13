@@ -52,7 +52,7 @@ public final class JsonParser extends XMLParser {
    * @return parser
    * @throws IOException I/O exception
    */
-  private static IO toXML(final IO io, final String options) throws IOException {
+  public static IO toXML(final IO io, final String options) throws IOException {
     final JsonOptions jopts = new JsonOptions(options);
     final String encoding = jopts.get(JsonOptions.ENCODING);
 
@@ -61,15 +61,14 @@ public final class JsonParser extends XMLParser {
 
     // parse input and convert to XML node
     try {
-      final JsonConverter conv = JsonConverter.get(jopts, null);
-      final Item node = conv.convert(string(content));
-
       // cache XML representation
+      final JsonConverter conv = JsonConverter.get(jopts);
+      final Item node = conv.convert(string(content));
       final IOContent xml = new IOContent(node.serialize().toArray());
       xml.name(io.name());
       return xml;
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
+    } catch(final QueryIOException ex) {
+      throw new BaseXException(ex.getLocalizedMessage());
     }
   }
 }

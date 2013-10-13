@@ -542,7 +542,7 @@ public abstract class SessionTest extends SandboxTest {
   }
 
   /** Runs an erroneous query.
-   * @throws IOException expected exception*/
+   * @throws IOException expected exception */
   @Test(expected = BaseXException.class)
   public void queryError2() throws IOException {
     session.query("(1,'a')[. eq 1]").execute();

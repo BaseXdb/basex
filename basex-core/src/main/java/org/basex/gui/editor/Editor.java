@@ -133,6 +133,14 @@ public class Editor extends BaseXPanel {
    * Sets the output text.
    * @param t output text
    */
+  public void setText(final String t) {
+    setText(token(t));
+  }
+
+  /**
+   * Sets the output text.
+   * @param t output text
+   */
   public void setText(final byte[] t) {
     setText(t, t.length);
     resetError();

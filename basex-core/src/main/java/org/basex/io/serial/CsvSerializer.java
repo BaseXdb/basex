@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.*;
+import org.basex.build.CsvOptions.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -20,14 +21,19 @@ import org.basex.util.list.*;
 public final class CsvSerializer extends OutputSerializer {
   /** Names of header elements. */
   private final TokenList headers;
-  /** Contents of current row. */
-  private TokenMap data;
   /** Separator. */
   private final int separator;
+  /** Plain format. */
+  private final boolean atts;
   /** Lax flag. */
   private final boolean lax;
+
+  /** Contents of current row. */
+  private TokenMap data;
   /** Header flag. */
   private boolean header;
+  /** Current attribute value. */
+  private byte[] attv;
 
   /**
    * Constructor.
@@ -42,11 +48,13 @@ public final class CsvSerializer extends OutputSerializer {
     header = copts.get(CsvOptions.HEADER);
     lax = copts.get(CsvOptions.LAX);
     headers = header ? new TokenList() : null;
+    atts = copts.format() == CsvFormat.ATTRIBUTES;
   }
 
   @Override
   protected void startOpen(final byte[] name) {
     if(level == 1) data = new TokenMap();
+    attv = null;
   }
 
   @Override
@@ -69,7 +77,6 @@ public final class CsvSerializer extends OutputSerializer {
   protected void finishClose() throws IOException {
     if(level != 1) return;
 
-    // print data
     if(headers != null) {
       final int s = headers.size();
       // print header
@@ -92,7 +99,9 @@ public final class CsvSerializer extends OutputSerializer {
   }
 
   @Override
-  protected void attribute(final byte[] n, final byte[] v) { }
+  protected void attribute(final byte[] n, final byte[] v) {
+    attv = v;
+  }
 
   @Override
   protected void finishComment(final byte[] n) { }
@@ -116,7 +125,7 @@ public final class CsvSerializer extends OutputSerializer {
    */
   private void cache(final byte[] text) {
     if(headers != null) {
-      final byte[] name = XMLToken.decode(elem, lax);
+      final byte[] name = XMLToken.decode(atts && attv != null ? attv : elem, lax);
       if(!headers.contains(name)) headers.add(name);
       final byte[] old = data.get(name);
       final byte[] txt = old == null || old.length == 0 ? text :

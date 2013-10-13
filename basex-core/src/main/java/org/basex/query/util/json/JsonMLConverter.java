@@ -28,17 +28,16 @@ public class JsonMLConverter extends JsonXMLConverter {
   /**
    * Constructor.
    * @param opts json options
-   * @param ii input info
    */
-  public JsonMLConverter(final JsonOptions opts, final InputInfo ii) {
-    super(opts, ii);
+  public JsonMLConverter(final JsonOptions opts) {
+    super(opts);
   }
 
   @Override
-  public ANode convert(final String in) throws QueryException {
+  public ANode convert(final String in) throws QueryIOException {
     final JsonMLHandler handler = new JsonMLHandler();
     stack.clear();
-    JsonParser.parse(in, jopts, handler, info);
+    JsonParser.parse(in, jopts, handler);
     return stack.pop();
   }
 
@@ -46,19 +45,19 @@ public class JsonMLConverter extends JsonXMLConverter {
    * Raises an error with the specified message.
    * @param msg error message
    * @param ext error details
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  void error(final String msg, final Object... ext) throws QueryException {
-    throw BXJS_PARSEML.thrw(info, Util.inf(msg, ext));
+  void error(final String msg, final Object... ext) throws QueryIOException {
+    throw BXJS_PARSEML.thrwIO(Util.inf(msg, ext));
   }
 
   /**
    * Returns the specified name.
    * @param name name
    * @return cached QName
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  byte[] check(final byte[] name) throws QueryException {
+  byte[] check(final byte[] name) throws QueryIOException {
     // retrieve name from cache, or create new instance
     if(!XMLToken.isNCName(name)) error("Invalid name: \"%\"", name);
     return name;
@@ -75,18 +74,18 @@ public class JsonMLConverter extends JsonXMLConverter {
     protected JsonMLHandler() { }
 
     @Override
-    public void openObject() throws QueryException {
+    public void openObject() throws QueryIOException {
       if(curr == null || attName != null || stack.peek() != null)
         error("No object allowed at this stage");
     }
 
     @Override
-    public void openPair(final byte[] key) throws QueryException {
+    public void openPair(final byte[] key) throws QueryIOException {
       attName = check(key);
     }
 
     @Override
-    public void closePair() throws QueryException { }
+    public void closePair() throws QueryIOException { }
 
     @Override
     public void closeObject() {
@@ -96,7 +95,7 @@ public class JsonMLConverter extends JsonXMLConverter {
     }
 
     @Override
-    public void openArray() throws QueryException {
+    public void openArray() throws QueryIOException {
       if(!stack.isEmpty()) {
         if(attName == null && curr != null && stack.peek() == null) {
           stack.pop();
@@ -114,10 +113,10 @@ public class JsonMLConverter extends JsonXMLConverter {
     public void openItem() { }
 
     @Override
-    public void closeItem() throws QueryException { }
+    public void closeItem() throws QueryIOException { }
 
     @Override
-    public void closeArray() throws QueryException {
+    public void closeArray() throws QueryIOException {
       FElem val = stack.pop();
       if(val == null) {
         val = curr;
@@ -131,7 +130,7 @@ public class JsonMLConverter extends JsonXMLConverter {
     }
 
     @Override
-    public void stringLit(final byte[] val) throws QueryException {
+    public void stringLit(final byte[] val) throws QueryIOException {
       if(attName == null && curr != null && stack.peek() == null) {
         stack.pop();
         stack.push(curr);
@@ -139,7 +138,7 @@ public class JsonMLConverter extends JsonXMLConverter {
       }
 
       if(curr == null) {
-        final FElem elem = stack.peek();
+        final FElem elem = stack.isEmpty() ? null : stack.peek();
         if(elem == null) curr = new FElem(check(val));
         else elem.add(new FTxt(val));
       } else if(attName != null) {
@@ -151,26 +150,26 @@ public class JsonMLConverter extends JsonXMLConverter {
     }
 
     @Override
-    public void numberLit(final byte[] value) throws QueryException {
+    public void numberLit(final byte[] value) throws QueryIOException {
       error("No numbers allowed");
     }
 
     @Override
-    public void nullLit() throws QueryException {
+    public void nullLit() throws QueryIOException {
       error("No 'null' allowed");
     }
 
     @Override
-    public void booleanLit(final byte[] b) throws QueryException {
+    public void booleanLit(final byte[] b) throws QueryIOException {
       error("No booleans allowed");
     }
 
     @Override
-    public void openConstr(final byte[] nm) throws QueryException {
+    public void openConstr(final byte[] nm) throws QueryIOException {
       error("No constructor functions allowed");
     }
     @Override public void openArg() { }
-    @Override public void closeArg() throws QueryException { }
-    @Override public void closeConstr() throws QueryException { }
+    @Override public void closeArg() throws QueryIOException { }
+    @Override public void closeConstr() throws QueryIOException { }
   }
 }

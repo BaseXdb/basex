@@ -325,14 +325,11 @@ public final class DialogServer extends BaseXDialog {
         refreshSess();
       } else if(cmp == refreshLog || cmp == logc) {
         byte[] cont = Token.EMPTY;
-        if(logc.getSelectedIndex() != -1) {
-          final IOFile f = new IOFile(logd, logc.getSelectedItem().toString());
-          cont = f.read();
-        }
+        if(logc.getSelectedIndex() != -1) cont = new IOFile(logd, logc.getSelectedItem()).read();
         logt.setText(cont);
         logt.scrollToEnd();
       } else if(cmp == delete) {
-        final IOFile f = new IOFile(logd, logc.getSelectedItem().toString());
+        final IOFile f = new IOFile(logd, logc.getSelectedItem());
         if(f.delete()) {
           logc.setSelectedIndex(-1);
           refreshLog();

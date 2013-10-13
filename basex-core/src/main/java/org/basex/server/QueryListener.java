@@ -114,8 +114,8 @@ final class QueryListener extends Proc {
    * @param full return full type information
    * @throws IOException I/O Exception
    */
-  void execute(final boolean iter, final OutputStream out, final boolean enc,
-      final boolean full) throws IOException {
+  void execute(final boolean iter, final OutputStream out, final boolean enc, final boolean full)
+      throws IOException {
 
     try {
       try {

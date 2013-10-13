@@ -39,16 +39,15 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
   /**
    * Constructor.
    * @param opts json options
-   * @param ii input info
    */
-  public JsonMapConverter(final JsonOptions opts, final InputInfo ii) {
-    super(opts, ii);
+  public JsonMapConverter(final JsonOptions opts) {
+    super(opts);
   }
 
   @Override
-  public Item convert(final String in) throws QueryException {
+  public Item convert(final String in) throws QueryIOException {
     stack.clear();
-    JsonParser.parse(in, jopts, this, info);
+    JsonParser.parse(in, jopts, this);
     return stack.peek().isEmpty() ? null : (Item) stack.pop();
   }
 
@@ -63,11 +62,15 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
   }
 
   @Override
-  public void closePair() throws QueryException {
+  public void closePair() throws QueryIOException {
     final Value val = stack.pop();
     final Item key = (Item) stack.pop();
     final Map map = (Map) stack.pop();
-    stack.push(map.insert(key, val, null));
+    try {
+      stack.push(map.insert(key, val, null));
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
+    }
   }
 
   @Override public void closeObject() { }
@@ -83,7 +86,7 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
   }
 
   @Override
-  public void closeItem() throws QueryException {
+  public void closeItem() throws QueryIOException {
     closePair();
   }
 
@@ -100,20 +103,24 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
     openItem();
   }
 
-  @Override public void closeArg() throws QueryException {
+  @Override public void closeArg() throws QueryIOException {
     closeItem();
   }
 
   @Override
-  public void closeConstr() throws QueryException {
+  public void closeConstr() throws QueryIOException {
     closeArray();
     closePair();
     closeObject();
   }
 
   @Override
-  public void numberLit(final byte[] val) throws QueryException {
-    stack.push(Dbl.get(val, info));
+  public void numberLit(final byte[] val) throws QueryIOException {
+    try {
+      stack.push(Dbl.get(val, null));
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
+    }
   }
 
   @Override

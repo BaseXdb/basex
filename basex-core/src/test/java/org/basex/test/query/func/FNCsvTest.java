@@ -20,12 +20,17 @@ public final class FNCsvTest extends AdvancedQueryTest {
     { "X", "", "<csv><record><entry>X</entry></record></csv>" },
     { " '\"X\"\"Y\"'", "", "...<entry>X\"Y</entry>" },
     { " '\"X\",Y'", "", "...<entry>X</entry><entry>Y</entry>" },
+
     { "X\nY", "'separator':''" },
     { "X\nY", "'separator':'XXX'" },
+    { "X;Y", "'separator':';'", "...<entry>X</entry><entry>Y</entry>" },
     { "X,Y", "", "...<entry>X</entry><entry>Y</entry>" },
+
     { "X\nY", "'header':true()", "<csv><record><X>Y</X></record></csv>" },
     { "A,B,C\nX,Y,Z", "'header':true()", "...<A>X</A><B>Y</B><C>Z</C>" },
-    { "X;Y", "'separator':';'", "...<entry>X</entry><entry>Y</entry>" },
+
+    { "X\nY", "'format':'abc'" },
+    { "X\nY", "'format':'attributes','header':true()", "...<entry name=\"X\">Y</entry>" },
   };
 
   /** XML snippets. */
@@ -74,6 +79,10 @@ public final class FNCsvTest extends AdvancedQueryTest {
 
     { "<csv><record><A>1</A></record></csv>", "'separator':''" },
     { "<csv><record><A>1</A></record></csv>", "'separator':'XX'" },
+
+    { "<csv><record><entry name='X'>1</entry></record></csv>",
+      "'format':'attributes','header':true()", "X1" },
+    { "<C><R><E name='X'>1</E></R></C>", "'format':'attributes','header':true()", "X1" }
   };
 
   /** Test method. */
@@ -82,7 +91,7 @@ public final class FNCsvTest extends AdvancedQueryTest {
       final String query = test[1].isEmpty() ? _CSV_PARSE.args(test[0]) :
         _CSV_PARSE.args(test[0], " {" + test[1] + "}");
       if(test.length == 2) {
-        error(query, Err.BXCS_CONFSEP, Err.INVALIDOPT);
+        error(query, Err.BXCS_CONFIG, Err.INVALIDOPT);
       } else if(test[2].startsWith("...")) {
         contains(query, test[2].substring(3));
       } else {
@@ -97,7 +106,7 @@ public final class FNCsvTest extends AdvancedQueryTest {
       final String query = test[1].isEmpty() ? _CSV_SERIALIZE.args(test[0]) :
         _CSV_SERIALIZE.args(test[0], " {" + test[1] + "}");
       if(test.length == 2) {
-        error(query, Err.BXCS_CONFSEP, Err.INVALIDOPT);
+        error(query, Err.BXCS_CONFIG, Err.INVALIDOPT);
       } else {
         query(query, test[2]);
       }

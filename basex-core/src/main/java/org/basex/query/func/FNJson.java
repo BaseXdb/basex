@@ -54,9 +54,9 @@ public final class FNJson extends StandardFunc {
     final JsonOptions opts = checkOptions(1, Q_OPTIONS, new JsonOptions(), ctx);
 
     try {
-      return JsonConverter.get(opts, info).convert(string(input)).item(ctx, info);
+      return JsonConverter.get(opts).convert(string(input)).item(ctx, info);
     } catch(final QueryIOException ex) {
-      throw ex.getCause();
+      throw ex.getCause(info);
     }
   }
 

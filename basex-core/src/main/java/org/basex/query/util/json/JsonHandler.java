@@ -1,6 +1,6 @@
 package org.basex.query.util.json;
 
-import org.basex.query.QueryException;
+import org.basex.query.*;
 
 /**
  * A handler for events from a {@link JsonParser}.
@@ -11,102 +11,102 @@ import org.basex.query.QueryException;
 public interface JsonHandler {
   /**
    * Called when a JSON object is opened.
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void openObject() throws QueryException;
+  void openObject() throws QueryIOException;
 
   /**
    * Called when a pair of a JSON object is opened.
    * @param key the key of the entry
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void openPair(byte[] key) throws QueryException;
+  void openPair(byte[] key) throws QueryIOException;
 
   /**
    * Called when a pair of a JSON object is closed.
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void closePair() throws QueryException;
+  void closePair() throws QueryIOException;
 
   /**
    * Called when a JSON object is closed.
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void closeObject() throws QueryException;
+  void closeObject() throws QueryIOException;
 
   /**
    * Called when a JSON array is opened.
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void openArray() throws QueryException;
+  void openArray() throws QueryIOException;
 
   /**
    * Called when an item of a JSON array is opened.
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void openItem() throws QueryException;
+  void openItem() throws QueryIOException;
 
   /**
    * Called when an item of a JSON array is closed.
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void closeItem() throws QueryException;
+  void closeItem() throws QueryIOException;
 
   /**
    * Called when a JSON array is closed.
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void closeArray() throws QueryException;
+  void closeArray() throws QueryIOException;
 
   /**
    * Called when a constructor function is opened.
    * @param name name of the constructor
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void openConstr(byte[] name) throws QueryException;
+  void openConstr(byte[] name) throws QueryIOException;
 
   /**
    * Called when an argument of a constructor function is opened.
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void openArg() throws QueryException;
+  void openArg() throws QueryIOException;
 
   /**
    * Called when an argument of a constructor function is closed.
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void closeArg() throws QueryException;
+  void closeArg() throws QueryIOException;
 
   /**
    * Called when a constructor function is closed.
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void closeConstr() throws QueryException;
+  void closeConstr() throws QueryIOException;
 
   /**
    * Called when a number literal is encountered.
    * @param value string representation of the number literal
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void numberLit(byte[] value) throws QueryException;
+  void numberLit(byte[] value) throws QueryIOException;
 
   /**
    * Called when a string literal is encountered.
    * @param bs the string
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void stringLit(byte[] bs) throws QueryException;
+  void stringLit(byte[] bs) throws QueryIOException;
 
   /**
    * Called when a {@code null} literal is encountered.
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void nullLit() throws QueryException;
+  void nullLit() throws QueryIOException;
 
   /**
    * Called when a boolean literal is encountered.
    * @param b the boolean
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  void booleanLit(byte[] b) throws QueryException;
+  void booleanLit(byte[] b) throws QueryIOException;
 }

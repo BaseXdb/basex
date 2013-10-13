@@ -175,7 +175,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         final Data data = gui.context.data();
         final boolean selected = combo.getSelectedIndex() != 0;
         if(selected) {
-          final String item = combo.getSelectedItem().toString();
+          final String item = combo.getSelectedItem();
           final boolean att = item.startsWith("@");
           final Names names = att ? data.atnindex : data.tagindex;
           final byte[] key = Token.token(att ? item.substring(1) : item);
@@ -225,7 +225,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       final BaseXCombo com = (BaseXCombo) panel.getComponent(c);
       final int k = com.getSelectedIndex();
       if(k <= 0) continue;
-      String key = com.getSelectedItem().toString().replaceAll("^(@?)(.*):", "$1*:");
+      String key = com.getSelectedItem().replaceAll("^(@?)(.*):", "$1*:");
       final boolean attr = key.startsWith("@");
 
       final Component comp = panel.getComponent(c + 1);
@@ -246,7 +246,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       } else if(comp instanceof BaseXCombo) {
         final BaseXCombo combo = (BaseXCombo) comp;
         if(combo.getSelectedIndex() != 0) {
-          val1 = combo.getSelectedItem().toString();
+          val1 = combo.getSelectedItem();
           pattern = PATEX;
         }
       } else if(comp instanceof BaseXDSlider) {

@@ -134,7 +134,7 @@ public final class DialogPrefs extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
-    creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem().toString()));
+    creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem()));
     if(cmp == names) {
       gui.gopts.set(GUIOptions.SHOWNAME, names.isSelected());
       gui.notify.layout();
@@ -146,7 +146,7 @@ public final class DialogPrefs extends BaseXDialog {
   @Override
   public void close() {
     final GlobalOptions opts = gui.context.globalopts;
-    opts.set(GlobalOptions.LANG, lang.getSelectedItem().toString());
+    opts.set(GlobalOptions.LANG, lang.getSelectedItem());
 
     // new database path: close existing database
     final String dbpath = path.getText();

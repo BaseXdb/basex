@@ -133,9 +133,7 @@ final class DialogUser extends BaseXBack {
     String msg = null;
 
     try {
-      final Object di = databases.getSelectedItem();
-      final String db = di == null ? null : di.toString();
-
+      final String db = databases.getSelectedItem();
       if(cmp instanceof Object[]) {
         final Object[] o = (Object[]) cmp;
         final boolean g = o[0] == Boolean.TRUE;
@@ -191,7 +189,7 @@ final class DialogUser extends BaseXBack {
           msg = sess.info();
         }
       } else if(cmp == add) {
-        final String us = addUser.getSelectedItem().toString();
+        final String us = addUser.getSelectedItem();
         for(int r = 0; r < users.contents.size(); ++r) {
           if(!users.value(r, 0).equals(us)) continue;
           int c = 3;
@@ -252,7 +250,7 @@ final class DialogUser extends BaseXBack {
       if(i == 0) table.update(new Table());
       if(i <= 0) return;
 
-      final Table data = table(databases.getSelectedItem().toString());
+      final Table data = table(databases.getSelectedItem());
       table.update(data);
 
       final StringList added = new StringList();

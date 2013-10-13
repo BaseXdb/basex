@@ -161,19 +161,19 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * Serializes the value, using the standard XML serializer,
    * and returns the cached result.
    * @return serialized value
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  public final ArrayOutput serialize() throws QueryException {
+  public final ArrayOutput serialize() throws QueryIOException {
     final ArrayOutput ao = new ArrayOutput();
     try {
       final Serializer ser = Serializer.get(ao);
       final ValueIter vi = iter();
       for(Item it; (it = vi.next()) != null;) ser.serialize(it);
       ser.close();
-    } catch(final QueryIOException ex) {
-      throw ex.getCause(null);
+    } catch(QueryIOException ex) {
+      throw ex;
     } catch(final IOException ex) {
-      SERANY.thrw(null, ex);
+      SERANY.thrwIO(ex);
     }
     return ao;
   }

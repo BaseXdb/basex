@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.*;
+import org.basex.build.CsvOptions.CsvFormat;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -19,12 +20,14 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class CsvConverter {
-  /** CSV element. */
+  /** CSV token. */
   private static final byte[] CSV = token("csv");
-  /** CSV element. */
+  /** CSV token. */
   private static final byte[] RECORD = token("record");
-  /** CSV element. */
+  /** CSV token. */
   private static final byte[] ENTRY = token("entry");
+  /** CSV token. */
+  private static final byte[] NAME = token("name");
 
   /** CSV options. */
   protected final CsvOptions copts;
@@ -38,6 +41,8 @@ public final class CsvConverter {
 
   /** Headers. */
   private final TokenList headers = new TokenList();
+  /** Attributes format. */
+  private final boolean atts;
   /** Lax QName conversion. */
   private final boolean lax;
 
@@ -56,6 +61,7 @@ public final class CsvConverter {
     separator = opts.separator();
     header = opts.get(CsvOptions.HEADER);
     lax = opts.get(CsvOptions.LAX);
+    atts = opts.format() == CsvFormat.ATTRIBUTES;
   }
 
   /**
@@ -142,7 +148,7 @@ public final class CsvConverter {
    */
   private void finish(final TokenBuilder entry, final boolean open) {
     if(open && !entry.isEmpty()) newRecord();
-    if(!entry.isEmpty()) newEntry(entry);
+    newEntry(entry);
     header = false;
     col = 0;
   }
@@ -154,15 +160,19 @@ public final class CsvConverter {
   private void newEntry(final TokenBuilder entry) {
     if(header) {
       // add header
-      headers.add(XMLToken.encode(entry.finish(), lax));
-      entry.reset();
+      headers.add(atts ? entry.finish() : XMLToken.encode(entry.finish(), lax));
     } else {
-      byte[] tag = headers.get(col);
-      if(tag == null) tag = ENTRY;
-
-      record.add(new FElem(tag).add(entry.finish()));
-      entry.reset();
+      byte[] name = headers.get(col);
+      final FElem e;
+      if(atts) {
+        e = new FElem(ENTRY);
+        if(name != null) e.add(NAME, name);
+      } else {
+        e = new FElem(name == null ? ENTRY : name);
+      }
+      if(record != null) record.add(e.add(entry.finish()));
       ++col;
     }
+    entry.reset();
   }
 }

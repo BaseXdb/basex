@@ -211,7 +211,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     public void endDocument() throws SAXException {
       try {
         res.content = new DBNode(((MemBuilder) builder).data()).serialize().toArray();
-      } catch(final QueryException ex) {
+      } catch(final QueryIOException ex) {
         error(new BaseXException(ex));
       }
     }

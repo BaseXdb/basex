@@ -203,7 +203,7 @@ public final class DialogManage extends BaseXDialog {
       } else if(dbs.size() == 1) {
         info = ONLY_BACKUP;
       }
-      detail.setText(Token.token(info));
+      detail.setText(info);
 
       // enable or disable buttons
       rename.setEnabled(active);

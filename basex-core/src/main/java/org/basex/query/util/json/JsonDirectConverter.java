@@ -52,7 +52,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public final class JsonDefaultConverter extends JsonXMLConverter {
+public final class JsonDirectConverter extends JsonXMLConverter {
   /** Type names. */
   private static final byte[][] NAMES = { T_ARRAY, T_OBJECT, T_STRING, T_NUMBER,
     T_BOOLEAN, NULL };
@@ -67,16 +67,15 @@ public final class JsonDefaultConverter extends JsonXMLConverter {
   /**
    * Constructor.
    * @param opts json options
-   * @param ii input info
    */
-  public JsonDefaultConverter(final JsonOptions opts, final InputInfo ii) {
-    super(opts, ii);
+  public JsonDirectConverter(final JsonOptions opts) {
+    super(opts);
   }
 
   @Override
-  public ANode convert(final String in) throws QueryException {
+  public ANode convert(final String in) throws QueryIOException {
     final JsonDefaultHandler handler = new JsonDefaultHandler(jopts.get(JsonOptions.LAX));
-    JsonParser.parse(in, jopts, handler, info);
+    JsonParser.parse(in, jopts, handler);
     final ByteList[] types = new ByteList[TYPES.length];
     for(final TypedArray arr : handler.names.values()) {
       if(arr != null) {

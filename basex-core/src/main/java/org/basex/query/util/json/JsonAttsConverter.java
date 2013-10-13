@@ -7,38 +7,35 @@ import org.basex.build.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 
 /**
- * <p>This class converts a JSON document to a plain XML structure.</p>
+ * This class converts a JSON document to a XML structure. JSON keys will be stored in attributes.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public class JsonPlainConverter extends JsonXMLConverter implements JsonHandler {
+public class JsonAttsConverter extends JsonXMLConverter implements JsonHandler {
   /** Current root element. */
   private FElem elem;
 
   /**
    * Constructor.
    * @param opts json options
-   * @param ii input info
    */
-  public JsonPlainConverter(final JsonOptions opts, final InputInfo ii) {
-    super(opts, ii);
+  public JsonAttsConverter(final JsonOptions opts) {
+    super(opts);
   }
 
   @Override
-  public ANode convert(final String in) throws QueryException {
-    JsonParser.parse(in, jopts, this, info);
-    return elem;
+  public ANode convert(final String in) throws QueryIOException {
+    JsonParser.parse(in, jopts, this);
+    return element();
   }
 
   @Override
   public void openObject() {
-    if(elem == null) elem = new FElem(T_JSON);
-    elem.add(T_TYPE, T_OBJECT);
+    element().add(T_TYPE, T_OBJECT);
   }
 
   @Override
@@ -59,8 +56,7 @@ public class JsonPlainConverter extends JsonXMLConverter implements JsonHandler 
 
   @Override
   public void openArray() {
-    if(elem == null) elem = new FElem(T_JSON);
-    elem.add(T_TYPE, T_ARRAY);
+    element().add(T_TYPE, T_ARRAY);
   }
 
   @Override
@@ -105,21 +101,30 @@ public class JsonPlainConverter extends JsonXMLConverter implements JsonHandler 
 
   @Override
   public void numberLit(final byte[] value) {
-    elem.add(T_TYPE, T_NUMBER).add(value);
+    element().add(T_TYPE, T_NUMBER).add(value);
   }
 
   @Override
   public void stringLit(final byte[] value) {
-    elem.add(T_TYPE, T_STRING).add(value);
+    element().add(T_TYPE, T_STRING).add(value);
   }
 
   @Override
   public void nullLit() {
-    elem.add(T_TYPE, NULL);
+    element().add(T_TYPE, NULL);
   }
 
   @Override
   public void booleanLit(final byte[] value) {
-    elem.add(T_TYPE, T_BOOLEAN).add(value);
+    element().add(T_TYPE, T_BOOLEAN).add(value);
+  }
+
+  /**
+   * Returns the current element.
+   * @return element
+   */
+  private FElem element() {
+    if(elem == null) elem = new FElem(T_JSON);
+    return elem;
   }
 }

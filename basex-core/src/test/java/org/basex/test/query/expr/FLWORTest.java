@@ -41,7 +41,7 @@ public final class FLWORTest extends AdvancedQueryTest {
       final String result = proc.value().serialize().toString();
       // quotes are replaced by apostrophes to simplify comparison
       assertEquals(expected.replaceAll("\"", "'"), result.replaceAll("\"", "'"));
-    } catch(final QueryException ex) {
+    } catch(final Exception ex) {
       throw (Error) new AssertionError(Util.message(ex)).initCause(ex);
     } finally {
       proc.close();

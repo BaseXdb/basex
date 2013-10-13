@@ -130,9 +130,13 @@ public final class FNXslt extends StandardFunc {
    */
   private IO read(final Item it) throws QueryException {
     if(it.type.isNode()) {
-      final IO io = new IOContent(it.serialize().toArray());
-      io.name(string(((ANode) it).baseURI()));
-      return io;
+      try {
+        final IO io = new IOContent(it.serialize().toArray());
+        io.name(string(((ANode) it).baseURI()));
+        return io;
+      } catch(final QueryIOException ex) {
+        ex.getCause(info);
+      }
     }
 
     if(it.type.isStringOrUntyped()) {

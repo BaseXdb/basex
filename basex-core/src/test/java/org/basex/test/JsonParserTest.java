@@ -26,9 +26,9 @@ public class JsonParserTest {
 
   /**
    * Tests for parsing numbers.
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  @Test public void numberTest() throws QueryException {
+  @Test public void numberTest() throws QueryIOException {
     parse("0", JsonSpec.ECMA_262);
     parse("1", JsonSpec.ECMA_262);
     parse("-1", JsonSpec.ECMA_262);
@@ -65,9 +65,9 @@ public class JsonParserTest {
 
   /**
    * Tests for paring strings.
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  @Test public void stringTest() throws QueryException {
+  @Test public void stringTest() throws QueryIOException {
     parse("\"\"", JsonSpec.ECMA_262);
     parse("\"test\"", JsonSpec.ECMA_262);
     parse("\"\u00e4\"", JsonSpec.ECMA_262);
@@ -104,9 +104,9 @@ public class JsonParserTest {
 
   /**
    * Tests for parsing arrays.
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  @Test public void arrayTest() throws QueryException {
+  @Test public void arrayTest() throws QueryIOException {
     parse("[ ]", JsonSpec.RFC4627);
     parse("[]", "[ ]", JsonSpec.RFC4627);
     parse("[[[[[[42], {}]]]]]", "[ [ [ [ [ [ 42 ], { } ] ] ] ] ]", JsonSpec.RFC4627);
@@ -128,9 +128,9 @@ public class JsonParserTest {
 
   /**
    * Tests for parsing objects.
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  @Test public void objectTest() throws QueryException {
+  @Test public void objectTest() throws QueryIOException {
     parse("{ }", JsonSpec.RFC4627);
     parse("{ \"\": 42 }", JsonSpec.RFC4627);
     parse("{ a : 42, b: 23 }", "{ \"a\": 42, \"b\": 23 }", JsonSpec.LIBERAL);
@@ -142,9 +142,9 @@ public class JsonParserTest {
 
   /**
    * Tests for parsing literals.
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  @Test public void literals() throws QueryException {
+  @Test public void literals() throws QueryIOException {
     parse("true", JsonSpec.ECMA_262);
     parse("false", JsonSpec.ECMA_262);
     parse("null", JsonSpec.ECMA_262);
@@ -157,9 +157,9 @@ public class JsonParserTest {
 
   /**
    * Tests for parsing constructors.
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  @Test public void constructorTest() throws QueryException {
+  @Test public void constructorTest() throws QueryIOException {
     parse("new foo()", JsonSpec.LIBERAL);
     parse("new Test(1, { })", JsonSpec.LIBERAL);
     parse("new Foo([ { \"a\": new Test(1, { }) } ])", JsonSpec.LIBERAL);
@@ -177,7 +177,7 @@ public class JsonParserTest {
     try {
       parse(json, spec);
       fail("Should have failed: '" + json + "'");
-    } catch(final QueryException qe) {
+    } catch(final QueryIOException qe) {
       // expected error
     }
   }
@@ -186,9 +186,9 @@ public class JsonParserTest {
    * Checks if the given JSON string is correct and is reproduced by the parser.
    * @param json JSON string
    * @param spec specification
-   * @throws QueryException parse error
+   * @throws QueryIOException parse error
    */
-  private void parse(final String json, final JsonSpec spec) throws QueryException {
+  private void parse(final String json, final JsonSpec spec) throws QueryIOException {
     parse(json, json, spec);
   }
 
@@ -197,10 +197,10 @@ public class JsonParserTest {
    * @param json JSON string
    * @param exp expected output
    * @param spec specification
-   * @throws QueryException parse error
+   * @throws QueryIOException parse error
    */
   private void parse(final String json, final String exp, final JsonSpec spec)
-      throws QueryException {
+      throws QueryIOException {
     tb.reset();
     JsonStringConverter.print(json, spec, true, tb);
     assertEquals(exp, tb.toString());
@@ -211,9 +211,9 @@ public class JsonParserTest {
    * {@code ECMA_262} spec and unescaping deactivated.
    * @param json JSON string
    * @param exp expected output
-   * @throws QueryException parse error
+   * @throws QueryIOException parse error
    */
-  private void unescape(final String json, final String exp) throws QueryException {
+  private void unescape(final String json, final String exp) throws QueryIOException {
     tb.reset();
     JsonStringConverter.print(json, JsonSpec.ECMA_262, false, tb);
     assertEquals(exp, tb.toString());

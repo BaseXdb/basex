@@ -143,7 +143,7 @@ public final class BaseXServer extends Main implements Runnable {
         final Socket s = socket.accept();
         if(stop.exists()) {
           if(!stop.delete()) {
-            context.log.writeServer(ERROR_C + Util.info(FILE_NOT_DELETED_X, stop));
+            context.log.writeServer(ERROR + COL + Util.info(FILE_NOT_DELETED_X, stop));
           }
           quit();
         } else {

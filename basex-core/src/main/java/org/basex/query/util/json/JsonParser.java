@@ -24,9 +24,6 @@ public final class JsonParser extends InputParser {
     "CAN", "EM",  "SUB", "ESC", "FS",  "GS",  "RS",  "US",
   };
 
-  /** Input info for errors. */
-  private final InputInfo info;
-
   /** JSON spec. */
   private final JsonSpec spec;
   /** Unescape flag. */
@@ -38,16 +35,12 @@ public final class JsonParser extends InputParser {
    * Constructor taking the input string and the spec according to which it is parsed.
    * @param in input string
    * @param opts json options
-   * @param ii input info
-   * @throws QueryException query exception
+   * @throws QueryIOException query exception
    */
-  private JsonParser(final String in, final JsonOptions opts, final InputInfo ii)
-      throws QueryException {
-
+  private JsonParser(final String in, final JsonOptions opts) throws QueryIOException {
     super(in);
     spec = opts.spec();
     unescape = opts.get(JsonOptions.UNESCAPE);
-    info = ii;
   }
 
   /**
@@ -55,20 +48,19 @@ public final class JsonParser extends InputParser {
    * @param json JSON string to parse
    * @param opts json options
    * @param handler JSON handler
-   * @param ii input info
-   * @throws QueryException parse exception
+   * @throws QueryIOException parse exception
    */
-  public static void parse(final String json, final JsonOptions opts, final JsonHandler handler,
-      final InputInfo ii) throws QueryException {
-    new JsonParser(json, opts, ii).parse(handler);
+  public static void parse(final String json, final JsonOptions opts, final JsonHandler handler)
+      throws QueryIOException {
+    new JsonParser(json, opts).parse(handler);
   }
 
   /**
    * Parses a JSON expression.
    * @param h handler
-   * @throws QueryException parse exception
+   * @throws QueryIOException query I/O exception
    */
-  private void parse(final JsonHandler h) throws QueryException {
+  private void parse(final JsonHandler h) throws QueryIOException {
     skipWs();
     if(spec == JsonSpec.RFC4627 && !(curr() == '{' || curr() == '['))
       throw error("Expected '{' or '[', found %", rest());
@@ -79,9 +71,9 @@ public final class JsonParser extends InputParser {
   /**
    * Parses a JSON value.
    * @param h handler
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  private void value(final JsonHandler h) throws QueryException {
+  private void value(final JsonHandler h) throws QueryIOException {
     if(pos >= length) throw eof(", expected JSON value.");
     switch(curr()) {
       case '[':
@@ -115,7 +107,7 @@ public final class JsonParser extends InputParser {
         else if(consume("null")) h.nullLit();
         else if(spec == JsonSpec.LIBERAL && consume("new") &&
             Character.isWhitespace(curr())) constr(h);
-        else throw error("Unexpected JSON value: '%'.", rest());
+        else throw error("Unexpected JSON value: '%'", rest());
         skipWs();
     }
   }
@@ -123,9 +115,9 @@ public final class JsonParser extends InputParser {
   /**
    * Parses a JSON object.
    * @param h handler
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  private void object(final JsonHandler h) throws QueryException {
+  private void object(final JsonHandler h) throws QueryIOException {
     consumeWs('{', true);
     h.openObject();
     if(!consumeWs('}', false)) {
@@ -143,9 +135,9 @@ public final class JsonParser extends InputParser {
   /**
    * Parses a JSON array.
    * @param h handler
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  private void array(final JsonHandler h) throws QueryException {
+  private void array(final JsonHandler h) throws QueryIOException {
     consumeWs('[', true);
     h.openArray();
     if(!consumeWs(']', false)) {
@@ -162,9 +154,9 @@ public final class JsonParser extends InputParser {
   /**
    * Parses a JSON constructor function.
    * @param h handler
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  private void constr(final JsonHandler h) throws QueryException {
+  private void constr(final JsonHandler h) throws QueryIOException {
     skipWs();
     if(!input.substring(pos).matches("^[a-zA-Z0-9_-]+\\(.*"))
       throw error("Wrong constructor syntax: '%'", rest());
@@ -187,12 +179,12 @@ public final class JsonParser extends InputParser {
   /**
    * Reads an unquoted string literal.
    * @return the string
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  private byte[] unquoted() throws QueryException {
+  private byte[] unquoted() throws QueryIOException {
     int cp = more() ? input.codePointAt(pos) : -1;
     if(cp < 0 || !Character.isJavaIdentifierStart(cp))
-      throw error("Expected unquoted string, found %.", rest());
+      throw error("Expected unquoted string, found %", rest());
     tb.reset();
     do {
       tb.add(cp);
@@ -205,9 +197,9 @@ public final class JsonParser extends InputParser {
   /**
    * Parses a number literal.
    * @return string representation
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  private byte[] number() throws QueryException {
+  private byte[] number() throws QueryIOException {
     tb.reset();
 
     // integral part
@@ -215,13 +207,13 @@ public final class JsonParser extends InputParser {
     tb.addByte((byte) c);
     if(c == '-') {
       c = consume();
-      if(c < '0' || c > '9') throw error("Number expected after '-'.");
+      if(c < '0' || c > '9') throw error("Number expected after '-'");
       tb.addByte((byte) c);
     }
 
     final boolean zero = c == '0';
     c = curr();
-    if(zero && c >= '0' && c <= '9') throw error("No digit allowed after '0'.");
+    if(zero && c >= '0' && c <= '9') throw error("No digit allowed after '0'");
     loop: while(true) {
       switch(c) {
         case '0':
@@ -251,7 +243,7 @@ public final class JsonParser extends InputParser {
     if(consume('.')) {
       tb.addByte((byte) '.');
       c = curr();
-      if(c < '0' || c > '9') throw error("Number expected after '.'.");
+      if(c < '0' || c > '9') throw error("Number expected after '.'");
       do {
         tb.addByte((byte) c);
         pos++;
@@ -271,7 +263,7 @@ public final class JsonParser extends InputParser {
       c = curr();
     }
 
-    if(c < '0' || c > '9') throw error("Exponent expected.");
+    if(c < '0' || c > '9') throw error("Exponent expected");
     do tb.addByte((byte) consume());
     while((c = curr()) >= '0' && c <= '9');
     skipWs();
@@ -281,9 +273,9 @@ public final class JsonParser extends InputParser {
   /**
    * Parses a string literal.
    * @return the string
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  private byte[] string() throws QueryException {
+  private byte[] string() throws QueryIOException {
     if(!consume('"')) throw error("Expected string, found '%'", curr());
     tb.reset();
     char hi = 0; // cached high surrogate
@@ -391,9 +383,9 @@ public final class JsonParser extends InputParser {
    * @param c character to be consumed
    * @param err error flag
    * @return if the character was consumed
-   * @throws QueryException parse error
+   * @throws QueryIOException parse error
    */
-  private boolean consumeWs(final char c, final boolean err) throws QueryException {
+  private boolean consumeWs(final char c, final boolean err) throws QueryIOException {
     if(consume() != c) {
       pos--;
       if(err) throw error("Expected '%', found '%'", c, curr());
@@ -407,10 +399,10 @@ public final class JsonParser extends InputParser {
    * Throws an end-of-input error.
    * @param desc description
    * @return never
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  private QueryException eof(final String desc) throws QueryException {
-    throw error("Unexpected end of input%.", desc);
+  private QueryIOException eof(final String desc) throws QueryIOException {
+    throw error("Unexpected end of input%", desc);
   }
 
   /**
@@ -418,10 +410,10 @@ public final class JsonParser extends InputParser {
    * @param msg error message
    * @param ext error details
    * @return build exception
-   * @throws QueryException query exception
+   * @throws QueryIOException query I/O exception
    */
-  private QueryException error(final String msg, final Object... ext) throws QueryException {
+  private QueryIOException error(final String msg, final Object... ext) throws QueryIOException {
     final int[] lc = new InputInfo(this).lineCol();
-    throw BXJS_PARSE.thrw(info, lc[0], lc[1], Util.inf(msg, ext));
+    throw BXJS_PARSE.thrwIO(lc[0], lc[1], Util.inf(msg, ext));
   }
 }

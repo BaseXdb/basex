@@ -179,7 +179,7 @@ public abstract class AQuery extends Command {
     // will only be evaluated when an error has occurred
     final StringBuilder sb = new StringBuilder();
     if(options.get(MainOptions.QUERYINFO)) {
-      sb.append(info()).append(qp.info()).append(NL).append(ERROR_C).append(NL);
+      sb.append(info()).append(qp.info()).append(NL).append(ERROR).append(COL).append(NL);
     }
     sb.append(err);
     return error(sb.toString());
