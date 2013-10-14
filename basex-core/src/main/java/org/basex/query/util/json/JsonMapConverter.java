@@ -32,7 +32,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public final class JsonMapConverter extends JsonConverter implements JsonHandler {
+public final class JsonMapConverter extends JsonConverter {
   /** Stack for intermediate values. */
   private final Stack<Value> stack = new Stack<Value>();
 
@@ -40,14 +40,12 @@ public final class JsonMapConverter extends JsonConverter implements JsonHandler
    * Constructor.
    * @param opts json options
    */
-  public JsonMapConverter(final JsonOptions opts) {
+  public JsonMapConverter(final JsonParserOptions opts) {
     super(opts);
   }
 
   @Override
-  public Item convert(final String in) throws QueryIOException {
-    stack.clear();
-    JsonParser.parse(in, jopts, this);
+  public Item finish() {
     return stack.peek().isEmpty() ? null : (Item) stack.pop();
   }
 

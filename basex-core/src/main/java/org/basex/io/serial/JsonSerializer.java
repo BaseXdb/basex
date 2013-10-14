@@ -15,7 +15,7 @@ import org.basex.build.*;
  */
 public abstract class JsonSerializer extends OutputSerializer {
   /** JSON options. */
-  protected final JsonOptions joptions;
+  protected final JsonParserOptions joptions;
 
   /**
    * Constructor.
@@ -28,6 +28,6 @@ public abstract class JsonSerializer extends OutputSerializer {
 
     super(os, opts);
     opts.set(S_METHOD, M_JSON);
-    joptions = new JsonOptions(opts.get(SerializerOptions.S_JSON));
+    joptions = new JsonParserOptions(opts.get(SerializerOptions.S_JSON));
   }
 }

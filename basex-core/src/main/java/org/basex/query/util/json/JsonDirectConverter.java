@@ -4,12 +4,8 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.build.*;
-import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * <p>This class converts a JSON document to XML. The converted XML document is
@@ -52,210 +48,116 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public final class JsonDirectConverter extends JsonXMLConverter {
-  /** Type names. */
-  private static final byte[][] NAMES = { T_ARRAY, T_OBJECT, T_STRING, T_NUMBER,
-    T_BOOLEAN, NULL };
-  /** The {@code types} QNames. */
-  private static final byte[][] TYPES = new byte[NAMES.length][];
+public final class JsonDirectConverter extends JsonXmlConverter {
+  /** Lax QName conversion. */
+  private final boolean lax;
 
-  static {
-    final byte[] s = { 's' };
-    for(int i = 0; i < NAMES.length; i++) TYPES[i] = concat(NAMES[i], s);
-  }
+  /** Name of next element. */
+  private byte[] name = T_JSON;
 
   /**
    * Constructor.
    * @param opts json options
    */
-  public JsonDirectConverter(final JsonOptions opts) {
+  public JsonDirectConverter(final JsonParserOptions opts) {
     super(opts);
-  }
-
-  @Override
-  public ANode convert(final String in) throws QueryIOException {
-    final JsonDefaultHandler handler = new JsonDefaultHandler(jopts.get(JsonOptions.LAX));
-    JsonParser.parse(in, jopts, handler);
-    final ByteList[] types = new ByteList[TYPES.length];
-    for(final TypedArray arr : handler.names.values()) {
-      if(arr != null) {
-        for(int i = 0; i < NAMES.length; i++) {
-          if(arr.type == NAMES[i] && arr.type != T_STRING) {
-            if(types[i] == null) types[i] = new ByteList();
-            else types[i].add(' ');
-            types[i].add(arr.vals[0].qname().string());
-            break;
-          }
-        }
-      }
-    }
-
-    for(int i = 0; i < types.length; i++)
-      if(types[i] != null) handler.elem.add(TYPES[i], types[i].toArray());
-    return handler.elem;
-  }
-
-  /** JSON handler containing the state of the conversion. */
-  static class JsonDefaultHandler implements JsonHandler {
-    /** Map from element name to a pair of all its nodes and the collective node type. */
-    final TokenObjMap<TypedArray> names = new TokenObjMap<TypedArray>();
-    /** Lax QName conversion. */
-    private final boolean lax;
-    /** The next element's name. */
-    private byte[] name = T_JSON;
-    /** The current node. */
-    FElem elem;
-
-    /**
-     * Constructor.
-     * @param l lax name conversion
-     */
-    JsonDefaultHandler(final boolean l) {
-      lax = l;
-    }
-
-    /**
-     * Adds a new element with the given type.
-     * @param type JSON type
-     * @return the element
-     */
-    private FElem addElem(final byte[] type) {
-      final FElem e = new FElem(name);
-
-      if(names.contains(name)) {
-        final TypedArray arr = names.get(name);
-        if(arr != null && arr.type == type) {
-          arr.add(e);
-        } else {
-          if(arr != null) {
-            names.put(name, null);
-            if(arr.type != T_STRING)
-              for(int i = 0; i < arr.size; i++) arr.vals[i].add(T_TYPE, arr.type);
-          }
-          if(type != T_STRING) e.add(T_TYPE, type);
-        }
-      } else {
-        names.put(name, new TypedArray(type, e));
-      }
-      if(elem != null) elem.add(e);
-      else elem = e;
-      name = null;
-      return e;
-    }
-
-    @Override
-    public void openObject() {
-      elem = addElem(T_OBJECT);
-    }
-
-    @Override
-    public void openPair(final byte[] key) {
-      name = XMLToken.encode(key, lax);
-    }
-
-    @Override
-    public void closePair() { }
-
-    @Override
-    public void closeObject() {
-      final FElem par = (FElem) elem.parent();
-      if(par != null) elem = par;
-    }
-
-    @Override
-    public void openArray() {
-      elem = addElem(T_ARRAY);
-    }
-
-    @Override
-    public void openItem() {
-      name = T_VALUE;
-    }
-
-    @Override
-    public void closeItem() { }
-
-    @Override
-    public void closeArray() {
-      closeObject();
-    }
-
-    @Override
-    public void openConstr(final byte[] nm) {
-      // [LW] what can be done here?
-      openObject();
-      openPair(nm);
-      openArray();
-    }
-
-    @Override
-    public void openArg() {
-      openItem();
-    }
-
-    @Override
-    public void closeArg() {
-      closeItem();
-    }
-
-    @Override
-    public void closeConstr() {
-      closeArray();
-      closePair();
-      closeObject();
-    }
-
-    @Override
-    public void numberLit(final byte[] value) {
-      addElem(T_NUMBER).add(value);
-    }
-
-    @Override
-    public void stringLit(final byte[] value) {
-      addElem(T_STRING).add(value);
-    }
-
-    @Override
-    public void nullLit() {
-      addElem(NULL);
-    }
-
-    @Override
-    public void booleanLit(final byte[] b) {
-      addElem(T_BOOLEAN).add(b);
-    }
+    lax = jopts.get(JsonOptions.LAX);
   }
 
   /**
-   * A simple container for all elements having the same name.
-   * @author Leo Woerteler
+   * Adds a new element with the given type.
+   * @param type JSON type
+   * @return the element
    */
-  private static final class TypedArray {
-    /** The shared JSON type. */
-    final byte[] type;
-    /** The nodes. */
-    FElem[] vals = new FElem[8];
-    /** Logical size of {@link #vals}.  */
-    int size;
+  private FElem addElem(final byte[] type) {
+    final FElem e = new FElem(name);
+    addType(e, e.name(), type);
 
-    /**
-     * Constructor.
-     * @param tp JSON type
-     * @param nd element
-     */
-    TypedArray(final byte[] tp, final FElem nd) {
-      type = tp;
-      vals[0] = nd;
-      size = 1;
-    }
+    if(elem != null) elem.add(e);
+    else elem = e;
+    name = null;
+    return e;
+  }
 
-    /**
-     * Adds a new element to the list.
-     * @param nd element to add
-     */
-    void add(final FElem nd) {
-      if(size == vals.length) vals = Array.copy(vals, new FElem[Array.newSize(size)]);
-      vals[size++] = nd;
-    }
+  @Override
+  public void openObject() {
+    elem = addElem(T_OBJECT);
+  }
+
+  @Override
+  public void openPair(final byte[] key) {
+    name = XMLToken.encode(key, lax);
+  }
+
+  @Override
+  public void closePair() { }
+
+  @Override
+  public void closeObject() {
+    final FElem par = (FElem) elem.parent();
+    if(par != null) elem = par;
+  }
+
+  @Override
+  public void openArray() {
+    elem = addElem(T_ARRAY);
+  }
+
+  @Override
+  public void openItem() {
+    name = T_VALUE;
+  }
+
+  @Override
+  public void closeItem() { }
+
+  @Override
+  public void closeArray() {
+    closeObject();
+  }
+
+  @Override
+  public void openConstr(final byte[] nm) {
+    // [LW] what can be done here?
+    openObject();
+    openPair(nm);
+    openArray();
+  }
+
+  @Override
+  public void openArg() {
+    openItem();
+  }
+
+  @Override
+  public void closeArg() {
+    closeItem();
+  }
+
+  @Override
+  public void closeConstr() {
+    closeArray();
+    closePair();
+    closeObject();
+  }
+
+  @Override
+  public void numberLit(final byte[] value) {
+    addElem(T_NUMBER).add(value);
+  }
+
+  @Override
+  public void stringLit(final byte[] value) {
+    addElem(T_STRING).add(value);
+  }
+
+  @Override
+  public void nullLit() {
+    addElem(NULL);
+  }
+
+  @Override
+  public void booleanLit(final byte[] b) {
+    addElem(T_BOOLEAN).add(b);
   }
 }

@@ -87,9 +87,10 @@ public final class DialogNew extends BaseXDialog {
 
     set(buttons, BorderLayout.SOUTH);
 
-    action(general.parser);
     general.setType(general.input());
+    action(general.parser);
 
+    setResizable(true);
     finish(null);
   }
 

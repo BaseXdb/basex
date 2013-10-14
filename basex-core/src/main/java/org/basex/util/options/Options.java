@@ -372,7 +372,7 @@ public class Options implements Iterable<Option> {
         for(final String s : (String[]) value) sl.add(s);
       } else if(value instanceof int[]) {
         for(final int s : (int[]) value) sl.add(Integer.toString(s));
-      } else if(!value.equals(options.get(name).value())) {
+      } else if(value != null && !value.equals(options.get(name).value())) {
         sl.add(value.toString());
       }
       for(final String s : sl) {

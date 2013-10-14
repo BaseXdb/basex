@@ -4,21 +4,19 @@ import org.basex.core.*;
 import org.basex.util.options.*;
 
 /**
- * Options for parsing and serializing text documents.
+ * Options for parsing and serializing CSV data.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class TextOptions extends Options {
-  /** Parser option: encoding. */
+public final class CsvParserOptions extends CsvOptions {
+  /** Option: encoding. */
   public static final StringOption ENCODING = new StringOption("encoding");
-  /** Parser option: line-wise parsing. */
-  public static final BooleanOption LINES = new BooleanOption("lines", true);
 
   /**
    * Constructor.
    */
-  public TextOptions() {
+  public CsvParserOptions() {
     super();
   }
 
@@ -27,7 +25,7 @@ public final class TextOptions extends Options {
    * @param opts options string
    * @throws BaseXException database exception
    */
-  public TextOptions(final String opts) throws BaseXException {
+  public CsvParserOptions(final String opts) throws BaseXException {
     super(opts);
   }
 }

@@ -272,10 +272,10 @@ public final class WesternTokenizer extends Tokenizer {
 
   @Override
   int pos(final int w, final FTUnit u) {
-    if(u == FTUnit.WORD) return w;
+    if(u == FTUnit.WORDS) return w;
 
     // if necessary, calculate sentences and paragraphs
-    final IntList il = u == FTUnit.SENTENCE ? sen : par;
+    final IntList il = u == FTUnit.SENTENCES ? sen : par;
     if(sen.isEmpty()) {
       init();
       while(more()) {

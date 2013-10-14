@@ -30,7 +30,7 @@ public final class CsvConverter {
   private static final byte[] NAME = token("name");
 
   /** CSV options. */
-  protected final CsvOptions copts;
+  protected final CsvParserOptions copts;
   /** Column separator (see {@link CsvOptions#SEPARATOR}). */
   private final int separator;
 
@@ -56,7 +56,7 @@ public final class CsvConverter {
    * @param opts CSV options
    * @throws QueryIOException query I/O exception
    */
-  public CsvConverter(final CsvOptions opts) throws QueryIOException {
+  private CsvConverter(final CsvParserOptions opts) throws QueryIOException {
     copts = opts;
     separator = opts.separator();
     header = opts.get(CsvOptions.HEADER);
@@ -65,23 +65,38 @@ public final class CsvConverter {
   }
 
   /**
-   * Converts the specified input to an XML element.
-   * @param input CSV input
-   * @return node
+   * Converts the specified input to an XQuery item.
+   * @param input input
+   * @param copts options
+   * @return item
    * @throws IOException I/O exception
    */
-  public FElem convert(final byte[] input) throws IOException {
-    return convert(new NewlineInput(new IOContent(input)));
+  public static FDoc convert(final IO input, final CsvParserOptions copts) throws IOException {
+    final String encoding = copts.get(CsvParserOptions.ENCODING);
+    return convert(new NewlineInput(input).encoding(encoding), copts);
   }
 
   /**
-   * Converts the specified input to an XML element.
-   * @param io input
-   * @return node
+   * Converts the specified input to an XQuery item.
+   * @param input input
+   * @param copts options
+   * @return item
    * @throws IOException I/O exception
    */
-  public FElem convert(final IO io) throws IOException {
-    return convert(new NewlineInput(io).encoding(copts.get(CsvOptions.ENCODING)));
+  public static FDoc convert(final byte[] input, final CsvParserOptions copts) throws IOException {
+    return convert(new NewlineInput(new IOContent(input)), copts);
+  }
+
+  /**
+   * Converts the specified input to an XQuery item.
+   * @param input input stream
+   * @param copts options
+   * @return item
+   * @throws IOException I/O exception
+   */
+  private static FDoc convert(final NewlineInput input, final CsvParserOptions copts)
+      throws IOException {
+    return new CsvConverter(copts).convert(input);
   }
 
   /**
@@ -90,7 +105,7 @@ public final class CsvConverter {
    * @return node
    * @throws IOException I/O exception
    */
-  private FElem convert(final NewlineInput input) throws IOException {
+  private FDoc convert(final NewlineInput input) throws IOException {
     final TokenBuilder data = new TokenBuilder();
     boolean quoted = false, open = true;
     int ch = -1;
@@ -129,7 +144,7 @@ public final class CsvConverter {
     }
 
     finish(data, open);
-    return root;
+    return new FDoc().add(root);
   }
 
   /**

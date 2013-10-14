@@ -1,12 +1,12 @@
 package org.basex.query.util.json;
 
-import org.basex.build.*;
-import org.basex.build.JsonOptions.*;
-import org.basex.query.*;
-import org.basex.util.*;
-
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
+import org.basex.build.JsonOptions.JsonSpec;
+import org.basex.build.*;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * A JSON parser generating parse events similar to a SAX XML parser.
@@ -37,22 +37,22 @@ public final class JsonParser extends InputParser {
    * @param opts json options
    * @throws QueryIOException query exception
    */
-  private JsonParser(final String in, final JsonOptions opts) throws QueryIOException {
+  private JsonParser(final String in, final JsonParserOptions opts) throws QueryIOException {
     super(in);
     spec = opts.spec();
-    unescape = opts.get(JsonOptions.UNESCAPE);
+    unescape = opts.get(JsonParserOptions.UNESCAPE);
   }
 
   /**
    * Parses the input JSON string and directs the parse events to the given handler.
-   * @param json JSON string to parse
+   * @param input JSON string to parse
    * @param opts json options
    * @param handler JSON handler
    * @throws QueryIOException parse exception
    */
-  public static void parse(final String json, final JsonOptions opts, final JsonHandler handler)
-      throws QueryIOException {
-    new JsonParser(json, opts).parse(handler);
+  public static void parse(final String input, final JsonParserOptions opts,
+      final JsonHandler handler) throws QueryIOException {
+    new JsonParser(input, opts).parse(handler);
   }
 
   /**

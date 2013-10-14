@@ -10,7 +10,7 @@ import java.net.*;
 import java.util.*;
 
 import org.basex.build.*;
-import org.basex.build.JsonOptions.*;
+import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;

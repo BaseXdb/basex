@@ -1088,8 +1088,10 @@ public interface Text {
   String SEPARATOR = lang("separator") + COL;
   /** Lax name conversion. */
   String LAX_NAME_CONVERSION = lang("lax_name_conversion");
-  /** Store types in root. */
-  String STORE_TYPES_ROOT = lang("store_types_root");
+  /** Merge type information. */
+  String MERGE_TYPES = lang("merge_types");
+  /** Merge type information. */
+  String INCLUDE_STRINGS = lang("include_strings");
   /** Specification. */
   String SPECIFICATION = lang("specification");
   /** Unescape characters. */

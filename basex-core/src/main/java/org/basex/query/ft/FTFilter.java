@@ -24,7 +24,7 @@ public abstract class FTFilter extends FTExpr {
    * @param e expression
    */
   protected FTFilter(final InputInfo ii, final FTExpr e) {
-    this(ii, e, FTUnit.WORD);
+    this(ii, e, FTUnit.WORDS);
   }
 
   /**
@@ -95,7 +95,7 @@ public abstract class FTFilter extends FTExpr {
    * @return result of check
    */
   boolean content() {
-    return unit != FTUnit.WORD;
+    return unit != FTUnit.WORDS;
   }
 
   /**
@@ -105,8 +105,8 @@ public abstract class FTFilter extends FTExpr {
    * @return new position
    */
   final int pos(final int p, final FTLexer ft) {
-    // ft can be zero if unit is WORD
-    return unit == FTUnit.WORD ? p : ft.pos(p, unit);
+    // ft can be zero if unit is WORDS
+    return unit == FTUnit.WORDS ? p : ft.pos(p, unit);
   }
 
   @Override

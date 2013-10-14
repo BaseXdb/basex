@@ -632,9 +632,10 @@ public final class QueryContext extends Proc {
     // convert to json
     try {
       if(type.equalsIgnoreCase(M_JSON)) {
-        final JsonOptions jp = new JsonOptions();
+        final JsonParserOptions jp = new JsonParserOptions();
         jp.set(JsonOptions.SPEC, JsonSpec.ECMA_262.toString());
-        return new JsonMapConverter(jp).convert(val.toString());
+        jp.set(JsonOptions.FORMAT, JsonFormat.MAP.toString());
+        return JsonConverter.convert(Token.token(val.toString()), jp);
       }
     } catch(final QueryIOException ex) {
       throw ex.getCause();

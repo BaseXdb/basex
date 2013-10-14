@@ -211,7 +211,7 @@ public final class XMLToken {
       if(lax) {
         tb.add(cp == '_' ? ' ' : cp);
       } else if(mode >= 3) {
-        uc = (uc << 4) + cp - (cp >= '0' && cp <= '9' ? '0' : 0x37);
+        uc = (uc << 4) + cp - (cp >= '0' && cp <= '9' ? '0' : cp >= 'a' ? 0x57 : 0x37);
         if(++mode == 7) {
           tb.add(uc);
           mode = 0;

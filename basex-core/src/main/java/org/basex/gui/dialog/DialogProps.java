@@ -152,7 +152,6 @@ public final class DialogProps extends BaseXDialog {
 
     action(this);
     setResizable(true);
-    setMinimumSize(getPreferredSize());
 
     main.setCursor(CURSORARROW);
     finish(null);

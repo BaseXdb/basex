@@ -1,13 +1,10 @@
 package org.basex.build;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.util.json.*;
 import org.basex.query.value.item.*;
@@ -53,22 +50,16 @@ public final class JsonParser extends XMLParser {
    * @throws IOException I/O exception
    */
   public static IO toXML(final IO io, final String options) throws IOException {
-    final JsonOptions jopts = new JsonOptions(options);
-    final String encoding = jopts.get(JsonOptions.ENCODING);
-
-    // parse input, using specified encoding
-    final byte[] content = new NewlineInput(io).encoding(encoding).content();
-
-    // parse input and convert to XML node
+    final JsonParserOptions jopts = new JsonParserOptions(options);
     try {
       // cache XML representation
-      final JsonConverter conv = JsonConverter.get(jopts);
-      final Item node = conv.convert(string(content));
-      final IOContent xml = new IOContent(node.serialize().toArray());
+      final Item item = JsonConverter.convert(io, jopts);
+      final IOContent xml = new IOContent(item.serialize().toArray());
       xml.name(io.name());
       return xml;
     } catch(final QueryIOException ex) {
-      throw new BaseXException(ex.getLocalizedMessage());
+      final String msg = ex.getLocalizedMessage();
+      throw new BaseXException(msg.replaceAll(".*?parser", "\"" + io + "\""));
     }
   }
 }

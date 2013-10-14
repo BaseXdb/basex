@@ -6,27 +6,20 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
- * Options for parsing and serializing JSON documents.
+ * Options for processing JSON documents.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class JsonOptions extends Options {
-  /** Option: encoding. */
-  public static final StringOption ENCODING = new StringOption("encoding", Token.UTF8);
+public abstract class JsonOptions extends Options {
   /** Option: parser specification. */
-  public static final StringOption SPEC = new StringOption("spec", JsonSpec.RFC4627.desc);
-  /** Option: unescape special characters. */
-  public static final BooleanOption UNESCAPE = new BooleanOption("unescape", true);
+  public static final StringOption SPEC = new StringOption("spec", JsonSpec.RFC4627.toString());
   /** Option: lax conversion of names to QNames. */
   public static final BooleanOption LAX = new BooleanOption("lax", false);
-  /** Option: store types in root element. */
-  public static final BooleanOption ROOT_TYPES = new BooleanOption("root-types", true);
-  /** Option: JSON format (default, jsonml, plain, map). */
+  /** Option: format. */
   public static final StringOption FORMAT = new StringOption("format",
       JsonFormat.DIRECT.toString());
 
@@ -69,7 +62,7 @@ public final class JsonOptions extends Options {
   /**
    * Default constructor.
    */
-  public JsonOptions() {
+  protected JsonOptions() {
     super();
   }
 
@@ -78,7 +71,7 @@ public final class JsonOptions extends Options {
    * @param opts options string
    * @throws BaseXException database exception
    */
-  public JsonOptions(final String opts) throws BaseXException {
+  protected JsonOptions(final String opts) throws BaseXException {
     super(opts);
   }
 
@@ -87,7 +80,7 @@ public final class JsonOptions extends Options {
    * @return spec
    * @throws QueryIOException query I/O exception
    */
-  public JsonSpec spec() throws QueryIOException {
+  public final JsonSpec spec() throws QueryIOException {
     final String spec = get(SPEC);
     for(final JsonSpec s : JsonSpec.values()) if(s.desc.equals(spec)) return s;
     throw BXJS_CONFIG.thrwIO("Spec '" + spec + "' is not supported");
@@ -98,7 +91,7 @@ public final class JsonOptions extends Options {
    * @return spec
    * @throws QueryIOException query I/O exception
    */
-  public JsonFormat format() throws QueryIOException {
+  public final JsonFormat format() throws QueryIOException {
     final String form = get(FORMAT);
     for(final JsonFormat f : JsonFormat.values()) if(f.toString().equals(form)) return f;
     throw BXJS_CONFIG.thrwIO("Format '" + form + "' is not supported");

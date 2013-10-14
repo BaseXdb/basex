@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -15,18 +14,15 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class CsvOptions extends Options {
-  /** Option: encoding. */
-  public static final StringOption ENCODING = new StringOption("encoding", Token.UTF8);
+public class CsvOptions extends Options {
   /** Option: column separator. */
   public static final StringOption SEPARATOR = new StringOption("separator", "comma");
   /** Option: header line. */
   public static final BooleanOption HEADER = new BooleanOption("header", false);
   /** Option: lax conversion of strings to QNames. */
   public static final BooleanOption LAX = new BooleanOption("lax", true);
-  /** Option: JSON format (default, attributes). */
-  public static final StringOption FORMAT = new StringOption("format",
-      CsvFormat.DIRECT.toString());
+  /** Option: format. */
+  public static final StringOption FORMAT = new StringOption("format", CsvFormat.DIRECT.toString());
 
   /** CSV separators. */
   public static enum CsvSep {
@@ -86,12 +82,11 @@ public final class CsvOptions extends Options {
    * @throws QueryIOException query I/O exception
    */
   public int separator() throws QueryIOException {
-    // set separator
     final String sep = get(SEPARATOR);
     final String val = sep.toLowerCase(Locale.ENGLISH);
     for(final CsvSep s : CsvSep.values()) if(val.equals(s.toString())) return s.ch;
     if(sep.length() != 1) BXCS_CONFIG.thrwIO(
-        Util.info("Separator must be single character; \"%\" found", sep));
+        "Separator must be single character; '" + sep + "' found");
     return sep.charAt(0);
   }
 

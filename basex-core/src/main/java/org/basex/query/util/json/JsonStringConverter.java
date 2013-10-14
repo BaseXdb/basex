@@ -1,7 +1,7 @@
 package org.basex.query.util.json;
 
+import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.build.*;
-import org.basex.build.JsonOptions.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -34,12 +34,12 @@ public final class JsonStringConverter implements JsonHandler {
    * @return the token builder
    * @throws QueryIOException query I/O exception
    */
-  public static TokenBuilder print(final String json, final JsonSpec spec,
-      final boolean un, final TokenBuilder tb) throws QueryIOException {
+  public static TokenBuilder print(final String json, final JsonSpec spec, final boolean un,
+      final TokenBuilder tb) throws QueryIOException {
 
-    final JsonOptions jopts = new JsonOptions();
+    final JsonParserOptions jopts = new JsonParserOptions();
     jopts.set(JsonOptions.SPEC, spec.toString());
-    jopts.set(JsonOptions.UNESCAPE, un);
+    jopts.set(JsonParserOptions.UNESCAPE, un);
     JsonParser.parse(json, jopts, new JsonStringConverter(tb));
     return tb;
   }

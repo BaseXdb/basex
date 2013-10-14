@@ -52,12 +52,12 @@ public class FNCsv extends StandardFunc {
    * @return element node
    * @throws QueryException query exception
    */
-  private FElem parse(final QueryContext ctx) throws QueryException {
+  private FDoc parse(final QueryContext ctx) throws QueryException {
     final byte[] input = checkStr(expr[0], ctx);
-    final CsvOptions opts = checkOptions(1, Q_OPTIONS, new CsvOptions(), ctx);
+    final CsvParserOptions opts = checkOptions(1, Q_OPTIONS, new CsvParserOptions(), ctx);
 
     try {
-      return new CsvConverter(opts).convert(input);
+      return CsvConverter.convert(input, opts);
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     } catch(final IOException ex) {

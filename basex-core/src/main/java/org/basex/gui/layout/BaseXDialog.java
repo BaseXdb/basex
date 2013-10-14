@@ -105,6 +105,7 @@ public abstract class BaseXDialog extends JDialog {
    */
   public final void finish(final int[] l) {
     pack();
+    setMinimumSize(getPreferredSize());
     if(l == null) setLocationRelativeTo(gui);
     else setLocation(gui.getX() + l[0], gui.getY() + l[1]);
     loc = l;

@@ -9,12 +9,9 @@ import java.util.*;
  * @author Christian Gruen
  */
 public enum FTUnit {
-  /** Word unit. */
-  WORD,
-  /** Sentence unit. */
-  SENTENCE,
-  /** Paragraph unit. */
-  PARAGRAPH;
+  /** Word unit. */      WORDS,
+  /** Sentence unit. */  SENTENCES,
+  /** Paragraph unit. */ PARAGRAPHS;
 
   /**
    * Returns a string representation.

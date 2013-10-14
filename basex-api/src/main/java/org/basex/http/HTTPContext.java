@@ -13,8 +13,8 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.basex.*;
+import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.build.*;
-import org.basex.build.JsonOptions.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
@@ -157,7 +157,7 @@ public final class HTTPContext {
     if(eq(mt, M_XHTML, M_HTML)) return TEXT_HTML;
     if(mt.equals(M_JSON)) {
       try {
-        final JsonOptions jprop = new JsonOptions(sopts.get(SerializerOptions.S_JSON));
+        final JsonParserOptions jprop = new JsonParserOptions(sopts.get(SerializerOptions.S_JSON));
         if(jprop.format() == JsonFormat.JSONML) return APP_JSONML;
       } catch(final IOException ignored) { }
       return APP_JSON;

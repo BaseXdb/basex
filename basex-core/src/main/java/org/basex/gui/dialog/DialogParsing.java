@@ -3,6 +3,7 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -29,25 +30,24 @@ final class DialogParsing extends BaseXBack {
   private final BaseXLabel label;
   /** Tabulators. */
   private final BaseXTabs tabs;
-
-  /** Main panel. */
-  private final BaseXBack main;
   /** Main window reference. */
   private final GUI gui;
 
   /** Current parser. */
   private BaseXBack parser;
+  /** Current parser type. */
+  private String type;
 
   /**
    * Default constructor.
    * @param d dialog reference
    * @param t tabs
    */
-  public DialogParsing(final BaseXDialog d, final BaseXTabs t) {
-    main = new BaseXBack(new BorderLayout()).border(8);
+  DialogParsing(final BaseXDialog d, final BaseXTabs t) {
+    border(8);
     gui = d.gui;
     tabs = t;
-    label = new BaseXLabel(" ").border(0, 0, 12, 0).large();
+    label = new BaseXLabel().border(0, 0, 12, 0).large();
 
     final MainOptions opts = gui.context.options;
     parsers = new DialogParser[] { new DialogXmlParser(d, opts), new DialogHtmlParser(d, opts),
@@ -55,24 +55,28 @@ final class DialogParsing extends BaseXBack {
     };
 
     setLayout(new BorderLayout());
-    add(main, BorderLayout.CENTER);
+    addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentShown(final ComponentEvent e) {
+        removeAll();
+        label.setText(Util.info(PARSER_X, type.toUpperCase(Locale.ENGLISH)));
+        add(label, BorderLayout.NORTH);
+        add(parser, BorderLayout.CENTER);
+        revalidate();
+        repaint();
+      }
+    });
   }
 
   /**
-   * Updates the options, depending on the specific type.
-   * @param type parsing type
+   * Sets the correct input type.
+   * @param tp type
    */
-  void updateType(final String type) {
-    label.setText(Util.info(PARSER_X, type.toUpperCase(Locale.ENGLISH)));
-
+  void setType(final String tp) {
+    type = tp;
+    tabs.setEnabledAt(1, !tp.equals(DataText.M_RAW));
     final int tl = TYPES.length;
-    for(int t = 0; t < tl; t++) if(type.equals(TYPES[t])) parser = parsers[t];
-
-    main.removeAll();
-    main.add(label, BorderLayout.NORTH);
-    if(parser != null) main.add(parser, BorderLayout.CENTER);
-    main.revalidate();
-    tabs.setEnabledAt(1, !type.equals(DataText.M_RAW));
+    for(int t = 0; t < tl; t++) if(tp.equals(TYPES[t])) parser = parsers[t];
   }
 
   /**

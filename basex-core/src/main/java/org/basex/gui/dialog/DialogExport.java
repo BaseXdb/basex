@@ -137,7 +137,7 @@ public final class DialogExport extends BaseXDialog {
   static BaseXCombo encoding(final BaseXDialog dialog, final String encoding) {
     final BaseXCombo cb = new BaseXCombo(dialog, ENCODINGS);
     boolean f = false;
-    String enc = encoding;
+    String enc = encoding == null ? Token.UTF8 : encoding;
     for(final String s : ENCODINGS) f |= s.equals(enc);
     if(!f) {
       enc = enc.toUpperCase(Locale.ENGLISH);

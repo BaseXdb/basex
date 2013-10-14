@@ -27,10 +27,10 @@ import org.basex.util.list.*;
  */
 final class DialogCsvParser extends DialogParser {
   /** CSV example string. */
-  private static final String EXAMPLE = "Name,Born,_X ?\nJohn Adam,1984,";
+  private static final String EXAMPLE = "Name,Born,X?_\nJohn Adam,1984,";
 
   /** Options. */
-  private CsvOptions copts;
+  private CsvParserOptions copts;
   /** JSON example. */
   private final Editor example;
   /** CSV: encoding. */
@@ -53,14 +53,14 @@ final class DialogCsvParser extends DialogParser {
    */
   DialogCsvParser(final BaseXDialog d, final MainOptions opts) {
     try {
-      copts = new CsvOptions(opts.get(MainOptions.CSVPARSER));
-    } catch(final IOException ex) { copts = new CsvOptions(); }
+      copts = new CsvParserOptions(opts.get(MainOptions.CSVPARSER));
+    } catch(final BaseXException ex) { copts = new CsvParserOptions(); }
 
     BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
     BaseXBack p = new BaseXBack(new TableLayout(4, 2, 8, 4));
 
     p.add(new BaseXLabel(ENCODING + COL, true, true));
-    encoding = DialogExport.encoding(d, copts.get(CsvOptions.ENCODING));
+    encoding = DialogExport.encoding(d, copts.get(CsvParserOptions.ENCODING));
     p.add(encoding);
 
     final BaseXBack sep = new BaseXBack().layout(new TableLayout(1, 2, 6, 0));
@@ -105,7 +105,6 @@ final class DialogCsvParser extends DialogParser {
     add(pp, BorderLayout.WEST);
 
     example = new Editor(false, d);
-    BaseXLayout.setWidth(example, 300);
 
     add(example, BorderLayout.CENTER);
     action(true);
@@ -139,7 +138,8 @@ final class DialogCsvParser extends DialogParser {
 
   @Override
   void update() {
-    copts.set(CsvOptions.ENCODING, encoding.getSelectedItem());
+    final String enc = encoding.getSelectedItem();
+    copts.set(CsvParserOptions.ENCODING, enc.equals(Token.UTF8) ? null : enc);
     copts.set(CsvOptions.HEADER, header.isSelected());
     copts.set(CsvOptions.SEPARATOR, seps.getSelectedIndex() <
       CsvSep.values().length ? seps.getSelectedItem() : sepchar.getText());

@@ -18,7 +18,7 @@ public final class FTDistanceOptions extends Options {
   /** Option: max. */
   public static final NumberOption MAX = new NumberOption("max", Integer.MAX_VALUE);
   /** Option: unit. */
-  public static final StringOption UNIT = new StringOption("unit", FTUnit.WORD.toString());
+  public static final StringOption UNIT = new StringOption("unit", FTUnit.WORDS.toString());
 
   /**
    * Constructor, specifying initial options.

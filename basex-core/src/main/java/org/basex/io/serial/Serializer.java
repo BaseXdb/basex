@@ -8,8 +8,8 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.build.*;
-import org.basex.build.JsonOptions.*;
 import org.basex.data.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -85,9 +85,9 @@ public abstract class Serializer {
 
     // serialize as JSON
     if(M_JSON.equals(m)) {
-      final JsonOptions jopts = new JsonOptions(opts.get(S_JSON));
+      final JsonParserOptions jopts = new JsonParserOptions(opts.get(S_JSON));
       return jopts.format() == JsonFormat.JSONML ? new JsonMLSerializer(os, opts) :
-        new JsonDefaultSerializer(os, opts);
+        new JsonDirectSerializer(os, opts);
     }
 
     // otherwise, serialize as XML (default)

@@ -32,18 +32,18 @@ abstract class DialogParser extends BaseXBack {
   abstract boolean action(final boolean active);
 
   /**
-   * Sets parser options.
+   * Updates the chosen parser options.
    */
   abstract void update();
 
   /**
-   * Finalizes the option parsing.
+   * Sets the global parser options.
    * @param gui gui reference
    */
   abstract void setOptions(final GUI gui);
 
   /**
-   * Builds a parsing example.
+   * Builds a parsing example string.
    * @param format format
    * @param input input string
    * @param output output string

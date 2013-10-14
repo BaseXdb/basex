@@ -167,7 +167,7 @@ public final class DialogImport extends BaseXBack {
     skipCorrupt.setEnabled(!raw);
 
     if(comp == parser) {
-      parsing.updateType(type);
+      parsing.setType(type);
       if(multi) filter.setText(raw ? "*" : "*." + type);
     }
 
@@ -205,7 +205,7 @@ public final class DialogImport extends BaseXBack {
   }
 
   /**
-   * Chooses the correct input type.
+   * Sets the correct input type.
    * @param in input path
    */
   void setType(final String in) {
@@ -215,33 +215,33 @@ public final class DialogImport extends BaseXBack {
 
     final boolean dir = io.isDir();
     final boolean archive = io.isArchive();
-    if(dir || archive) filter.setText('*' + IO.XMLSUFFIX);
+    if(dir || archive) {
+      return;
+      //filter.setText('*' + IO.XMLSUFFIX);
+    }
 
     // evaluate input type
     String type = null;
-    if(!dir && !archive) {
-      // input type of single file
-      final String path = io.path();
-      final int i = path.lastIndexOf('.');
-      if(i != -1) {
-        // analyze file suffix
-        final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
-        if(Token.eq(suf, IO.XMLSUFFIXES)) type = DataText.M_XML;
-        else if(Token.eq(suf, IO.XSLSUFFIXES)) type = DataText.M_XML;
-        else if(Token.eq(suf, IO.HTMLSUFFIXES)) type = DataText.M_HTML;
-        else if(Token.eq(suf, IO.CSVSUFFIX)) type = DataText.M_CSV;
-        else if(Token.eq(suf, IO.TXTSUFFIXES)) type = DataText.M_TEXT;
-        else if(Token.eq(suf, IO.JSONSUFFIX)) type = DataText.M_JSON;
-      }
-      // unknown suffix: analyze first bytes
-      if(type == null) type = guess(io);
+    // input type of single file
+    final String path = io.path();
+    final int i = path.lastIndexOf('.');
+    if(i != -1) {
+      // analyze file suffix
+      final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
+      if(Token.eq(suf, IO.XMLSUFFIXES)) type = DataText.M_XML;
+      else if(Token.eq(suf, IO.XSLSUFFIXES)) type = DataText.M_XML;
+      else if(Token.eq(suf, IO.HTMLSUFFIXES)) type = DataText.M_HTML;
+      else if(Token.eq(suf, IO.CSVSUFFIX)) type = DataText.M_CSV;
+      else if(Token.eq(suf, IO.TXTSUFFIXES)) type = DataText.M_TEXT;
+      else if(Token.eq(suf, IO.JSONSUFFIX)) type = DataText.M_JSON;
     }
+    // unknown suffix: analyze first bytes
+    if(type == null) type = guess(io);
     // default parser: XML
     if(type == null) type = DataText.M_XML;
 
     // choose correct parser (default: XML)
     parser.setSelectedItem(type.toUpperCase(Locale.ENGLISH));
-    parsing.updateType(type);
   }
 
   /**
@@ -258,7 +258,7 @@ public final class DialogImport extends BaseXBack {
    * @return type
    */
   static String guess(final IO in) {
-    if(!in.exists()) return null;
+    if(!in.exists() || in instanceof IOUrl) return null;
 
     BufferInput ti = null;
     try {

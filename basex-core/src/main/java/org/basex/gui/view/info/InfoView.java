@@ -1,7 +1,6 @@
 package org.basex.gui.view.info;
 
 import static org.basex.core.Text.*;
-import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -62,7 +61,7 @@ public final class InfoView extends View implements LinkListener {
    * @param man view manager
    */
   public InfoView(final ViewNotifier man) {
-    super(INFOVIEW, man);
+    super(GUIConstants.INFOVIEW, man);
     border(5).layout(new BorderLayout(0, 5));
 
     label = new BaseXLabel(QUERY_INFO);
@@ -113,8 +112,8 @@ public final class InfoView extends View implements LinkListener {
   @Override
   public void refreshLayout() {
     label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
-    timer.setFont(font);
-    area.setFont(font);
+    timer.setFont(GUIConstants.font);
+    area.setFont(GUIConstants.font);
     editor.bar().refreshLayout();
   }
 
@@ -197,7 +196,7 @@ public final class InfoView extends View implements LinkListener {
           line.startsWith(PRINTED_CC) || line.startsWith(READ_LOCKING_CC) ||
           line.startsWith(WRITE_LOCKING_CC)) {
         result.add(LI + line);
-      } else if(line.startsWith(ERROR + COL)) {
+      } else if(line.startsWith(Text.ERROR + COL)) {
         while(i + 1 < split.length && !split[++i].isEmpty()) {
           final Pattern p = Pattern.compile(STOPPED_AT + "(.*)" + COL);
           final Matcher m = p.matcher(split[i]);
@@ -241,7 +240,7 @@ public final class InfoView extends View implements LinkListener {
     }
 
     add(COMMAND + COL, command);
-    add(ERROR + COL, err);
+    add(Text.ERROR + COL, err);
     add(STACK_TRACE + COL, stack);
     add(EVALUATING + COL, eval);
     add(COMPILING + COL, comp);
@@ -309,7 +308,7 @@ public final class InfoView extends View implements LinkListener {
     final int l = stat.size();
     if(l == 0) return;
 
-    final int fs = fontSize;
+    final int fs = GUIConstants.fontSize;
     h = label.getHeight() + 4;
     w = (int) (getWidth() * .98 - fs / 2 - label.getWidth());
     bw = fs * 2 + w / 10;
@@ -326,17 +325,17 @@ public final class InfoView extends View implements LinkListener {
     for(int i = 0; i < l - 1; ++i) {
       if(i != focus) continue;
       final int bx = w - bw + bs * i;
-      g.setColor(color3);
+      g.setColor(GUIConstants.color3);
       g.fillRect(bx, by, bs + 1, bh);
     }
 
     // draw all bars
     for(int i = 0; i < l - 1; ++i) {
       final int bx = w - bw + bs * i;
-      g.setColor(color((i == focus ? 3 : 2) + i * 2));
+      g.setColor(GUIConstants.color((i == focus ? 3 : 2) + i * 2));
       final int p = Math.max(1, stat.get(i) * bh / m);
       g.fillRect(bx, by + bh - p, bs, p);
-      g.setColor(color(8));
+      g.setColor(GUIConstants.color(8));
       g.drawRect(bx, by + bh - p, bs, p - 1);
     }
   }

@@ -3134,8 +3134,8 @@ public class QueryParser extends InputParser {
         final boolean diff = !same && wsConsumeWs(DIFFERENT);
         if(same || diff) {
           FTUnit unit = null;
-          if(wsConsumeWs(SENTENCE)) unit = FTUnit.SENTENCE;
-          else if(wsConsumeWs(PARAGRAPH)) unit = FTUnit.PARAGRAPH;
+          if(wsConsumeWs(SENTENCE)) unit = FTUnit.SENTENCES;
+          else if(wsConsumeWs(PARAGRAPH)) unit = FTUnit.PARAGRAPHS;
           else error(INCOMPLETE);
           expr = new FTScope(info(), expr, unit, same);
         }
@@ -3339,9 +3339,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private FTUnit ftUnit() throws QueryException {
-    if(wsConsumeWs(WORDS)) return FTUnit.WORD;
-    if(wsConsumeWs(SENTENCES)) return FTUnit.SENTENCE;
-    if(wsConsumeWs(PARAGRAPHS)) return FTUnit.PARAGRAPH;
+    if(wsConsumeWs(WORDS)) return FTUnit.WORDS;
+    if(wsConsumeWs(SENTENCES)) return FTUnit.SENTENCES;
+    if(wsConsumeWs(PARAGRAPHS)) return FTUnit.PARAGRAPHS;
     error(INCOMPLETE);
     return null;
   }

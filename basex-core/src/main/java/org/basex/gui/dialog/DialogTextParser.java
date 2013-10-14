@@ -9,6 +9,7 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * CSV parser panel.
@@ -55,7 +56,8 @@ final class DialogTextParser extends DialogParser {
 
   @Override
   void update() {
-    topts.set(TextOptions.ENCODING, encoding.getSelectedItem());
+    final String enc = encoding.getSelectedItem();
+    topts.set(TextOptions.ENCODING, enc.equals(Token.UTF8) ? null : enc);
     topts.set(TextOptions.LINES, lines.isSelected());
   }
 

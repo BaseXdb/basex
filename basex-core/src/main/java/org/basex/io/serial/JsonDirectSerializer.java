@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class JsonDefaultSerializer extends JsonSerializer {
+public final class JsonDirectSerializer extends JsonSerializer {
   /** Plural. */
   private static final byte[] S = { 's' };
   /** Global data type attributes. */
@@ -47,11 +47,10 @@ public final class JsonDefaultSerializer extends JsonSerializer {
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  JsonDefaultSerializer(final OutputStream os, final SerializerOptions opts)
-      throws IOException {
+  JsonDirectSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
     super(os, opts);
     for(int t = 0; t < typeCache.length; t++) typeCache[t] = new TokenMap();
-    final JsonOptions jopts = new JsonOptions(opts.get(SerializerOptions.S_JSON));
+    final JsonSerialOptions jopts = new JsonSerialOptions(opts.get(SerializerOptions.S_JSON));
     lax = jopts.get(JsonOptions.LAX);
   }
 

@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.basex.build.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -21,24 +20,23 @@ import org.basex.util.*;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public class JsonMLConverter extends JsonXMLConverter {
+public class JsonMLConverter extends JsonXmlConverter {
   /** Element stack. */
-  final Stack<FElem> stack = new Stack<FElem>();
+  private final Stack<FElem> stack = new Stack<FElem>();
+  /** Current attribute name. */
+  private byte[] attName;
 
   /**
    * Constructor.
    * @param opts json options
    */
-  public JsonMLConverter(final JsonOptions opts) {
+  public JsonMLConverter(final JsonParserOptions opts) {
     super(opts);
   }
 
   @Override
-  public ANode convert(final String in) throws QueryIOException {
-    final JsonMLHandler handler = new JsonMLHandler();
-    stack.clear();
-    JsonParser.parse(in, jopts, handler);
-    return stack.pop();
+  protected FDoc finish() {
+    return new FDoc().add(stack.pop());
   }
 
   /**
@@ -63,113 +61,105 @@ public class JsonMLConverter extends JsonXMLConverter {
     return name;
   }
 
-  /** JSON handler. */
-  private class JsonMLHandler implements JsonHandler {
-    /** Current element. */
-    private FElem curr;
-    /** Current attribute name. */
-    private byte[] attName;
-
-    /** Constructor for visibility. */
-    protected JsonMLHandler() { }
-
-    @Override
-    public void openObject() throws QueryIOException {
-      if(curr == null || attName != null || stack.peek() != null)
-        error("No object allowed at this stage");
-    }
-
-    @Override
-    public void openPair(final byte[] key) throws QueryIOException {
-      attName = check(key);
-    }
-
-    @Override
-    public void closePair() throws QueryIOException { }
-
-    @Override
-    public void closeObject() {
-      stack.pop();
-      stack.push(curr);
-      curr = null;
-    }
-
-    @Override
-    public void openArray() throws QueryIOException {
-      if(!stack.isEmpty()) {
-        if(attName == null && curr != null && stack.peek() == null) {
-          stack.pop();
-          stack.push(curr);
-          curr = null;
-        } else if(attName != null || curr != null || stack.peek() == null) {
-          error("No array allowed at this stage");
-        }
-      }
-      stack.push(null);
-      curr = null;
-    }
-
-    @Override
-    public void openItem() { }
-
-    @Override
-    public void closeItem() throws QueryIOException { }
-
-    @Override
-    public void closeArray() throws QueryIOException {
-      FElem val = stack.pop();
-      if(val == null) {
-        val = curr;
-        curr = null;
-      }
-
-      if(val == null) error("Missing element name");
-
-      if(stack.isEmpty()) stack.push(val);
-      else stack.peek().add(val);
-    }
-
-    @Override
-    public void stringLit(final byte[] val) throws QueryIOException {
-      if(attName == null && curr != null && stack.peek() == null) {
-        stack.pop();
-        stack.push(curr);
-        curr = null;
-      }
-
-      if(curr == null) {
-        final FElem elem = stack.isEmpty() ? null : stack.peek();
-        if(elem == null) curr = new FElem(check(val));
-        else elem.add(new FTxt(val));
-      } else if(attName != null) {
-        curr.add(attName, val);
-        attName = null;
-      } else {
-        error("No string allowed at this stage");
-      }
-    }
-
-    @Override
-    public void numberLit(final byte[] value) throws QueryIOException {
-      error("No numbers allowed");
-    }
-
-    @Override
-    public void nullLit() throws QueryIOException {
-      error("No 'null' allowed");
-    }
-
-    @Override
-    public void booleanLit(final byte[] b) throws QueryIOException {
-      error("No booleans allowed");
-    }
-
-    @Override
-    public void openConstr(final byte[] nm) throws QueryIOException {
-      error("No constructor functions allowed");
-    }
-    @Override public void openArg() { }
-    @Override public void closeArg() throws QueryIOException { }
-    @Override public void closeConstr() throws QueryIOException { }
+  @Override
+  public void openObject() throws QueryIOException {
+    if(elem == null || attName != null || stack.peek() != null)
+      error("No object allowed at this stage");
   }
+
+  @Override
+  public void openPair(final byte[] key) throws QueryIOException {
+    attName = check(key);
+  }
+
+  @Override
+  public void closePair() throws QueryIOException { }
+
+  @Override
+  public void closeObject() {
+    stack.pop();
+    stack.push(elem);
+    elem = null;
+  }
+
+  @Override
+  public void openArray() throws QueryIOException {
+    if(!stack.isEmpty()) {
+      if(attName == null && elem != null && stack.peek() == null) {
+        stack.pop();
+        stack.push(elem);
+        elem = null;
+      } else if(attName != null || elem != null || stack.peek() == null) {
+        error("No array allowed at this stage");
+      }
+    }
+    stack.push(null);
+    elem = null;
+  }
+
+  @Override
+  public void openItem() { }
+
+  @Override
+  public void closeItem() throws QueryIOException { }
+
+  @Override
+  public void closeArray() throws QueryIOException {
+    FElem val = stack.pop();
+    if(val == null) {
+      val = elem;
+      elem = null;
+    }
+
+    if(val == null) error("Missing element name");
+
+    if(stack.isEmpty()) stack.push(val);
+    else stack.peek().add(val);
+  }
+
+  @Override
+  public void stringLit(final byte[] val) throws QueryIOException {
+    if(attName == null && elem != null && stack.peek() == null) {
+      stack.pop();
+      stack.push(elem);
+      elem = null;
+    }
+
+    if(elem == null) {
+      final FElem e = stack.isEmpty() ? null : stack.peek();
+      if(e == null) elem = new FElem(check(val));
+      else e.add(new FTxt(val));
+    } else if(attName != null) {
+      elem.add(attName, val);
+      attName = null;
+    } else {
+      error("No string allowed at this stage");
+    }
+  }
+
+  @Override
+  public void numberLit(final byte[] value) throws QueryIOException {
+    error("No numbers allowed");
+  }
+
+  @Override
+  public void nullLit() throws QueryIOException {
+    error("No 'null' allowed");
+  }
+
+  @Override
+  public void booleanLit(final byte[] b) throws QueryIOException {
+    error("No booleans allowed");
+  }
+
+  @Override
+  public void openConstr(final byte[] nm) throws QueryIOException {
+    error("No constructor functions allowed");
+  }
+
+  @Override public void openArg() { }
+
+  @Override public void closeArg() throws QueryIOException { }
+
+  @Override public void closeConstr() throws QueryIOException { }
 }

@@ -37,9 +37,9 @@ public final class FNJson extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
-      case _JSON_PARSE:        return parse(ctx);
-      case _JSON_SERIALIZE:    return serialize(ctx);
-      default:                 return super.item(ctx, ii);
+      case _JSON_PARSE:     return parse(ctx);
+      case _JSON_SERIALIZE: return serialize(ctx);
+      default:              return super.item(ctx, ii);
     }
   }
 
@@ -51,10 +51,9 @@ public final class FNJson extends StandardFunc {
    */
   private Item parse(final QueryContext ctx) throws QueryException {
     final byte[] input = checkStr(expr[0], ctx);
-    final JsonOptions opts = checkOptions(1, Q_OPTIONS, new JsonOptions(), ctx);
-
+    final JsonParserOptions opts = checkOptions(1, Q_OPTIONS, new JsonParserOptions(), ctx);
     try {
-      return JsonConverter.get(opts).convert(string(input)).item(ctx, info);
+      return JsonConverter.convert(input, opts);
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     }
@@ -68,7 +67,7 @@ public final class FNJson extends StandardFunc {
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
     final ANode node = checkNode(expr[0], ctx);
-    final JsonOptions opts = checkOptions(1, Q_OPTIONS, new JsonOptions(), ctx);
+    final JsonSerialOptions opts = checkOptions(1, Q_OPTIONS, new JsonSerialOptions(), ctx);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(S_METHOD, M_JSON);
