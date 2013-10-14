@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.layout.BaseXLayout.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -41,25 +42,27 @@ final class DialogXmlParser extends DialogParser {
    * @param opts main options
    */
   DialogXmlParser(final BaseXDialog d, final MainOptions opts) {
+    super(d);
     final BaseXBack pp = new BaseXBack(new TableLayout(9, 1));
 
-    intparse = new BaseXCheckBox(INT_PARSER, opts.get(MainOptions.INTPARSE), 0, d);
+    intparse = new BaseXCheckBox(INT_PARSER, MainOptions.INTPARSE, opts, d).bold();
     pp.add(intparse);
     pp.add(new BaseXLabel(H_INT_PARSER, true, false));
 
-    dtd = new BaseXCheckBox(PARSE_DTDS, opts.get(MainOptions.DTD), 0, d);
+    dtd = new BaseXCheckBox(PARSE_DTDS, MainOptions.DTD, opts, d).bold();
     pp.add(dtd);
 
-    stripNS = new BaseXCheckBox(STRIP_NS, opts.get(MainOptions.STRIPNS), 0, d);
+    stripNS = new BaseXCheckBox(STRIP_NS, MainOptions.STRIPNS, opts, d).bold();
     pp.add(stripNS);
 
-    chopWS = new BaseXCheckBox(CHOP_WS, opts.get(MainOptions.CHOP), 0, d);
+    chopWS = new BaseXCheckBox(CHOP_WS, MainOptions.CHOP, opts, d).bold();
     pp.add(chopWS);
     pp.add(new BaseXLabel(H_CHOP_WS, false, false).border(0, 0, 8, 0));
     pp.add(new BaseXLabel());
 
     // catalog resolver
-    usecat = new BaseXCheckBox(USE_CATALOG_FILE, !opts.get(MainOptions.CATFILE).isEmpty(), 0, d);
+    final boolean cat = !opts.get(MainOptions.CATFILE).isEmpty();
+    usecat = new BaseXCheckBox(USE_CATALOG_FILE, cat, d).bold();
     final boolean rsen = CatalogWrapper.available();
     final BaseXBack cr = new BaseXBack(new TableLayout(2, 2, 8, 0));
     usecat.setEnabled(rsen);
@@ -73,7 +76,7 @@ final class DialogXmlParser extends DialogParser {
     browsec = new BaseXButton(BROWSE_D, d);
     browsec.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(final ActionEvent e) { catchoose(d.gui); }
+      public void actionPerformed(final ActionEvent e) { catchoose(); }
     });
     browsec.setEnabled(rsen);
     cr.add(browsec);
@@ -108,6 +111,12 @@ final class DialogXmlParser extends DialogParser {
 
   @Override
   void update() {
+    final MainOptions opts = dialog.gui.context.options;
+    tooltip(opts, MainOptions.CHOP, chopWS);
+    tooltip(opts, MainOptions.STRIPNS, stripNS);
+    tooltip(opts, MainOptions.DTD, dtd);
+    tooltip(opts, MainOptions.INTPARSE, intparse);
+    tooltip(opts, MainOptions.CATFILE, usecat);
   }
 
   @Override
@@ -121,12 +130,11 @@ final class DialogXmlParser extends DialogParser {
 
   /**
    * Opens a file dialog to choose an XML catalog or directory.
-   * @param gui gui reference
    */
-  private void catchoose(final GUI gui) {
-    final GUIOptions gopts = gui.gopts;
+  private void catchoose() {
+    final GUIOptions gopts = dialog.gui.gopts;
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
-        gopts.get(GUIOptions.INPUTPATH), gui).filter(XML_DOCUMENTS, IO.XMLSUFFIX);
+        gopts.get(GUIOptions.INPUTPATH), dialog.gui).filter(XML_DOCUMENTS, IO.XMLSUFFIX);
 
     final IO file = fc.select(Mode.FDOPEN);
     if(file != null) cfile.setText(file.path());

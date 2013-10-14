@@ -65,16 +65,16 @@ public final class DialogNew extends BaseXDialog {
     // index panel
     final BaseXBack indexes = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
 
-    txtindex = new BaseXCheckBox(TEXT_INDEX, opts.get(MainOptions.TEXTINDEX), 0, this).large();
+    txtindex = new BaseXCheckBox(TEXT_INDEX, MainOptions.TEXTINDEX, opts, this).bold().large();
     indexes.add(txtindex);
     indexes.add(new BaseXLabel(H_TEXT_INDEX, true, false));
 
-    atvindex = new BaseXCheckBox(ATTRIBUTE_INDEX, opts.get(MainOptions.ATTRINDEX), 0, this).large();
+    atvindex = new BaseXCheckBox(ATTRIBUTE_INDEX, MainOptions.ATTRINDEX, opts, this).bold().large();
     indexes.add(atvindex);
     indexes.add(new BaseXLabel(H_ATTR_INDEX, true, false));
 
     // full-text panel
-    ftxindex = new BaseXCheckBox(FULLTEXT_INDEX, opts.get(MainOptions.FTINDEX), 0, this).large();
+    ftxindex = new BaseXCheckBox(FULLTEXT_INDEX, MainOptions.FTINDEX, opts, this).bold().large();
     indexes.add(ftxindex);
 
     ft = new DialogFT(this, true);

@@ -84,23 +84,22 @@ public final class DialogPrefs extends BaseXDialog {
     pp.add(new BaseXLabel(GUI_INTERACTIONS + COL, true, true).border(12, 0, 6, 0));
 
     // checkbox for Java look and feel
-    javalook = new BaseXCheckBox(JAVA_LF, gopts.get(GUIOptions.JAVALOOK), this);
+    javalook = new BaseXCheckBox(JAVA_LF, GUIOptions.JAVALOOK, gopts, this);
     pp.add(javalook);
 
     // checkbox for realtime mouse focus
-    focus = new BaseXCheckBox(RT_FOCUS, gopts.get(GUIOptions.MOUSEFOCUS), this);
+    focus = new BaseXCheckBox(RT_FOCUS, GUIOptions.MOUSEFOCUS, gopts, this);
     pp.add(focus);
 
     // checkbox for simple file dialog
-    simpfd = new BaseXCheckBox(SIMPLE_FILE_CHOOSER, gopts.get(GUIOptions.SIMPLEFD), this);
+    simpfd = new BaseXCheckBox(SIMPLE_FILE_CHOOSER, GUIOptions.SIMPLEFD, gopts, this);
     pp.add(simpfd);
 
     // enable only if current document contains name attributes
-    final boolean sn = gopts.get(GUIOptions.SHOWNAME);
-    names = new BaseXCheckBox(SHOW_NAME_ATTS, sn, 6, this);
     final Data data = gui.context.data();
+    names = new BaseXCheckBox(SHOW_NAME_ATTS, GUIOptions.SHOWNAME, gopts, this);
     names.setEnabled(data != null && ViewData.nameID(data) != 0);
-    oldShowNames = sn;
+    oldShowNames = names.isSelected();
     pp.add(names);
 
     // maximum number of hits to be displayed
@@ -110,7 +109,7 @@ public final class DialogPrefs extends BaseXDialog {
       public void actionPerformed(final ActionEvent e) { action(limit); }
     });
     label = new BaseXLabel(" ");
-    p = new BaseXBack(new TableLayout(1, 4, 12, 0));
+    p = new BaseXBack(new TableLayout(1, 4, 12, 0)).border(8, 0, 0, 0);
     p.add(new BaseXLabel(MAX_NO_OF_HITS + COL));
     p.add(limit);
     p.add(label);

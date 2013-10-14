@@ -25,8 +25,9 @@ final class DialogHtmlParser extends DialogParser {
    * @param opts main options
    */
   DialogHtmlParser(final BaseXDialog d, final MainOptions opts) {
-    final boolean avl = HtmlParser.available();
+    super(d);
 
+    final boolean avl = HtmlParser.available();
     BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
     pp.add(new BaseXLabel(avl ? H_HTML_PARSER : H_NO_HTML_PARSER));
 

@@ -30,11 +30,11 @@ public final class DialogTreeOptions extends BaseXDialog {
     final GUIOptions gopts = gui.gopts;
 
     // create checkbox
-    slim = new BaseXCheckBox(ADJUST_NODES, gopts.get(GUIOptions.TREESLIMS), this);
+    slim = new BaseXCheckBox(ADJUST_NODES, GUIOptions.TREESLIMS, gopts, this);
     p.add(slim);
 
     // create checkbox
-    atts = new BaseXCheckBox(SHOW_ATTS, gopts.get(GUIOptions.TREEATTS), this);
+    atts = new BaseXCheckBox(SHOW_ATTS, GUIOptions.TREEATTS, gopts, this);
     p.add(atts);
 
     set(p, BorderLayout.CENTER);

@@ -5,6 +5,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import org.basex.util.options.*;
+
 /**
  * Project specific CheckBox implementation.
  *
@@ -14,26 +16,26 @@ import javax.swing.*;
 public final class BaseXCheckBox extends JCheckBox {
   /**
    * Checkbox.
-   * @param txt checkbox text
-   * @param sel initial selection state
+   * @param label checkbox text
+   * @param option option
+   * @param opts options
    * @param win parent window
    */
-  public BaseXCheckBox(final String txt, final boolean sel, final Window win) {
-    this(txt, sel, 1, win);
+  public BaseXCheckBox(final String label, final BooleanOption option, final Options opts,
+      final Window win) {
+    this(label, opts.get(option), win);
   }
 
   /**
-   * Constructor.
+   * Checkbox.
    * @param label checkbox text
    * @param sel initial selection state
-   * @param dist distance to next component
    * @param win parent window
    */
-  public BaseXCheckBox(final String label, final boolean sel, final int dist, final Window win) {
+  public BaseXCheckBox(final String label, final boolean sel, final Window win) {
     super(label, sel);
     setOpaque(false);
-    setMargin(new Insets(0, 0, dist, 0));
-    if(dist == 0) setFont(getFont().deriveFont(Font.BOLD));
+    setMargin(new Insets(0, 0, 0, 0));
     BaseXLayout.addInteraction(this, win);
     if(!(win instanceof BaseXDialog)) return;
 
@@ -45,6 +47,15 @@ public final class BaseXCheckBox extends JCheckBox {
         dialog.action(e.getSource());
       }
     });
+  }
+
+  /**
+   * Chooses a bold font.
+   * @return self reference
+   */
+  public BaseXCheckBox bold() {
+    setFont(getFont().deriveFont(Font.BOLD));
+    return this;
   }
 
   /**

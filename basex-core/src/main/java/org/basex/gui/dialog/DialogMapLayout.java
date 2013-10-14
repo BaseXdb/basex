@@ -64,7 +64,7 @@ public final class DialogMapLayout extends BaseXDialog {
     p.add(tmp);
 
     // create checkbox
-    atts = new BaseXCheckBox(SHOW_ATTS, gopts.get(GUIOptions.MAPATTS), this);
+    atts = new BaseXCheckBox(SHOW_ATTS, GUIOptions.MAPATTS, gopts, this);
     p.add(atts);
 
     set(p, BorderLayout.CENTER);

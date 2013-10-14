@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.layout.BaseXLayout.*;
 
 import java.awt.*;
 import java.io.*;
@@ -57,6 +58,7 @@ final class DialogJsonParser extends DialogParser {
    * @param opts main options
    */
   DialogJsonParser(final BaseXDialog d, final MainOptions opts) {
+    super(d);
     try {
       jopts = new JsonParserOptions(opts.get(MainOptions.JSONPARSER));
     } catch(final IOException ex) { jopts = new JsonParserOptions(); }
@@ -75,10 +77,10 @@ final class DialogJsonParser extends DialogParser {
     spec = new BaseXCombo(d, sl.toArray());
     spec.setSelectedItem(jopts.get(JsonOptions.SPEC));
 
-    unescape = new BaseXCheckBox(UNESCAPE_CHARS, jopts.get(JsonParserOptions.UNESCAPE), 0, d);
-    merge = new BaseXCheckBox(MERGE_TYPES, jopts.get(JsonParserOptions.MERGE), 0, d);
-    strings = new BaseXCheckBox(INCLUDE_STRINGS, jopts.get(JsonParserOptions.STRINGS), 0, d);
-    lax = new BaseXCheckBox(LAX_NAME_CONVERSION, jopts.get(JsonOptions.LAX), 0, d);
+    unescape = new BaseXCheckBox(UNESCAPE_CHARS, JsonParserOptions.UNESCAPE, jopts, d);
+    merge = new BaseXCheckBox(MERGE_TYPES, JsonParserOptions.MERGE, jopts, d);
+    strings = new BaseXCheckBox(INCLUDE_STRINGS, JsonParserOptions.STRINGS, jopts, d);
+    lax = new BaseXCheckBox(LAX_NAME_CONVERSION, JsonOptions.LAX, jopts, d);
 
     BaseXBack pp = new BaseXBack(new TableLayout(2, 1, 0, 8));
     BaseXBack p = new BaseXBack(new TableLayout(3, 2, 8, 4));
@@ -134,14 +136,21 @@ final class DialogJsonParser extends DialogParser {
 
   @Override
   void update() {
-    final String enc = encoding.getSelectedItem();
+    String enc = encoding.getSelectedItem();
     jopts.set(JsonParserOptions.ENCODING, enc.equals(Token.UTF8) ? null : enc);
+    tooltip(jopts, JsonParserOptions.ENCODING, encoding);
     jopts.set(JsonParserOptions.UNESCAPE, unescape.isSelected());
+    tooltip(jopts, JsonParserOptions.UNESCAPE, unescape);
     jopts.set(JsonParserOptions.MERGE, merge.isSelected());
+    tooltip(jopts, JsonParserOptions.MERGE, merge);
     jopts.set(JsonParserOptions.STRINGS, strings.isSelected());
+    tooltip(jopts, JsonParserOptions.STRINGS, strings);
     jopts.set(JsonOptions.FORMAT, format.getSelectedItem());
+    tooltip(jopts, JsonOptions.FORMAT, format);
     jopts.set(JsonOptions.SPEC, spec.getSelectedItem());
+    tooltip(jopts, JsonOptions.SPEC, spec);
     jopts.set(JsonOptions.LAX, lax.isSelected());
+    tooltip(jopts, JsonOptions.LAX, lax);
   }
 
   @Override

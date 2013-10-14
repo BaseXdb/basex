@@ -8,7 +8,6 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.basex.gui.*;
-import org.basex.gui.layout.BaseXLayout.DropHandler;
 import org.basex.util.options.*;
 
 /**
@@ -45,24 +44,24 @@ public class BaseXTextField extends JTextField {
 
   /**
    * Constructor.
-   * @param txt input text
+   * @param text input text
    * @param dialog dialog window
    */
-  public BaseXTextField(final String txt, final BaseXDialog dialog) {
-    this(txt, dialog, dialog);
+  public BaseXTextField(final String text, final BaseXDialog dialog) {
+    this(text, dialog, dialog);
   }
 
   /**
    * Constructor.
-   * @param txt input text
+   * @param text input text
    * @param win parent window
    * @param dialog dialog reference
    */
-  private BaseXTextField(final String txt, final Window win, final BaseXDialog dialog) {
+  private BaseXTextField(final String text, final Window win, final BaseXDialog dialog) {
     BaseXLayout.setWidth(this, DWIDTH);
     BaseXLayout.addInteraction(this, win);
 
-    if(txt != null) setText(txt);
+    if(text != null) setText(text);
 
     addFocusListener(new FocusAdapter() {
       @Override
@@ -82,15 +81,6 @@ public class BaseXTextField extends JTextField {
       }
     });
     if(dialog != null) addKeyListener(dialog.keys);
-
-    setDragEnabled(true);
-    BaseXLayout.addDrop(this, new DropHandler() {
-      @Override
-      public void drop(final Object object) {
-        setText(object.toString());
-        if(dialog != null) dialog.action(BaseXTextField.this);
-      }
-    });
   }
 
   /**

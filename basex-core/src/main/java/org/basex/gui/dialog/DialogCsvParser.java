@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.layout.BaseXLayout.*;
 
 import java.awt.*;
 import java.io.*;
@@ -52,6 +53,7 @@ final class DialogCsvParser extends DialogParser {
    * @param opts main options
    */
   DialogCsvParser(final BaseXDialog d, final MainOptions opts) {
+    super(d);
     try {
       copts = new CsvParserOptions(opts.get(MainOptions.CSVPARSER));
     } catch(final BaseXException ex) { copts = new CsvParserOptions(); }
@@ -95,10 +97,10 @@ final class DialogCsvParser extends DialogParser {
     pp.add(p);
 
     p = new BaseXBack(new TableLayout(2, 1));
-    header = new BaseXCheckBox(FIRST_LINE_HEADER, copts.get(CsvOptions.HEADER), 0, d);
+    header = new BaseXCheckBox(FIRST_LINE_HEADER, CsvOptions.HEADER, copts, d);
     p.add(header);
 
-    lax = new BaseXCheckBox(LAX_NAME_CONVERSION, copts.get(CsvOptions.LAX), 0, d);
+    lax = new BaseXCheckBox(LAX_NAME_CONVERSION, CsvOptions.LAX, copts, d);
     p.add(lax);
     pp.add(p);
 
@@ -140,10 +142,13 @@ final class DialogCsvParser extends DialogParser {
   void update() {
     final String enc = encoding.getSelectedItem();
     copts.set(CsvParserOptions.ENCODING, enc.equals(Token.UTF8) ? null : enc);
+    tooltip(copts, CsvParserOptions.ENCODING, encoding);
     copts.set(CsvOptions.HEADER, header.isSelected());
     copts.set(CsvOptions.SEPARATOR, seps.getSelectedIndex() <
       CsvSep.values().length ? seps.getSelectedItem() : sepchar.getText());
+    tooltip(copts, CsvOptions.SEPARATOR, seps);
     copts.set(CsvOptions.FORMAT, format.getSelectedItem());
+    tooltip(copts, CsvOptions.FORMAT, format);
     copts.set(CsvOptions.LAX, lax.isSelected());
   }
 

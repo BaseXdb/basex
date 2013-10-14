@@ -13,6 +13,7 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
+import org.basex.gui.layout.BaseXLayout.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
@@ -71,12 +72,12 @@ public final class DialogImport extends BaseXBack {
     // add options
     add(new BaseXLabel(FILE_OR_DIR + COL, true, true).border(0, 0, 6, 0));
 
-    final String in = gui.gopts.get(GUIOptions.INPUTPATH);
-    input = new BaseXTextField(gui.gopts.get(GUIOptions.INPUTPATH), dial);
+    final String path = gui.gopts.get(GUIOptions.INPUTPATH);
+    input = new BaseXTextField(path, dial);
     input.history(gui, GUIOptions.INPUTS);
 
-    final IO io = IO.get(in);
-    if(io instanceof IOFile && !in.isEmpty()) dbname = io.dbname();
+    final IO io = IO.get(path);
+    if(io instanceof IOFile && !path.isEmpty()) dbname = io.dbname();
 
     browse = new BaseXButton(BROWSE_D, dial);
     browse.addActionListener(new ActionListener() {
@@ -101,9 +102,9 @@ public final class DialogImport extends BaseXBack {
     filter = new BaseXTextField(opts.get(MainOptions.CREATEFILTER), dial);
     BaseXLayout.setWidth(filter, 200);
 
-    addRaw = new BaseXCheckBox(ADD_RAW_FILES, opts.get(MainOptions.ADDRAW), dial);
-    skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES, opts.get(MainOptions.SKIPCORRUPT), dial);
-    archives = new BaseXCheckBox(PARSE_ARCHIVES, opts.get(MainOptions.ADDARCHIVES), dial);
+    addRaw = new BaseXCheckBox(ADD_RAW_FILES, MainOptions.ADDRAW, opts, dial);
+    skipCorrupt = new BaseXCheckBox(SKIP_CORRUPT_FILES, MainOptions.SKIPCORRUPT, opts, dial);
+    archives = new BaseXCheckBox(PARSE_ARCHIVES, MainOptions.ADDARCHIVES, opts, dial);
 
     final BaseXBack p = new BaseXBack(new TableLayout(2, 2, 20, 0));
     p.add(new BaseXLabel(INPUT_FORMAT, false, true).border(0, 0, 6, 0));
@@ -119,6 +120,17 @@ public final class DialogImport extends BaseXBack {
     // add info label
     info = new BaseXLabel(" ").border(32, 0, 6, 0);
     add(info);
+
+    final DropHandler dh = new DropHandler() {
+      @Override
+      public void drop(final Object object) {
+        input.setText(object.toString());
+        action(input, dial instanceof DialogNew);
+      }
+    };
+
+    BaseXLayout.addDrop(this, dh);
+    BaseXLayout.addDrop(input, dh);
   }
 
   /**
