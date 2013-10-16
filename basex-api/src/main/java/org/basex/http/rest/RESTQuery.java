@@ -61,8 +61,7 @@ class RESTQuery extends RESTCode {
     final LocalSession session = http.session();
     if(item != null) {
       // create main memory instance of the document specified as context node
-      final boolean mm = session.execute(
-          new Get(MainOptions.MAINMEM)).split(COLS)[1].equals(TRUE);
+      final boolean mm = session.execute(new Get(MainOptions.MAINMEM)).split(COLS)[1].equals(TRUE);
       session.execute(new Set(MainOptions.MAINMEM, true));
       session.create(Util.className(RESTQuery.class), new ArrayInput(item));
       if(!mm) session.execute(new Set(MainOptions.MAINMEM, false));
@@ -71,14 +70,14 @@ class RESTQuery extends RESTCode {
       open(http);
     }
 
-    // send serialization options to the server
-    session.execute(new Set(MainOptions.SERIALIZER, serial(http)));
-    session.setOutputStream(http.res.getOutputStream());
     // set base path to correctly resolve local references
     session.execute(new Set(MainOptions.QUERYPATH, path));
+    // send serialization options to the server
+    session.execute(new Set(MainOptions.SERIALIZER, serial(http)));
 
     // create query instance and bind http context
-    final Query qu = session.query(in);
+    session.setOutputStream(http.res.getOutputStream());
+    final LocalQuery qu = session.query(in);
     qu.context(http);
 
     // bind external variables
@@ -88,7 +87,8 @@ class RESTQuery extends RESTCode {
       if(val.length == 1) qu.bind(e.getKey(), val[0]);
     }
     // initializes the response with query serialization options
-    http.initResponse(new SerializerOptions(qu.options()));
+    http.serialization.parse(qu.options());
+    http.initResponse();
     // run query
     qu.execute();
   }
@@ -98,12 +98,12 @@ class RESTQuery extends RESTCode {
    * @param http HTTP context
    * @return serialization parameters
    */
-  static String serial(final HTTPContext http) {
+  static SerializerOptions serial(final HTTPContext http) {
     final SerializerOptions sopts = http.serialization;
     if(http.wrapping) {
       sopts.set(SerializerOptions.WRAP_PREFIX, REST);
       sopts.set(SerializerOptions.WRAP_URI, RESTURI);
     }
-    return sopts.toString();
+    return sopts;
   }
 }

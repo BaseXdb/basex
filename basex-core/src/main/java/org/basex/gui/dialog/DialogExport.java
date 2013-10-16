@@ -173,7 +173,9 @@ public final class DialogExport extends BaseXDialog {
     if(ok) {
       gui.gopts.set(GUIOptions.INPUTPATH, pth);
       try {
-        Serializer.get(new ArrayOutput(), new SerializerOptions(params.getText()));
+        final SerializerOptions sopts = new SerializerOptions();
+        sopts.parse(params.getText());
+        Serializer.get(new ArrayOutput(), sopts);
       } catch(final IOException ex) {
         ok = false;
         inf = ex.getMessage();
@@ -192,10 +194,11 @@ public final class DialogExport extends BaseXDialog {
     final String mth = method.getSelectedItem().toLowerCase(Locale.ENGLISH);
     final String enc = encoding.getSelectedItem();
     try {
-      final SerializerOptions sp = new SerializerOptions(params.getText());
-      sp.set(SerializerOptions.METHOD, mth);
-      sp.set(SerializerOptions.ENCODING, enc);
-      gui.set(MainOptions.EXPORTER, parameters(sp, false));
+      final SerializerOptions sopts = new SerializerOptions();
+      sopts.parse(params.getText());
+      sopts.set(SerializerOptions.METHOD, mth);
+      sopts.set(SerializerOptions.ENCODING, enc);
+      gui.set(MainOptions.EXPORTER, parameters(sopts, false));
     } catch(final BaseXException ex) { Util.notexpected(); }
     super.close();
     path.store();

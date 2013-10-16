@@ -1,6 +1,5 @@
 package org.basex.build;
 
-import org.basex.core.*;
 import org.basex.util.options.*;
 
 /**
@@ -14,20 +13,4 @@ public final class TextOptions extends Options {
   public static final StringOption ENCODING = new StringOption("encoding");
   /** Parser option: line-wise parsing. */
   public static final BooleanOption LINES = new BooleanOption("lines", true);
-
-  /**
-   * Constructor.
-   */
-  public TextOptions() {
-    super();
-  }
-
-  /**
-   * Constructor, specifying initial options.
-   * @param opts options string
-   * @throws BaseXException database exception
-   */
-  public TextOptions(final String opts) throws BaseXException {
-    super(opts);
-  }
 }

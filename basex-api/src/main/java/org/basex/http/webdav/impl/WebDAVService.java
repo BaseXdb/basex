@@ -480,7 +480,6 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   private T addXML(final String db, final String p, final InputStream in) throws IOException {
-
     final Session session = http.session();
     session.execute(new Set(MainOptions.CHOP, false));
     session.add(p, in);
@@ -497,7 +496,6 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   private T store(final String db, final String p, final InputStream in) throws IOException {
-
     http.session().store(p, in);
     return factory.file(this, metaData(db, p));
   }

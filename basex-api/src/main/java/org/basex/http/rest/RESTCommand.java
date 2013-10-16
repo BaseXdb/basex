@@ -28,10 +28,9 @@ public class RESTCommand extends RESTCode {
   void run(final HTTPContext http) throws IOException {
     // open addressed database
     open(http);
-    // set default content type to raw
-    final String sopts = SerializerOptions.METHOD.name() + '=' + SerialMethod.TEXT + ',' +
-        http.serialization;
-    http.initResponse(new SerializerOptions(sopts));
+    // set default content type to text
+    http.serialization.set(SerializerOptions.METHOD, SerialMethod.TEXT);
+    http.initResponse();
 
     // perform command
     final LocalSession session = http.session();

@@ -62,22 +62,6 @@ public class CsvOptions extends Options {
     }
   }
 
-  /**
-   * Constructor.
-   */
-  public CsvOptions() {
-    super();
-  }
-
-  /**
-   * Constructor, specifying initial options.
-   * @param opts options string
-   * @throws BaseXException database exception
-   */
-  public CsvOptions(final String opts) throws BaseXException {
-    super(opts);
-  }
-
   @Override
   public synchronized <O extends Options, V extends Enum<V>> void assign(
       final String name, final String value) throws BaseXException {

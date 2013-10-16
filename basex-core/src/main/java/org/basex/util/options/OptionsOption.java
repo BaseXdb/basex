@@ -45,7 +45,14 @@ public final class OptionsOption<O extends Options> extends Option {
 
   @Override
   public O copy() {
-    return value == null ? null : Reflect.get(Reflect.find(clazz, String.class), value.toString());
+    if(value == null) return null;
+    final O o = newInstance();
+    try {
+      o.parse(value.toString());
+    } catch(final Exception ex) {
+      Util.notexpected(ex);
+    }
+    return o;
   }
 
   /**
@@ -53,6 +60,10 @@ public final class OptionsOption<O extends Options> extends Option {
    * @return options
    */
   public O newInstance() {
-    return Reflect.get(clazz);
+    try {
+      return clazz.newInstance();
+    } catch(final Exception ex) {
+      throw Util.notexpected(ex);
+    }
   }
 }

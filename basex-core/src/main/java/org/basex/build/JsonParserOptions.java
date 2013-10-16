@@ -1,6 +1,5 @@
 package org.basex.build;
 
-import org.basex.core.*;
 import org.basex.util.options.*;
 
 /**
@@ -18,20 +17,4 @@ public final class JsonParserOptions extends JsonOptions {
   public static final BooleanOption MERGE = new BooleanOption("merge", false);
   /** Option: include string types. */
   public static final BooleanOption STRINGS = new BooleanOption("strings", false);
-
-  /**
-   * Default constructor.
-   */
-  public JsonParserOptions() {
-    super();
-  }
-
-  /**
-   * Constructor, specifying initial options.
-   * @param opts options string
-   * @throws BaseXException database exception
-   */
-  public JsonParserOptions(final String opts) throws BaseXException {
-    super(opts);
-  }
 }

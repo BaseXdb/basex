@@ -1,6 +1,5 @@
 package org.basex.build;
 
-import org.basex.core.*;
 import org.basex.util.options.*;
 
 /**
@@ -18,14 +17,5 @@ public final class CsvParserOptions extends CsvOptions {
    */
   public CsvParserOptions() {
     super();
-  }
-
-  /**
-   * Constructor, specifying initial options.
-   * @param opts options string
-   * @throws BaseXException database exception
-   */
-  public CsvParserOptions(final String opts) throws BaseXException {
-    super(opts);
   }
 }

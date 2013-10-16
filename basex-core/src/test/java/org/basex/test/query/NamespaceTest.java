@@ -7,6 +7,8 @@ import static org.junit.Assert.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.io.serial.*;
+import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
@@ -822,7 +824,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @BeforeClass
   public static void start() throws BaseXException {
     // turn off pretty printing
-    new Set(MainOptions.SERIALIZER, "indent=no").execute(context);
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.INDENT, YesNo.NO);
+    new Set(MainOptions.SERIALIZER, sopts).execute(context);
   }
 
   /**

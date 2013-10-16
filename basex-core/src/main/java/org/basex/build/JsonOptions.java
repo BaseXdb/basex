@@ -2,7 +2,6 @@ package org.basex.build;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.util.options.*;
 
 /**
@@ -56,21 +55,5 @@ public abstract class JsonOptions extends Options {
     public String toString() {
       return super.toString().toLowerCase(Locale.ENGLISH);
     }
-  }
-
-  /**
-   * Default constructor.
-   */
-  protected JsonOptions() {
-    super();
-  }
-
-  /**
-   * Constructor, specifying initial options.
-   * @param opts options string
-   * @throws BaseXException database exception
-   */
-  protected JsonOptions(final String opts) throws BaseXException {
-    super(opts);
   }
 }

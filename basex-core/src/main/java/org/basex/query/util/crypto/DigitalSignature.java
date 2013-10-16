@@ -19,6 +19,7 @@ import javax.xml.xpath.*;
 
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -346,7 +347,9 @@ public final class DigitalSignature {
    */
   private static byte[] nodeToBytes(final ANode n) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
-    final Serializer ser = Serializer.get(ao, new SerializerOptions("format=no"));
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.FORMAT, YesNo.NO);
+    final Serializer ser = Serializer.get(ao, sopts);
     ser.serialize(n);
     ser.close();
     return ao.toArray();

@@ -39,7 +39,7 @@ final class RESTGet extends RESTCode {
         input = val;
       } else if(key.equalsIgnoreCase(WRAP)) {
         // wrapping flag
-        wrap(val, http);
+        http.wrapping = Util.yes(val);
       } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
         item = Token.token(val);

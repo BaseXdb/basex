@@ -450,11 +450,10 @@ public final class QueryContext extends Proc {
   }
 
   /**
-   * Returns the serialization parameters used for and specified by this query.
+   * Returns the query-specific or global serialization parameters.
    * @return serialization parameters
    */
   public SerializerOptions serParams() {
-    // retrieve query-specific or global parameters
     return serialOpts != null ? serialOpts : context.options.get(MainOptions.SERIALIZER);
   }
 

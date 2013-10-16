@@ -103,7 +103,8 @@ final class RestXqResponse {
 
       // serialize result
       final SerializerOptions sp = function.output;
-      http.initResponse(sp);
+      http.serialization = sp;
+      http.initResponse();
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sp);
       for(; item != null; item = iter.next()) ser.serialize(item);
       ser.close();

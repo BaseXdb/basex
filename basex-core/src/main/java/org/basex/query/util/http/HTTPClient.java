@@ -304,15 +304,14 @@ public final class HTTPClient {
       final byte[] method, final OutputStream out) throws IOException {
 
     // extract serialization parameters
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(METHOD).add('=').add(method);
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.METHOD, string(method));
     for(final byte[] key : attrs) {
-      if(!eq(key, SRC)) tb.add(',').add(key).add('=').add(attrs.get(key));
+      if(!eq(key, SRC)) sopts.assign(string(key), string(attrs.get(key)));
     }
 
     // serialize items according to the parameters
-    final SerializerOptions sp = new SerializerOptions(tb.toString());
-    final Serializer ser = Serializer.get(out, sp);
+    final Serializer ser = Serializer.get(out, sopts);
     try {
       payload.serialize(ser);
     } finally {

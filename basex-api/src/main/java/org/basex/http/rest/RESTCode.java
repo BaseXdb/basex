@@ -11,7 +11,6 @@ import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.server.*;
-import org.basex.util.*;
 
 /**
  * Abstract class for performing REST operations.
@@ -42,15 +41,6 @@ public abstract class RESTCode {
     } catch(final IOException ex) {
       HTTPErr.NOT_FOUND_X.thrw(ex);
     }
-  }
-
-  /**
-   * Sets the wrapping flag.
-   * @param val value
-   * @param http HTTP context
-   */
-  static void wrap(final String val, final HTTPContext http) {
-    http.wrapping = Util.yes(val);
   }
 
   /**

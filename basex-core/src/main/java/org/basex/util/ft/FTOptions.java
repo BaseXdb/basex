@@ -1,6 +1,5 @@
 package org.basex.util.ft;
 
-import org.basex.core.*;
 import org.basex.util.options.*;
 
 /**
@@ -19,20 +18,4 @@ public final class FTOptions extends Options {
   /** Option: distance. */
   public static final OptionsOption<FTDistanceOptions> DISTANCE =
       new OptionsOption<FTDistanceOptions>("distance", FTDistanceOptions.class);
-
-  /**
-   * Constructor.
-   */
-  public FTOptions() {
-    super();
-  }
-
-  /**
-   * Constructor, specifying initial options.
-   * @param opts options string
-   * @throws BaseXException database exception
-   */
-  public FTOptions(final String opts) throws BaseXException {
-    super(opts);
-  }
 }

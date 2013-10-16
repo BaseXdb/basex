@@ -1,7 +1,5 @@
 package org.basex.build;
 
-import java.io.*;
-
 import org.basex.util.options.*;
 
 /**
@@ -46,19 +44,4 @@ public final class HtmlOptions extends Options {
   public static final StringOption DOCTYPEPUB = new StringOption("doctype-public");
   /** TagSoup option: encoding=encoding. */
   public static final StringOption ENCODING = new StringOption("encoding");
-
-  /**
-   * Constructor.
-   */
-  public HtmlOptions() {
-  }
-
-  /**
-   * Constructor.
-   * @param opts options string
-   * @throws IOException exception
-   */
-  public HtmlOptions(final String opts) throws IOException {
-    super(opts);
-  }
 }

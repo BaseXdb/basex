@@ -46,7 +46,6 @@ public class RESTPost extends RESTCode {
       throw HTTPErr.BAD_REQUEST_X.thrw(ex);
     }
 
-    final SerializerOptions sp = new SerializerOptions();
     QueryProcessor qp;
     RESTCode code;
 
@@ -57,10 +56,10 @@ public class RESTPost extends RESTCode {
       for(final Item param : qp.value()) {
         final String name = value("data(@name)", param, ctx);
         final String value = value("data(@value)", param, ctx);
-        if(sp.option(name) != null) {
+        if(sopts.option(name) != null) {
           sopts.assign(name, value);
         } else if(name.equals(WRAP)) {
-          wrap(value, http);
+          http.wrapping = Util.yes(value);
         } else {
           HTTPErr.UNKNOWN_PARAM_X.thrw(name);
         }

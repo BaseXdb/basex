@@ -1,6 +1,5 @@
 package org.basex.build;
 
-import org.basex.core.*;
 import org.basex.util.options.*;
 
 /**
@@ -16,20 +15,4 @@ public final class JsonSerialOptions extends JsonOptions {
   public static final BooleanOption INDENT = new BooleanOption("indent");
   /** Option: fallback function. */
   public static final StringOption FALLBACK = new StringOption("fallback");
-
-  /**
-   * Default constructor.
-   */
-  public JsonSerialOptions() {
-    super();
-  }
-
-  /**
-   * Constructor, specifying initial options.
-   * @param opts options string
-   * @throws BaseXException database exception
-   */
-  public JsonSerialOptions(final String opts) throws BaseXException {
-    super(opts);
-  }
 }

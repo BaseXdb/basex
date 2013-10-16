@@ -813,6 +813,8 @@ public interface Text {
   String WARNING = "Warning";
 
   /** Options error. */
+  String OPT_OFFSET = "List counter for '%' is invalid.";
+  /** Options error. */
   String OPT_BOOLEAN = "Value of '%' must be a boolean.";
   /** Options error. */
   String OPT_NUMBER = "Value of '%' must be a number.";

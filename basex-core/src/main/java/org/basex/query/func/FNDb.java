@@ -16,6 +16,7 @@ import org.basex.index.query.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -450,10 +451,9 @@ public final class FNDb extends StandardFunc {
     final Data data = checkData(ctx);
     final String path = string(checkStr(expr[1], ctx));
     final Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
+    final SerializerOptions sopts = FuncOptions.serializer(it, info);
     try {
-      Export.export(data, path, FuncOptions.serializer(it, info), null);
-    } catch(final QueryIOException ex) {
-      throw ex.getCause(info);
+      Export.export(data, path, sopts, null);
     } catch(final IOException ex) {
       SERANY.thrw(info, ex);
     }

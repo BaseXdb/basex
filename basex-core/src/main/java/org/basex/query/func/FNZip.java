@@ -345,15 +345,14 @@ public final class FNZip extends StandardFunc {
    */
   private static SerializerOptions serPar(final ANode node) throws BaseXException {
     // interpret query parameters
-    final TokenBuilder tb = new TokenBuilder();
+    final SerializerOptions sopts = new SerializerOptions();
     final AxisIter ati = node.attributes();
     for(ANode at; (at = ati.next()) != null;) {
       final byte[] name = at.qname().string();
-      if(Token.eq(name, NAME) || Token.eq(name, SRC)) continue;
-      if(!tb.isEmpty()) tb.add(',');
-      tb.add(name).add('=').add(Token.string(at.string()).replace(",", ",,"));
+      if(Token.eq(name, NAME, SRC)) continue;
+      sopts.assign(Token.string(name), Token.string(at.string()));
     }
-    return new SerializerOptions(tb.toString());
+    return sopts;
   }
 
   /**

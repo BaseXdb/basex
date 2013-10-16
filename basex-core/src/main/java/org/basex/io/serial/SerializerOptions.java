@@ -182,23 +182,6 @@ public final class SerializerOptions extends Options {
   }
 
   /**
-   * Constructor.
-   */
-  public SerializerOptions() {
-    super();
-  }
-
-  /**
-   * Constructor, specifying initial options.
-   * @param opts options string. Options are separated with commas ({@code ,}),
-   * key/values with the equality character ({@code =}).
-   * @throws BaseXException database exception
-   */
-  public SerializerOptions(final String opts) throws BaseXException {
-    super(opts);
-  }
-
-  /**
    * Checks if the specified option is true.
    * @param option option
    * @return value

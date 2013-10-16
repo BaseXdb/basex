@@ -7,6 +7,8 @@ import java.security.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.io.serial.*;
+import org.basex.io.serial.SerializerOptions.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -115,12 +117,13 @@ public class FNCryptoTest {
 
     final Process proc = Runtime.getRuntime().exec(GENKEY_CMD);
     Thread.sleep(2000); // give the keytool some time to finish
-    if(proc.exitValue() != 0)
-      throw new RuntimeException("Cannot initialize keystore.");
+    if(proc.exitValue() != 0) throw new RuntimeException("Cannot initialize keystore.");
 
     context = new Context();
     // turn off pretty printing
-    new Set(MainOptions.SERIALIZER, "indent=no").execute(context);
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.INDENT, YesNo.NO);
+    new Set(MainOptions.SERIALIZER, sopts).execute(context);
   }
 
   /**

@@ -38,7 +38,7 @@ public final class HTTPContext {
   public final HTTPMethod method;
 
   /** Serialization parameters. */
-  public final SerializerOptions serialization = new SerializerOptions();
+  public SerializerOptions serialization = new SerializerOptions();
   /** Result wrapping. */
   public boolean wrapping;
   /** User name. */
@@ -130,13 +130,12 @@ public final class HTTPContext {
 
   /**
    * Initializes the output. Sets the expected encoding and content type.
-   * @param sopts serialization parameters
    */
-  public void initResponse(final SerializerOptions sopts) {
+  public void initResponse() {
     // set content type and encoding
-    final String enc = sopts.get(SerializerOptions.ENCODING);
+    final String enc = serialization.get(SerializerOptions.ENCODING);
     res.setCharacterEncoding(enc);
-    final String ct = mediaType(sopts);
+    final String ct = mediaType(serialization);
     res.setContentType(new TokenBuilder(ct).add(CHARSET).add(enc).toString());
   }
 
@@ -221,9 +220,7 @@ public final class HTTPContext {
    * @param error treat as error (use web server standard output)
    * @throws IOException I/O exception
    */
-  public void status(final int code, final String message, final boolean error)
-      throws IOException {
-
+  public void status(final int code, final String message, final boolean error) throws IOException {
     try {
       log(message, code);
       res.resetBuffer();

@@ -54,7 +54,7 @@ public class BaseX extends Main {
     // create session to show optional login request
     session();
 
-    final StringBuilder serial = new StringBuilder();
+    SerializerOptions sopts = null;
     final StringBuilder bind = new StringBuilder();
     boolean v = false, qi = false, qp = false;
 
@@ -98,9 +98,9 @@ public class BaseX extends Main {
         } else if(c == 'L') {
           // toggle newline separators
           newline ^= true;
-          if(serial.length() != 0) serial.append(',');
-          val = serial.append(SerializerOptions.ITEM_SEPARATOR.name()).
-              append("=\\n").toString();
+          if(sopts == null) sopts = new SerializerOptions();
+          sopts.set(SerializerOptions.ITEM_SEPARATOR, "\\n");
+          val = sopts.toString();
           opt = MainOptions.SERIALIZER;
         } else if(c == 'o') {
           // change output stream
@@ -128,8 +128,10 @@ public class BaseX extends Main {
           opt = MainOptions.RUNS;
         } else if(c == 's') {
           // set/add serialization parameter
-          if(serial.length() != 0) serial.append(',');
-          val = serial.append(val.replaceAll(",", ",,")).toString();
+          if(sopts == null) sopts = new SerializerOptions();
+          final String[] kv = val.split("=", 2);
+          sopts.assign(kv[0], kv.length > 1  ? kv[1] : "");
+          val = sopts.toString();
           opt = MainOptions.SERIALIZER;
         } else if(c == 'u') {
           // (de)activate write-back for updates

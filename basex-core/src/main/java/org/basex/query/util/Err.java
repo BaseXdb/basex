@@ -592,7 +592,7 @@ public enum Err {
   /** SEPM0016. */
   SERMAP(SEPM, 16, "Character map '%' is not defined."),
   /** SEPM0016. */
-  SERANY(SEPM, 16, "%."),
+  SERANY(SEPM, 16, "%"),
   /** SEPM0017. */
   SEROPT(SEPM, 17, "%."),
   /** SEPM0017. */
