@@ -38,7 +38,7 @@ public final class HTTPContext {
   public final HTTPMethod method;
 
   /** Serialization parameters. */
-  public String serialization = "";
+  public final SerializerOptions serialization = new SerializerOptions();
   /** Result wrapping. */
   public boolean wrapping;
   /** User name. */
@@ -156,11 +156,8 @@ public final class HTTPContext {
     if(sm == SerialMethod.XML) return APP_XML;
     if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return TEXT_HTML;
     if(sm == SerialMethod.JSON) {
-      try {
-        final JsonParserOptions jprop = new JsonParserOptions(sopts.get(SerializerOptions.JSON));
-        if(jprop.get(JsonOptions.FORMAT) == JsonFormat.JSONML) return APP_JSONML;
-      } catch(final IOException ignore) { }
-      return APP_JSON;
+      final JsonSerialOptions jprop = sopts.get(SerializerOptions.JSON);
+      return jprop.get(JsonOptions.FORMAT) == JsonFormat.JSONML ? APP_JSONML : APP_JSON;
     }
     return TEXT_PLAIN;
   }

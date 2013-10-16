@@ -1,13 +1,13 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.core.Text.*;
 
 import java.io.*;
 
 import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -50,9 +50,9 @@ public final class Put extends BasicOperation {
       try {
         final PrintOutput po = new PrintOutput(u);
         try {
-          final SerializerOptions pr = new SerializerOptions();
           // try to reproduce non-chopped documents correctly
-          pr.set(SerializerOptions.INDENT, node.data.meta.chop ? YES : NO);
+          final SerializerOptions pr = new SerializerOptions();
+          pr.set(SerializerOptions.INDENT, node.data.meta.chop ? YesNo.YES : YesNo.NO);
           final Serializer ser = Serializer.get(po, pr);
           ser.serialize(node);
           ser.close();

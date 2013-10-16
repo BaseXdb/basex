@@ -32,7 +32,7 @@ final class DialogHtmlParser extends DialogParser {
     final BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
     pp.add(new BaseXLabel(avl ? H_HTML_PARSER : H_NO_HTML_PARSER));
 
-    options = new BaseXTextField(opts.get(MainOptions.HTMLPARSER), d);
+    options = new BaseXTextField(opts.get(MainOptions.HTMLPARSER).toString(), d);
     if(avl) {
       final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
       p.add(new BaseXLabel(PARAMETERS + COL, true, true));

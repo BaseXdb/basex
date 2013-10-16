@@ -79,8 +79,8 @@ public class CsvOptions extends Options {
   }
 
   @Override
-  public synchronized <V extends Enum<V>> void assign(final String name, final String value)
-      throws BaseXException {
+  public synchronized <O extends Options, V extends Enum<V>> void assign(
+      final String name, final String value) throws BaseXException {
 
     super.assign(name, value);
     // check if separator contains only one character

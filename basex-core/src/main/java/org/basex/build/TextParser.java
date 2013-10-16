@@ -34,11 +34,10 @@ public final class TextParser extends SingleParser {
    * Constructor.
    * @param source document source
    * @param opts database options
-   * @throws IOException I/O exception
    */
-  public TextParser(final IO source, final MainOptions opts) throws IOException {
+  public TextParser(final IO source, final MainOptions opts) {
     super(source, opts);
-    final TextOptions tp = new TextOptions(opts.get(MainOptions.TEXTPARSER));
+    final TextOptions tp = opts.get(MainOptions.TEXTPARSER);
     lines = tp.get(TextOptions.LINES);
     encoding = tp.get(TextOptions.ENCODING);
   }

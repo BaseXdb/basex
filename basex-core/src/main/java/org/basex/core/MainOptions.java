@@ -2,6 +2,8 @@ package org.basex.core;
 
 import java.util.*;
 
+import org.basex.build.*;
+import org.basex.io.serial.*;
 import org.basex.util.options.*;
 
 /**
@@ -31,13 +33,17 @@ public final class MainOptions extends Options {
   /** Cache new documents before adding them to a database. */
   public static final BooleanOption ADDCACHE = new BooleanOption("ADDCACHE", false);
   /** Define CSV parser options. */
-  public static final StringOption CSVPARSER = new StringOption("CSVPARSER", "");
+  public static final OptionsOption<CsvParserOptions> CSVPARSER =
+      new OptionsOption<CsvParserOptions>("CSVPARSER", new CsvParserOptions());
   /** Define text parser options. */
-  public static final StringOption TEXTPARSER = new StringOption("TEXTPARSER", "");
+  public static final OptionsOption<TextOptions> TEXTPARSER =
+      new OptionsOption<TextOptions>("TEXTPARSER", new TextOptions());
   /** Define JSON parser options. */
-  public static final StringOption JSONPARSER = new StringOption("JSONPARSER", "");
+  public static final OptionsOption<JsonParserOptions> JSONPARSER =
+      new OptionsOption<JsonParserOptions>("JSONPARSER", new JsonParserOptions());
   /** Define TagSoup HTML options. */
-  public static final StringOption HTMLPARSER = new StringOption("HTMLPARSER", "");
+  public static final OptionsOption<HtmlOptions> HTMLPARSER =
+      new OptionsOption<HtmlOptions>("HTMLPARSER", new HtmlOptions());
   /** Define import parser. */
   public static final EnumOption<MainParser> PARSER =
       new EnumOption<MainParser>("PARSER", MainParser.XML);
@@ -115,10 +121,12 @@ public final class MainOptions extends Options {
 
   /** Flag for serializing query results. */
   public static final BooleanOption SERIALIZE = new BooleanOption("SERIALIZE", true);
-  /** Serialization parameters, separated by commas. */
-  public static final StringOption SERIALIZER = new StringOption("SERIALIZER", "");
   /** Exporter serialization parameters. */
-  public static final StringOption EXPORTER = new StringOption("EXPORTER", "");
+  public static final OptionsOption<SerializerOptions> SERIALIZER =
+      new OptionsOption<SerializerOptions>("SERIALIZER", new SerializerOptions());
+  /** Exporter serialization parameters. */
+  public static final OptionsOption<SerializerOptions> EXPORTER =
+      new OptionsOption<SerializerOptions>("EXPORTER", new SerializerOptions());
 
   /** Prints an XML plan. */
   public static final BooleanOption XMLPLAN = new BooleanOption("XMLPLAN", false);

@@ -32,13 +32,12 @@ public final class CsvParser extends XMLParser {
   /**
    * Converts CSV data to XML.
    * @param io input
-   * @param options parsing options
+   * @param copts parsing options
    * @return parser
    * @throws IOException I/O exception
    */
-  public static IO toXML(final IO io, final String options) throws IOException {
-    // convert input to XML and return cached result
-    final Item node = CsvConverter.convert(io, new CsvParserOptions(options));
+  public static IO toXML(final IO io, final CsvParserOptions copts) throws IOException {
+    final Item node = CsvConverter.convert(io, copts);
     final IOContent xml = new IOContent(node.serialize().toArray());
     xml.name(io.name());
     return xml;

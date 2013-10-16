@@ -33,6 +33,14 @@ public abstract class Option {
    */
   public abstract Object value();
 
+  /**
+   * Copies mutable default values. Otherwise, returns the existing instance.
+   * @return default value
+   */
+  public Object copy() {
+    return value();
+  }
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(name());

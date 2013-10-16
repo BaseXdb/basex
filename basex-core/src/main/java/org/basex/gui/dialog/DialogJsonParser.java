@@ -57,12 +57,7 @@ final class DialogJsonParser extends DialogParser {
    */
   DialogJsonParser(final BaseXDialog d, final MainOptions opts) {
     super(d, MainParser.JSON);
-    try {
-      jopts = new JsonParserOptions(opts.get(MainOptions.JSONPARSER));
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      jopts = new JsonParserOptions();
-    }
+    jopts = opts.get(MainOptions.JSONPARSER);
 
     encoding = DialogExport.encoding(d, jopts.get(JsonParserOptions.ENCODING));
 
@@ -127,7 +122,7 @@ final class DialogJsonParser extends DialogParser {
         } else {
           json = EXAMPLE;
         }
-        final IO io = JsonParser.toXML(new IOContent(json), jopts.toString());
+        final IO io = JsonParser.toXML(new IOContent(json), jopts);
         example.setText(example(MainParser.JSON.name(), json, io.toString()));
       }
     } catch(final IOException ex) {

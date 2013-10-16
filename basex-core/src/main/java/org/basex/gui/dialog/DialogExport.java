@@ -76,13 +76,7 @@ public final class DialogExport extends BaseXDialog {
 
     // provide components for method and encoding
     final MainOptions opts = gui.context.options;
-    final String exporter = opts.get(MainOptions.EXPORTER);
-    SerializerOptions sopts;
-    try {
-      sopts = new SerializerOptions(exporter);
-    } catch(final BaseXException ex) {
-      sopts = new SerializerOptions();
-    }
+    final SerializerOptions sopts = opts.get(MainOptions.EXPORTER);
 
     // method (ignore last entry)
     final StringList sl = new StringList();

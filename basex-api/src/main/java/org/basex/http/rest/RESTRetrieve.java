@@ -41,10 +41,10 @@ final class RESTRetrieve extends RESTQuery {
     open(http);
 
     final LocalSession session = http.session();
+    SerializerOptions sopts = http.serialization;
     if(http.depth() == 0) {
       // list databases
       final Table table = new Table(session.execute(new List()));
-      final SerializerOptions sopts = new SerializerOptions(http.serialization);
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sopts);
       http.initResponse(sopts);
 
@@ -56,8 +56,6 @@ final class RESTRetrieve extends RESTQuery {
     } else if(!exists(http)) {
       // list database resources
       final Table table = new Table(session.execute(new List(http.db(), http.dbpath())));
-      final String serial = http.serialization;
-      final SerializerOptions sopts = new SerializerOptions(serial);
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sopts);
       http.initResponse(sopts);
 
@@ -69,13 +67,14 @@ final class RESTRetrieve extends RESTQuery {
       ser.close();
     } else if(isRaw(http)) {
       // retrieve raw file; prefix user parameters with media type
-      final String ct = SerializerOptions.MEDIA_TYPE.name() + '=' + contentType(http);
-      http.initResponse(new SerializerOptions(ct + ',' + http.serialization));
+      if(sopts == null) sopts = new SerializerOptions();
+      sopts.set(SerializerOptions.MEDIA_TYPE, contentType(http));
+      http.initResponse(sopts);
       session.setOutputStream(http.res.getOutputStream());
       session.execute(new Retrieve(http.dbpath()));
     } else {
       // retrieve xml file
-      http.initResponse(new SerializerOptions(http.serialization));
+      http.initResponse(sopts);
       session.execute(new Set(MainOptions.SERIALIZER, serial(http)));
       session.setOutputStream(http.res.getOutputStream());
       session.query(".").execute();

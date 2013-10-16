@@ -66,11 +66,11 @@ public final class FNJson extends StandardFunc {
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
     final ANode node = checkNode(expr[0], ctx);
-    final JsonSerialOptions opts = checkOptions(1, Q_OPTIONS, new JsonSerialOptions(), ctx);
+    final JsonSerialOptions jopts = checkOptions(1, Q_OPTIONS, new JsonSerialOptions(), ctx);
 
     final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.METHOD, SerialMethod.JSON.toString());
-    sopts.set(SerializerOptions.JSON, opts.toString());
+    sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
+    sopts.set(SerializerOptions.JSON, jopts);
     return Str.get(delete(serialize(node.iter(), sopts, INVALIDOPT), '\r'));
   }
 }

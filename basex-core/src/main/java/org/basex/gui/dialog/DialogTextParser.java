@@ -3,7 +3,6 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.io.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -33,12 +32,7 @@ final class DialogTextParser extends DialogParser {
    */
   DialogTextParser(final BaseXDialog d, final MainOptions opts) {
     super(d, MainParser.TEXT);
-    try {
-      topts = new TextOptions(opts.get(MainOptions.TEXTPARSER));
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      topts = new TextOptions();
-    }
+    topts = opts.get(MainOptions.TEXTPARSER);
 
     final BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
 

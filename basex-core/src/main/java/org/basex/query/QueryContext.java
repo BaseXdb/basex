@@ -451,19 +451,11 @@ public final class QueryContext extends Proc {
 
   /**
    * Returns the serialization parameters used for and specified by this query.
-   * @param optional if {@code true}, a {@code null} reference is returned if no
-   *   parameters have been specified
    * @return serialization parameters
-   * @throws BaseXException database exception
    */
-  public SerializerOptions serParams(final boolean optional) throws BaseXException {
-    // if available, return parameters specified by the query
-    if(serialOpts != null) return serialOpts;
-    // retrieve global parameters
-    final String serial = context.options.get(MainOptions.SERIALIZER);
-    if(optional && serial.isEmpty()) return null;
-    // otherwise, if requested, return default parameters
-    return new SerializerOptions(serial);
+  public SerializerOptions serParams() {
+    // retrieve query-specific or global parameters
+    return serialOpts != null ? serialOpts : context.options.get(MainOptions.SERIALIZER);
   }
 
   /**

@@ -141,7 +141,7 @@ public final class JsonSerializerTest extends SandboxTest {
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.JSON.toString());
-    sopts.set(SerializerOptions.JSON, jopts.toString());
+    sopts.set(SerializerOptions.JSON, jopts);
 
     final Serializer ser = Serializer.get(ao, sopts);
     for(final Item it : qp.value()) ser.serialize(it);

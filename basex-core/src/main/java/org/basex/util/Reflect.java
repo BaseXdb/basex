@@ -12,14 +12,11 @@ import java.util.*;
  */
 public final class Reflect {
   /** Cached constructors. */
-  private static final HashMap<String, Constructor<?>> CONS =
-    new HashMap<String, Constructor<?>>();
+  private static final HashMap<String, Constructor<?>> CONS = new HashMap<String, Constructor<?>>();
   /** Cached classes. */
-  private static final HashMap<String, Class<?>> CLASSES =
-    new HashMap<String, Class<?>>();
+  private static final HashMap<String, Class<?>> CLASSES = new HashMap<String, Class<?>>();
   /** Cached fields. */
-  private static final HashMap<String, Field> FIELDS =
-      new HashMap<String, Field>();
+  private static final HashMap<String, Field> FIELDS = new HashMap<String, Field>();
 
   /** Hidden constructor. */
   private Reflect() { }
@@ -124,16 +121,18 @@ public final class Reflect {
    * Caches and returns a constructor by parameter types.
    * @param clazz class to search for the constructor
    * @param types constructor parameters
+   * @param <O> class type
    * @return {@code null} if the constructor is not found
    */
-  public static Constructor<?> find(final Class<?> clazz, final Class<?>... types) {
+  public static <O> Constructor<O> find(final Class<O> clazz, final Class<?>... types) {
     if(clazz == null) return null;
 
     final StringBuilder sb = new StringBuilder(clazz.getName());
     for(final Class<?> c : types) sb.append(c.getName());
     final String key = sb.toString();
 
-    Constructor<?> m = CONS.get(key);
+    @SuppressWarnings("unchecked")
+    Constructor<O> m = (Constructor<O>) CONS.get(key);
     if(m == null) {
       try {
         try {
@@ -157,9 +156,7 @@ public final class Reflect {
    * @param types method parameters
    * @return reference, or {@code null} if the method is not found
    */
-  public static Method method(final Class<?> clazz, final String name,
-      final Class<?>... types) {
-
+  public static Method method(final Class<?> clazz, final String name, final Class<?>... types) {
     if(clazz == null) return null;
     Method m = null;
     try {
@@ -178,9 +175,10 @@ public final class Reflect {
   /**
    * Returns a class instance, or throws a runtime exception.
    * @param clazz class
+   * @param <O> type
    * @return instance
    */
-  public static Object get(final Class<?> clazz) {
+  public static <O> O get(final Class<O> clazz) {
     try {
       return clazz != null ? clazz.newInstance() : null;
     } catch(final Throwable ex) {
@@ -193,9 +191,10 @@ public final class Reflect {
    * Returns a class instance, or {@code null}.
    * @param clazz class
    * @param args arguments
+   * @param <O> class type
    * @return instance
    */
-  public static Object get(final Constructor<?> clazz, final Object... args) {
+  public static <O> O get(final Constructor<O> clazz, final Object... args) {
     try {
       return clazz != null ? clazz.newInstance(args) : null;
     } catch(final Throwable ex) {
@@ -211,9 +210,7 @@ public final class Reflect {
    * @param args arguments
    * @return result of method call
    */
-  public static Object invoke(final Method method, final Object object,
-      final Object... args) {
-
+  public static Object invoke(final Method method, final Object object, final Object... args) {
     try {
       return method != null ? method.invoke(object, args) : null;
     } catch(final Throwable ex) {

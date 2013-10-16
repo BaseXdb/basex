@@ -51,12 +51,7 @@ final class DialogCsvParser extends DialogParser {
    */
   DialogCsvParser(final BaseXDialog d, final MainOptions opts) {
     super(d, MainParser.CSV);
-    try {
-      copts = new CsvParserOptions(opts.get(MainOptions.CSVPARSER));
-    } catch(final BaseXException ex) {
-      Util.debug(ex);
-      copts = new CsvParserOptions();
-    }
+    copts = opts.get(MainOptions.CSVPARSER);
 
     final BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
     BaseXBack p = new BaseXBack(new TableLayout(4, 2, 8, 4));
@@ -116,7 +111,7 @@ final class DialogCsvParser extends DialogParser {
       format.setEnabled(head);
       lax.setEnabled(head && copts.get(CsvOptions.FORMAT) == CsvFormat.DIRECT);
 
-      final IO io = CsvParser.toXML(new IOContent(EXAMPLE), copts.toString());
+      final IO io = CsvParser.toXML(new IOContent(EXAMPLE), copts);
       example.setText(example(MainParser.CSV.name(), EXAMPLE, io.toString()));
     } catch(final IOException ex) {
       example.setText(error(ex));

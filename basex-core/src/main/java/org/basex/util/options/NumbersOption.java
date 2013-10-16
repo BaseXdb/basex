@@ -28,6 +28,11 @@ public final class NumbersOption extends Option {
   }
 
   @Override
+  public int[] copy() {
+    return value == null ? null : value.clone();
+  }
+
+  @Override
   public String toString() {
     return new StringBuilder(name()).append(Arrays.asList(value)).toString();
   }

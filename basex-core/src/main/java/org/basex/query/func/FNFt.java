@@ -7,7 +7,6 @@ import static org.basex.util.ft.FTFlag.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -203,14 +202,11 @@ public final class FNFt extends StandardFunc {
     ctx.ftOpt(tmp);
 
     if(opts != null && opts.contains(FTOptions.DISTANCE)) {
-      try {
-        final FTDistanceOptions ftdo = new FTDistanceOptions(opts.get(FTOptions.DISTANCE));
-        expr = new FTDistance(info, expr, new Expr[] {
-          Int.get(ftdo.get(FTDistanceOptions.MIN)), Int.get(ftdo.get(FTDistanceOptions.MAX))
-        }, ftdo.get(FTDistanceOptions.UNIT));
-      } catch(final BaseXException ex) {
-        INVALIDOPT.thrw(info, ex);
-      }
+      final FTDistanceOptions ftdo = opts.get(FTOptions.DISTANCE);
+      final int min = ftdo.get(FTDistanceOptions.MIN);
+      final int max = ftdo.get(FTDistanceOptions.MAX);
+      expr = new FTDistance(info, expr, Int.get(min), Int.get(max),
+          ftdo.get(FTDistanceOptions.UNIT));
     }
     return new FTIndexAccess(info, expr, ic).iter(ctx);
   }

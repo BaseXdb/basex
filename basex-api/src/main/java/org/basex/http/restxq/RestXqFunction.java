@@ -80,14 +80,12 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param uf associated user function
    * @param qc query context
    * @param m associated module
-   * @throws Exception exception
    */
-  RestXqFunction(final StaticFunc uf, final QueryContext qc, final RestXqModule m)
-      throws Exception {
+  RestXqFunction(final StaticFunc uf, final QueryContext qc, final RestXqModule m) {
     function = uf;
     context = qc;
     module = m;
-    output = qc.serParams(false);
+    output = qc.serParams();
   }
 
   /**
@@ -183,8 +181,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(!mth.isEmpty()) methods = mth;
 
     if(found) {
-      if(path == null && error == null)
-        error(function.info, ANN_MISSING, '%', PATH, '%', ERROR);
+      if(path == null && error == null) error(function.info, ANN_MISSING, '%', PATH, '%', ERROR);
 
       for(int i = 0; i < declared.length; i++) {
         if(declared[i]) continue;
@@ -415,7 +412,6 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    */
   private void bind(final RestXqParam rxp, final Expr[] args, final Value value)
       throws QueryException {
-
     bind(rxp.name, args, value == null || value.isEmpty() ? rxp.value : value);
   }
 
@@ -426,9 +422,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @param value value to be bound
    * @throws QueryException query exception
    */
-  private void bind(final QNm name, final Expr[] args, final Value value)
-      throws QueryException {
-
+  private void bind(final QNm name, final Expr[] args, final Value value) throws QueryException {
     // skip nulled values
     if(value == null) return;
 

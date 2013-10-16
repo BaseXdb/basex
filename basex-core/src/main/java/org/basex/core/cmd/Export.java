@@ -41,8 +41,7 @@ public final class Export extends Command {
   protected boolean run() {
     try {
       final Data data = context.data();
-      final String export = data.meta.options.get(MainOptions.EXPORTER);
-      export(data, args[0], new SerializerOptions(export), this);
+      export(data, args[0], data.meta.options.get(MainOptions.EXPORTER), this);
       return info(DB_EXPORTED_X, data.meta.name, perf);
     } catch(final IOException ex) {
       return error(Util.message(ex));

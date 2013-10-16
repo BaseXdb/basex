@@ -52,20 +52,19 @@ public class RESTPost extends RESTCode {
 
     try {
       // handle serialization parameters
-      final TokenBuilder ser = new TokenBuilder();
+      final SerializerOptions sopts = http.serialization;
       qp = new QueryProcessor("*/*:parameter", ctx).context(doc);
       for(final Item param : qp.value()) {
         final String name = value("data(@name)", param, ctx);
         final String value = value("data(@value)", param, ctx);
         if(sp.option(name) != null) {
-          ser.add(name).add('=').add(value).add(',');
+          sopts.assign(name, value);
         } else if(name.equals(WRAP)) {
           wrap(value, http);
         } else {
           HTTPErr.UNKNOWN_PARAM_X.thrw(name);
         }
       }
-      http.serialization = ser.toString();
 
       // handle database options
       qp = new QueryProcessor("*/*:option", ctx).context(doc);

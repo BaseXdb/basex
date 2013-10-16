@@ -44,7 +44,7 @@ public final class CsvSerializer extends OutputSerializer {
    */
   public CsvSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
     super(os, opts);
-    final CsvOptions copts = new CsvOptions(opts.get(SerializerOptions.CSV));
+    final CsvOptions copts = opts.get(SerializerOptions.CSV);
     separator = copts.separator();
     header = copts.get(CsvOptions.HEADER);
     lax = copts.get(CsvOptions.LAX);

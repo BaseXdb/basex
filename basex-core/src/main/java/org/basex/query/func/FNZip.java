@@ -351,7 +351,7 @@ public final class FNZip extends StandardFunc {
       final byte[] name = at.qname().string();
       if(Token.eq(name, NAME) || Token.eq(name, SRC)) continue;
       if(!tb.isEmpty()) tb.add(',');
-      tb.add(name).add('=').add(at.string());
+      tb.add(name).add('=').add(Token.string(at.string()).replace(",", ",,"));
     }
     return new SerializerOptions(tb.toString());
   }

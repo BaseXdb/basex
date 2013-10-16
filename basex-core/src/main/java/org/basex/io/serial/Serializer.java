@@ -79,9 +79,8 @@ public abstract class Serializer {
       case TEXT:  return new TextSerializer(os, opts);
       case RAW:   return new RawSerializer(os, opts);
       case CSV:   return new CsvSerializer(os, opts);
-      case JSON:
-        final JsonSerialOptions jopts = new JsonSerialOptions(opts.get(SerializerOptions.JSON));
-        return jopts.get(JsonOptions.FORMAT) == JsonFormat.JSONML ?
+      case JSON:  return opts.get(SerializerOptions.JSON).
+          get(JsonOptions.FORMAT) == JsonFormat.JSONML ?
           new JsonMLSerializer(os, opts) : new JsonDirectSerializer(os, opts);
       default: return new XMLSerializer(os, opts);
     }

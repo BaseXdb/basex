@@ -17,7 +17,8 @@ public final class FTOptions extends Options {
   /** Option: wildcards. */
   public static final BooleanOption WILDCARDS = new BooleanOption("wildcards", false);
   /** Option: distance. */
-  public static final StringOption DISTANCE = new StringOption("distance");
+  public static final OptionsOption<FTDistanceOptions> DISTANCE =
+      new OptionsOption<FTDistanceOptions>("distance", FTDistanceOptions.class);
 
   /**
    * Constructor.

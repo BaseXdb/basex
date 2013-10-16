@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.io.serial.*;
+import org.basex.io.serial.SerializerOptions.YesNo;
 import org.basex.test.*;
 import org.junit.*;
 
@@ -30,7 +32,7 @@ public final class XMLParserTest extends SandboxTest {
     context.options.set(MainOptions.MAINMEM, false);
     context.options.set(MainOptions.CHOP, true);
     context.options.set(MainOptions.STRIPNS, false);
-    context.options.set(MainOptions.SERIALIZER, "");
+    context.options.set(MainOptions.SERIALIZER, new SerializerOptions());
     context.options.set(MainOptions.INTPARSE, true);
   }
 
@@ -85,7 +87,9 @@ public final class XMLParserTest extends SandboxTest {
   @Test
   public void parse() throws Exception {
     context.options.set(MainOptions.STRIPNS, true);
-    context.options.set(MainOptions.SERIALIZER, "indent=no");
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.INDENT, YesNo.NO);
+    context.options.set(MainOptions.SERIALIZER, sopts);
 
     final String doc = "<e xmlns='A'><b:f xmlns:b='B'/></e>";
     for(final boolean b : new boolean[] { false, true }) {
@@ -104,7 +108,9 @@ public final class XMLParserTest extends SandboxTest {
    */
   @Test
   public void xmlSpace() throws Exception {
-    context.options.set(MainOptions.SERIALIZER, "indent=no");
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.INDENT, YesNo.NO);
+    context.options.set(MainOptions.SERIALIZER, sopts);
 
     final String in = "<x><a xml:space='default'> </a><a> </a>" +
         "<a xml:space='preserve'> </a></x>";

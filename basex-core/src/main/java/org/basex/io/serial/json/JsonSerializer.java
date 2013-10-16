@@ -25,8 +25,8 @@ public abstract class JsonSerializer extends OutputSerializer {
    */
   protected JsonSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
     super(os, opts);
-    opts.set(METHOD, SerialMethod.JSON.toString());
-    jopts = new JsonSerialOptions(opts.get(SerializerOptions.JSON));
+    opts.set(METHOD, SerialMethod.JSON);
+    jopts = opts.get(SerializerOptions.JSON);
     if(jopts.contains(JsonSerialOptions.INDENT)) {
       indent = jopts.get(JsonSerialOptions.INDENT);
     }

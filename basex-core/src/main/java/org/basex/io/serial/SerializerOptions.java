@@ -2,6 +2,7 @@ package org.basex.io.serial;
 
 import java.util.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -93,13 +94,12 @@ public final class SerializerOptions extends Options {
   /** Specific serialization parameter: URI of result wrapper. */
   public static final StringOption WRAP_URI =
       new StringOption("wrap-uri", "");
-
   /** Specific serialization parameter. */
-  public static final StringOption CSV =
-      new StringOption("csv", "");
+  public static final OptionsOption<CsvOptions> CSV =
+      new OptionsOption<CsvOptions>("csv", new CsvOptions());
   /** Specific serialization parameter. */
-  public static final StringOption JSON =
-      new StringOption("json", "");
+  public static final OptionsOption<JsonSerialOptions> JSON =
+      new OptionsOption<JsonSerialOptions>("json", new JsonSerialOptions());
 
   /** Yes/No enumeration. */
   public enum YesNo {

@@ -18,6 +18,13 @@ public final class FTDistanceOptions extends Options {
   public static final NumberOption MAX = new NumberOption("max", Integer.MAX_VALUE);
 
   /**
+   * Constructor.
+   */
+  public FTDistanceOptions() {
+    super();
+  }
+
+  /**
    * Constructor, specifying initial options.
    * @param opts options string
    * @throws BaseXException database exception

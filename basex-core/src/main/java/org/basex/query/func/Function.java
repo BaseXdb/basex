@@ -1176,8 +1176,8 @@ public enum Function {
    * @return function
    */
   public StandardFunc get(final InputInfo ii, final Expr... arg) {
-    return (StandardFunc) Reflect.get(Reflect.find(
-        func, InputInfo.class, Function.class, Expr[].class), ii, this, arg);
+    return Reflect.get(Reflect.find(func, InputInfo.class, Function.class, Expr[].class),
+        ii, this, arg);
   }
 
   /**

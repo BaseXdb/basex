@@ -8,6 +8,8 @@ package org.basex.util.options;
  * @param <V> enumeration value
  */
 public final class EnumOption<V extends Enum<V>> extends Option {
+  /** Class. */
+  private final Class<V> clazz;
   /** Default value. */
   private final V value;
 
@@ -16,9 +18,22 @@ public final class EnumOption<V extends Enum<V>> extends Option {
    * @param n name
    * @param v value
    */
+  @SuppressWarnings("unchecked")
   public EnumOption(final String n, final V v) {
     super(n);
     value = v;
+    clazz = (Class<V>) v.getClass();
+  }
+
+  /**
+   * Constructor.
+   * @param n name
+   * @param v value
+   */
+  public EnumOption(final String n, final Class<V> v) {
+    super(n);
+    clazz = v;
+    value = null;
   }
 
   @Override
@@ -40,8 +55,7 @@ public final class EnumOption<V extends Enum<V>> extends Option {
    * Returns all enumeration values.
    * @return enumeration
    */
-  @SuppressWarnings("unchecked")
   public V[] values() {
-    return (V[]) value.getClass().getEnumConstants();
+    return clazz.getEnumConstants();
   }
 }

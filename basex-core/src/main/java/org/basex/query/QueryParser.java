@@ -554,12 +554,7 @@ public class QueryParser extends InputParser {
       if(module != null) error(MODOUT);
 
       if(ctx.serialOpts == null) {
-        final MainOptions opts = ctx.context.options;
-        try {
-          ctx.serialOpts = new SerializerOptions(opts.get(MainOptions.SERIALIZER));
-        } catch(final IOException ex) {
-          ctx.serialOpts = new SerializerOptions();
-        }
+        ctx.serialOpts = ctx.context.options.get(MainOptions.SERIALIZER);
       }
       if(!decl.add("S " + name)) error(OUTDUPL, name);
       try {
@@ -575,7 +570,7 @@ public class QueryParser extends InputParser {
           final ANode node = new DBNode(io, ctx.context.options).children().next();
           // check parameters and add values to serialization parameters
           final InputInfo info = info();
-          FuncOptions.parse(node, ctx.serialOpts, info);
+          FuncOptions.serializer(node, ctx.serialOpts, info);
 
           final HashMap<String, String> free = ctx.serialOpts.free();
           if(!free.isEmpty()) SERWHICH.thrw(info, free.keySet().iterator().next());
@@ -3121,7 +3116,7 @@ public class QueryParser extends InputParser {
       } else if(wsConsumeWs(DISTANCE)) {
         final Expr[] rng = ftRange(false);
         if(rng == null) error(FTRANGE);
-        expr = new FTDistance(info(), expr, rng, ftUnit());
+        expr = new FTDistance(info(), expr, rng[0], rng[1], ftUnit());
       } else if(wsConsumeWs(AT)) {
         final boolean start = wsConsumeWs(START);
         final boolean end = !start && wsConsumeWs(END);

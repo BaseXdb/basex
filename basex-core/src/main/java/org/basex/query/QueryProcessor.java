@@ -186,7 +186,7 @@ public final class QueryProcessor extends Proc {
   public Serializer getSerializer(final OutputStream os) throws IOException, QueryException {
     compile();
     try {
-      return Serializer.get(os, ctx.serParams(true));
+      return Serializer.get(os, ctx.serParams());
     } catch(final QueryIOException ex) {
       throw ex.getCause();
     }

@@ -33,25 +33,23 @@ public final class JsonParser extends XMLParser {
    * Constructor.
    * @param source document source
    * @param opts database options
-   * @param parser parser options
+   * @param jopts parser options
    * @throws IOException I/O exception
    */
-  public JsonParser(final IO source, final MainOptions opts, final String parser)
+  public JsonParser(final IO source, final MainOptions opts, final JsonParserOptions jopts)
       throws IOException {
-    super(toXML(source, parser), opts);
+    super(toXML(source, jopts), opts);
   }
 
   /**
    * Converts a JSON document to XML.
    * @param io input
-   * @param options parsing options
+   * @param options parser options
    * @return parser
    * @throws IOException I/O exception
    */
-  public static IO toXML(final IO io, final String options) throws IOException {
-    final JsonParserOptions jopts = new JsonParserOptions(options);
-    // cache XML representation
-    final Item item = JsonConverter.convert(io, jopts);
+  public static IO toXML(final IO io, final JsonParserOptions options) throws IOException {
+    final Item item = JsonConverter.convert(io, options);
     final IOContent xml = new IOContent(item.serialize().toArray());
     xml.name(io.name());
     return xml;

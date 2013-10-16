@@ -27,8 +27,7 @@ final class RESTGet extends RESTCode {
     byte[] item = null;
 
     // parse database options
-    final TokenBuilder ser = new TokenBuilder();
-    final SerializerOptions sp = new SerializerOptions();
+    final SerializerOptions sopts = http.serialization;
     for(final Entry<String, String[]> param : http.params().entrySet()) {
       final String key = param.getKey();
       final String[] vals = param.getValue();
@@ -44,15 +43,14 @@ final class RESTGet extends RESTCode {
       } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
         item = Token.token(val);
-      } else if(sp.option(key) != null) {
+      } else if(sopts.option(key) != null) {
         // serialization parameters
-        for(final String v : vals) ser.add(key).add('=').add(v).add(',');
+        for(final String v : vals) sopts.assign(key, v);
       } else if(!parseOption(http, param, false)) {
         // external variables
         vars.put(key, new String[] { val });
       }
     }
-    http.serialization = ser.toString();
 
     final RESTCode code;
     if(operation == null) {

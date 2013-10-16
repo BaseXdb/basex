@@ -104,10 +104,9 @@ public final class DigitalSignature {
    * @return signed node
    * @throws QueryException query exception
    */
-  public Item generateSignature(final ANode node, final byte[] c,
-      final byte[] d, final byte[] sig, final byte[] ns, final byte[] t,
-      final byte[] expr, final ANode ce, final QueryContext ctx, final InputInfo ii)
-          throws QueryException {
+  public Item generateSignature(final ANode node, final byte[] c, final byte[] d, final byte[] sig,
+      final byte[] ns, final byte[] t, final byte[] expr, final ANode ce, final QueryContext ctx,
+      final InputInfo ii) throws QueryException {
 
     // checking input variables
     byte[] b = c;
@@ -255,16 +254,6 @@ public final class DigitalSignature {
       if(eq(type, DEFT)) {
         signContext = new DOMSignContext(pk, inputNode.getDocumentElement());
         xmlSig = fac.newXMLSignature(si, ki);
-
-        // detached signature
-//      } else if(eq(type, DETT)) {
-//      final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-//        dbf.setNamespaceAware(true);
-//        inputNode = dbf.newDocumentBuilder().newDocument();
-//        signContext = new DOMSignContext(pk, inputNode);
-//        xmlSig = fac.newXMLSignature(si, ki);
-
-        // enveloping signature
       } else {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);

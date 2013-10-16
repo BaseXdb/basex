@@ -15,6 +15,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.io.serial.SerializerOptions.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.Compare.Mode;
@@ -112,7 +113,11 @@ public final class QT3TS {
     final Performance perf = new Performance();
     ctx.options.set(MainOptions.CHOP, false);
     ctx.options.set(MainOptions.INTPARSE, false);
-    ctx.options.set(MainOptions.SERIALIZER, "omit-xml-declaration=no,indent=no");
+
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.INDENT, YesNo.NO);
+    sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.NO);
+    ctx.options.set(MainOptions.SERIALIZER, sopts);
 
     final XdmValue doc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx).value();
     final String version = asString("*:catalog/@version", doc);

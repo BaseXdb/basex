@@ -1,5 +1,6 @@
 package org.basex.util.options;
 
+import static java.lang.Integer.MIN_VALUE;
 import static org.basex.core.Prop.*;
 import static org.basex.util.Token.*;
 
@@ -74,7 +75,7 @@ public class Options implements Iterable<Option> {
       for(final Option opt : options(getClass())) {
         if(opt instanceof Comment) continue;
         final String name = opt.name();
-        values.put(name, opt.value());
+        values.put(name, opt.copy());
         options.put(name, opt);
       }
     } catch(final Exception ex) {
@@ -89,11 +90,12 @@ public class Options implements Iterable<Option> {
     BufferedWriter bw = null;
     try {
       bw = new BufferedWriter(new FileWriter(file.file()));
+      boolean first = true;
       for(final Option opt : options(getClass())) {
         final String name = opt.name();
-        //final Object value = value(opt);
         if(opt instanceof Comment) {
-          bw.write(NL + "# " + name + NL);
+          if(!first) bw.write(NL);
+          bw.write("# " + name + NL);
         } else if(opt instanceof NumbersOption) {
           final int[] ints = get((NumbersOption) opt);
           final int is = ints == null ? 0 : ints.length;
@@ -106,6 +108,7 @@ public class Options implements Iterable<Option> {
         } else {
           bw.write(name + " = " + get(opt) + NL);
         }
+        first = false;
       }
       bw.write(NL + PROPUSER + NL);
       bw.write(user.toString());
@@ -186,7 +189,8 @@ public class Options implements Iterable<Option> {
    * @return value
    */
   public final synchronized String[] get(final StringsOption option) {
-    return (String[]) get((Option) option);
+    final String[] v = (String[]) get((Option) option);
+    return v == null ? null : v.clone();
   }
 
   /**
@@ -195,7 +199,22 @@ public class Options implements Iterable<Option> {
    * @return value
    */
   public final synchronized int[] get(final NumbersOption option) {
-    return (int[]) get((Option) option);
+    final int[] v = (int[]) get((Option) option);
+    return v == null ? null : v.clone();
+  }
+
+  /**
+   * Returns the requested options.
+   * @param option option to be found
+   * @param <O> options
+   * @return value
+   */
+  @SuppressWarnings("unchecked")
+  public final synchronized <O extends Options> O get(final OptionsOption<O> option) {
+    final O o = (O) get((Option) option);
+    if(o == null) return null;
+    final Class<O> clz = (Class<O>) o.getClass();
+    return Reflect.get(Reflect.find(clz, String.class), o.toString());
   }
 
   /**
@@ -255,6 +274,17 @@ public class Options implements Iterable<Option> {
   }
 
   /**
+   * Sets the options of an option.
+   * @param option option to be set
+   * @param value value to be set
+   * @param <O> options
+   */
+  public final synchronized <O extends Options> void set(final OptionsOption<O> option,
+      final O value) {
+    put(option, value);
+  }
+
+  /**
    * Sets the enumeration of an option.
    * @param option option to be set
    * @param value value to be set
@@ -280,62 +310,62 @@ public class Options implements Iterable<Option> {
    * Assigns a value after casting it to the correct type. If the option is unknown,
    * it will be added as free option.
    * @param name name of option
-   * @param value value
+   * @param val value
    * @param <V> enumeration value
+   * @param <O> options
    * @throws BaseXException database exception
    */
-  public synchronized <V extends Enum<V>> void assign(final String name, final String value)
-      throws BaseXException {
+  public synchronized <O extends Options, V extends Enum<V>> void assign(final String name,
+      final String val) throws BaseXException {
 
     if(options.isEmpty()) {
-      free.put(name, value);
+      free.put(name, val);
     } else {
       final Option option = options.get(name);
       if(option == null) throw new BaseXException(error(name));
 
       if(option instanceof BooleanOption) {
-        // toggle boolean if no value was specified
-        final BooleanOption bo = (BooleanOption) option;
         final boolean v;
-        if(value == null || value.isEmpty()) {
-          v = !get(bo);
+        if(val == null || val.isEmpty()) {
+          v = !get((BooleanOption) option);
         } else {
-          v = Util.yes(value);
-          if(!v && !Util.no(value)) throw new BaseXException(Text.OPT_BOOLEAN, option.name());
+          v = Util.yes(val);
+          if(!v && !Util.no(val)) throw new BaseXException(Text.OPT_BOOLEAN, option.name());
         }
-        set(bo, v);
+        put(option, v);
+      } else if(option instanceof NumberOption) {
+        final int v = toInt(val);
+        if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
+        put(option, v);
+      } else if(option instanceof StringOption) {
+        put(option, val);
       } else if(option instanceof EnumOption) {
         @SuppressWarnings("unchecked")
         final EnumOption<V> eo = (EnumOption<V>) option;
-        final V v = eo.get(value);
-        if(v != null) set(eo, v);
-        else throw new BaseXException(allowed(option, (Object[]) eo.values()));
-      } else if(option instanceof NumberOption) {
-        final int v = toInt(value);
-        if(v == Integer.MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
-        set((NumberOption) option, v);
-      } else if(option instanceof StringOption) {
-        set((StringOption) option, value);
+        final V v = eo.get(val);
+        if(v == null) throw new BaseXException(allowed(option, (Object[]) eo.values()));
+        put(option, v);
+      } else if(option instanceof OptionsOption) {
+        @SuppressWarnings("unchecked")
+        final O o = ((OptionsOption<O>) option).newInstance();
+        o.parse(val);
+        put(option, o);
       } else if(option instanceof NumbersOption) {
-        final NumbersOption no = (NumbersOption) option;
-        int[] ii = get(no);
+        int[] ii = (int[]) get(option);
         if(ii == null) ii = new int[0];
         final IntList il = new IntList(ii.length + 1);
         for(final int i : ii) il.add(i);
-        try {
-          il.add(Integer.parseInt(value));
-        } catch(final NumberFormatException ex) {
-          throw new BaseXException(Text.INVALID_VALUE_X_X, option.name(), value);
-        }
-        set(no, il.toArray());
+        final int v = toInt(val);
+        if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
+        il.add(v);
+        put(option, il.toArray());
       } else if(option instanceof StringsOption) {
-        final StringsOption so = (StringsOption) option;
-        String[] ss = get(so);
+        String[] ss = (String[]) get(option);
         if(ss == null) ss = new String[0];
         final StringList sl = new StringList(ss.length + 1);
         for(final String s : ss) sl.add(s);
-        sl.add(value);
-        set(so, sl.toArray());
+        sl.add(val);
+        put(option, sl.toArray());
       }
     }
   }
@@ -491,7 +521,7 @@ public class Options implements Iterable<Option> {
    * @param string options string
    * @throws BaseXException database exception
    */
-  private synchronized void parse(final String string) throws BaseXException {
+  public synchronized void parse(final String string) throws BaseXException {
     final int sl = string.length();
     int i = 0;
     while(i < sl) {
@@ -513,16 +543,16 @@ public class Options implements Iterable<Option> {
    * Reads the configuration file and initializes the options.
    * The file is located in the project home directory.
    * @param opts options file
+   * @param <O> options
    * @param <V> enumeration
    */
-  private synchronized <V extends Enum<V>> void read(final IOFile opts) {
+  private synchronized <O extends Options, V extends Enum<V>> void read(final IOFile opts) {
     file = opts;
     final StringList read = new StringList();
-    final TokenBuilder err = new TokenBuilder();
+    final StringList errs = new StringList();
     boolean local = false;
-    if(!file.exists()) {
-      err.addExt("Saving options in \"%\"..." + NL, file);
-    } else {
+    boolean exists = file.exists();
+    if(exists) {
       BufferedReader br = null;
       try {
         br = new BufferedReader(new FileReader(file.file()));
@@ -539,11 +569,11 @@ public class Options implements Iterable<Option> {
           if(line.isEmpty() || line.charAt(0) == '#') continue;
           final int d = line.indexOf('=');
           if(d < 0) {
-            err.addExt("%: \"%\" ignored. " + NL, file, line);
+            errs.add("Line \"" + line + "\" ignored.");
             continue;
           }
 
-          final String value = line.substring(d + 1).trim();
+          final String val = line.substring(d + 1).trim();
           String name = line.substring(0, d).trim();
 
           // extract numeric value in key
@@ -558,45 +588,57 @@ public class Options implements Iterable<Option> {
           }
           // cache local options as system properties
           if(local) {
-            setSystem(name, value);
+            setSystem(name, val);
             continue;
           }
 
           final Option option = options.get(name);
           if(option == null) {
-            err.addExt("%: \"%\" not found. " + NL, file, name);
+            errs.add(error(name));
           } else if(option instanceof BooleanOption) {
-            final boolean v = Util.yes(value);
-            if(!v && !Util.no(value))
-              err.addExt("%: Invalid boolean: %=%." + NL, file, name, value);
-            set((BooleanOption) option, v);
+            final boolean v;
+            if(val == null || val.isEmpty()) {
+              v = !get((BooleanOption) option);
+            } else {
+              v = Util.yes(val);
+              if(!v && !Util.no(val)) errs.add(Util.info(Text.OPT_BOOLEAN, option.name()));
+            }
+            put(option, v);
           } else if(option instanceof NumberOption) {
-            final int v = toInt(value);
-            if(v == Integer.MIN_VALUE)
-              err.addExt("%: Invalid number: %=%." + NL, file, name, value);
-            else set((NumberOption) option, v);
+            final int v = toInt(val);
+            if(v == MIN_VALUE) errs.add(Util.info(Text.OPT_NUMBER, option.name()));
+            else put(option, v);
+          } else if(option instanceof StringOption) {
+            put(option, val);
           } else if(option instanceof EnumOption) {
             @SuppressWarnings("unchecked")
             final EnumOption<V> eo = (EnumOption<V>) option;
-            final V v = eo.get(value);
-            if(v == null) err.addExt("%: Unknown enumeration value: %=%." + NL, file, name, value);
-            else set(eo, v);
-          } else if(option instanceof StringOption) {
-            set((StringOption) option, value);
+            final V v = eo.get(val);
+            if(v == null) errs.add(allowed(option, (Object[]) eo.values()));
+            else put(option, v);
+          } else if(option instanceof OptionsOption) {
+            @SuppressWarnings("unchecked")
+            final O o = ((OptionsOption<O>) option).newInstance();
+            o.parse(val);
+            put(option, o);
           } else if(option instanceof NumbersOption) {
-            get((NumbersOption) option)[num] = Integer.parseInt(value);
+            final int v = toInt(val);
+            if(v == MIN_VALUE) errs.add(Util.info(Text.OPT_NUMBER, option.name()));
+            else ((int[]) get(option))[num] = v;
           } else if(option instanceof StringsOption) {
             if(num == 0) {
-              values.put(name, new String[Integer.parseInt(value)]);
+              final int v = toInt(val);
+              if(v == MIN_VALUE) errs.add(Util.info(Text.OPT_NUMBER, option.name()));
+              values.put(name, new String[v]);
             } else {
-              get((StringsOption) option)[num - 1] = value;
+              ((String[]) get(option))[num - 1] = val;
             }
           }
           // add key for final check
           read.add(name);
         }
       } catch(final IOException ex) {
-        err.addExt("% could not be parsed." + NL, file);
+        errs.add("File could not be parsed.");
         Util.errln(ex);
       } finally {
         if(br != null) try { br.close(); } catch(final IOException ignored) { }
@@ -604,21 +646,21 @@ public class Options implements Iterable<Option> {
     }
 
     // check if all mandatory files have been read
-    try {
-      if(err.isEmpty()) {
-        boolean ok = true;
+    boolean ok = true;
+    if(errs.isEmpty()) {
+      try {
         for(final Option opt : options(getClass())) {
           if(ok && !(opt instanceof Comment)) ok = read.contains(opt.name());
         }
-        if(!ok) err.addExt("Saving options in \"%\"..." + NL, file);
+      } catch(final IllegalAccessException ex) {
+        Util.notexpected(ex);
       }
-    } catch(final IllegalAccessException ex) {
-      Util.notexpected(ex);
     }
 
-    if(!err.isEmpty()) {
-      Util.err(err.toString());
+    if(!errs.isEmpty()) {
       write();
+      errs.add("Writing new configuration file.");
+      for(final String s : errs) Util.errln(file + ": " + s);
     }
   }
 
@@ -630,7 +672,7 @@ public class Options implements Iterable<Option> {
   private String similar(final String name) {
     final byte[] nm = token(name);
     final Levenshtein ls = new Levenshtein();
-    for(final String opts : values.keySet()) {
+    for(final String opts : options.keySet()) {
       if(ls.similar(nm, token(opts))) return opts;
     }
     return null;

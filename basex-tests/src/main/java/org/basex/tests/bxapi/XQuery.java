@@ -210,10 +210,9 @@ public final class XQuery implements Iterable<XdmItem> {
   /**
    * Returns serialization properties.
    * @return serialization properties
-   * @throws BaseXException database exception
    */
-  public SerializerOptions serializer() throws BaseXException {
-    return qp.ctx.serParams(false);
+  public SerializerOptions serializer() {
+    return qp.ctx.serParams();
   }
 
   /**

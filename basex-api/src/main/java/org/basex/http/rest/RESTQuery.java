@@ -99,12 +99,11 @@ class RESTQuery extends RESTCode {
    * @return serialization parameters
    */
   static String serial(final HTTPContext http) {
-    final TokenBuilder ser = new TokenBuilder(http.serialization);
+    final SerializerOptions sopts = http.serialization;
     if(http.wrapping) {
-      if(!ser.isEmpty()) ser.add(',');
-      ser.addExt(SerializerOptions.WRAP_PREFIX.name()).add('=').add(REST).add(',');
-      ser.addExt(SerializerOptions.WRAP_URI.name()).add('=').add(RESTURI);
+      sopts.set(SerializerOptions.WRAP_PREFIX, REST);
+      sopts.set(SerializerOptions.WRAP_URI, RESTURI);
     }
-    return ser.toString();
+    return sopts.toString();
   }
 }

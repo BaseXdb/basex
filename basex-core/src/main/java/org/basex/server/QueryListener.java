@@ -93,7 +93,7 @@ final class QueryListener extends Proc {
    * @throws IOException I/O Exception
    */
   String options() throws IOException {
-    if(options == null) options = parse().ctx.serParams(false);
+    if(options == null) options = parse().ctx.serParams();
     return options.toString();
   }
 

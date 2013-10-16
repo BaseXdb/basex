@@ -336,9 +336,9 @@ public final class HTTPPayload {
     Value val = null;
     if(ctype != null) {
       if(MimeTypes.isJSON(ctype)) {
-        final String options = eq(ctype, APP_JSON) ? "" :
-          JsonOptions.FORMAT.name() + "=" + JsonFormat.JSONML;
-        val = new DBNode(new JsonParser(in, opts, options));
+        final JsonParserOptions jopts = new JsonParserOptions();
+        if(eq(ctype, APP_JSONML)) jopts.set(JsonOptions.FORMAT, JsonFormat.JSONML);
+        val = new DBNode(new JsonParser(in, opts, jopts));
       } else if(TEXT_CSV.equals(ctype)) {
         val = new DBNode(new CsvParser(in, opts));
       } else if(TEXT_HTML.equals(ctype)) {

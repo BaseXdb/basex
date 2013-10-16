@@ -19,30 +19,36 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FTDistance extends FTFilter {
-  /** Distance. */
-  private final Expr[] dist;
+  /** Minimum distance. */
+  private Expr min;
+  /** Maximum distance. */
+  private Expr max;
 
   /**
    * Constructor.
    * @param ii input info
    * @param e expression
-   * @param d distances
+   * @param mn minimum
+   * @param mx maximum
    * @param u unit
    */
-  public FTDistance(final InputInfo ii, final FTExpr e, final Expr[] d, final FTUnit u) {
+  public FTDistance(final InputInfo ii, final FTExpr e, final Expr mn, final Expr mx,
+      final FTUnit u) {
     super(ii, e, u);
-    dist = d;
+    min = mn;
+    max = mx;
   }
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoneUp(dist);
+    checkNoneUp(min, max);
     super.checkUp();
   }
 
   @Override
   public FTExpr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    for(int d = 0; d < dist.length; d++) dist[d] = dist[d].compile(ctx, scp);
+    min = min.compile(ctx, scp);
+    max = max.compile(ctx, scp);
     return super.compile(ctx, scp);
   }
 
@@ -50,8 +56,8 @@ public final class FTDistance extends FTFilter {
   protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex)
       throws QueryException {
 
-    final long min = checkItr(dist[0], ctx);
-    final long max = checkItr(dist[1], ctx);
+    final long mn = checkItr(min, ctx);
+    final long mx = checkItr(max, ctx);
     mtc.sort();
 
     final FTMatch match = new FTMatch();
@@ -64,7 +70,7 @@ public final class FTDistance extends FTFilter {
           first = sm;
         } else {
           final int d = pos(sm.start, lex) - pos(last.end, lex) - 1;
-          if(d < min || d > max) return false;
+          if(d < mn || d > mx) return false;
         }
         last = sm;
       }
@@ -78,54 +84,51 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public boolean has(final Flag flag) {
-    for(final Expr d : dist) if(d.has(flag)) return true;
-    return super.has(flag);
+    return min.has(flag) || max.has(flag) || super.has(flag);
   }
 
   @Override
   public boolean removable(final Var v) {
-    for(final Expr d : dist) if(!d.removable(v)) return false;
-    return super.removable(v);
+    return min.removable(v) || max.removable(v) && super.removable(v);
   }
 
   @Override
   public VarUsage count(final Var v) {
-    return super.count(v).plus(VarUsage.sum(v, dist));
+    return super.count(v).plus(VarUsage.sum(v, min, max));
   }
 
   @Override
   public FTExpr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
       throws QueryException {
-    return inlineAll(ctx, scp, expr, v, e) | inlineAll(ctx, scp, dist, v, e)
+    return inlineAll(ctx, scp, expr, v, e) | inlineAll(ctx, scp, new Expr[] { min, max }, v, e)
         ? optimize(ctx, scp) : null;
   }
 
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return new FTDistance(info, expr[0].copy(ctx, scp, vs),
-        Arr.copyAll(ctx, scp, vs, dist), unit);
+        min.copy(ctx, scp, vs), max.copy(ctx, scp, vs), unit);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(DISTANCE, dist[0] + "-" + dist[1] + ' ' + unit), expr);
+    addPlan(plan, planElem(DISTANCE, min + "-" + max + ' ' + unit), expr);
   }
 
   @Override
   public String toString() {
-    return super.toString() + DISTANCE + PAR1 + dist[0] + '-' + dist[1] + ' ' + unit + PAR2;
+    return super.toString() + DISTANCE + PAR1 + min + '-' + max + ' ' + unit + PAR2;
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return super.accept(visitor) && visitAll(visitor, dist);
+    return super.accept(visitor) && visitAll(visitor, min, max);
   }
 
   @Override
   public int exprSize() {
     int sz = 1;
     for(final FTExpr e : expr) sz += e.exprSize();
-    for(final Expr e : dist) sz += e.exprSize();
-    return sz;
+    return min.exprSize() + max.exprSize() + sz;
   }
 }
