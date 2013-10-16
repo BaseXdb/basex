@@ -36,9 +36,11 @@ public class RESTPut extends RESTCode {
     // choose correct importer
     if(MimeTypes.isJSON(ct)) {
       session.execute(new Set(MainOptions.PARSER, MainParser.JSON));
-      if(APP_JSONML.equals(ct))
-        session.execute(new Set(MainOptions.JSONPARSER,
-            JsonOptions.FORMAT.name() + '=' + JsonFormat.JSONML));
+      if(APP_JSONML.equals(ct)) {
+        JsonParserOptions jopts = new JsonParserOptions();
+        jopts.set(JsonOptions.FORMAT, JsonFormat.JSONML);
+        session.execute(new Set(MainOptions.JSONPARSER, jopts));
+      }
     } else if(TEXT_CSV.equals(ct)) {
       session.execute(new Set(MainOptions.PARSER, MainParser.CSV));
     } else if(TEXT_HTML.equals(ct)) {
