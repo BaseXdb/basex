@@ -9,8 +9,8 @@ import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -65,12 +65,12 @@ public final class FNJson extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-    final ANode node = checkNode(expr[0], ctx);
+    final Iter iter = ctx.iter(expr[0]);
     final JsonSerialOptions jopts = checkOptions(1, Q_OPTIONS, new JsonSerialOptions(), ctx);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
     sopts.set(SerializerOptions.JSON, jopts);
-    return Str.get(delete(serialize(node.iter(), sopts, INVALIDOPT), '\r'));
+    return Str.get(delete(serialize(iter, sopts, INVALIDOPT), '\r'));
   }
 }

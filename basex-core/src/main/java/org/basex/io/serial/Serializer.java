@@ -62,27 +62,30 @@ public abstract class Serializer {
   /**
    * Returns a specific serializer.
    * @param os output stream reference
-   * @param opts serialization parameters (can be {@code null})
+   * @param sopts serialization parameters (can be {@code null})
    * @return serializer
    * @throws IOException I/O exception
    */
-  public static Serializer get(final OutputStream os, final SerializerOptions opts)
+  public static Serializer get(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
 
     // no parameters given: serialize as XML
-    if(opts == null) return get(os);
+    if(sopts == null) return get(os);
 
     // standard types: XHTML, HTML, text
-    switch(opts.get(SerializerOptions.METHOD)) {
-      case XHTML: return new XHTMLSerializer(os, opts);
-      case HTML:  return new HTMLSerializer(os, opts);
-      case TEXT:  return new TextSerializer(os, opts);
-      case RAW:   return new RawSerializer(os, opts);
-      case CSV:   return new CsvSerializer(os, opts);
-      case JSON:  return opts.get(SerializerOptions.JSON).
-          get(JsonOptions.FORMAT) == JsonFormat.JSONML ?
-          new JsonMLSerializer(os, opts) : new JsonDirectSerializer(os, opts);
-      default: return new XMLSerializer(os, opts);
+    switch(sopts.get(SerializerOptions.METHOD)) {
+      case XHTML: return new XHTMLSerializer(os, sopts);
+      case HTML:  return new HTMLSerializer(os, sopts);
+      case TEXT:  return new TextSerializer(os, sopts);
+      case RAW:   return new RawSerializer(os, sopts);
+      case CSV:   return new CsvSerializer(os, sopts);
+      case JSON:
+        final JsonSerialOptions jopts = sopts.get(SerializerOptions.JSON);
+        final JsonFormat format = jopts.get(JsonOptions.FORMAT);
+        return format == JsonFormat.JSONML ? new JsonMLSerializer(os, sopts) :
+               format == JsonFormat.MAP ? new JsonMapSerializer(os, sopts) :
+               new JsonDirectSerializer(os, sopts);
+      default: return new XMLSerializer(os, sopts);
     }
   }
 
@@ -93,7 +96,7 @@ public abstract class Serializer {
    * @param item item to be serialized
    * @throws IOException I/O exception
    */
-  public final void serialize(final Item item) throws IOException {
+  public void serialize(final Item item) throws IOException {
     openResult();
     if(item instanceof ANode) {
       final Type type = item.type;

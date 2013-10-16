@@ -41,7 +41,7 @@ public final class Token {
   /** Token 'null'. */
   public static final byte[] NULL = token("null");
   /** Token 'NaN'. */
-  private static final byte[] NAN = token("NaN");
+  public static final byte[] NAN = token("NaN");
   /** Token 'INF'. */
   public static final byte[] INF = token("INF");
   /** Token '-INF'. */

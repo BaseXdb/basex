@@ -41,7 +41,7 @@ public abstract class OutputSerializer extends Serializer {
   /** HTML5 flag. */
   protected final boolean html5;
   /** URI escape flag. */
-  protected final boolean escape;
+  protected final boolean escuri;
   /** Standalone 'omit' flag. */
   protected final boolean saomit;
   /** Include content type flag. */
@@ -125,7 +125,7 @@ public abstract class OutputSerializer extends Serializer {
     docsys  = opts.get(DOCTYPE_SYSTEM);
     docpub  = opts.get(DOCTYPE_PUBLIC);
     media   = opts.get(MEDIA_TYPE);
-    escape  = opts.yes(ESCAPE_URI_ATTRIBUTES);
+    escuri  = opts.yes(ESCAPE_URI_ATTRIBUTES);
     content = opts.yes(INCLUDE_CONTENT_TYPE);
     undecl  = opts.yes(UNDECLARE_PREFIXES);
     indent  = opts.yes(INDENT) && format;
@@ -419,7 +419,7 @@ public abstract class OutputSerializer extends Serializer {
    * Indents the next text.
    * @throws IOException I/O exception
    */
-  protected final void indent() throws IOException {
+  protected void indent() throws IOException {
     if(item) {
       item = false;
     } else if(indent) {

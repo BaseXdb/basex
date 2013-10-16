@@ -13,6 +13,4 @@ public final class JsonSerialOptions extends JsonOptions {
   public static final BooleanOption ESCAPE = new BooleanOption("escape", true);
   /** Option: indentation. */
   public static final BooleanOption INDENT = new BooleanOption("indent");
-  /** Option: fallback function. */
-  public static final StringOption FALLBACK = new StringOption("fallback");
 }

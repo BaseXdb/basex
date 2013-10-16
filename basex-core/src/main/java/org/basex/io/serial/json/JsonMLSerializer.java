@@ -91,21 +91,6 @@ public final class JsonMLSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void encode(final int ch) throws IOException {
-    switch(ch) {
-      case '\b': print("\\b");  break;
-      case '\f': print("\\f");  break;
-      case '\n': print("\\n");  break;
-      case '\r': print("\\r");  break;
-      case '\t': print("\\t");  break;
-      case '"':  print("\\\""); break;
-      case '/':  print("\\/");  break;
-      case '\\': print("\\\\"); break;
-      default:   print(ch);     break;
-    }
-  }
-
-  @Override
   protected void finishComment(final byte[] value) throws IOException { }
 
   @Override

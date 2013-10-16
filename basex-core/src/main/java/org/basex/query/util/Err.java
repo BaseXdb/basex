@@ -573,6 +573,8 @@ public enum Err {
   SERNS(SENR, 1, "Namespaces cannot be serialized:%."),
   /** SENR0001. */
   SERFUNC(SENR, 1, "Functions cannot be serialized: %."),
+  /** SENR0001. */
+  SERITEM(SENR, 1, "Item cannot be serialized: %."),
   /** SEPM0004. */
   SERSA(SEPM, 4, "If 'standalone' is specified, the root must be a single element."),
   /** SEPM0004. */

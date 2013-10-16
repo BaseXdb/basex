@@ -56,14 +56,14 @@ public final class Map extends FItem {
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
     return get(args[0].item(ctx, ii), ii).item(ctx, ii);
   }
 
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
     return get(args[0].item(ctx, ii), ii);
   }
 
@@ -170,7 +170,6 @@ public final class Map extends FItem {
    * @throws QueryException query exception
    */
   public Map insert(final Item k, final Value v, final InputInfo ii) throws QueryException {
-
     final Item key = key(k, ii);
     if(key == null) return this;
     final TrieNode ins = root.insert(key.hash(ii), key, v, 0, ii);

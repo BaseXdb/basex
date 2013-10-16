@@ -107,8 +107,7 @@ public final class Dbl extends ANum {
 
   @Override
   public boolean sameAs(final Expr cmp) {
-    return cmp instanceof Dbl && val == ((Dbl) cmp).val ||
-      this == NAN && cmp == NAN;
+    return cmp instanceof Dbl && val == ((Dbl) cmp).val || this == NAN && cmp == NAN;
   }
 
   /**

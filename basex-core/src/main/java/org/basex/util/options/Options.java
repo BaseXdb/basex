@@ -610,7 +610,9 @@ public class Options implements Iterable<Option> {
     } else if(option instanceof BooleanOption) {
       final boolean v;
       if(val == null || val.isEmpty()) {
-        v = !get((BooleanOption) option);
+        final Boolean b = get((BooleanOption) option);
+        if(b == null) throw new BaseXException(Text.OPT_BOOLEAN, option.name());
+        v = !b;
       } else {
         v = Util.yes(val);
         if(!v && !Util.no(val)) throw new BaseXException(Text.OPT_BOOLEAN, option.name());

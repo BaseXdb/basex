@@ -605,7 +605,7 @@ public enum Function {
   /** XQuery function. */
   _CSV_PARSE(FNCsv.class, "parse(string[,config])", arg(STR, MAP_O), ITEM_ZO),
   /** XQuery function. */
-  _CSV_SERIALIZE(FNCsv.class, "serialize(node[,params])", arg(NOD, ITEM_ZO), STR),
+  _CSV_SERIALIZE(FNCsv.class, "serialize(item[,params])", arg(ITEM_ZO, ITEM_ZO), STR),
 
   /* FNDb functions. */
 
@@ -879,7 +879,7 @@ public enum Function {
   /** XQuery function. */
   _JSON_PARSE(FNJson.class, "parse(string[,config])", arg(STR, MAP_O), ITEM_ZO),
   /** XQuery function. */
-  _JSON_SERIALIZE(FNJson.class, "serialize(node[,params])", arg(NOD, ITEM_ZO), STR),
+  _JSON_SERIALIZE(FNJson.class, "serialize(item[,params])", arg(ITEM_ZO, ITEM_ZO), STR),
 
   /* FNOut functions. */
 

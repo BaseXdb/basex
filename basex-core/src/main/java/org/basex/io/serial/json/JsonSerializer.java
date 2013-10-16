@@ -16,6 +16,8 @@ import org.basex.io.serial.*;
 public abstract class JsonSerializer extends OutputSerializer {
   /** JSON options. */
   protected final JsonSerialOptions jopts;
+  /** Escape special characters. */
+  protected final boolean escape;
 
   /**
    * Constructor.
@@ -27,8 +29,23 @@ public abstract class JsonSerializer extends OutputSerializer {
     super(os, opts);
     opts.set(METHOD, SerialMethod.JSON);
     jopts = opts.get(SerializerOptions.JSON);
-    if(jopts.contains(JsonSerialOptions.INDENT)) {
-      indent = jopts.get(JsonSerialOptions.INDENT);
+    escape = jopts.get(JsonSerialOptions.ESCAPE);
+    if(jopts.contains(JsonSerialOptions.INDENT)) indent = jopts.get(JsonSerialOptions.INDENT);
+  }
+
+  @Override
+  protected final void encode(final int ch) throws IOException {
+    if(!escape) {
+      print(ch);
+    } else switch(ch) {
+      case '\b': print("\\b");  break;
+      case '\f': print("\\f");  break;
+      case '\n': print("\\n");  break;
+      case '\r': print("\\r");  break;
+      case '\t': print("\\t");  break;
+      case '"':  print("\\\""); break;
+      case '\\': print("\\\\"); break;
+      default:   print(ch);     break;
     }
   }
 }

@@ -44,7 +44,7 @@ public class HTMLSerializer extends OutputSerializer {
     final byte[] tagatt = concat(lc(tag), COLON, lc(n));
     if(BOOLEAN.contains(tagatt) && eq(n, v)) return;
     // escape URI attributes
-    final byte[] val = escape && URIS.contains(tagatt) ? escape(v) : v;
+    final byte[] val = escuri && URIS.contains(tagatt) ? escape(v) : v;
 
     print(' ');
     print(n);
