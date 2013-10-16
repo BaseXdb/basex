@@ -248,6 +248,14 @@ public final class DBLocking implements Locking {
       }
     }
 
+    // Downgrade from local write lock to no write locks
+    synchronized(globalLock) {
+      if(write.isEmpty()) {
+        localWriters--;
+        globalLock.notifyAll();
+      }
+    }
+
     // Write back new locking lists
     writeLocked.put(thread, newWriteObjects);
     if (null != newReadObjects)
