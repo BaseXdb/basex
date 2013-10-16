@@ -100,10 +100,11 @@ public abstract class StandardFunc extends Arr {
    * Serializes the data from the specified iterator.
    * @param ir data to serialize
    * @param opts serialization parameters
+   * @param err error code
    * @return result
    * @throws QueryException query exception
    */
-  protected byte[] serialize(final Iter ir, final SerializerOptions opts)
+  protected byte[] serialize(final Iter ir, final SerializerOptions opts, final Err err)
       throws QueryException {
 
     final ArrayOutput ao = new ArrayOutput();
@@ -114,7 +115,7 @@ public abstract class StandardFunc extends Arr {
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     } catch(final IOException ex) {
-      SERANY.thrw(info, ex);
+      err.thrw(info, ex);
     }
     return ao.toArray();
   }

@@ -109,9 +109,9 @@ public abstract class DBNew extends BasicOperation {
 
     // add input
     final IOFile dbpath = ctx.globalopts.dbpath(string(ni.dbname));
-    final Parser p = new DirParser(ni.io, ctx.options, dbpath).target(string(ni.path));
-    final MemBuilder b = new MemBuilder(dbname, p);
     try {
+      final Parser p = new DirParser(ni.io, ctx.options, dbpath).target(string(ni.path));
+      final MemBuilder b = new MemBuilder(dbname, p);
       return new DataClip(b.build());
     } catch(final IOException ex) {
       throw IOERR.thrw(info, ex);

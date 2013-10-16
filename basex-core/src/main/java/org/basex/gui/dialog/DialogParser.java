@@ -6,6 +6,7 @@ import java.awt.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.MainOptions.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
@@ -19,14 +20,18 @@ import org.basex.util.*;
 abstract class DialogParser extends BaseXBack {
   /** Parent dialog. */
   final BaseXDialog dialog;
+  /** Parser. */
+  final MainParser parser;
 
   /**
    * Constructor.
    * @param d parent dialog
+   * @param p parser
    */
-  DialogParser(final BaseXDialog d) {
+  DialogParser(final BaseXDialog d, final MainParser p) {
     setLayout(new BorderLayout(16, 0));
     dialog = d;
+    parser = p;
   }
 
   /**

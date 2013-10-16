@@ -6,6 +6,7 @@ import java.awt.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
+import org.basex.core.MainOptions.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 
@@ -25,10 +26,10 @@ final class DialogHtmlParser extends DialogParser {
    * @param opts main options
    */
   DialogHtmlParser(final BaseXDialog d, final MainOptions opts) {
-    super(d);
+    super(d, MainParser.HTML);
 
     final boolean avl = HtmlParser.available();
-    BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
+    final BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
     pp.add(new BaseXLabel(avl ? H_HTML_PARSER : H_NO_HTML_PARSER));
 
     options = new BaseXTextField(opts.get(MainOptions.HTMLPARSER), d);

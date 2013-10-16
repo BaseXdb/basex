@@ -89,7 +89,7 @@ final class RestXqRespBuilder {
     }
 
     // set content type
-    if(cType != null) sp.set(SerializerOptions.S_MEDIA_TYPE, cType);
+    if(cType != null) sp.set(SerializerOptions.MEDIA_TYPE, cType);
 
     // check next item
     Item item = iter.next();

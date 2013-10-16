@@ -27,13 +27,13 @@ public class Options implements Iterable<Option> {
   private static final String PROPUSER = "# Local Options";
 
   /** Map with option names and definition. */
-  private final HashMap<String, Option> options = new HashMap<String, Option>();
+  protected final TreeMap<String, Option> options = new TreeMap<String, Option>();
   /** Map with option names and values. */
-  private final TreeMap<String, Object> values = new TreeMap<String, Object>();
+  protected final TreeMap<String, Object> values = new TreeMap<String, Object>();
   /** Free option definitions. */
-  private final HashMap<String, String> free = new HashMap<String, String>();
+  protected final HashMap<String, String> free = new HashMap<String, String>();
   /** Options, cached from an input file. */
-  private final StringBuilder user = new StringBuilder();
+  protected final StringBuilder user = new StringBuilder();
 
   /** Options file. */
   private IOFile file;
@@ -94,21 +94,17 @@ public class Options implements Iterable<Option> {
         //final Object value = value(opt);
         if(opt instanceof Comment) {
           bw.write(NL + "# " + name + NL);
-        } else if(opt instanceof BooleanOption) {
-          bw.write(name + " = " + get((BooleanOption) opt) + NL);
-        } else if(opt instanceof StringOption) {
-          bw.write(name + " = " + get((StringOption) opt) + NL);
-        } else if(opt instanceof NumberOption) {
-          bw.write(name + " = " + get((NumberOption) opt) + NL);
         } else if(opt instanceof NumbersOption) {
           final int[] ints = get((NumbersOption) opt);
           final int is = ints == null ? 0 : ints.length;
           for(int i = 0; i < is; ++i) bw.write(name + i + " = " + ints[i] + NL);
-        } else {
+        } else if(opt instanceof StringsOption) {
           final String[] strings = get((StringsOption) opt);
           final int ss = strings == null ? 0 : strings.length;
           bw.write(name + " = " + ss + NL);
           for(int i = 0; i < ss; ++i) bw.write(name + (i + 1) + " = " + strings[i] + NL);
+        } else {
+          bw.write(name + " = " + get(opt) + NL);
         }
       }
       bw.write(NL + PROPUSER + NL);
@@ -203,8 +199,19 @@ public class Options implements Iterable<Option> {
   }
 
   /**
-   * Sets the string value of an option.
+   * Returns the requested enum value.
    * @param option option to be found
+   * @param <V> enumeration value
+   * @return value
+   */
+  @SuppressWarnings("unchecked")
+  public final synchronized <V extends Enum<V>> V get(final EnumOption<V> option) {
+    return (V) get((Option) option);
+  }
+
+  /**
+   * Sets the string value of an option.
+   * @param option option to be set
    * @param value value to be written
    */
   public final synchronized void set(final StringOption option, final String value) {
@@ -213,7 +220,7 @@ public class Options implements Iterable<Option> {
 
   /**
    * Sets the integer value of an option.
-   * @param option option to be found
+   * @param option option to be set
    * @param value value to be written
    */
   public final synchronized void set(final NumberOption option, final int value) {
@@ -222,7 +229,7 @@ public class Options implements Iterable<Option> {
 
   /**
    * Sets the boolean value of an option.
-   * @param option option to be found
+   * @param option option to be set
    * @param value value to be written
    */
   public final synchronized void set(final BooleanOption option, final boolean value) {
@@ -231,7 +238,7 @@ public class Options implements Iterable<Option> {
 
   /**
    * Sets the string array value of an option.
-   * @param option option to be found
+   * @param option option to be set
    * @param value value to be written
    */
   public final synchronized void set(final StringsOption option, final String[] value) {
@@ -240,7 +247,7 @@ public class Options implements Iterable<Option> {
 
   /**
    * Sets the integer array value of an option.
-   * @param option option to be found
+   * @param option option to be set
    * @param value value to be written
    */
   public final synchronized void set(final NumbersOption option, final int[] value) {
@@ -248,13 +255,36 @@ public class Options implements Iterable<Option> {
   }
 
   /**
+   * Sets the enumeration of an option.
+   * @param option option to be set
+   * @param value value to be set
+   * @param <V> enumeration value
+   */
+  public final synchronized <V extends Enum<V>> void set(final EnumOption<V> option,
+      final Enum<V> value) {
+    put(option, value);
+  }
+
+  /**
+   * Sets the enumeration of an option.
+   * @param option option to be set
+   * @param value string value, which will be converted to an enum value or {@code null}
+   * @param <V> enumeration value
+   */
+  public final synchronized <V extends Enum<V>> void set(final EnumOption<V> option,
+      final String value) {
+    put(option, option.get(value));
+  }
+
+  /**
    * Assigns a value after casting it to the correct type. If the option is unknown,
    * it will be added as free option.
    * @param name name of option
    * @param value value
+   * @param <V> enumeration value
    * @throws BaseXException database exception
    */
-  public final synchronized void assign(final String name, final String value)
+  public synchronized <V extends Enum<V>> void assign(final String name, final String value)
       throws BaseXException {
 
     if(options.isEmpty()) {
@@ -266,19 +296,26 @@ public class Options implements Iterable<Option> {
       if(option instanceof BooleanOption) {
         // toggle boolean if no value was specified
         final BooleanOption bo = (BooleanOption) option;
+        final boolean v;
         if(value == null || value.isEmpty()) {
-          set(bo, !get(bo));
+          v = !get(bo);
         } else {
-          final boolean yes = Util.yes(value);
-          if(yes || Util.no(value)) set(bo, yes);
-          else throw new BaseXException(Text.INVALID_VALUE_X_X, option.name(), value);
+          v = Util.yes(value);
+          if(!v && !Util.no(value)) throw new BaseXException(Text.OPT_BOOLEAN, option.name());
         }
+        set(bo, v);
+      } else if(option instanceof EnumOption) {
+        @SuppressWarnings("unchecked")
+        final EnumOption<V> eo = (EnumOption<V>) option;
+        final V v = eo.get(value);
+        if(v != null) set(eo, v);
+        else throw new BaseXException(allowed(option, (Object[]) eo.values()));
       } else if(option instanceof NumberOption) {
-        try {
-          set((NumberOption) option, Integer.parseInt(value));
-        } catch(final NumberFormatException ex) {
-          throw new BaseXException(Text.INVALID_VALUE_X_X, option.name(), value);
-        }
+        final int v = toInt(value);
+        if(v == Integer.MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER, option.name());
+        set((NumberOption) option, v);
+      } else if(option instanceof StringOption) {
+        set((StringOption) option, value);
       } else if(option instanceof NumbersOption) {
         final NumbersOption no = (NumbersOption) option;
         int[] ii = get(no);
@@ -291,8 +328,6 @@ public class Options implements Iterable<Option> {
           throw new BaseXException(Text.INVALID_VALUE_X_X, option.name(), value);
         }
         set(no, il.toArray());
-      } else if(option instanceof StringOption) {
-        put(option, value);
       } else if(option instanceof StringsOption) {
         final StringsOption so = (StringsOption) option;
         String[] ss = get(so);
@@ -437,6 +472,18 @@ public class Options implements Iterable<Option> {
     return opts.toArray(new Option[opts.size()]);
   };
 
+  /**
+   * Returns a list of allowed keys.
+   * @param option option
+   * @param all allowed values
+   * @return exception
+   */
+  public static String allowed(final Option option, final Object... all) {
+    final TokenBuilder vals = new TokenBuilder();
+    for(final Object a : all) vals.add(vals.isEmpty() ? "" : ",").add(a.toString());
+    return Util.info(Text.OPT_ONEOF, option.name(), vals);
+  }
+
   // PRIVATE METHODS ====================================================================
 
   /**
@@ -448,8 +495,8 @@ public class Options implements Iterable<Option> {
     final int sl = string.length();
     int i = 0;
     while(i < sl) {
-      final int k = string.indexOf('=', i);
-      if(k == -1) break;
+      int k = string.indexOf('=', i);
+      if(k == -1) k = sl;
       final String key = string.substring(i, k).trim();
       final StringBuilder val = new StringBuilder();
       i = k;
@@ -466,8 +513,9 @@ public class Options implements Iterable<Option> {
    * Reads the configuration file and initializes the options.
    * The file is located in the project home directory.
    * @param opts options file
+   * @param <V> enumeration
    */
-  private synchronized void read(final IOFile opts) {
+  private synchronized <V extends Enum<V>> void read(final IOFile opts) {
     file = opts;
     final StringList read = new StringList();
     final TokenBuilder err = new TokenBuilder();
@@ -495,7 +543,7 @@ public class Options implements Iterable<Option> {
             continue;
           }
 
-          final String val = line.substring(d + 1).trim();
+          final String value = line.substring(d + 1).trim();
           String name = line.substring(0, d).trim();
 
           // extract numeric value in key
@@ -510,34 +558,46 @@ public class Options implements Iterable<Option> {
           }
           // cache local options as system properties
           if(local) {
-            setSystem(name, val);
+            setSystem(name, value);
             continue;
           }
 
-          final Option opt = options.get(name);
-          if(opt == null) {
+          final Option option = options.get(name);
+          if(option == null) {
             err.addExt("%: \"%\" not found. " + NL, file, name);
-          } else if(opt instanceof BooleanOption) {
-            put(opt, Boolean.parseBoolean(val));
-          } else if(opt instanceof NumberOption) {
-            put(opt, Integer.parseInt(val));
-          } else if(opt instanceof StringOption) {
-            put(opt, val);
-          } else if(opt instanceof NumbersOption) {
-            get((NumbersOption) opt)[num] = Integer.parseInt(val);
-          } else if(opt instanceof StringsOption) {
+          } else if(option instanceof BooleanOption) {
+            final boolean v = Util.yes(value);
+            if(!v && !Util.no(value))
+              err.addExt("%: Invalid boolean: %=%." + NL, file, name, value);
+            set((BooleanOption) option, v);
+          } else if(option instanceof NumberOption) {
+            final int v = toInt(value);
+            if(v == Integer.MIN_VALUE)
+              err.addExt("%: Invalid number: %=%." + NL, file, name, value);
+            else set((NumberOption) option, v);
+          } else if(option instanceof EnumOption) {
+            @SuppressWarnings("unchecked")
+            final EnumOption<V> eo = (EnumOption<V>) option;
+            final V v = eo.get(value);
+            if(v == null) err.addExt("%: Unknown enumeration value: %=%." + NL, file, name, value);
+            else set(eo, v);
+          } else if(option instanceof StringOption) {
+            set((StringOption) option, value);
+          } else if(option instanceof NumbersOption) {
+            get((NumbersOption) option)[num] = Integer.parseInt(value);
+          } else if(option instanceof StringsOption) {
             if(num == 0) {
-              values.put(name, new String[Integer.parseInt(val)]);
+              values.put(name, new String[Integer.parseInt(value)]);
             } else {
-              get((StringsOption) opt)[num - 1] = val;
+              get((StringsOption) option)[num - 1] = value;
             }
           }
           // add key for final check
           read.add(name);
         }
-      } catch(final Exception ex) {
+      } catch(final IOException ex) {
         err.addExt("% could not be parsed." + NL, file);
-        Util.debug(ex);
+        Util.errln(ex);
       } finally {
         if(br != null) try { br.close(); } catch(final IOException ignored) { }
       }

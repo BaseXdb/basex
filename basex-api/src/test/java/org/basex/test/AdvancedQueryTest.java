@@ -26,7 +26,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       final Serializer ser = qp.getSerializer(ao);
       qp.execute().serialize(ser);
       ser.close();
-      return ao.toString().replaceAll("(\\r|\\n)+ *", "");
+      return ao.toString().replaceAll("(\\r|\\n)\\s*", "");
     } catch(final Exception ex) {
       final AssertionError err = new AssertionError("Query failed:\n" + query);
       err.initCause(ex);
@@ -45,7 +45,6 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     final String res = query(query);
     final String exp = result.toString();
     if(!res.equals(exp))
-      fail("Wrong result:\n[Q] " + query + "\n[E] \u00bb" + result +
-          "\u00ab\n[F] \u00bb" + res + '\u00ab');
+      fail("Wrong result:\n[Q] " + query + "\n[E] " + result + "\n[F] " + res);
   }
 }

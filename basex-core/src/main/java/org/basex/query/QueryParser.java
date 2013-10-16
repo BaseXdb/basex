@@ -565,10 +565,11 @@ public class QueryParser extends InputParser {
       try {
         ctx.serialOpts.assign(name, string(val));
       } catch(final BaseXException ex) {
-        error(OUTWHICH, name);
+        for(final Option o : ctx.serialOpts) if(o.name().equals(name)) error(SERANY, ex);
+        error(OUTINVALID, ex);
       }
 
-      if(name.equals(SerializerOptions.S_PARAMETER_DOCUMENT.name())) {
+      if(name.equals(SerializerOptions.PARAMETER_DOCUMENT.name())) {
         final IO io = IO.get(string(resolvedUri(val).string()));
         try {
           final ANode node = new DBNode(io, ctx.context.options).children().next();
@@ -578,7 +579,7 @@ public class QueryParser extends InputParser {
 
           final HashMap<String, String> free = ctx.serialOpts.free();
           if(!free.isEmpty()) SERWHICH.thrw(info, free.keySet().iterator().next());
-          final StringOption cm = SerializerOptions.S_USE_CHARACTER_MAPS;
+          final StringOption cm = SerializerOptions.USE_CHARACTER_MAPS;
           if(!ctx.serialOpts.get(cm).isEmpty()) SERWHICH.thrw(info, cm.name());
         } catch(final IOException ex) {
           error(OUTDOC, val);

@@ -6,8 +6,8 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.test.*;
 import org.junit.*;
@@ -30,7 +30,7 @@ public final class CsvTest extends SandboxTest {
    */
   @BeforeClass
   public static void before() throws BaseXException {
-    new Set(MainOptions.PARSER, DataText.M_CSV).execute(context);
+    new Set(MainOptions.PARSER, MainParser.CSV).execute(context);
   }
 
   /**

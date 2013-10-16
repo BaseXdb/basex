@@ -1,6 +1,5 @@
 package org.basex.http.rest;
 
-import static org.basex.http.rest.RESTText.*;
 import static org.basex.query.func.Function.*;
 
 import java.io.*;
@@ -11,9 +10,8 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.http.*;
-import org.basex.io.serial.*;
-import org.basex.query.*;
 import org.basex.server.*;
+import org.basex.util.*;
 
 /**
  * Abstract class for performing REST operations.
@@ -50,14 +48,9 @@ public abstract class RESTCode {
    * Sets the wrapping flag.
    * @param val value
    * @param http HTTP context
-   * @throws HTTPException REST exception
    */
-  static void wrap(final String val, final HTTPContext http) throws HTTPException {
-    try {
-      http.wrapping = SerializerOptions.yes(WRAP, val);
-    } catch(final QueryIOException ex) {
-      HTTPErr.BAD_REQUEST_X.thrw(ex);
-    }
+  static void wrap(final String val, final HTTPContext http) {
+    http.wrapping = Util.yes(val);
   }
 
   /**

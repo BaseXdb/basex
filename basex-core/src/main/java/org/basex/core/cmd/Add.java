@@ -90,16 +90,20 @@ public final class Add extends ACreate {
     // ensure that the final name is not empty
     if(name.isEmpty()) return error(NAME_INVALID_X, name);
 
-    parser = new DirParser(io, options, data.meta.path);
-    parser.target(target);
-
-    // create random database name for disk-based creation
-    final boolean cache = cache(parser);
-    final String db = cache ? context.globalopts.random(data.meta.name) : name;
-    build = cache ? new DiskBuilder(db, parser, context) : new MemBuilder(db, parser);
-
+    String db = null;
     Data tmp = null;
     try {
+      parser = new DirParser(io, options, data.meta.path);
+      parser.target(target);
+
+      // create random database name for disk-based creation
+      if(cache(parser)) {
+        db = context.globalopts.random(data.meta.name);
+        build = new DiskBuilder(db, parser, context);
+      } else {
+        build = new MemBuilder(name, parser);
+      }
+
       tmp = build.build();
       // skip update if fragment is empty
       if(tmp.meta.size > 1) {
@@ -115,7 +119,7 @@ public final class Add extends ACreate {
     } finally {
       // close and drop intermediary database instance
       if(tmp != null) tmp.close();
-      if(cache) DropDB.drop(db, context);
+      if(db != null) DropDB.drop(db, context);
     }
   }
 

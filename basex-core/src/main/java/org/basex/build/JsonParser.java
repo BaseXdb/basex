@@ -5,8 +5,7 @@ import java.io.*;
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.query.*;
-import org.basex.query.util.json.*;
+import org.basex.io.parse.json.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -51,15 +50,10 @@ public final class JsonParser extends XMLParser {
    */
   public static IO toXML(final IO io, final String options) throws IOException {
     final JsonParserOptions jopts = new JsonParserOptions(options);
-    try {
-      // cache XML representation
-      final Item item = JsonConverter.convert(io, jopts);
-      final IOContent xml = new IOContent(item.serialize().toArray());
-      xml.name(io.name());
-      return xml;
-    } catch(final QueryIOException ex) {
-      final String msg = ex.getLocalizedMessage();
-      throw new BaseXException(msg.replaceAll(".*?parser", "\"" + io + "\""));
-    }
+    // cache XML representation
+    final Item item = JsonConverter.convert(io, jopts);
+    final IOContent xml = new IOContent(item.serialize().toArray());
+    xml.name(io.name());
+    return xml;
   }
 }

@@ -9,7 +9,6 @@ import java.nio.charset.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.*;
@@ -18,6 +17,7 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -74,7 +74,7 @@ public final class DialogExport extends BaseXDialog {
     pp.add(browse);
     p.add(pp);
 
-    // encoding
+    // provide components for method and encoding
     final MainOptions opts = gui.context.options;
     final String exporter = opts.get(MainOptions.EXPORTER);
     SerializerOptions sopts;
@@ -84,25 +84,31 @@ public final class DialogExport extends BaseXDialog {
       sopts = new SerializerOptions();
     }
 
-    // encoding and method
-    final String[] methods = new String[DataText.METHODS.length - 1];
-    for(int m = 0; m < methods.length; m++) {
-      methods[m] = DataText.METHODS[m].toUpperCase(Locale.ENGLISH);
-    }
-    method = new BaseXCombo(this, methods);
-    method.setSelectedItem(sopts.get(SerializerOptions.S_METHOD).toUpperCase(Locale.ENGLISH));
+    // method (ignore last entry)
+    final StringList sl = new StringList();
+    for(final SerialMethod sm : SerialMethod.values()) sl.add(sm.name());
+    sl.deleteAt(sl.size() - 1);
+    method = new BaseXCombo(this, sl.toArray());
+    method.setSelectedItem(sopts.get(SerializerOptions.METHOD).name());
 
     encoding = new BaseXCombo(this, ENCODINGS);
-    String enc = sopts.get(SerializerOptions.S_ENCODING);
+    String enc = sopts.get(SerializerOptions.ENCODING);
     boolean f = false;
     for(final String s : ENCODINGS) f |= s.equals(enc);
     if(!f) {
       enc = enc.toUpperCase(Locale.ENGLISH);
       for(final String s : ENCODINGS) f |= s.equals(enc);
     }
-    encoding.setSelectedItem(f ? enc : sopts.get(SerializerOptions.S_ENCODING));
+    encoding.setSelectedItem(f ? enc : sopts.get(SerializerOptions.ENCODING));
 
     params = new BaseXTextField(parameters(sopts, true), this);
+
+    final StringBuilder sb = new StringBuilder("<html><b>").append(PARAMETERS).append(":</b><br>");
+    for(final Option so : Serializer.OPTIONS) {
+      sb.append("\u2022 ").append(so).append("<br/>");
+    }
+    sb.append("</html>");
+    params.setToolTipText(sb.toString());
 
     pp = new BaseXBack(new TableLayout(3, 2, 16, 6)).border(8, 0, 8, 0);
     pp.add(new BaseXLabel(METHOD + COL, true, true));
@@ -172,12 +178,11 @@ public final class DialogExport extends BaseXDialog {
 
     if(ok) {
       gui.gopts.set(GUIOptions.INPUTPATH, pth);
-      // validate serialization parameters
       try {
         Serializer.get(new ArrayOutput(), new SerializerOptions(params.getText()));
       } catch(final IOException ex) {
         ok = false;
-        inf = ex.getLocalizedMessage();
+        inf = ex.getMessage();
       }
     }
 
@@ -194,8 +199,8 @@ public final class DialogExport extends BaseXDialog {
     final String enc = encoding.getSelectedItem();
     try {
       final SerializerOptions sp = new SerializerOptions(params.getText());
-      sp.set(SerializerOptions.S_METHOD, mth);
-      sp.set(SerializerOptions.S_ENCODING, enc);
+      sp.set(SerializerOptions.METHOD, mth);
+      sp.set(SerializerOptions.ENCODING, enc);
       gui.set(MainOptions.EXPORTER, parameters(sp, false));
     } catch(final BaseXException ex) { Util.notexpected(); }
     super.close();
@@ -203,24 +208,23 @@ public final class DialogExport extends BaseXDialog {
   }
 
   /**
-   * Create a serialization parameter string.
+   * Creates a serialization parameter string.
    * @param sopts serialization parameters
    * @param excl exclude method and encoding
    * @return result string
    */
   private String parameters(final SerializerOptions sopts, final boolean excl) {
     final String[] ex = !excl ? new String[0] : new String[] {
-        SerializerOptions.S_METHOD.name(), SerializerOptions.S_ENCODING.name() };
+        SerializerOptions.METHOD.name(), SerializerOptions.ENCODING.name() };
     final StringBuilder sb = new StringBuilder();
     for(final Option o : sopts) {
-      // all serialization parameters are strings...
-      final StringOption so = (StringOption) o;
       final String name = o.name();
       if(Token.eq(name, ex)) continue;
-      final String val = sopts.get(so);
-      if(!Serializer.OPTIONS.get(so).equals(val)) {
+      final Object val1 = sopts.get(o);
+      final Object val2 = Serializer.OPTIONS.get(o);
+      if(val1 == null ? val2 != null : val2 == null || !val1.equals(val2)) {
         if(sb.length() != 0) sb.append(',');
-        sb.append(name).append('=').append(val);
+        sb.append(name).append('=').append(val1);
       }
     }
     return sb.toString();

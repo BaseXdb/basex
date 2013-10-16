@@ -102,8 +102,8 @@ class RESTQuery extends RESTCode {
     final TokenBuilder ser = new TokenBuilder(http.serialization);
     if(http.wrapping) {
       if(!ser.isEmpty()) ser.add(',');
-      ser.addExt(SerializerOptions.S_WRAP_PREFIX.name()).add('=').add(REST).add(',');
-      ser.addExt(SerializerOptions.S_WRAP_URI.name()).add('=').add(RESTURI);
+      ser.addExt(SerializerOptions.WRAP_PREFIX.name()).add('=').add(REST).add(',');
+      ser.addExt(SerializerOptions.WRAP_URI.name()).add('=').add(RESTURI);
     }
     return ser.toString();
   }

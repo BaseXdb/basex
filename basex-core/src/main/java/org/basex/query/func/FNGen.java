@@ -44,7 +44,7 @@ public final class FNGen extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case DATA:                return dataa(ctx);
+      case DATA:                return data(ctx);
       case COLLECTION:          return collection(ctx).iter();
       case URI_COLLECTION:      return uriCollection(ctx);
       case UNPARSED_TEXT_LINES: return unparsedTextLines(ctx);
@@ -90,7 +90,7 @@ public final class FNGen extends StandardFunc {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private Iter dataa(final QueryContext ctx) throws QueryException {
+  private Iter data(final QueryContext ctx) throws QueryException {
     final Iter ir = ctx.iter(expr.length != 0 ? expr[0] : checkCtx(ctx));
 
     return new Iter() {
@@ -288,7 +288,6 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private ANode parseXml(final QueryContext ctx, final boolean frag) throws QueryException {
-
     final Item item = expr[0].item(ctx, info);
     if(item == null) return null;
     try {
@@ -308,7 +307,7 @@ public final class FNGen extends StandardFunc {
   private Str serialize(final QueryContext ctx) throws QueryException {
     final Item it = expr.length > 1 ? expr[1].item(ctx, info) : null;
     final SerializerOptions sopts = FuncOptions.serializer(it, info);
-    return Str.get(serialize(expr[0].iter(ctx), sopts));
+    return Str.get(serialize(expr[0].iter(ctx), sopts, SERANY));
   }
 
   @Override

@@ -113,15 +113,14 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public Expr inline(final QueryContext ctx, final VarScope scp,
-      final Var v, final Expr e) throws QueryException {
+  public Expr inline(final QueryContext ctx, final VarScope scp, final Var v, final Expr e)
+      throws QueryException {
     // values do not contain variable references
     return null;
   }
 
   @Override
-  public Value copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public Value copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     return this;
   }
 
@@ -170,7 +169,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
       final ValueIter vi = iter();
       for(Item it; (it = vi.next()) != null;) ser.serialize(it);
       ser.close();
-    } catch(QueryIOException ex) {
+    } catch(final QueryIOException ex) {
+      System.out.println("????");
       throw ex;
     } catch(final IOException ex) {
       SERANY.thrwIO(ex);

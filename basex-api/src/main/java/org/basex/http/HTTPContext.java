@@ -134,7 +134,7 @@ public final class HTTPContext {
    */
   public void initResponse(final SerializerOptions sopts) {
     // set content type and encoding
-    final String enc = sopts.get(SerializerOptions.S_ENCODING);
+    final String enc = sopts.get(SerializerOptions.ENCODING);
     res.setCharacterEncoding(enc);
     final String ct = mediaType(sopts);
     res.setContentType(new TokenBuilder(ct).add(CHARSET).add(enc).toString());
@@ -147,19 +147,19 @@ public final class HTTPContext {
    */
   public static String mediaType(final SerializerOptions sopts) {
     // set content type
-    final String type = sopts.get(SerializerOptions.S_MEDIA_TYPE);
+    final String type = sopts.get(SerializerOptions.MEDIA_TYPE);
     if(!type.isEmpty()) return type;
 
     // determine content type dependent on output method
-    final String mt = sopts.get(SerializerOptions.S_METHOD);
-    if(mt.equals(M_RAW)) return APP_OCTET;
-    if(mt.equals(M_XML)) return APP_XML;
-    if(eq(mt, M_XHTML, M_HTML)) return TEXT_HTML;
-    if(mt.equals(M_JSON)) {
+    final SerialMethod sm = sopts.get(SerializerOptions.METHOD);
+    if(sm == SerialMethod.RAW) return APP_OCTET;
+    if(sm == SerialMethod.XML) return APP_XML;
+    if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return TEXT_HTML;
+    if(sm == SerialMethod.JSON) {
       try {
-        final JsonParserOptions jprop = new JsonParserOptions(sopts.get(SerializerOptions.S_JSON));
-        if(jprop.format() == JsonFormat.JSONML) return APP_JSONML;
-      } catch(final IOException ignored) { }
+        final JsonParserOptions jprop = new JsonParserOptions(sopts.get(SerializerOptions.JSON));
+        if(jprop.get(JsonOptions.FORMAT) == JsonFormat.JSONML) return APP_JSONML;
+      } catch(final IOException ignore) { }
       return APP_JSON;
     }
     return TEXT_PLAIN;

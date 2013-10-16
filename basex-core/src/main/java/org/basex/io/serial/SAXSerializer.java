@@ -178,9 +178,9 @@ public final class SAXSerializer extends Serializer implements XMLReader {
         attrs.addAttribute(uri, lname, rname, null, value);
       }
 
-      final String uri = string(namespaces.get(prefix(elem)));
-      final String lname = string(local(elem));
-      final String rname = string(elem);
+      final String uri = string(namespaces.get(prefix(tag)));
+      final String lname = string(local(tag));
+      final String rname = string(tag);
       contentHandler.startElement(uri, lname, rname, attrs);
 
     } catch(final SAXException ex) {
@@ -197,7 +197,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   protected void finishClose() throws IOException {
     try {
-      final String name = string(elem);
+      final String name = string(tag);
       contentHandler.endElement("", name, name);
       namespaces = namespaces.getParent();
     } catch(final SAXException ex) {

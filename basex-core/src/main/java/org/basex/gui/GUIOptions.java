@@ -120,7 +120,7 @@ public final class GUIOptions extends Options {
   public static final BooleanOption EXECRT = new BooleanOption("EXECRT", false);
 
   /** Name of new database. */
-  public static final StringOption DBNAME = new StringOption("CREATENAME", "");
+  public static final StringOption DBNAME = new StringOption("DBNAME", "");
   /** Last insertion type. */
   public static final NumberOption LASTINSERT = new NumberOption("LASTINSERT", 1);
 

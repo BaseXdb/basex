@@ -131,28 +131,6 @@ public interface DataText {
   /** Version. */
   String V50 = "5.0";
 
-  /** Output method. */
-  String M_CSV = "csv";
-  /** Method. */
-  String M_XML = "xml";
-  /** Method. */
-  String M_XHTML = "xhtml";
-  /** Method. */
-  String M_HTML = "html";
-  /** Method. */
-  String M_TEXT = "text";
-  /** Method. */
-  String M_JSON = "json";
-  /** Method. */
-  String M_RAW = "raw";
-  /** Methods. */
-  String[] METHODS = { M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_CSV, M_RAW };
-
-  /** Normalization. */
-  String NFC = "NFC";
-  /** Normalization. */
-  String NONE = "none";
-
   /** Document declaration. */
   String DOCDECL1 = "xml version=\"";
   /** Document declaration. */
@@ -160,6 +138,8 @@ public interface DataText {
   /** Document declaration. */
   String DOCDECL3 = "\" standalone=\"";
 
+  /** HTML. */
+  String HTML = "html";
   /** Doctype output. */
   String DOCTYPE = "<!DOCTYPE ";
   /** Doctype system keyword. */
@@ -188,28 +168,6 @@ public interface DataText {
   byte[] T_NAME = token("name");
   /** Token: size. */
   byte[] T_SIZE = token("size");
-
-  /** Token: json. */
-  byte[] T_JSON = token("json");
-  /** Token: type. */
-  byte[] T_TYPE = token("type");
-  /** Token: pair. */
-  byte[] T_PAIR = token("pair");
-  /** Token: item. */
-  byte[] T_ITEM = token("item");
-
-  /** Token: string. */
-  byte[] T_STRING = token("string");
-  /** Token: number. */
-  byte[] T_NUMBER = token("number");
-  /** Token: boolean. */
-  byte[] T_BOOLEAN = token("boolean");
-  /** Token: array. */
-  byte[] T_ARRAY = token("array");
-  /** Token: object. */
-  byte[] T_OBJECT = token("object");
-  /** Token: array value. */
-  byte[] T_VALUE = token("_");
 
   /** Comment output. */
   byte[] COMM_O = token("<!--");
@@ -244,7 +202,7 @@ public interface DataText {
   /** Text output. */
   byte[] TEXT = token("text()");
   /** Comment output. */
-  byte[] COMM = token("comment()");
+  byte[] COMMENT = token("comment()");
   /** Processing instruction output. */
   byte[] PI = token("processing-instruction()");
   /** Attribute output. */
@@ -271,15 +229,6 @@ public interface DataText {
   byte[] CONTENT = token("content");
   /** HTML: charset attribute value. */
   byte[] CHARSET = token("; charset=");
-
-  // ERRORS ===================================================================
-
-  /** Serialization error. */
-  String SERVAL = "Parameter '%' must be [%";
-  /** Serialization error. */
-  String SERVAL2 = "|%";
-  /** Serialization error. */
-  String SERVAL3 = "]; '%' found";
 
   // TABLE SERIALIZATION ======================================================
 

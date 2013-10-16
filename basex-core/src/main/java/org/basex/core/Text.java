@@ -7,9 +7,8 @@ import java.util.*;
 import org.basex.core.parse.Commands.*;
 
 /**
- * This class contains internationalized text strings, which are used
- * throughout the project. If this class is called first, the Strings
- * are initialized by the {@link Lang} class.
+ * This class contains internationalized text strings, which are used throughout the project.
+ * If this class is called first, the Strings are initialized by the {@link Lang} class.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
@@ -812,6 +811,13 @@ public interface Text {
   String FATAL = "Fatal";
   /** "Warning". */
   String WARNING = "Warning";
+
+  /** Options error. */
+  String OPT_BOOLEAN = "Value of '%' must be a boolean.";
+  /** Options error. */
+  String OPT_NUMBER = "Value of '%' must be a number.";
+  /** Options error. */
+  String OPT_ONEOF = "Value of '%' must be one of (%).";
 
   // MENU ENTRIES =============================================================
 

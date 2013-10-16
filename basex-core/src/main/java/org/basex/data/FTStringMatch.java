@@ -54,7 +54,7 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
 
   @Override
   public int hashCode() {
-    int h = start + 1;
+    final int h = start + 1;
     return (h << 5) - h + end;
   }
 

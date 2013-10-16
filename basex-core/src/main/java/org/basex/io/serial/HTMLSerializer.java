@@ -41,7 +41,7 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void attribute(final byte[] n, final byte[] v) throws IOException {
     // don't append value for boolean attributes
-    final byte[] tagatt = concat(lc(elem), COLON, lc(n));
+    final byte[] tagatt = concat(lc(tag), COLON, lc(n));
     if(BOOLEAN.contains(tagatt) && eq(n, v)) return;
     // escape URI attributes
     final byte[] val = escape && URIS.contains(tagatt) ? escape(v) : v;
@@ -99,7 +99,7 @@ public class HTMLSerializer extends OutputSerializer {
     print(t);
     sep = indent;
     script = SCRIPTS.contains(lc(t));
-    if(content && eq(lc(elem), HEAD)) ct++;
+    if(content && eq(lc(tag), HEAD)) ct++;
   }
 
   @Override
@@ -113,9 +113,9 @@ public class HTMLSerializer extends OutputSerializer {
     if(ct(true, true)) return;
     print(ELEM_C);
     if(html5) {
-      if(EMPTIES5.contains(lc(elem))) return;
+      if(EMPTIES5.contains(lc(tag))) return;
     } else {
-      if(EMPTIES.contains(lc(elem))) {
+      if(EMPTIES.contains(lc(tag))) {
         final byte[] u = nsUri(EMPTY);
         if(u == null || u.length == 0) return;
       }
@@ -127,7 +127,7 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void finishClose() throws IOException {
     super.finishClose();
-    script = script && !SCRIPTS.contains(lc(elem));
+    script = script && !SCRIPTS.contains(lc(tag));
   }
 
   @Override
@@ -136,7 +136,7 @@ public class HTMLSerializer extends OutputSerializer {
     if(!super.doctype(dt) && html5) {
       if(sep) indent();
       print(DOCTYPE);
-      if(dt == null) print(M_HTML);
+      if(dt == null) print(HTML);
       else print(dt);
       print(ELEM_C);
       if(indent) print(nl);

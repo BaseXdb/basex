@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
-import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -10,11 +9,14 @@ import java.util.Map.Entry;
 import java.util.regex.*;
 
 import org.basex.build.*;
-import org.basex.build.JsonOptions.*;
+import org.basex.build.JsonOptions.JsonFormat;
+import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.core.*;
+import org.basex.core.MainOptions.MainParser;
 import org.basex.core.Context;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
@@ -22,7 +24,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.util.*;
-import org.basex.query.util.json.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -631,10 +632,10 @@ public final class QueryContext extends Proc {
 
     // convert to json
     try {
-      if(type.equalsIgnoreCase(M_JSON)) {
+      if(type.equalsIgnoreCase(MainParser.JSON.toString())) {
         final JsonParserOptions jp = new JsonParserOptions();
-        jp.set(JsonOptions.SPEC, JsonSpec.ECMA_262.toString());
-        jp.set(JsonOptions.FORMAT, JsonFormat.MAP.toString());
+        jp.set(JsonOptions.SPEC, JsonSpec.ECMA_262);
+        jp.set(JsonOptions.FORMAT, JsonFormat.MAP);
         return JsonConverter.convert(Token.token(val.toString()), jp);
       }
     } catch(final QueryIOException ex) {

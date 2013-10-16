@@ -1,7 +1,6 @@
 package org.basex.query.util.http;
 
 import static java.net.HttpURLConnection.*;
-import static org.basex.data.DataText.*;
 import static org.basex.io.MimeTypes.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.query.util.http.HTTPText.*;
@@ -226,16 +225,16 @@ public final class HTTPClient {
       byte[] m = payloadAtts.get(METHOD);
       if(m == null) {
         if(eq(type, APP_HTML_XML)) {
-          m = token(M_XHTML);
+          m = token(SerialMethod.XHTML.toString());
         } else if(eq(type, TEXT_HTML)) {
-          m = token(M_HTML);
+          m = token(SerialMethod.HTML.toString());
         } else if(type != null && isXML(type)) {
-          m = token(M_XML);
+          m = token(SerialMethod.XML.toString());
         } else if(type != null && isText(type)) {
-          m = token(M_TEXT);
+          m = token(SerialMethod.TEXT.toString());
         } else {
           // default serialization method is XML
-          m = token(M_XML);
+          m = token(SerialMethod.XML.toString());
         }
       }
       // write content depending on the method

@@ -1,11 +1,8 @@
 package org.basex.io.serial;
 
-import static org.basex.core.Text.*;
-import static org.basex.data.DataText.*;
-import static org.basex.query.util.Err.*;
+import java.util.*;
 
 import org.basex.core.*;
-import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -16,80 +13,173 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class SerializerOptions extends Options {
-  /** Undefined flag. */
-  static final String UNDEFINED = "\u0001";
-
   /** Serialization parameter: yes/no. */
-  public static final StringOption S_BYTE_ORDER_MARK = new StringOption("byte-order-mark", NO);
+  public static final EnumOption<YesNo> BYTE_ORDER_MARK =
+      new EnumOption<YesNo>("byte-order-mark", YesNo.NO);
   /** Serialization parameter: list of QNames. */
-  public static final StringOption S_CDATA_SECTION_ELEMENTS =
+  public static final StringOption CDATA_SECTION_ELEMENTS =
       new StringOption("cdata-section-elements", "");
   /** Serialization parameter. */
-  public static final StringOption S_DOCTYPE_PUBLIC = new StringOption("doctype-public", "");
+  public static final StringOption DOCTYPE_PUBLIC =
+      new StringOption("doctype-public", "");
   /** Serialization parameter. */
-  public static final StringOption S_DOCTYPE_SYSTEM = new StringOption("doctype-system", "");
+  public static final StringOption DOCTYPE_SYSTEM =
+      new StringOption("doctype-system", "");
   /** Serialization parameter: valid encoding. */
-  public static final StringOption S_ENCODING = new StringOption("encoding", Token.UTF8);
+  public static final StringOption ENCODING =
+      new StringOption("encoding", Token.UTF8);
   /** Serialization parameter: yes/no. */
-  public static final StringOption S_ESCAPE_URI_ATTRIBUTES =
-      new StringOption("escape-uri-attributes", NO);
+  public static final EnumOption<YesNo> ESCAPE_URI_ATTRIBUTES =
+      new EnumOption<YesNo>("escape-uri-attributes", YesNo.NO);
   /** Serialization parameter: yes/no. */
-  public static final StringOption S_INCLUDE_CONTENT_TYPE =
-      new StringOption("include-content-type", NO);
+  public static final EnumOption<YesNo> INCLUDE_CONTENT_TYPE =
+      new EnumOption<YesNo>("include-content-type", YesNo.NO);
   /** Serialization parameter: yes/no. */
-  public static final StringOption S_INDENT = new StringOption("indent", YES);
+  public static final EnumOption<YesNo> INDENT =
+      new EnumOption<YesNo>("indent", YesNo.YES);
   /** Serialization parameter. */
-  public static final StringOption S_SUPPRESS_INDENTATION =
+  public static final StringOption SUPPRESS_INDENTATION =
       new StringOption("suppress-indentation", "");
   /** Serialization parameter. */
-  public static final StringOption S_MEDIA_TYPE = new StringOption("media-type", "");
+  public static final StringOption MEDIA_TYPE =
+      new StringOption("media-type", "");
   /** Serialization parameter: xml/xhtml/html/text. */
-  public static final StringOption S_METHOD = new StringOption("method", M_XML);
+  public static final EnumOption<SerialMethod> METHOD =
+      new EnumOption<SerialMethod>("method", SerialMethod.XML);
   /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
-  public static final StringOption S_NORMALIZATION_FORM =
-      new StringOption("normalization-form", NFC);
+  public static final EnumOption<Norm> NORMALIZATION_FORM =
+      new EnumOption<Norm>("normalization-form", Norm.NFC);
   /** Serialization parameter: yes/no. */
-  public static final StringOption S_OMIT_XML_DECLARATION =
-      new StringOption("omit-xml-declaration", YES);
+  public static final EnumOption<YesNo> OMIT_XML_DECLARATION =
+      new EnumOption<YesNo>("omit-xml-declaration", YesNo.YES);
   /** Serialization parameter: yes/no/omit. */
-  public static final StringOption S_STANDALONE = new StringOption("standalone", OMIT);
+  public static final EnumOption<YesNoOmit> STANDALONE =
+      new EnumOption<YesNoOmit>("standalone", YesNoOmit.OMIT);
   /** Serialization parameter: yes/no. */
-  public static final StringOption S_UNDECLARE_PREFIXES =
-      new StringOption("undeclare-prefixes", NO);
+  public static final EnumOption<YesNo> UNDECLARE_PREFIXES =
+      new EnumOption<YesNo>("undeclare-prefixes", YesNo.NO);
   /** Serialization parameter. */
-  public static final StringOption S_USE_CHARACTER_MAPS =
+  public static final StringOption USE_CHARACTER_MAPS =
       new StringOption("use-character-maps", "");
   /** Serialization parameter. */
-  public static final StringOption S_ITEM_SEPARATOR =
-      new StringOption("item-separator", UNDEFINED);
+  public static final StringOption ITEM_SEPARATOR =
+      new StringOption("item-separator");
   /** Serialization parameter: 1.0/1.1. */
-  public static final StringOption S_VERSION = new StringOption("version", "");
+  public static final StringOption VERSION =
+      new StringOption("version", "");
   /** Serialization parameter: 4.0/4.01/5.0. */
-  public static final StringOption S_HTML_VERSION = new StringOption("html-version", "");
+  public static final StringOption HTML_VERSION =
+      new StringOption("html-version", "");
   /** Parameter document. */
-  public static final StringOption S_PARAMETER_DOCUMENT =
+  public static final StringOption PARAMETER_DOCUMENT =
       new StringOption("parameter-document", "");
 
   /** Specific serialization parameter: newline. */
-  public static final StringOption S_NEWLINE = new StringOption(
-    "newline", Prop.NL.equals("\r") ? S_CR : Prop.NL.equals("\n") ? S_NL : S_CRNL);
+  public static final EnumOption<Newline> NEWLINE =
+      new EnumOption<Newline>("newline",
+      Prop.NL.equals("\r") ? Newline.CR : Prop.NL.equals("\n") ? Newline.NL : Newline.CRNL);
   /** Specific serialization parameter: formatting. */
-  public static final StringOption S_FORMAT = new StringOption("format", YES);
+  public static final EnumOption<YesNo> FORMAT =
+      new EnumOption<YesNo>("format", YesNo.YES);
   /** Specific serialization parameter: indent with spaces or tabs. */
-  public static final StringOption S_TABULATOR = new StringOption("tabulator", NO);
+  public static final EnumOption<YesNo> TABULATOR =
+      new EnumOption<YesNo>("tabulator", YesNo.NO);
   /** Specific serialization parameter: number of spaces to indent. */
-  public static final StringOption S_INDENTS = new StringOption("indents", "2");
-  /** Specific serialization parameter: item separator. */
-  public static final StringOption S_SEPARATOR = new StringOption("separator", UNDEFINED);
+  public static final NumberOption INDENTS =
+      new NumberOption("indents", 2);
   /** Specific serialization parameter: prefix of result wrapper. */
-  public static final StringOption S_WRAP_PREFIX = new StringOption("wrap-prefix", "");
+  public static final StringOption WRAP_PREFIX =
+      new StringOption("wrap-prefix", "");
   /** Specific serialization parameter: URI of result wrapper. */
-  public static final StringOption S_WRAP_URI = new StringOption("wrap-uri", "");
+  public static final StringOption WRAP_URI =
+      new StringOption("wrap-uri", "");
 
   /** Specific serialization parameter. */
-  public static final StringOption S_CSV = new StringOption("csv", "");
+  public static final StringOption CSV =
+      new StringOption("csv", "");
   /** Specific serialization parameter. */
-  public static final StringOption S_JSON = new StringOption("json", "");
+  public static final StringOption JSON =
+      new StringOption("json", "");
+
+  /** Yes/No enumeration. */
+  public enum YesNo {
+    /** Yes. */ YES,
+    /** No.  */ NO;
+
+    @Override
+    public String toString() {
+      return super.toString().toLowerCase(Locale.ENGLISH);
+    }
+  }
+
+  /** Yes/No enumeration. */
+  public enum YesNoOmit {
+    /** Yes.  */ YES,
+    /** No.   */ NO,
+    /** Omit. */ OMIT;
+
+    @Override
+    public String toString() {
+      return super.toString().toLowerCase(Locale.ENGLISH);
+    }
+  }
+
+  /** Normalization form. */
+  public enum Norm {
+    /** NFC.   */ NFC("NFC"),
+    /** None.  */ NONE("none");
+
+    /** String. */
+    private final String string;
+
+    /**
+     * Constructor.
+     * @param s string
+     */
+    Norm(final String s) {
+      string = s;
+    }
+
+    @Override
+    public String toString() {
+      return string;
+    }
+  }
+
+  /** Newlines. */
+  public enum Newline {
+    /** NL.   */ NL("\\n", "\n"),
+    /** CR.   */ CR("\\r", "\r"),
+    /** CRNL. */ CRNL("\\r\\n", "\r\n");
+
+    /** Name. */
+    private final String name;
+    /** Newline. */
+    private final String newline;
+
+    /**
+     * Constructor.
+     * @param n name
+     * @param nl newline string
+     */
+    Newline(final String n, final String nl) {
+      name = n;
+      newline = nl;
+    }
+
+    /**
+     * Returns the newline string.
+     * @return newline string
+     */
+    String newline() {
+      return newline;
+    }
+
+    @Override
+    public String toString() {
+      return name;
+    }
+  }
 
   /**
    * Constructor.
@@ -109,84 +199,11 @@ public final class SerializerOptions extends Options {
   }
 
   /**
-   * Retrieves a value from the specified option and checks allowed values.
-   * @param option option
-   * @param allowed allowed values
-   * @return value
-   * @throws QueryIOException query I/O exception
-   */
-  public String check(final StringOption option, final String... allowed)
-      throws QueryIOException {
-
-    final String val = get(option);
-    for(final String a : allowed) if(a.equals(val)) return val;
-    throw error(option.name(), val, allowed);
-  }
-
-  /**
-   * Retrieves a value from the specified option and checks for supported values.
-   * @param option option
-   * @param allowed allowed values
-   * @return value
-   * @throws QueryIOException query I/O exception
-   */
-  public String supported(final StringOption option, final String... allowed)
-      throws QueryIOException {
-
-    final String val = get(option);
-    if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;
-    for(final String a : allowed) if(a.equals(val)) return val;
-    throw SERNOTSUPP.thrwIO(allowed(option.name(), val, allowed));
-  }
-
-  /**
-   * Retrieves a value from the specified option and checks for its boolean value.
+   * Checks if the specified option is true.
    * @param option option
    * @return value
-   * @throws QueryIOException query I/O exception
    */
-  public boolean yes(final StringOption option) throws QueryIOException {
-    return yes(option.name(), get(option));
-  }
-
-  /**
-   * Converts the specified value to a boolean or throws an exception if value is unknown.
-   * @param key key
-   * @param value value
-   * @return result of check
-   * @throws QueryIOException query I/O exception
-   */
-  public static boolean yes(final String key, final String value) throws QueryIOException {
-    if(Util.yes(value)) return true;
-    if(Util.no(value)) return false;
-    throw error(key, value, YES, NO);
-  }
-
-  /**
-   * Returns an exception string for a wrong key.
-   * @param name name of option
-   * @param found found value
-   * @param allowed allowed values
-   * @return exception
-   * @throws QueryIOException query I/O exception
-   */
-  public static QueryIOException error(final String name, final String found,
-      final String... allowed) throws QueryIOException {
-    throw SEROPT.thrwIO(allowed(name, found, allowed));
-  }
-
-  /**
-   * Returns a list of allowed keys.
-   * @param name name of option
-   * @param found found value
-   * @param all allowed values
-   * @return exception
-   */
-  private static String allowed(final String name, final String found, final String... all) {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.addExt(SERVAL, name, all[0]);
-    for(int a = 1; a < all.length; ++a) tb.addExt(SERVAL2, all[a]);
-    tb.addExt(SERVAL3, found);
-    return tb.toString();
+  public boolean yes(final EnumOption<YesNo> option) {
+    return get(option) == YesNo.YES;
   }
 }

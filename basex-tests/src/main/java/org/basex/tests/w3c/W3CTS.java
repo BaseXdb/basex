@@ -318,7 +318,7 @@ public abstract class W3CTS {
 
         // serialize query
         final SerializerOptions sp = new SerializerOptions();
-        sp.set(SerializerOptions.S_INDENT, NO);
+        sp.set(SerializerOptions.INDENT, NO);
         final Serializer ser = Serializer.get(ao, sp);
         for(Item it; (it = iter.next()) != null;) ser.serialize(it);
         ser.close();

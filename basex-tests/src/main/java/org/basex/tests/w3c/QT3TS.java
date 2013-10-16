@@ -363,7 +363,7 @@ public final class QT3TS {
       } else if(result.err != null) {
         res = result.err.getCode() + ": " + result.err.getLocalizedMessage();
       } else {
-        result.sprop.set(SerializerOptions.S_OMIT_XML_DECLARATION, "yes");
+        result.sprop.set(SerializerOptions.OMIT_XML_DECLARATION, "yes");
         res = serialize(result.value, result.sprop);
       }
     } catch(final XQueryException ex) {

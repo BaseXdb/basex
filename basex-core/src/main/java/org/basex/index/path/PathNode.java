@@ -167,7 +167,7 @@ public final class PathNode {
       case Data.ELEM: return data.tagindex.key(name);
       case Data.ATTR: return Token.concat(ATT, data.atnindex.key(name));
       case Data.TEXT: return TEXT;
-      case Data.COMM: return COMM;
+      case Data.COMM: return COMMENT;
       case Data.PI:   return PI;
       default:        return Token.EMPTY;
     }
@@ -202,7 +202,7 @@ public final class PathNode {
       case Data.ELEM: tb.add(data.tagindex.key(name)); break;
       case Data.TEXT: tb.add(TEXT); break;
       case Data.ATTR: tb.add(ATT); tb.add(data.atnindex.key(name)); break;
-      case Data.COMM: tb.add(COMM); break;
+      case Data.COMM: tb.add(COMMENT); break;
       case Data.PI:   tb.add(PI); break;
     }
     tb.add(": " + stats);

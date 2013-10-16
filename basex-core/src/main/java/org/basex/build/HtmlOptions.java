@@ -15,8 +15,6 @@ public final class HtmlOptions extends Options {
   public static final BooleanOption HTML = new BooleanOption("html", false);
   /** TagSoup option: omit-xml-declaration. */
   public static final BooleanOption OMITXML = new BooleanOption("omit-xml-declaration", false);
-  /** TagSoup option: method (html). */
-  public static final StringOption METHOD = new StringOption("method", "xml");
   /** TagSoup option: nons. */
   public static final BooleanOption NONS = new BooleanOption("nons", true);
   /** TagSoup option: nobogons. */
@@ -39,12 +37,15 @@ public final class HtmlOptions extends Options {
   public static final BooleanOption NOCDATA = new BooleanOption("nocdata", false);
   /** TagSoup option: lexical. */
   public static final BooleanOption LEXICAL = new BooleanOption("lexical", false);
+
+  /** TagSoup option: method (html). */
+  public static final StringOption METHOD = new StringOption("method", "xml");
   /** TagSoup option: doctype-system=systemid. */
-  public static final StringOption DOCTYPESYS = new StringOption("doctype-system", "");
+  public static final StringOption DOCTYPESYS = new StringOption("doctype-system");
   /** TagSoup option: doctype-public=publicid. */
-  public static final StringOption DOCTYPEPUB = new StringOption("doctype-public", "");
+  public static final StringOption DOCTYPEPUB = new StringOption("doctype-public");
   /** TagSoup option: encoding=encoding. */
-  public static final StringOption ENCODING = new StringOption("encoding", "");
+  public static final StringOption ENCODING = new StringOption("encoding");
 
   /**
    * Constructor.

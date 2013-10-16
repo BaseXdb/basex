@@ -42,7 +42,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
   /**
    * Checks if a query yields the specified string.
    * @param query query string
-   * @param result query result
+   * @param result expected query result
    */
   protected static void query(final String query, final Object result) {
     final String res = query(query);
@@ -117,8 +117,8 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     } catch(final QueryException ex) {
       check(query, ex, error);
     } catch(final Exception ex) {
-      fail("Unexpected exception: " + ex);
       ex.printStackTrace();
+      fail("Unexpected exception: " + ex);
     } finally {
       qp.close();
     }

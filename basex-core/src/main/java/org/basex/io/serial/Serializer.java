@@ -1,16 +1,17 @@
 package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
-import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.build.*;
+import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.data.*;
+import org.basex.io.serial.csv.*;
+import org.basex.io.serial.json.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -29,12 +30,12 @@ public abstract class Serializer {
   /** Default serialization parameters. */
   public static final SerializerOptions OPTIONS = new SerializerOptions();
 
-  /** Stack with opened tag names. */
+  /** Stack with names of opened elements. */
   protected final TokenList tags = new TokenList();
   /** Current level. */
   protected int level;
   /** Current element name. */
-  protected byte[] elem;
+  protected byte[] tag;
   /** Undeclare prefixes. */
   protected boolean undecl;
   /** Indentation flag. */
@@ -72,26 +73,18 @@ public abstract class Serializer {
     if(opts == null) return get(os);
 
     // standard types: XHTML, HTML, text
-    final String m = opts.check(S_METHOD, METHODS);
-    if(M_XHTML.equals(m)) return new XHTMLSerializer(os, opts);
-    if(M_HTML.equals(m)) return new HTMLSerializer(os, opts);
-    if(M_TEXT.equals(m)) return new TextSerializer(os, opts);
-
-    // serialize as raw data
-    if(M_RAW.equals(m)) return new RawSerializer(os, opts);
-
-    // serialize as CSV
-    if(M_CSV.equals(m)) return new CsvSerializer(os, opts);
-
-    // serialize as JSON
-    if(M_JSON.equals(m)) {
-      final JsonParserOptions jopts = new JsonParserOptions(opts.get(S_JSON));
-      return jopts.format() == JsonFormat.JSONML ? new JsonMLSerializer(os, opts) :
-        new JsonDirectSerializer(os, opts);
+    switch(opts.get(SerializerOptions.METHOD)) {
+      case XHTML: return new XHTMLSerializer(os, opts);
+      case HTML:  return new HTMLSerializer(os, opts);
+      case TEXT:  return new TextSerializer(os, opts);
+      case RAW:   return new RawSerializer(os, opts);
+      case CSV:   return new CsvSerializer(os, opts);
+      case JSON:
+        final JsonSerialOptions jopts = new JsonSerialOptions(opts.get(SerializerOptions.JSON));
+        return jopts.get(JsonOptions.FORMAT) == JsonFormat.JSONML ?
+          new JsonMLSerializer(os, opts) : new JsonDirectSerializer(os, opts);
+      default: return new XMLSerializer(os, opts);
     }
-
-    // otherwise, serialize as XML (default)
-    return new XMLSerializer(os, opts);
   }
 
   // PUBLIC METHODS =====================================================================
@@ -148,7 +141,7 @@ public abstract class Serializer {
     finishElement();
     nstack.push(nspaces.size());
     opening = true;
-    elem = name;
+    tag = name;
     startOpen(name);
   }
 
@@ -162,7 +155,7 @@ public abstract class Serializer {
       finishEmpty();
       opening = false;
     } else {
-      elem = tags.pop();
+      tag = tags.pop();
       level--;
       finishClose();
     }
@@ -494,7 +487,7 @@ public abstract class Serializer {
     if(!opening) return;
     opening = false;
     finishOpen();
-    tags.push(elem);
+    tags.push(tag);
     level++;
   }
 }

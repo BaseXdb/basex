@@ -10,6 +10,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
+import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -84,7 +85,7 @@ public final class List extends Command {
       }
 
       // count number of raw files
-      final IOFile dir = new IOFile(goptions.dbpath(name), M_RAW);
+      final IOFile dir = new IOFile(goptions.dbpath(name), IO.RAW);
       final int bin = dir.descendants().size();
 
       // create entry
@@ -129,7 +130,7 @@ public final class List extends Command {
         final TokenList tl = new TokenList(3);
         final byte[] file = data.text(pre, true);
         tl.add(file);
-        tl.add(DataText.M_XML);
+        tl.add(SerialMethod.XML.toString());
         tl.add(MimeTypes.APP_XML);
         tl.add(data.size(pre, Data.DOC));
         table.contents.add(tl);
@@ -139,7 +140,7 @@ public final class List extends Command {
         final String f = string(file);
         final TokenList tl = new TokenList(3);
         tl.add(file);
-        tl.add(DataText.M_RAW);
+        tl.add(SerialMethod.RAW.toString());
         tl.add(MimeTypes.get(f));
         tl.add(data.meta.binary(f).length());
         table.contents.add(tl);

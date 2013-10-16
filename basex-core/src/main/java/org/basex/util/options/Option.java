@@ -32,4 +32,12 @@ public abstract class Option {
    * @return default value
    */
   public abstract Object value();
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(name());
+    final Object v = value();
+    if(v != null && !v.toString().isEmpty()) sb.append('=').append(v);
+    return sb.toString();
+  }
 }

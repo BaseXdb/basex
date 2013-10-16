@@ -115,60 +115,43 @@ public final class HtmlParser extends XMLParser {
       final Object writer = Reflect.get(WRITER, sw);
 
       // set TagSoup options
-      String p;
       if(opts.get(HtmlOptions.HTML)) {
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
         opt("method", "html");
         opt("omit-xml-declaration", "yes");
       }
-      if(opts.get(HtmlOptions.NONS)) {
+      if(opts.get(HtmlOptions.NONS))
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
-      }
-      if(opts.get(HtmlOptions.OMITXML)) {
+      if(opts.get(HtmlOptions.OMITXML))
         opt("omit-xml-declaration", "yes");
-      }
-      if(!(p = opts.get(HtmlOptions.METHOD)).isEmpty()) {
-        opt("method", p);
-      }
-      if(opts.get(HtmlOptions.NOBOGONS)) {
+      if(opts.get(HtmlOptions.NOBOGONS))
         reader.setFeature(FEATURES + "ignore-bogons", true);
-      }
-      if(opts.get(HtmlOptions.NODEFAULTS)) {
+      if(opts.get(HtmlOptions.NODEFAULTS))
         reader.setFeature(FEATURES + "default-attributes", false);
-      }
-      if(opts.get(HtmlOptions.NOCOLONS)) {
+      if(opts.get(HtmlOptions.NOCOLONS))
         reader.setFeature(FEATURES + "translate-colons", true);
-      }
-      if(opts.get(HtmlOptions.NORESTART)) {
+      if(opts.get(HtmlOptions.NORESTART))
         reader.setFeature(FEATURES + "restart-elements", false);
-      }
-      if(opts.get(HtmlOptions.IGNORABLE)) {
+      if(opts.get(HtmlOptions.IGNORABLE))
         reader.setFeature(FEATURES + "ignorable-whitespace", true);
-      }
-      if(opts.get(HtmlOptions.EMPTYBOGONS)) {
+      if(opts.get(HtmlOptions.EMPTYBOGONS))
         reader.setFeature(FEATURES + "bogons-empty", true);
-      }
-      if(opts.get(HtmlOptions.ANY)) {
+      if(opts.get(HtmlOptions.ANY))
         reader.setFeature(FEATURES + "bogons-empty", false);
-      }
-      if(opts.get(HtmlOptions.NOROOTBOGONS)) {
+      if(opts.get(HtmlOptions.NOROOTBOGONS))
         reader.setFeature(FEATURES + "root-bogons", false);
-      }
-      if(opts.get(HtmlOptions.NOCDATA)) {
+      if(opts.get(HtmlOptions.NOCDATA))
         reader.setFeature(FEATURES + "cdata-elements", false);
-      }
-      if(opts.get(HtmlOptions.LEXICAL)) {
+      if(opts.get(HtmlOptions.LEXICAL))
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
-      }
-      if(!(p = opts.get(HtmlOptions.DOCTYPESYS)).isEmpty()) {
-        opt("doctype-system", p);
-      }
-      if(!(p = opts.get(HtmlOptions.DOCTYPEPUB)).isEmpty()) {
-        opt("doctype-public", p);
-      }
-      if(!(p = opts.get(HtmlOptions.ENCODING)).isEmpty()) {
-        is.setEncoding(p);
-      }
+      if(opts.contains(HtmlOptions.METHOD))
+        opt("method", opts.get(HtmlOptions.METHOD));
+      if(opts.contains(HtmlOptions.DOCTYPESYS))
+        opt("doctype-system", opts.get(HtmlOptions.DOCTYPESYS));
+      if(opts.contains(HtmlOptions.DOCTYPEPUB))
+        opt("doctype-public", opts.get(HtmlOptions.DOCTYPEPUB));
+      if(opts.contains(HtmlOptions.ENCODING))
+        is.setEncoding(opts.get(HtmlOptions.ENCODING));
       // end TagSoup options
 
       reader.setContentHandler((ContentHandler) writer);

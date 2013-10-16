@@ -1,15 +1,14 @@
 package org.basex.query.func;
 
-import static org.basex.data.DataText.*;
-import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.build.*;
+import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.json.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -70,8 +69,8 @@ public final class FNJson extends StandardFunc {
     final JsonSerialOptions opts = checkOptions(1, Q_OPTIONS, new JsonSerialOptions(), ctx);
 
     final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(S_METHOD, M_JSON);
-    sopts.set(S_JSON, opts.toString());
-    return Str.get(delete(serialize(node.iter(), sopts), '\r'));
+    sopts.set(SerializerOptions.METHOD, SerialMethod.JSON.toString());
+    sopts.set(SerializerOptions.JSON, opts.toString());
+    return Str.get(delete(serialize(node.iter(), sopts, INVALIDOPT), '\r'));
   }
 }

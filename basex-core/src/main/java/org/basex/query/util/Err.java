@@ -71,8 +71,6 @@ public enum Err {
   BXCS_PARSE(BXCS, 1, "CSV parser: %."),
   /** BXCS0002. */
   BXCS_SERIAL(BXCS, 2, "CSV serializer: %."),
-  /** BXCS0003. */
-  BXCS_CONFIG(BXJS, 3, "CSV: %."),
 
   // Database module
 
@@ -133,8 +131,6 @@ public enum Err {
   BXJS_PARSEML(BXJS, 1, "JsonML parser: %."),
   /** BXJS0002. */
   BXJS_SERIAL(BXJS, 2, "JSON serializer: %."),
-  /** BXJS0003. */
-  BXJS_CONFIG(BXJS, 3, "JSON: %."),
 
   // Process module
 
@@ -588,7 +584,7 @@ public enum Err {
   /** SEPM0010. */
   SERUNDECL(SEPM, 10, "XML 1.0: undeclaring prefixes not allowed."),
   /** SESU0013. */
-  SERNOTSUPP(SESU, 13, "%."),
+  SERNOTSUPP(SESU, 13, "%"),
   /** SERE0014. */
   SERILL(SERE, 14, "Illegal HTML character found: #x%;."),
   /** SERE0015. */
@@ -1007,6 +1003,8 @@ public enum Err {
   MODOUT(XQST, 108, "No output declarations allowed in library modules."),
   /** XPST0109. */
   OUTWHICH(XQST, 109, "Unknown serialization parameter: '%'."),
+  /** XPST0109. */
+  OUTINVALID(XQST, 109, "%"),
   /** XPST0110. */
   OUTDUPL(XQST, 110, "Duplicate declaration of 'output:%'."),
   /** XPST0111. */

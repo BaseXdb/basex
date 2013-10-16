@@ -1,7 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.data.DataText.*;
-import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
@@ -9,10 +7,10 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.*;
+import org.basex.io.parse.csv.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.csv.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -55,11 +53,8 @@ public class FNCsv extends StandardFunc {
   private FDoc parse(final QueryContext ctx) throws QueryException {
     final byte[] input = checkStr(expr[0], ctx);
     final CsvParserOptions opts = checkOptions(1, Q_OPTIONS, new CsvParserOptions(), ctx);
-
     try {
       return CsvConverter.convert(input, opts);
-    } catch(final QueryIOException ex) {
-      throw ex.getCause(info);
     } catch(final IOException ex) {
       throw BXCS_PARSE.thrw(info, ex);
     }
@@ -76,8 +71,8 @@ public class FNCsv extends StandardFunc {
     final CsvOptions opts = checkOptions(1, Q_OPTIONS, new CsvOptions(), ctx);
 
     final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(S_METHOD, M_CSV);
-    sopts.set(S_CSV, opts.toString());
-    return Str.get(delete(serialize(node.iter(), sopts), '\r'));
+    sopts.set(SerializerOptions.METHOD, SerialMethod.CSV.toString());
+    sopts.set(SerializerOptions.CSV, opts.toString());
+    return Str.get(delete(serialize(node.iter(), sopts, INVALIDOPT), '\r'));
   }
 }

@@ -1,13 +1,10 @@
 package org.basex.build;
 
-import static org.basex.core.Text.*;
-
 import java.io.*;
-import java.util.*;
 
 import org.basex.build.xml.*;
 import org.basex.core.*;
-import org.basex.data.*;
+import org.basex.core.MainOptions.MainParser;
 import org.basex.io.*;
 import org.basex.util.*;
 
@@ -120,20 +117,14 @@ public abstract class Parser extends Proc {
       final String target) throws IOException {
 
     // use file specific parser
-    final String parser = options.get(MainOptions.PARSER).toLowerCase(Locale.ENGLISH);
     final SingleParser p;
-    if(parser.equals(DataText.M_HTML)) {
-      p = new HtmlParser(in, options);
-    } else if(parser.equals(DataText.M_TEXT)) {
-      p = new TextParser(in, options);
-    } else if(parser.equals(DataText.M_JSON)) {
-      p = new JsonParser(in, options);
-    } else if(parser.equals(DataText.M_CSV)) {
-      p = new CsvParser(in, options);
-    } else if(parser.equals(DataText.M_XML)) {
-      p = xmlParser(in, options);
-    } else {
-      throw new BuildException(UNKNOWN_PARSER_X, parser);
+    final MainParser mp = options.get(MainOptions.PARSER);
+    switch(mp) {
+      case HTML: p = new HtmlParser(in, options); break;
+      case TEXT: p = new TextParser(in, options); break;
+      case JSON: p = new JsonParser(in, options); break;
+      case CSV:  p = new CsvParser(in, options); break;
+      default:   p = xmlParser(in, options); break;
     }
     p.target(target);
     return p;

@@ -231,7 +231,7 @@ public final class MetaData {
    * @return binary directory
    */
   public IOFile binaries() {
-    return new IOFile(path, M_RAW);
+    return new IOFile(path, IO.RAW);
   }
 
   /**

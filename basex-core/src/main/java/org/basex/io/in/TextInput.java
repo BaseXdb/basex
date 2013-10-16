@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.io.*;
-import org.basex.io.serial.*;
 import org.basex.util.*;
 
 /**

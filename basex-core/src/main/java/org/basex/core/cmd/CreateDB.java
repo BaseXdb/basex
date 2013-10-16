@@ -69,18 +69,18 @@ public final class CreateDB extends ACreate {
       return error(Util.message(ex));
     }
 
-    // create parser instance
-    if(io != null) {
-      if(!io.exists()) return error(RES_NOT_FOUND_X, io);
-      parser = new DirParser(io, options, goptions.dbpath(name));
-    } else if(parser == null) {
-      parser = Parser.emptyParser(context.options);
-    }
-
-    // close open database
-    new Close().run(context);
-
     try {
+      // create parser instance
+      if(io != null) {
+        if(!io.exists()) return error(RES_NOT_FOUND_X, io);
+        parser = new DirParser(io, options, goptions.dbpath(name));
+      } else if(parser == null) {
+        parser = Parser.emptyParser(context.options);
+      }
+
+      // close open database
+      new Close().run(context);
+
       if(options.get(MainOptions.MAINMEM)) {
         // create main memory instance
         final Data data = proc(new MemBuilder(name, parser)).build();

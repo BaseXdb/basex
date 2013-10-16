@@ -1,11 +1,8 @@
 package org.basex.build;
 
-import static org.basex.query.util.Err.*;
-
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.query.*;
 import org.basex.util.options.*;
 
 /**
@@ -16,12 +13,14 @@ import org.basex.util.options.*;
  */
 public abstract class JsonOptions extends Options {
   /** Option: parser specification. */
-  public static final StringOption SPEC = new StringOption("spec", JsonSpec.RFC4627.toString());
-  /** Option: lax conversion of names to QNames. */
-  public static final BooleanOption LAX = new BooleanOption("lax", false);
+  public static final EnumOption<JsonSpec> SPEC =
+      new EnumOption<JsonSpec>("spec", JsonSpec.RFC4627);
   /** Option: format. */
-  public static final StringOption FORMAT = new StringOption("format",
-      JsonFormat.DIRECT.toString());
+  public static final EnumOption<JsonFormat> FORMAT =
+      new EnumOption<JsonFormat>("format", JsonFormat.DIRECT);
+  /** Option: lax conversion of names to QNames. */
+  public static final BooleanOption LAX =
+      new BooleanOption("lax", false);
 
   /** JSON specs. */
   public static enum JsonSpec {
@@ -29,20 +28,20 @@ public abstract class JsonOptions extends Options {
     /** Parse the input being as compatible as possible. */ LIBERAL("liberal"),
     /** Parse the input according to ECMA-262.           */ ECMA_262("ECMA-262");
 
-    /** Description. */
-    private final String desc;
+    /** String. */
+    private final String string;
 
     /**
      * Constructor.
-     * @param dsc description
+     * @param str description
      */
-    private JsonSpec(final String dsc) {
-      desc = dsc;
+    private JsonSpec(final String str) {
+      string = str;
     }
 
     @Override
     public String toString() {
-      return desc;
+      return string;
     }
   }
 
@@ -73,27 +72,5 @@ public abstract class JsonOptions extends Options {
    */
   protected JsonOptions(final String opts) throws BaseXException {
     super(opts);
-  }
-
-  /**
-   * Returns the specification.
-   * @return spec
-   * @throws QueryIOException query I/O exception
-   */
-  public final JsonSpec spec() throws QueryIOException {
-    final String spec = get(SPEC);
-    for(final JsonSpec s : JsonSpec.values()) if(s.desc.equals(spec)) return s;
-    throw BXJS_CONFIG.thrwIO("Spec '" + spec + "' is not supported");
-  }
-
-  /**
-   * Returns the specification.
-   * @return spec
-   * @throws QueryIOException query I/O exception
-   */
-  public final JsonFormat format() throws QueryIOException {
-    final String form = get(FORMAT);
-    for(final JsonFormat f : JsonFormat.values()) if(f.toString().equals(form)) return f;
-    throw BXJS_CONFIG.thrwIO("Format '" + form + "' is not supported");
   }
 }

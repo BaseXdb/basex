@@ -33,9 +33,4 @@ public final class NumberOption extends Option {
   public Integer value() {
     return value;
   }
-
-  @Override
-  public String toString() {
-    return new StringBuilder(name()).append('=').append(value).toString();
-  }
 }

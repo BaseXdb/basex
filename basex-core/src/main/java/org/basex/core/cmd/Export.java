@@ -63,8 +63,8 @@ public final class Export extends Command {
    * @param export calling instance
    * @throws IOException I/O exception
    */
-  public static void export(final Data data, final String path,
-      final SerializerOptions sopts, final Export export) throws IOException {
+  public static void export(final Data data, final String path, final SerializerOptions sopts,
+      final Export export) throws IOException {
 
     final IOFile root = new IOFile(path);
     root.md();

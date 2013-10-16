@@ -13,7 +13,7 @@ public final class JsonSerialOptions extends JsonOptions {
   /** Option: escape special characters. */
   public static final BooleanOption ESCAPE = new BooleanOption("escape", true);
   /** Option: indentation. */
-  public static final BooleanOption INDENT = new BooleanOption("indent", true);
+  public static final BooleanOption INDENT = new BooleanOption("indent");
   /** Option: fallback function. */
   public static final StringOption FALLBACK = new StringOption("fallback");
 

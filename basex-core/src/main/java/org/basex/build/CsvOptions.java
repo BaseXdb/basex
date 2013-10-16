@@ -1,11 +1,9 @@
 package org.basex.build;
 
-import static org.basex.query.util.Err.*;
-
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.query.*;
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -16,13 +14,28 @@ import org.basex.util.options.*;
  */
 public class CsvOptions extends Options {
   /** Option: column separator. */
-  public static final StringOption SEPARATOR = new StringOption("separator", "comma");
-  /** Option: header line. */
-  public static final BooleanOption HEADER = new BooleanOption("header", false);
-  /** Option: lax conversion of strings to QNames. */
-  public static final BooleanOption LAX = new BooleanOption("lax", true);
+  public static final StringOption SEPARATOR =
+      new StringOption("separator", CsvSep.COMMA.toString());
   /** Option: format. */
-  public static final StringOption FORMAT = new StringOption("format", CsvFormat.DIRECT.toString());
+  public static final EnumOption<CsvFormat> FORMAT =
+      new EnumOption<CsvFormat>("format", CsvFormat.DIRECT);
+  /** Option: header line. */
+  public static final BooleanOption HEADER =
+      new BooleanOption("header", false);
+  /** Option: lax conversion of strings to QNames. */
+  public static final BooleanOption LAX =
+      new BooleanOption("lax", true);
+
+  /** CSV formats. */
+  public static enum CsvFormat {
+    /** Default.    */ DIRECT,
+    /** Attributes. */ ATTRIBUTES;
+
+    @Override
+    public String toString() {
+      return super.toString().toLowerCase(Locale.ENGLISH);
+    }
+  }
 
   /** CSV separators. */
   public static enum CsvSep {
@@ -33,26 +46,15 @@ public class CsvOptions extends Options {
     /** Space.     */ SPACE(' ');
 
     /** Character. */
-    private final int ch;
+    public final char sep;
 
     /**
      * Constructor.
-     * @param c mapped character
+     * @param sp separator character
      */
-    private CsvSep(final int c) {
-      ch = c;
+    private CsvSep(final char sp) {
+      sep = sp;
     }
-
-    @Override
-    public String toString() {
-      return super.toString().toLowerCase(Locale.ENGLISH);
-    }
-  }
-
-  /** CSV formats. */
-  public static enum CsvFormat {
-    /** Default.    */ DIRECT,
-    /** Attributes. */ ATTRIBUTES;
 
     @Override
     public String toString() {
@@ -76,28 +78,29 @@ public class CsvOptions extends Options {
     super(opts);
   }
 
-  /**
-   * Returns the separator character.
-   * @return separator
-   * @throws QueryIOException query I/O exception
-   */
-  public int separator() throws QueryIOException {
-    final String sep = get(SEPARATOR);
-    final String val = sep.toLowerCase(Locale.ENGLISH);
-    for(final CsvSep s : CsvSep.values()) if(val.equals(s.toString())) return s.ch;
-    if(sep.length() != 1) BXCS_CONFIG.thrwIO(
-        "Separator must be single character; '" + sep + "' found");
-    return sep.charAt(0);
+  @Override
+  public synchronized <V extends Enum<V>> void assign(final String name, final String value)
+      throws BaseXException {
+
+    super.assign(name, value);
+    // check if separator contains only one character
+    if(options.get(name) == CsvOptions.SEPARATOR && separator() == -1)
+      throw new BaseXException("Separator must be single character; '%' found", value);
   }
 
   /**
-   * Returns the specification.
-   * @return spec
-   * @throws QueryIOException query I/O exception
+   * Returns the separator character or {@code -1} if character is invalid.
+   * @return separator
    */
-  public CsvFormat format() throws QueryIOException {
-    final String form = get(FORMAT);
-    for(final CsvFormat f : CsvFormat.values()) if(f.toString().equals(form)) return f;
-    throw BXCS_CONFIG.thrwIO("Format '" + form + "' is not supported");
+  public int separator() {
+    final String sep = get(SEPARATOR);
+    for(final CsvSep s : CsvSep.values()) {
+      if(sep.equals(s.toString())) return s.sep;
+    }
+    if(sep.length() == 1) {
+      final char ch = sep.charAt(0);
+      if(XMLToken.valid(ch)) return ch;
+    }
+    return -1;
   }
 }

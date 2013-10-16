@@ -19,7 +19,6 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.editor.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * This class provides static layout and paint helper methods which are used all over
@@ -268,17 +267,6 @@ public final class BaseXLayout {
     int i = str.lastIndexOf('.');
     if(i == -1) i = str.length();
     return str.substring(0, i) + " (" + sb.substring(1) + ')' + str.substring(i);
-  }
-
-  /**
-   * Sets a tooltip.
-   * @param opts options
-   * @param option option
-   * @param comp component
-   */
-  public static void tooltip(final Options opts, final Option option, final JComponent comp) {
-    final Object v = opts.get(option);
-    comp.setToolTipText(v == null ? null : option.name() + '=' + v);
   }
 
   /**

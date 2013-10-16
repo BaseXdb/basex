@@ -196,7 +196,7 @@ public final class FNValidate extends StandardFunc {
           if(!sc.exists()) WHICHRES.thrw(info, dtd);
           tmp = createTmp(sc);
           if(tmp != null) sc = tmp;
-          sp.set(SerializerOptions.S_DOCTYPE_SYSTEM, sc.url());
+          sp.set(SerializerOptions.DOCTYPE_SYSTEM, sc.url());
         }
 
         final IO in = read(it, ctx, sp);
@@ -230,7 +230,7 @@ public final class FNValidate extends StandardFunc {
         Util.debug(e);
         e = e.getCause();
       }
-      return Str.get(Text.FATAL + Text.COL + ex.getLocalizedMessage());
+      return Str.get("Fatal" + Text.COL + ex.getLocalizedMessage());
     } finally {
       if(v.tmp != null) v.tmp.delete();
     }
@@ -296,17 +296,17 @@ public final class FNValidate extends StandardFunc {
 
     @Override
     public void fatalError(final SAXParseException ex) {
-      error(ex, Text.FATAL + Text.COL);
+      error(ex, "Fatal");
     }
 
     @Override
     public void error(final SAXParseException ex) {
-      error(ex, Text.ERROR + Text.COL);
+      error(ex, "Error");
     }
 
     @Override
     public void warning(final SAXParseException ex) {
-      error(ex, Text.WARNING + Text.COL);
+      error(ex, "Warning");
     }
 
     /**
@@ -329,7 +329,7 @@ public final class FNValidate extends StandardFunc {
         report.add(": ").add(msg);
         msg = report.toString();
       }
-      exceptions.add(type + msg);
+      exceptions.add(type + Text.COL + msg);
     }
 
     /**

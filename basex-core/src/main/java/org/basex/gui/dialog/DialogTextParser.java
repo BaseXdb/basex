@@ -1,13 +1,13 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-import static org.basex.gui.layout.BaseXLayout.*;
 
 import java.awt.*;
 import java.io.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
+import org.basex.core.MainOptions.MainParser;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
@@ -32,17 +32,20 @@ final class DialogTextParser extends DialogParser {
    * @param opts main options
    */
   DialogTextParser(final BaseXDialog d, final MainOptions opts) {
-    super(d);
+    super(d, MainParser.TEXT);
     try {
       topts = new TextOptions(opts.get(MainOptions.TEXTPARSER));
-    } catch(final IOException ex) { topts = new TextOptions(); }
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      topts = new TextOptions();
+    }
 
-    BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
+    final BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));
 
     encoding = DialogExport.encoding(d, topts.get(TextOptions.ENCODING));
     lines = new BaseXCheckBox(SPLIT_INPUT_LINES, TextOptions.LINES, topts, d);
 
-    BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 4));
+    final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 4));
     p.add(new BaseXLabel(ENCODING + COL, true, true));
     p.add(encoding);
     pp.add(p);
@@ -60,9 +63,7 @@ final class DialogTextParser extends DialogParser {
   void update() {
     final String enc = encoding.getSelectedItem();
     topts.set(TextOptions.ENCODING, enc.equals(Token.UTF8) ? null : enc);
-    tooltip(topts, TextOptions.ENCODING, encoding);
     topts.set(TextOptions.LINES, lines.isSelected());
-    tooltip(topts, TextOptions.LINES, lines);
   }
 
   @Override

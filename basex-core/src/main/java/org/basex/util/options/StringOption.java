@@ -11,6 +11,14 @@ public final class StringOption extends Option {
   private final String value;
 
   /**
+   * Constructor without default value.
+   * @param n name
+   */
+  public StringOption(final String n) {
+    this(n, null);
+  }
+
+  /**
    * Default constructor.
    * @param n name
    * @param v value
@@ -20,22 +28,8 @@ public final class StringOption extends Option {
     value = v;
   }
 
-  /**
-   * Constructor without default value.
-   * @param n name
-   */
-  public StringOption(final String n) {
-    super(n);
-    value = null;
-  }
-
   @Override
   public String value() {
     return value;
-  }
-
-  @Override
-  public String toString() {
-    return new StringBuilder(name()).append('=').append(value).toString();
   }
 }

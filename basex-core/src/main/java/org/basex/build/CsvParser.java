@@ -5,8 +5,7 @@ import java.io.*;
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.query.*;
-import org.basex.query.util.csv.*;
+import org.basex.io.parse.csv.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -38,14 +37,10 @@ public final class CsvParser extends XMLParser {
    * @throws IOException I/O exception
    */
   public static IO toXML(final IO io, final String options) throws IOException {
-    try {
-      // convert input to XML and return cached result
-      final Item node = CsvConverter.convert(io, new CsvParserOptions(options));
-      final IOContent xml = new IOContent(node.serialize().toArray());
-      xml.name(io.name());
-      return xml;
-    } catch(final QueryIOException ex) {
-      throw new BaseXException(ex.getLocalizedMessage());
-    }
+    // convert input to XML and return cached result
+    final Item node = CsvConverter.convert(io, new CsvParserOptions(options));
+    final IOContent xml = new IOContent(node.serialize().toArray());
+    xml.name(io.name());
+    return xml;
   }
 }

@@ -1,6 +1,5 @@
 package org.basex.io.serial;
 
-import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.util.Err.*;
@@ -17,6 +16,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * This class serializes data to an output stream.
@@ -89,22 +89,21 @@ public abstract class OutputSerializer extends Serializer {
    * @param versions supported versions
    * @throws IOException I/O exception
    */
-  OutputSerializer(final OutputStream os, final SerializerOptions sopts,
+  protected OutputSerializer(final OutputStream os, final SerializerOptions sopts,
       final String... versions) throws IOException {
 
     final SerializerOptions opts = sopts == null ? OPTIONS : sopts;
-    final String ver = opts.supported(S_VERSION, versions);
-    final String htmlver = opts.supported(S_HTML_VERSION, V40, V401, V50);
+    final String ver = supported(VERSION, opts, versions);
+    final String htmlver = supported(HTML_VERSION, opts, V40, V401, V50);
     html5 = htmlver.equals(V50) || ver.equals(V50);
 
-    final boolean omitDecl = opts.yes(S_OMIT_XML_DECLARATION);
-    final boolean bom  = opts.yes(S_BYTE_ORDER_MARK);
-    final String sa = opts.check(S_STANDALONE, YES, NO, OMIT);
-    saomit = sa.equals(OMIT);
-    opts.check(S_NORMALIZATION_FORM, NFC, DataText.NONE);
+    final boolean omitDecl = opts.yes(OMIT_XML_DECLARATION);
+    final boolean bom  = opts.yes(BYTE_ORDER_MARK);
+    final YesNoOmit sa = opts.get(STANDALONE);
+    saomit = sa == YesNoOmit.OMIT;
 
-    final String maps = opts.get(S_USE_CHARACTER_MAPS);
-    final String enc = normEncoding(opts.get(S_ENCODING));
+    final String maps = opts.get(USE_CHARACTER_MAPS);
+    final String enc = normEncoding(opts.get(ENCODING));
     try {
       encoding = Charset.forName(enc);
     } catch(final Exception ex) {
@@ -113,25 +112,23 @@ public abstract class OutputSerializer extends Serializer {
     utf8 = enc == UTF8;
 
     // project specific options
-    indents = Math.max(0, toInt(opts.get(S_INDENTS)));
-    format  = opts.yes(S_FORMAT);
-    tab     = opts.yes(S_TABULATOR) ? '\t' : ' ';
-    wPre    = token(opts.get(S_WRAP_PREFIX));
+    indents = opts.get(INDENTS);
+    format  = opts.yes(FORMAT);
+    tab     = opts.yes(TABULATOR) ? '\t' : ' ';
+    wPre    = token(opts.get(WRAP_PREFIX));
     wrap    = wPre.length != 0;
-    final String eol = opts.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
-    nl = utf8(token(eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n"), enc);
-    String s = opts.get(S_ITEM_SEPARATOR);
-    if(s.equals(UNDEFINED)) s = opts.get(S_SEPARATOR);
-    itemsep = s.equals(UNDEFINED) ? null : token(s.indexOf('\\') != -1 ?
-      s.replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t") : s);
 
-    docsys  = opts.get(S_DOCTYPE_SYSTEM);
-    docpub  = opts.get(S_DOCTYPE_PUBLIC);
-    media   = opts.get(S_MEDIA_TYPE);
-    escape  = opts.yes(S_ESCAPE_URI_ATTRIBUTES);
-    content = opts.yes(S_INCLUDE_CONTENT_TYPE);
-    undecl  = opts.yes(S_UNDECLARE_PREFIXES);
-    indent  = opts.yes(S_INDENT) && format;
+    nl = utf8(token(opts.get(NEWLINE).newline()), enc);
+    itemsep = !opts.contains(ITEM_SEPARATOR) ? null : token(
+      opts.get(ITEM_SEPARATOR).replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t"));
+
+    docsys  = opts.get(DOCTYPE_SYSTEM);
+    docpub  = opts.get(DOCTYPE_PUBLIC);
+    media   = opts.get(MEDIA_TYPE);
+    escape  = opts.yes(ESCAPE_URI_ATTRIBUTES);
+    content = opts.yes(INCLUDE_CONTENT_TYPE);
+    undecl  = opts.yes(UNDECLARE_PREFIXES);
+    indent  = opts.yes(INDENT) && format;
 
     webdav = maps.equals("webdav");
     if(!webdav && !maps.isEmpty()) SERMAP.thrwIO(maps);
@@ -152,7 +149,7 @@ public abstract class OutputSerializer extends Serializer {
       }
     }
 
-    final String supp = opts.get(S_SUPPRESS_INDENTATION);
+    final String supp = opts.get(SUPPRESS_INDENTATION);
     if(!supp.isEmpty()) {
       for(final String c : supp.split("\\s+")) {
         if(!c.isEmpty()) suppress.add(c);
@@ -163,7 +160,7 @@ public abstract class OutputSerializer extends Serializer {
     final boolean html = this instanceof HTMLSerializer;
     final boolean xml = this instanceof XMLSerializer || this instanceof XHTMLSerializer;
     if(xml || html) {
-      final String cdse = opts.get(S_CDATA_SECTION_ELEMENTS);
+      final String cdse = opts.get(CDATA_SECTION_ELEMENTS);
       for(final String c : cdse.split("\\s+")) {
         if(c.isEmpty()) continue;
         if(!html || c.contains(":") && (!html5 || !c.contains("html:"))) cdata.add(c);
@@ -178,10 +175,10 @@ public abstract class OutputSerializer extends Serializer {
           print(DOCDECL1);
           print(ver);
           print(DOCDECL2);
-          print(opts.get(S_ENCODING));
+          print(opts.get(ENCODING));
           if(!saomit) {
             print(DOCDECL3);
-            print(sa);
+            print(sa.toString());
           }
           print(ATT2);
           print(PI_C);
@@ -193,7 +190,7 @@ public abstract class OutputSerializer extends Serializer {
     // open results element
     if(wrap) {
       startElement(concat(wPre, COLON, T_RESULTS));
-      namespace(wPre, token(opts.get(S_WRAP_URI)));
+      namespace(wPre, token(opts.get(WRAP_URI)));
     }
   }
 
@@ -369,7 +366,7 @@ public abstract class OutputSerializer extends Serializer {
   protected void finishClose() throws IOException {
     if(sep) indent();
     print(ELEM_OS);
-    print(elem);
+    print(tag);
     print(ELEM_C);
     sep = true;
   }
@@ -408,7 +405,7 @@ public abstract class OutputSerializer extends Serializer {
     if(level != 0 || docsys == null && docpub == null) return false;
     if(sep) indent();
     print(DOCTYPE);
-    if(dt == null) print(M_HTML);
+    if(dt == null) print(HTML);
     else print(dt);
     if(docpub != null) print(' ' + PUBLIC + " \"" + docpub + '"');
     else print(' ' + SYSTEM);
@@ -523,5 +520,24 @@ public abstract class OutputSerializer extends Serializer {
     level--;
     if(empty) finishClose();
     return true;
+  }
+
+  // PRIVATE METHODS ====================================================================
+
+  /**
+   * Retrieves a value from the specified option and checks for supported values.
+   * @param option option
+   * @param opts options
+   * @param allowed allowed values
+   * @return value
+   * @throws QueryIOException query I/O exception
+   */
+  private String supported(final StringOption option, final Options opts, final String... allowed)
+      throws QueryIOException {
+
+    final String val = opts.get(option);
+    if(val.isEmpty()) return allowed.length > 0 ? allowed[0] : val;
+    for(final String a : allowed) if(a.equals(val)) return val;
+    throw SERNOTSUPP.thrwIO(Options.allowed(option, (Object[]) allowed));
   }
 }

@@ -51,14 +51,14 @@ public class BuilderSerializer extends Serializer {
 
   @Override
   protected final void finishOpen() throws IOException {
-    build.openElem(elem, atts, nsp);
+    build.openElem(tag, atts, nsp);
     atts.clear();
     nsp.clear();
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    build.emptyElem(elem, atts, nsp);
+    build.emptyElem(tag, atts, nsp);
     atts.clear();
     nsp.clear();
   }

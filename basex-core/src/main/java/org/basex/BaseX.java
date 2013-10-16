@@ -99,7 +99,7 @@ public class BaseX extends Main {
           // toggle newline separators
           newline ^= true;
           if(serial.length() != 0) serial.append(',');
-          val = serial.append(SerializerOptions.S_ITEM_SEPARATOR.name()).
+          val = serial.append(SerializerOptions.ITEM_SEPARATOR.name()).
               append("=\\n").toString();
           opt = MainOptions.SERIALIZER;
         } else if(c == 'o') {

@@ -59,7 +59,7 @@ class DialogAdd extends BaseXBack {
     optimize = new BaseXButton(OPTIMIZE + DOTS, d);
 
     add(d.newButtons(add, optimize), BorderLayout.SOUTH);
-    action(general.parser);
+    action(general.parsers);
   }
 
   /**

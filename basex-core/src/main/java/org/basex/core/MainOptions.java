@@ -1,5 +1,7 @@
 package org.basex.core;
 
+import java.util.*;
+
 import org.basex.util.options.*;
 
 /**
@@ -28,8 +30,6 @@ public final class MainOptions extends Options {
   public static final BooleanOption ADDRAW = new BooleanOption("ADDRAW", false);
   /** Cache new documents before adding them to a database. */
   public static final BooleanOption ADDCACHE = new BooleanOption("ADDCACHE", false);
-  /** Define import parser. */
-  public static final StringOption PARSER = new StringOption("PARSER", "xml");
   /** Define CSV parser options. */
   public static final StringOption CSVPARSER = new StringOption("CSVPARSER", "");
   /** Define text parser options. */
@@ -38,6 +38,9 @@ public final class MainOptions extends Options {
   public static final StringOption JSONPARSER = new StringOption("JSONPARSER", "");
   /** Define TagSoup HTML options. */
   public static final StringOption HTMLPARSER = new StringOption("HTMLPARSER", "");
+  /** Define import parser. */
+  public static final EnumOption<MainParser> PARSER =
+      new EnumOption<MainParser>("PARSER", MainParser.XML);
 
   // XML Parsing
 
@@ -145,4 +148,19 @@ public final class MainOptions extends Options {
   public static final NumberOption INLINELIMIT = new NumberOption("INLINELIMIT", 0);
   /** Hidden: maximum number of hits to be displayed in the GUI (will be overwritten). */
   public static final NumberOption MAXHITS = new NumberOption("MAXHITS", -1);
+
+  /** Parser. */
+  public static enum MainParser {
+    /** XML.  */ XML,
+    /** HTML. */ HTML,
+    /** Json. */ JSON,
+    /** CSV.  */ CSV,
+    /** Text. */ TEXT,
+    /** RAW.  */ RAW;
+
+    @Override
+    public String toString() {
+      return super.toString().toLowerCase(Locale.ENGLISH);
+    }
+  }
 }

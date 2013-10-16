@@ -4,7 +4,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'check' command: opens an existing database or

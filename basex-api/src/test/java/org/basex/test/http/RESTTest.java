@@ -155,16 +155,6 @@ public class RESTTest extends HTTPTest {
 
   /** GET Test. */
   @Test
-  public void getErr2() {
-    try {
-      get("?query=()&wrap=n");
-      fail("Error expected.");
-    } catch(final IOException ex) {
-    }
-  }
-
-  /** GET Test. */
-  @Test
   public void getErr3() {
     try {
       get("?query=()&method=xxx");

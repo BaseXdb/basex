@@ -416,8 +416,7 @@ public final class StringParser extends CmdParser {
     if(!suggest || token == null || !token.isEmpty()) {
       try {
         // return command reference; allow empty strings as input ("NULL")
-        final String t = token == null ? "NULL" : token.toUpperCase(Locale.ENGLISH);
-        return Enum.valueOf(cmp, t);
+        return Enum.valueOf(cmp, token == null ? "NULL" : token.toUpperCase(Locale.ENGLISH));
       } catch(final IllegalArgumentException ignore) { }
     }
 

@@ -65,9 +65,7 @@ public final class FuncOptions {
    * @param error raise error if parameter is unknown
    * @throws QueryException query exception
    */
-  public void parse(final Item item, final Options options, final Err error)
-      throws QueryException {
-
+  public void parse(final Item item, final Options options, final Err error) throws QueryException {
     if(item == null) return;
     try {
       // XQuery map: convert to internal map

@@ -156,8 +156,8 @@ public abstract class Item extends Value {
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean eq(final Item it, final Collation coll,
-      final InputInfo ii) throws QueryException;
+  public abstract boolean eq(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException;
 
   /**
    * Checks the items for equivalence.
@@ -167,8 +167,8 @@ public abstract class Item extends Value {
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean equiv(final Item it, final Collation coll,
-      final InputInfo ii) throws QueryException {
+  public final boolean equiv(final Item it, final Collation coll, final InputInfo ii)
+      throws QueryException {
     // check if both values are NaN, or if values are equal..
     return (this == Dbl.NAN || this == Flt.NAN) && it instanceof ANum &&
         Double.isNaN(it.dbl(ii)) || comparable(it) && eq(it, coll, ii);
@@ -183,8 +183,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public int diff(final Item it, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int diff(final Item it, final Collation coll, final InputInfo ii) throws QueryException {
     throw (this == it ? TYPECMP : INVTYPECMP).thrw(ii, type, it.type);
   }
 

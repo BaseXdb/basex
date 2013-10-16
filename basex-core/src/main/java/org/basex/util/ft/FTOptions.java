@@ -10,12 +10,12 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class FTOptions extends Options {
+  /** Option: wildcards. */
+  public static final EnumOption<FTMode> MODE = new EnumOption<FTMode>("mode", FTMode.ANY);
   /** Option: fuzzy. */
   public static final BooleanOption FUZZY = new BooleanOption("fuzzy", false);
   /** Option: wildcards. */
   public static final BooleanOption WILDCARDS = new BooleanOption("wildcards", false);
-  /** Option: wildcards. */
-  public static final StringOption MODE = new StringOption("mode", "any");
   /** Option: distance. */
   public static final StringOption DISTANCE = new StringOption("distance");
 

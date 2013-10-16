@@ -4,10 +4,9 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
+import org.basex.core.MainOptions.MainParser;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
@@ -19,10 +18,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class DialogParsing extends BaseXBack {
-  /** Parser types. */
-  private static final String[] TYPES = {
-    DataText.M_XML, DataText.M_HTML, DataText.M_JSON, DataText.M_CSV, DataText.M_TEXT
-  };
   /** JSON options panel. */
   private final DialogParser[] parsers;
 
@@ -33,10 +28,10 @@ final class DialogParsing extends BaseXBack {
   /** Main window reference. */
   private final GUI gui;
 
-  /** Current parser. */
-  private BaseXBack parser;
-  /** Current parser type. */
-  private String type;
+  /** Currently chosen parser. */
+  private MainParser parser;
+  /** Current parser panel. */
+  private BaseXBack panel;
 
   /**
    * Default constructor.
@@ -59,9 +54,9 @@ final class DialogParsing extends BaseXBack {
       @Override
       public void componentShown(final ComponentEvent e) {
         removeAll();
-        label.setText(Util.info(PARSER_X, type.toUpperCase(Locale.ENGLISH)));
+        label.setText(Util.info(PARSER_X, parser.name()));
         add(label, BorderLayout.NORTH);
-        add(parser, BorderLayout.CENTER);
+        add(panel, BorderLayout.CENTER);
         revalidate();
         repaint();
       }
@@ -69,14 +64,18 @@ final class DialogParsing extends BaseXBack {
   }
 
   /**
-   * Sets the correct input type.
-   * @param tp type
+   * Sets the chosen parser.
+   * @param mp parser
    */
-  void setType(final String tp) {
-    type = tp;
-    tabs.setEnabledAt(1, !tp.equals(DataText.M_RAW));
-    final int tl = TYPES.length;
-    for(int t = 0; t < tl; t++) if(tp.equals(TYPES[t])) parser = parsers[t];
+  void setType(final MainParser mp) {
+    parser = mp;
+    if(mp == MainParser.RAW) {
+      tabs.setEnabledAt(1, false);
+    } else {
+      tabs.setEnabledAt(1, true);
+      final MainParser[] mps = MainParser.values();
+      for(int t = 0; t < mps.length; t++) if(mps[t] == mp) panel = parsers[t];
+    }
   }
 
   /**
@@ -86,7 +85,7 @@ final class DialogParsing extends BaseXBack {
   boolean action() {
     update();
     boolean ok = true;
-    for(final DialogParser dp : parsers) ok &= dp.action(parser == dp);
+    for(final DialogParser dp : parsers) ok &= dp.action(panel == dp);
     return ok;
   }
 

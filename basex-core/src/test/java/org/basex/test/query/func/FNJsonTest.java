@@ -2,6 +2,7 @@ package org.basex.test.query.func;
 
 import static org.basex.query.func.Function.*;
 
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
@@ -13,94 +14,82 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNJsonTest extends AdvancedQueryTest {
-  /** JSON snippets. */
-  private static final String[][] TOXML = {
-    { "" },
-    { "{" },
-    { "[]", "<json arrays=\"json\"/>" },
-    { "{}", "<json objects=\"json\"/>" },
-    { "{ } ", "<json objects=\"json\"/>" },
-    { "{ \"" },
-    { "{ \"\\c\" : 0 }" },
-    { "{ \"\\t\" : 0 }",
-      "<json objects=\"json\" numbers=\"_0009\"><_0009>0</_0009></json>"  },
-    { "{ \"a\" :0 }",
-      "<json objects=\"json\" numbers=\"a\"><a>0</a></json>" },
-    { "{ \"\" : 0 }",
-      "<json objects=\"json\" numbers=\"_\"><_>0</_></json>" },
-    { "{ \"\" : 0.0e0 }",
-      "...<_>0.0e0</_>" },
-    { "{ \"\" : null }",
-      "...<_/>" },
-    { "{ \"\" : true }",
-      "...<_>true</_>" },
-    { "{ \"\" : {} }",
-      "... objects=\"json _\"><_/>" },
-    { "{ \"\" : [] }",
-      "... arrays=\"_\" objects=\"json\"><_/>" },
-    { "{ \"\" : 0, \"\": 1 }",
-      "... objects=\"json\" numbers=\"_\"><_>0</_><_>1</_>" },
-    { "{ \"O\" : [ 1 ] }",
-      "... arrays=\"O\" objects=\"json\" numbers=\"_\"><O><_>1</_></O>" },
-    { "{ \"A\" : [ 0,1 ] }",
-      "... objects=\"json\" numbers=\"_\"><A><_>0</_><_>1</_>" },
-    { "{ \"\" : 00 }" },
-    { "{ \"\" : 0. }" },
-    { "{ \"\" : 0.0 }", "...0.0" },
-    { "{ \"\" : 0e }" },
-    { "{ \"\" : 0.1. }" },
-    { "{ \"\" : 0.1e }" },
-    { "{ \"a\" : 0, }" },
-    { "{ \"a\" : 0 }}" },
-  };
+  /** Test method. */
+  @Test
+  public void parse() {
+    // default output
+    parse("[]", "", "<json type=\"array\"/>");
+    parse("{}", "", "<json type=\"object\"/>");
+    parse("{ } ", "", "<json type=\"object\"/>");
+    parse("{ \"\\t\" : 0 }", "", "<json type=\"object\"><_0009 type=\"number\">0</_0009></json>");
+    parse("{ \"a\" :0 }", "", "<json type=\"object\"><a type=\"number\">0</a></json>");
+    parse("{ \"\" : 0 }", "", "<json type=\"object\"><_ type=\"number\">0</_></json>");
+    parse("{ \"\" : 0.0e0 }", "", "...<_ type=\"number\">0.0e0</_>");
+    parse("{ \"\" : null }", "", "...<_ type=\"null\"/>");
+    parse("{ \"\" : true }", "", "...<_ type=\"boolean\">true</_>");
+    parse("{ \"\" : {} }", "", "... type=\"object\"><_ type=\"object\"/>");
+    parse("{ \"\" : [] }", "", "... type=\"object\"><_ type=\"array\"/>");
+    parse("{ \"\" : 0, \"\": 1 }", "",
+        "... type=\"object\"><_ type=\"number\">0</_><_ type=\"number\">1</_>");
+    parse("{ \"O\" : [ 1 ] }", "", "...<O type=\"array\"><_ type=\"number\">1</_></O>");
+    parse("{ \"A\" : [ 0,1 ] }", "",
+        "...<A type=\"array\"><_ type=\"number\">0</_><_ type=\"number\">1</_>");
+    parse("{ \"\" : 0.0 }", "", "...0.0");
 
-  /** XML snippets. */
-  private static final String[][] TOJSON = {
-    { "<a/>" }, // invalid tag
-    { "<json/>" }, // no type specified
-    { "<json type='o'/>" }, // invalid type
-    { "<json type='object'/>", "{}" },
-    { "<json objects='json'/>", "{}" },
-    { "<json type='array'/>", "[]" },
-    { "<json arrays='json'/>", "[]" },
-    { "<json type='number'>1</json>" }, // no text allowed in json tag
-    { "<json type='array'><item type='null'/></json>", "[null]" },
-    { "<json type='array'><item type='number'/></json>" }, // value needed
-    { "<json type='array'><item type='boolean'/></json>" }, // value needed
-    { "<json type='array'><item type='null'>x</item></json>" }, // no value
-    { "<json type='array'><item type='string'/></json>", "[\"\"]" },
-    { "<json type='array'><item type='string'>x</item></json>", "[\"x\"]" },
-    { "<json type='array'><item type='number'>1</item></json>", "[1]" },
-    { "<json numbers=\"item\" type='array'><item>1</item></json>", "[1]" },
+    // merging data types
+    parse("[]", "'merge':true()", "<json arrays=\"json\"/>");
+    parse("{}", "'merge':true()", "<json objects=\"json\"/>");
+    parse("{ } ", "'merge':true()", "<json objects=\"json\"/>");
+    parse("{ \"\\t\" : 0 }", "'merge':true()",
+        "<json objects=\"json\" numbers=\"_0009\"><_0009>0</_0009></json>");
+    parse("{ \"a\" :0 }", "'merge':true()", "<json objects=\"json\" numbers=\"a\"><a>0</a></json>");
+    parse("{ \"\" : 0 }", "'merge':true()", "<json objects=\"json\" numbers=\"_\"><_>0</_></json>");
+    parse("{ \"\" : 0.0e0 }", "'merge':true()", "...<_>0.0e0</_>");
+    parse("{ \"\" : null }", "'merge':true()", "...<_/>");
+    parse("{ \"\" : true }", "'merge':true()", "...<_>true</_>");
+    parse("{ \"\" : {} }", "'merge':true()", "... objects=\"json _\"><_/>");
+    parse("{ \"\" : [] }", "'merge':true()", "... objects=\"json\" arrays=\"_\"><_/>");
+    parse("{ \"\" : 0, \"\": 1 }", "'merge':true()",
+        "... objects=\"json\" numbers=\"_\"><_>0</_><_>1</_>");
+    parse("{ \"O\" : [ 1 ] }", "'merge':true()",
+        "... objects=\"json\" arrays=\"O\" numbers=\"_\"><O><_>1</_></O>");
+    parse("{ \"A\" : [ 0,1 ] }", "'merge':true()",
+        "... objects=\"json\" arrays=\"A\" numbers=\"_\"><A><_>0</_><_>1</_>");
+
+    // errors
+    parseError("", "");
+    parseError("{", "");
+    parseError("{ \"", "");
+    parseError("{ \"\" : 00 }", "");
+    parseError("{ \"\" : 0. }", "");
+    parseError("{ \"\\c\" : 0 }", "");
+    parseError("{ \"\" : 0e }", "");
+    parseError("{ \"\" : 0.1. }", "");
+    parseError("{ \"\" : 0.1e }", "");
+    parseError("{ \"a\" : 0, }", "");
+    parseError("{ \"a\" : 0 }}", "");
   };
 
   /** Test method. */
-  @Test public void parse() {
-    for(final String[] test : TOXML) {
-      final String query = _JSON_PARSE.args(test[0]);
-      if(test.length == 1) {
-        error(query, Err.BXJS_PARSE);
-      } else if(test[1].startsWith("...")) {
-        contains(query, test[1].substring(3));
-      } else {
-        query(query, test[1]);
-      }
-    }
-  }
-
-  /** Test method. */
-  @Test public void serialize() {
-    for(final String[] f : TOJSON) {
-      final String qu = _JSON_SERIALIZE.args(f[0]);
-      if(f.length == 1) {
-        error(qu, Err.BXJS_SERIAL, Err.BXJS_CONFIG);
-      } else if(f[1].startsWith("...")) {
-        contains(qu, f[1].substring(3));
-      } else {
-        query(qu, f[1]);
-      }
-    }
-  }
+  @Test
+  public void serialize() {
+    serialError("<a/>", ""); // invalid tag
+    serialError("<json/>", ""); // no type specified
+    serialError("<json type='o'/>", ""); // invalid type
+    serial("<json type='object'/>", "", "{}");
+    serial("<json objects='json'/>", "", "{}");
+    serial("<json type='array'/>", "", "[]");
+    serial("<json arrays='json'/>", "", "[]");
+    serialError("<json type='number'>1</json>", ""); // no text allowed in json tag
+    serial("<json type='array'><_ type='null'/></json>", "", "[null]");
+    serialError("<json type='array'><_ type='number'/></json>", ""); // value needed
+    serialError("<json type='array'><_ type='boolean'/></json>", ""); // value needed
+    serialError("<json type='array'><_ type='null'>x</_></json>", ""); // no value
+    serial("<json type='array'><_ type='string'/></json>", "", "[\"\"]");
+    serial("<json type='array'><_ type='string'>x</_></json>", "", "[\"x\"]");
+    serial("<json type='array'><_ type='number'>1</_></json>", "", "[1]");
+    serial("<json numbers=\"_\" type='array'><_>1</_></json>", "", "[1]");
+  };
 
   /** Test method with namespaces. */
   @Test public void ns() {
@@ -113,10 +102,78 @@ public final class FNJsonTest extends AdvancedQueryTest {
         "<foo test=\"asdf\"/>");
     query("map:size(json:parse('[\"foo\",{\"test\":\"asdf\"}]', {'format':'map'}))",
         "2");
-    query("json:parse('\"\\t\\u000A\"'," +
-        "  {'format':'map','unescape':false(),'spec':'liberal'})", "\\t\\u000A");
+    query("json:parse('\"\\t\\u000A\"', {'format':'map','unescape':false(),'spec':'liberal'})",
+        "\\t\\u000A");
     query("string-to-codepoints(json:parse('\"\\t\\u000A\"'," +
         "  {'format':'map','unescape':true(),'spec':'liberal'}))", "9 10");
-    error("json:parse('42', {'spec':'garbage'})", Err.BXJS_CONFIG);
+    error("json:parse('42', {'spec':'garbage'})", Err.INVALIDOPT);
+  }
+
+  /**
+   * Runs the specified query.
+   * @param input query input
+   * @param options options
+   * @param expected expected result
+   */
+  private void parse(final String input, final String options, final String expected) {
+    query(input, options, expected, _JSON_PARSE);
+  }
+
+  /**
+   * Runs the specified query.
+   * @param input query input
+   * @param options options
+   * @param expected expected result
+   */
+  private void serial(final String input, final String options, final String expected) {
+    query(input, options, expected, _JSON_SERIALIZE);
+  }
+
+  /**
+   * Tests a query which yields an error.
+   * @param input query input
+   * @param options options
+   * @param expected expected result
+   * @param function function
+   */
+  private void query(final String input, final String options, final String expected,
+      final Function function) {
+    final String query = options.isEmpty() ? function.args(input) :
+      function.args(input, " {" + options + "}");
+    if(expected.startsWith("...")) {
+      contains(query, expected.substring(3));
+    } else {
+      query(query, expected);
+    }
+  }
+
+  /**
+   * Tests a query which yields an error.
+   * @param input query input
+   * @param options options
+   */
+  private void parseError(final String input, final String options) {
+    error(input, options, _JSON_PARSE);
+  }
+
+  /**
+   * Tests a query which yields an error.
+   * @param input query input
+   * @param options options
+   */
+  private void serialError(final String input, final String options) {
+    error(input, options, _JSON_SERIALIZE);
+  }
+
+  /**
+   * Tests a query which yields an error.
+   * @param input query input
+   * @param options options
+   * @param function function
+   */
+  private void error(final String input, final String options, final Function function) {
+    final String query = options.isEmpty() ? function.args(input) :
+      function.args(input, " {" + options + "}");
+    error(query, Err.INVALIDOPT, Err.BXJS_PARSE, Err.BXJS_SERIAL);
   }
 }

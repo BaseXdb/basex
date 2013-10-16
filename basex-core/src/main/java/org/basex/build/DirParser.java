@@ -1,7 +1,6 @@
 package org.basex.build;
 
 import static org.basex.core.Text.*;
-import static org.basex.data.DataText.*;
 
 import java.io.*;
 import java.util.*;
@@ -9,8 +8,8 @@ import java.util.regex.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
+import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
-import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -66,14 +65,13 @@ public final class DirParser extends Parser {
     archives = options.get(MainOptions.ADDARCHIVES);
     addRaw = options.get(MainOptions.ADDRAW);
     dtd = options.get(MainOptions.DTD);
-    rawParser = options.get(MainOptions.PARSER).toLowerCase(Locale.ENGLISH).
-        equals(DataText.M_RAW);
+    rawParser = options.get(MainOptions.PARSER) == MainParser.RAW;
 
     filter = !source.isDir() && !source.isArchive() ? null :
       Pattern.compile(IOFile.regex(opts.get(MainOptions.CREATEFILTER)));
     // choose binary storage if (disk-based) database path is known and
     // if raw parser or "add raw" option were chosen
-    rawPath = path != null && (addRaw || rawParser) ? new IOFile(path, M_RAW) : null;
+    rawPath = path != null && (addRaw || rawParser) ? new IOFile(path, IO.RAW) : null;
   }
 
   @Override

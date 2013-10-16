@@ -196,9 +196,7 @@ public final class FNFt extends StandardFunc {
     if(opts != null) {
       opt.set(FZ, opts.get(FTOptions.FUZZY));
       opt.set(WC, opts.get(FTOptions.WILDCARDS));
-      final String md = opts.get(FTOptions.MODE);
-      mode = FTMode.get(md);
-      if(mode == null) INVALIDOPT.thrw(info, Util.info(Text.INVALID_VALUE_X_X, "mode", md));
+      mode = opts.get(FTOptions.MODE);
     }
     ctx.ftOpt(opt);
     FTExpr expr = new FTWords(info, ic, terms, mode, ctx);
@@ -208,8 +206,8 @@ public final class FNFt extends StandardFunc {
       try {
         final FTDistanceOptions ftdo = new FTDistanceOptions(opts.get(FTOptions.DISTANCE));
         expr = new FTDistance(info, expr, new Expr[] {
-            Int.get(ftdo.get(FTDistanceOptions.MIN)), Int.get(ftdo.get(FTDistanceOptions.MAX))
-        }, ftdo.unit());
+          Int.get(ftdo.get(FTDistanceOptions.MIN)), Int.get(ftdo.get(FTDistanceOptions.MAX))
+        }, ftdo.get(FTDistanceOptions.UNIT));
       } catch(final BaseXException ex) {
         INVALIDOPT.thrw(info, ex);
       }

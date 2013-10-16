@@ -128,7 +128,7 @@ final class QueryListener extends Proc {
         final Iter ir = qp.iter();
         qi.evlt = perf.time();
         options();
-        final boolean wrap = !options.get(S_WRAP_PREFIX).isEmpty();
+        final boolean wrap = !options.get(WRAP_PREFIX).isEmpty();
 
         // iterate through results
         final PrintOutput po = PrintOutput.get(enc ? new EncodingOutput(out) : out);

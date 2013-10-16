@@ -81,7 +81,7 @@ public final class ViewData {
       case Data.ELEM: return data.name(p, k);
       case Data.DOC:  return data.text(p, true);
       case Data.TEXT: return s ? TEXT : data.text(p, true);
-      case Data.COMM: return s ? COMM : data.text(p, true);
+      case Data.COMM: return s ? COMMENT : data.text(p, true);
       case Data.PI:   return s ? PI : data.text(p, true);
     }
 
