@@ -3,7 +3,7 @@ package org.basex.util.options;
 import org.basex.util.*;
 
 /**
- * String option.
+ * Option containing another {@link Options} value.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen

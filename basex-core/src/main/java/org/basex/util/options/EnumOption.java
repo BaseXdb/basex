@@ -1,7 +1,7 @@
 package org.basex.util.options;
 
 /**
- * Enum option.
+ * Option containing an enumeration value.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen

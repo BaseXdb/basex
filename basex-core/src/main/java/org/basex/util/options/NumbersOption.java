@@ -3,7 +3,7 @@ package org.basex.util.options;
 import java.util.*;
 
 /**
- * Numbers option.
+ * Option containing an integer array value.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen

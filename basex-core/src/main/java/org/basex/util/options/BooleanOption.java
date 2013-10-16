@@ -1,7 +1,7 @@
 package org.basex.util.options;
 
 /**
- * Boolean option.
+ * Option containing a boolean value.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen

@@ -1,7 +1,7 @@
 package org.basex.util.options;
 
 /**
- * Integer option.
+ * Option containing an integer value.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen

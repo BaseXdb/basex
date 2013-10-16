@@ -3,7 +3,7 @@ package org.basex.util.options;
 import java.util.*;
 
 /**
- * String option.
+ * Option containing an strings array value.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen

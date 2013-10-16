@@ -1,7 +1,7 @@
 package org.basex.util.options;
 
 /**
- * String option.
+ * Option containing a string value.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
