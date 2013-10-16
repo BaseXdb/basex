@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.basex.test.*;
 import org.basex.util.list.*;
 import org.junit.*;
@@ -354,18 +353,6 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
-   * Test for concurrent writes.
-   * @throws BaseXException database exception
-   */
-  @Test
-  public void downgradeTest() throws BaseXException {
-    // hangs if QueryContext.downgrade call is activated..
-    new CreateDB(NAME, "<x/>").execute(context);
-    new XQuery("delete node /y").execute(context);
-    new XQuery("let $d := '" + NAME + "' return doc($d)").execute(context);
-  }
-
-  /**
    * Lock downgrading, the other thread is reader.
    * @throws InterruptedException Got interrupted.
    */
@@ -440,6 +427,28 @@ public final class LockingTest extends SandboxTest {
     th1.release();
     assertTrue("Thread 2 should be able to acquire lock now.",
         test.await(WAIT, TimeUnit.MILLISECONDS));
+    th2.release();
+  }
+
+  /**
+   * Downgrade from global write lock, other fetches local writes locks.
+   * @throws InterruptedException Got interrupted.
+   */
+  @Test
+  public void downgradeToNoWriteLocksTest() throws InterruptedException {
+    final CountDownLatch sync = new CountDownLatch(1), test = new CountDownLatch(1);
+
+    final LockTester th1 = new LockTester(null, NONE, objects, sync);
+    final LockTester th2 = new LockTester(sync, null, NONE, test);
+
+    th1.start();
+    th2.start();
+    assertFalse("Thread 2 shouldn't be able to acquire lock yet.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th1.downgrade(NONE);
+    assertTrue("Thread 2 should be able to acquire lock now.",
+        test.await(WAIT, TimeUnit.MILLISECONDS));
+    th1.release();
     th2.release();
   }
 
