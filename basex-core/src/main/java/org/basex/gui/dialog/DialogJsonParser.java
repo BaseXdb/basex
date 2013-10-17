@@ -74,8 +74,8 @@ final class DialogJsonParser extends DialogParser {
     spec.setSelectedItem(jopts.get(JsonOptions.SPEC));
 
     unescape = new BaseXCheckBox(UNESCAPE_CHARS, JsonParserOptions.UNESCAPE, jopts, d);
-    merge = new BaseXCheckBox(MERGE_TYPES, JsonParserOptions.MERGE, jopts, d);
-    strings = new BaseXCheckBox(INCLUDE_STRINGS, JsonParserOptions.STRINGS, jopts, d);
+    merge = new BaseXCheckBox(MERGE_TYPES, JsonOptions.MERGE, jopts, d);
+    strings = new BaseXCheckBox(INCLUDE_STRINGS, JsonOptions.STRINGS, jopts, d);
     lax = new BaseXCheckBox(LAX_NAME_CONVERSION, JsonOptions.LAX, jopts, d);
 
     final BaseXBack pp = new BaseXBack(new TableLayout(2, 1, 0, 8));
@@ -136,8 +136,8 @@ final class DialogJsonParser extends DialogParser {
     final String enc = encoding.getSelectedItem();
     jopts.set(JsonParserOptions.ENCODING, enc.equals(Token.UTF8) ? null : enc);
     jopts.set(JsonParserOptions.UNESCAPE, unescape.isSelected());
-    jopts.set(JsonParserOptions.MERGE, merge.isSelected());
-    jopts.set(JsonParserOptions.STRINGS, strings.isSelected());
+    jopts.set(JsonOptions.MERGE, merge.isSelected());
+    jopts.set(JsonOptions.STRINGS, strings.isSelected());
     jopts.set(JsonOptions.FORMAT, format.getSelectedItem());
     jopts.set(JsonOptions.SPEC, spec.getSelectedItem());
     jopts.set(JsonOptions.LAX, lax.isSelected());

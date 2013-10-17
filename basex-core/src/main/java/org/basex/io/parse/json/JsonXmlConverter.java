@@ -32,8 +32,8 @@ public abstract class JsonXmlConverter extends JsonConverter {
    */
   protected JsonXmlConverter(final JsonParserOptions opts) {
     super(opts);
-    merge = jopts.get(JsonParserOptions.MERGE);
-    strings = jopts.get(JsonParserOptions.STRINGS);
+    merge = jopts.get(JsonOptions.MERGE);
+    strings = jopts.get(JsonOptions.STRINGS);
   }
 
   /**

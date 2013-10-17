@@ -24,7 +24,7 @@ import org.basex.util.*;
  */
 public class FNCsv extends StandardFunc {
   /** Element: options. */
-  private static final QNm Q_OPTIONS = QNm.get("options", CSVURI);
+  private static final QNm Q_OPTIONS = QNm.get("csv:options", CSVURI);
 
   /**
    * Constructor.

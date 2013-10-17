@@ -3,7 +3,7 @@ package org.basex.test.io.serial.json;
 import static org.junit.Assert.*;
 
 import org.basex.build.*;
-import org.basex.build.JsonOptions.JsonFormat;
+import org.basex.build.JsonOptions.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.io.serial.json.*;
@@ -132,6 +132,14 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("{ 'A':{1:'B'} }", "{'A':['B']}", format);
     serialize("{ 'A':{4:true(),2:{'C':'D'},1:0} }", "{'A':[0,{'C':'D'},null,true]}", format);
 
+    // ECMA-262, liberal spec
+    serialize("'A'", "'A'", format, JsonSpec.ECMA_262);
+    serialize("'A'", "'A'", format, JsonSpec.LIBERAL);
+    serialize("true()", "true", format, JsonSpec.LIBERAL);
+    serialize("1", "1", format, JsonSpec.LIBERAL);
+    serialize("(1,2)", "1 2", format, JsonSpec.LIBERAL);
+
+    error("'A'", format);
     error("{ 0: () }", format);
     error("{ -1: () }", format);
   }
@@ -143,8 +151,20 @@ public final class JsonSerializerTest extends SandboxTest {
    * @param format format
    */
   private void serialize(final String query, final String expected, final JsonFormat format) {
+    serialize(query, expected, format, JsonSpec.RFC4627);
+  }
+
+  /**
+   * Serializes the specified input as JSON.
+   * @param query query string
+   * @param expected expected result
+   * @param format format
+   * @param spec spec
+   */
+  private void serialize(final String query, final String expected, final JsonFormat format,
+      final JsonSpec spec) {
     try {
-      final String actual = serialize(query, format);
+      final String actual = serialize(query, format, spec);
       assertEquals("\n[E] " + expected + "\n[F] " + actual + "\n", expected, actual);
     } catch(final Exception ex) {
       fail(ex.toString());
@@ -157,8 +177,18 @@ public final class JsonSerializerTest extends SandboxTest {
    * @param format format
    */
   private void error(final String query, final JsonFormat format) {
+    error(query, format, JsonSpec.RFC4627);
+  }
+
+  /**
+   * Serializes the specified input as JSON.
+   * @param query query string
+   * @param format format
+   * @param spec spec
+   */
+  private void error(final String query, final JsonFormat format, final JsonSpec spec) {
     try {
-      serialize(query, format);
+      serialize(query, format, spec);
       fail("Error expected: " + Err.BXJS_SERIAL);
     } catch(final QueryIOException ex) {
       assertEquals(Err.BXJS_SERIAL, ex.getCause().err());
@@ -172,16 +202,20 @@ public final class JsonSerializerTest extends SandboxTest {
    * Serializes the specified input as JSON.
    * @param qu query string
    * @param format format
+   * @param spec spec
    * @return result
    * @throws Exception exception
    */
-  private String serialize(final String qu, final JsonFormat format) throws Exception {
+  private String serialize(final String qu, final JsonFormat format, final JsonSpec spec)
+      throws Exception {
+
     final QueryProcessor qp = new QueryProcessor(qu, context);
     final ArrayOutput ao = new ArrayOutput();
 
     final JsonSerialOptions jopts = new JsonSerialOptions();
     jopts.set(JsonSerialOptions.INDENT, false);
     jopts.set(JsonOptions.FORMAT, format);
+    jopts.set(JsonOptions.SPEC, spec);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);

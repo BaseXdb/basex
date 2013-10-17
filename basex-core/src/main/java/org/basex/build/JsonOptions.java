@@ -10,16 +10,19 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public abstract class JsonOptions extends Options {
+public class JsonOptions extends Options {
+  /** Option: merge type information. */
+  public static final BooleanOption MERGE = new BooleanOption("merge", false);
+  /** Option: include string types. */
+  public static final BooleanOption STRINGS = new BooleanOption("strings", false);
+  /** Option: lax conversion of names to QNames. */
+  public static final BooleanOption LAX = new BooleanOption("lax", false);
   /** Option: parser specification. */
   public static final EnumOption<JsonSpec> SPEC =
       new EnumOption<JsonSpec>("spec", JsonSpec.RFC4627);
   /** Option: format. */
   public static final EnumOption<JsonFormat> FORMAT =
       new EnumOption<JsonFormat>("format", JsonFormat.DIRECT);
-  /** Option: lax conversion of names to QNames. */
-  public static final BooleanOption LAX =
-      new BooleanOption("lax", false);
 
   /** JSON specs. */
   public static enum JsonSpec {

@@ -5,6 +5,8 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.build.*;
+import org.basex.build.JsonOptions.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -33,6 +35,8 @@ public class JsonMapSerializer extends JsonSerializer {
 
   @Override
   public void serialize(final Item item) throws IOException {
+    if(sep && level == 0) print(' ');
+
     try {
       if(item instanceof Map) {
         final Map map = (Map) item;
@@ -77,6 +81,8 @@ public class JsonMapSerializer extends JsonSerializer {
         level--;
         indent();
         print(object ? '}' : ']');
+      } else if(level == 0 && jopts.get(JsonOptions.SPEC) == JsonSpec.RFC4627) {
+        BXJS_SERIAL.thrwIO("Top level must be a map; " + item.type + " found");
       } else if(item == null) {
         // empty sequence
         print(NULL);
@@ -92,6 +98,7 @@ public class JsonMapSerializer extends JsonSerializer {
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
+    sep = true;
   }
 
   @Override

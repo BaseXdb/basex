@@ -21,7 +21,7 @@ import org.basex.util.*;
  */
 public final class FNJson extends StandardFunc {
   /** Element: options. */
-  private static final QNm Q_OPTIONS = QNm.get("options", JSONURI);
+  private static final QNm Q_OPTIONS = QNm.get("json:options", JSONURI);
 
   /**
    * Constructor.
