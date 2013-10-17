@@ -93,6 +93,50 @@ public final class JsonSerializerTest extends SandboxTest {
   }
 
   /**
+   * Tests for the 'map' serialization format.
+   */
+  @Test public void map() {
+    final JsonFormat format = JsonFormat.MAP;
+
+    // objects
+    serialize("{ }", "{}", format);
+    serialize("{ '': () }", "{'':null}", format);
+    serialize("{ 'A' : 'B' }", "{'A':'B'}", format);
+    serialize("{ 'A': 1 }", "{'A':1}", format);
+    serialize("{ 'A': 1.2 }", "{'A':1.2}", format);
+    serialize("{ 'A': .2 }", "{'A':0.2}", format);
+    serialize("{ 'A': .0 }", "{'A':0}", format);
+    serialize("{ 'A': 1 div 0.0e0 }", "{'A':'INF'}", format);
+    serialize("{ 'A': -1 div 0.0e0 }", "{'A':'-INF'}", format);
+    serialize("{ 'A': 0 div 0.0e0 }", "{'A':'NaN'}", format);
+    serialize("{ 'A': true() }", "{'A':true}", format);
+    serialize("{ 'A': false() }", "{'A':false}", format);
+    serialize("{ 'A': false() }", "{'A':false}", format);
+
+    error("{ true(): false() }", format);
+    error("{ true(): true#0 }", format);
+    error("{ 'A': ('B','C') }", format);
+    error("{ 'A': 'B', 'C': 'D', 1: 'E' }", format);
+    error("{ 1: 'B', 2: 'C', 'C': 'D' }", format);
+
+    // arrays
+    serialize("{ 1:() }", "[null]", format);
+    serialize("{ 1:2 }", "[2]", format);
+    serialize("{ 1:2,2:3 }", "[2,3]", format);
+    serialize("{ 1:2,3:4 }", "[2,null,4]", format);
+    serialize("{ 3:4,1:2 }", "[2,null,4]", format);
+
+    // mixed
+    serialize("{ 'A':{} }", "{'A':{}}", format);
+    serialize("{ 'A':{'B':'C'} }", "{'A':{'B':'C'}}", format);
+    serialize("{ 'A':{1:'B'} }", "{'A':['B']}", format);
+    serialize("{ 'A':{4:true(),2:{'C':'D'},1:0} }", "{'A':[0,{'C':'D'},null,true]}", format);
+
+    error("{ 0: () }", format);
+    error("{ -1: () }", format);
+  }
+
+  /**
    * Serializes the specified input as JSON.
    * @param query query string
    * @param expected expected result
@@ -140,12 +184,12 @@ public final class JsonSerializerTest extends SandboxTest {
     jopts.set(JsonOptions.FORMAT, format);
 
     final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.METHOD, SerialMethod.JSON.toString());
+    sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
     sopts.set(SerializerOptions.JSON, jopts);
 
     final Serializer ser = Serializer.get(ao, sopts);
     for(final Item it : qp.value()) ser.serialize(it);
-    // replace quotes with apostrophes to increase readibility of tests
+    // replace quotes with apostrophes to increase legibility of tests
     return ao.toString().replace("\"", "'");
   }
 }
