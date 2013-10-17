@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
@@ -35,6 +36,8 @@ public final class DialogExport extends BaseXDialog {
   private final BaseXLabel info;
   /** Serialization method. */
   private final BaseXCombo method;
+  /** Parameters. */
+  private final BaseXTextField mparams;
   /** Encoding. */
   private final BaseXCombo encoding;
   /** Buttons. */
@@ -85,6 +88,13 @@ public final class DialogExport extends BaseXDialog {
     method = new BaseXCombo(this, sl.toArray());
     method.setSelectedItem(sopts.get(SerializerOptions.METHOD).name());
 
+    mparams = new BaseXTextField(this);
+    BaseXLayout.setWidth(mparams, BaseXTextField.DWIDTH * 2 / 3);
+
+    final BaseXBack mth = new BaseXBack(new TableLayout(1, 2, 8, 0));
+    mth.add(method);
+    mth.add(mparams);
+
     encoding = new BaseXCombo(this, ENCODINGS);
     String enc = sopts.get(SerializerOptions.ENCODING);
     boolean f = false;
@@ -95,18 +105,12 @@ public final class DialogExport extends BaseXDialog {
     }
     encoding.setSelectedItem(f ? enc : sopts.get(SerializerOptions.ENCODING));
 
-    params = new BaseXTextField(parameters(sopts, true), this);
-
-    final StringBuilder sb = new StringBuilder("<html><b>").append(PARAMETERS).append(":</b><br>");
-    for(final Option so : Serializer.OPTIONS) {
-      sb.append("\u2022 ").append(so).append("<br/>");
-    }
-    sb.append("</html>");
-    params.setToolTipText(sb.toString());
+    params = new BaseXTextField(sopts.toString(), this);
+    params.setToolTipText(tooltip(Serializer.OPTIONS));
 
     pp = new BaseXBack(new TableLayout(3, 2, 16, 6)).border(8, 0, 8, 0);
     pp.add(new BaseXLabel(METHOD + COL, true, true));
-    pp.add(method);
+    pp.add(mth);
     pp.add(new BaseXLabel(ENCODING + COL, true, true));
     pp.add(encoding);
     pp.add(new BaseXLabel(PARAMETERS + COL, true, true));
@@ -170,12 +174,28 @@ public final class DialogExport extends BaseXDialog {
     String inf = io.isDir() && io.children().length > 0 ? DIR_NOT_EMPTY : null;
     ok = !pth.isEmpty();
 
+    final SerialMethod mth = SerialMethod.valueOf(method.getSelectedItem());
+    final OptionsOption<? extends Options> opts =
+        mth == SerialMethod.JSON ? SerializerOptions.JSON :
+        mth == SerialMethod.CSV ? SerializerOptions.CSV : null;
+    final boolean showmparams = opts != null;
+    mparams.setEnabled(showmparams);
+
     if(ok) {
       gui.gopts.set(GUIOptions.INPUTPATH, pth);
       try {
-        final SerializerOptions sopts = new SerializerOptions();
-        sopts.parse(params.getText());
-        Serializer.get(new ArrayOutput(), sopts);
+        if(comp == method) {
+          if(showmparams) {
+            final Options mopts = options(null).get(opts);
+            System.out.println("=> " + options(null));
+            mparams.setToolTipText(tooltip(mopts));
+            mparams.setText(mopts.toString());
+          } else {
+            mparams.setToolTipText(null);
+            mparams.setText("");
+          }
+        }
+        Serializer.get(new ArrayOutput(), options(mth));
       } catch(final IOException ex) {
         ok = false;
         inf = ex.getMessage();
@@ -190,40 +210,48 @@ public final class DialogExport extends BaseXDialog {
   public void close() {
     if(!ok) return;
 
-    // remembers serialization parameters
-    final String mth = method.getSelectedItem().toLowerCase(Locale.ENGLISH);
-    final String enc = encoding.getSelectedItem();
+    final SerialMethod mth = SerialMethod.valueOf(method.getSelectedItem());
     try {
-      final SerializerOptions sopts = new SerializerOptions();
-      sopts.parse(params.getText());
-      sopts.set(SerializerOptions.METHOD, mth);
-      sopts.set(SerializerOptions.ENCODING, enc);
-      gui.set(MainOptions.EXPORTER, parameters(sopts, false));
-    } catch(final BaseXException ex) { Util.notexpected(); }
+      gui.set(MainOptions.EXPORTER, options(mth));
+    } catch(final BaseXException ex) { Util.notexpected(ex); }
+
     super.close();
     path.store();
   }
 
   /**
-   * Creates a serialization parameter string.
-   * @param sopts serialization parameters
-   * @param excl exclude method and encoding
-   * @return result string
+   * Returns the current serialization options.
+   * @param mth consider specified serialization method (may be {@code null})
+   * @return options
+   * @throws BaseXException database exception
    */
-  private String parameters(final SerializerOptions sopts, final boolean excl) {
-    final String[] ex = !excl ? new String[0] : new String[] {
-        SerializerOptions.METHOD.name(), SerializerOptions.ENCODING.name() };
-    final StringBuilder sb = new StringBuilder();
-    for(final Option o : sopts) {
-      final String name = o.name();
-      if(Token.eq(name, ex)) continue;
-      final Object val1 = sopts.get(o);
-      final Object val2 = Serializer.OPTIONS.get(o);
-      if(val1 == null ? val2 != null : val2 == null || !val1.equals(val2)) {
-        if(sb.length() != 0) sb.append(',');
-        sb.append(name).append('=').append(val1);
-      }
+  private SerializerOptions options(final SerialMethod mth) throws BaseXException {
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.parse(params.getText());
+    sopts.set(SerializerOptions.METHOD, SerialMethod.valueOf(method.getSelectedItem()));
+    sopts.set(SerializerOptions.ENCODING, encoding.getSelectedItem());
+    if(mth == SerialMethod.JSON) {
+      final JsonSerialOptions jopts = new JsonSerialOptions();
+      jopts.parse(mparams.getText());
+      sopts.set(SerializerOptions.JSON, jopts);
+    } else if(mth == SerialMethod.CSV) {
+      final CsvOptions copts = new CsvOptions();
+      copts.parse(mparams.getText());
+      sopts.set(SerializerOptions.CSV, copts);
     }
-    return sb.toString();
+    return sopts;
+  }
+
+  /**
+   * Returns a tooltip for the specified options string.
+   * @param opts serialization options
+   * @return string
+   */
+  private String tooltip(final Options opts) {
+    final StringBuilder sb = new StringBuilder("<html><b>").append(PARAMETERS).append(":</b><br>");
+    for(final Option so : opts) {
+      if(!(so instanceof OptionsOption)) sb.append("\u2022 ").append(so).append("<br/>");
+    }
+    return sb.append("</html>").toString();
   }
 }

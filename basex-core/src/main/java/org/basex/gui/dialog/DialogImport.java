@@ -189,8 +189,7 @@ public final class DialogImport extends BaseXBack {
    * Sets the parsing options.
    */
   void setOptions() {
-    final MainParser parser = MainParser.valueOf(parsers.getSelectedItem());
-    gui.set(MainOptions.PARSER, parser);
+    gui.set(MainOptions.PARSER, MainParser.valueOf(parsers.getSelectedItem()));
     gui.set(MainOptions.CREATEFILTER, filter.getText());
     gui.set(MainOptions.ADDARCHIVES, archives.isSelected());
     gui.set(MainOptions.SKIPCORRUPT, skipCorrupt.isSelected());
