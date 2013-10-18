@@ -52,7 +52,14 @@ public final class Prop {
   /** System property for specifying database home directory. */
   public static final String PATH = DBPREFIX + "path";
   /** User's home directory. */
-  public static final String USERHOME = dir(System.getProperty("user.home"));
+  public static final String USERHOME;
+
+  static {
+    // linux: check HOME variable (#773)
+    final String home = System.getenv("HOME");
+    USERHOME = dir(home != null ? home : System.getProperty("user.home"));
+  }
+
   /** Directory for storing the property files, database directory, etc. */
   public static final String HOME = dir(homePath());
 
