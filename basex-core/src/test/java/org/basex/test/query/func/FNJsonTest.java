@@ -66,8 +66,8 @@ public final class FNJsonTest extends AdvancedQueryTest {
     parseError("{ \"\" : 0e }", "");
     parseError("{ \"\" : 0.1. }", "");
     parseError("{ \"\" : 0.1e }", "");
-    parseError("{ \"a\" : 0, }", "");
     parseError("{ \"a\" : 0 }}", "");
+    parseError("{ \"a\" : 0, }", "'format':'RFC4627'");
   };
 
   /** Test method. */
