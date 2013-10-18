@@ -5,9 +5,11 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.gflwor.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -15,6 +17,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function item.
@@ -255,7 +258,8 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean visit(final ASTVisitor visitor) {
     for(final Var var : vars) if(!visitor.declared(var)) return false;
-    for(final Var var : closure.keySet()) if(!visitor.declared(var)) return false;
+    for(final Entry<Var, Value> e : closure.entrySet())
+      if(!(visitor.declared(e.getKey()) && e.getValue().accept(visitor))) return false;
     return expr.accept(visitor);
   }
 
@@ -281,5 +285,57 @@ public final class FuncItem extends FItem implements Scope {
     for(final Var v : vars) tb.addExt(v).add(v == vars[vars.length - 1] ? "" : ", ");
     return tb.add(')').add(ft.type != null ? " as " + ft.type : "").add(" { ").
         addExt(expr).add(" }").toString();
+  }
+
+  @Override
+  public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
+      final InputInfo ii)
+      throws QueryException {
+    if(!inline(exprs, ctx)) return null;
+    // create let bindings for all variables
+    final LinkedList<GFLWOR.Clause> cls = exprs.length == 0 ? null :
+      new LinkedList<GFLWOR.Clause>();
+    final IntObjMap<Var> vs = new IntObjMap<Var>();
+    for(int i = 0; i < vars.length; i++) {
+      final Var old = vars[i], v = scp.newCopyOf(ctx, old);
+      vs.put(old.id, v);
+      cls.add(new Let(v, exprs[i], false, ii).optimize(ctx, scp));
+    }
+
+    for(final Entry<Var, Value> e : closure.entrySet()) {
+      final Var old = e.getKey(), v = scp.newCopyOf(ctx, old);
+      vs.put(old.id, v);
+      cls.add(new Let(v, e.getValue(), false, ii).optimize(ctx, scp));
+    }
+
+    // copy the function body
+    final Expr cpy = expr.copy(ctx, scp, vs), rt = cast == null ? cpy :
+      new TypeCheck(sc, ii, cpy, cast, true).optimize(ctx, scp);
+
+    return cls == null ? rt : new GFLWOR(ii, cls, rt).optimize(ctx, scp);
+  }
+
+  /**
+   * Checks if this function item should be inlined.
+   * @param as argument expressions
+   * @param ctx query context
+   * @return result of check
+   */
+  private boolean inline(final Expr[] as, final QueryContext ctx) {
+    if(expr.isValue() || expr.exprSize() < ctx.context.options.get(MainOptions.INLINELIMIT) &&
+        !(expr.has(Flag.NDT) || expr.has(Flag.CTX))) {
+      final ASTVisitor visitor = new ASTVisitor() {
+        @Override
+        public boolean funcItem(final FuncItem f) {
+          return f != FuncItem.this && f.visit(this);
+        }
+        @Override
+        public boolean inlineFunc(final Scope sub) {
+          return sub.visit(this);
+        }
+      };
+      return Expr.visitAll(visitor, as);
+    }
+    return false;
   }
 }

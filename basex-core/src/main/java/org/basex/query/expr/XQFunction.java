@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -75,4 +76,16 @@ public interface XQFunction {
    * @throws QueryException query exception
    */
   Item invokeItem(QueryContext ctx, InputInfo ii, Value... args) throws QueryException;
+
+  /**
+   * Tries to inline this function with the given argument expressions.
+   * @param exprs argument expressions
+   * @param ctx query context
+   * @param scp variable scope
+   * @param ii input info
+   * @return the expression to inline if successful, {@code null} otherwise
+   * @throws QueryException query exception
+   */
+  Expr inlineExpr(Expr[] exprs, QueryContext ctx, VarScope scp, InputInfo ii)
+      throws QueryException;
 }

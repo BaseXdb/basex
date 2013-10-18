@@ -20,7 +20,7 @@ public final class TypeCheck extends Single {
   /** Flag for function conversion. */
   public final boolean promote;
   /** Static context. */
-  private final StaticContext sc;
+  public final StaticContext sc;
 
   /**
    * Constructor.
@@ -59,13 +59,10 @@ public final class TypeCheck extends Single {
       if(occ == null) throw Err.INVCAST.thrw(info, argType, type);
     }
 
-    switch(type.occ) {
-      case ZERO_ONE:
-      case ONE:
-        return new Cast(sc, info, expr, type);
-      default:
-        return this;
-    }
+    final Expr opt = expr.typeCheck(this, ctx, scp);
+    if(opt != null) return optPre(opt, ctx);
+
+    return this;
   }
 
   @Override
@@ -105,5 +102,18 @@ public final class TypeCheck extends Single {
    */
   public boolean isRedundant(final Var var) {
     return (!promote || var.promotes()) && var.declaredType().instanceOf(type);
+  }
+
+  /**
+   * Creates an expression that checks the given expression's return type.
+   * @param e expression to check
+   * @param ctx query context
+   * @param scp variable scope
+   * @return the resulting expression
+   * @throws QueryException query exception
+   */
+  public Expr check(final Expr e, final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return new TypeCheck(sc, info, e, type, promote).optimize(ctx, scp);
   }
 }

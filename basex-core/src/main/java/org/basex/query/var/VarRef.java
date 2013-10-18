@@ -114,7 +114,8 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(DOLLAR).add(var.name.toString()).toString();
+    return new TokenBuilder(DOLLAR).add(
+        var.name.toString())/* .add('_').addInt(var.id) */.toString();
   }
 
   @Override

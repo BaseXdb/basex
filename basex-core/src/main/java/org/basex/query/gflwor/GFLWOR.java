@@ -13,6 +13,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.SeqType.Occ;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -117,6 +118,9 @@ public final class GFLWOR extends ParseExpr {
       // rewrite singleton for clauses to let
       changed = forToLet(ctx);
 
+      // slide let clauses out to avoid repeated evaluation
+      changed |= slideLetsOut(ctx);
+
       // inline let expressions if they are used only once (and not in a loop)
       changed |= inlineLets(ctx, scp);
 
@@ -125,9 +129,6 @@ public final class GFLWOR extends ParseExpr {
 
       // include the clauses of nested FLWR expressions into this one
       changed |= unnestFLWR(ctx, scp);
-
-      // slide let clauses out to avoid repeated evaluation
-      changed |= slideLetsOut(ctx);
 
       // float where expressions upwards to filter earlier
       changed |= optimizeWhere(ctx, scp);
@@ -174,22 +175,32 @@ public final class GFLWOR extends ParseExpr {
         }
       }
 
-      if(!clauses.isEmpty() && ret instanceof GFLWOR) {
-        final GFLWOR sub = (GFLWOR) ret;
-        if(sub.isFLWR()) {
-          // flatten nested FLWOR expressions
-          ctx.compInfo(QueryText.OPTFLAT, this);
-          clauses.addAll(sub.clauses);
-          ret = sub.ret;
-          changed = true;
-        } else if(sub.clauses.getFirst() instanceof Let) {
-          ctx.compInfo(QueryText.OPTFLAT, this);
-          final LinkedList<Clause> cls = sub.clauses;
-          // propagate all leading let bindings into outer clauses
-          do clauses.add(cls.removeFirst());
-          while(!cls.isEmpty() && cls.getFirst() instanceof Let);
-          ret = ret.optimize(ctx, scp);
-          changed = true;
+      if(!clauses.isEmpty()) {
+        if(ret instanceof GFLWOR) {
+          final GFLWOR sub = (GFLWOR) ret;
+          if(sub.isFLWR()) {
+            // flatten nested FLWOR expressions
+            ctx.compInfo(QueryText.OPTFLAT, this);
+            clauses.addAll(sub.clauses);
+            ret = sub.ret;
+            changed = true;
+          }
+        }
+
+        final TypeCheck tc = ret instanceof TypeCheck ? (TypeCheck) ret : null;
+        if(ret instanceof GFLWOR || tc != null && tc.expr instanceof GFLWOR) {
+          final GFLWOR sub = (GFLWOR) (tc == null ? ret : tc.expr);
+          if(sub.clauses.getFirst() instanceof Let) {
+            ctx.compInfo(QueryText.OPTFLAT, this);
+            final LinkedList<Clause> cls = sub.clauses;
+            // propagate all leading let bindings into outer clauses
+            do {
+              clauses.add(cls.removeFirst());
+            } while(!cls.isEmpty() && cls.getFirst() instanceof Let);
+            if(tc != null) tc.expr = sub.optimize(ctx, scp);
+            ret = ret.optimize(ctx, scp);
+            changed = true;
+          }
         }
       }
 
@@ -675,6 +686,14 @@ public final class GFLWOR extends ParseExpr {
     int sz = 1;
     for(final Clause cl : clauses) sz += cl.exprSize();
     return ret.exprSize() + sz;
+  }
+
+  @Override
+  public Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    if(tc.type.occ != Occ.ZERO_MORE) return null;
+    ret = tc.check(ret, ctx, scp);
+    return optimize(ctx, scp);
   }
 
   /**

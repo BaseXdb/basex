@@ -112,6 +112,7 @@ public final class Let extends GFLWOR.Clause {
 
   @Override
   public Let compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    var.refineType(score ? SeqType.DBL : expr.type(), ctx, info);
     expr = expr.compile(ctx, scp);
     return optimize(ctx, scp);
   }

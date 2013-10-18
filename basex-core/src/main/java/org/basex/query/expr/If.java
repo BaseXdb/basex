@@ -59,6 +59,14 @@ public final class If extends Arr {
       }
     }
 
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+    // static condition: return branch in question
+    if(cond.isValue()) return optPre(eval(ctx), ctx);
+
     // if A then B else B -> B (errors in A will be ignored)
     if(expr[0].sameAs(expr[1])) return optPre(expr[0], ctx);
 
@@ -195,5 +203,12 @@ public final class If extends Arr {
     int sz = 1;
     for(final Expr e : expr) sz += e.exprSize();
     return sz + cond.exprSize();
+  }
+
+  @Override
+  public Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    for(int i = 0; i < expr.length; i++) expr[i] = tc.check(expr[i], ctx, scp);
+    return optimize(ctx, scp);
   }
 }

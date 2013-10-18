@@ -38,6 +38,11 @@ public final class Cast extends Single {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     if(expr.type().one()) type = SeqType.get(type.type, Occ.ONE);
 
     // pre-evaluate value
@@ -51,6 +56,9 @@ public final class Cast extends Single {
       optPre(expr, ctx);
       return expr;
     }
+
+    size = type.occ();
+
     return this;
   }
 

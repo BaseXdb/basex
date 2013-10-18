@@ -69,10 +69,20 @@ public final class FNAggr extends StandardFunc {
 
     final long c = e.size();
     switch(sig) {
-      case COUNT: return c >= 0 ? Int.get(c) : this;
-      case SUM:   return c == 0 ? expr.length == 2 ? expr[1] : Int.get(0) : this;
-      default:    return this;
+      case COUNT:
+        if(c >= 0) return Int.get(c);
+        break;
+      case SUM:
+        if(c == 0) return expr.length == 2 ? expr[1] : Int.get(0);
+        final Type a = e.type().type, b = expr.length == 2 ? expr[1].type().type : a;
+        if(a.isNumberOrUntyped() && b.isNumberOrUntyped()) {
+          type = Calc.type(a, b).seqType();
+        }
+        break;
+      default:
+        break;
     }
+    return this;
   }
 
   /**
