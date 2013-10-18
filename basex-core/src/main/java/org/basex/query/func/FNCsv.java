@@ -4,8 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
-
 import org.basex.build.*;
 import org.basex.io.parse.csv.*;
 import org.basex.io.serial.*;
@@ -13,7 +11,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -51,12 +48,12 @@ public class FNCsv extends StandardFunc {
    * @return element node
    * @throws QueryException query exception
    */
-  private FDoc parse(final QueryContext ctx) throws QueryException {
+  private Item parse(final QueryContext ctx) throws QueryException {
     final byte[] input = checkStr(expr[0], ctx);
     final CsvParserOptions opts = checkOptions(1, Q_OPTIONS, new CsvParserOptions(), ctx);
     try {
       return CsvConverter.convert(input, opts);
-    } catch(final IOException ex) {
+    } catch(final QueryIOException ex) {
       throw BXCS_PARSE.thrw(info, ex);
     }
   }

@@ -63,10 +63,10 @@ public final class FNSeq extends StandardFunc {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case SUBSEQUENCE:     return subseqValue(ctx);
-      case TAIL:            final Value seq = ctx.value(expr[0]);
-                            return SubSeq.get(seq, 1, seq.size() - 1);
-      default:              return super.value(ctx);
+      case SUBSEQUENCE: return subseqValue(ctx);
+      case TAIL:        final Value seq = ctx.value(expr[0]);
+                        return SubSeq.get(seq, 1, seq.size() - 1);
+      default:          return super.value(ctx);
     }
   }
 
@@ -483,7 +483,7 @@ public final class FNSeq extends StandardFunc {
       // estimate result size (could be known in the original expression)
       final ValueBuilder vb = new ValueBuilder(Math.max((int) expr[0].size(), 1));
       for(Item it; (it = iter.next()) != null;) vb.add(it);
-      Array.reverse(vb.item, 0, (int) vb.size());
+      Array.reverse(vb.items(), 0, (int) vb.size());
       return vb;
     }
 

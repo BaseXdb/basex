@@ -3,6 +3,7 @@ package org.basex.io.parse.json;
 import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.build.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -11,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public final class JsonStringConverter implements JsonHandler {
+public final class JsonStringConverter extends JsonConverter {
   /** The token builder. */
   private final TokenBuilder tb;
   /** Flag for first array entry, object member or constructor argument. */
@@ -19,9 +20,11 @@ public final class JsonStringConverter implements JsonHandler {
 
   /**
    * Constructor.
+   * @param opts options
    * @param builder the token builder
    */
-  private JsonStringConverter(final TokenBuilder builder) {
+  private JsonStringConverter(final JsonParserOptions opts, final TokenBuilder builder) {
+    super(opts);
     tb = builder;
   }
 
@@ -40,7 +43,7 @@ public final class JsonStringConverter implements JsonHandler {
     final JsonParserOptions jopts = new JsonParserOptions();
     jopts.set(JsonOptions.SPEC, spec);
     jopts.set(JsonParserOptions.UNESCAPE, un);
-    JsonParser.parse(json, jopts, new JsonStringConverter(tb));
+    JsonParser.parse(json, jopts, new JsonStringConverter(jopts, tb));
     return tb;
   }
 
@@ -162,5 +165,10 @@ public final class JsonStringConverter implements JsonHandler {
   @Override
   public void booleanLit(final byte[] b) {
     tb.add(b);
+  }
+
+  @Override
+  public Item finish() {
+    return Str.get(tb.finish());
   }
 }

@@ -46,7 +46,7 @@ public abstract class JsonXmlConverter extends JsonConverter {
   }
 
   @Override
-  protected FDoc finish() {
+  public FDoc finish() {
     final FElem e = element();
     if(merge) {
       final ByteList[] types = new ByteList[ATTRS.length];

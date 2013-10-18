@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 final class DialogTextParser extends DialogParser {
   /** Options. */
-  private TextOptions topts;
+  private final TextOptions topts;
   /** Text: encoding. */
   private final BaseXCombo encoding;
   /** Text: Use lines. */

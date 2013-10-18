@@ -32,7 +32,7 @@ final class DialogJsonParser extends DialogParser {
       "  { \"born\": \"1984\" },\n  \"John\\nAdam\"\n]";
 
   /** Options. */
-  private JsonParserOptions jopts;
+  private final JsonParserOptions jopts;
   /** JSON example. */
   private final Editor example;
   /** JSON: encoding. */

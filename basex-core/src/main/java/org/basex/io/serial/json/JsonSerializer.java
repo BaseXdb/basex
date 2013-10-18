@@ -1,7 +1,5 @@
 package org.basex.io.serial.json;
 
-import static org.basex.io.serial.SerializerOptions.*;
-
 import java.io.*;
 
 import org.basex.build.*;
@@ -27,7 +25,6 @@ public abstract class JsonSerializer extends OutputSerializer {
    */
   protected JsonSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
     super(os, opts);
-    opts.set(METHOD, SerialMethod.JSON);
     jopts = opts.get(SerializerOptions.JSON);
     escape = jopts.get(JsonSerialOptions.ESCAPE);
     if(jopts.contains(JsonSerialOptions.INDENT)) indent = jopts.get(JsonSerialOptions.INDENT);

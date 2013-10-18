@@ -8,6 +8,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.*;
+import org.basex.build.CsvOptions.CsvFormat;
 import org.basex.build.JsonOptions.JsonFormat;
 import org.basex.data.*;
 import org.basex.io.serial.csv.*;
@@ -78,12 +79,16 @@ public abstract class Serializer {
       case HTML:  return new HTMLSerializer(os, sopts);
       case TEXT:  return new TextSerializer(os, sopts);
       case RAW:   return new RawSerializer(os, sopts);
-      case CSV:   return new CsvSerializer(os, sopts);
+      case CSV:
+        final CsvOptions copts = sopts.get(SerializerOptions.CSV);
+        final CsvFormat cform = copts.get(CsvOptions.FORMAT);
+        return cform == CsvFormat.MAP ? new CsvMapSerializer(os, sopts) :
+               new CsvDirectSerializer(os, sopts);
       case JSON:
         final JsonSerialOptions jopts = sopts.get(SerializerOptions.JSON);
-        final JsonFormat format = jopts.get(JsonOptions.FORMAT);
-        return format == JsonFormat.JSONML ? new JsonMLSerializer(os, sopts) :
-               format == JsonFormat.MAP ? new JsonMapSerializer(os, sopts) :
+        final JsonFormat jform = jopts.get(JsonOptions.FORMAT);
+        return jform == JsonFormat.JSONML ? new JsonMLSerializer(os, sopts) :
+               jform == JsonFormat.MAP ? new JsonMapSerializer(os, sopts) :
                new JsonDirectSerializer(os, sopts);
       default: return new XMLSerializer(os, sopts);
     }

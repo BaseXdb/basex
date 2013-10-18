@@ -6,7 +6,7 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.parse.csv.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 
 /**
  * This class parses files in the CSV format
@@ -37,7 +37,7 @@ public final class CsvParser extends XMLParser {
    * @throws IOException I/O exception
    */
   public static IO toXML(final IO io, final CsvParserOptions copts) throws IOException {
-    final Item node = CsvConverter.convert(io, copts);
+    final Value node = CsvConverter.convert(io, copts);
     final IOContent xml = new IOContent(node.serialize().toArray());
     xml.name(io.name());
     return xml;

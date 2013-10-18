@@ -34,7 +34,7 @@ public class InputParser {
    */
   public InputParser(final String in) {
     input = in;
-    length = input.length();
+    length = in.length();
   }
 
   /**

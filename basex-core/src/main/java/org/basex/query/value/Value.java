@@ -152,7 +152,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    */
   public final ValueBuilder cache() {
     final ValueBuilder vb = new ValueBuilder((int) size());
-    vb.size(writeTo(vb.item, 0));
+    vb.size(writeTo(vb.items(), 0));
     return vb;
   }
 

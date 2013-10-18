@@ -101,7 +101,7 @@ public final class FNHof extends StandardFunc {
     if(v.size() < 2) return v;
     final ValueBuilder vb = v.cache();
     try {
-      Arrays.sort(vb.item, 0, (int) vb.size(), cmp);
+      Arrays.sort(vb.items(), 0, (int) vb.size(), cmp);
     } catch(final QueryRTException ex) {
       throw ex.getCause();
     }

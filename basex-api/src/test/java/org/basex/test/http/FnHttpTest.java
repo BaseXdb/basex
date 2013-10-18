@@ -124,7 +124,7 @@ public class FnHttpTest extends HTTPTest {
     Result r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
-    assertEquals(NodeType.DOC, ((ValueBuilder) r).item[1].type);
+    assertEquals(NodeType.DOC, ((ValueBuilder) r).get(1).type);
     qp.close();
 
     // GET2 - with override-media-type='text/plain'
@@ -133,7 +133,7 @@ public class FnHttpTest extends HTTPTest {
     r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
-    assertEquals(AtomType.STR, ((ValueBuilder) r).item[1].type);
+    assertEquals(AtomType.STR, ((ValueBuilder) r).get(1).type);
     qp.close();
 
     // Get3 - with status-only='true'

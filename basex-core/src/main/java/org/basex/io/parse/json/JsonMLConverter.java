@@ -35,7 +35,7 @@ public class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  protected FDoc finish() {
+  public FDoc finish() {
     return new FDoc().add(stack.pop());
   }
 

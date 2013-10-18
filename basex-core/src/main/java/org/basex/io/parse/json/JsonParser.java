@@ -3,9 +3,10 @@ package org.basex.io.parse.json;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.build.*;
+import org.basex.build.JsonOptions.JsonSpec;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -24,7 +25,9 @@ public final class JsonParser extends InputParser {
     "CAN", "EM",  "SUB", "ESC", "FS",  "GS",  "RS",  "US",
   };
 
-  /** JSON spec. */
+  /** Converter. */
+  private final JsonConverter conv;
+  /** Spec. */
   private final JsonSpec spec;
   /** Unescape flag. */
   private final boolean unescape;
@@ -34,56 +37,59 @@ public final class JsonParser extends InputParser {
   /**
    * Constructor taking the input string and the spec according to which it is parsed.
    * @param in input string
-   * @param opts json options
+   * @param opts options
+   * @param cnv converter
    */
-  private JsonParser(final String in, final JsonParserOptions opts) {
+  private JsonParser(final String in, final JsonParserOptions opts, final JsonConverter cnv) {
     super(in);
     spec = opts.get(JsonOptions.SPEC);
     unescape = opts.get(JsonParserOptions.UNESCAPE);
+    conv = cnv;
   }
 
   /**
-   * Parses the input JSON string and directs the parse events to the given handler.
-   * @param input JSON string to parse
-   * @param opts json options
-   * @param handler JSON handler
+   * Parses the input string, directs the parse events to the given handler and returns
+   * the resulting value.
+   * @param input input string
+   * @param opts options
+   * @param conv converter
+   * @return resulting item
    * @throws QueryIOException parse exception
    */
-  public static void parse(final String input, final JsonParserOptions opts,
-      final JsonHandler handler) throws QueryIOException {
-    new JsonParser(input, opts).parse(handler);
+  static Item parse(final String input, final JsonParserOptions opts, final JsonConverter conv)
+      throws QueryIOException {
+    new JsonParser(input, opts, conv).parse();
+    return conv.finish();
   }
 
   /**
    * Parses a JSON expression.
-   * @param h handler
    * @throws QueryIOException query I/O exception
    */
-  private void parse(final JsonHandler h) throws QueryIOException {
+  private void parse() throws QueryIOException {
     skipWs();
     if(spec == JsonSpec.RFC4627 && !(curr() == '{' || curr() == '['))
       throw error("Expected '{' or '[', found %", rest());
-    value(h);
+    value();
     if(more()) throw error("Unexpected trailing content: %", rest());
   }
 
   /**
    * Parses a JSON value.
-   * @param h handler
    * @throws QueryIOException query I/O exception
    */
-  private void value(final JsonHandler h) throws QueryIOException {
+  private void value() throws QueryIOException {
     if(pos >= length) throw eof(", expected JSON value.");
     switch(curr()) {
       case '[':
-        array(h);
+        array();
         break;
       case '{':
-        object(h);
+        object();
         break;
       case '"':
         // string
-        h.stringLit(string());
+        conv.stringLit(string());
         break;
       case '-':
       case '0':
@@ -97,15 +103,15 @@ public final class JsonParser extends InputParser {
       case '8':
       case '9':
         // number
-        h.numberLit(number());
+        conv.numberLit(number());
         break;
       default:
         // boolean, null or constructor
-        if(consume("true")) h.booleanLit(TRUE);
-        else if(consume("false")) h.booleanLit(FALSE);
-        else if(consume("null")) h.nullLit();
+        if(consume("true")) conv.booleanLit(TRUE);
+        else if(consume("false")) conv.booleanLit(FALSE);
+        else if(consume("null")) conv.nullLit();
         else if(spec == JsonSpec.LIBERAL && consume("new") &&
-            Character.isWhitespace(curr())) constr(h);
+            Character.isWhitespace(curr())) constr();
         else throw error("Unexpected JSON value: '%'", rest());
         skipWs();
     }
@@ -113,66 +119,63 @@ public final class JsonParser extends InputParser {
 
   /**
    * Parses a JSON object.
-   * @param h handler
    * @throws QueryIOException query I/O exception
    */
-  private void object(final JsonHandler h) throws QueryIOException {
+  private void object() throws QueryIOException {
     consumeWs('{', true);
-    h.openObject();
+    conv.openObject();
     if(!consumeWs('}', false)) {
       do {
-        h.openPair(spec != JsonSpec.LIBERAL || curr() == '"' ? string() : unquoted());
+        conv.openPair(spec != JsonSpec.LIBERAL || curr() == '"' ? string() : unquoted());
         consumeWs(':', true);
-        value(h);
-        h.closePair();
+        value();
+        conv.closePair();
       } while(consumeWs(',', false) && !(spec == JsonSpec.LIBERAL && curr() == '}'));
       consumeWs('}', true);
     }
-    h.closeObject();
+    conv.closeObject();
   }
 
   /**
    * Parses a JSON array.
-   * @param h handler
    * @throws QueryIOException query I/O exception
    */
-  private void array(final JsonHandler h) throws QueryIOException {
+  private void array() throws QueryIOException {
     consumeWs('[', true);
-    h.openArray();
+    conv.openArray();
     if(!consumeWs(']', false)) {
       do {
-        h.openItem();
-        value(h);
-        h.closeItem();
+        conv.openItem();
+        value();
+        conv.closeItem();
       } while(consumeWs(',', false) && !(spec == JsonSpec.LIBERAL && curr() == ']'));
       consumeWs(']', true);
     }
-    h.closeArray();
+    conv.closeArray();
   }
 
   /**
    * Parses a JSON constructor function.
-   * @param h handler
    * @throws QueryIOException query I/O exception
    */
-  private void constr(final JsonHandler h) throws QueryIOException {
+  private void constr() throws QueryIOException {
     skipWs();
     if(!input.substring(pos).matches("^[a-zA-Z0-9_-]+\\(.*"))
       throw error("Wrong constructor syntax: '%'", rest());
 
     final int p = input.indexOf('(', pos);
-    h.openConstr(token(input.substring(pos, p)));
+    conv.openConstr(token(input.substring(pos, p)));
     pos = p + 1;
     skipWs();
     if(!consumeWs(')', false)) {
       do {
-        h.openArg();
-        value(h);
-        h.closeArg();
+        conv.openArg();
+        value();
+        conv.closeArg();
       } while(consumeWs(',', false));
       consumeWs(')', true);
     }
-    h.closeConstr();
+    conv.closeConstr();
   }
 
   /**
@@ -202,19 +205,19 @@ public final class JsonParser extends InputParser {
     tb.reset();
 
     // integral part
-    int c = consume();
-    tb.addByte((byte) c);
-    if(c == '-') {
-      c = consume();
-      if(c < '0' || c > '9') throw error("Number expected after '-'");
-      tb.addByte((byte) c);
+    int ch = consume();
+    tb.addByte((byte) ch);
+    if(ch == '-') {
+      ch = consume();
+      if(ch < '0' || ch > '9') throw error("Number expected after '-'");
+      tb.addByte((byte) ch);
     }
 
-    final boolean zero = c == '0';
-    c = curr();
-    if(zero && c >= '0' && c <= '9') throw error("No digit allowed after '0'");
+    final boolean zero = ch == '0';
+    ch = curr();
+    if(zero && ch >= '0' && ch <= '9') throw error("No digit allowed after '0'");
     loop: while(true) {
-      switch(c) {
+      switch(ch) {
         case '0':
         case '1':
         case '2':
@@ -225,9 +228,9 @@ public final class JsonParser extends InputParser {
         case '7':
         case '8':
         case '9':
-          tb.addByte((byte) c);
+          tb.addByte((byte) ch);
           pos++;
-          c = curr();
+          ch = curr();
           break;
         case '.':
         case 'e':
@@ -241,14 +244,14 @@ public final class JsonParser extends InputParser {
 
     if(consume('.')) {
       tb.addByte((byte) '.');
-      c = curr();
-      if(c < '0' || c > '9') throw error("Number expected after '.'");
+      ch = curr();
+      if(ch < '0' || ch > '9') throw error("Number expected after '.'");
       do {
-        tb.addByte((byte) c);
+        tb.addByte((byte) ch);
         pos++;
-        c = curr();
-      } while(c >= '0' && c <= '9');
-      if(c != 'e' && c != 'E') {
+        ch = curr();
+      } while(ch >= '0' && ch <= '9');
+      if(ch != 'e' && ch != 'E') {
         skipWs();
         return tb.finish();
       }
@@ -256,15 +259,15 @@ public final class JsonParser extends InputParser {
 
     // 'e' or 'E'
     tb.addByte((byte) consume());
-    c = curr();
-    if(c == '-' || c == '+') {
+    ch = curr();
+    if(ch == '-' || ch == '+') {
       tb.addByte((byte) consume());
-      c = curr();
+      ch = curr();
     }
 
-    if(c < '0' || c > '9') throw error("Exponent expected");
+    if(ch < '0' || ch > '9') throw error("Exponent expected");
     do tb.addByte((byte) consume());
-    while((c = curr()) >= '0' && c <= '9');
+    while((ch = curr()) >= '0' && ch <= '9');
     skipWs();
     return tb.finish();
   }
@@ -279,14 +282,14 @@ public final class JsonParser extends InputParser {
     tb.reset();
     char hi = 0; // cached high surrogate
     while(pos < length) {
-      int cp = consume();
-      if(cp == '"') {
+      int ch = consume();
+      if(ch == '"') {
         if(hi != 0) tb.add(hi);
         skipWs();
         return tb.finish();
       }
 
-      if(cp == '\\') {
+      if(ch == '\\') {
         if(!unescape) {
           if(hi != 0) {
             tb.add(hi);
@@ -300,32 +303,32 @@ public final class JsonParser extends InputParser {
           case '/':
           case '\\':
           case '"':
-            cp = n;
+            ch = n;
             break;
           case 'b':
-            cp = unescape ? '\b' : 'b';
+            ch = unescape ? '\b' : 'b';
             break;
           case 'f':
-            cp = unescape ? '\f' : 'f';
+            ch = unescape ? '\f' : 'f';
             break;
           case 't':
-            cp = unescape ? '\t' : 't';
+            ch = unescape ? '\t' : 't';
             break;
           case 'r':
-            cp = unescape ? '\r' : 'r';
+            ch = unescape ? '\r' : 'r';
             break;
           case 'n':
-            cp = unescape ? '\n' : 'n';
+            ch = unescape ? '\n' : 'n';
             break;
           case 'u':
             if(pos + 4 >= length) throw eof(", expected four-digit hex value");
             if(unescape) {
-              cp = 0;
+              ch = 0;
               for(int i = 0; i < 4; i++) {
                 final char x = consume();
-                if(x >= '0' && x <= '9')      cp = 16 * cp + x      - '0';
-                else if(x >= 'a' && x <= 'f') cp = 16 * cp + x + 10 - 'a';
-                else if(x >= 'A' && x <= 'F') cp = 16 * cp + x + 10 - 'A';
+                if(x >= '0' && x <= '9')      ch = 16 * ch + x      - '0';
+                else if(x >= 'a' && x <= 'f') ch = 16 * ch + x + 10 - 'a';
+                else if(x >= 'A' && x <= 'F') ch = 16 * ch + x + 10 - 'A';
                 else throw error("Illegal hexadecimal digit: '%'", x);
               }
             } else {
@@ -334,7 +337,7 @@ public final class JsonParser extends InputParser {
                 final char x = consume();
                 if(x >= '0' && x <= '9' || x >= 'a' && x <= 'f' || x >= 'A' && x <= 'F') {
                   if(i < 3) tb.addByte((byte) x);
-                  else cp = x;
+                  else ch = x;
                 } else throw error("Illegal hexadecimal digit: '%'", x);
               }
             }
@@ -342,19 +345,19 @@ public final class JsonParser extends InputParser {
           default:
             throw error("Unknown character escape: '\\%'", n);
         }
-      } else if(spec != JsonSpec.LIBERAL && cp <= 0x1F) {
-        throw error("Non-escaped control character: '\\%'", CTRL[cp]);
+      } else if(spec != JsonSpec.LIBERAL && ch <= 0x1F) {
+        throw error("Non-escaped control character: '\\%'", CTRL[ch]);
       }
 
       if(hi != 0) {
-        if(cp >= 0xDC00 && cp <= 0xDFFF)
-          cp = (hi - 0xD800 << 10) + cp - 0xDC00 + 0x10000;
+        if(ch >= 0xDC00 && ch <= 0xDFFF)
+          ch = (hi - 0xD800 << 10) + ch - 0xDC00 + 0x10000;
         else tb.add(hi);
         hi = 0;
       }
 
-      if(cp >= 0xD800 && cp <= 0xDBFF) hi = (char) cp;
-      else tb.add(cp);
+      if(ch >= 0xD800 && ch <= 0xDBFF) hi = (char) ch;
+      else tb.add(ch);
     }
     throw eof(" in string literal");
   }
@@ -379,15 +382,15 @@ public final class JsonParser extends InputParser {
   /**
    * Tries to consume the given character. If successful, following whitespace is skipped.
    * Otherwise if the error flag is set a parse error is thrown.
-   * @param c character to be consumed
+   * @param ch character to be consumed
    * @param err error flag
    * @return if the character was consumed
    * @throws QueryIOException parse error
    */
-  private boolean consumeWs(final char c, final boolean err) throws QueryIOException {
-    if(consume() != c) {
+  private boolean consumeWs(final char ch, final boolean err) throws QueryIOException {
+    if(consume() != ch) {
       pos--;
-      if(err) throw error("Expected '%', found '%'", c, curr());
+      if(err) throw error("Expected '%', found '%'", ch, curr());
       return false;
     }
     skipWs();

@@ -29,7 +29,8 @@ public class CsvOptions extends Options {
   /** CSV formats. */
   public static enum CsvFormat {
     /** Default.    */ DIRECT,
-    /** Attributes. */ ATTRIBUTES;
+    /** Attributes. */ ATTRIBUTES,
+    /** Map.        */ MAP;
 
     @Override
     public String toString() {

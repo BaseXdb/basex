@@ -28,7 +28,7 @@ final class DialogCsvParser extends DialogParser {
   private static final String EXAMPLE = "Name,Born,X?_\nJohn Adam,1984,";
 
   /** Options. */
-  private CsvParserOptions copts;
+  private final CsvParserOptions copts;
   /** JSON example. */
   private final Editor example;
   /** CSV: encoding. */
@@ -82,7 +82,9 @@ final class DialogCsvParser extends DialogParser {
 
     p.add(new BaseXLabel(FORMAT + COL, true, true));
     sl.reset();
-    for(final CsvFormat cf : CsvFormat.values()) sl.add(cf.toString());
+    final CsvFormat[] formats = CsvFormat.values();
+    final int fl = formats.length - 1;
+    for(int f = 0; f < fl; f++) sl.add(formats[f].toString());
     format = new BaseXCombo(d, sl.toArray());
     format.setSelectedItem(copts.get(CsvOptions.FORMAT));
     p.add(format);
