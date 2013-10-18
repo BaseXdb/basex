@@ -178,10 +178,9 @@
     </mailingList>
   </mailingLists>
 
-  <!--<developerConnection>scm:git:git@github.com:BaseXdb/basex.git</developerConnection>-->
   <scm>
     <connection>scm:git:git://github.com/BaseXdb/basex.git</connection>
-    <developerConnection>scm:git:file:///d:/basex/code/basex</developerConnection>
+    <developerConnection>scm:git:git@github.com:BaseXdb/basex.git</developerConnection>
     <url>https://github.com/BaseXdb/basex</url>
     <tag>HEAD</tag>
   </scm>
