@@ -19,7 +19,7 @@ public class JsonOptions extends Options {
   public static final BooleanOption LAX = new BooleanOption("lax", false);
   /** Option: parser specification. */
   public static final EnumOption<JsonSpec> SPEC =
-      new EnumOption<JsonSpec>("spec", JsonSpec.LIBERAL);
+      new EnumOption<JsonSpec>("spec", JsonSpec.RFC4627);
   /** Option: format. */
   public static final EnumOption<JsonFormat> FORMAT =
       new EnumOption<JsonFormat>("format", JsonFormat.DIRECT);
