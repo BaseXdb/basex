@@ -46,8 +46,8 @@ public abstract class FItem extends Item implements XQFunction {
    * @return coerced item
    * @throws QueryException query exception
    */
-  public abstract FItem coerceTo(final FuncType ft, final QueryContext ctx,
-      final InputInfo ii) throws QueryException;
+  public abstract FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii)
+      throws QueryException;
 
   @Override
   public final byte[] string(final InputInfo ii) throws QueryException {

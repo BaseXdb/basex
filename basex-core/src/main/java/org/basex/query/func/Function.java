@@ -451,6 +451,8 @@ public enum Function {
   _MAP_KEYS(FNMap.class, "keys(map)", arg(MAP_O), AAT_ZM, flag(X30)),
   /** XQuery function. */
   _MAP_COLLATION(FNMap.class, "collation(map)", arg(MAP_O), STR, flag(X30)),
+  /** XQuery function. */
+  _MAP_SERIALIZE(FNMap.class, "serialize(map)", arg(MAP_O), STR, flag(X30)),
 
   /* FNMath functions. */
 

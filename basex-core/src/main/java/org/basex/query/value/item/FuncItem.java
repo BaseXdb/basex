@@ -240,8 +240,8 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public FItem coerceTo(final FuncType ft, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
+  public FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
 
     if(vars.length != ft.args.length) throw Err.cast(ii, ft, this);
     return type.instanceOf(ft) ? this : coerce(ctx, ii, this, ft);

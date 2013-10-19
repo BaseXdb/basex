@@ -216,6 +216,18 @@ public final class Map extends FItem {
     return root.deep(ii, o.root);
   }
 
+  /**
+   * Returns a string representation of the map.
+   * @param ii input info
+   * @return string
+   * @throws QueryException query exception
+   */
+  public byte[] serialize(final InputInfo ii) throws QueryException {
+    final TokenBuilder tb = new TokenBuilder();
+    string(tb, 0, ii);
+    return tb.finish();
+  }
+
   @Override
   public HashMap<Object, Object> toJava() throws QueryException {
     final HashMap<Object, Object> map = new HashMap<Object, Object>();
@@ -253,6 +265,48 @@ public final class Map extends FItem {
       Util.notexpected(ex);
     }
     addPlan(plan, el);
+  }
+
+  /**
+   * Returns a string representation of the map.
+   * @param tb token builder
+   * @param level current level
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  private void string(final TokenBuilder tb, final int level, final InputInfo ii)
+      throws QueryException {
+
+    tb.add("{");
+    int c = 0;
+    for(final Item key : keys()) {
+      if(c++ > 0) tb.add(',');
+      tb.add('\n');
+      indent(tb, level + 1);
+      tb.add(key.toString());
+      tb.add(": ");
+      final Value v = get(key, ii);
+      if(v.size() != 1) tb.add('(');
+      int cc = 0;
+      for(final Item it : v) {
+        if(cc++ > 0) tb.add(", ");
+        if(it instanceof Map) ((Map) it).string(tb, level + 1, ii);
+        else tb.add(it.toString());
+      }
+      if(v.size() != 1) tb.add(')');
+    }
+    tb.add('\n');
+    indent(tb, level);
+    tb.add('}');
+  }
+
+  /**
+   * Adds some indentation.
+   * @param tb token builder
+   * @param level level
+   */
+  private void indent(final TokenBuilder tb, final int level) {
+    for(int l = 0; l < level; l++) tb.add("  ");
   }
 
   @Override
