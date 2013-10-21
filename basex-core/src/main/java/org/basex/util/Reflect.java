@@ -55,9 +55,9 @@ public final class Reflect {
    * Caches and returns a reference to the specified class, or throws an exception.
    * @param name fully qualified class name
    * @return class reference
-   * @throws Throwable any exception or error
+   * @throws ClassNotFoundException any exception or error
    */
-  public static Class<?> forName(final String name) throws Throwable {
+  public static Class<?> forName(final String name) throws ClassNotFoundException {
     return cache(name, Class.forName(name));
   }
 

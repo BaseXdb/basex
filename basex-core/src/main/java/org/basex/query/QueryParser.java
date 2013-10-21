@@ -776,7 +776,7 @@ public class QueryParser extends InputParser {
     // resolve module uri
     if(ctx.modules.addImport(uri, info(), this)) return;
 
-    error(NOMODULE, uri);
+    error(WHICHMODULE, uri);
   }
 
   /**
@@ -817,7 +817,7 @@ public class QueryParser extends InputParser {
     try {
       qu = string(io.read());
     } catch(final IOException ex) {
-      error(NOMODULEFILE, ctx.context.user.has(Perm.ADMIN) ? io.path() : io.name());
+      error(WHICHMODFILE, ctx.context.user.has(Perm.ADMIN) ? io.path() : io.name());
     }
 
     ctx.modStack.push(p);

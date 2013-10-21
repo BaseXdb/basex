@@ -936,13 +936,15 @@ public enum Err {
   /** XQST0057. */
   NSEMPTY(XQST, 57, "Namespace URI cannot be empty."),
   /** XQST0059. */
-  NOINST(XQST, 59, "Could not instantiate module '%'."),
+  INSTERR(XQST, 59, "Could not instantiate module '%'."),
   /** XQST0059. */
-  NOMODULE(XQST, 59, "Module \"%\" not found."),
+  WHICHMODULE(XQST, 59, "Module '%' not found."),
   /** XQST0059. */
-  MODINIT(XQST, 59, "Module '%' not initialized."),
+  WHICHCLASS(XQST, 59, "Class not found: '%'."),
   /** XQST0059. */
-  NOMODULEFILE(XQST, 59, "Could not retrieve module '%'."),
+  MODINITERR(XQST, 59, "Module not initialized: %."),
+  /** XQST0059. */
+  WHICHMODFILE(XQST, 59, "Could not retrieve module '%'."),
   /** XQST0059. */
   WRONGMODULE(XQST, 59, "Wrong URI '%' in imported module '%'."),
   /** XQST0060. */

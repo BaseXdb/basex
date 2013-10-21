@@ -1293,6 +1293,27 @@ public final class Token {
   }
 
   /**
+   * Converts the given string to camel case.
+   * @param string string to convert
+   * @return resulting string
+   */
+  public static String camelCase(final String string) {
+    final StringBuilder sb = new StringBuilder(string.length());
+    boolean dash = false;
+    for(int p = 0; p < string.length(); p++) {
+      final char ch = string.charAt(p);
+      if(dash) {
+        sb.append(Character.toUpperCase(ch));
+        dash = false;
+      } else {
+        dash = ch == '-';
+        if(!dash) sb.append(ch);
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
    * Returns a hex representation of the specified byte array.
    * @param val values to be mapped
    * @param uc upper case

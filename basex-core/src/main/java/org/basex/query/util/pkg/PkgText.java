@@ -86,5 +86,5 @@ public interface PkgText {
   /** No jars registered. */
   String NOJARS = "No jars specified";
   /** No public classes registered. */
-  String NOCLASS = "No public classes specified";
+  String NOCLASSES = "No public classes specified";
 }

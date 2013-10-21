@@ -103,8 +103,7 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
-   * Checks if all functions have been correctly declared, and initializes
-   * all function calls.
+   * Checks if all functions have been correctly declared, and initializes all function calls.
    * @param qc query context
    * @throws QueryException query exception
    */
@@ -131,7 +130,6 @@ public final class StaticFuncs extends ExprInfo {
           final int a = call.expr.length;
           (a == 1 ? FUNCTYPESG : FUNCTYPEPL).thrw(call.info, call.name.string(), a, exp);
         }
-
         // if not, indicate that function is unknown
         FUNCUNKNOWN.thrw(call.info, call.name.string());
       }

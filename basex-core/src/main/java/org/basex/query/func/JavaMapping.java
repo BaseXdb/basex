@@ -160,18 +160,18 @@ public abstract class JavaMapping extends Arr {
    * @return method if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private static Method getModMethod(final Object mod, final String path,
-      final String name, final long arity, final QueryContext ctx, final InputInfo ii)
-          throws QueryException {
+  private static Method getModMethod(final Object mod, final String path, final String name,
+      final long arity, final QueryContext ctx, final InputInfo ii) throws QueryException {
+
     // find method with identical name and arity
     Method meth = null;
     for(final Method m : mod.getClass().getMethods()) {
       if(m.getName().equals(name) && m.getParameterTypes().length == arity) {
-        if(meth != null) throw JAVAAMBIG.thrw(ii, path + ':' + name);
+        if(meth != null) JAVAAMBIG.thrw(ii, path + ':' + name);
         meth = m;
       }
     }
-    if(meth == null) throw FUNCJAVA.thrw(ii, path + ':' + name);
+    if(meth == null) FUNCJAVA.thrw(ii, path + ':' + name);
 
     // check if user has sufficient permissions to call the function
     Perm perm = Perm.ADMIN;
@@ -182,34 +182,13 @@ public abstract class JavaMapping extends Arr {
   }
 
   /**
-   * Converts a module URI to a path.
+   * Converts a module URI to a Java path.
    * @param uri module URI
    * @return module path
    */
   private static String toPath(final byte[] uri) {
     final String path = string(uri), p = ModuleLoader.uri2path(path);
     return p == null ? path : ModuleLoader.capitalize(p).replace("/", ".").substring(1);
-  }
-
-  /**
-   * Converts the given name to camel case.
-   * @param ln name to convert
-   * @return resulting name
-   */
-  private static String camelCase(final byte[] ln) {
-    final TokenBuilder tb = new TokenBuilder();
-    boolean dash = false;
-    for(int p = 0; p < ln.length; p += cl(ln, p)) {
-      final int ch = cp(ln, p);
-      if(dash) {
-        tb.add(Character.toUpperCase(ch));
-        dash = false;
-      } else {
-        dash = ch == '-';
-        if(!dash) tb.add(ch);
-      }
-    }
-    return tb.toString();
   }
 
   /**
@@ -229,10 +208,10 @@ public abstract class JavaMapping extends Arr {
     final boolean java = startsWith(uri, JAVAPREF);
 
     // rewrite function name: convert dashes to upper-case initials
-    final String name = camelCase(qname.local());
+    final String name = camelCase(string(qname.local()));
 
     // check imported Java modules
-    final String path = toPath(java ? substring(uri, JAVAPREF.length) : uri);
+    final String path = camelCase(toPath(java ? substring(uri, JAVAPREF.length) : uri));
 
     final Object jm  = ctx.modules.findImport(path);
     if(jm != null) {
@@ -245,11 +224,10 @@ public abstract class JavaMapping extends Arr {
 
     // check addressed class
     try {
-      final Class<?> clz = ctx.modules.findClass(path);
-      return new JavaFunc(ii, clz, name, args);
+      return new JavaFunc(ii, ctx.modules.findClass(path), name, args);
     } catch(final ClassNotFoundException ex) {
       // only throw exception if "java:" prefix was explicitly specified
-      if(java) throw FUNCJAVA.thrw(ii, uri);
+      if(java) FUNCJAVA.thrw(ii, path);
     } catch(final Throwable th) {
       throw JAVAINIT.thrw(ii, th);
     }

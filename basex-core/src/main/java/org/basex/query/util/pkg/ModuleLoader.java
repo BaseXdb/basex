@@ -100,7 +100,7 @@ public final class ModuleLoader {
     if(file.exists()) addURL(file);
 
     // try to create Java class instance
-    addJava(uriPath, uri, ii);
+    addJava(uriPath, ii);
     return true;
   }
 
@@ -214,27 +214,24 @@ public final class ModuleLoader {
   /**
    * Loads a Java class.
    * @param path file path
-   * @param uri original URI
    * @param ii input info
    * @throws QueryException query exception
    */
-  private void addJava(final String path, final byte[] uri, final InputInfo ii)
-      throws QueryException {
-
-    final String cp = path.replace('/', '.').substring(1);
+  private void addJava(final String path, final InputInfo ii) throws QueryException {
+    final String cp = camelCase(path.replace('/', '.').substring(1));
     Class<?> clz = null;
     try {
       clz = findClass(cp);
     } catch(final ClassNotFoundException ex) {
-      NOMODULE.thrw(ii, uri);
+      WHICHCLASS.thrw(ii, ex.getMessage());
       // expected exception
     } catch(final Throwable th) {
-      MODINIT.thrw(ii, th);
+      MODINITERR.thrw(ii, th);
     }
 
     final boolean qm = clz.getSuperclass() == QueryModule.class;
     final Object jm = Reflect.get(clz);
-    if(jm == null) NOINST.thrw(ii, cp);
+    if(jm == null) INSTERR.thrw(ii, cp);
 
     // add all public methods of the class (ignore methods from super classes)
     final ArrayList<Method> list = new ArrayList<Method>();
