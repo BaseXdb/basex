@@ -87,9 +87,15 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("<json type='array'><item/><item/></json>", "['','']", format);
     serialize("<json type='array'><item>x</item></json>", "['x']", format);
 
+    serialize("<json/>", "''", format, JsonSpec.LIBERAL);
+    serialize("<json>a</json>", "'a'", format, JsonSpec.LIBERAL);
+    serialize("<json type='number'>1</json>", "1", format, JsonSpec.LIBERAL);
+
     error("<json type='array'><_/></json>", format);
     error("<json type='array'><item type='number'>x</item></json>", format);
     error("<json type='array'><item type='boolean'>x</item></json>", format);
+    error("<json type='number'>x</json>", format, JsonSpec.LIBERAL);
+    error("<json/>", format);
   }
 
   /**

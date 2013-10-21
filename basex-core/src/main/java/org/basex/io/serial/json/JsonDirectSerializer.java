@@ -128,7 +128,7 @@ public final class JsonDirectSerializer extends JsonSerializer {
       print('{');
     } else if(eq(type, ARRAY)) {
       print('[');
-    } else if(level == 0) {
+    } else if(level == 0 && spec == JsonSpec.RFC4627) {
       error("<%> must be typed as \"%\" or \"%\"", JSON, OBJECT, ARRAY);
     }
   }

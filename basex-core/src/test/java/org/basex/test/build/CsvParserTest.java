@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
@@ -18,7 +19,7 @@ import org.junit.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class CsvTest extends SandboxTest {
+public final class CsvParserTest extends SandboxTest {
   /** Test CSV file. */
   private static final String FILE = "src/test/resources/input.csv";
   /** Temporary CSV file. */
@@ -47,7 +48,9 @@ public final class CsvTest extends SandboxTest {
    */
   @Before
   public void init() throws BaseXException {
-    new Set(MainOptions.CSVPARSER, "header=true").execute(context);
+    final CsvParserOptions copts = new CsvParserOptions();
+    copts.set(CsvOptions.HEADER, true);
+    new Set(MainOptions.CSVPARSER, copts).execute(context);
   }
 
   /**
@@ -92,10 +95,13 @@ public final class CsvTest extends SandboxTest {
    */
   @Test
   public void sep() throws Exception {
-    new Set(MainOptions.CSVPARSER, "separator=tab,header=true").execute(context);
+    CsvParserOptions copts = new CsvParserOptions();
+    copts.set(CsvOptions.SEPARATOR, "tab");
+    copts.set(CsvOptions.HEADER, true);
+    new Set(MainOptions.CSVPARSER, copts).execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("0", new XQuery("count(//Name)").execute(context));
-    new Set(MainOptions.CSVPARSER, "separator=;,header=true").execute(context);
+    copts.set(CsvOptions.SEPARATOR, ";");
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("0", new XQuery("count(//Name)").execute(context));
   }
