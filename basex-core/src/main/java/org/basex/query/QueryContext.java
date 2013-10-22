@@ -116,8 +116,8 @@ public final class QueryContext extends Proc {
 
   /** Number of successive tail calls. */
   public int tailCalls;
-  /** Maximum number of successive tail calls. */
-  public final int maxCalls;
+  /** Maximum number of successive tail calls (will be set before compilation). */
+  public int maxCalls;
   /** Counter for variable IDs. */
   public int varIDs;
 
@@ -165,7 +165,6 @@ public final class QueryContext extends Proc {
     context = ctx;
     nodes = ctx.current();
     inf = ctx.options.get(MainOptions.QUERYINFO) || Prop.debug;
-    maxCalls = ctx.options.get(MainOptions.TAILCALLS);
     modules = new ModuleLoader(ctx);
   }
 
@@ -221,6 +220,8 @@ public final class QueryContext extends Proc {
         BASX_VALUE.thrw(null, o.get(s), o.get(s + 1));
       }
     }
+    // set tail call option after assignment database option
+    maxCalls = context.options.get(MainOptions.TAILCALLS);
 
     // bind external variables
     vars.bindExternal(this, bindings);

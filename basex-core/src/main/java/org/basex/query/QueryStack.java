@@ -1,4 +1,5 @@
 package org.basex.query;
+
 import org.basex.query.value.Value;
 import org.basex.query.var.Var;
 import org.basex.util.InputInfo;
@@ -10,7 +11,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public class QueryStack {
+public final class QueryStack {
   /** Initial stack size. */
   private static final int INIT = 1 << 5;
   /** The stack. */
