@@ -27,7 +27,7 @@ import org.basex.util.options.*;
  */
 public final class FNSql extends StandardFunc {
   /** Module prefix. */
-  private static final String PREFIX = "zip";
+  private static final String PREFIX = "sql";
   /** QName. */
   private static final QNm Q_ROW = QNm.get(PREFIX, "row", SQLURI);
   /** QName. */
