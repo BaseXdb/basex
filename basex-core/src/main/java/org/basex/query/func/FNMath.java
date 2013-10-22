@@ -19,12 +19,14 @@ import org.basex.util.*;
 public final class FNMath extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNMath(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNMath(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override

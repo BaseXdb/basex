@@ -122,10 +122,12 @@ public final class CmpG extends Cmp {
    * @param e1 first expression
    * @param e2 second expression
    * @param o operator
+   * @param coll collation
    * @param ii input info
    */
-  public CmpG(final Expr e1, final Expr e2, final OpG o, final InputInfo ii) {
-    super(ii, e1, e2);
+  public CmpG(final Expr e1, final Expr e2, final OpG o, final Collation coll,
+      final InputInfo ii) {
+    super(ii, e1, e2, coll);
     op = o;
     type = SeqType.BLN;
   }
@@ -181,7 +183,7 @@ public final class CmpG extends Cmp {
     } else if(e1.type().eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
         op == OpG.NE && e2 == Bln.TRUE)) {
       // (A = false()) -> not(A)
-      e = Function.NOT.get(info, e1);
+      e = Function.NOT.get(null, info, e1);
       ctx.compInfo(OPTWRITE, this);
     } else {
       // rewrite path CMP number
@@ -214,7 +216,7 @@ public final class CmpG extends Cmp {
       if(it1 == null) return Bln.FALSE;
       final Item it2 = expr[1].item(ctx, info);
       if(it2 == null) return Bln.FALSE;
-      return Bln.get(eval(it1, it2, ctx.sc.collation));
+      return Bln.get(eval(it1, it2, collation));
     }
 
     final Iter ir1 = ctx.iter(expr[0]);
@@ -226,7 +228,7 @@ public final class CmpG extends Cmp {
 
     // evaluate single items
     if(s1 && expr[1].size() == 1)
-      return Bln.get(eval(ir1.next(), expr[1].item(ctx, info), ctx.sc.collation));
+      return Bln.get(eval(ir1.next(), expr[1].item(ctx, info), collation));
 
     Iter ir2 = ctx.iter(expr[1]);
     final long is2 = ir2.size();
@@ -236,14 +238,14 @@ public final class CmpG extends Cmp {
     final boolean s2 = is2 == 1;
 
     // evaluate single items
-    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next(), ctx.sc.collation));
+    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next(), collation));
 
     // evaluate iterator and single item
     Item it1, it2;
     if(s2) {
       it2 = ir2.next();
       while((it1 = ir1.next()) != null) {
-        if(eval(it1, it2, ctx.sc.collation)) return Bln.TRUE;
+        if(eval(it1, it2, collation)) return Bln.TRUE;
       }
       return Bln.FALSE;
     }
@@ -254,7 +256,7 @@ public final class CmpG extends Cmp {
       final ValueBuilder vb = new ValueBuilder();
       if((it1 = ir1.next()) != null) {
         while((it2 = ir2.next()) != null) {
-          if(eval(it1, it2, ctx.sc.collation)) return Bln.TRUE;
+          if(eval(it1, it2, collation)) return Bln.TRUE;
           vb.add(it2);
         }
       }
@@ -264,7 +266,7 @@ public final class CmpG extends Cmp {
     while((it1 = ir1.next()) != null) {
       ir2.reset();
       while((it2 = ir2.next()) != null) {
-        if(eval(it1, it2, ctx.sc.collation)) return Bln.TRUE;
+        if(eval(it1, it2, collation)) return Bln.TRUE;
       }
     }
     return Bln.FALSE;
@@ -290,7 +292,7 @@ public final class CmpG extends Cmp {
   @Override
   public CmpG invert() {
     return expr[0].size() != 1 || expr[1].size() != 1 ? this :
-      new CmpG(expr[0], expr[1], op.invert(), info);
+      new CmpG(expr[0], expr[1], op.invert(), collation, info);
   }
 
   /**
@@ -384,7 +386,8 @@ public final class CmpG extends Cmp {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CmpG(expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs), op, info);
+    final Expr a = expr[0].copy(ctx, scp, vs), b = expr[1].copy(ctx, scp, vs);
+    return new CmpG(a, b, op, collation, info);
   }
 
   @Override

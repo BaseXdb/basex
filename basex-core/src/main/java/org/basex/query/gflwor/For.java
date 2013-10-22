@@ -227,11 +227,11 @@ public final class For extends GFLWOR.Clause {
    */
   boolean toPred(final QueryContext ctx, final VarScope scp, final Expr p)
       throws QueryException {
-    if(empty || vars.length > 1 || !p.removable(var)) return false;
+    if(empty || !(vars.length == 1 && p.uses(var) && p.removable(var))) return false;
     final Expr r = p.inline(ctx, scp, var, new Context(info)), e = r == null ? p : r;
 
     // attach predicates to axis path or filter, or create a new filter
-    final Expr a = e.type().mayBeNumber() ? Function.BOOLEAN.get(info, e) : e;
+    final Expr a = e.type().mayBeNumber() ? Function.BOOLEAN.get(null, info, e) : e;
 
     // add to clause expression
     if(expr instanceof AxisPath) {

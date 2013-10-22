@@ -401,4 +401,18 @@ public abstract class Expr extends ExprInfo {
    * @return number of expressions
    */
   public abstract int exprSize();
+
+  /**
+   * Tries to push the given type check inside this expression.
+   * @param tc type check to push into the expression
+   * @param ctx query context
+   * @param scp variable scope
+   * @return the resulting expression if successful, {@code null} otherwise
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return null;
+  }
 }

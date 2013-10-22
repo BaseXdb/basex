@@ -36,15 +36,20 @@ import org.basex.util.options.*;
 public abstract class StandardFunc extends Arr {
   /** Function signature. */
   Function sig;
+  /** Static context. */
+  final StaticContext sc;
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param s function definition
    * @param args arguments
    */
-  protected StandardFunc(final InputInfo ii, final Function s, final Expr... args) {
+  protected StandardFunc(final StaticContext sctx, final InputInfo ii, final Function s,
+      final Expr... args) {
     super(ii, args);
+    sc = sctx;
     sig = s;
     type = sig.ret;
   }
@@ -80,7 +85,7 @@ public abstract class StandardFunc extends Arr {
     final int es = expr.length;
     final Expr[] arg = new Expr[es];
     for(int e = 0; e < es; e++) arg[e] = expr[e].copy(ctx, scp, vs);
-    return sig.get(info, arg);
+    return sig.get(sc, info, arg);
   }
 
   /**

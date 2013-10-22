@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
 import java.util.*;
@@ -35,6 +36,11 @@ public final class DynFuncCall extends FuncCall {
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     final int ar = expr.length - 1;
     final Expr f = expr[ar];
     final Type t = f.type().type;
@@ -43,8 +49,20 @@ public final class DynFuncCall extends FuncCall {
       if(ft.args != null && ft.args.length != ar) INVARITY.thrw(info, f, ar);
       if(ft.type != null) type = ft.type;
     }
-    // maps can only contain fully evaluated Values, so this is safe
-    return allAreValues() && f instanceof Map ? optPre(value(ctx), ctx) : this;
+
+    if(f instanceof XQFunction) {
+      // maps can only contain fully evaluated Values, so this is safe
+      if(allAreValues() && f instanceof Map) return optPre(value(ctx), ctx);
+
+      final Expr[] args = Arrays.copyOf(expr, expr.length - 1);
+      final Expr inl = ((XQFunction) f).inlineExpr(args, ctx, scp, info);
+      if(inl != null) {
+        // inline the function
+        ctx.compInfo(OPTINLINEFN, f);
+        return inl;
+      }
+    }
+    return this;
   }
 
   @Override

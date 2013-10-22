@@ -2,6 +2,7 @@ package org.basex.test.query.ast;
 
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -17,7 +18,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void idTest() {
     check("function($x) { $x }(42)",
         "42",
-        "exists(//" + Util.className(FuncItem.class) + ")"
+        "empty(//" + Util.className(InlineFunc.class) + ")"
     );
   }
 
@@ -26,7 +27,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void literalTest() {
     check("lower-case#1('FooBar')",
         "foobar",
-        "exists(//" + Util.className(FuncItem.class) + ")"
+        "empty(//" + Util.className(FuncLit.class) + ")"
     );
   }
 
@@ -35,7 +36,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void partAppTest() {
     check("starts-with('foobar', ?)('foo')",
         "true",
-        "exists(//" + Util.className(FuncItem.class) + ")"
+        "empty(//" + Util.className(PartFunc.class) + ")"
     );
   }
 
@@ -92,7 +93,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "declare function local:b() { 42 };" +
         "local:a#0()",
         "42",
-        "exists(//" + Util.className(FuncItem.class) + ")"
+        "empty(//" + Util.className(FuncLit.class) + ")"
     );
   }
 
@@ -147,6 +148,33 @@ public final class FuncItemTest extends QueryPlanTest {
         "return $id(42)",
         "42",
         "exists(//" + Util.className(FuncItem.class) + ")"
+    );
+  }
+
+  /** Checks in non-recursive function items are inlined. */
+  @Test
+  public void funcItemInlining() {
+    check("let $fold-left :=" +
+        "  function($f, $start, $seq) {" +
+        "    let $go :=" +
+        "      function($go, $acc, $xs) {" +
+        "        if(empty($xs)) then $acc" +
+        "        else $go($go, $f($acc, head($xs)), tail($xs))" +
+        "      }" +
+        "    return $go($go, $start, $seq)" +
+        "  }" +
+        "return $fold-left(function($a,$b) {$a + $b}, 0, 1 to 100000)",
+
+        "5000050000",
+
+        // all inline functions are pre-compiled
+        "empty(//" + Util.className(InlineFunc.class) + ")",
+        // the outer function item was inlined and removed
+        "every $f in //" + Util.className(FuncItem.class) + " satisfies $f/*[1]/@name = '$go'",
+        // the addition function was inlined
+        "count(//" + Util.className(DynFuncCall.class) + ") = 3",
+        // there are only three variables left
+        "count(distinct-values(//" + Util.className(Var.class) + "/@id)) = 3"
     );
   }
 }

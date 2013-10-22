@@ -23,12 +23,14 @@ import org.basex.util.list.*;
 public final class FNNode extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNNode(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNNode(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -56,7 +58,7 @@ public final class FNNode extends StandardFunc {
         Uri base = Uri.EMPTY;
         ANode n = node;
         do {
-          if(n == null) return ctx.sc.baseURI().resolve(base, info);
+          if(n == null) return sc.baseURI().resolve(base, info);
           final Uri bu = Uri.uri(n.baseURI(), false);
           if(!bu.isValid()) FUNCAST.thrw(ii, bu.type, bu);
           base = bu.resolve(base, info);

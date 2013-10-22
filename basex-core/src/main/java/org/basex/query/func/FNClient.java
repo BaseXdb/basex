@@ -30,12 +30,14 @@ public final class FNClient extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNClient(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNClient(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -144,7 +146,7 @@ public final class FNClient extends StandardFunc {
       // evaluate query
       while(cq.more()) {
         final String result = cq.next();
-        vb.add(cq.type().castString(result, ctx, info));
+        vb.add(cq.type().castString(result, ctx, sc, info));
       }
       return vb.value();
     } catch(final QueryIOException ex) {

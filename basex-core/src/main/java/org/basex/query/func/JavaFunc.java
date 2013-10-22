@@ -29,13 +29,15 @@ public final class JavaFunc extends JavaMapping {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param c Java class
    * @param m Java method/field
    * @param a arguments
    */
-  JavaFunc(final InputInfo ii, final Class<?> c, final String m, final Expr[] a) {
-    super(ii, a);
+  JavaFunc(final StaticContext sctx, final InputInfo ii, final Class<?> c, final String m,
+      final Expr[] a) {
+    super(sctx, ii, a);
     cls = c;
     mth = m;
   }
@@ -59,7 +61,7 @@ public final class JavaFunc extends JavaMapping {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new JavaFunc(info, cls, mth, copyAll(ctx, scp, vs, expr));
+    return new JavaFunc(sc, info, cls, mth, copyAll(ctx, scp, vs, expr));
   }
 
   /**
@@ -101,7 +103,11 @@ public final class JavaFunc extends JavaMapping {
         Object inst = null;
         if(!st) {
           inst = instObj(ar[0]);
-          if(inst instanceof QueryModule) ((QueryModule) inst).context = ctx;
+          if(inst instanceof QueryModule) {
+            final QueryModule mod = (QueryModule) inst;
+            mod.staticContext = sc;
+            mod.context = ctx;
+          }
         }
         return meth.invoke(inst, arg);
       }

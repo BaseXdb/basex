@@ -28,12 +28,14 @@ import org.basex.util.*;
 public final class FNSeq extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNSeq(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNSeq(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -243,7 +245,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter indexOf(final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[1], ctx);
-    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx);
+    final Collation coll = checkColl(expr.length == 3 ? expr[2] : null, ctx, sc);
 
     return new Iter() {
       final Iter ir = expr[0].iter(ctx);
@@ -268,7 +270,7 @@ public final class FNSeq extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter distinctValues(final QueryContext ctx) throws QueryException {
-    final Collation coll = checkColl(expr.length == 2 ? expr[1] : null, ctx);
+    final Collation coll = checkColl(expr.length == 2 ? expr[1] : null, ctx, sc);
     if(expr[0] instanceof RangeSeq) return expr[0].iter(ctx);
 
     return new Iter() {

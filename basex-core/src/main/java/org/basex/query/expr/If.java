@@ -55,9 +55,17 @@ public final class If extends Arr {
         expr[e] = expr[e].compile(ctx, scp);
       } catch(final QueryException ex) {
         // replace original expression with error
-        expr[e] = FNInfo.error(ex);
+        expr[e] = FNInfo.error(ex, type);
       }
     }
+
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+    // static condition: return branch in question
+    if(cond.isValue()) return optPre(eval(ctx), ctx);
 
     // if A then B else B -> B (errors in A will be ignored)
     if(expr[0].sameAs(expr[1])) return optPre(expr[0], ctx);
@@ -81,7 +89,7 @@ public final class If extends Arr {
     // if A then B else true() -> not(A) or B
     if(expr[0].type().eq(SeqType.BLN) && expr[1] == Bln.TRUE) {
       ctx.compInfo(OPTWRITE, this);
-      final Expr e = Function.NOT.get(info, cond);
+      final Expr e = Function.NOT.get(null, info, cond);
       return expr[0] == Bln.FALSE ? e : new Or(info, e, expr[0]);
     }
 
@@ -141,7 +149,7 @@ public final class If extends Arr {
       try {
         nw = expr[i].inline(ctx, scp, v, e);
       } catch(final QueryException qe) {
-        nw = FNInfo.error(qe);
+        nw = FNInfo.error(qe, type);
       }
       if(nw != null) {
         expr[i] = nw;
@@ -195,5 +203,12 @@ public final class If extends Arr {
     int sz = 1;
     for(final Expr e : expr) sz += e.exprSize();
     return sz + cond.exprSize();
+  }
+
+  @Override
+  public Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    for(int i = 0; i < expr.length; i++) expr[i] = tc.check(expr[i], ctx, scp);
+    return optimize(ctx, scp);
   }
 }

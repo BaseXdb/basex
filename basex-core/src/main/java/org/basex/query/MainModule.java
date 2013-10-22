@@ -30,9 +30,11 @@ public class MainModule extends StaticScope {
    * @param rt root expression
    * @param scp variable scope
    * @param xqdoc documentation
+   * @param sctx static context
    */
-  public MainModule(final Expr rt, final VarScope scp, final String xqdoc) {
-    this(rt, scp, null, xqdoc, null);
+  public MainModule(final Expr rt, final VarScope scp, final String xqdoc,
+      final StaticContext sctx) {
+    this(rt, scp, null, xqdoc, sctx, null);
   }
 
   /**
@@ -41,12 +43,13 @@ public class MainModule extends StaticScope {
    * @param scp variable scope
    * @param xqdoc documentation
    * @param type optional type
+   * @param sctx static context
    * @param ii input info
    */
   public MainModule(final Expr rt, final VarScope scp, final SeqType type,
-      final String xqdoc, final InputInfo ii) {
+      final String xqdoc, final StaticContext sctx, final InputInfo ii) {
 
-    super(scp, xqdoc, ii);
+    super(scp, xqdoc, sctx, ii);
     expr = rt;
     declType = type;
   }

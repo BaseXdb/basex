@@ -8,6 +8,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -19,12 +20,14 @@ import org.basex.util.*;
 public final class FNInfo extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNInfo(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNInfo(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override
@@ -68,7 +71,7 @@ public final class FNInfo extends StandardFunc {
     if(it == null) {
       if(al == 1) INVEMPTY.thrw(info, description());
     } else {
-      name = checkQNm(it, ctx);
+      name = checkQNm(it, ctx, sc);
     }
     if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
     final Value val = al > 2 ? ctx.value(expr[2]) : null;
@@ -145,9 +148,13 @@ public final class FNInfo extends StandardFunc {
   /**
    * Creates an error function instance.
    * @param ex query exception
+   * @param tp type of the expression
    * @return function
    */
-  public static FNInfo error(final QueryException ex) {
-    return new FNInfo(ex.info(), ERROR, ex.qname(), Str.get(ex.getLocalizedMessage()));
+  public static FNInfo error(final QueryException ex, final SeqType tp) {
+    final FNInfo err = new FNInfo(null, ex.info(), ERROR, ex.qname(),
+        Str.get(ex.getLocalizedMessage()));
+    err.type = tp;
+    return err;
   }
 }

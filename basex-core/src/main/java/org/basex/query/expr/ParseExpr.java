@@ -147,7 +147,7 @@ public abstract class ParseExpr extends Expr {
    * @return expression
    */
   public static final Expr compBln(final Expr e, final InputInfo ii) {
-    return e.type().eq(SeqType.BLN) ? e : Function.BOOLEAN.get(ii, e);
+    return e.type().eq(SeqType.BLN) ? e : Function.BOOLEAN.get(null, ii, e);
   }
 
   // VALIDITY CHECKS ==========================================================
@@ -286,11 +286,13 @@ public abstract class ParseExpr extends Expr {
    * Checks if the specified collation is supported.
    * @param e expression to be checked
    * @param ctx query context
+   * @param sc static context
    * @return collator, or {@code null} (default collation)
    * @throws QueryException query exception
    */
-  public final Collation checkColl(final Expr e, final QueryContext ctx) throws QueryException {
-    return Collation.get(e == null ? null : checkStr(e, ctx), ctx, info, WHICHCOLL);
+  public final Collation checkColl(final Expr e, final QueryContext ctx, final StaticContext sc)
+      throws QueryException {
+    return Collation.get(e == null ? null : checkStr(e, ctx), ctx, sc, info, WHICHCOLL);
   }
 
   /**
@@ -400,14 +402,16 @@ public abstract class ParseExpr extends Expr {
    * an exception.
    * @param e expression to be checked
    * @param ctx query context
+   * @param sc static context
    * @return specified item
    * @throws QueryException query exception
    */
-  public final QNm checkQNm(final Expr e, final QueryContext ctx) throws QueryException {
+  public final QNm checkQNm(final Expr e, final QueryContext ctx, final StaticContext sc)
+      throws QueryException {
 
     final Item it = checkItem(e, ctx);
     if(it.type == AtomType.QNM) return (QNm) it;
-    if(it.type.isUntyped() && ctx.sc.xquery3()) NSSENS.thrw(info, it.type, AtomType.QNM);
+    if(it.type.isUntyped() && sc.xquery3()) NSSENS.thrw(info, it.type, AtomType.QNM);
     throw Err.INVCAST.thrw(info, it.type, AtomType.QNM);
   }
 

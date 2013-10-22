@@ -13,8 +13,6 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public abstract class StaticDecl extends StaticScope {
-  /** Static context of this declaration. */
-  public final StaticContext sc;
   /** Annotations. */
   public final Ann ann;
   /** This declaration's name. */
@@ -38,8 +36,7 @@ public abstract class StaticDecl extends StaticScope {
   public StaticDecl(final StaticContext sctx, final Ann a, final QNm nm, final SeqType t,
       final VarScope scp, final String xqdoc, final InputInfo ii) {
 
-    super(scp, xqdoc, ii);
-    sc = sctx;
+    super(scp, xqdoc, sctx, ii);
     ann = a == null ? new Ann() : a;
     name = nm;
     declType = t;

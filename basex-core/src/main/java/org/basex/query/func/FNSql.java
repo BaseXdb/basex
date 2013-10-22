@@ -72,12 +72,14 @@ public final class FNSql extends StandardFunc {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNSql(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNSql(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override

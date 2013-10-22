@@ -116,9 +116,6 @@ public final class InlineFunc extends Single implements Scope {
     for(final Entry<Var, Expr> e : scope.closure().entrySet())
       e.setValue(e.getValue().compile(ctx, scp));
 
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
-
     final int fp = scope.enter(ctx);
     try {
       // constant propagation
@@ -127,11 +124,10 @@ public final class InlineFunc extends Single implements Scope {
 
       expr = expr.compile(ctx, scope);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe);
+      expr = FNInfo.error(qe, ret != null ? ret : expr.type());
     } finally {
       scope.cleanUp(this);
       scope.exit(ctx, fp);
-      ctx.sc = cs;
     }
 
     // convert all function calls in tail position to proper tail calls
@@ -171,9 +167,6 @@ public final class InlineFunc extends Single implements Scope {
       }
     }
 
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
-
     if(val) {
       final int fp = scope.enter(ctx);
       try {
@@ -182,11 +175,10 @@ public final class InlineFunc extends Single implements Scope {
           if(inl != null) expr = inl;
         }
       } catch(final QueryException qe) {
-        expr = FNInfo.error(qe);
+        expr = FNInfo.error(qe, ret != null ? ret : expr.type());
       } finally {
         scope.cleanUp(this);
         scope.exit(ctx, fp);
-        ctx.sc = cs;
       }
     }
 
@@ -198,7 +190,9 @@ public final class InlineFunc extends Single implements Scope {
     final VarScope v = scope.copy(cx, scp, vs);
     final Var[] a = args.clone();
     for(int i = 0; i < a.length; i++) a[i] = vs.get(a[i].id);
-    return copyType(new InlineFunc(info, name, ret, a, expr.copy(cx, v, vs), ann, sc, v));
+    final Expr e = expr.copy(cx, v, vs);
+    e.markTailCalls();
+    return copyType(new InlineFunc(info, name, ret, a, e, ann, sc, v));
   }
 
   @Override
@@ -211,7 +205,7 @@ public final class InlineFunc extends Single implements Scope {
     for(final Entry<Var, Expr> e : scope.closure().entrySet())
       clos.put(e.getKey(), e.getValue().value(ctx));
 
-    return new FuncItem(args, expr, ft, clos, c, scope, ctx.sc);
+    return new FuncItem(args, expr, ft, clos, c, scope, sc);
   }
 
   @Override

@@ -85,7 +85,7 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope o, final IntObjMap<Var> vs) {
-    final VarScope scp = new VarScope();
+    final VarScope scp = new VarScope(sc);
     final Var[] arg = new Var[args.length];
     for(int i = 0; i < arg.length; i++)
       vs.put(args[i].id, arg[i] = scp.newCopyOf(ctx, args[i]));
@@ -103,18 +103,19 @@ public final class FuncLit extends Single implements Scope {
    * @param nm function name
    * @param ar function arity
    * @param ctx query context
+   * @param sctx static context
    * @param ii input info
    * @return function literal
    * @throws QueryException query exception
    */
   public static FuncLit unknown(final QNm nm, final long ar, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
-    final VarScope scp = new VarScope();
+      final StaticContext sctx, final InputInfo ii) throws QueryException {
+    final VarScope scp = new VarScope(sctx);
     final FuncType temp = FuncType.arity((int) ar);
     final Var[] arg = new Var[(int) ar];
     final Expr[] refs = temp.args(arg, ctx, scp, ii);
-    final TypedFunc call = ctx.funcs.getFuncRef(nm, refs, ctx.sc, ii);
-    return new FuncLit(nm, arg, call.fun, null, scp, ctx.sc, ii);
+    final TypedFunc call = ctx.funcs.getFuncRef(nm, refs, sctx, ii);
+    return new FuncLit(nm, arg, call.fun, null, scp, sctx, ii);
   }
 
   @Override

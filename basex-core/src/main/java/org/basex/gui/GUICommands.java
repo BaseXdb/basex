@@ -850,6 +850,7 @@ public enum GUICommands implements GUICmd {
    * @return function string
    */
   static String openPre(final Nodes n, final int i) {
-    return Function._DB_OPEN_PRE.get(Str.get(n.data.meta.name), Int.get(n.pres[i])).toString();
+    return Function._DB_OPEN_PRE.get(null, Str.get(n.data.meta.name),
+        Int.get(n.pres[i])).toString();
   }
 }

@@ -220,7 +220,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       for(int s = 0; s < path.size; s++) {
         final Matcher m = TEMPLATE.matcher(path.segment[s]);
         if(!m.find()) continue;
-        final QNm qnm = new QNm(token(m.group(1)), context);
+        final QNm qnm = new QNm(token(m.group(1)), function.sc);
         bind(qnm, arg, new Atm(http.segment(s)));
       }
     }
@@ -356,7 +356,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     final byte[] vn = token(m.group(1));
     if(!XMLToken.isQName(vn)) error(INV_VARNAME, vn);
     final QNm name = new QNm(vn);
-    if(name.hasPrefix()) name.uri(context.sc.ns.uri(name.prefix()));
+    if(name.hasPrefix()) name.uri(function.sc.ns.uri(name.prefix()));
     int r = -1;
     while(++r < args.length && !args[r].name.eq(name));
     if(r == args.length) error(UNKNOWN_VAR, vn);
@@ -432,7 +432,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       // casts and binds the value
       final SeqType decl = var.declaredType();
       final Value val = value.type().instanceOf(decl) ? value :
-        decl.cast(value, context, null, var);
+        decl.cast(value, context, function.sc, null, var);
       args[i] = var.checkType(val, context, null);
       break;
     }
@@ -504,7 +504,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     if(!err.equals("*")) {
       final byte[] c = token(err);
       if(!XMLToken.isQName(c)) error(INV_CODE, c);
-      code = new QNm(c, context);
+      code = new QNm(c, function.sc);
       if(!code.hasURI() && code.hasPrefix()) error(INV_NONS, code);
     }
     // message

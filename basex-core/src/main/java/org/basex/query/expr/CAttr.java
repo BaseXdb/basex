@@ -26,13 +26,15 @@ public final class CAttr extends CName {
 
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param c computed construction flag
    * @param n name
    * @param v attribute values
    */
-  public CAttr(final InputInfo ii, final boolean c, final Expr n, final Expr... v) {
-    super(ATTRIBUTE, ii, n, v);
+  public CAttr(final StaticContext sctx, final InputInfo ii, final boolean c,
+      final Expr n, final Expr... v) {
+    super(ATTRIBUTE, sctx, ii, n, v);
     comp = c;
     type = SeqType.ATT;
   }
@@ -62,6 +64,7 @@ public final class CAttr extends CName {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new CAttr(info, comp, name.copy(ctx, scp, vs), copyAll(ctx, scp, vs, expr));
+    return new CAttr(sc, info, comp, name.copy(ctx, scp, vs),
+        copyAll(ctx, scp, vs, expr));
   }
 }

@@ -34,8 +34,8 @@ public final class MapType extends FuncType {
   }
 
   @Override
-  public Map cast(final Item it, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Map cast(final Item it, final QueryContext ctx, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
     if(it instanceof Map) {
       final Map m = (Map) it;
       if(m.hasType(this)) return m;

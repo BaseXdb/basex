@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Flag;
+import org.basex.query.gflwor.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -17,6 +18,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * A static user-defined function.
@@ -66,20 +68,17 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     compiling = compiled = true;
 
     final Value cv = ctx.value;
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
     ctx.value = null;
 
     final int fp = scope.enter(ctx);
     try {
       expr = expr.compile(ctx, scope);
     } catch(final QueryException qe) {
-      expr = FNInfo.error(qe);
+      expr = FNInfo.error(qe, expr.type());
     } finally {
       scope.cleanUp(this);
       scope.exit(ctx, fp);
       ctx.value = cv;
-      ctx.sc = cs;
     }
 
     // convert all function calls in tail position to proper tail calls
@@ -169,8 +168,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
     // reset context and evaluate function
     final Value cv = ctx.value;
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
     ctx.value = null;
     final int fp = scope.enter(ctx);
     try {
@@ -178,11 +175,10 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       final Item it = expr.item(ctx, ii);
       final Value v = it == null ? Empty.SEQ : it;
       // optionally promote return value to target type
-      return cast ? declType.funcConvert(ctx, ii, v).item(ctx, ii) : it;
+      return cast ? declType.funcConvert(ctx, sc, ii, v).item(ctx, ii) : it;
     } finally {
       scope.exit(ctx, fp);
       ctx.value = cv;
-      ctx.sc = cs;
     }
   }
 
@@ -191,19 +187,16 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       final Value... arg) throws QueryException {
     // reset context and evaluate function
     final Value cv = ctx.value;
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
     ctx.value = null;
     final int fp = scope.enter(ctx);
     try {
       addArgs(ctx, ii, arg);
       final Value v = ctx.value(expr);
       // optionally promote return value to target type
-      return cast ? declType.funcConvert(ctx, info, v) : v;
+      return cast ? declType.funcConvert(ctx, sc, info, v) : v;
     } finally {
       scope.exit(ctx, fp);
       ctx.value = cv;
-      ctx.sc = cs;
     }
   }
 
@@ -283,5 +276,26 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public byte[] id() {
     return StaticFuncs.sig(name, args.length);
+  }
+
+  @Override
+  public Expr inlineExpr(final Expr[] exprs, final QueryContext ctx, final VarScope scp,
+      final InputInfo ii) throws QueryException {
+    if(!inline(ctx)) return null;
+    // create let bindings for all variables
+    final LinkedList<GFLWOR.Clause> cls = exprs.length == 0 ? null :
+      new LinkedList<GFLWOR.Clause>();
+    final IntObjMap<Var> vs = new IntObjMap<Var>();
+    for(int i = 0; i < args.length; i++) {
+      final Var old = args[i], v = scp.newCopyOf(ctx, old);
+      vs.put(old.id, v);
+      cls.add(new Let(v, exprs[i], false, info).optimize(ctx, scp));
+    }
+
+    // copy the function body
+    final Expr cpy = expr.copy(ctx, scp, vs), rt = !cast ? cpy :
+      new TypeCheck(sc, info, cpy, declType, true).optimize(ctx, scp);
+
+    return cls == null ? rt : new GFLWOR(info, cls, rt).optimize(ctx, scp);
   }
 }

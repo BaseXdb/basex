@@ -57,12 +57,12 @@ public final class StaticVar extends StaticDecl {
 
   /**
    * Constructor for implicitly declared external variables.
-   * @param ctx query context
+   * @param sctx static context
    * @param nm variable name
    * @param ii input info
    */
-  public StaticVar(final QueryContext ctx, final QNm nm, final InputInfo ii) {
-    super(ctx.sc, null, nm, null, new VarScope(), null, ii);
+  public StaticVar(final StaticContext sctx, final QNm nm, final InputInfo ii) {
+    super(sctx, null, nm, null, new VarScope(sctx), null, ii);
     expr = null;
     external = true;
     lazy = false;
@@ -72,12 +72,9 @@ public final class StaticVar extends StaticDecl {
   @Override
   public void compile(final QueryContext ctx) throws QueryException {
     if(expr == null) throw (implicit ? VARUNDEF : VAREMPTY).thrw(info, this);
-    if(dontEnter) throw circVar(ctx, this);
+    if(dontEnter) throw circVar(this);
 
     if(!compiled) {
-      final StaticContext cs = ctx.sc;
-      ctx.sc = sc;
-
       dontEnter = true;
       final int fp = scope.enter(ctx);
       try {
@@ -85,14 +82,13 @@ public final class StaticVar extends StaticDecl {
       } catch(final QueryException qe) {
         compiled = true;
         if(lazy) {
-          expr = FNInfo.error(qe);
+          expr = FNInfo.error(qe, expr.type());
           return;
         }
         throw qe.notCatchable();
       } finally {
         scope.cleanUp(this);
         scope.exit(ctx, fp);
-        ctx.sc = cs;
         dontEnter = false;
       }
 
@@ -108,12 +104,10 @@ public final class StaticVar extends StaticDecl {
    * @throws QueryException query exception
    */
   public Value value(final QueryContext ctx) throws QueryException {
-    if(dontEnter) circVar(ctx, this);
+    if(dontEnter) circVar(this);
     if(lazy) {
       if(!compiled) throw Util.notexpected(this + " was not compiled.");
       if(value != null) return value;
-      final StaticContext cs = ctx.sc;
-      ctx.sc = sc;
       dontEnter = true;
       final int fp = scope.enter(ctx);
       try {
@@ -122,7 +116,6 @@ public final class StaticVar extends StaticDecl {
         throw qe.notCatchable();
       } finally {
         scope.exit(ctx, fp);
-        ctx.sc = cs;
         dontEnter = false;
       }
     }
@@ -131,13 +124,10 @@ public final class StaticVar extends StaticDecl {
     if(expr == null) throw VAREMPTY.thrw(info, this);
     dontEnter = true;
     final int fp = scope.enter(ctx);
-    final StaticContext cs = ctx.sc;
-    ctx.sc = sc;
     try {
       return bind(expr.value(ctx));
     } finally {
       scope.exit(ctx, fp);
-      ctx.sc = cs;
       dontEnter = false;
     }
   }
@@ -177,7 +167,7 @@ public final class StaticVar extends StaticDecl {
     if(e instanceof Value) {
       Value v = (Value) e;
       if(ext && declType != null && !declType.instance(v))
-        v = declType.cast(v, ctx, ii, e);
+        v = declType.cast(v, ctx, sc, ii, e);
       bind(v);
     } else {
       expr = checkType(e, ii);

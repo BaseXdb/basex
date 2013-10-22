@@ -64,7 +64,7 @@ public abstract class Inspect {
     try {
       final String input = string(io.read());
       // parse query
-      final QueryParser qp = new QueryParser(input, io.path(), qc);
+      final QueryParser qp = new QueryParser(input, io.path(), qc, null);
       module = QueryProcessor.isLibrary(input) ? qp.parseLibrary(true) : qp.parseMain();
       return qp;
     } catch(final IOException ex) {

@@ -27,6 +27,8 @@ public final class QueryProcessor extends Proc {
   private static final Pattern LIBMOD_PATTERN = Pattern.compile(
   "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module namespace.*");
 
+  /** Static context. */
+  public final StaticContext sc;
   /** Expression context. */
   public final QueryContext ctx;
   /** Query. */
@@ -44,6 +46,7 @@ public final class QueryProcessor extends Proc {
   public QueryProcessor(final String qu, final Context cx) {
     query = qu;
     ctx = proc(new QueryContext(cx));
+    sc = new StaticContext(cx.options.get(MainOptions.XQUERY3));
   }
 
   /**
@@ -53,7 +56,7 @@ public final class QueryProcessor extends Proc {
   public void parse() throws QueryException {
     if(parsed) return;
     parsed = true;
-    ctx.parseMain(query, null);
+    ctx.parseMain(query, null, sc);
     updating = ctx.updating;
   }
 
@@ -146,7 +149,7 @@ public final class QueryProcessor extends Proc {
    * @throws QueryException query exception
    */
   public QueryProcessor context(final Object value, final String type) throws QueryException {
-    ctx.context(value, type);
+    ctx.context(value, type, sc);
     return this;
   }
 
@@ -170,7 +173,7 @@ public final class QueryProcessor extends Proc {
    * @throws QueryException query exception
    */
   public QueryProcessor namespace(final String prefix, final String uri) throws QueryException {
-    ctx.sc.namespace(prefix, uri);
+    sc.namespace(prefix, uri);
     return this;
   }
 

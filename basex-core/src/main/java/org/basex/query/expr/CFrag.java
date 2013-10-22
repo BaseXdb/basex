@@ -13,13 +13,17 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class CFrag extends Arr {
+  /** Static context. */
+  final StaticContext sc;
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param n name
    */
-  CFrag(final InputInfo ii, final Expr... n) {
+  CFrag(final StaticContext sctx, final InputInfo ii, final Expr... n) {
     super(ii, n);
+    sc = sctx;
     size = 1;
   }
 

@@ -82,7 +82,7 @@ public final class CmpN extends Cmp {
    * @param ii input info
    */
   public CmpN(final Expr e1, final Expr e2, final OpN o, final InputInfo ii) {
-    super(ii, e1, e2);
+    super(ii, e1, e2, null);
     op = o;
     type = SeqType.BLN_ZO;
   }

@@ -41,7 +41,7 @@ public final class QuerySuggest extends QueryParser {
    */
   public QuerySuggest(final String q, final QueryContext c, final Data d)
       throws QueryException {
-    super(q, null, c);
+    super(q, null, c, null);
     data = d;
     checkInit();
   }

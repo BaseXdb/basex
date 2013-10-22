@@ -49,9 +49,15 @@ public abstract class Preds extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+    for(int p = 0; p < preds.length; ++p)
+      preds[p] = preds[p].compile(ctx, scp).compEbv(ctx);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     for(int p = 0; p < preds.length; ++p) {
-      Expr pr = preds[p].compile(ctx, scp).compEbv(ctx);
-      pr = Pos.get(OpV.EQ, pr, pr, info);
+      Expr pr = Pos.get(OpV.EQ, preds[p], preds[p], info);
 
       // position() = last() -> last()
       if(pr instanceof CmpG || pr instanceof CmpV) {
@@ -82,7 +88,7 @@ public abstract class Preds extends ParseExpr {
         for(final Expr e : Arrays.asList(preds).subList(0, p)) tmp.add(e);
         for(final Expr a : and) {
           // wrap test with boolean() if the result is numeric
-          tmp.add(Function.BOOLEAN.get(info, a).compEbv(ctx));
+          tmp.add(Function.BOOLEAN.get(null, info, a).compEbv(ctx));
         }
         for(final Expr e : Arrays.asList(preds).subList(p + 1, preds.length)) tmp.add(e);
         preds = tmp.finish();

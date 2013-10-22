@@ -18,9 +18,10 @@ public class LibraryModule extends StaticScope {
    * Constructor.
    * @param nm of library
    * @param xqdoc documentation
+   * @param sctx static context
    */
-  public LibraryModule(final QNm nm, final String xqdoc) {
-    super(null, xqdoc, null);
+  public LibraryModule(final QNm nm, final String xqdoc, final StaticContext sctx) {
+    super(null, xqdoc, sctx, null);
     name = nm;
   }
 

@@ -106,11 +106,13 @@ public final class QueryResources {
    * Evaluates {@code fn:doc()}: opens an existing database document, or creates a new
    * database and node.
    * @param qi query input
+   * @param baseIO base URI
    * @param info input info
    * @return document
    * @throws QueryException query exception
    */
-  public DBNode doc(final QueryInput qi, final InputInfo info) throws QueryException {
+  public DBNode doc(final QueryInput qi, final IO baseIO, final InputInfo info)
+      throws QueryException {
     // check currently opened databases
     for(int d = 0; d < datas; ++d) {
       final Data dt = data[d];
@@ -126,7 +128,7 @@ public final class QueryResources {
 
     // open new database, or create new instance
     Data dt = open(qi);
-    if(dt == null) dt = create(qi, true, info);
+    if(dt == null) dt = create(qi, true, baseIO, info);
     return doc(dt, qi, info);
   }
 
@@ -145,15 +147,16 @@ public final class QueryResources {
    * Evaluates {@code fn:collection()}: opens an existing database collection, or creates
    * a new data reference.
    * @param input collection path
+   * @param baseIO base URI
    * @param info input info
    * @return collection
    * @throws QueryException query exception
    */
-  public Value collection(final String input, final InputInfo info) throws QueryException {
+  public Value collection(final String input, final IO baseIO, final InputInfo info)
+      throws QueryException {
 
     // merge input with base directory
-    final IO base = ctx.sc.baseIO();
-    final String in = base != null ? base.merge(input).path() : null;
+    final String in = baseIO != null ? baseIO.merge(input).path() : null;
 
     // check currently opened collections
     if(in != null) {
@@ -180,7 +183,7 @@ public final class QueryResources {
 
     // open new database, or create new instance
     if(dt == null) dt = open(qi);
-    if(dt == null) dt = create(qi, false, info);
+    if(dt == null) dt = create(qi, false, baseIO, info);
     return DBNodeSeq.get(dt.resources.docs(qi.path), dt, true, qi.path.isEmpty());
   }
 
@@ -188,11 +191,13 @@ public final class QueryResources {
    * Adds a document with the specified path. Only called from the test APIs.
    * @param name document identifier (may be {@code null})
    * @param path documents path
+   * @param baseIO base URI
    * @throws QueryException query exception
    */
-  public void addDoc(final String name, final String path) throws QueryException {
+  public void addDoc(final String name, final String path, final IO baseIO)
+      throws QueryException {
     final QueryInput qi = new QueryInput(path);
-    final Data d = create(qi, true, null);
+    final Data d = create(qi, true, baseIO, null);
     if(name != null) d.meta.original = name;
   }
 
@@ -209,15 +214,17 @@ public final class QueryResources {
    * Adds a collection with the specified paths. Only called from the test APIs.
    * @param name name of collection
    * @param paths documents paths
+   * @param baseIO base URI
    * @throws QueryException query exception
    */
-  public void addCollection(final String name, final String[] paths) throws QueryException {
+  public void addCollection(final String name, final String[] paths, final IO baseIO)
+      throws QueryException {
 
     final int ns = paths.length;
     final DBNode[] nodes = new DBNode[ns];
     for(int n = 0; n < ns; n++) {
       final QueryInput qi = new QueryInput(paths[n]);
-      nodes[n] = new DBNode(create(qi, true, null), 0, Data.DOC);
+      nodes[n] = new DBNode(create(qi, true, baseIO, null), 0, Data.DOC);
     }
     addCollection(Seq.get(nodes, ns, NodeType.DOC), name);
   }
@@ -247,15 +254,16 @@ public final class QueryResources {
    * Creates a new database instance.
    * @param input query input
    * @param single expect single document
+   * @param baseIO base URI
    * @param info input info
    * @return data reference
    * @throws QueryException query exception
    */
-  private Data create(final QueryInput input, final boolean single, final InputInfo info)
-      throws QueryException {
+  private Data create(final QueryInput input, final boolean single,
+      final IO baseIO, final InputInfo info) throws QueryException {
 
     try {
-      final Data d = createDB(input, single, info);
+      final Data d = createDB(input, single, baseIO, info);
       input.path = "";
       addData(d);
       return d;
@@ -268,20 +276,20 @@ public final class QueryResources {
    * Creates a new database instance.
    * @param input query input
    * @param single expect single document
+   * @param baseIO base URI
    * @param info input info
    * @return data reference
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private Data createDB(final QueryInput input, final boolean single,
-      final InputInfo info) throws QueryException, IOException {
+      final IO baseIO, final InputInfo info) throws QueryException, IOException {
 
     if(input.input.exists()) return CreateDB.create(input.input, single, ctx.context);
 
     // try to create database with path relative to base uri
-    final IO base = ctx.sc.baseIO();
-    if(base != null) {
-      final String in = base.merge(input.original).path();
+    if(baseIO != null) {
+      final String in = baseIO.merge(input.original).path();
       if(!in.equals(input.original))
         return CreateDB.create(IO.get(in), single, ctx.context);
     }

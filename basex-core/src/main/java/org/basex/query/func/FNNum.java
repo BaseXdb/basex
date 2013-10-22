@@ -18,12 +18,14 @@ import org.basex.util.*;
 public final class FNNum extends StandardFunc {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  public FNNum(final InputInfo ii, final Function f, final Expr... e) {
-    super(ii, f, e);
+  public FNNum(final StaticContext sctx, final InputInfo ii, final Function f,
+      final Expr... e) {
+    super(sctx, ii, f, e);
   }
 
   @Override

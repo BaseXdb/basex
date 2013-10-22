@@ -35,12 +35,16 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
-    type = var.type();
-    size = var.size;
-
     // constant propagation
     final Value v = ctx.get(var);
-    return v != null ? v : this;
+    return v != null ? v : optimize(ctx, scp);
+  }
+
+  @Override
+  public VarRef optimize(final QueryContext ctx, final VarScope scp) {
+    type = var.type();
+    size = var.size;
+    return this;
   }
 
   @Override
@@ -79,7 +83,7 @@ public final class VarRef extends ParseExpr {
   public VarRef copy(final QueryContext ctx, final VarScope scp,
       final IntObjMap<Var> vs) {
     final Var nw = vs.get(var.id);
-    return new VarRef(info, nw != null ? nw : var);
+    return new VarRef(info, nw != null ? nw : var).optimize(ctx, scp);
   }
 
   @Override
@@ -110,7 +114,8 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(DOLLAR).add(var.name.toString()).toString();
+    return new TokenBuilder(DOLLAR).add(
+        var.name.toString())/* .add('_').addInt(var.id) */.toString();
   }
 
   @Override

@@ -19,20 +19,30 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Cast extends Single {
+  /** Static context. */
+  private final StaticContext sc;
+
   /**
    * Function constructor.
+   * @param sx static context
    * @param ii input info
    * @param e expression
    * @param t data type
    */
-  public Cast(final InputInfo ii, final Expr e, final SeqType t) {
+  public Cast(final StaticContext sx, final InputInfo ii, final Expr e, final SeqType t) {
     super(ii, e);
+    sc = sx;
     type = t;
   }
 
   @Override
   public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
     super.compile(ctx, scp);
+    return optimize(ctx, scp);
+  }
+
+  @Override
+  public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     if(expr.type().one()) type = SeqType.get(type.type, Occ.ONE);
 
     // pre-evaluate value
@@ -46,6 +56,9 @@ public final class Cast extends Single {
       optPre(expr, ctx);
       return expr;
     }
+
+    size = type.occ();
+
     return this;
   }
 
@@ -56,12 +69,12 @@ public final class Cast extends Single {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    return type.cast(expr.item(ctx, info), ctx, info, this);
+    return type.cast(expr.item(ctx, info), ctx, sc, info, this);
   }
 
   @Override
   public Cast copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Cast(info, expr.copy(ctx, scp, vs), type);
+    return new Cast(sc, info, expr.copy(ctx, scp, vs), type);
   }
 
   @Override

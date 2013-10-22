@@ -216,7 +216,7 @@ public final class WebDAVLockService {
      */
     private void registerModule() throws IOException {
       try {
-        p.ctx.parseLibrary(string(readModule()), null);
+        p.ctx.parseLibrary(string(readModule()), null, p.sc);
       } catch(final QueryException ex) {
         throw new BaseXException(ex);
       }

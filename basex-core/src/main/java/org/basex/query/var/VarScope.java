@@ -21,6 +21,9 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class VarScope {
+  /** Static context. */
+  private final StaticContext sc;
+
   /** stack of currently accessible variables. */
   private final VarStack current = new VarStack();
   /** Local variables in this scope. */
@@ -30,9 +33,13 @@ public final class VarScope {
   /** This scope's parent scope, used for looking up non-local variables. */
   private final VarScope parent;
 
-  /** Constructor for a top-level module. */
-  public VarScope() {
-    this(null);
+  /**
+   * Constructor for a top-level module.
+   * @param sctx static context
+   */
+  public VarScope(final StaticContext sctx) {
+    parent = null;
+    sc = sctx;
   }
 
   /**
@@ -41,6 +48,7 @@ public final class VarScope {
    */
   private VarScope(final VarScope par) {
     parent = par;
+    sc = par.sc;
   }
 
   /**
@@ -71,7 +79,7 @@ public final class VarScope {
     if(nonLocal == null) return null;
 
     // a variable in the closure
-    final Var local = add(new Var(ctx, name, nonLocal.type()));
+    final Var local = add(new Var(ctx, sc, name, nonLocal.type()));
     closure.put(local, nonLocal);
     return new VarRef(ii, local);
   }
@@ -118,7 +126,7 @@ public final class VarScope {
    * @return variable
    */
   public Var uniqueVar(final QueryContext ctx, final SeqType type, final boolean param) {
-    return add(new Var(ctx, new QNm(token(ctx.varIDs)), type, param));
+    return add(new Var(ctx, sc, new QNm(token(ctx.varIDs)), type, param));
   }
 
   /**
@@ -131,7 +139,7 @@ public final class VarScope {
    */
   public Var newLocal(final QueryContext ctx, final QNm name, final SeqType typ,
       final boolean param) {
-    return add(new Var(ctx, name, typ, param));
+    return add(new Var(ctx, sc, name, typ, param));
   }
 
   /**
@@ -141,7 +149,7 @@ public final class VarScope {
    * @return the variable
    */
   public Var newCopyOf(final QueryContext ctx, final Var var) {
-    return add(new Var(ctx, var));
+    return add(new Var(ctx, sc, var));
   }
 
   /**
@@ -220,14 +228,14 @@ public final class VarScope {
    */
   public VarScope copy(final QueryContext ctx, final VarScope scp,
       final IntObjMap<Var> vs) {
-    final VarScope sc = new VarScope(scp);
-    for(final Var v : vars) vs.put(v.id, sc.newCopyOf(ctx, v));
+    final VarScope cscp = new VarScope(scp);
+    for(final Var v : vars) vs.put(v.id, cscp.newCopyOf(ctx, v));
     for(final Entry<Var, Expr> e : closure.entrySet()) {
       final Var v = vs.get(e.getKey().id);
       final Expr ex = e.getValue().copy(ctx, scp, vs);
-      sc.closure.put(v, ex);
+      cscp.closure.put(v, ex);
     }
-    sc.current.clear();
-    return sc;
+    cscp.current.clear();
+    return cscp;
   }
 }

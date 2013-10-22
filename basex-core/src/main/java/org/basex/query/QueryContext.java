@@ -48,8 +48,6 @@ public final class QueryContext extends Proc {
   private static final Pattern BIND =
       Pattern.compile("^((\"|')(.*?)\\2:|(\\{(.*?)\\}))(.+)$");
 
-  /** Static context of an expression. */
-  public StaticContext sc;
   /** Static variables. */
   public final Variables vars = new Variables();
   /** Functions. */
@@ -118,8 +116,8 @@ public final class QueryContext extends Proc {
 
   /** Number of successive tail calls. */
   public int tailCalls;
-  /** Maximum number of successive tail calls. */
-  public final int maxCalls;
+  /** Maximum number of successive tail calls (will be set before compilation). */
+  public int maxCalls;
   /** Counter for variable IDs. */
   public int varIDs;
 
@@ -167,8 +165,6 @@ public final class QueryContext extends Proc {
     context = ctx;
     nodes = ctx.current();
     inf = ctx.options.get(MainOptions.QUERYINFO) || Prop.debug;
-    sc = new StaticContext(ctx.options.get(MainOptions.XQUERY3));
-    maxCalls = ctx.options.get(MainOptions.TAILCALLS);
     modules = new ModuleLoader(ctx);
   }
 
@@ -176,12 +172,14 @@ public final class QueryContext extends Proc {
    * Parses the specified query.
    * @param qu input query
    * @param path file path (may be {@code null})
+   * @param sc static context
    * @return main module
    * @throws QueryException query exception
    */
-  public MainModule parseMain(final String qu, final String path) throws QueryException {
+  public MainModule parseMain(final String qu, final String path, final StaticContext sc)
+      throws QueryException {
     query = qu;
-    root = new QueryParser(qu, path, this).parseMain();
+    root = new QueryParser(qu, path, this, sc).parseMain();
     return root;
   }
 
@@ -189,12 +187,14 @@ public final class QueryContext extends Proc {
    * Parses the specified module.
    * @param qu input query
    * @param path file path (may be {@code null})
+   * @param sc static context
    * @return name of module
    * @throws QueryException query exception
    */
-  public LibraryModule parseLibrary(final String qu, final String path) throws QueryException {
+  public LibraryModule parseLibrary(final String qu, final String path,
+      final StaticContext sc) throws QueryException {
     query = qu;
-    return new QueryParser(qu, path, this).parseLibrary(true);
+    return new QueryParser(qu, path, this, sc).parseLibrary(true);
   }
 
   /**
@@ -220,6 +220,8 @@ public final class QueryContext extends Proc {
         BASX_VALUE.thrw(null, o.get(s), o.get(s + 1));
       }
     }
+    // set tail call option after assignment database option
+    maxCalls = context.options.get(MainOptions.TAILCALLS);
 
     // bind external variables
     vars.bindExternal(this, bindings);
@@ -243,8 +245,8 @@ public final class QueryContext extends Proc {
 
     // if specified, convert context item to specified type
     // [LW] should not be necessary
-    if(value != null && sc.initType != null) {
-      value = sc.initType.funcConvert(this, null, value);
+    if(value != null && root.sc.initType != null) {
+      value = root.sc.initType.funcConvert(this, root.sc, null, value);
     }
 
     // dynamic compilation
@@ -365,14 +367,16 @@ public final class QueryContext extends Proc {
    * {@link #bind binding variables}.
    * @param val value to be bound
    * @param type data type (may be {@code null})
+   * @param sc static context
    * @throws QueryException query exception
    */
-  public void context(final Object val, final String type) throws QueryException {
+  public void context(final Object val, final String type, final StaticContext sc)
+      throws QueryException {
     // bind http context to extra variable
     if(val.getClass().getName().equals("org.basex.http.HTTPContext")) {
       http = val;
     } else {
-      ctxItem = new MainModule(cast(val, type), new VarScope(), null);
+      ctxItem = new MainModule(cast(val, type), new VarScope(sc), null, sc);
     }
   }
 
@@ -605,7 +609,7 @@ public final class QueryContext extends Proc {
     if(nm.isEmpty() || !XMLToken.isNCName(ln)) return;
 
     // bind variable
-    bindings.put(uri.length == 0 ? new QNm(ln, this) : new QNm(ln, uri), e);
+    bindings.put(new QNm(ln, uri), e);
   }
 
   /**
@@ -617,9 +621,11 @@ public final class QueryContext extends Proc {
    * @throws QueryException query exception
    */
   private Expr cast(final Object val, final String type) throws QueryException {
+    final StaticContext sc = root != null ? root.sc : new StaticContext(true);
+
     // return original value
     if(type == null || type.isEmpty())
-      return val instanceof Expr ? (Expr) val : JavaMapping.toValue(val, this);
+      return val instanceof Expr ? (Expr) val : JavaMapping.toValue(val, this, sc);
 
     // convert to json
     try {
@@ -634,7 +640,8 @@ public final class QueryContext extends Proc {
     }
 
     // convert to the specified type
-    final QNm nm = new QNm(token(type.replaceAll("\\(.*?\\)$", "")), this);
+    // [LW] type should be parsed properly
+    final QNm nm = new QNm(token(type.replaceAll("\\(.*?\\)$", "")), sc);
     if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm.string());
 
     Type t = null;
@@ -645,7 +652,7 @@ public final class QueryContext extends Proc {
       if(t == null) t = AtomType.find(nm, false);
     }
     if(t == null) NOTYPE.thrw(null, type);
-    return t.cast(val, this, null);
+    return t.cast(val, this, sc, null);
   }
 
   /**

@@ -153,7 +153,7 @@ public final class MainOptions extends Options {
   /** Hidden: flag for tail-call optimization. */
   public static final NumberOption TAILCALLS = new NumberOption("TAILCALLS", 256);
   /** Hidden: flag for the size limit on inlineable functions. */
-  public static final NumberOption INLINELIMIT = new NumberOption("INLINELIMIT", 0);
+  public static final NumberOption INLINELIMIT = new NumberOption("INLINELIMIT", 32);
   /** Hidden: maximum number of hits to be displayed in the GUI (will be overwritten). */
   public static final NumberOption MAXHITS = new NumberOption("MAXHITS", -1);
 

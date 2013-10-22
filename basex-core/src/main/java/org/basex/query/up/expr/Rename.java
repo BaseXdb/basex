@@ -25,12 +25,14 @@ import org.basex.util.hash.*;
 public final class Rename extends Update {
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param tg target expression
    * @param n new name expression
    */
-  public Rename(final InputInfo ii, final Expr tg, final Expr n) {
-    super(ii, tg, n);
+  public Rename(final StaticContext sctx, final InputInfo ii, final Expr tg,
+      final Expr n) {
+    super(sctx, ii, tg, n);
   }
 
   @Override
@@ -44,11 +46,11 @@ public final class Rename extends Update {
 
     final CFrag ex;
     if(i.type == NodeType.ELM) {
-      ex = new CElem(info, expr[1], null);
+      ex = new CElem(sc, info, expr[1], null);
     } else if(i.type == NodeType.ATT) {
-      ex = new CAttr(info, false, expr[1], Empty.SEQ);
+      ex = new CAttr(sc, info, false, expr[1], Empty.SEQ);
     } else if(i.type == NodeType.PI) {
-      ex = new CPI(info, expr[1], Empty.SEQ);
+      ex = new CPI(sc, info, expr[1], Empty.SEQ);
     } else {
       throw UPWRTRGTYP.thrw(info);
     }
@@ -74,7 +76,7 @@ public final class Rename extends Update {
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new Rename(info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
+    return new Rename(sc, info, expr[0].copy(ctx, scp, vs), expr[1].copy(ctx, scp, vs));
   }
 
   @Override

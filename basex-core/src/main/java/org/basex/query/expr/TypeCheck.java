@@ -19,15 +19,21 @@ import org.basex.util.hash.*;
 public final class TypeCheck extends Single {
   /** Flag for function conversion. */
   public final boolean promote;
+  /** Static context. */
+  private final StaticContext sc;
+
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param e expression to be promoted
    * @param to type to promote to
    * @param f flag for function conversion
    */
-  public TypeCheck(final InputInfo ii, final Expr e, final SeqType to, final boolean f) {
+  public TypeCheck(final StaticContext sctx, final InputInfo ii, final Expr e,
+      final SeqType to, final boolean f) {
     super(ii, e);
+    sc = sctx;
     type = to;
     promote = f;
   }
@@ -53,6 +59,9 @@ public final class TypeCheck extends Single {
       if(occ == null) throw Err.INVCAST.thrw(info, argType, type);
     }
 
+    final Expr opt = expr.typeCheck(this, ctx, scp);
+    if(opt != null) return optPre(opt, ctx);
+
     return this;
   }
 
@@ -65,13 +74,13 @@ public final class TypeCheck extends Single {
   public Value value(final QueryContext ctx) throws QueryException {
     final Value val = expr.value(ctx);
     if(type.instance(val)) return val;
-    if(promote) return type.funcConvert(ctx, info, val);
+    if(promote) return type.funcConvert(ctx, sc, info, val);
     throw Err.INVCAST.thrw(info, val.type(), type);
   }
 
   @Override
   public Expr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new TypeCheck(info, expr.copy(ctx, scp, vs), type, promote);
+    return new TypeCheck(sc, info, expr.copy(ctx, scp, vs), type, promote);
   }
 
   @Override
@@ -93,5 +102,18 @@ public final class TypeCheck extends Single {
    */
   public boolean isRedundant(final Var var) {
     return (!promote || var.promotes()) && var.declaredType().instanceOf(type);
+  }
+
+  /**
+   * Creates an expression that checks the given expression's return type.
+   * @param e expression to check
+   * @param ctx query context
+   * @param scp variable scope
+   * @return the resulting expression
+   * @throws QueryException query exception
+   */
+  public Expr check(final Expr e, final QueryContext ctx, final VarScope scp)
+      throws QueryException {
+    return new TypeCheck(sc, info, e, type, promote).optimize(ctx, scp);
   }
 }

@@ -53,13 +53,18 @@ public abstract class JavaMapping extends Arr {
     AtomType.URI, AtomType.URI
   };
 
+  /** Static context. */
+  final StaticContext sc;
+
   /**
    * Constructor.
+   * @param sctx static context
    * @param ii input info
    * @param a arguments
    */
-  JavaMapping(final InputInfo ii, final Expr[] a) {
+  JavaMapping(final StaticContext sctx, final InputInfo ii, final Expr[] a) {
     super(ii, a);
+    sc = sctx;
   }
 
   @Override
@@ -72,7 +77,7 @@ public abstract class JavaMapping extends Arr {
     final int es = expr.length;
     final Value[] args = new Value[es];
     for(int e = 0; e < es; ++e) args[e] = ctx.value(expr[e]);
-    return toValue(eval(args, ctx), ctx);
+    return toValue(eval(args, ctx), ctx, sc);
   }
 
   /**
@@ -89,17 +94,19 @@ public abstract class JavaMapping extends Arr {
    * Converts the specified result to an XQuery value.
    * @param obj result object
    * @param ctx query context
+   * @param sc static context
    * @return value
    * @throws QueryException query exception
    */
-  public static Value toValue(final Object obj, final QueryContext ctx) throws QueryException {
+  public static Value toValue(final Object obj, final QueryContext ctx, final StaticContext sc)
+      throws QueryException {
 
     if(obj == null) return Empty.SEQ;
     if(obj instanceof Value) return (Value) obj;
     if(obj instanceof Iter) return ((Iter) obj).value();
     // find XQuery mapping for specified type
     final Type type = type(obj);
-    if(type != null) return type.cast(obj, ctx, null);
+    if(type != null) return type.cast(obj, ctx, sc, null);
 
     // primitive arrays
     if(obj instanceof byte[])    return BytSeq.get((byte[]) obj);
@@ -145,7 +152,7 @@ public abstract class JavaMapping extends Arr {
     // any other array (also nested ones)
     final Object[] objs = (Object[]) obj;
     final ValueBuilder vb = new ValueBuilder(objs.length);
-    for(final Object o : objs) vb.add(toValue(o, ctx));
+    for(final Object o : objs) vb.add(toValue(o, ctx, sc));
     return vb.value();
   }
 
@@ -196,12 +203,13 @@ public abstract class JavaMapping extends Arr {
    * @param qname function name
    * @param args arguments
    * @param ctx query context
+   * @param sctx static context
    * @param ii input info
    * @return Java function, or {@code null}
    * @throws QueryException query exception
    */
   static JavaMapping get(final QNm qname, final Expr[] args, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
+      final StaticContext sctx, final InputInfo ii) throws QueryException {
 
     final byte[] uri = qname.uri();
     // check if URI starts with "java:" prefix (if yes, module must be Java code)
@@ -216,7 +224,7 @@ public abstract class JavaMapping extends Arr {
     final Object jm  = ctx.modules.findImport(path);
     if(jm != null) {
       final Method meth = getModMethod(jm, path, name, args.length, ctx, ii);
-      if(meth != null) return new JavaModuleFunc(ii, jm, meth, args);
+      if(meth != null) return new JavaModuleFunc(sctx, ii, jm, meth, args);
     }
 
     // only allowed with administrator permissions
@@ -224,7 +232,7 @@ public abstract class JavaMapping extends Arr {
 
     // check addressed class
     try {
-      return new JavaFunc(ii, ctx.modules.findClass(path), name, args);
+      return new JavaFunc(sctx, ii, ctx.modules.findClass(path), name, args);
     } catch(final ClassNotFoundException ex) {
       // only throw exception if "java:" prefix was explicitly specified
       if(java) FUNCJAVA.thrw(ii, path);

@@ -2,11 +2,8 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.gflwor.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -23,7 +20,7 @@ import org.basex.util.hash.*;
  */
 public final class StaticFuncCall extends FuncCall {
   /** Static context of this function call. */
-  protected final StaticContext sc;
+  private final StaticContext sc;
   /** Function name. */
   final QNm name;
   /** Function reference. */
@@ -65,30 +62,16 @@ public final class StaticFuncCall extends FuncCall {
 
     // disallow call of private functions from module with different uri
     if(func.ann.contains(Ann.Q_PRIVATE) && !Token.eq(func.sc.baseURI().string(),
-        ctx.sc.baseURI().string())) throw Err.FUNCPRIV.thrw(info, name.string());
+        sc.baseURI().string())) throw Err.FUNCPRIV.thrw(info, name.string());
 
     // compile mutually recursive functions
     func.compile(ctx);
 
-    if(func.inline(ctx)) {
+    final Expr inl = func.inlineExpr(expr, ctx, scp, info);
+    if(inl != null) {
       // inline the function
       ctx.compInfo(OPTINLINEFN, func.name);
-
-      // create let bindings for all variables
-      final LinkedList<GFLWOR.Clause> cls = expr.length == 0 ? null :
-        new LinkedList<GFLWOR.Clause>();
-      final IntObjMap<Var> vs = new IntObjMap<Var>();
-      for(int i = 0; i < func.args.length; i++) {
-        final Var old = func.args[i], v = scp.newCopyOf(ctx, old);
-        vs.put(old.id, v);
-        cls.add(new Let(v, expr[i], false, func.info).optimize(ctx, scp));
-      }
-
-      // copy the function body
-      final Expr cpy = func.expr.copy(ctx, scp, vs), rt = !func.cast ? cpy :
-        new TypeCheck(func.info, cpy, func.declType, true).optimize(ctx, scp);
-
-      return cls == null ? rt : new GFLWOR(func.info, cls, rt).optimize(ctx, scp);
+      return inl;
     }
     type = func.type();
     return this;
@@ -119,7 +102,7 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   /**
-   * Returns the called function if already known, {@code false} otherwise.
+   * Returns the called function if already known, {@code null} otherwise.
    * @return the function
    */
   public StaticFunc func() {
