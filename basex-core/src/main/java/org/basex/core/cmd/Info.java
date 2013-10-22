@@ -40,7 +40,7 @@ public final class Info extends AInfo {
    */
   public static String info(final Context context) {
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(GENERAL_INFO + NL);
+    tb.add(GENERAL_INFO + COL + NL);
     info(tb, VERSINFO, Prop.VERSION);
     if(context.user.has(Perm.CREATE)) {
       Performance.gc(2);
@@ -48,11 +48,11 @@ public final class Info extends AInfo {
     }
     if(context.user.has(Perm.ADMIN)) {
       final GlobalOptions gopts = context.globalopts;
-      tb.add(NL + MAIN_OPTIONS + NL);
+      tb.add(NL + GLOBAL_OPTIONS + COL + NL);
       for(final Option o : gopts) info(tb, o.name(), gopts.get(o));
     }
     final MainOptions opts = context.options;
-    tb.add(NL + OPTIONS + NL);
+    tb.add(NL + LOCAL_OPTIONS + NL);
     for(final Option o : opts) info(tb, o.name(), opts.get(o));
     return tb.toString();
   }

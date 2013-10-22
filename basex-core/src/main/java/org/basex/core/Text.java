@@ -798,8 +798,10 @@ public interface Text {
   String DB_PROPS = lang("db_props");
   /** "General Information". */
   String GENERAL_INFO = lang("general_info");
-  /** "Main Options". */
-  String MAIN_OPTIONS = lang("main_options");
+  /** "Global Options". */
+  String GLOBAL_OPTIONS = lang("global_options");
+  /** "Local Options". */
+  String LOCAL_OPTIONS = lang("local_options");
 
   /** "(chopped)". */
   String CHOPPED = "(" + lang("chopped") + ") ";

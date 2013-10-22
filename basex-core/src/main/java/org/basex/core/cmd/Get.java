@@ -43,10 +43,10 @@ public final class Get extends AGet {
     if(args[0] == null) {
       // retrieve values of all options
       if(context.user.has(Perm.ADMIN)) {
-        out.println(MAIN_OPTIONS + COL);
+        out.println(GLOBAL_OPTIONS + COL);
         for(final Option o : goptions) out.println(o.name() + COLS + goptions.get(o));
       }
-      out.println(NL + OPTIONS + COL);
+      out.println(NL + LOCAL_OPTIONS + COL);
       for(final Option o : options) out.println(o.name() + COLS + options.get(o));
     } else {
       // retrieve value of specific option

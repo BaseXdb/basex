@@ -558,7 +558,7 @@ public final class FNDb extends StandardFunc {
    * @return resulting name
    */
   public static String toName(final String str) {
-    return str.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH);
+    return str.replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH);
   }
 
   /**
