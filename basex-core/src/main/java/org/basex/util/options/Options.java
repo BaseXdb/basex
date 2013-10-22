@@ -535,7 +535,7 @@ public class Options implements Iterable<Option> {
           if(line.isEmpty() || line.charAt(0) == '#') continue;
           final int d = line.indexOf('=');
           if(d < 0) {
-            errs.add("Line \"" + line + "\" ignored.");
+            errs.add("line \"" + line + "\" ignored.");
             continue;
           }
 
@@ -566,7 +566,7 @@ public class Options implements Iterable<Option> {
           }
         }
       } catch(final IOException ex) {
-        errs.add("File could not be parsed.");
+        errs.add("file could not be parsed.");
         Util.errln(ex);
       } finally {
         if(br != null) try { br.close(); } catch(final IOException ignored) { }
@@ -585,9 +585,9 @@ public class Options implements Iterable<Option> {
       }
     }
 
-    if(!exists || !errs.isEmpty()) {
+    if(!ok || !exists || !errs.isEmpty()) {
       write();
-      errs.add("Writing new configuration file.");
+      errs.add("writing new configuration file.");
       for(final String s : errs) Util.errln(file + ": " + s);
     }
   }
