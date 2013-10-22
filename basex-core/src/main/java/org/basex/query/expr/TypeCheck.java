@@ -20,7 +20,7 @@ public final class TypeCheck extends Single {
   /** Flag for function conversion. */
   public final boolean promote;
   /** Static context. */
-  public final StaticContext sc;
+  private final StaticContext sc;
 
   /**
    * Constructor.
