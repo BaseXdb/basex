@@ -8,7 +8,7 @@ import java.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class NumbersOption extends Option {
+public final class NumbersOption extends Option<int[]> {
   /** Default value. */
   public final int[] value;
 

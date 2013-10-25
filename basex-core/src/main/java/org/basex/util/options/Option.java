@@ -6,8 +6,9 @@ package org.basex.util.options;
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
+ * @param <O> option type
  */
-public abstract class Option {
+public abstract class Option<O> {
   /** Name. */
   private final String name;
 

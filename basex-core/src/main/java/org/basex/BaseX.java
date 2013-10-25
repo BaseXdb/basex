@@ -12,7 +12,6 @@ import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 /**
  * This is the starter class for the stand-alone console mode.
@@ -64,14 +63,13 @@ public class BaseX extends Main {
       for(int i = 0; i < ops.size(); i++) {
         final int c = ops.get(i);
         String val = vals.get(i);
-        Option opt = null;
 
         if(c == 'b') {
           // set/add variable binding
           if(bind.length() != 0) bind.append(',');
           // commas are escaped by a second comma
           val = bind.append(val.replaceAll(",", ",,")).toString();
-          opt = MainOptions.BINDINGS;
+          execute(new Set(MainOptions.BINDINGS, val), false);
         } else if(c == 'c') {
           // evaluate commands
           final IO io = IO.get(val);
@@ -89,7 +87,7 @@ public class BaseX extends Main {
           Prop.debug ^= true;
         } else if(c == 'D') {
           // hidden option: show/hide dot query graph
-          opt = MainOptions.DOTPLAN;
+          execute(new Set(MainOptions.DOTPLAN, null), false);
         } else if(c == 'i') {
           // open database or create main memory representation
           execute(new Set(MainOptions.MAINMEM, true), false);
@@ -100,8 +98,7 @@ public class BaseX extends Main {
           newline ^= true;
           if(sopts == null) sopts = new SerializerOptions();
           sopts.set(SerializerOptions.ITEM_SEPARATOR, "\\n");
-          val = sopts.toString();
-          opt = MainOptions.SERIALIZER;
+          execute(new Set(MainOptions.SERIALIZER, sopts), false);
         } else if(c == 'o') {
           // change output stream
           if(out != System.out) out.close();
@@ -125,42 +122,40 @@ public class BaseX extends Main {
           console = false;
         } else if(c == 'r') {
           // hidden option: parse number of runs
-          opt = MainOptions.RUNS;
+          execute(new Set(MainOptions.RUNS, Token.toInt(val)), false);
         } else if(c == 's') {
           // set/add serialization parameter
           if(sopts == null) sopts = new SerializerOptions();
           final String[] kv = val.split("=", 2);
           sopts.assign(kv[0], kv.length > 1  ? kv[1] : "");
-          val = sopts.toString();
-          opt = MainOptions.SERIALIZER;
+          execute(new Set(MainOptions.SERIALIZER, sopts), false);
         } else if(c == 'u') {
           // (de)activate write-back for updates
-          opt = MainOptions.WRITEBACK;
+          execute(new Set(MainOptions.WRITEBACK, null), false);
         } else if(c == 'v') {
           // show/hide verbose mode
           v ^= true;
         } else if(c == 'V') {
           // show/hide query info
           qi ^= true;
-          opt = MainOptions.QUERYINFO;
+          execute(new Set(MainOptions.QUERYINFO, null), false);
         } else if(c == 'w') {
           // toggle chopping of whitespaces
-          opt = MainOptions.CHOP;
+          execute(new Set(MainOptions.CHOP, null), false);
         } else if(c == 'W') {
           // hidden option: toggle writing of options before exit
           writeOptions ^= true;
         } else if(c == 'x') {
           // show/hide xml query plan
-          opt = MainOptions.XMLPLAN;
+          execute(new Set(MainOptions.XMLPLAN, null), false);
           qp ^= true;
         } else if(c == 'X') {
           // hidden option: show query plan before/after query compilation
-          opt = MainOptions.COMPPLAN;
+          execute(new Set(MainOptions.COMPPLAN, null), false);
         } else if(c == 'z') {
           // toggle result serialization
-          opt = MainOptions.SERIALIZE;
+          execute(new Set(MainOptions.SERIALIZE, null), false);
         }
-        if(opt != null) execute(new Set(opt, val), false);
         verbose = qi || qp || v;
       }
 

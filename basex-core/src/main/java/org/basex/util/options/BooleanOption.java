@@ -6,7 +6,7 @@ package org.basex.util.options;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class BooleanOption extends Option {
+public final class BooleanOption extends Option<Boolean> {
   /** Default value. */
   public final Boolean value;
 

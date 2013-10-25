@@ -26,7 +26,7 @@ public final class Get extends AGet {
    * Default constructor.
    * @param option option to be found
    */
-  public Get(final Option option) {
+  public Get(final Option<?> option) {
     this(option.name());
   }
 
@@ -44,10 +44,10 @@ public final class Get extends AGet {
       // retrieve values of all options
       if(context.user.has(Perm.ADMIN)) {
         out.println(GLOBAL_OPTIONS + COL);
-        for(final Option o : goptions) out.println(o.name() + COLS + goptions.get(o));
+        for(final Option<?> o : goptions) out.println(o.name() + COLS + goptions.get(o));
       }
       out.println(NL + LOCAL_OPTIONS + COL);
-      for(final Option o : options) out.println(o.name() + COLS + options.get(o));
+      for(final Option<?> o : options) out.println(o.name() + COLS + options.get(o));
     } else {
       // retrieve value of specific option
       final String name = args[0].toUpperCase(Locale.ENGLISH);
@@ -69,7 +69,7 @@ public final class Get extends AGet {
    */
   public static String get(final String name, final Context ctx) throws BaseXException {
     Options opts = ctx.options;
-    Option opt = opts.option(name);
+    Option<?> opt = opts.option(name);
     if(opt == null && ctx.user.has(Perm.ADMIN)) {
       opts = ctx.globalopts;
       opt = opts.option(name);

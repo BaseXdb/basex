@@ -17,7 +17,7 @@ import org.basex.util.options.*;
  */
 public final class DBPragma extends Pragma {
   /** Option key. */
-  private final Option option;
+  private final Option<?> option;
   /** Cached value. */
   private Object old;
 
@@ -27,7 +27,7 @@ public final class DBPragma extends Pragma {
    * @param o option
    * @param v optional value
    */
-  public DBPragma(final QNm n, final Option o, final byte[] v) {
+  public DBPragma(final QNm n, final Option<?> o, final byte[] v) {
     super(n, v);
     option = o;
   }

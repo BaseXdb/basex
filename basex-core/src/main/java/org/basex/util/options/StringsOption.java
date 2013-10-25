@@ -8,7 +8,7 @@ import java.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class StringsOption extends Option {
+public final class StringsOption extends Option<String[]> {
   /** Default value. */
   private final String[] value;
 

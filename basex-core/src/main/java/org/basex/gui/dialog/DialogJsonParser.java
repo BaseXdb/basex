@@ -145,6 +145,6 @@ final class DialogJsonParser extends DialogParser {
 
   @Override
   void setOptions(final GUI gui) {
-    gui.set(MainOptions.JSONPARSER, jopts.toString());
+    gui.set(MainOptions.JSONPARSER, jopts);
   }
 }

@@ -146,6 +146,6 @@ final class DialogCsvParser extends DialogParser {
 
   @Override
   void setOptions(final GUI gui) {
-    gui.set(MainOptions.CSVPARSER, copts.toString());
+    gui.set(MainOptions.CSVPARSER, copts);
   }
 }

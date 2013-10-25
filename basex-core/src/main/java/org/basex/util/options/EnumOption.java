@@ -7,7 +7,7 @@ package org.basex.util.options;
  * @author Christian Gruen
  * @param <V> enumeration value
  */
-public final class EnumOption<V extends Enum<V>> extends Option {
+public final class EnumOption<V extends Enum<V>> extends Option<V> {
   /** Class. */
   private final Class<V> clazz;
   /** Default value. */

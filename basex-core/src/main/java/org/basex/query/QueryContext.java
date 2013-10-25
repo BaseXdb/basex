@@ -68,7 +68,7 @@ public final class QueryContext extends Proc {
   /** Cached thesaurus files. */
   public HashMap<String, IO> thes;
   /** Global database options (will be reassigned after query execution). */
-  public final HashMap<Option, Object> staticOpts = new HashMap<Option, Object>();
+  public final HashMap<Option<?>, Object> staticOpts = new HashMap<Option<?>, Object>();
   /** Temporary query options (key/value pairs), supplied by option declarations. */
   public final StringList tempOpts = new StringList();
 
@@ -496,7 +496,7 @@ public final class QueryContext extends Proc {
     closed = true;
 
     // reassign original database options
-    for(final Entry<Option, Object> e : staticOpts.entrySet())
+    for(final Entry<Option<?>, Object> e : staticOpts.entrySet())
       context.options.put(e.getKey(), e.getValue());
 
     // close database connections

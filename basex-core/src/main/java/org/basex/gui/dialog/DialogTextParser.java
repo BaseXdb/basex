@@ -62,6 +62,6 @@ final class DialogTextParser extends DialogParser {
 
   @Override
   void setOptions(final GUI gui) {
-    gui.set(MainOptions.TEXTPARSER, topts.toString());
+    gui.set(MainOptions.TEXTPARSER, topts);
   }
 }

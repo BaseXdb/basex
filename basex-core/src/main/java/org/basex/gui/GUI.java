@@ -494,10 +494,12 @@ public final class GUI extends AGUI {
  /**
   * Sets an option if its value differs from current value and displays the command
   * in the info view.
+   * @param <T> option type
+   * @param <V> value type
   * @param opt option to be set
   * @param val value
   */
- public void set(final Option opt, final Object val) {
+ public <T extends Option<V>, V> void set(final T opt, final V val) {
    if(!context.options.get(opt).equals(val)) {
      final Set cmd = new Set(opt, val);
      cmd.run(context);

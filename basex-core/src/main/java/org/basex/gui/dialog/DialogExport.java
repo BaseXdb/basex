@@ -187,7 +187,6 @@ public final class DialogExport extends BaseXDialog {
         if(comp == method) {
           if(showmparams) {
             final Options mopts = options(null).get(opts);
-            System.out.println("=> " + options(null));
             mparams.setToolTipText(tooltip(mopts));
             mparams.setText(mopts.toString());
           } else {
@@ -249,7 +248,7 @@ public final class DialogExport extends BaseXDialog {
    */
   private String tooltip(final Options opts) {
     final StringBuilder sb = new StringBuilder("<html><b>").append(PARAMETERS).append(":</b><br>");
-    for(final Option so : opts) {
+    for(final Option<?> so : opts) {
       if(!(so instanceof OptionsOption)) sb.append("\u2022 ").append(so).append("<br/>");
     }
     return sb.append("</html>").toString();

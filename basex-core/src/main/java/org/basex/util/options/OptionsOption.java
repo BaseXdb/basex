@@ -7,9 +7,9 @@ import org.basex.util.*;
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
- * @param <O> enumeration value
+ * @param <O> options value
  */
-public final class OptionsOption<O extends Options> extends Option {
+public final class OptionsOption<O extends Options> extends Option<O> {
   /** Class. */
   private final Class<O> clazz;
   /** Default value. */

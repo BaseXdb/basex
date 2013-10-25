@@ -6,7 +6,7 @@ package org.basex.util.options;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class Comment extends Option {
+public final class Comment extends Option<Object> {
   /**
    * Constructor without default value.
    * @param n name

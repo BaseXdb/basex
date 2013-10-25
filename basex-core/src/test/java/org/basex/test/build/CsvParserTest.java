@@ -83,7 +83,9 @@ public final class CsvParserTest extends SandboxTest {
     assertEquals("3", new XQuery("count(//Name)").execute(context));
     assertEquals("2", new XQuery("count(//Email)").execute(context));
 
-    new Set(MainOptions.CSVPARSER, "header=true").execute(context);
+    final CsvParserOptions copts = new CsvParserOptions();
+    copts.set(CsvOptions.HEADER, true);
+    new Set(MainOptions.CSVPARSER, copts).execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("3", new XQuery("count(//record)").execute(context));
     assertEquals("true", new XQuery("//text() = 'Picard?'").execute(context));

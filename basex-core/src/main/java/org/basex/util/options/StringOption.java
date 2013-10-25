@@ -6,7 +6,7 @@ package org.basex.util.options;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class StringOption extends Option {
+public final class StringOption extends Option<String> {
   /** Default value. */
   private final String value;
 

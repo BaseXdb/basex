@@ -32,7 +32,7 @@ public final class HTMLExample {
     // Import the specified file
     System.out.println("\n* Import: \"" + file + "\".");
 
-    new Set(MainOptions.PARSER, "html").execute(ctx);
+    new Set("parser", "html").execute(ctx);
     new CreateDB(name, file).execute(ctx);
 
     // ------------------------------------------------------------------------

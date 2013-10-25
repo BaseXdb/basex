@@ -24,20 +24,20 @@ import org.basex.util.options.*;
  */
 public abstract class DBNew extends BasicOperation {
   /** Numeric index options. */
-  protected static final Option[] N_OPT = { MainOptions.MAXCATS, MainOptions.MAXLEN,
+  private static final NumberOption[] N_OPT = { MainOptions.MAXCATS, MainOptions.MAXLEN,
     MainOptions.INDEXSPLITSIZE, MainOptions.FTINDEXSPLITSIZE };
   /** Boolean index options. */
-  protected static final Option[] B_OPT = { MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
+  private static final BooleanOption[] B_OPT = { MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
     MainOptions.FTINDEX, MainOptions.STEMMING, MainOptions.CASESENS, MainOptions.DIACRITICS,
     MainOptions.UPDINDEX };
   /** String index options. */
-  protected static final Option[] S_OPT = { MainOptions.LANGUAGE, MainOptions.STOPWORDS };
+  private static final StringOption[] S_OPT = { MainOptions.LANGUAGE, MainOptions.STOPWORDS };
   /** Names of numeric index options. */
-  protected static final String[] K_N_OPT = new String[N_OPT.length];
+  private static final String[] K_N_OPT = new String[N_OPT.length];
   /** Names of boolean index options. */
-  protected static final String[] K_B_OPT = new String[B_OPT.length];
+  private static final String[] K_B_OPT = new String[B_OPT.length];
   /** NAmes of numeric index options. */
-  protected static final String[] K_S_OPT = new String[S_OPT.length];
+  private static final String[] K_S_OPT = new String[S_OPT.length];
 
   static {
     // initialize options arrays
@@ -56,11 +56,10 @@ public abstract class DBNew extends BasicOperation {
   /** Insertion sequence. */
   protected Data md;
 
-  /** Original options. */
-  protected final HashMap<Option, Object> oprops = new HashMap<Option, Object>();
   /** New options. */
-  protected final HashMap<Option, Object> nprops = new HashMap<Option, Object>();
-
+  protected final HashMap<Option<?>, Object> nprops = new HashMap<Option<?>, Object>();
+  /** Original options. */
+  protected final HashMap<Option<?>, Object> oprops = new HashMap<Option<?>, Object>();
 
   /**
    * Constructor.
@@ -156,7 +155,7 @@ public abstract class DBNew extends BasicOperation {
    */
   protected void assignOptions() {
     final MainOptions opts = qc.context.options;
-    for(final Option option : nprops.keySet()) oprops.put(option, opts.get(option));
+    for(final Option<?> option : nprops.keySet()) oprops.put(option, opts.get(option));
     setOptions(nprops);
   }
 
@@ -171,8 +170,8 @@ public abstract class DBNew extends BasicOperation {
    * Assigns the specified options.
    * @param map options map
    */
-  private void setOptions(final HashMap<Option, Object> map) {
+  private void setOptions(final HashMap<Option<?>, Object> map) {
     final MainOptions opts = qc.context.options;
-    for(final Map.Entry<Option, Object> e : map.entrySet()) opts.put(e.getKey(), e.getValue());
+    for(final Map.Entry<Option<?>, Object> e : map.entrySet()) opts.put(e.getKey(), e.getValue());
   }
 }

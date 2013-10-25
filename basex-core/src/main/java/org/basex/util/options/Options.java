@@ -23,12 +23,12 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public class Options implements Iterable<Option> {
+public class Options implements Iterable<Option<?>> {
   /** Comment in configuration file. */
   private static final String PROPUSER = "# Local Options";
 
   /** Map with option names and definition. */
-  protected final TreeMap<String, Option> options = new TreeMap<String, Option>();
+  protected final TreeMap<String, Option<?>> options = new TreeMap<String, Option<?>>();
   /** Map with option names and values. */
   protected final TreeMap<String, Object> values = new TreeMap<String, Object>();
   /** Free option definitions. */
@@ -72,7 +72,7 @@ public class Options implements Iterable<Option> {
    */
   private void init() {
     try {
-      for(final Option opt : options(getClass())) {
+      for(final Option<?> opt : options(getClass())) {
         if(opt instanceof Comment) continue;
         final String name = opt.name();
         values.put(name, opt.value());
@@ -91,7 +91,7 @@ public class Options implements Iterable<Option> {
     try {
       bw = new BufferedWriter(new FileWriter(file.file()));
       boolean first = true;
-      for(final Option opt : options(getClass())) {
+      for(final Option<?> opt : options(getClass())) {
         final String name = opt.name();
         if(opt instanceof Comment) {
           if(!first) bw.write(NL);
@@ -125,7 +125,7 @@ public class Options implements Iterable<Option> {
    * @param name name of the option
    * @return value (may be {@code null})
    */
-  public final synchronized Option option(final String name) {
+  public final synchronized Option<?> option(final String name) {
     return options.get(name);
   }
 
@@ -134,7 +134,7 @@ public class Options implements Iterable<Option> {
    * @param option option
    * @return value (may be {@code null})
    */
-  public final synchronized Object get(final Option option) {
+  public final synchronized Object get(final Option<?> option) {
     return values.get(option.name());
   }
 
@@ -143,7 +143,7 @@ public class Options implements Iterable<Option> {
    * @param option option
    * @param value value to be assigned
    */
-  public final synchronized void put(final Option option, final Object value) {
+  public final synchronized void put(final Option<?> option, final Object value) {
     values.put(option.name(), value);
   }
 
@@ -152,7 +152,7 @@ public class Options implements Iterable<Option> {
    * @param option option
    * @return result of check
    */
-  public final synchronized boolean contains(final Option option) {
+  public final synchronized boolean contains(final Option<?> option) {
     return get(option) != null;
   }
 
@@ -162,7 +162,7 @@ public class Options implements Iterable<Option> {
    * @return value
    */
   public final synchronized String get(final StringOption option) {
-    return (String) get((Option) option);
+    return (String) get((Option<?>) option);
   }
 
   /**
@@ -171,7 +171,7 @@ public class Options implements Iterable<Option> {
    * @return value
    */
   public final synchronized Integer get(final NumberOption option) {
-    return (Integer) get((Option) option);
+    return (Integer) get((Option<?>) option);
   }
 
   /**
@@ -180,7 +180,7 @@ public class Options implements Iterable<Option> {
    * @return value
    */
   public final synchronized Boolean get(final BooleanOption option) {
-    return (Boolean) get((Option) option);
+    return (Boolean) get((Option<?>) option);
   }
 
   /**
@@ -189,7 +189,7 @@ public class Options implements Iterable<Option> {
    * @return value
    */
   public final synchronized String[] get(final StringsOption option) {
-    final String[] v = (String[]) get((Option) option);
+    final String[] v = (String[]) get((Option<?>) option);
     return v == null ? null : v.clone();
   }
 
@@ -199,7 +199,7 @@ public class Options implements Iterable<Option> {
    * @return value
    */
   public final synchronized int[] get(final NumbersOption option) {
-    final int[] v = (int[]) get((Option) option);
+    final int[] v = (int[]) get((Option<?>) option);
     return v == null ? null : v.clone();
   }
 
@@ -211,7 +211,7 @@ public class Options implements Iterable<Option> {
    */
   @SuppressWarnings("unchecked")
   public final synchronized <O extends Options> O get(final OptionsOption<O> option) {
-    final O o = (O) get((Option) option);
+    final O o = (O) get((Option<?>) option);
     if(o == null) return null;
     try {
       final O n = ((Class<O>) o.getClass()).newInstance();
@@ -230,7 +230,7 @@ public class Options implements Iterable<Option> {
    */
   @SuppressWarnings("unchecked")
   public final synchronized <V extends Enum<V>> V get(final EnumOption<V> option) {
-    return (V) get((Option) option);
+    return (V) get((Option<?>) option);
   }
 
   /**
@@ -381,7 +381,7 @@ public class Options implements Iterable<Option> {
   }
 
   @Override
-  public final synchronized Iterator<Option> iterator() {
+  public final synchronized Iterator<Option<?>> iterator() {
     return options.values().iterator();
   }
 
@@ -422,7 +422,7 @@ public class Options implements Iterable<Option> {
    * @param option option
    * @return value, or empty string
    */
-  public static String getSystem(final Option option) {
+  public static String getSystem(final Option<?> option) {
     String name = option.name().toLowerCase(Locale.ENGLISH);
     if(!name.startsWith(DBPREFIX)) name = DBPREFIX + name;
     final String v = System.getProperty(name);
@@ -434,7 +434,7 @@ public class Options implements Iterable<Option> {
    * @param option option
    * @param val value
    */
-  public static void setSystem(final Option option, final Object val) {
+  public static void setSystem(final Option<?> option, final Object val) {
     setSystem(option.name(), val);
   }
 
@@ -456,14 +456,14 @@ public class Options implements Iterable<Option> {
    * @return option instances
    * @throws IllegalAccessException exception
    */
-  public static final Option[] options(final Class<? extends Options> clz)
+  public static final Option<?>[] options(final Class<? extends Options> clz)
       throws IllegalAccessException {
 
-    final ArrayList<Option> opts = new ArrayList<Option>();
+    final ArrayList<Option<?>> opts = new ArrayList<Option<?>>();
     for(final Field f : clz.getFields()) {
       if(!Modifier.isStatic(f.getModifiers())) continue;
       final Object obj = f.get(null);
-      if(obj instanceof Option) opts.add((Option) obj);
+      if(obj instanceof Option) opts.add((Option<?>) obj);
     }
     return opts.toArray(new Option[opts.size()]);
   };
@@ -474,7 +474,7 @@ public class Options implements Iterable<Option> {
    * @param all allowed values
    * @return exception
    */
-  public static String allowed(final Option option, final Object... all) {
+  public static String allowed(final Option<?> option, final Object... all) {
     final TokenBuilder vals = new TokenBuilder();
     for(final Object a : all) vals.add(vals.isEmpty() ? "" : ",").add(a.toString());
     return Util.info(Text.OPT_ONEOF, option.name(), vals);
@@ -577,7 +577,7 @@ public class Options implements Iterable<Option> {
     boolean ok = true;
     if(errs.isEmpty()) {
       try {
-        for(final Option opt : options(getClass())) {
+        for(final Option<?> opt : options(getClass())) {
           if(ok && !(opt instanceof Comment)) ok = read.contains(opt.name());
         }
       } catch(final IllegalAccessException ex) {
@@ -604,7 +604,7 @@ public class Options implements Iterable<Option> {
   private synchronized <O extends Options, V extends Enum<V>> void assign(
       final String name, final String val, final int num) throws BaseXException {
 
-    final Option option = options.get(name);
+    final Option<?> option = options.get(name);
     if(option == null) {
       throw new BaseXException(error(name));
     } else if(option instanceof BooleanOption) {

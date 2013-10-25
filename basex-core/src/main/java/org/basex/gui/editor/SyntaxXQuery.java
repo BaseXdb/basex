@@ -63,7 +63,7 @@ public final class SyntaxXQuery extends Syntax {
    * @throws Exception exception
    */
   private static void addOptions(final Class<? extends Options> opt) throws Exception {
-    for(final Option o : Options.options(opt)) {
+    for(final Option<?> o : Options.options(opt)) {
       if(o instanceof Comment) continue;
       Collections.addAll(FUNC, o.name().toLowerCase(Locale.ENGLISH).split("-"));
     }

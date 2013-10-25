@@ -17,10 +17,12 @@ import org.basex.util.options.*;
 public final class Set extends AGet {
   /**
    * Default constructor.
+   * @param <O> option type
+   * @param <V> value type
    * @param option option to be found
    * @param value value to set (optional, depending on the option)
    */
-  public Set(final Option option, final Object value) {
+  public <O extends Option<V>, V> Set(final O option, final V value) {
     this(option.name(), value);
   }
 
@@ -40,7 +42,7 @@ public final class Set extends AGet {
     if(context.user.has(Perm.ADMIN) && goptions.option(name) != null)
       return error(Text.GLOBAL_OPTION_X, name);
 
-    final Option opt = options.option(name);
+    final Option<?> opt = options.option(name);
     try {
       // set value and return info string with new value
       options.assign(name, val);

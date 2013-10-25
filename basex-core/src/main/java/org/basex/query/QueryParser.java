@@ -564,7 +564,7 @@ public class QueryParser extends InputParser {
       try {
         ctx.serialOpts.assign(name, string(val));
       } catch(final BaseXException ex) {
-        for(final Option o : ctx.serialOpts) if(o.name().equals(name)) error(SERANY, ex);
+        for(final Option<?> o : ctx.serialOpts) if(o.name().equals(name)) error(SERANY, ex);
         error(OUTINVALID, ex);
       }
 
@@ -589,7 +589,7 @@ public class QueryParser extends InputParser {
     } else if(eq(qnm.uri(), DBURI)) {
       // project-specific declaration
       final String ukey = name.toUpperCase(Locale.ENGLISH);
-      final Option opt = ctx.context.options.option(ukey);
+      final Option<?> opt = ctx.context.options.option(ukey);
       if(opt == null) error(BASX_OPTIONS, ukey);
       // cache old value (to be reset after query evaluation)
       ctx.staticOpts.put(opt, ctx.context.options.get(opt));
@@ -1780,7 +1780,7 @@ public class QueryParser extends InputParser {
       if(eq(name.prefix(), DB)) {
         // project-specific declaration
         final String key = string(uc(name.local()));
-        final Option opt = ctx.context.options.option(key);
+        final Option<?> opt = ctx.context.options.option(key);
         if(opt == null) error(BASX_OPTIONS, key);
         el.add(new DBPragma(name, opt, v));
       }
