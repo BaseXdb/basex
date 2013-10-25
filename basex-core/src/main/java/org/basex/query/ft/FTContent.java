@@ -1,7 +1,6 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
@@ -18,29 +17,25 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FTContent extends FTFilter {
-  /** Start flag. */
-  private final boolean start;
-  /** End flag. */
-  private final boolean end;
+  /** Content type. */
+  private final FTContents content;
 
   /**
    * Constructor.
    * @param ii input info
    * @param ex expression
-   * @param s start flag
-   * @param e end flag
+   * @param cont contents type
    */
-  public FTContent(final InputInfo ii, final FTExpr ex, final boolean s, final boolean e) {
+  public FTContent(final InputInfo ii, final FTExpr ex, final FTContents cont) {
     super(ii, ex);
-    start = s;
-    end = e;
+    content = cont;
   }
 
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc, final FTLexer lex) {
-    if(start) {
+    if(content == FTContents.START) {
       for(final FTStringMatch sm : mtc) if(sm.start == 0) return true;
-    } else if(end) {
+    } else if(content == FTContents.END) {
       final int p = lex.count() - 1;
       for(final FTStringMatch sm : mtc) if(sm.end == p) return true;
     } else {
@@ -58,22 +53,24 @@ public final class FTContent extends FTFilter {
 
   @Override
   protected boolean content() {
-    return end || !start;
+    return content != FTContents.START;
   }
 
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTContent(info, expr[0].copy(ctx, scp, vs), start, end);
+    return new FTContent(info, expr[0].copy(ctx, scp, vs), content);
   }
 
   @Override
   public void plan(final FElem plan) {
-    addPlan(plan, planElem(start ? START : end ? END : CONTENT, TRUE), expr);
+    addPlan(plan, planElem(CONTENT, content.toString()), expr);
   }
 
   @Override
   public String toString() {
-    return super.toString() + (start || end ? AT + ' ' +
-        (start ? START : END) : ENTIRE + ' ' + CONTENT);
+    return super.toString() + (
+      content == FTContents.START ? (AT + ' ' + START) :
+      content == FTContents.END   ? (AT + ' ' + END) :
+      (ENTIRE + ' ' + CONTENT));
   }
 }

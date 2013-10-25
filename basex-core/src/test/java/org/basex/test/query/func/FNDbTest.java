@@ -152,20 +152,6 @@ public final class FNDbTest extends AdvancedQueryTest {
    * @throws BaseXException database exception
    */
   @Test
-  public void fulltext() throws BaseXException {
-    // run function without and with index
-    new DropIndex(Commands.CmdIndex.FULLTEXT).execute(context);
-    error(_DB_FULLTEXT.args(NAME, "assignments"), Err.BXDB_INDEX);
-    new CreateIndex(Commands.CmdIndex.FULLTEXT).execute(context);
-    query(_DB_FULLTEXT.args(NAME, "assignments"), "Assignments");
-    query(_DB_FULLTEXT.args(NAME, "XXX"), "");
-  }
-
-  /**
-   * Test method.
-   * @throws BaseXException database exception
-   */
-  @Test
   public void list() throws BaseXException {
     // add documents
     new Add("test/docs", FLDR).execute(context);

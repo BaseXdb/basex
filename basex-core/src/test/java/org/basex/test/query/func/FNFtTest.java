@@ -65,6 +65,13 @@ public final class FNFtTest extends AdvancedQueryTest {
     query(_FT_SEARCH.args(NAME, "1 Exercise", " { 'mode':'all words' }"),
         "Exercise 1");
 
+    query(_FT_SEARCH.args(NAME, "databases xml", " { 'mode':'all words'," +
+        "'distance':{'min':0,'max':1} }"), "Databases and XML");
+    query(_FT_SEARCH.args(NAME, "databases xml", " { 'mode':'all words'," +
+        "'distance':{'max':0} }"), "");
+    query(_FT_SEARCH.args(NAME, "databases xml", " { 'mode':'all words'," +
+        "'window':{'size':3} }"), "Databases and XML");
+
     // check buggy options
     error(_FT_SEARCH.args(NAME, "x", " { 'x':'y' }"), Err.INVALIDOPT);
     error(_FT_SEARCH.args(NAME, "x", " { 'mode':'' }"), Err.INVALIDOPT);
@@ -140,14 +147,14 @@ public final class FNFtTest extends AdvancedQueryTest {
     new CreateIndex(IndexType.FULLTEXT).execute(context);
 
     String entries = _FT_TOKENS.args(NAME);
-    query("count(" + entries + ')', 6);
+    query("count(" + entries + ')', 7);
     query("exists(" + entries + "/self::entry)", "true");
     query(entries + "/@count = 1", "true");
     query(entries + "/@count = 2", "true");
     query(entries + "/@count = 3", "false");
 
     entries = _FT_TOKENS.args(NAME, "a");
-    query("count(" + entries + ')', 1);
+    query("count(" + entries + ')', 2);
   }
 
   /** Test method. */

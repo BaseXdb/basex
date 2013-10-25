@@ -196,7 +196,6 @@ public class CommandLockingTest extends SandboxTest {
     // Read Operations
     ckDBs(new XQuery("db:attribute('" + NAME + "', 'foo')"), false, NAME_LIST);
     ckDBs(new XQuery("db:attribute-range('" + NAME + "', '23', '42')"), false, NAME_LIST);
-    ckDBs(new XQuery("db:fulltext('" + NAME + "', 'foo')"), false, NAME_LIST);
     ckDBs(new XQuery("db:node-id(.)"), false, CTX_LIST);
     ckDBs(new XQuery("db:node-pre(.)"), false, CTX_LIST);
     ckDBs(new XQuery("db:retrieve('" + NAME + "', 'foo')"), false, NAME_LIST);

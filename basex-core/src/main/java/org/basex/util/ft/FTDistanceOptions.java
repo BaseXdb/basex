@@ -12,7 +12,7 @@ public final class FTDistanceOptions extends Options {
   /** Option: unit. */
   public static final EnumOption<FTUnit> UNIT = new EnumOption<FTUnit>("unit", FTUnit.WORDS);
   /** Option: min. */
-  public static final NumberOption MIN = new NumberOption("min", 1);
+  public static final NumberOption MIN = new NumberOption("min", 0);
   /** Option: max. */
   public static final NumberOption MAX = new NumberOption("max", Integer.MAX_VALUE);
 }

@@ -3121,13 +3121,13 @@ public class QueryParser extends InputParser {
         if(rng == null) error(FTRANGE);
         expr = new FTDistance(info(), expr, rng[0], rng[1], ftUnit());
       } else if(wsConsumeWs(AT)) {
-        final boolean start = wsConsumeWs(START);
-        final boolean end = !start && wsConsumeWs(END);
-        if(!start && !end) error(INCOMPLETE);
-        expr = new FTContent(info(), expr, start, end);
+        final FTContents cont = wsConsumeWs(START) ? FTContents.START : wsConsumeWs(END) ?
+          FTContents.END : null;
+        if(cont == null) error(INCOMPLETE);
+        expr = new FTContent(info(), expr, cont);
       } else if(wsConsumeWs(ENTIRE)) {
         wsCheck(CONTENT);
-        expr = new FTContent(info(), expr, false, false);
+        expr = new FTContent(info(), expr, FTContents.ENTIRE);
       } else {
         final boolean same = wsConsumeWs(SAME);
         final boolean diff = !same && wsConsumeWs(DIFFERENT);
@@ -3136,7 +3136,7 @@ public class QueryParser extends InputParser {
           if(wsConsumeWs(SENTENCE)) unit = FTUnit.SENTENCES;
           else if(wsConsumeWs(PARAGRAPH)) unit = FTUnit.PARAGRAPHS;
           else error(INCOMPLETE);
-          expr = new FTScope(info(), expr, unit, same);
+          expr = new FTScope(info(), expr, same, unit);
         }
       }
       if(first == null && old != null && old != expr) first = expr;
@@ -3294,17 +3294,17 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr[] ftRange(final boolean i) throws QueryException {
-    final Expr[] occ = { Int.get(1), Int.get(Long.MAX_VALUE) };
+    final Expr[] occ = { Int.get(0), Int.get(Long.MAX_VALUE) };
     if(wsConsumeWs(EXACTLY)) {
       occ[0] = ftAdditive(i);
       occ[1] = occ[0];
     } else if(wsConsumeWs(AT)) {
       if(wsConsumeWs(LEAST)) {
         occ[0] = ftAdditive(i);
-      } else {
-        wsCheck(MOST);
-        occ[0] = Int.get(0);
+      } else if(wsConsumeWs(MOST)) {
         occ[1] = ftAdditive(i);
+      } else {
+        return null;
       }
     } else if(wsConsumeWs(FROM)) {
       occ[0] = ftAdditive(i);

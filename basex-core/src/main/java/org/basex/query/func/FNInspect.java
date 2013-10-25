@@ -33,7 +33,7 @@ public final class FNInspect extends StandardFunc {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
       case _INSPECT_FUNCTIONS: return contextFunctions(ctx);
-      default:                         return super.iter(ctx);
+      default:                 return super.iter(ctx);
     }
   }
 

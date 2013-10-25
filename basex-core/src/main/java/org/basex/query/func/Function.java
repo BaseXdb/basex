@@ -629,8 +629,6 @@ public enum Function {
   _DB_ATTRIBUTE_RANGE(FNDb.class, "attribute-range(database,from,to[,name])",
       arg(STR, ITEM, ITEM, STR), NOD_ZM, flag(NDT)),
   /** XQuery function. */
-  _DB_FULLTEXT(FNDb.class, "fulltext(database,string)", arg(STR, STR), NOD_ZM, flag(NDT)),
-  /** XQuery function. */
   _DB_LIST(FNDb.class, "list([database[,path]])", arg(STR, STR), STR_ZM),
   /** XQuery function. */
   _DB_LIST_DETAILS(FNDb.class, "list-details([database[,path]])",

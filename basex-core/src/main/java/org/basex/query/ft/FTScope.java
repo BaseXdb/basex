@@ -25,12 +25,12 @@ public final class FTScope extends FTFilter {
    * Constructor.
    * @param ii input info
    * @param e expression
-   * @param u unit
-   * @param s same flag
+   * @param sm same flag
+   * @param un unit
    */
-  public FTScope(final InputInfo ii, final FTExpr e, final FTUnit u, final boolean s) {
-    super(ii, e, u);
-    same = s;
+  public FTScope(final InputInfo ii, final FTExpr e, final boolean sm, final FTUnit un) {
+    super(ii, e, un);
+    same = sm;
   }
 
   @Override
@@ -60,7 +60,7 @@ public final class FTScope extends FTFilter {
 
   @Override
   public FTExpr copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
-    return new FTScope(info, expr[0].copy(ctx, scp, vs), unit, same);
+    return new FTScope(info, expr[0].copy(ctx, scp, vs), same, unit);
   }
 
   @Override

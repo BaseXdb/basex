@@ -86,7 +86,6 @@ public final class FNDb extends StandardFunc {
       case _DB_TEXT_RANGE:      return rangeAccess(true, ctx).iter(ctx);
       case _DB_ATTRIBUTE:       return attribute(valueAccess(false, ctx), ctx, 2);
       case _DB_ATTRIBUTE_RANGE: return attribute(rangeAccess(false, ctx), ctx, 3);
-      case _DB_FULLTEXT:        return fulltext(ctx);
       case _DB_LIST:            return list(ctx);
       case _DB_LIST_DETAILS:    return listDetails(ctx);
       case _DB_NODE_ID:         return node(ctx, true);
@@ -223,16 +222,6 @@ public final class FNDb extends StandardFunc {
         return n;
       }
     };
-  }
-
-  /**
-   * Performs the fulltext function.
-   * @param ctx query context
-   * @return iterator
-   * @throws QueryException query exception
-   */
-  private Iter fulltext(final QueryContext ctx) throws QueryException {
-    return FNFt.search(checkData(ctx), ctx.value(expr[1]), null, this, ctx);
   }
 
   /**
@@ -895,8 +884,7 @@ public final class FNDb extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    if(!oneOf(sig, _DB_BACKUPS, _DB_NODE_ID, _DB_NODE_PRE, _DB_EVENT, _DB_OUTPUT,
-        _DB_SYSTEM)) {
+    if(!oneOf(sig, _DB_BACKUPS, _DB_NODE_ID, _DB_NODE_PRE, _DB_EVENT, _DB_OUTPUT, _DB_SYSTEM)) {
       if(expr.length == 0) {
         if(!visitor.lock(null)) return false;
       } else {
@@ -909,8 +897,7 @@ public final class FNDb extends StandardFunc {
   @Override
   public boolean iterable() {
     // index functions will always yield ordered and duplicate-free results
-    return oneOf(sig, _DB_OPEN, _DB_TEXT, _DB_ATTRIBUTE, _DB_FULLTEXT) ||
-      super.iterable();
+    return oneOf(sig, _DB_OPEN, _DB_TEXT, _DB_ATTRIBUTE) || super.iterable();
   }
 
   /**
