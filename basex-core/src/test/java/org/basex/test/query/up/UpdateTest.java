@@ -142,6 +142,17 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
+   * Basic lazy replace test.
+   */
+  @Test
+  public void lazyReplace() {
+    query(transform("<n><r>a</r></n>", "replace node $input/r with <r>b</r>"),
+        "<n><r>b</r></n>");
+
+    query(transform("<n><r>a</r></n>", "replace node $input/r with <r>b</r>"),
+        "<n><r>b</r></n>");
+  }
+  /**
    * ReplaceValue on attribute.
    */
   @Test
@@ -239,7 +250,7 @@ public final class UpdateTest extends AdvancedQueryTest {
    * snapshot. *****
    *
    * Only delete primitives {@link DeleteNode} are allowed to create atomic delete
-   * updates {@link AtomicUpdateList}. This ensures that
+   * updates {@link AtomicUpdateCache}. This ensures that
    * no PRE value is deleted twice by an atomic delete, as the XQUF module resolves
    * multiple operations of the same type on the same node. Deleting a PRE value twice
    * would lead to deleting another node due to PRE shifts after the first delete.
@@ -328,7 +339,8 @@ public final class UpdateTest extends AdvancedQueryTest {
   /**
    * ReplaceElementContent on a target T with a text node and rename on a child of
    * T. As a rename does not introduce any new node identities the rename is lost and T
-   * is expected to have no children after the end of the snapshot.
+   * is expected to have no children after the end of the snapshot (except the new text
+   * node).
    */
   @Test
   public void replaceelementcontent6() {

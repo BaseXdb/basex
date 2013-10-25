@@ -40,7 +40,7 @@ public final class ReplaceNode extends NodeCopy {
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
+  public void addAtomics(final AtomicUpdateCache l) {
     l.addReplace(targetPre, insseq);
   }
 

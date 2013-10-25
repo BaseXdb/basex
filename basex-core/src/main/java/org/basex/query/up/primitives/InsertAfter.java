@@ -33,7 +33,7 @@ public final class InsertAfter extends NodeCopy {
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
+  public void addAtomics(final AtomicUpdateCache l) {
     final int k = data.kind(targetPre);
     final int s = data.size(targetPre, k);
     l.addInsert(targetPre + s, data.parent(targetPre, k), insseq, false);

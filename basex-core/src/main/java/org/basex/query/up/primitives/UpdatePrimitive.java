@@ -69,7 +69,7 @@ public abstract class UpdatePrimitive extends Operation {
    * Adds the atomic update operations for this update primitive to the given list.
    * @param l list of atomic updates
    */
-  public abstract void addAtomics(final AtomicUpdateList l);
+  public abstract void addAtomics(final AtomicUpdateCache l);
 
   /**
    * Substitutes the update primitive if necessary. For instance a 'Replace Value

@@ -67,7 +67,7 @@ public final class DeleteNode extends UpdatePrimitive {
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
+  public void addAtomics(final AtomicUpdateCache l) {
     l.addDelete(targetPre);
   }
 }

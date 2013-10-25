@@ -56,8 +56,8 @@ public final class RenameNode extends UpdatePrimitive {
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
-    l.addRename(targetPre, data.kind(targetPre), name.string(), name.uri());
+  public void addAtomics(final AtomicUpdateCache l) {
+    l.addRename(targetPre, name.string(), name.uri());
   }
 
   @Override

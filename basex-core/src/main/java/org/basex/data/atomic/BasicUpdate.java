@@ -4,35 +4,33 @@ import org.basex.data.*;
 
 /**
  * Abstract atomic update.
- * Atomic updates can only be initialized via {@link AtomicUpdateList}.
+ * Atomic updates can only be initialized via {@link AtomicUpdateCache}.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Lukas Kircher
  */
 public abstract class BasicUpdate {
-  /** PRE value of the target node. */
+  /** PRE value of the target location. */
   final int location;
-  /** PRE value shifts introduced by this atomic update due to structural changes. */
-  final int shifts;
-  /** PRE value of the first node for which the distance must be updated due to PRE value
-   * shifts introduced by this update. */
-  final int preOfAffectedNode;
-
-  /** Total/accumulated number of shifts introduced by all updates on the list up to this
-   * updates (inclusive). The number of total shifts is used to calculate PRE values
-   * before/after updates. */
-  int accumulatedShifts;
+  /** Parent PRE of nodes to insert. */
+  final int parent;
 
   /**
    * Constructor.
    * @param l target node location PRE
-   * @param s PRE value shifts introduced by update
-   * @param f PRE value of the first node the distance of which has to be updated
+   * @param p parent node PRE value
    */
-  BasicUpdate(final int l, final int s, final int f) {
+  BasicUpdate(final int l, final int p) {
     location = l;
-    shifts = s;
-    preOfAffectedNode = f;
+    parent = p;
+  }
+
+  /**
+   * Getter for accumulated shifts.
+   * @return accumulated shifts, or zero if non-structural update.
+   */
+  int accumulatedShifts() {
+    return 0;
   }
 
   /**
@@ -48,15 +46,25 @@ public abstract class BasicUpdate {
   abstract DataClip getInsertionData();
 
   /**
-   * Returns the parent of the update location, mostly important for inserts.
-   * @return parent PRE value
-   */
-  abstract int parent();
-
-  /**
    * Returns whether this updates destroys the target nodes identity. Used to determine
    * superfluous operations on the subtree of the target.
    * @return true, if target node identity destroyed
    */
   abstract boolean destructive();
+
+  /**
+   * Merges the given update and this update if possible.
+   * @param data data reference
+   * @param u update to merge with
+   * @return merged atomic update or null if merge not possible
+   */
+  @SuppressWarnings("unused")
+  public BasicUpdate merge(final Data data, final BasicUpdate u) {
+    return null;
+  }
+
+  @Override
+  public String toString() {
+    return "L" + location;
+  }
 }
