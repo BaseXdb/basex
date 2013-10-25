@@ -46,7 +46,7 @@ import org.basex.util.list.*;
  * <li> Before applying the updates the {@link UpdatePrimitiveComparator} helps to order
  *      {@link UpdatePrimitive} for execution. Each primitive then creates a sequence of
  *      {@link BasicUpdate} which are passed to the {@link Data} layer via an
- *      {@link AtomicUpdateList}. This list takes care of optimization and also text node
+ *      {@link AtomicUpdateCache}. This list takes care of optimization and also text node
  *      merging.</li>
  * </ol>
  *

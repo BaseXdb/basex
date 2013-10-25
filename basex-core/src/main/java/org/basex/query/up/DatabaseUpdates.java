@@ -227,10 +227,10 @@ final class DatabaseUpdates {
    * @param l list of ordered {@link UpdatePrimitive}
    * @return list of atomic updates ready for execution
    */
-  private AtomicUpdateList createAtomicUpdates(final List<UpdatePrimitive> l) {
-    final AtomicUpdateList atomics = new AtomicUpdateList(data);
-    // from the highest to the lowest score
-    for(int i = l.size() - 1; i >= 0; i--) {
+  private AtomicUpdateCache createAtomicUpdates(final List<UpdatePrimitive> l) {
+    final AtomicUpdateCache atomics = new AtomicUpdateCache(data);
+    //  from the lowest to the highest score, corresponds w/ from lowest to highest PRE
+    for(int i = 0; i < l.size(); i++) {
       final UpdatePrimitive u = l.get(i);
       u.addAtomics(atomics);
       l.set(i, null);

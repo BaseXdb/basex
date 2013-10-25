@@ -21,11 +21,23 @@ final class UpdateValue extends BasicUpdate {
    * @param l PRE value of the target node location
    * @param k node kind of the target node
    * @param v new value which is assigned to the target node
+   * @param p parent of updated node
    */
-  UpdateValue(final int l, final int k, final byte[] v) {
-    super(l, 0, -1);
+  private UpdateValue(final int l, final int k, final byte[] v, final int p) {
+    super(l, p);
     targetkind = k;
     value = v;
+  }
+
+  /**
+   * Factory.
+   * @param data data reference
+   * @param pre PRE value of the target node location
+   * @param v new value which is assigned to the target node
+   * @return new instance
+   */
+  static UpdateValue getInstance(final Data data, final int pre, final byte[] v) {
+    return new UpdateValue(pre, data.kind(pre), v, data.parent(pre, data.kind(pre)));
   }
 
   @Override
@@ -40,17 +52,12 @@ final class UpdateValue extends BasicUpdate {
   }
 
   @Override
-  int parent() {
-    return -1;
-  }
-
-  @Override
   boolean destructive() {
     return false;
   }
 
   @Override
   public String toString() {
-    return "UpdateValue: " + location;
+    return "\nUpdateValue: " + super.toString();
   }
 }

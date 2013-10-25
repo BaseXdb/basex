@@ -68,8 +68,8 @@ public final class Replace extends ACreate {
         ok = add.run(context) || error(add.info());
         // delete old documents if addition was successful
         if(ok) {
-          final AtomicUpdateList atomics = new AtomicUpdateList(data);
-          for(int p = pre.size() - 1; p >= 0; p--) atomics.addDelete(pre.get(p));
+          final AtomicUpdateCache atomics = new AtomicUpdateCache(data);
+          for(int p = 0; p < pre.size(); p++) atomics.addDelete(pre.get(p));
           atomics.execute(false);
         }
       }

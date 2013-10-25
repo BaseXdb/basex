@@ -40,7 +40,7 @@ public final class InsertAttribute extends NodeCopy {
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
+  public void addAtomics(final AtomicUpdateCache l) {
     l.addInsert(targetPre + 1, targetPre, insseq, true);
   }
 

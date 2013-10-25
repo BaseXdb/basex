@@ -23,13 +23,27 @@ final class Rename extends BasicUpdate {
    * @param k target node kind
    * @param n new name for the target node
    * @param u new name uri for the target node
+   * @param p parent node PRE
    */
-  Rename(final int l, final int k, final byte[] n, final byte[] u) {
-    super(l, 0, -1);
+  private Rename(final int l, final int k, final byte[] n, final byte[] u, final int p) {
+    super(l, p);
     if(n.length == 0) Util.notexpected("New name must not be empty.");
     targetkind = k;
     name = n;
     uri = u;
+  }
+
+  /**
+   * Factory.
+   * @param data data reference
+   * @param pre target node PRE
+   * @param n new name
+   * @param u new uri
+   * @return instance
+   */
+  static Rename getInstance(final Data data, final int pre, final byte[] n,
+      final byte[] u) {
+    return new Rename(pre, data.kind(pre), n, u, data.parent(pre, data.kind(pre)));
   }
 
   @Override
@@ -44,17 +58,12 @@ final class Rename extends BasicUpdate {
   }
 
   @Override
-  int parent() {
-    return -1;
-  }
-
-  @Override
   boolean destructive() {
     return false;
   }
 
   @Override
   public String toString() {
-    return "Rename: " + location;
+    return "\n Rename: " + super.toString();
   }
 }

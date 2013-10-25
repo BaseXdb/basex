@@ -33,7 +33,7 @@ public class InsertIntoAsLast extends NodeCopy {
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
+  public void addAtomics(final AtomicUpdateCache l) {
     final int s = data.size(targetPre, data.kind(targetPre));
     l.addInsert(targetPre + s, targetPre, insseq, false);
   }

@@ -86,9 +86,9 @@ public final class ReplaceValue extends UpdatePrimitive {
   }
 
   @Override
-  public void addAtomics(final AtomicUpdateList l) {
+  public void addAtomics(final AtomicUpdateCache l) {
     if(!substituted())
-      l.addUpdateValue(targetPre, data.kind(targetPre), value);
+      l.addUpdateValue(targetPre, value);
   }
 
   @Override
