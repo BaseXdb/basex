@@ -39,9 +39,7 @@ public abstract class Step extends Preds {
    * @param p predicates
    * @return step
    */
-  public static Step get(final InputInfo ii, final Axis a, final Test t,
-      final Expr... p) {
-
+  public static Step get(final InputInfo ii, final Axis a, final Test t, final Expr... p) {
     boolean num = false;
     for(final Expr pr : p) num |= pr.type().mayBeNumber() || pr.has(Flag.FCS);
     return num ? new AxisStep(ii, a, t, p) : new IterStep(ii, a, t, p);

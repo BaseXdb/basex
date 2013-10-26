@@ -397,7 +397,7 @@ public final class CmpG extends Cmp {
 
   @Override
   public String description() {
-    return "'" + op + "' expression";
+    return "'" + op + "' operator";
   }
 
   @Override

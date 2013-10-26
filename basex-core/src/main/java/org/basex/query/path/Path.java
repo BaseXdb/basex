@@ -75,7 +75,9 @@ public abstract class Path extends ParseExpr {
   @Override
   public final void checkUp() throws QueryException {
     checkNoUp(root);
-    checkNoneUp(steps);
+    final int ss = steps.length;
+    for(int s = 0; s < ss - 1; ++s) checkNoUp(steps[s]);
+    steps[ss - 1].checkUp();
   }
 
   @Override

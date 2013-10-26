@@ -58,8 +58,7 @@ final class AxisStep extends Step {
   }
 
   @Override
-  public Step copy(final QueryContext ctx, final VarScope scp,
-      final IntObjMap<Var> vs) {
+  public Step copy(final QueryContext ctx, final VarScope scp, final IntObjMap<Var> vs) {
     final Expr[] pred = new Expr[preds.length];
     for(int i = 0; i < pred.length; i++) pred[i] = preds[i].copy(ctx, scp, vs);
     return copy(new AxisStep(info, axis, test.copy(), pred));

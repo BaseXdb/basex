@@ -47,6 +47,16 @@ public final class Bang extends Single {
   }
 
   @Override
+  public void checkUp() throws QueryException {
+    expr.checkUp();
+  }
+
+  @Override
+  public String description() {
+    return "Map operator";
+  }
+
+  @Override
   public String toString() {
     return expr.toString();
   }

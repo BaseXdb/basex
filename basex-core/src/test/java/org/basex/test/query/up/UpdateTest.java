@@ -1093,4 +1093,21 @@ public final class UpdateTest extends AdvancedQueryTest {
         "31"
     );
   }
+
+  /** Tests the modify operator (!!). */
+  @Test
+  public void modify() {
+    query("let $c := <x/> return $c !! ()", "<x/>");
+    query("let $c := <x/> return $c !! insert node <y/> into .", "<x><y/></x>");
+  }
+
+  /**
+   * Tests the relaxed rule that the last step of a path may be simple, vacuous, or updating.
+   */
+  @Test
+  public void updateLastStep() {
+    query("<X/>!(delete node .)");
+    query("<X/>/(delete node .)");
+    query("(<X/>,<Y/>)/(insert node <Z/> into .)");
+  }
 }
