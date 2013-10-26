@@ -788,15 +788,15 @@ public enum Err {
   /** XPST0017. */
   FUNCARGPL(XPST, 17, "%: % arguments supplied."),
   /** XPST0017. */
-  FUNCTYPESG(XPST, 17, "Function '%': % argument supplied; expected: %."),
+  FUNCTYPESG(XPST, 17, "Function '%': % argument supplied, % expected."),
   /** XPST0017. */
-  FUNCTYPEPL(XPST, 17, "Function '%': % arguments supplied; expected: %."),
+  FUNCTYPEPL(XPST, 17, "Function '%': % arguments supplied, % expected."),
   /** XPST0017. */
-  FUNCUNKNOWN(XPST, 17, "Unknown function '%'."),
+  FUNCUNKNOWN(XPST, 17, "Function '%' is unknown."),
   /** XPST0017. */
-  FUNCNOIMPL(XPST, 17, "Function v not implemented."),
+  FUNCNOIMPL(XPST, 17, "Function '%' is not implemented."),
   /** XPST0017. */
-  FUNCJAVA(XPST, 17, "Java function '%' not found."),
+  FUNCJAVA(XPST, 17, "Java function '%' is not found."),
   /** XPST0017. */
   JAVAAMBIG(XPST, 17, "Signature '%' is ambiguous."),
   /** XPST0017. */
