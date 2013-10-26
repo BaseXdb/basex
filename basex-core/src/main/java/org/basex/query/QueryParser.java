@@ -1483,12 +1483,33 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr and() throws QueryException {
-    final Expr e = comparison();
+    final Expr e = modify();
     if(!wsConsumeWs(AND)) return e;
 
     final ExprList el = new ExprList(e);
-    do add(el, comparison()); while(wsConsumeWs(AND));
+    do add(el, modify()); while(wsConsumeWs(AND));
     return new And(info(), el.finish());
+  }
+
+  /**
+   * Parses the "CopyExpr" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr modify() throws QueryException {
+    final Expr e = comparison();
+    if(e != null) {
+      if(wsConsumeWs("!!")) {
+        final int s = scope.open();
+        final boolean u = ctx.updating;
+        ctx.updating(false);
+        final Expr m = check(single(), COPYEXPR);
+        scope.close(s);
+        ctx.updating = u;
+        return new Modify(info(), e, m);
+      }
+    }
+    return e;
   }
 
   /**
@@ -1830,7 +1851,7 @@ public class QueryParser extends InputParser {
       final Expr ex = step();
       if(ex == null) return null;
       // return non-step expression if no path or map operator follows
-      final boolean nostep = curr() != '/' && (curr() != '!' || next() == '=');
+      final boolean nostep = curr() != '/' && (curr() != '!' || next() == '=' || next() == '!');
       if(nostep && !(ex instanceof Step)) return ex;
       el = new ExprList();
       if(ex instanceof Step) add(el, ex);
@@ -1847,7 +1868,7 @@ public class QueryParser extends InputParser {
    */
   void relativePath(final ExprList el) throws QueryException {
     while(true) {
-      boolean b = false;
+      boolean map = false;
       if(consume('/')) {
         if(consume('/')) {
           add(el, descOrSelf());
@@ -1855,15 +1876,15 @@ public class QueryParser extends InputParser {
         } else {
           checkAxis(Axis.CHILD);
         }
-      } else if(next() != '=' && consume('!')) {
-        b = true;
+      } else if(next() != '=' && next() != '!' && consume('!')) {
+        map = true;
       } else {
         return;
       }
       mark();
       Expr st = step();
       if(st == null) error(PATHMISS, found());
-      if(b) st = new Bang(info(), st);
+      if(map) st = new Bang(info(), st);
       add(el, st);
     }
   }

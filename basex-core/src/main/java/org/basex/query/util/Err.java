@@ -636,6 +636,8 @@ public enum Err {
   /** XPST0003. */
   CMPEXPR(XPST, 3, "Comparison is incomplete."),
   /** XPST0003. */
+  COPYEXPR(XPST, 3, "Copy expression is incomplete."),
+  /** XPST0003. */
   NOTAG(XPST, 3, "Expecting tag name."),
   /** XPST0003. */
   TAGNAME(XPST, 3, "Expecting tag name, '<%' found."),
@@ -1105,6 +1107,8 @@ public enum Err {
   UPWRTRGTYP(XUTY, 12, "Single element, attribute or pi expected as rename target."),
   /** XUTY0013. */
   UPCOPYMULT(XUTY, 13, "Value assigned to $% must be a single node."),
+  /** XUTY0013. */
+  UPSOURCE(XUTY, 13, "Source of copy expression must be a single node."),
   /** XUTY0022. */
   UPATTELM2(XUTY, 22, "Insert target must be an element.");
 
