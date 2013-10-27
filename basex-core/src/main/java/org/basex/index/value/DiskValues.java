@@ -421,7 +421,7 @@ public class DiskValues implements Index {
    * @return if the key is found: index of the key else: (-(insertion point) - 1)
    */
   protected int get(final byte[] key) {
-    return get(key, 0, size.get() - 1);
+    return get(key, 0, size.get());
   }
 
   /**
@@ -433,7 +433,7 @@ public class DiskValues implements Index {
    * @return if the key is found: index of the key else: (-(insertion point) - 1)
    */
   protected int get(final byte[] key, final int first, final int last) {
-    int l = first, h = last;
+    int l = first, h = last - 1;
     synchronized(monitor) {
       while(l <= h) {
         final int m = l + h >>> 1;
