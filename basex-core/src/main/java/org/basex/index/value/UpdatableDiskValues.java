@@ -76,8 +76,8 @@ public final class UpdatableDiskValues extends DiskValues {
     for(int j = nkeys.size() - 1, i = last, pos = s + j; j >= 0; --j) {
       final byte[] key = nkeys.get(j);
 
-      final int in = -(1 + get(key, 0, i));
-      if(in < 0) throw new IllegalStateException("Key should not exist: '" + string(key) + "'");
+      final int in = -(1 + get(key, 0, i + 1));
+      if(in < 0) Util.notexpected("Key should not exist: '" + string(key) + "'");
 
       // shift all bigger keys to the right
       while(i >= in) {
@@ -130,11 +130,11 @@ public final class UpdatableDiskValues extends DiskValues {
 
     // delete ids and create a list of the key positions which should be deleted
     final IntList empty = new IntList(m.size());
-    int p = 0;
-    final int s = size.get() - 1;
+    int p = -1;
+    final int s = size.get();
     for(final byte[] key : allkeys) {
-      p = get(key, p, s);
-      if(p < 0) p = -(p + 1); // should not occur, but anyway
+      p = get(key, ++p, s);
+      if(p < 0) Util.notexpected("Tried to delete ids " + m.get(key) + " of non-existing index key: '" + string(key) + "'");
       else if(deleteIds(p, key, m.get(key).sort().toArray()) == 0) empty.add(p);
     }
 
@@ -154,7 +154,7 @@ public final class UpdatableDiskValues extends DiskValues {
     final int numold = idxl.readNum(pos);
 
     if(numold == ids.length) {
-      // all ids should be detected: the key itself will be deleted, too
+      // all ids should be deleted: the key itself will be deleted, too
       cache.delete(key);
       return 0;
     }
