@@ -67,6 +67,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void transform() {
     query("let $c := <x/> return copy $c := $c modify () return $c", "<x/>");
+    query("declare variable $d := document{ <x/> } !! (); $d/x", "<x/>");
   }
 
   /**
@@ -1094,7 +1095,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     );
   }
 
-  /** Tests the modify operator (!!). */
+  /** Tests the experimental modify operator (!!). */
   @Test
   public void modify() {
     query("let $c := <x/> return $c !! ()", "<x/>");

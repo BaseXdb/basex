@@ -29,8 +29,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
    * @param i input info
    * @param n node copy
    */
-  NodeCopy(final PrimitiveType t, final int p, final Data d, final InputInfo i,
-      final ANodeList n) {
+  NodeCopy(final PrimitiveType t, final int p, final Data d, final InputInfo i, final ANodeList n) {
     super(t, p, d, i);
     insert = n;
   }

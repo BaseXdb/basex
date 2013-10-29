@@ -369,7 +369,7 @@ public final class MetaData {
   /**
    * Notifies the meta structures of an update and invalidates the indexes.
    */
-  void update() {
+  public void update() {
     // update database timestamp
     time = System.currentTimeMillis();
     uptodate = false;
