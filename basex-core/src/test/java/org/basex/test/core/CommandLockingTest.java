@@ -1,12 +1,12 @@
 package org.basex.test.core;
 
 import static org.junit.Assert.*;
-import org.basex.index.*;
 
 import org.basex.core.*;
-import org.basex.core.LockResult;
 import org.basex.core.cmd.*;
+import org.basex.index.*;
 import org.basex.test.*;
+import org.basex.test.query.func.*;
 import org.basex.util.list.*;
 import org.junit.*;
 
@@ -52,7 +52,9 @@ public class CommandLockingTest extends SandboxTest {
   private static final StringList BACKUP_NAME = new StringList(DBLocking.BACKUP, NAME);
   /** StringList containing EVENT lock string. */
   private static final StringList EVENT_LIST = new StringList(DBLocking.EVENT);
-
+  /** StringList containing java module test lock strings. */
+  private static final StringList MODULE_LIST = new StringList(DBLocking.MODULE_PREFIX
+      + QueryModuleTest.LOCK1, DBLocking.MODULE_PREFIX + QueryModuleTest.LOCK2);
   /**
    * Test commands affecting databases.
    */
@@ -114,9 +116,10 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new Store(FILE), true, CTX_LIST);
   }
 
-  /** Tests locked databases in XQuery queries. */
+  /** Tests locked databases in XQuery queries.
+   * @throws BaseXException database exception */
   @Test
-  public void xquery() {
+  public void xquery() throws BaseXException {
     // Basic document access
     ckDBs(new XQuery("collection('" + NAME + "')"), false, NAME_LIST);
     ckDBs(new XQuery("collection()"), false, COLL_LIST);
@@ -169,6 +172,19 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery("declare function local:a($a) {" +
         "if($a = 0) then doc('" + NAME + "') else local:a($a idiv 2) };" +
         "local:a(5)"), false, NAME_LIST);
+
+    // Java module function test. Locks are added at compilation, so execute each query
+    // to get it compiled.
+    XQuery query = new XQuery(
+        "import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
+        "qm:readLock()");
+    query.execute(context);
+    ckDBs(query, false, MODULE_LIST);
+    query = new XQuery(
+        "import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
+        "qm:writeLock()");
+    query.execute(context);
+    ckDBs(query, true, MODULE_LIST);
   }
 
   /** Test admin module. */

@@ -178,7 +178,7 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
-   * Throws an error if the name of a function is similar to the specified function name.
+   * Throws an exception if the name of a function is similar to the specified function name.
    * @param name function name
    * @param ii input info
    * @throws QueryException query exception

@@ -413,7 +413,7 @@ final class XMLScanner extends Proc {
   }
 
   /**
-   * Checks input for whitespaces; if none are found, throws an error.
+   * Checks input for whitespaces; if none are found, throws an exception.
    * @throws IOException I/O exception
    */
   private void checkS() throws IOException {
@@ -1008,7 +1008,7 @@ final class XMLScanner extends Proc {
   }
 
   /**
-   * Throws an error.
+   * Throws an exception.
    * @param e error message
    * @param a error arguments
    * @return build exception (indicates that an error is raised)

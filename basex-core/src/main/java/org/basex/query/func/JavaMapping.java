@@ -185,6 +185,14 @@ public abstract class JavaMapping extends Arr {
     final QueryModule.Requires req = meth.getAnnotation(QueryModule.Requires.class);
     if(req != null) perm = Perm.get(req.value().name());
     if(!ctx.context.user.has(perm)) return null;
+
+    // Add module locks to QueryContext.
+    QueryModule.Lock lock = meth.getAnnotation(QueryModule.Lock.class);
+    if(lock != null) {
+      for(String read : lock.read()) ctx.readLocks.add(DBLocking.MODULE_PREFIX + read);
+      for(String write : lock.write()) ctx.writeLocks.add(DBLocking.MODULE_PREFIX + write);
+    }
+
     return meth;
   }
 

@@ -402,7 +402,7 @@ public final class StringParser extends CmdParser {
   }
 
   /**
-   * Returns the found command or throws an error.
+   * Returns the found command or throws an exception.
    * @param cmp possible completions
    * @param par parent command
    * @param <E> token type

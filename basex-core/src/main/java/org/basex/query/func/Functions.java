@@ -247,7 +247,7 @@ public final class Functions extends TokenSet {
   }
 
   /**
-   * Throws an error if the name of a pre-defined functions is similar to the
+   * Throws an exception if the name of a pre-defined functions is similar to the
    * specified function name.
    * @param name function name
    * @param ii input info
