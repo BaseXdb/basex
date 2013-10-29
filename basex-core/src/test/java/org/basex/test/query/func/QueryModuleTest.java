@@ -60,16 +60,12 @@ public class QueryModuleTest extends QueryModule {
   /**
    * Read lock.
    */
-  @Requires(Permission.NONE)
-  @ContextDependent
   @Lock(read = { LOCK1, LOCK2})
   public void readLock() { }
 
   /**
    * Write locks.
    */
-  @Requires(Permission.NONE)
-  @ContextDependent
   @Lock(write = { LOCK1, LOCK2})
   public void writeLock() { }
 
