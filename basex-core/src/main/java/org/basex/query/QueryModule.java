@@ -7,7 +7,7 @@ import java.lang.annotation.*;
  * as well as Java instances, which will be treated as modules. Any class with a public,
  * empty constructor can be imported as module.</p>
  *
- * <p>If a class extends the {@link QueryModule} class, it inherits the {@link #context}
+ * <p>If a class extends the {@link QueryModule} class, it inherits the {@link #queryContext}
  * and {@link #staticContext} variables, which provide access to all properties of the
  * current query. E.g., they provide access to the current {@link QueryContext#value
  * context item} or the {@link StaticContext#ns declared namespaces} of a query.
@@ -21,7 +21,7 @@ import java.lang.annotation.*;
  *       {@link Deterministic} if you know that it will have no side-effects and will
  *       always yield the same result.</li>
  *   <li>Java code is treated as "context-independent". If a function accesses
- *       the specified {@link #context}, it should be annotated as
+ *       the specified {@link #queryContext}, it should be annotated as
  *       {@link ContextDependent}.</li>
  *   <li>Java code is treated as "focus-independent". If a function accesses
  *       the current context item, position or size, it should be annotated as
@@ -82,7 +82,7 @@ public abstract class QueryModule {
 
   /**
    * Java code is treated as "context-independent". If a function accesses the specified
-   * {@link #context}, it should be annotated as {@link ContextDependent}.
+   * {@link #queryContext}, it should be annotated as {@link ContextDependent}.
    */
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.METHOD)
@@ -117,9 +117,8 @@ public abstract class QueryModule {
     String[] write() default { };
   }
 
+  /** Global query context. */
+  public QueryContext queryContext;
   /** Static context. */
   public StaticContext staticContext;
-
-  /** Query context. */
-  public QueryContext context;
 }

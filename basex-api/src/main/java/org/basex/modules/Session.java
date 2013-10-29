@@ -102,7 +102,7 @@ public final class Session extends QueryModule {
     final Data d = it.data();
     if(d != null && !d.inMemory()) {
       // convert database node to main memory data instance
-      it = ((ANode) it).dbCopy(context.context.options);
+      it = ((ANode) it).dbCopy(queryContext.context.options);
     } else if(it instanceof FItem) {
       throw SessionErrors.functionItem();
     }
@@ -134,7 +134,7 @@ public final class Session extends QueryModule {
    * @throws QueryException query exception
    */
   private HttpSession session() throws QueryException {
-    if(context.http == null) throw SessionErrors.noContext();
-    return ((HTTPContext) context.http).req.getSession();
+    if(queryContext.http == null) throw SessionErrors.noContext();
+    return ((HTTPContext) queryContext.http).req.getSession();
   }
 }

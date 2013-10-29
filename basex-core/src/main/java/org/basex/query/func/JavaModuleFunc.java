@@ -49,7 +49,7 @@ public final class JavaModuleFunc extends JavaMapping {
     if(module instanceof QueryModule) {
       final QueryModule mod = (QueryModule) module;
       mod.staticContext = sc;
-      mod.context = ctx;
+      mod.queryContext = ctx;
     }
 
     final Object[] args = JavaFunc.args(mth.getParameterTypes(), vals, true);

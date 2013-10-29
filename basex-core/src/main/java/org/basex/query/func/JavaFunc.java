@@ -106,7 +106,7 @@ public final class JavaFunc extends JavaMapping {
           if(inst instanceof QueryModule) {
             final QueryModule mod = (QueryModule) inst;
             mod.staticContext = sc;
-            mod.context = ctx;
+            mod.queryContext = ctx;
           }
         }
         return meth.invoke(inst, arg);

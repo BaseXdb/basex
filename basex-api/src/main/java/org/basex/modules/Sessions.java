@@ -105,7 +105,7 @@ public final class Sessions extends QueryModule {
     final Data d = it.data();
     if(d != null && !d.inMemory()) {
       // convert database node to main memory data instance
-      it = ((ANode) it).dbCopy(context.context.options);
+      it = ((ANode) it).dbCopy(queryContext.context.options);
     } else if(it instanceof FItem) {
       throw SessionErrors.functionItem();
     }
@@ -138,7 +138,7 @@ public final class Sessions extends QueryModule {
    * @throws QueryException query exception
    */
   private HttpSession session(final Str id) throws QueryException {
-    if(context.http == null) throw SessionErrors.noContext();
+    if(queryContext.http == null) throw SessionErrors.noContext();
     final HashMap<String, HttpSession> http = SessionListener.sessions();
     final HttpSession session = http.get(id.toJava());
     if(session == null) throw SessionErrors.whichSession(id);

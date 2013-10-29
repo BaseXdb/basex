@@ -272,7 +272,7 @@ public final class Request extends QueryModule {
    * @throws QueryException query exception
    */
   private HttpServletRequest request() throws QueryException {
-    if(context.http != null) return ((HTTPContext) context.http).req;
+    if(queryContext.http != null) return ((HTTPContext) queryContext.http).req;
     throw new QueryException("Servlet context required.");
   }
 }

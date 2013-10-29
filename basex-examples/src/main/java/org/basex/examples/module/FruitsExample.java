@@ -35,7 +35,7 @@ public final class FruitsExample {
         "  for $i in 1 to 4\n" +
         "  return fruits:fast($i)\n" +
         "},\n" +
-        "element functions { fruits:functionNamespace() }";
+        "element user { fruits:user() }";
 
     System.out.println("\n* Query:");
     System.out.println(query);
