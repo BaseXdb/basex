@@ -71,7 +71,7 @@ public final class RESTPost {
       // handle database options
       qp = new QueryProcessor("*/*:option", ctx).context(doc);
       for(final Item it : qp.value()) {
-        final String name = value("@name", it, ctx);
+        final String name = value("@name", it, ctx).toUpperCase(Locale.ENGLISH);
         final String value = value("@value", it, ctx);
         ctx.options.assign(name, value);
       }
