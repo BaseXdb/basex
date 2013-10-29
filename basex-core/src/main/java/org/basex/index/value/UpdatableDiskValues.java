@@ -134,7 +134,8 @@ public final class UpdatableDiskValues extends DiskValues {
     final int s = size.get();
     for(final byte[] key : allkeys) {
       p = get(key, ++p, s);
-      if(p < 0) Util.notexpected("Tried to delete ids " + m.get(key) + " of non-existing index key: '" + string(key) + "'");
+      if(p < 0) Util.notexpected("Tried to delete ids " + m.get(key) +
+          " of non-existing index key: '" + string(key) + "'");
       else if(deleteIds(p, key, m.get(key).sort().toArray()) == 0) empty.add(p);
     }
 
