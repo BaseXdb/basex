@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -17,27 +18,49 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class RESTRun extends RESTQuery {
+  /** Path. */
+  final String path;
+
   /**
    * Constructor.
-   * @param in input file to be executed
+   * @param rs REST session
    * @param vars external variables
-   * @param it context item
+   * @param val context value
+   * @param pth path to query file
    */
-  RESTRun(final String in, final Map<String, String[]> vars, final byte[] it) {
-    super(in, vars, it);
+  RESTRun(final RESTSession rs, final Map<String, String[]> vars, final String val,
+      final String pth) {
+    super(rs, vars, val);
+    path = pth;
   }
 
   @Override
-  void run(final HTTPContext http) throws IOException {
+  protected void run0() throws IOException {
+    query(path);
+  }
+
+  /**
+   * Creates a new instance of this command.
+   * @param rs REST session
+   * @param input query input
+   * @param vars external variables
+   * @param val context value
+   * @return command
+   * @throws IOException I/O exception
+   */
+  static RESTRun get(final RESTSession rs, final String input, final Map<String, String[]> vars,
+      final String val) throws IOException {
+
     // get root directory for files
-    final IOFile root = new IOFile(http.context().globalopts.get(GlobalOptions.WEBPATH));
+    final IOFile root = new IOFile(rs.context.globalopts.get(GlobalOptions.WEBPATH));
 
     // check if file is not found, is a folder or points to parent folder
     final IOFile io = new IOFile(root, input);
     if(!io.exists() || io.isDir() || !io.path().startsWith(root.path()))
-      HTTPErr.NOT_FOUND_X.thrw(Util.info(RES_NOT_FOUND_X, input));
+      HTTPCode.NOT_FOUND_X.thrw(Util.info(RES_NOT_FOUND_X, input));
 
     // perform query
-    query(io.string(), http, io.path());
+    rs.add(new XQuery(io.string()));
+    return new RESTRun(rs, vars, val, io.path());
   }
 }

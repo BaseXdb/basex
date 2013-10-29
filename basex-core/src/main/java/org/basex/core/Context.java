@@ -117,7 +117,8 @@ public final class Context {
   }
 
   /**
-   * Closes the database context. Should only be called from the main context instance.
+   * Closes the database context. Should only be called on the global database context,
+   * and not on client instances.
    */
   public synchronized void close() {
     while(!sessions.isEmpty()) sessions.get(0).quit();

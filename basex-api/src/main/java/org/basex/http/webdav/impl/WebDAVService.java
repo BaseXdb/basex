@@ -1,29 +1,23 @@
 package org.basex.http.webdav.impl;
 
-import org.basex.core.MainOptions;
-import org.basex.core.Text;
-import org.basex.core.cmd.*;
-import org.basex.http.HTTPContext;
-import org.basex.io.in.ArrayInput;
-import org.basex.io.in.BufferInput;
-import org.basex.query.func.*;
-import org.basex.server.Query;
-import org.basex.server.Session;
-import org.basex.util.DateTime;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import static org.basex.http.webdav.impl.Utils.*;
+import static org.basex.http.webdav.impl.WebDAVLockService.*;
+import static org.basex.io.MimeTypes.*;
+import static org.basex.query.func.Function.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.io.*;
+import java.text.*;
+import java.util.*;
 import java.util.List;
 
-import static org.basex.http.webdav.impl.WebDAVLockService.*;
-import static org.basex.http.webdav.impl.Utils.*;
-import static org.basex.io.MimeTypes.APP_XML;
-import static org.basex.query.func.Function.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.core.cmd.Set;
+import org.basex.http.*;
+import org.basex.io.in.*;
+import org.basex.query.func.*;
+import org.basex.server.*;
+import org.basex.util.*;
 
 /**
  * Service handling the various WebDAV operations.
@@ -58,7 +52,7 @@ public final class WebDAVService<T> {
    */
   public void authenticate(final String user, final String pass) throws IOException {
     http.credentials(user, pass);
-    http.session().close();
+    http.authenticate();
   }
 
   /**
@@ -66,27 +60,36 @@ public final class WebDAVService<T> {
    * @param user user name
    * @param action action
    * @param db database
-   * @param p path
+   * @param path path
    * @return {@code true} if the user is authorized
    */
   @SuppressWarnings("unused")
   public boolean authorize(final String user, final String action, final String db,
-      final String p) {
+      final String path) {
     return !WEBDAV_LOCKS_DB.equals(db);
+  }
+
+  /**
+   * Returns an HTTP session.
+   * @return session
+   * @throws LoginException login exception
+   */
+  private LocalSession session() throws LoginException {
+    return new LocalSession(http.authenticate(), http.user, http.pass);
   }
 
   /**
    * Checks a folder for a dummy document and delete it.
    * @param db database
-   * @param p path
+   * @param path path
    * @throws IOException I/O exception
    */
-  public void deleteDummy(final String db, final String p) throws IOException {
-    final String dummy = p + SEP + DUMMY;
+  public void deleteDummy(final String db, final String path) throws IOException {
+    final String dummy = path + SEP + DUMMY;
     if(!pathExists(db, dummy)) return;
 
     // path contains dummy document
-    final Session session = http.session();
+    final Session session = session();
     session.execute(new Open(db));
     session.execute(new Delete(dummy));
   }
@@ -98,13 +101,9 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public boolean dbExists(final String db) throws IOException {
-    final Query q = http.session().query(_DB_LIST.args() + "[. = $db]");
+    final Query q = session().query(_DB_LIST.args() + "[. = $db]");
     q.bind("db", db);
-    try {
-      return q.more();
-    } finally {
-      q.close();
-    }
+    return !q.execute().isEmpty();
   }
 
   /**
@@ -114,14 +113,13 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public long timestamp(final String db) throws IOException {
-    final String s = DATA.args(_DB_INFO.args("$p") +
-        "/descendant::" + FNDb.toName(Text.TIMESTAMP) + "[1]");
-    final Query q = http.session().query(s);
+    final Query q = session().query(DATA.args(_DB_INFO.args("$p") +
+        "/descendant::" + FNDb.toName(Text.TIMESTAMP) + "[1]"));
     q.bind("p", db);
     try {
       // retrieve and parse timestamp
       return DateTime.parse(q.execute(), DateTime.DATETIME).getTime();
-    } catch(final Exception ex) {
+    } catch(final ParseException ex) {
       Util.errln(ex);
       return 0L;
     }
@@ -130,12 +128,12 @@ public final class WebDAVService<T> {
   /**
    * Retrieves meta data about the resource at the given path.
    * @param db database
-   * @param p resource path
+   * @param path resource path
    * @return resource meta data
    * @throws IOException I/O exception
    */
-  ResourceMetaData metaData(final String db, final String p) throws IOException {
-    final Query q = http.session().query(
+  ResourceMetaData metaData(final String db, final String path) throws IOException {
+    final Query q = session().query(
         "let $a := " + _DB_LIST_DETAILS.args("$d", "$p") +
         "return (" +
         "$a/@raw/data()," +
@@ -144,15 +142,15 @@ public final class WebDAVService<T> {
         "$a/@size/data()," +
         "$a/text())");
     q.bind("d", db);
-    q.bind("p", p);
+    q.bind("p", path);
     try {
       final boolean raw = Boolean.parseBoolean(q.next());
       final String ctype = q.next();
       final long mod = DateTime.parse(q.next());
       final Long size = raw ? Long.valueOf(q.next()) : null;
-      final String path = stripLeadingSlash(q.next());
-      final boolean folder = path.lastIndexOf(SEP) <= 0;
-      return new ResourceMetaData(db, path, mod, raw, ctype, size, folder);
+      final String pth = stripLeadingSlash(q.next());
+      final boolean folder = pth.lastIndexOf(SEP) <= 0;
+      return new ResourceMetaData(db, pth, mod, raw, ctype, size, folder);
     } finally {
       q.close();
     }
@@ -161,57 +159,58 @@ public final class WebDAVService<T> {
   /**
    * Deletes a document or folder.
    * @param db database
-   * @param p path
+   * @param path path
    * @throws IOException I/O exception
    */
-  public void delete(final String db, final String p) throws IOException {
-    final Session session = http.session();
+  public void delete(final String db, final String path) throws IOException {
+    final Session session = session();
     session.execute(new Open(db));
-    session.execute(new Delete(p));
+    session.execute(new Delete(path));
 
     // create dummy, if parent is an empty folder
-    final int ix = p.lastIndexOf(SEP);
-    if(ix > 0) createDummy(db, p.substring(0, ix));
+    final int ix = path.lastIndexOf(SEP);
+    if(ix > 0) createDummy(db, path.substring(0, ix));
   }
 
   /**
    * Renames a document or folder.
    * @param db database
-   * @param p path
-   * @param n new name
+   * @param path path
+   * @param npath new path
    * @throws IOException I/O exception
    */
-  public void rename(final String db, final String p, final String n) throws IOException {
-    final Session session = http.session();
+  public void rename(final String db, final String path, final String npath) throws IOException {
+    final Session session = session();
     session.execute(new Open(db));
-    session.execute(new Rename(p, n));
+    session.execute(new Rename(path, npath));
 
     // create dummy, if old parent is an empty folder
-    final int i1 = p.lastIndexOf(SEP);
-    if(i1 > 0) createDummy(db, p.substring(0, i1));
+    final int i1 = path.lastIndexOf(SEP);
+    if(i1 > 0) createDummy(db, path.substring(0, i1));
 
     // delete dummy, if new parent is an empty folder
-    final int i2 = n.lastIndexOf(SEP);
-    if(i2 > 0) deleteDummy(db, n.substring(0, i2));
+    final int i2 = npath.lastIndexOf(SEP);
+    if(i2 > 0) deleteDummy(db, npath.substring(0, i2));
   }
 
   /**
    * Copies a document to the specified target.
-   * @param sdb source database
-   * @param spath source path
+   * @param db source database
+   * @param path source path
    * @param tdb target database
    * @param tpath target path
    * @throws IOException I/O exception
    */
-  public void copyDoc(final String sdb, final String spath, final String tdb,
-      final String tpath) throws IOException {
-    final Query q = http.session().query(
+  public void copyDoc(final String db, final String path, final String tdb, final String tpath)
+      throws IOException {
+
+    final Query q = session().query(
         "declare option db:chop 'false'; " +
         "if(" + _DB_IS_RAW.args("$db", "$path") + ") " +
         " then " + _DB_STORE.args("$tdb", "$tpath", _DB_RETRIEVE.args("$db", "$path")) +
         " else " + _DB_ADD.args("$tdb", _DB_OPEN.args("$db", "$path"), "$tpath"));
-    q.bind("db", sdb);
-    q.bind("path", spath);
+    q.bind("db", db);
+    q.bind("path", path);
     q.bind("tdb", tdb);
     q.bind("tpath", tpath);
     q.execute();
@@ -219,23 +218,24 @@ public final class WebDAVService<T> {
 
   /**
    * Copies all documents in a folder to another folder.
-   * @param sdb source database
-   * @param spath source path
+   * @param db source database
+   * @param path source path
    * @param tdb target database
    * @param tpath target folder
    * @throws IOException I/O exception
    */
-  public void copyAll(final String sdb, final String spath, final String tdb,
-      final String tpath) throws IOException {
-    final Query q = http.session().query(
+  public void copyAll(final String db, final String path, final String tdb, final String tpath)
+      throws IOException {
+
+    final Query q = session().query(
         "declare option db:chop 'false'; " +
         "for $d in " + _DB_LIST.args("$db", "$path") +
         "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) return " +
         "if(" + _DB_IS_RAW.args("$db", "$d") + ") " +
         "then " + _DB_STORE.args("$tdb", "$t", _DB_RETRIEVE.args("$db", "$d")) +
         " else " + _DB_ADD.args("$tdb", _DB_OPEN.args("$db", "$d"), "$t"));
-    q.bind("db", sdb);
-    q.bind("path", spath);
+    q.bind("db", db);
+    q.bind("path", path);
     q.bind("tdb", tdb);
     q.bind("tpath", tpath);
     q.execute();
@@ -244,21 +244,21 @@ public final class WebDAVService<T> {
   /**
    * Writes a file to the specified output stream.
    * @param db database
-   * @param p path
+   * @param path path
    * @param raw is the file a raw file
    * @param out output stream
    * @throws IOException I/O exception
    */
-  public void retrieve(final String db, final String p, final boolean raw,
+  public void retrieve(final String db, final String path, final boolean raw,
       final OutputStream out) throws IOException {
 
-    final Session session = http.session();
+    final Session session = session();
     session.setOutputStream(out);
     final Query q = session.query("declare option output:" + (raw ?
       "method 'raw'; " + _DB_RETRIEVE.args("$db", "$path") :
       "use-character-maps 'webdav'; " + _DB_OPEN.args("$db", "$path")));
     q.bind("db", db);
-    q.bind("path", p);
+    q.bind("path", path);
     q.execute();
   }
 
@@ -269,7 +269,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public T createDb(final String db) throws IOException {
-    http.session().execute(new CreateDB(db));
+    session().execute(new CreateDB(db));
     return factory.database(this, new ResourceMetaData(db, timestamp(db)));
   }
 
@@ -279,7 +279,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public void dropDb(final String db) throws IOException {
-    http.session().execute(new DropDB(db));
+    session().execute(new DropDB(db));
   }
 
   /**
@@ -289,7 +289,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public void renameDb(final String db, final String n) throws IOException {
-    http.session().execute(new AlterDB(db, n));
+    session().execute(new AlterDB(db, n));
   }
 
   /**
@@ -299,7 +299,7 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   public void copyDb(final String db, final String n) throws IOException {
-    http.session().execute(new Copy(db, n));
+    session().execute(new Copy(db, n));
   }
 
   /**
@@ -312,7 +312,7 @@ public final class WebDAVService<T> {
   public List<T> list(final String db, final String path) throws IOException {
     final List<T> ch = new ArrayList<T>();
     final HashSet<String> paths = new HashSet<String>();
-    final Query q = http.session().query(
+    final Query q = session().query(
         "for $a in " + _DB_LIST_DETAILS.args("$d", "$p") +
         "return ($a/@raw/data()," +
         "$a/@content-type/data()," +
@@ -326,15 +326,15 @@ public final class WebDAVService<T> {
       final String ctype = q.next();
       final long mod = DateTime.parse(q.next());
       final Long size = raw ? Long.valueOf(q.next()) : null;
-      final String p = stripLeadingSlash(q.next());
-      final int ix = p.indexOf(SEP);
+      final String pth = stripLeadingSlash(q.next());
+      final int ix = pth.indexOf(SEP);
       // check if document or folder
       if(ix < 0) {
-        if(!p.equals(DUMMY))
-          ch.add(factory.file(this, new ResourceMetaData(db, path + SEP + p, mod,
+        if(!pth.equals(DUMMY))
+          ch.add(factory.file(this, new ResourceMetaData(db, path + SEP + pth, mod,
             raw, ctype, size)));
       } else {
-        final String dir = path + SEP + p.substring(0, ix);
+        final String dir = path + SEP + pth.substring(0, ix);
         if(paths.add(dir))
           ch.add(factory.folder(this, new ResourceMetaData(db, dir, mod)));
       }
@@ -350,7 +350,7 @@ public final class WebDAVService<T> {
    */
   public List<T> listDbs() throws IOException {
     final List<T> dbs = new ArrayList<T>();
-    final Query q = http.session().query(
+    final Query q = session().query(
         "for $d in " + _DB_LIST_DETAILS.args() +
         "where not($d/text() eq '" + WEBDAV_LOCKS_DB + "') " +
         "return ($d/text(), $d/@modified-date/data())");
@@ -371,15 +371,14 @@ public final class WebDAVService<T> {
   /**
    * Creates a folder at the given path.
    * @param db database
-   * @param p path
-   * @param n new folder name
+   * @param path path
+   * @param name new folder name
    * @return new folder resource
    * @throws IOException I/O exception
    */
-  public T createFolder(final String db, final String p, final String n) throws IOException {
-
-    deleteDummy(db, p);
-    final String newFolder = p + SEP + n;
+  public T createFolder(final String db, final String path, final String name) throws IOException {
+    deleteDummy(db, path);
+    final String newFolder = path + SEP + name;
     createDummy(db, newFolder);
     return factory.folder(this, new ResourceMetaData(db, newFolder, timestamp(db)));
   }
@@ -387,36 +386,40 @@ public final class WebDAVService<T> {
   /**
    * Gets the resource at the given path.
    * @param db database
-   * @param p path
+   * @param path path
    * @return resource
    * @throws IOException I/O exception
    */
-  public T resource(final String db, final String p) throws IOException {
-    return exists(db, p) ?
-      factory.file(this, metaData(db, p)) :
-      pathExists(db, p) ?
-        factory.folder(this, new ResourceMetaData(db, p, timestamp(db))) :
+  public T resource(final String db, final String path) throws IOException {
+    return exists(db, path) ?
+      factory.file(this, metaData(db, path)) :
+      pathExists(db, path) ?
+        factory.folder(this, new ResourceMetaData(db, path, timestamp(db))) :
         null;
   }
 
   /**
    * Adds the given file to the specified path.
    * @param db database
-   * @param p path
-   * @param n file name
+   * @param path path
+   * @param name file name
    * @param in file content
    * @return object representing the newly added file
    * @throws IOException I/O exception
    */
-  public T createFile(final String db, final String p, final String n,
+  public T createFile(final String db, final String path, final String name,
     final InputStream in) throws IOException {
-    final Session session = http.session();
+    final Session session = session();
     session.execute(new Open(db));
-    final String dbp = p.isEmpty() ? n : p + SEP + n;
+    final String dbp = path.isEmpty() ? name : path + SEP + name;
     // delete old resource if it already exists
-    if(pathExists(db, dbp)) session.execute(new Delete(dbp));
+    if(pathExists(db, dbp)) {
+      session.execute(new Open(db));
+      session.execute(new Delete(dbp));
+    } else {
       // otherwise, delete dummy file
-    else deleteDummy(db, p);
+      deleteDummy(db, path);
+    }
     return addFile(db, dbp, in);
   }
 
@@ -434,28 +437,28 @@ public final class WebDAVService<T> {
   /**
    * Checks if any of the resources which start with the given path.
    * @param db name of database
-   * @param p path
+   * @param path path
    * @return {@code true} if there are resources with the given prefix
    * @throws IOException I/O exception
    */
-  private boolean pathExists(final String db, final String p) throws IOException {
-    final Query q = http.session().query(COUNT.args(_DB_LIST.args("$d", "$p")));
+  private boolean pathExists(final String db, final String path) throws IOException {
+    final Query q = session().query(EXISTS.args(_DB_LIST.args("$d", "$p")));
     q.bind("d", db);
-    q.bind("p", p);
-    return !"0".equals(q.execute());
+    q.bind("p", path);
+    return q.execute().equals(Text.TRUE);
   }
 
   /**
    * Checks if any resource with the specified name exists.
    * @param db name of database
-   * @param p resource path
+   * @param path resource path
    * @return {@code true} if there are resources with the name
    * @throws IOException I/O exception
    */
-  private boolean exists(final String db, final String p) throws IOException {
-    final Query q = http.session().query(_DB_EXISTS.args("$d", "$p"));
+  private boolean exists(final String db, final String path) throws IOException {
+    final Query q = session().query(_DB_EXISTS.args("$d", "$p"));
     q.bind("d", db);
-    q.bind("p", p);
+    q.bind("p", path);
     return q.execute().equals(Text.TRUE);
   }
 
@@ -467,49 +470,50 @@ public final class WebDAVService<T> {
    * @throws IOException I/O exception
    */
   private T createDb(final String db, final InputStream in) throws IOException {
-    http.session().create(db, in);
+    session().create(db, in);
     return factory.database(this, new ResourceMetaData(db, timestamp(db)));
   }
 
   /**
    * Adds a document with the specified name to the given path.
    * @param db database
-   * @param p path where the document will be added
+   * @param path path where the document will be added
    * @param in data stream
    * @return object representing the newly added XML
    * @throws IOException I/O exception
    */
-  private T addXML(final String db, final String p, final InputStream in) throws IOException {
-    final Session session = http.session();
+  private T addXML(final String db, final String path, final InputStream in) throws IOException {
+    final Session session = session();
     session.execute(new Set(MainOptions.CHOP, false));
-    session.add(p, in);
-    return factory.file(this, new ResourceMetaData(db, p, timestamp(db), false,
-      APP_XML, null));
+    session.execute(new Open(db));
+    session.add(path, in);
+    return factory.file(this, new ResourceMetaData(db, path, timestamp(db), false, APP_XML, null));
   }
 
   /**
    * Adds a binary file with the specified name to the given path.
    * @param db database
-   * @param p path where the file will be stored
+   * @param path path where the file will be stored
    * @param in data stream
    * @return object representing the newly added file
    * @throws IOException I/O exception
    */
-  private T store(final String db, final String p, final InputStream in) throws IOException {
-    http.session().store(p, in);
-    return factory.file(this, metaData(db, p));
+  private T store(final String db, final String path, final InputStream in) throws IOException {
+    final Session session = session();
+    session.execute(new Open(db));
+    session.store(path, in);
+    return factory.file(this, metaData(db, path));
   }
 
   /**
    * Adds a file in to the given path.
    * @param db database
-   * @param p path
+   * @param path path
    * @param in file content
    * @return object representing the newly added file
    * @throws IOException I/O exception
    */
-  private T addFile(final String db, final String p, final InputStream in) throws IOException {
-
+  private T addFile(final String db, final String path, final InputStream in) throws IOException {
     // use 4MB as buffer input
     final BufferInput bi = new BufferInput(in, 1 << 22);
     try {
@@ -517,7 +521,7 @@ public final class WebDAVService<T> {
       if(peek(bi) == '<') {
         try {
           // add input as XML document
-          return db == null ? createDb(dbname(p), bi) : addXML(db, p, bi);
+          return db == null ? createDb(dbname(path), bi) : addXML(db, path, bi);
         } catch(final IOException ex) {
           // reset stream if it did not work out
           try {
@@ -532,12 +536,12 @@ public final class WebDAVService<T> {
       // add input as raw file
       final String d;
       if(db == null) {
-        d = dbname(p);
+        d = dbname(path);
         createDb(d);
       } else {
         d = db;
       }
-      return store(d, p, bi);
+      return store(d, path, bi);
     } finally {
       bi.close();
     }
@@ -546,15 +550,15 @@ public final class WebDAVService<T> {
   /**
    * Checks if a folder is empty and create a dummy document.
    * @param db database
-   * @param p path
+   * @param path path
    * @throws IOException I/O exception
    */
-  private void createDummy(final String db, final String p) throws IOException {
+  private void createDummy(final String db, final String path) throws IOException {
     // check if path is a folder and is empty
-    if(p.matches("[^/]") || pathExists(db, p)) return;
+    if(path.matches("[^/]") || pathExists(db, path)) return;
 
-    final Session session = http.session();
+    final Session session = session();
     session.execute(new Open(db));
-    session.store(p + SEP + DUMMY, new ArrayInput(Token.EMPTY));
+    session.store(path + SEP + DUMMY, new ArrayInput(Token.EMPTY));
   }
 }

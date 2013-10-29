@@ -1,109 +1,94 @@
 package org.basex.http.rest;
 
-import static org.basex.core.Text.*;
-import static org.basex.http.rest.RESTText.*;
-
 import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Set;
 import org.basex.http.*;
-import org.basex.io.in.*;
-import org.basex.io.serial.*;
-import org.basex.server.*;
-import org.basex.util.*;
+import org.basex.query.value.type.*;
 
 /**
- * REST-based evaluation of XQuery expressions.
+ * Evaluate queries via REST.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-class RESTQuery extends RESTCode {
+class RESTQuery extends RESTCmd {
   /** External variables. */
-  protected final Map<String, String[]> variables;
-  /** Query input. */
-  protected final String input;
-  /** Optional context item. */
-  protected final byte[] item;
+  private final Map<String, String[]> variables;
+  /** Optional context value. */
+  private final String value;
 
   /**
    * Constructor.
-   * @param in query to be executed
+   * @param rs REST Session
    * @param vars external variables
-   * @param it context item
+   * @param val context value
    */
-  RESTQuery(final String in, final Map<String, String[]> vars, final byte[] it) {
-    input = in;
+  RESTQuery(final RESTSession rs, final Map<String, String[]> vars, final String val) {
+    super(rs);
     variables = vars;
-    item = it;
+    value = val;
   }
 
   @Override
-  void run(final HTTPContext http) throws IOException {
-    query(input, http, http.context().globalopts.get(GlobalOptions.WEBPATH));
+  protected void run0() throws IOException {
+    query(session.context.globalopts.get(GlobalOptions.WEBPATH));
   }
 
   /**
    * Evaluates the specified query.
-   * @param in query input
-   * @param http HTTP context
    * @param path set query path
    * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  protected void query(final String in, final HTTPContext http, final String path)
-      throws IOException {
+  protected void query(final String path) throws IOException {
+    final XQuery xq;
+    int c = 0;
+    while(!(cmds.get(c) instanceof XQuery)) run(cmds.get(c++));
+    xq = (XQuery) cmds.get(c);
 
-    final LocalSession session = http.session();
-    if(item != null) {
-      // create main memory instance of the document specified as context node
-      final boolean mm = session.execute(new Get(MainOptions.MAINMEM)).split(COLS)[1].equals(TRUE);
-      session.execute(new Set(MainOptions.MAINMEM, true));
-      session.create(Util.className(RESTQuery.class), new ArrayInput(item));
-      if(!mm) session.execute(new Set(MainOptions.MAINMEM, false));
-    } else {
-      // open addressed database
-      open(http);
-    }
+    // create query instance
+    if(value != null) xq.bind(null, value, NodeType.DOC.toString());
 
-    // set base path to correctly resolve local references
-    session.execute(new Set(MainOptions.QUERYPATH, path));
-    // send serialization options to the server
-    session.execute(new Set(MainOptions.SERIALIZER, serial(http)));
+    // set base path and serialization parameters
+    final HTTPContext http = session.http;
+    context.options.set(MainOptions.QUERYPATH, path);
+    context.options.set(MainOptions.SERIALIZER, serial(http));
 
-    // create query instance and bind http context
-    session.setOutputStream(http.res.getOutputStream());
-    final LocalQuery qu = session.query(in);
-    qu.context(http);
-
-    // bind external variables
+    // bind HTTP context and external variables
+    xq.http(http);
     for(final Entry<String, String[]> e : variables.entrySet()) {
+      final String key = e.getKey();
       final String[] val = e.getValue();
-      if(val.length == 2) qu.bind(e.getKey(), val[0], val[1]);
-      if(val.length == 1) qu.bind(e.getKey(), val[0]);
+      if(val.length == 2) xq.bind(key, val[0], val[1]);
+      if(val.length == 1) xq.bind(key, val[0]);
     }
+
     // initializes the response with query serialization options
-    http.serialization.parse(qu.options());
+    http.serialization.parse(xq.parameters(context).toString());
     http.initResponse();
     // run query
-    qu.execute();
+    run(xq, http.res.getOutputStream());
   }
 
   /**
-   * Returns a string representation of the used serialization parameters.
-   * @param http HTTP context
-   * @return serialization parameters
+   * Creates a new instance of this command.
+   * @param rs REST session
+   * @param query query
+   * @param vars external variables
+   * @param val context value
+   * @return command
+   * @throws IOException I/O exception
    */
-  static SerializerOptions serial(final HTTPContext http) {
-    final SerializerOptions sopts = http.serialization;
-    if(http.wrapping) {
-      sopts.set(SerializerOptions.WRAP_PREFIX, REST);
-      sopts.set(SerializerOptions.WRAP_URI, RESTURI);
-    }
-    return sopts;
+  @SuppressWarnings("unused")
+  static RESTQuery get(final RESTSession rs, final String query, final Map<String, String[]> vars,
+      final String val) throws IOException {
+
+    open(rs);
+    rs.add(new XQuery(query));
+    return new RESTQuery(rs, vars, val);
   }
 }

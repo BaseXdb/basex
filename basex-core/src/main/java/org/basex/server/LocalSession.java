@@ -66,22 +66,22 @@ public class LocalSession extends Session {
   }
 
   @Override
-  public void create(final String name, final InputStream input) throws IOException {
+  public void create(final String name, final InputStream input) throws BaseXException {
     execute(new CreateDB(name), input);
   }
 
   @Override
-  public void add(final String path, final InputStream input) throws IOException {
+  public void add(final String path, final InputStream input) throws BaseXException {
     execute(new Add(path), input);
   }
 
   @Override
-  public void replace(final String path, final InputStream input) throws IOException {
+  public void replace(final String path, final InputStream input) throws BaseXException {
     execute(new Replace(path), input);
   }
 
   @Override
-  public void store(final String path, final InputStream input) throws IOException {
+  public void store(final String path, final InputStream input) throws BaseXException {
     execute(new Store(path), input);
   }
 

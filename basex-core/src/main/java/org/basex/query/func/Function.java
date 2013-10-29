@@ -1240,8 +1240,7 @@ public enum Function {
 
   /**
    * Returns a string representation of the function with the specified
-   * arguments. All objects are wrapped with quotes,
-   * except for the following ones:
+   * arguments. All objects are wrapped with quotes, except for the following ones:
    * <ul>
    * <li>integers</li>
    * <li>booleans (which will be suffixed with parentheses)</li>

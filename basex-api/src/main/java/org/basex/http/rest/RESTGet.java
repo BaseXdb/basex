@@ -16,17 +16,22 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-final class RESTGet extends RESTCode {
-  @Override
-  void run(final HTTPContext http) throws IOException {
+final class RESTGet {
+  /** Private constructor. */
+  private RESTGet() { }
+
+  /**
+   * Creates REST code.
+   * @param rs REST session
+   * @return code
+   * @throws IOException I/O exception
+   */
+  public static RESTCmd get(final RESTSession rs) throws IOException {
     final Map<String, String[]> vars = new HashMap<String, String[]>();
 
-    // handle query parameters
-    String operation = null;
-    String input = null;
-    byte[] item = null;
-
-    // parse database options
+    // parse query string
+    String op = null, input = null, value = null;
+    final HTTPContext http = rs.http;
     final SerializerOptions sopts = http.serialization;
     for(final Entry<String, String[]> param : http.params().entrySet()) {
       final String key = param.getKey();
@@ -34,34 +39,27 @@ final class RESTGet extends RESTCode {
       final String val = vals[0];
 
       if(Token.eqic(key, COMMAND, QUERY, RUN)) {
-        if(operation != null || vals.length > 1) HTTPErr.ONEOP.thrw();
-        operation = key;
+        if(op != null || vals.length > 1) HTTPCode.ONEOP.thrw();
+        op = key;
         input = val;
       } else if(key.equalsIgnoreCase(WRAP)) {
         // wrapping flag
         http.wrapping = Util.yes(val);
       } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
-        item = Token.token(val);
+        value = val;
       } else if(sopts.option(key) != null) {
         // serialization parameters
         for(final String v : vals) sopts.assign(key, v);
-      } else if(!parseOption(http, param, false)) {
-        // external variables
+      } else if(!RESTCmd.parseOption(rs, param, false)) {
+        // options or (if not found) external variables
         vars.put(key, new String[] { val });
       }
     }
 
-    final RESTCode code;
-    if(operation == null) {
-      code = new RESTRetrieve(input, vars, item);
-    } else if(operation.equals(QUERY)) {
-      code = new RESTQuery(input, vars, item);
-    } else if(operation.equals(RUN)) {
-      code = new RESTRun(input, vars, item);
-    } else {
-      code = new RESTCommand(input);
-    }
-    code.run(http);
+    if(op == null) return RESTRetrieve.get(rs);
+    if(op.equals(QUERY)) return RESTQuery.get(rs, input, vars, value);
+    if(op.equals(RUN)) return RESTRun.get(rs, input, vars, value);
+    return RESTCommand.get(rs, input);
   }
 }

@@ -241,7 +241,7 @@ final class Docs {
    * sorting can be disabled as it slows down bulk inserts/deletes/replaces.
    * @param path input path
    * @param sort sort paths before access
-   * @return root nodes
+   * @return pre value of document node
    */
   synchronized int doc(final String path, final boolean sort) {
     // invalid or empty path, or no documents: return -1

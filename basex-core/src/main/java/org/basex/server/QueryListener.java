@@ -33,8 +33,8 @@ final class QueryListener extends Proc {
 
   /** Query processor. */
   private QueryProcessor qp;
-  /** Serialization options. */
-  private SerializerOptions options;
+  /** Serialization parameters. */
+  private SerializerOptions parameters;
   /** Parsing flag. */
   private boolean parsed;
   /** Query info. */
@@ -88,13 +88,13 @@ final class QueryListener extends Proc {
   }
 
   /**
-   * Returns the serialization options.
-   * @return serialization options
+   * Returns the serialization parameters.
+   * @return serialization parameters
    * @throws IOException I/O Exception
    */
-  String options() throws IOException {
-    if(options == null) options = parse().ctx.serParams();
-    return options.toString();
+  String parameters() throws IOException {
+    if(parameters == null) parameters = parse().ctx.serParams();
+    return parameters.toString();
   }
 
   /**
@@ -127,14 +127,14 @@ final class QueryListener extends Proc {
         qi.cmpl = perf.time();
         final Iter ir = qp.iter();
         qi.evlt = perf.time();
-        options();
-        final boolean wrap = !options.get(WRAP_PREFIX).isEmpty();
+        parameters();
+        final boolean wrap = !parameters.get(WRAP_PREFIX).isEmpty();
 
         // iterate through results
         final PrintOutput po = PrintOutput.get(enc ? new EncodingOutput(out) : out);
         if(iter && wrap) po.write(1);
 
-        final Serializer ser = Serializer.get(po, full ? null : options);
+        final Serializer ser = Serializer.get(po, full ? null : parameters);
         int c = 0;
         for(Item it; (it = ir.next()) != null;) {
           if(iter && !wrap) {

@@ -24,6 +24,8 @@ import org.xml.sax.*;
 public abstract class Command extends Proc {
   /** Command arguments. */
   public final String[] args;
+  /** Permission required to execute this command. */
+  public final Perm perm;
 
   /** Performance measurements. */
   protected Performance perf;
@@ -40,8 +42,6 @@ public abstract class Command extends Proc {
 
   /** Container for query information. */
   private final TokenBuilder info = new TokenBuilder();
-  /** Permission required to execute this command. */
-  private final Perm perm;
   /** Indicates if the command requires an opened database. */
   private final boolean data;
 
@@ -74,7 +74,29 @@ public abstract class Command extends Proc {
    * @throws BaseXException command exception
    */
   public final void execute(final Context ctx, final OutputStream os) throws BaseXException {
-    if(!exec(ctx, os)) throw new BaseXException(info());
+    // check if data reference is available
+    final Data dt = ctx.data();
+    if(dt == null && data) throw new BaseXException(NO_DB_OPENED);
+
+    // check permissions
+    if(!ctx.perm(perm, dt != null ? dt.meta : null))
+      throw new BaseXException(PERM_REQUIRED_X, perm);
+
+    // set updating flag
+    updating = updating(ctx);
+
+    try {
+      // register process
+      ctx.register(this);
+      // run command and return success flag
+      if(!run(ctx, os)) throw new BaseXException(info());
+    } catch(final RuntimeException th) {
+      Util.stack(th);
+      throw th;
+    } finally {
+      // guarantee that process will be unregistered
+      ctx.unregister(this);
+    }
   }
 
   /**
@@ -140,7 +162,7 @@ public abstract class Command extends Proc {
    */
   @SuppressWarnings("unused")
   public boolean updating(final Context ctx) {
-    return createWrite();
+    return perm == Perm.CREATE || perm == Perm.WRITE;
   }
 
   /**
@@ -284,49 +306,6 @@ public abstract class Command extends Proc {
     return close && new Close().run(ctx);
   }
 
-  // PRIVATE METHODS ==========================================================
-
-  /**
-   * Checks if the command demands write or create permissions.
-   * @return result of check
-   */
-  private boolean createWrite() {
-    return perm == Perm.CREATE || perm == Perm.WRITE;
-  }
-
-  /**
-   * Executes the command, prints the result to the specified output stream
-   * and returns a success flag.
-   * @param ctx database context
-   * @param os output stream
-   * @return success flag. The {@link #info()} method returns information
-   * on a potential exception
-   */
-  private boolean exec(final Context ctx, final OutputStream os) {
-    // check if data reference is available
-    final Data dt = ctx.data();
-    if(dt == null && data) return error(NO_DB_OPENED);
-
-    // check permissions
-    if(!ctx.perm(perm, dt != null ? dt.meta : null)) return error(PERM_REQUIRED_X, perm);
-
-    // set updating flag
-    updating = updating(ctx);
-
-    try {
-      // register process
-      ctx.register(this);
-      // run command and return success flag
-      return run(ctx, os);
-    } catch(final RuntimeException th) {
-      Util.stack(th);
-      throw th;
-    } finally {
-      // guarantee that process will be unregistered
-      ctx.unregister(this);
-    }
-  }
-
   /**
    * Runs the command without permission, data and concurrency checks.
    * @param ctx database context
@@ -352,7 +331,7 @@ public abstract class Command extends Proc {
       abort();
       if(ex instanceof OutOfMemoryError) {
         Util.debug(ex);
-        return error(OUT_OF_MEM + (createWrite() ? H_OUT_OF_MEM : ""));
+        return error(OUT_OF_MEM + (perm == Perm.CREATE ? H_OUT_OF_MEM : ""));
       }
       return error(Util.bug(ex) + NL + info.toString());
     } finally {

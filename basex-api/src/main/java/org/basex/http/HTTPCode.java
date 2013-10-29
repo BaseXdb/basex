@@ -3,12 +3,12 @@ package org.basex.http;
 import static javax.servlet.http.HttpServletResponse.*;
 
 /**
- * This class contains all query error messages.
+ * Enumeration with HTTP codes and error messages.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public enum HTTPErr {
+public enum HTTPCode {
   /** Error: 201 (created). */
   CREATED_X(SC_CREATED, "%"),
 
@@ -43,7 +43,7 @@ public enum HTTPErr {
    * @param c status code
    * @param d description
    */
-  private HTTPErr(final int c, final String d) {
+  private HTTPCode(final int c, final String d) {
     code = c;
     desc = d;
   }

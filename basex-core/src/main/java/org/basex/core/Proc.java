@@ -130,10 +130,10 @@ public abstract class Proc {
 
   /**
    * Adds the names of the databases that may be touched by the process.
-   * @param lockResult Container for lock result to pass around
+   * @param lr container for lock result to pass around
    */
-  public void databases(final LockResult lockResult) {
-    lockResult.writeAll = true;
+  public void databases(final LockResult lr) {
+    lr.writeAll = true;
   }
 
   /**

@@ -77,8 +77,7 @@ public final class MimeTypes {
    * @return result of check
    */
   public static boolean isXML(final String type) {
-    return eq(type, TEXT_XML, TEXT_XML_EXT, APP_XML, APP_XML_EXTERNAL) ||
-        type.endsWith(XML_SUFFIX);
+    return eq(type, TEXT_XML, TEXT_XML_EXT, APP_XML, APP_XML_EXTERNAL) || type.endsWith(XML_SUFFIX);
   }
 
   /**

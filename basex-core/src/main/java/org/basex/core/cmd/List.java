@@ -52,7 +52,8 @@ public final class List extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    lr.readAll = true;
+    if(args[0] == null || args[0].isEmpty()) lr.readAll = true;
+    else lr.read.add(args[0]);
   }
 
   /**

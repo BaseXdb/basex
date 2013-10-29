@@ -58,7 +58,7 @@ public class CommandLockingTest extends SandboxTest {
    */
   @Test
   public final void databaseCommands() {
-    ckDBs(new Add(FILE), true, CTX_LIST);
+    ckDBs(new Add(FILE, FILE), true, CTX_LIST);
     ckDBs(new AlterDB(NAME, NAME2), true, new StringList(NAME, NAME2));
     ckDBs(new AlterUser(NAME, NAME), true, ADMIN_LIST);
     ckDBs(new Check(NAME), false, NAME_CTX);
@@ -91,7 +91,8 @@ public class CommandLockingTest extends SandboxTest {
     ckDBs(new InfoStorage(), false, CTX_LIST);
     ckDBs(new Inspect(), false, CTX_LIST);
     ckDBs(new Kill(NAME), true, ADMIN_LIST);
-    ckDBs(new List(NAME), false, null);
+    ckDBs(new List(), false, null);
+    ckDBs(new List(NAME), false, NAME_LIST);
     ckDBs(new Open(NAME), false, NAME_CTX);
     ckDBs(new Optimize(), true, CTX_LIST);
     ckDBs(new OptimizeAll(), true, CTX_LIST);

@@ -64,7 +64,7 @@ final class RestXqResponse {
 
     // assign main module and http context and register process
     query.mainModule(mm);
-    query.context(http, null, null);
+    query.http(http);
 
     query.context.register(query);
     try {

@@ -79,7 +79,6 @@ public abstract class BaseXServlet extends HttpServlet {
         }
         Util.out("_ RESPONSE ________________________________" + Prop.NL + res);
       }
-      http.close();
     }
   }
 

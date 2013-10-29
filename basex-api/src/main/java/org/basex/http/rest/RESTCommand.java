@@ -2,9 +2,11 @@ package org.basex.http.rest;
 
 import java.io.*;
 
+import org.basex.core.*;
+import org.basex.core.parse.*;
 import org.basex.http.*;
 import org.basex.io.serial.*;
-import org.basex.server.*;
+import org.basex.query.*;
 
 /**
  * REST-based evaluation of database commands.
@@ -12,29 +14,39 @@ import org.basex.server.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public class RESTCommand extends RESTCode {
-  /** Query input. */
-  protected final String input;
-
+public class RESTCommand extends RESTCmd {
   /**
    * Constructor.
-   * @param in command to be executed
+   * @param rs REST session
    */
-  RESTCommand(final String in) {
-    input = in;
+  RESTCommand(final RESTSession rs) {
+    super(rs);
   }
 
   @Override
-  void run(final HTTPContext http) throws IOException {
-    // open addressed database
-    open(http);
-    // set default content type to text
+  protected void run0() throws IOException {
+    // set content type to text
+    final HTTPContext http = session.http;
     http.serialization.set(SerializerOptions.METHOD, SerialMethod.TEXT);
     http.initResponse();
 
-    // perform command
-    final LocalSession session = http.session();
-    session.setOutputStream(http.res.getOutputStream());
-    session.execute(input);
+    for(final Command c : cmds) run(c, http.res.getOutputStream());
+  }
+
+  /**
+   * Creates a new instance of this command.
+   * @param rs REST session
+   * @param input string input
+   * @return command
+   * @throws BaseXException database exception
+   */
+  static RESTCommand get(final RESTSession rs, final String input) throws BaseXException {
+    try {
+      open(rs);
+      rs.add(new CommandParser(input, rs.context).parseSingle());
+      return new RESTCommand(rs);
+    } catch(final QueryException ex) {
+      throw new BaseXException(ex);
+    }
   }
 }

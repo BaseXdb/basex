@@ -141,6 +141,16 @@ public final class QueryProcessor extends Proc {
   }
 
   /**
+   * Binds the HTTP context to the query processor.
+   * @param value HTTP context
+   * @return self reference
+   */
+  public QueryProcessor http(final Object value) {
+    ctx.http(value);
+    return this;
+  }
+
+  /**
    * Binds a value with the specified data type to the context item,
    * using the same rules as for {@link #bind binding variables}.
    * @param value value to be bound

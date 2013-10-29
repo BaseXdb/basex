@@ -30,9 +30,6 @@ public final class Add extends ACreate {
   /**
    * Constructor, specifying a target path.
    * The input needs to be set via {@link #setInput(InputStream)}.
-   * Note that the constructors of this class have changed with Version 7.0:
-   * the target path and file name have been merged and are now specified
-   * as first argument.
    * @param path target path, optionally terminated by a new file name
    */
   public Add(final String path) {
@@ -41,9 +38,6 @@ public final class Add extends ACreate {
 
   /**
    * Constructor, specifying a target path and an input.
-   * Note that the constructors of this class have changed with Version 7.0:
-   * the target path and file name have been merged and are now specified
-   * as first argument.
    * @param path target path, optionally terminated by a new file name.
    * If {@code null}, the name of the input will be set as path.
    * @param input input file or XML string

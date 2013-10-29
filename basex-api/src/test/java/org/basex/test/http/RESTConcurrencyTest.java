@@ -12,7 +12,7 @@ import org.junit.*;
  * This class sends parallel requests to the REST API.
  *
  * It currently fails when {@link #CLIENTS} is set to a value larger than 1,
- * because {@link RESTCode#open} performs separate transactions that may be intervened
+ * because {@link RESTCmd#open} performs separate transactions that may be intervened
  * by the updating transaction of another client.
  *
  * @author BaseX Team 2005-13, BSD License
@@ -24,7 +24,7 @@ public class RESTConcurrencyTest extends HTTPTest {
   /** Root path. */
   protected static final String ROOT = "http://" + Text.LOCALHOST + ":9998/" + REST + '/';
   /** Client count. */
-  private static final int CLIENTS = 1;
+  private static final int CLIENTS = 10;
   /** Runs per client. */
   private static final int RUNS = 10;
   /** Control client sessions. */

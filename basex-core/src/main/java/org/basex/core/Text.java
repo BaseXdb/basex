@@ -333,7 +333,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPEXECUTE = {
-    '[' + C_INPUT + ']', lang("c_execute1"), lang("c_execute2", C_PATH)
+    '[' + C_INPUT + ']', lang("c_execute1"), lang("c_execute2", C_INPUT)
   };
   /** Command help. */
   String[] HELPCS = {

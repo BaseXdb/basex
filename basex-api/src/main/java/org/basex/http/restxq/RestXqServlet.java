@@ -19,13 +19,13 @@ public final class RestXqServlet extends BaseXServlet {
   @Override
   protected void run(final HTTPContext http) throws Exception {
     // authenticate user
-    http.session();
+    http.authenticate();
 
     // analyze input path
     final RestXqModules rxm = RestXqModules.get();
     // select XQuery function
     RestXqFunction func = rxm.find(http, null);
-    if(func == null) HTTPErr.NO_XQUERY.thrw();
+    if(func == null) HTTPCode.NO_XQUERY.thrw();
     try {
       // process function that matches the current request
       func.process(http, null);

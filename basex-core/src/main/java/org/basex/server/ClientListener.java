@@ -282,7 +282,6 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   public synchronized void notify(final byte[] name, final byte[] msg) throws IOException {
-
     last = System.currentTimeMillis();
     eout.print(name);
     eout.write(0);
@@ -491,7 +490,7 @@ public final class ClientListener extends Thread {
         } else if(sc == ServerCmd.INFO) {
           out.print(qp.info());
         } else if(sc == ServerCmd.OPTIONS) {
-          out.print(qp.options());
+          out.print(qp.parameters());
         } else if(sc == ServerCmd.UPDATING) {
           out.print(Boolean.toString(qp.updating()));
         } else if(sc == ServerCmd.CLOSE) {

@@ -363,6 +363,14 @@ public final class QueryContext extends Proc {
   }
 
   /**
+   * Binds the HTTP context.
+   * @param val HTTP context
+   */
+  public void http(final Object val) {
+    http = val;
+  }
+
+  /**
    * Binds a value to the context item, using the same rules as for
    * {@link #bind binding variables}.
    * @param val value to be bound
@@ -372,12 +380,7 @@ public final class QueryContext extends Proc {
    */
   public void context(final Object val, final String type, final StaticContext sc)
       throws QueryException {
-    // bind http context to extra variable
-    if(val.getClass().getName().equals("org.basex.http.HTTPContext")) {
-      http = val;
-    } else {
-      ctxItem = new MainModule(cast(val, type), new VarScope(sc), null, sc);
-    }
+    ctxItem = new MainModule(cast(val, type), new VarScope(sc), null, sc);
   }
 
   /**
@@ -395,8 +398,7 @@ public final class QueryContext extends Proc {
    * @param type data type (may be {@code null})
    * @throws QueryException query exception
    */
-  public void bind(final String name, final Object val, final String type)
-      throws QueryException {
+  public void bind(final String name, final Object val, final String type) throws QueryException {
     bind(name, cast(val, type));
   }
 

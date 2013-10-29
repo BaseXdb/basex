@@ -62,7 +62,7 @@ public class LocalQuery extends Query {
 
   @Override
   public String options() throws IOException {
-    return ql.options();
+    return ql.parameters();
   }
 
   @Override

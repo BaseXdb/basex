@@ -43,8 +43,10 @@ public final class HTTPContext {
   public boolean wrapping;
   /** User name. */
   public String user;
+  /** Password. */
+  public String pass;
 
-  /** Singleton database context. */
+  /** Global static database context. */
   private static Context context;
   /** Initialization flag. */
   private static boolean init;
@@ -53,10 +55,6 @@ public final class HTTPContext {
   private final Performance perf = new Performance();
   /** Segments. */
   private final String[] segments;
-  /** Current user session. */
-  private LocalSession session;
-  /** Password. */
-  private String pass;
 
   /**
    * Constructor.
@@ -248,32 +246,49 @@ public final class HTTPContext {
   }
 
   /**
-   * Creates a new {@link LocalSession} instance.
-   * @return database session
-   * @throws IOException I/O exception
+   * Authenticate the user and returns a new client {@link Context} instance.
+   * @return client context
+   * @throws LoginException login exception
    */
-  public LocalSession session() throws IOException {
-    if(session == null) {
-      final byte[] address = token(req.getRemoteAddr());
-      try {
-        if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
-          throw new LoginException(NOPASSWD);
-        session = new LocalSession(context(), user, pass);
-        context.blocker.remove(address);
-      } catch(final LoginException ex) {
-        // delay users with wrong passwords
-        for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(1000);
-        throw ex;
-      }
+  public Context authenticate() throws LoginException {
+    final byte[] address = token(req.getRemoteAddr());
+    try {
+      if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
+        throw new LoginException(NOPASSWD);
+      final Context ctx = new Context(context(), null);
+      ctx.user = ctx.users.get(user);
+      if(ctx.user == null || !ctx.user.password.equals(Token.md5(pass))) throw new LoginException();
+
+      context.blocker.remove(address);
+      return ctx;
+    } catch(final LoginException ex) {
+      // delay users with wrong passwords
+      for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(1000);
+      throw ex;
     }
-    return session;
   }
 
   /**
-   * Closes an open database session.
+   * Creates a new {@link LocalSession} instance.
+   * @return database session
+   * @throws LoginException login exception
+   * @deprecated("Use {@link #authenticate} instead")
    */
-  public void close() {
-    if(session != null) session.close();
+  @Deprecated
+  public LocalSession session() throws LoginException {
+    final LocalSession session;
+    final byte[] address = token(req.getRemoteAddr());
+    try {
+      if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
+        throw new LoginException(NOPASSWD);
+      session = new LocalSession(context(), user, pass);
+      context.blocker.remove(address);
+    } catch(final LoginException ex) {
+      // delay users with wrong passwords
+      for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(1000);
+      throw ex;
+    }
+    return session;
   }
 
   /**
