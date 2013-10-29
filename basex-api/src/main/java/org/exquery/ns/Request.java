@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 public final class Request extends QueryModule {
   /**
    * Returns the method of a request.
-   * @return path
+   * @return method
    * @throws QueryException query exception
    */
   @Deterministic @Requires(Permission.NONE)
@@ -30,7 +30,7 @@ public final class Request extends QueryModule {
 
   /**
    * Returns the Scheme component of a request.
-   * @return path
+   * @return scheme
    * @throws QueryException query exception
    */
   @Deterministic @Requires(Permission.NONE)
@@ -40,7 +40,7 @@ public final class Request extends QueryModule {
 
   /**
    * Returns the Hostname fragment of a request.
-   * @return path
+   * @return host name
    * @throws QueryException query exception
    */
   @Deterministic @Requires(Permission.NONE)
@@ -50,7 +50,7 @@ public final class Request extends QueryModule {
 
   /**
    * Returns the Port fragment of a request.
-   * @return path
+   * @return port
    * @throws QueryException query exception
    */
   @Deterministic @Requires(Permission.NONE)
@@ -70,7 +70,7 @@ public final class Request extends QueryModule {
 
   /**
    * Returns the query string of a request.
-   * @return path
+   * @return query string
    * @throws QueryException query exception
    */
   @Deterministic @Requires(Permission.NONE)
@@ -81,7 +81,7 @@ public final class Request extends QueryModule {
 
   /**
    * Returns the URI of a request.
-   * @return path
+   * @return URI
    * @throws QueryException query exception
    */
   @Deterministic @Requires(Permission.NONE)
@@ -90,8 +90,18 @@ public final class Request extends QueryModule {
   }
 
   /**
-   * Returns the query string of a request.
-   * @return path
+   * Returns the context path of a request.
+   * @return context path
+   * @throws QueryException query exception
+   */
+  @Deterministic @Requires(Permission.NONE)
+  public Str contextPath() throws QueryException {
+    return Str.get(request().getContextPath());
+  }
+
+  /**
+   * Returns the address of a request.
+   * @return address
    * @throws QueryException query exception
    */
   @Deterministic @Requires(Permission.NONE)
@@ -110,8 +120,8 @@ public final class Request extends QueryModule {
   }
 
   /**
-   * Returns the remote host name of a request.
-   * @return host name
+   * Returns the remote address of a request.
+   * @return remote address
    * @throws QueryException query exception
    */
   @Deterministic @Requires(Permission.NONE)
@@ -120,8 +130,8 @@ public final class Request extends QueryModule {
   }
 
   /**
-   * Returns the remote host name of a request.
-   * @return host name
+   * Returns the remote port of a request.
+   * @return remote port
    * @throws QueryException query exception
    */
   @Deterministic @Requires(Permission.NONE)

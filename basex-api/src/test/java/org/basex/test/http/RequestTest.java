@@ -88,6 +88,15 @@ public class RequestTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test
+  public void contextPath() throws Exception {
+    assertEquals("", get("?query=" + request("R:context-path()")));
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test
   public void parameterNames() throws Exception {
     final String query = "count(R:parameter-names())";
     assertEquals("1", get("?query=" + request(query)));
