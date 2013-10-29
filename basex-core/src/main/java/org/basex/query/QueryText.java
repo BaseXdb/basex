@@ -299,6 +299,8 @@ public interface QueryText {
   /** Parser token. */
   String UNORDERED = "unordered";
   /** Parser token. */
+  String UPDATE = "update";
+  /** Parser token. */
   String UPDATING = "updating";
   /** Parser token. */
   String UPPERCASE = "uppercase";

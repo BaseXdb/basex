@@ -1499,7 +1499,7 @@ public class QueryParser extends InputParser {
   private Expr modify() throws QueryException {
     final Expr e = comparison();
     if(e != null) {
-      if(wsConsumeWs("!!")) {
+      if(wsConsumeWs(UPDATE)) {
         final int s = scope.open();
         final boolean u = ctx.updating;
         ctx.updating(false);
@@ -1851,7 +1851,7 @@ public class QueryParser extends InputParser {
       final Expr ex = step();
       if(ex == null) return null;
       // return non-step expression if no path or map operator follows
-      final boolean nostep = curr() != '/' && (curr() != '!' || next() == '=' || next() == '!');
+      final boolean nostep = curr() != '/' && (curr() != '!' || next() == '=');
       if(nostep && !(ex instanceof Step)) return ex;
       el = new ExprList();
       if(ex instanceof Step) add(el, ex);
@@ -1876,7 +1876,7 @@ public class QueryParser extends InputParser {
         } else {
           checkAxis(Axis.CHILD);
         }
-      } else if(next() != '=' && next() != '!' && consume('!')) {
+      } else if(next() != '=' && consume('!')) {
         map = true;
       } else {
         return;
