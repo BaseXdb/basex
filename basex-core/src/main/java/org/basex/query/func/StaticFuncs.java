@@ -118,7 +118,7 @@ public final class StaticFuncs extends ExprInfo {
         final IntList al = new IntList();
         for(final FuncCache ofc : funcs.values()) {
           if(oid++ == id) continue;
-          if(call.name.eq(ofc.name())) al.add(ofc.func.arity());
+          if(ofc.func != null && call.name.eq(ofc.name())) al.add(ofc.func.arity());
         }
         if(!al.isEmpty()) {
           final StringBuilder exp = new StringBuilder();

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.test.*;
@@ -55,10 +56,9 @@ public abstract class QueryTest extends SandboxTest {
       final String query = qu[correct ? 2 : 1].toString();
       final Result cmp = correct ? (Result) qu[1] : null;
 
-      final Command c = new XQuery(query);
+      final QueryProcessor qp = new QueryProcessor(query, context);
       try {
-        c.execute(context);
-        final Result val = c.result();
+        final Result val = qp.execute();
         if(cmp instanceof Nodes) {
           ((Nodes) cmp).data = context.data();
         }
@@ -87,7 +87,7 @@ public abstract class QueryTest extends SandboxTest {
             details() + '\n');
           ++fail;
         }
-      } catch(final Exception ex) {
+      } catch(final QueryException ex) {
         final String msg = ex.getMessage();
         if(correct || msg == null || msg.contains("mailman")) {
           final String cp = correct && (!(cmp instanceof Nodes) ||
@@ -98,6 +98,8 @@ public abstract class QueryTest extends SandboxTest {
               details() + '\n');
           ++fail;
         }
+      } finally {
+        qp.close();
       }
     }
     if(fail != 0) fail(fail + " Errors. [E] = expected, [F] = found:\n" +
