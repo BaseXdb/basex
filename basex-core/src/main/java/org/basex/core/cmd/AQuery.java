@@ -162,11 +162,11 @@ public abstract class AQuery extends Command {
   protected final void queryNodes() {
     try {
       result = qp(args[0], context).queryNodes();
+      qp.close();
     } catch(final QueryException ex) {
+      qp.close();
       qp = null;
       error(Util.message(ex));
-    } finally {
-      qp.close();
     }
   }
 
