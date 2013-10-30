@@ -66,15 +66,13 @@ public abstract class CsvConverter {
   /**
    * Adds a new header.
    * @param string string
-   * @throws QueryIOException query exception
    */
-  abstract void header(final byte[] string) throws QueryIOException;
+  abstract void header(final byte[] string);
 
   /**
    * Adds a new record.
-   * @throws QueryIOException query exception
    */
-  abstract void record() throws QueryIOException;
+  abstract void record();
 
   /**
    * Called when an entry is encountered.

@@ -26,9 +26,9 @@ import org.basex.util.list.*;
  */
 public abstract class RESTCmd extends Command {
   /** REST session. */
-  protected final RESTSession session;
+  final RESTSession session;
   /** Command. */
-  protected final ArrayList<Command> cmds;
+  final ArrayList<Command> cmds;
 
   /** Return code (may be {@code null}). */
   HTTPCode code;
@@ -37,7 +37,7 @@ public abstract class RESTCmd extends Command {
    * Constructor.
    * @param rs REST session
    */
-  protected RESTCmd(final RESTSession rs) {
+  RESTCmd(final RESTSession rs) {
     super(max(rs.cmds));
     cmds = rs.cmds;
     session = rs;
@@ -77,7 +77,7 @@ public abstract class RESTCmd extends Command {
    * @return string result
    * @throws HTTPException HTTP exception
    */
-  public final String run(final Command c) throws HTTPException {
+  final String run(final Command c) throws HTTPException {
     final ArrayOutput ao = new ArrayOutput();
     run(c, ao);
     return ao.toString();
@@ -89,7 +89,7 @@ public abstract class RESTCmd extends Command {
    * @param os output stream
    * @throws HTTPException HTTP exception
    */
-  public final void run(final Command c, final OutputStream os) throws HTTPException {
+  final void run(final Command c, final OutputStream os) throws HTTPException {
     final boolean ok = c.run(context, os);
     error(c.info());
     if(!ok) HTTPCode.BAD_REQUEST_X.thrw(c.info());

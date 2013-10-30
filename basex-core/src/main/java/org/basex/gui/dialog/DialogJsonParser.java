@@ -56,7 +56,7 @@ final class DialogJsonParser extends DialogParser {
    * @param opts main options
    */
   DialogJsonParser(final BaseXDialog d, final MainOptions opts) {
-    super(d, MainParser.JSON);
+    super(d);
     jopts = opts.get(MainOptions.JSONPARSER);
 
     encoding = DialogExport.encoding(d, jopts.get(JsonParserOptions.ENCODING));

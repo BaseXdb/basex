@@ -15,8 +15,6 @@ import org.basex.util.*;
 final class ReplaceContext {
   /** Replace string. */
   final String replace;
-  /** Search context. */
-  SearchContext search;
   /** Text. */
   byte[] text;
 
@@ -38,7 +36,6 @@ final class ReplaceContext {
    */
   int[] replace(final SearchContext sc, final byte[] txt, final int start, final int end) {
     final int os = txt.length;
-    search = sc;
     if(sc.search.isEmpty()) {
       text = txt;
     } else {

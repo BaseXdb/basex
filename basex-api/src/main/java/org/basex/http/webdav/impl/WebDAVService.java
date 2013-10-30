@@ -149,8 +149,7 @@ public final class WebDAVService<T> {
       final long mod = DateTime.parse(q.next());
       final Long size = raw ? Long.valueOf(q.next()) : null;
       final String pth = stripLeadingSlash(q.next());
-      final boolean folder = pth.lastIndexOf(SEP) <= 0;
-      return new ResourceMetaData(db, pth, mod, raw, ctype, size, folder);
+      return new ResourceMetaData(db, pth, mod, raw, ctype, size);
     } finally {
       q.close();
     }

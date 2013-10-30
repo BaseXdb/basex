@@ -48,14 +48,14 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Associated function. */
   final StaticFunc function;
   /** Associated module. */
-  final RestXqModule module;
+  private final RestXqModule module;
   /** Path. */
   RestXqPath path;
 
   /** Error. */
   RestXqError error;
   /** Query parameters. */
-  final ArrayList<RestXqParam> errorParams = new ArrayList<RestXqParam>();
+  private final ArrayList<RestXqParam> errorParams = new ArrayList<RestXqParam>();
 
   /** Query parameters. */
   final ArrayList<RestXqParam> queryParams = new ArrayList<RestXqParam>();
@@ -64,7 +64,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
   /** Header parameters. */
   final ArrayList<RestXqParam> headerParams = new ArrayList<RestXqParam>();
   /** Cookie parameters. */
-  final ArrayList<RestXqParam> cookieParams = new ArrayList<RestXqParam>();
+  private final ArrayList<RestXqParam> cookieParams = new ArrayList<RestXqParam>();
 
   /** Query context. */
   private final QueryContext context;

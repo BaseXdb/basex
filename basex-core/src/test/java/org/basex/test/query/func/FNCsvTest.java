@@ -80,7 +80,7 @@ public final class FNCsvTest extends AdvancedQueryTest {
     serialError("<csv/>", "'x':'y'");
     serialError("<csv><record><A>1</A></record></csv>", "'separator':''");
     serialError("<csv><record><A>1</A></record></csv>", "'separator':'XX'");
-  };
+  }
 
   /**
    * Runs the specified query.

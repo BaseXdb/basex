@@ -82,8 +82,7 @@ public final class TypeCase extends Single {
       final IntObjMap<Var> vs) {
     final Var v = var == null ? null : scp.newCopyOf(ctx, var);
     if(var != null) vs.put(var.id, v);
-    final TypeCase tc = new TypeCase(info, v, types.clone(), expr.copy(ctx, scp, vs));
-    return tc;
+    return new TypeCase(info, v, types.clone(), expr.copy(ctx, scp, vs));
   }
 
   /**

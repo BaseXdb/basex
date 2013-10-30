@@ -16,7 +16,7 @@ import org.junit.*;
  */
 public class RequestTest extends HTTPTest {
   /** Root path. */
-  protected static final String ROOT = "http://" + Text.LOCALHOST + ":9998/rest/";
+  private static final String ROOT = "http://" + Text.LOCALHOST + ":9998/rest/";
 
   /**
    * Start server.

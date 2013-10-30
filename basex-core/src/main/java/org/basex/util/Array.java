@@ -99,7 +99,7 @@ public final class Array {
    * @param target target array
    * @return object
    */
-  public static <T> T[] copy(final Object[] source, final T[] target) {
+  public static <T> T[] copy(final T[] source, final T[] target) {
     System.arraycopy(source, 0, target, 0, source.length);
     return target;
   }

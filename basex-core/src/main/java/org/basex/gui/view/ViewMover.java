@@ -34,13 +34,12 @@ final class ViewMover extends BaseXPanel {
     setCursor(GUIConstants.CURSORMOVE);
     refreshLayout();
 
-    new BaseXPopup(this, new GUICmd[] {
-      new GUIBaseCmd() {
+    new BaseXPopup(this, new GUIBaseCmd() {
         @Override
         public String label() { return Text.CLOSE; }
         @Override
         public void execute(final GUI g) { ((ViewPanel) getParent()).delete(); }
-      }});
+      });
    }
 
   @Override

@@ -106,17 +106,17 @@ public final class RestXqTest extends HTTPTest {
    * @throws Exception exception */
   @Test public void post() throws Exception {
     String f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
-    post(f, "", "12", "12", TEXT_PLAIN);
-    post(f, "", "<x>A</x>", "<x>A</x>", APP_XML);
+    post(f, "12", "12", TEXT_PLAIN);
+    post(f, "<x>A</x>", "<x>A</x>", APP_XML);
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x/json/*};";
-    post(f, "", "<A>B</A>", "{ \"A\":\"B\" }", APP_JSON);
+    post(f, "<A>B</A>", "{ \"A\":\"B\" }", APP_JSON);
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
-    post(f, "", "<A/>", "[\"A\"]", APP_JSONML);
+    post(f, "<A/>", "[\"A\"]", APP_JSONML);
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x/csv/*/*};";
-    post(f, "", "<entry>A</entry>", "A", TEXT_CSV);
+    post(f, "<entry>A</entry>", "A", TEXT_CSV);
     f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
-    post(f, "", "QUFB", "AAA", APP_OCTET);
-    post(f, "", "QUFB", "AAA", "whatever/type");
+    post(f, "QUFB", "AAA", APP_OCTET);
+    post(f, "QUFB", "AAA", "whatever/type");
   }
 
   /**
@@ -244,13 +244,12 @@ public final class RestXqTest extends HTTPTest {
    */
   @Test public void head() throws Exception {
     // correct return type
-    head("declare %R:HEAD %R:path('') function m:f() { <R:response/> };", "", "");
-    head("declare %R:HEAD %R:path('') function m:f() as element(R:response) " +
-        "{ <R:response/> };", "", "");
+    headR("declare %R:HEAD %R:path('') function m:f() { <R:response/> };");
+    headR("declare %R:HEAD %R:path('') function m:f() as element(R:response) { <R:response/> };");
     // wrong type
-    headE("declare %R:HEAD %R:path('') function m:f() { () };", "");
-    headE("declare %R:HEAD %R:path('') function m:f() { <response/> };", "");
-    headE("declare %R:HEAD %R:path('') function m:f() as element(R:response)* {()};", "");
+    headE("declare %R:HEAD %R:path('') function m:f() { () };");
+    headE("declare %R:HEAD %R:path('') function m:f() { <response/> };");
+    headE("declare %R:HEAD %R:path('') function m:f() as element(R:response)* {()};");
   }
 
   /**
@@ -389,17 +388,17 @@ public final class RestXqTest extends HTTPTest {
 
   /**
    * Executes the specified POST request and tests the result.
+   *
    * @param function function to test
-   * @param query request
    * @param exp expected result
    * @param request request body
    * @param type content type
    * @throws IOException I/O exception
    */
-  private static void post(final String function, final String query, final String exp,
-      final String request, final String type) throws IOException {
+  private static void post(final String function, final String exp,
+                           final String request, final String type) throws IOException {
     install(function);
-    assertEquals(exp, post(query, request, type));
+    assertEquals(exp, post("", request, type));
   }
 
   /**
@@ -432,29 +431,26 @@ public final class RestXqTest extends HTTPTest {
 
   /**
    * Executes the specified HEAD request and tests the result.
+   *
    * @param function function to test
-   * @param query request
-   * @param exp expected result
    * @throws IOException I/O exception
    */
-  private static void head(final String function, final String query, final String exp)
-      throws IOException {
+  private static void headR(final String function) throws IOException {
     install(function);
-    assertEquals(exp, head(query));
+    assertEquals("", head(""));
   }
 
   /**
    * Executes the specified HEAD request and tests for an error.
+   *
    * @param function function to test
-   * @param query request
    * @throws IOException I/O exception
    */
-  private static void headE(final String function, final String query) throws IOException {
-
+  private static void headE(final String function) throws IOException {
     install(function);
     try {
-      head(query);
-      fail("Error expected: " + query);
+      head("");
+      fail("Error expected: " + "");
     } catch(final BaseXException ex) {
     }
   }

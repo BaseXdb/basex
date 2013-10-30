@@ -54,7 +54,7 @@ public abstract class ConsoleReader {
    * Creates a new instance.
    * @return instance of console reader
    */
-  public static final ConsoleReader get() {
+  public static ConsoleReader get() {
     if(JLineConsoleReader.isAvailable()) {
       try {
         return new JLineConsoleReader();

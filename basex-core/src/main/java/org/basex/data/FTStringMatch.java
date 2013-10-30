@@ -61,7 +61,7 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder().append(pos);
-    sb.append(':').append(start + "-" + end);
+    sb.append(':').append(start).append("-").append(end);
     return exclude ? "not(" + sb + ")" : sb.toString();
   }
 }

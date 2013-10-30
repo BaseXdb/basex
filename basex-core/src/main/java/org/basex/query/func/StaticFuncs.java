@@ -226,7 +226,7 @@ public final class StaticFuncs extends ExprInfo {
   /** Function cache. */
   private static class FuncCache {
     /** Function calls. */
-    ArrayList<StaticFuncCall> calls = new ArrayList<StaticFuncCall>(0);
+    final ArrayList<StaticFuncCall> calls = new ArrayList<StaticFuncCall>(0);
     /** Function. */
     StaticFunc func;
 

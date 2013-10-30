@@ -30,21 +30,20 @@ public final class JsonStringConverter extends JsonConverter {
 
   /**
    * Writes a pretty-printed representation of the given JSON string to the given builder.
+   *
    * @param json JSON string
    * @param spec JSON spec for parsing
    * @param un unescape flag
    * @param tb token builder
-   * @return the token builder
    * @throws QueryIOException query I/O exception
    */
-  public static TokenBuilder print(final String json, final JsonSpec spec, final boolean un,
+  public static void print(final String json, final JsonSpec spec, final boolean un,
       final TokenBuilder tb) throws QueryIOException {
 
     final JsonParserOptions jopts = new JsonParserOptions();
     jopts.set(JsonOptions.SPEC, spec);
     jopts.set(JsonParserOptions.UNESCAPE, un);
     JsonParser.parse(json, jopts, new JsonStringConverter(jopts, tb));
-    return tb;
   }
 
   @Override

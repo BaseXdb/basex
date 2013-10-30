@@ -45,7 +45,7 @@ public abstract class BXNode implements Node {
    * @param node input node
    * @return DOM node
    */
-  public static final BXNode get(final ANode node) {
+  public static BXNode get(final ANode node) {
     if(node == null) return null;
     switch(node.nodeType()) {
       case DOC: return new BXDoc(node);
@@ -300,7 +300,7 @@ public abstract class BXNode implements Node {
    * Throws a DOM modification exception.
    * @return DOM exception
    */
-  protected static final DOMException readOnly() {
+  protected static DOMException readOnly() {
     throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
         "DOM implementation is read-only.");
   }

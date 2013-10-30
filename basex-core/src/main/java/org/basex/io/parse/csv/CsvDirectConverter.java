@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.build.*;
 import org.basex.build.CsvOptions.*;
-import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -58,7 +57,7 @@ public final class CsvDirectConverter extends CsvConverter {
   }
 
   @Override
-  public void header(final byte[] value) throws QueryIOException {
+  public void header(final byte[] value) {
     headers.add(atts ? value : XMLToken.encode(value, lax));
   }
 

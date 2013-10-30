@@ -207,16 +207,15 @@ public final class PinTest extends SandboxTest {
 
   /**
    * Assumes that this command is successful.
+   *
    * @param cmd command reference
    * @param ctx database context
-   * @return result as string
    */
-  private static String ok(final Command cmd, final Context ctx) {
+  private static void ok(final Command cmd, final Context ctx) {
     try {
-      return cmd.execute(ctx);
+      cmd.execute(ctx);
     } catch(final IOException ex) {
       fail(Util.message(ex));
-      return null;
     }
   }
 

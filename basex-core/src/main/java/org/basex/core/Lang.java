@@ -166,7 +166,7 @@ public final class Lang {
       final String lang = f.name().replace('.' + SUFFIX, "");
       if(lang.equals("English")) continue;
       read(lang);
-      for(final Object o : set.toArray()) {
+      for(final String o : set.toArray(new String[set.size()])) {
         if(TEXTS.remove(o) == null) sb.append("- ").append(o).append('\n');
       }
       if(sb.length() != 0) {

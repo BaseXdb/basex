@@ -27,7 +27,7 @@ import org.basex.util.*;
  */
 public abstract class ParseExpr extends Expr {
   /** Input information. */
-  public InputInfo info;
+  public final InputInfo info;
   /** Cardinality of result; unknown if set to -1. */
   public long size = -1;
   /** Static type. */
@@ -146,7 +146,7 @@ public abstract class ParseExpr extends Expr {
    * @param ii input info
    * @return expression
    */
-  public static final Expr compBln(final Expr e, final InputInfo ii) {
+  public static Expr compBln(final Expr e, final InputInfo ii) {
     return e.type().eq(SeqType.BLN) ? e : Function.BOOLEAN.get(null, ii, e);
   }
 

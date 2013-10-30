@@ -74,7 +74,7 @@ public abstract class Arr extends ParseExpr {
    * @return deep copy of the array
    */
   @SuppressWarnings("unchecked")
-  public static final <T extends Expr> T[] copyAll(final QueryContext ctx,
+  public static <T extends Expr> T[] copyAll(final QueryContext ctx,
       final VarScope scp, final IntObjMap<Var> vs, final T[] arr) {
     final T[] copy = arr.clone();
     for(int i = 0; i < copy.length; i++) copy[i] = (T) copy[i].copy(ctx, scp, vs);

@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.util.*;
 
 import org.basex.index.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;
 
@@ -16,8 +15,6 @@ import org.junit.*;
  * @author Dimitar Popov
  */
 public final class IdPreMapTest {
-  /** Verbose flag. */
-  private static final boolean VERBOSE = false;
   /** Number of update operations to execute in each test. */
   private static final int ITERATIONS = 200;
   /** Initial number of records. */
@@ -108,42 +105,36 @@ public final class IdPreMapTest {
   /** Insert performance: insert at random positions. */
   @Test
   public void insertPerformance() {
-    if(VERBOSE) Util.err("Tested mapping: ");
     insertPerformance(testedmap);
   }
 
   /** Delete performance: delete at random positions. */
   @Test
   public void deletePerformance() {
-    if(VERBOSE) Util.err("Tested mapping: ");
     deletePerformance(testedmap, basemap);
   }
 
   /** Search performance: insert at random positions and the search. */
   @Test
   public void searchPerformance() {
-    if(VERBOSE) Util.err("Tested mapping: ");
     searchPerformance(testedmap);
   }
 
   /** Dummy insert performance: insert at random positions. */
   @Test
   public void insertPerformanceDummy() {
-    if(VERBOSE) Util.err("Dummy mapping: ");
     insertPerformance(basemap);
   }
 
   /** Dummy delete performance: delete at random positions. */
   @Test
   public void deletePerformanceDummy() {
-    if(VERBOSE) Util.err("Dummy mapping: ");
     deletePerformance(basemap, basemap.copy());
   }
 
   /** Dummy search performance: insert at random positions and the search. */
   @Test
   public void searchPerformanceDummy() {
-    if(VERBOSE) Util.err("Dummy mapping: ");
     searchPerformance(basemap);
   }
 
@@ -159,9 +150,7 @@ public final class IdPreMapTest {
       d[i][1] = id;
     }
     // perform the actual test:
-    final Performance p = new Performance();
     for(final int[] a : d) m.insert(a[0], a[1], 1);
-    if(VERBOSE) Util.errln(d.length + " records inserted in: " + p);
   }
 
   /**
@@ -178,9 +167,7 @@ public final class IdPreMapTest {
       b.delete(d[i][0], d[i][1], -1);
     }
     // perform the test:
-    final Performance p = new Performance();
     for(final int[] dd : d) m.delete(dd[0], dd[1], -1);
-    if(VERBOSE) Util.errln(d.length + " records deleted in: " + p);
   }
 
   /**
@@ -191,9 +178,7 @@ public final class IdPreMapTest {
     final int n = BASEID + ITERATIONS;
     for(int id = BASEID + 1; id <= n; ++id) m.insert(RANDOM.nextInt(id), id, 1);
 
-    final Performance p = new Performance();
     for(int i = 0; i < n; ++i) m.pre(i);
-    if(VERBOSE) Util.errln(n + " records found in: " + p);
   }
 
   /**

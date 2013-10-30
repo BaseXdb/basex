@@ -84,7 +84,7 @@ public final class DialogInsert extends BaseXDialog {
     }
     set(knd, BorderLayout.NORTH);
 
-    back = new BaseXBack(10, 0, 0, 0);
+    back = new BaseXBack().border(10, 0, 0, 0);
     set(back, BorderLayout.CENTER);
 
     final BaseXBack pp = new BaseXBack(new BorderLayout());

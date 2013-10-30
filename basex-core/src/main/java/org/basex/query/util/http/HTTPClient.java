@@ -139,7 +139,7 @@ public final class HTTPClient {
    * @param r request data
    */
   private static void setContentType(final HttpURLConnection conn, final HTTPRequest r) {
-    String mt = null;
+    String mt;
     final byte[] contTypeHdr = r.headers.get(lc(token(CONTENT_TYPE)));
     if(contTypeHdr != null) {
       // if header "Content-Type" is set explicitly by the user, its value is used

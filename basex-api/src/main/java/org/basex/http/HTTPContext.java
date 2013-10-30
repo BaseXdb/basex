@@ -269,29 +269,6 @@ public final class HTTPContext {
   }
 
   /**
-   * Creates a new {@link LocalSession} instance.
-   * @return database session
-   * @throws LoginException login exception
-   * @deprecated("Use {@link #authenticate} instead")
-   */
-  @Deprecated
-  public LocalSession session() throws LoginException {
-    final LocalSession session;
-    final byte[] address = token(req.getRemoteAddr());
-    try {
-      if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
-        throw new LoginException(NOPASSWD);
-      session = new LocalSession(context(), user, pass);
-      context.blocker.remove(address);
-    } catch(final LoginException ex) {
-      // delay users with wrong passwords
-      for(int d = context.blocker.delay(address); d > 0; d--) Performance.sleep(1000);
-      throw ex;
-    }
-    return session;
-  }
-
-  /**
    * Returns the database context.
    * @return context;
    */

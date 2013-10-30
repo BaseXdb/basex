@@ -95,9 +95,9 @@ public abstract class IndexBuilder extends Proc {
     if(!Prop.debug) return;
 
     final StringBuilder sb = new StringBuilder();
-    if(splits > 1) sb.append(" " + splits + " splits,");
-    sb.append(" " + count + " operations, ");
-    sb.append(perf + " (" + Performance.getMemory() + ')');
+    if(splits > 1) sb.append(" ").append(splits).append(" splits,");
+    sb.append(" ").append(count).append(" operations, ");
+    sb.append(perf).append(" (").append(Performance.getMemory()).append(')');
     Util.errln(sb);
   }
 

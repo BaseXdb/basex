@@ -588,7 +588,7 @@ public class CommandTest extends SandboxTest {
    * @param cmd command reference
    * @return result as string
    */
-  static final String ok(final Command cmd) {
+  static String ok(final Command cmd) {
     try {
       return session.execute(cmd);
     } catch(final IOException ex) {
@@ -601,7 +601,7 @@ public class CommandTest extends SandboxTest {
    * Assumes that this command fails.
    * @param cmd command reference
    */
-  static final void no(final Command cmd) {
+  static void no(final Command cmd) {
     try {
       session.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");

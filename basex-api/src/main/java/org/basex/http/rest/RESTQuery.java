@@ -44,7 +44,7 @@ class RESTQuery extends RESTCmd {
    * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  protected void query(final String path) throws IOException {
+  void query(final String path) throws IOException {
     final XQuery xq;
     int c = 0;
     while(!(cmds.get(c) instanceof XQuery)) run(cmds.get(c++));

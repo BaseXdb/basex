@@ -81,7 +81,7 @@ public abstract class ContextModifier {
     final Collection<DatabaseUpdates> updates = pendingUpdates.values();
     final Collection<DBCreate> creates = dbCreates.values();
 
-    // create temporary mem data instance if not available yet
+    // create temporary mem data instance if not available yet (break after first operation)
     if(tmp == null) {
       for(final DatabaseUpdates c : updates) {
         tmp = new MemData(c.data().meta.options);

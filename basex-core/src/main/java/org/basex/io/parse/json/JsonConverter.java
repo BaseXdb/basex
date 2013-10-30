@@ -86,9 +86,8 @@ public abstract class JsonConverter {
 
   /**
    * Called when a JSON object is closed.
-   * @throws QueryIOException query exception
    */
-  abstract void closeObject() throws QueryIOException;
+  abstract void closeObject();
 
   /**
    * Called when a JSON array is opened.
@@ -98,9 +97,8 @@ public abstract class JsonConverter {
 
   /**
    * Called when an item of a JSON array is opened.
-   * @throws QueryIOException query exception
    */
-  abstract void openItem() throws QueryIOException;
+  abstract void openItem();
 
   /**
    * Called when an item of a JSON array is closed.
@@ -123,9 +121,8 @@ public abstract class JsonConverter {
 
   /**
    * Called when an argument of a constructor function is opened.
-   * @throws QueryIOException query exception
    */
-  abstract void openArg() throws QueryIOException;
+  abstract void openArg();
 
   /**
    * Called when an argument of a constructor function is closed.

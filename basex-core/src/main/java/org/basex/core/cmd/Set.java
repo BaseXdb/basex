@@ -32,7 +32,7 @@ public final class Set extends AGet {
    * @param value value to set (optional, depending on the option)
    */
   public Set(final String name, final Object value) {
-    super(Perm.NONE, name, value == null ? "" : value.toString());
+    super(name, value == null ? "" : value.toString());
   }
 
   @Override

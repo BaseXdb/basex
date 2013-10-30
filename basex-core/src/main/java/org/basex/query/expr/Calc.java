@@ -305,7 +305,7 @@ public enum Calc {
    * @param d value to be checked
    * @throws QueryException query exception
    */
-  static final void checkRange(final InputInfo ii, final double d) throws QueryException {
+  static void checkRange(final InputInfo ii, final double d) throws QueryException {
     if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) RANGE.thrw(ii, d);
   }
 

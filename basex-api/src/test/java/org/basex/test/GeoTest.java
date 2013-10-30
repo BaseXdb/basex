@@ -873,7 +873,7 @@ public final class GeoTest extends AdvancedQueryTest {
    * @param query query string
    * @param error expected error
    */
-  static void error(final String query, final QNm error) {
+  private static void error(final String query, final QNm error) {
     final String q = "import module namespace geo='http://expath.org/ns/geo'; " +
         "declare namespace gml='http://www.opengis.net/gml';" + query;
 

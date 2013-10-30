@@ -733,7 +733,7 @@ public class Editor extends BaseXPanel {
 
     if(ENTER.is(e)) {
       text.open(sb);
-    } else if(sb.length() != 0 && "}])".indexOf(sb.toString()) != -1) {
+    } else if(sb.length() != 0 && "}])".contains(sb.toString())) {
       text.close();
     }
 
@@ -774,13 +774,11 @@ public class Editor extends BaseXPanel {
    * Returns the clipboard text.
    * @return text
    */
-  static final String clip() {
+  static String clip() {
     // copy selection to clipboard
     final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
     final Transferable tr = clip.getContents(null);
-    if(tr != null) {
-      for(final Object o : BaseXLayout.contents(tr)) return o.toString();
-    }
+    if(tr != null) for(final Object o : BaseXLayout.contents(tr)) return o.toString();
     return null;
   }
 
@@ -963,9 +961,6 @@ public class Editor extends BaseXPanel {
     @Override
     public void execute(final GUI main) {
       selectAll();
-    }
-    @Override
-    public void refresh(final GUI main, final AbstractButton button) {
     }
     @Override
     public String label() {

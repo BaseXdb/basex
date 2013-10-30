@@ -24,7 +24,7 @@ public class RESTTest extends HTTPTest {
   /** REST identifier. */
   private static final String REST = "rest";
   /** Root path. */
-  protected static final String ROOT = "http://" + Text.LOCALHOST + ":9998/" + REST + '/';
+  static final String ROOT = "http://" + Text.LOCALHOST + ":9998/" + REST + '/';
 
   /** REST URI. */
   private static final String URI = RESTText.RESTURI;

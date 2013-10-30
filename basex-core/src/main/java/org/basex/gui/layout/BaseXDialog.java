@@ -204,11 +204,10 @@ public abstract class BaseXDialog extends JDialog {
    */
   public static void enableOK(final JComponent panel, final String label, final boolean enabled) {
     for(final Component c : panel.getComponents()) {
-      if(!(c instanceof JComponent)) {
-      } else if(c instanceof BaseXButton) {
+      if(c instanceof BaseXButton) {
         final BaseXButton b = (BaseXButton) c;
         if(b.getText().equals(label)) b.setEnabled(enabled);
-      } else {
+      } else if(c instanceof JComponent) {
         enableOK((JComponent) c, label, enabled);
       }
     }

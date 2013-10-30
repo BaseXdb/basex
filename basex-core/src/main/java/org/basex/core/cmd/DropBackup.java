@@ -43,18 +43,16 @@ public class DropBackup extends ABackup {
 
   /**
    * Drops one or more backups of the specified database.
+   *
    * @param db database
    * @param ctx database context
-   * @return number of dropped backups
    */
-  private static int drop(final String db, final Context ctx) {
+  private static void drop(final String db, final Context ctx) {
     final IOFile dir = ctx.globalopts.dbpath();
-    int c = 0;
     for(final IOFile f : dir.children()) {
       final String n = f.name();
-      if(n.startsWith(db) && n.endsWith(IO.ZIPSUFFIX) && f.delete()) c++;
+      if(n.startsWith(db) && n.endsWith(IO.ZIPSUFFIX)) f.delete();
     }
-    return c;
   }
 
   @Override

@@ -34,7 +34,7 @@ public class IntSet extends ASet {
   /**
    * Stores the specified key if it has not been stored before.
    * @param key key to be added
-   * @return {@Code true} if the key did not exist yet and was stored
+   * @return {@code true} if the key did not exist yet and was stored
    */
   public final boolean add(final int key) {
     return index(key) > 0;

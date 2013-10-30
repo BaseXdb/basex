@@ -49,7 +49,7 @@ public final class LockingTest extends SandboxTest {
   /** Global options, used to read parallel transactions limit. */
   private final GlobalOptions gopts = new Context().globalopts;
   /** Locking instance used for testing. */
-  DBLocking locks = new DBLocking(gopts);
+  final DBLocking locks = new DBLocking(gopts);
   /** Objects used for locking. */
   final String[] objects = new String[5];
   /** Empty string array for convenience. */
@@ -487,7 +487,7 @@ public final class LockingTest extends SandboxTest {
   @Test
   public void deadlockTest() throws InterruptedException {
     final CountDownLatch sync = new CountDownLatch(1), test2 = new CountDownLatch(1),
-        test3 = new CountDownLatch(1);;
+        test3 = new CountDownLatch(1);
 
     final LockTester th1 = new LockTester(null, NONE, new String[] {"3"}, sync);
     final LockTester th2 = new LockTester(sync, new String[] {"2"},
@@ -536,8 +536,7 @@ public final class LockingTest extends SandboxTest {
 
           final int start = (int) (Math.random() * set.length);
           final int end = (int) (Math.random() * (set.length - start)) + start;
-          final String[] subset = Arrays.copyOfRange(set, start, end);
-          return subset;
+          return Arrays.copyOfRange(set, start, end);
         }
 
         @Override

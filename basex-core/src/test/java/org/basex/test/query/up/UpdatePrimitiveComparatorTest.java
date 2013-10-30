@@ -504,7 +504,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
    */
   private static void compare(final UpdatePrimitive[] order) {
     final List<UpdatePrimitive> l = new ArrayList<UpdatePrimitive>();
-    for(final UpdatePrimitive p : order) l.add(p);
+    Collections.addAll(l, order);
     final List<UpdatePrimitive> l2 = new ArrayList<UpdatePrimitive>();
     for(final UpdatePrimitive p : order) l2.add(0, p);
 

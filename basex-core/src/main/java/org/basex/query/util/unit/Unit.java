@@ -47,7 +47,7 @@ public final class Unit {
    */
   public FElem test(final StaticContext sc) throws QueryException {
     final ArrayList<StaticFunc> funcs = new ArrayList<StaticFunc>();
-    for(final StaticFunc uf : ctx.funcs.funcs()) funcs.add(uf);
+    Collections.addAll(funcs, ctx.funcs.funcs());
     return test(sc, funcs);
   }
 

@@ -30,11 +30,11 @@ public class Options implements Iterable<Option<?>> {
   /** Map with option names and definition. */
   protected final TreeMap<String, Option<?>> options = new TreeMap<String, Option<?>>();
   /** Map with option names and values. */
-  protected final TreeMap<String, Object> values = new TreeMap<String, Object>();
+  private final TreeMap<String, Object> values = new TreeMap<String, Object>();
   /** Free option definitions. */
-  protected final HashMap<String, String> free = new HashMap<String, String>();
+  private final HashMap<String, String> free = new HashMap<String, String>();
   /** Options, cached from an input file. */
-  protected final StringBuilder user = new StringBuilder();
+  private final StringBuilder user = new StringBuilder();
 
   /** Options file. */
   private IOFile file;
@@ -451,7 +451,7 @@ public class Options implements Iterable<Option<?>> {
    * @return option instances
    * @throws IllegalAccessException exception
    */
-  public static final Option<?>[] options(final Class<? extends Options> clz)
+  public static Option<?>[] options(final Class<? extends Options> clz)
       throws IllegalAccessException {
 
     final ArrayList<Option<?>> opts = new ArrayList<Option<?>>();

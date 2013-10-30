@@ -79,11 +79,6 @@ public final class FNFileTest extends AdvancedQueryTest {
 
   /** Test method. */
   @Test
-  public void lineSeparator() {
-  }
-
-  /** Test method. */
-  @Test
   public void exists() {
     query(_FILE_WRITE.args(PATH1, "()"));
     query(_FILE_EXISTS.args(PATH1), true);

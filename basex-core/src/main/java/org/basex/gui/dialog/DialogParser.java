@@ -6,7 +6,6 @@ import java.awt.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.MainOptions.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
@@ -20,18 +19,14 @@ import org.basex.util.*;
 abstract class DialogParser extends BaseXBack {
   /** Parent dialog. */
   final BaseXDialog dialog;
-  /** Parser. */
-  final MainParser parser;
 
   /**
    * Constructor.
    * @param d parent dialog
-   * @param p parser
    */
-  DialogParser(final BaseXDialog d, final MainParser p) {
+  DialogParser(final BaseXDialog d) {
     setLayout(new BorderLayout(16, 0));
     dialog = d;
-    parser = p;
   }
 
   /**
@@ -59,7 +54,7 @@ abstract class DialogParser extends BaseXBack {
    * @param output output string
    * @return example string
    */
-  static final String example(final String format, final String input, final String output) {
+  static String example(final String format, final String input, final String output) {
     final TokenBuilder text = new TokenBuilder();
     text.bold().add(format).add(COL).norm().nline().add(input).nline().nline();
     return text.bold().add("XML").add(COL).norm().nline().add(output).toString();
@@ -70,7 +65,7 @@ abstract class DialogParser extends BaseXBack {
    * @param ex I/O exception
    * @return error string
    */
-  static final String error(final IOException ex) {
+  static String error(final IOException ex) {
     final TokenBuilder text = new TokenBuilder().bold().add(Text.ERROR).add(COL).norm().nline();
     return text.add(ex.getLocalizedMessage()).toString();
   }

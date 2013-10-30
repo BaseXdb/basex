@@ -102,9 +102,9 @@ public final class QueryContext extends Proc {
   public Item zone;
 
   /** Strings to lock defined by lock:read option. */
-  public StringList readLocks = new StringList(0);
+  public final StringList readLocks = new StringList(0);
   /** Strings to lock defined by lock:write option. */
-  public StringList writeLocks = new StringList(0);
+  public final StringList writeLocks = new StringList(0);
 
   /** Pending updates. */
   public Updates updates;
@@ -646,7 +646,7 @@ public final class QueryContext extends Proc {
     final QNm nm = new QNm(token(type.replaceAll("\\(.*?\\)$", "")), sc);
     if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm.string());
 
-    Type t = null;
+    Type t;
     if(type.endsWith(")")) {
       t = NodeType.find(nm);
     } else {

@@ -167,7 +167,7 @@ public final class AddDeleteTest extends SandboxTest {
     new Delete("/").execute(context);
     assertEquals(0, docs());
     final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i < 256; i++) sb.append("<a" + i + "/>");
+    for(int i = 0; i < 256; i++) sb.append("<a").append(i).append("/>");
     new Add("x", "<x>" + sb + "</x>").execute(context);
     assertEquals(1, docs());
     assertEquals("1", new XQuery("count(//x)").execute(context));

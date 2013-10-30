@@ -116,7 +116,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     for(int c = 0; c < cs; c += 2) {
       final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
       if(combo.getSelectedIndex() == 0) continue;
-      final String elem = combo.getSelectedItem().toString();
+      final String elem = combo.getSelectedItem();
       if(!elem.startsWith("@")) tl.add(Token.token(elem));
     }
 

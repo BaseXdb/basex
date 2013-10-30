@@ -161,7 +161,7 @@ public final class FNClient extends StandardFunc {
     } catch(final IOException ex) {
       throw BXCL_COMM.thrw(info, ex);
     } finally {
-      if(cq != null) try { cq.close(); } catch(final IOException ex) { }
+      if(cq != null) try { cq.close(); } catch(final IOException ignored) { }
     }
   }
 

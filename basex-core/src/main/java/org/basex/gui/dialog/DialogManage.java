@@ -184,7 +184,7 @@ public final class DialogManage extends BaseXDialog {
       for(final String b : back) cmds.add(new DropBackup(b));
       refresh = true;
 
-    } else if(cmp != backups) {
+    } else {
       final String title = dbs.size() == 1 ? db : dbs.size() + " " + DATABASES;
       doc1.setText(title);
       doc2.setText(BACKUPS + COLS + title);

@@ -1234,7 +1234,7 @@ public enum Function {
    */
   private static EnumSet<Flag> flag(final Flag... flags) {
     final EnumSet<Flag> set = EnumSet.noneOf(Flag.class);
-    for(final Flag f : flags) set.add(f);
+    Collections.addAll(set, flags);
     return set;
   }
 

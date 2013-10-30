@@ -51,8 +51,8 @@ public final class DateTime {
    * @param date date
    * @return string with the formatted date
    */
-  public static String format(final Date date, final DateFormat format) {
-    synchronized(format) { return format.format(date); }
+  public static synchronized String format(final Date date, final DateFormat format) {
+    return format.format(date);
   }
 
   /**
@@ -62,7 +62,8 @@ public final class DateTime {
    * @return parsed date
    * @throws ParseException if the string cannot be parsed
    */
-  public static Date parse(final String date, final DateFormat format) throws ParseException {
-    synchronized(format) { return format.parse(date); }
+  public static synchronized Date parse(final String date, final DateFormat format)
+      throws ParseException {
+    return format.parse(date);
   }
 }

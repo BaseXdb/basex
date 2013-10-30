@@ -29,17 +29,17 @@ import org.xml.sax.helpers.XMLReaderFactory;
 public abstract class BXAbstractResource implements
     CopyableResource, DeletableResource, MoveableResource, LockableResource {
   /** Resource meta data. */
-  protected final ResourceMetaData meta;
+  final ResourceMetaData meta;
   /** WebDAV service implementation. */
-  protected final WebDAVService<BXAbstractResource> service;
+  final WebDAVService<BXAbstractResource> service;
 
   /**
    * Constructor.
    * @param m resource meta data
    * @param s service
    */
-  protected BXAbstractResource(final ResourceMetaData m,
-      final WebDAVService<BXAbstractResource> s) {
+  BXAbstractResource(final ResourceMetaData m,
+                     final WebDAVService<BXAbstractResource> s) {
     meta = m;
     service = s;
   }
@@ -199,7 +199,7 @@ public abstract class BXAbstractResource implements
    * Delete document or folder.
    * @throws IOException I/O exception
    */
-  protected void del() throws IOException {
+  void del() throws IOException {
     service.delete(meta.db, meta.path);
   }
 
@@ -208,7 +208,7 @@ public abstract class BXAbstractResource implements
    * @param n new name
    * @throws IOException I/O exception
    */
-  protected void rename(final String n) throws IOException {
+  void rename(final String n) throws IOException {
     service.rename(meta.db, meta.path, n);
   }
 
@@ -232,7 +232,7 @@ public abstract class BXAbstractResource implements
    * @param n new name of the folder (database)
    * @throws IOException I/O exception
    */
-  protected void moveToRoot(final String n) throws IOException {
+  void moveToRoot(final String n) throws IOException {
     // folder is moved to the root: create new database with it
     copyToRoot(n);
     del();

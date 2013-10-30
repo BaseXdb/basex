@@ -60,7 +60,7 @@ abstract class MapPainter {
    * @param mr map rectangle
    * @return byte[] content
    */
-  static final byte[] content(final Data data, final MapRect mr) {
+  static byte[] content(final Data data, final MapRect mr) {
     return ViewData.content(data, mr.pre, false);
   }
 }

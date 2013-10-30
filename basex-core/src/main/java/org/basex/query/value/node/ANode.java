@@ -440,7 +440,7 @@ public abstract class ANode extends Item {
    * @param ch child nodes
    * @param nc node cache
    */
-  static final void addDesc(final AxisMoreIter ch, final NodeSeqBuilder nc) {
+  static void addDesc(final AxisMoreIter ch, final NodeSeqBuilder nc) {
     for(ANode n; (n = ch.next()) != null;) {
       nc.add(n.finish());
       addDesc(n.children(), nc);

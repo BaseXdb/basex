@@ -14,12 +14,12 @@ import org.basex.query.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public class RESTCommand extends RESTCmd {
+public final class RESTCommand extends RESTCmd {
   /**
    * Constructor.
    * @param rs REST session
    */
-  RESTCommand(final RESTSession rs) {
+  private RESTCommand(final RESTSession rs) {
     super(rs);
   }
 

@@ -180,7 +180,7 @@ public abstract class Preds extends ParseExpr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final Expr e : preds) sb.append("[" + e + ']');
+    for(final Expr e : preds) sb.append('[').append(e).append(']');
     return sb.toString();
   }
 

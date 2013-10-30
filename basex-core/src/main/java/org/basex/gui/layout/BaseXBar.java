@@ -59,8 +59,6 @@ public final class BaseXBar extends BaseXPanel {
   private boolean up;
   /** Scrollbar slider offset. */
   private int barOffset;
-  /** Flag for permanent scrollbar visibility. */
-  private final boolean visible;
 
   /**
    * Default constructor. By default, the scrollbar is switched off
@@ -68,19 +66,8 @@ public final class BaseXBar extends BaseXPanel {
    * @param cmp reference to the scrolled component
    */
   public BaseXBar(final BaseXPanel cmp) {
-    this(cmp, false);
-  }
-
-  /**
-   * Default constructor, allowing to modify the scrollbar visibility.
-   * @param cmp reference to the scrolled component
-   * @param vis states if scrollbar is always visible or hidden when
-   * the displayed content needs no scrollbar
-   */
-  private BaseXBar(final BaseXPanel cmp, final boolean vis) {
     super(cmp.gui);
     comp = cmp;
-    visible = vis;
     addMouseListener(this);
     addKeyListener(this);
     addMouseMotionListener(this);
@@ -123,7 +110,7 @@ public final class BaseXBar extends BaseXPanel {
   public void paintComponent(final Graphics g) {
     hh = getHeight();
     super.paintComponent(g);
-    if(!visible && hh >= height) return;
+    if(hh >= height) return;
 
     // calculate bar size
     final int barH = hh - ww * 2 + 4;

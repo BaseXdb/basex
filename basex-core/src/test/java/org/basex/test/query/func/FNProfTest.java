@@ -77,14 +77,4 @@ public final class FNProfTest extends AdvancedQueryTest {
     query(_PROF_VOID.args("1"), "");
     query(_PROF_VOID.args("1,2"), "");
   }
-
-  /** Test method. */
-  @Test
-  public void currentMs() {
-  }
-
-  /** Test method. */
-  @Test
-  public void currentNs() {
-  }
 }

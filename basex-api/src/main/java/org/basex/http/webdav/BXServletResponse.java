@@ -21,7 +21,7 @@ import com.bradmcevoy.http.Cookie;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXServletResponse extends AbstractResponse {
+final class BXServletResponse extends AbstractResponse {
   /** Thread local variable to hold the current response. */
   private static final ThreadLocal<HttpServletResponse> RESPONSE =
       new ThreadLocal<HttpServletResponse>();

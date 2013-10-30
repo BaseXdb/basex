@@ -33,8 +33,7 @@ public final class DBAdd extends DBNew {
   @Override
   public void merge(final BasicOperation o) {
     final DBAdd a = (DBAdd) o;
-    final Iterator<NewInput> d = a.inputs.iterator();
-    while(d.hasNext()) inputs.add(d.next());
+    for(final NewInput input : a.inputs) inputs.add(input);
   }
 
   @Override

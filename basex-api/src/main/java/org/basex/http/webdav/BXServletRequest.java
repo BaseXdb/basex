@@ -29,7 +29,7 @@ import com.bradmcevoy.http.Cookie;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXServletRequest extends AbstractRequest {
+final class BXServletRequest extends AbstractRequest {
   /** HTTP servlet request. */
   private final HttpServletRequest req;
   /** Request method. */
@@ -207,7 +207,7 @@ public final class BXServletRequest extends AbstractRequest {
    * Request content type.
    * @return the content type of the current request
    */
-  protected ContentType getRequestContentType() {
+  ContentType getRequestContentType() {
     final String s = req.getContentType();
     if(s == null) return null;
     if(s.contains(Response.MULTIPART)) return ContentType.MULTIPART;
@@ -218,7 +218,7 @@ public final class BXServletRequest extends AbstractRequest {
    * Is the content type of the request a multi-part?
    * @return {@code true} if the request is multi-part
    */
-  protected boolean isMultiPart() {
+  boolean isMultiPart() {
     return ContentType.MULTIPART.equals(getRequestContentType());
   }
 }

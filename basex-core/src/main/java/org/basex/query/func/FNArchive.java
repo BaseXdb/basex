@@ -122,7 +122,7 @@ public final class FNArchive extends StandardFunc {
   private B64 create(final QueryContext ctx) throws QueryException {
     final Iter entr = ctx.iter(expr[0]);
     final Iter cont = ctx.iter(expr[1]);
-    final Options opts = checkOptions(2, Q_OPTIONS, new ArchiveOptions(), ctx);;
+    final Options opts = checkOptions(2, Q_OPTIONS, new ArchiveOptions(), ctx);
 
     final String format = opts.get(ArchiveOptions.FORMAT);
     final ArchiveOut out = ArchiveOut.get(format.toLowerCase(Locale.ENGLISH), info);

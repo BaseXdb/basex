@@ -56,7 +56,7 @@ public class Str extends AStr {
    * @return instance
    */
   public static Str get(final String s) {
-    return get(Token.token(s.toString()));
+    return get(Token.token(s));
   }
 
   /**

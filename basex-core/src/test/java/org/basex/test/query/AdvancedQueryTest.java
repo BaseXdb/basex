@@ -63,11 +63,10 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    */
   protected static String transform(final String input, final String modification,
       final String ret) {
-    final String q =
-        "copy $input := " + input + " " +
-        "modify (" + modification + ") " +
-        "return (" + (ret.length() == 0 ? "$input" : ret) + ")";
-    return q;
+    return
+      "copy $input := " + input + " " +
+      "modify (" + modification + ") " +
+      "return (" + (ret.length() == 0 ? "$input" : ret) + ")";
   }
 
   /**
@@ -109,9 +108,9 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       ser.close();
       final String res = ao.toString().replaceAll("(\\r|\\n)+ *", "");
       final StringBuilder sb = new StringBuilder("Query did not fail:\n");
-      sb.append(query + "\n[E]");
-      for(final Err e : error) sb.append(" " + e);
-      fail(sb.append("\n[F] " + res).toString());
+      sb.append(query).append("\n[E]");
+      for(final Err e : error) sb.append(" ").append(e);
+      fail(sb.append("\n[F] ").append(res).toString());
     } catch(final QueryIOException ex) {
       check(query, ex.getCause(), error);
     } catch(final QueryException ex) {

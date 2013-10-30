@@ -129,7 +129,7 @@ public final class FNXQuery extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    if(oneOf(sig, _XQUERY_EVAL, _XQUERY_INVOKE) && !visitor.lock(null)) return false;
-    return super.accept(visitor);
+    return !(oneOf(sig, _XQUERY_EVAL, _XQUERY_INVOKE) && !visitor.lock(null)) &&
+      super.accept(visitor);
   }
 }

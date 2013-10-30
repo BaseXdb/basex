@@ -58,9 +58,8 @@ final class Delete extends StructuralUpdate {
     if(u != null && parent == u.parent && u instanceof Insert &&
         location - shifts == u.location && data.kind(location) != Data.ATTR) {
       final Insert ins = (Insert) u;
-      final Replace rep = new Replace(location, shifts + ins.shifts,
+      return new Replace(location, shifts + ins.shifts,
           ins.accumulatedShifts, preOfAffectedNode, ins.insseq, parent);
-      return rep;
     }
     return null;
   }

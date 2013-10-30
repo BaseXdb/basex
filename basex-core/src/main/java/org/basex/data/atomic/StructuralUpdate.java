@@ -10,7 +10,7 @@ package org.basex.data.atomic;
  */
 public abstract class StructuralUpdate extends BasicUpdate {
   /** PRE value shifts introduced by this atomic update due to structural changes. */
-  int shifts;
+  final int shifts;
   /** PRE value of the first node for which the distance must be updated due to PRE value
    * shifts introduced by this update. */
   final int preOfAffectedNode;

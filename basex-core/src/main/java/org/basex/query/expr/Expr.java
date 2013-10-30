@@ -61,7 +61,7 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public Expr optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
     return this;
-  };
+  }
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
@@ -389,7 +389,7 @@ public abstract class Expr extends ExprInfo {
    * @param exprs expressions to visit
    * @return success flag
    */
-  protected static final boolean visitAll(final ASTVisitor visitor, final Expr...exprs) {
+  protected static boolean visitAll(final ASTVisitor visitor, final Expr...exprs) {
     for(final Expr e : exprs) if(!e.accept(visitor)) return false;
     return true;
   }

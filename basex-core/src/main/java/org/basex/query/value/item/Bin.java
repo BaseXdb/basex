@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public abstract class Bin extends Item {
   /** Binary data. */
-  byte[] data;
+  final byte[] data;
 
   /**
    * Constructor.

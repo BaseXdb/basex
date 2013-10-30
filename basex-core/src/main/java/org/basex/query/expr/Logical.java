@@ -32,12 +32,12 @@ public abstract class Logical extends Arr {
     final boolean and = this instanceof And;
     final int es = expr.length;
     final ExprList el = new ExprList(es);
-    for(int e = 0; e < es; e++) {
-      final Expr ex = expr[e].compEbv(ctx);
-      if(ex.isValue()) {
+    for(final Expr e : expr) {
+      final Expr ex = e.compEbv(ctx);
+      if (ex.isValue()) {
         // atomic items can be pre-evaluated
-        ctx.compInfo(OPTREMOVE, this, expr[e]);
-        if(ex.ebv(ctx, info).bool(info) ^ and) return Bln.get(!and);
+        ctx.compInfo(OPTREMOVE, this, e);
+        if (ex.ebv(ctx, info).bool(info) ^ and) return Bln.get(!and);
       } else {
         el.add(ex);
       }

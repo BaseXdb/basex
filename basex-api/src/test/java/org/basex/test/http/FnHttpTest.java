@@ -35,7 +35,7 @@ import org.junit.*;
  */
 public class FnHttpTest extends HTTPTest {
   /** Example url. */
-  static final String ROOT = "http://" + LOCALHOST + ":9998/rest/";
+  private static final String ROOT = "http://" + LOCALHOST + ":9998/rest/";
   /** Example url. */
   static final String RESTURL = ROOT + NAME;
 
@@ -55,7 +55,7 @@ public class FnHttpTest extends HTTPTest {
   private static final String CRLF = "\r\n";
 
   /** Local database context. */
-  protected static Context ctx;
+  static Context ctx;
 
   /**
    * Start server.
@@ -401,14 +401,13 @@ public class FnHttpTest extends HTTPTest {
         + "</http:request>");
     falseReqs.add(falseReq8);
 
-    final Iterator<byte[]> i = falseReqs.iterator();
-    while(i.hasNext()) {
-      final DBNode dbNode = new DBNode(new IOContent(i.next()), ctx.options);
+    for(final byte[] falseReq : falseReqs) {
+      final DBNode dbNode = new DBNode(new IOContent(falseReq), ctx.options);
       try {
         final HTTPRequestParser rp = new HTTPRequestParser(null);
         rp.parse(dbNode.children().next(), null);
         fail("Exception not thrown");
-      } catch(final QueryException ex) {
+      } catch (final QueryException ex) {
         assertTrue(contains(token(ex.getMessage()), token(ErrType.HC.toString())));
       }
     }
@@ -800,7 +799,7 @@ public class FnHttpTest extends HTTPTest {
    * @param itemsCount expected number of items
    * @throws QueryException query exception
    */
-  static void checkResponse(final Result r, final int expStatus, final int itemsCount)
+  private static void checkResponse(final Result r, final int expStatus, final int itemsCount)
       throws QueryException {
 
     assertTrue(r instanceof Iter);

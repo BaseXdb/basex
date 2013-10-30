@@ -68,7 +68,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
     parseError("{ \"\" : 0.1e }", "");
     parseError("{ \"a\" : 0 }}", "");
     parseError("{ \"a\" : 0, }", "'format':'RFC4627'");
-  };
+  }
 
   /** Test method. */
   @Test
@@ -89,7 +89,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
     serial("<json type='array'><_ type='string'>x</_></json>", "", "[\"x\"]");
     serial("<json type='array'><_ type='number'>1</_></json>", "", "[1]");
     serial("<json numbers=\"_\" type='array'><_>1</_></json>", "", "[1]");
-  };
+  }
 
   /** Test method with namespaces. */
   @Test public void ns() {

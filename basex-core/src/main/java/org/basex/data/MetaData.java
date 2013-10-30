@@ -266,8 +266,6 @@ public final class MetaData {
     try {
       di = new DataInput(dbfile(DATAINF));
       read(di);
-    } catch(final IOException ex) {
-      throw ex;
     } finally {
       if(di != null) try { di.close(); } catch(final IOException ignored) { }
     }

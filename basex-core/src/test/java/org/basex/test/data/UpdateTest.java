@@ -72,7 +72,7 @@ public abstract class UpdateTest extends SandboxTest {
   /**
    * Reloads the database.
    */
-  static final void reload() {
+  static void reload() {
     if(mainmem) return;
     exec(new Close());
     exec(new Open(NAME));
@@ -83,7 +83,7 @@ public abstract class UpdateTest extends SandboxTest {
    * @param exp expected value
    * @param act actual value
    */
-  static final void assertArraysEquals(final byte[] exp, final byte[] act) {
+  static void assertArraysEquals(final byte[] exp, final byte[] act) {
     assertEquals("array lengths don't equal", exp.length, act.length);
     for(int i = 0; i < exp.length; ++i) assertEquals(exp[i], act[i]);
   }

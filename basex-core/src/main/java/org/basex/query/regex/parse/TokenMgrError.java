@@ -48,7 +48,7 @@ public class TokenMgrError extends Error {
    * @param str string to be escaped
    * @return escaped string
    */
-  protected static final String addEscapes(final String str) {
+  protected static String addEscapes(final String str) {
     final StringBuilder retval = new StringBuilder();
     char ch;
     for (int i = 0; i < str.length(); i++) {

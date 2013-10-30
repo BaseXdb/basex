@@ -247,7 +247,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final String local) {
     return CACHE.index(null, token(local), null);
-  };
+  }
 
   /**
    * Returns a cached QName with the specified local name.
@@ -256,7 +256,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final byte[] local) {
     return CACHE.index(null, local, null);
-  };
+  }
 
   /**
    * Returns a cached QName with the specified local name and uri.
@@ -266,7 +266,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final String local, final byte[] uri) {
     return CACHE.index(null, token(local), uri);
-  };
+  }
 
   /**
    * Returns a cached QName with the specified local name and uri.
@@ -276,7 +276,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final byte[] local, final byte[] uri) {
     return CACHE.index(null, local, uri);
-  };
+  }
 
   /**
    * Returns a cached QName with the specified prefix, local name and uri.
@@ -287,7 +287,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final String prefix, final String local, final byte[] uri) {
     return CACHE.index(token(prefix), token(local), uri);
-  };
+  }
 
   /**
    * Returns a cached QName with the specified prefix, local name and uri.
@@ -298,7 +298,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final String prefix, final String local, final String uri) {
     return CACHE.index(token(prefix), token(local), token(uri));
-  };
+  }
 
   /**
    * Returns a cached QName with the specified prefix, local name and uri.
@@ -309,7 +309,7 @@ public final class QNm extends Item {
    */
   public static QNm get(final byte[] prefix, final byte[] local, final byte[] uri) {
     return CACHE.index(prefix, local, uri);
-  };
+  }
 
   /**
    * Constructs an internal string representation for the components of a QName.

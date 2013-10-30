@@ -14,7 +14,7 @@ import org.basex.core.*;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXNotAuthorizedResource implements FolderResource {
+final class BXNotAuthorizedResource implements FolderResource {
   /** The only instance of this class. */
   public static final Resource NOAUTH = new BXNotAuthorizedResource();
 

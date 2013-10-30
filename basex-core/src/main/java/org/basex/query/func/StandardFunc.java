@@ -95,7 +95,7 @@ public abstract class StandardFunc extends Arr {
    * @return atomized item
    * @throws QueryException query exception
    */
-  public static final Item atom(final Item it, final InputInfo ii) throws QueryException {
+  public static Item atom(final Item it, final InputInfo ii) throws QueryException {
     final Type ip = it.type;
     return it instanceof ANode ? ip == NodeType.PI || ip == NodeType.COM ?
         Str.get(it.string(ii)) : new Atm(it.string(ii)) : it.materialize(ii);

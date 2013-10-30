@@ -61,16 +61,14 @@ public final class IOUrl extends IO {
       return conn.getInputStream();
     } catch(final IOException ex) {
       final TokenBuilder msg = new TokenBuilder(Util.message(ex));
-      try {
-        // try to retrieve more information on why the request failed
-        if(conn instanceof HttpURLConnection) {
-          final InputStream es = ((HttpURLConnection) conn).getErrorStream();
-          if(es != null) {
-            final byte[] err = new IOStream(es).read();
-            if(err.length != 0) msg.add(NL).add(INFORMATION).add(COL).add(NL).add(err);
-          }
+      // try to retrieve more information on why the request failed
+      if(conn instanceof HttpURLConnection) {
+        final InputStream es = ((HttpURLConnection) conn).getErrorStream();
+        if(es != null) {
+          final byte[] err = new IOStream(es).read();
+          if(err.length != 0) msg.add(NL).add(INFORMATION).add(COL).add(NL).add(err);
         }
-      } finally { /* ignored */ }
+      }
       final IOException io = new IOException(msg.toString());
       io.setStackTrace(ex.getStackTrace());
       throw io;

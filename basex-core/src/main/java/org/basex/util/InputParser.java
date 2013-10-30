@@ -114,7 +114,7 @@ public class InputParser {
    * @param ch character to be checked
    * @return result
    */
-  protected static final boolean quote(final int ch) {
+  protected static boolean quote(final int ch) {
     return ch == '"' || ch == '\'';
   }
 

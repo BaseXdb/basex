@@ -362,7 +362,7 @@ public final class DBLocking implements Locking {
     sb.append(ind + "Transactions running: " + transactions + NL);
     sb.append(ind + "Transaction queue: " + queue + NL);
     sb.append(ind + "Held locks by object:" + NL);
-    for(final Object object : locks.keySet())
+    for(final String object : locks.keySet())
       sb.append(ind + ind + object + " -> " + locks.get(object) + NL);
     sb.append(ind + "Held write locks by transaction:" + NL);
     for(final Long thread : writeLocked.keySet())

@@ -6,7 +6,6 @@ import java.awt.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
-import org.basex.core.MainOptions.MainParser;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.util.*;
@@ -31,7 +30,7 @@ final class DialogTextParser extends DialogParser {
    * @param opts main options
    */
   DialogTextParser(final BaseXDialog d, final MainOptions opts) {
-    super(d, MainParser.TEXT);
+    super(d);
     topts = opts.get(MainOptions.TEXTPARSER);
 
     final BaseXBack pp  = new BaseXBack(new TableLayout(2, 1, 0, 8));

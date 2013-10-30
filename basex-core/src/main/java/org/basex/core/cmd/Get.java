@@ -35,7 +35,7 @@ public final class Get extends AGet {
    * @param key key to be found
    */
   public Get(final String key) {
-    super(Perm.NONE, key);
+    super(key);
   }
 
   @Override

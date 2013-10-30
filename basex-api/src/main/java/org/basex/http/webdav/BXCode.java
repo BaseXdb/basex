@@ -21,7 +21,7 @@ public abstract class BXCode<E> {
    * Constructor.
    * @param res resource
    */
-  protected BXCode(final BXAbstractResource res) {
+  BXCode(final BXAbstractResource res) {
     resource = res;
   }
 

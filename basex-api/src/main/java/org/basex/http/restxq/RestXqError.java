@@ -11,7 +11,7 @@ import org.basex.util.*;
  */
 final class RestXqError implements Comparable<RestXqError> {
   /** Error code ({@code null}: wildcard). */
-  final QNm code;
+  private final QNm code;
 
   /**
    * Constructor.

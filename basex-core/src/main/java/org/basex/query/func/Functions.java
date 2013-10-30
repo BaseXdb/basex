@@ -145,8 +145,6 @@ public final class Functions extends TokenSet {
     if(fn != null) {
       final VarScope scp = new VarScope(sc);
       final FuncType ft = fn.type(arity);
-      final QNm[] names = new QNm[arity];
-      for(int a = 0; a < arity; a++) names[a] = new QNm("value" + (a + 1));
       final Var[] args = new Var[arity];
       final Expr[] calls = ft.args(args, ctx, scp, ii);
 
@@ -188,8 +186,6 @@ public final class Functions extends TokenSet {
     final FuncType ft = sf.funcType();
     final VarScope scp = new VarScope(sc);
     final int arity = sf.args.length;
-    final QNm[] names = new QNm[arity];
-    for(int a = 0; a < arity; a++) names[a] = sf.args[a].name;
     final Var[] args = new Var[arity];
     final Expr[] calls = ft.args(args, ctx, scp, info);
     final TypedFunc tf = ctx.funcs.getFuncRef(sf.name, calls, sc, info);

@@ -41,18 +41,6 @@ public class BaseXBack extends JPanel {
   }
 
   /**
-   * Constructor, specifying an empty border.
-   * @param t top distance
-   * @param l left distance
-   * @param b bottom distance
-   * @param r right distance
-   */
-  public BaseXBack(final int t, final int l, final int b, final int r) {
-    this();
-    border(t, l, b, r);
-  }
-
-  /**
    * Constructor, specifying a layout manager.
    * @param lm layout manager
    */
@@ -130,7 +118,7 @@ public class BaseXBack extends JPanel {
    * Activates graphics anti-aliasing.
    * @param g graphics reference
    */
-  protected static final void smooth(final Graphics g) {
+  protected static void smooth(final Graphics g) {
     ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
   }

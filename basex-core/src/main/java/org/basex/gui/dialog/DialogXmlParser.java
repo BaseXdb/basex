@@ -7,7 +7,6 @@ import java.awt.event.*;
 
 import org.basex.build.xml.*;
 import org.basex.core.*;
-import org.basex.core.MainOptions.MainParser;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
@@ -42,7 +41,7 @@ final class DialogXmlParser extends DialogParser {
    * @param opts main options
    */
   DialogXmlParser(final BaseXDialog d, final MainOptions opts) {
-    super(d, MainParser.XML);
+    super(d);
     final BaseXBack pp = new BaseXBack(new TableLayout(9, 1));
 
     intparse = new BaseXCheckBox(INT_PARSER, MainOptions.INTPARSE, opts, d).bold();

@@ -141,7 +141,7 @@ public final class GroupBy extends GFLWOR.Clause {
           }
 
           // find the group for this key
-          Group fst = null, grp = null;
+          Group fst, grp = null;
           // no collations, so we can use hashing
           for(Group g = fst = map.get(hash); g != null; g = g.next) {
             if(eq(key, g.key, colls)) {

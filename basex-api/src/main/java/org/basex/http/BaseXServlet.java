@@ -23,9 +23,9 @@ import org.basex.util.*;
  */
 public abstract class BaseXServlet extends HttpServlet {
   /** Servlet-specific user. */
-  protected String user;
+  String user;
   /** Servlet-specific password. */
-  protected String pass;
+  String pass;
 
   @Override
   public void init(final ServletConfig config) throws ServletException {

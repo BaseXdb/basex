@@ -157,12 +157,12 @@ public final class AtomicUpdateCache {
   /**
    * Adds the given update to the updates/buffer depending on the type and whether it's
    * been merged or not.
+   *
    * @param u update
    * @param merged if true, the given update has been merged w/ the recent one
-   * @return update has been added
    */
-  private boolean add(final BasicUpdate u, final boolean merged) {
-    if(u == null) return false;
+  private void add(final BasicUpdate u, final boolean merged) {
+    if(u == null) return;
 
     if(!merged) {
       if(recent instanceof StructuralUpdate)
@@ -170,7 +170,6 @@ public final class AtomicUpdateCache {
       else val.add(recent);
     }
     recent = u;
-    return true;
   }
 
   /**

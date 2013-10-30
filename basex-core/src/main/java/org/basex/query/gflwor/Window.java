@@ -443,17 +443,16 @@ public final class Window extends GFLWOR.Clause {
 
     /**
      * Write all non-{@code null} variables in this condition to the given array.
+     *
      * @param arr array to write to
      * @param p start position
-     * @return the array for convenience
      */
-    Var[] writeVars(final Var[] arr, final int p) {
+    void writeVars(final Var[] arr, final int p) {
       int i = p;
       if(item != null) arr[i++] = item;
       if(pos  != null) arr[i++] = pos;
       if(prev != null) arr[i++] = prev;
-      if(next != null) arr[i++] = next;
-      return arr;
+      if(next != null) arr[i]   = next;
     }
 
     /**

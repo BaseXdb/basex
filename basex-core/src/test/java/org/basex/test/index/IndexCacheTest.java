@@ -29,11 +29,10 @@ public final class IndexCacheTest {
   public void testGetNotExisting() {
     for(int i = 0; i < 4000; ++i) {
       final byte[] key = token("keyAdd" + i);
-      final int size = i;
       final long pointer = i + 5000L;
 
-      cache.add(key, size, pointer);
-      assertCacheEntry(key, size, pointer);
+      cache.add(key, i, pointer);
+      assertCacheEntry(key, i, pointer);
     }
     assertNull(cache.get(token("keyAdd" + 4000)));
   }
@@ -43,11 +42,10 @@ public final class IndexCacheTest {
   public void testAdd() {
     for(int i = 0; i < 4000; ++i) {
       final byte[] key = token("keyAdd" + i);
-      final int size = i;
       final long pointer = i + 5000L;
 
-      cache.add(key, size, pointer);
-      assertCacheEntry(key, size, pointer);
+      cache.add(key, i, pointer);
+      assertCacheEntry(key, i, pointer);
     }
   }
 

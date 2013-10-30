@@ -20,7 +20,7 @@ import org.basex.query.value.node.*;
  */
 final class RestXqRespBuilder {
   /** Output cache. */
-  final ArrayOutput cache = new ArrayOutput();;
+  final ArrayOutput cache = new ArrayOutput();
   /** Show error. */
   boolean error;
   /** Status code. */

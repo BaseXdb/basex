@@ -57,6 +57,6 @@ public final class FTExtensionSelection extends FTExpr {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final Pragma p : pragmas) sb.append(p).append(' ');
-    return sb.append(BRACE1 + ' ' + expr[0] + ' ' + BRACE2).toString();
+    return sb.append(BRACE1 + ' ').append(expr[0]).append(' ').append(BRACE2).toString();
   }
 }

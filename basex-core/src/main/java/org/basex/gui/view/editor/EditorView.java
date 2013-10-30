@@ -393,7 +393,7 @@ public final class EditorView extends View {
    */
   void refreshHistory(final IO file) {
     final StringList paths = new StringList();
-    String path = null;
+    String path;
     if(file != null) {
       path = file.path();
       gui.gopts.set(GUIOptions.WORKPATH, file.dirPath());

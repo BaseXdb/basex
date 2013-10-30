@@ -24,7 +24,7 @@ final class RESTRetrieve extends RESTCmd {
    * Constructor.
    * @param rs REST session
    */
-  RESTRetrieve(final RESTSession rs) {
+  private RESTRetrieve(final RESTSession rs) {
     super(rs);
   }
 

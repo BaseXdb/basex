@@ -17,9 +17,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public class RESTRun extends RESTQuery {
+public final class RESTRun extends RESTQuery {
   /** Path. */
-  final String path;
+  private final String path;
 
   /**
    * Constructor.
@@ -28,8 +28,8 @@ public class RESTRun extends RESTQuery {
    * @param val context value
    * @param pth path to query file
    */
-  RESTRun(final RESTSession rs, final Map<String, String[]> vars, final String val,
-      final String pth) {
+  private RESTRun(final RESTSession rs, final Map<String, String[]> vars, final String val,
+                  final String pth) {
     super(rs, vars, val);
     path = pth;
   }

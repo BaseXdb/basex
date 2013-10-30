@@ -18,17 +18,17 @@ import org.junit.*;
  */
 public abstract class SandboxTest {
   /** Default output stream. */
-  public static final PrintStream OUT = System.out;
+  protected static final PrintStream OUT = System.out;
   /** Default error stream. */
   public static final PrintStream ERR = System.err;
   /** Null output stream. */
-  public static final PrintStream NULL = new PrintStream(new NullOutput());
+  protected static final PrintStream NULL = new PrintStream(new NullOutput());
   /** Test name. */
-  public static final String NAME = Util.className(SandboxTest.class);
+  protected static final String NAME = Util.className(SandboxTest.class);
   /** Database context. */
   protected static Context context;
   /** Clean up files. */
-  protected static boolean cleanup;
+  private static boolean cleanup;
 
   /**
    * Creates the sandbox.
@@ -70,7 +70,7 @@ public abstract class SandboxTest {
    * Returns the sandbox database path.
    * @return database path
    */
-  protected static IOFile sandbox() {
+  private static IOFile sandbox() {
     return new IOFile(Prop.TMP, NAME);
   }
 }

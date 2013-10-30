@@ -223,6 +223,5 @@ public class MainModule extends StaticScope {
       exitFocus();
       return ac;
     }
-  };
-
+  }
 }

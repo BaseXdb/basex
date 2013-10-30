@@ -11,11 +11,10 @@ import org.basex.core.*;
 abstract class AGet extends Command {
   /**
    * Default constructor.
-   * @param p required permission
    * @param a arguments
    */
-  AGet(final Perm p, final String... a) {
-    super(p, a);
+  AGet(final String... a) {
+    super(Perm.NONE, a);
   }
 
   @Override

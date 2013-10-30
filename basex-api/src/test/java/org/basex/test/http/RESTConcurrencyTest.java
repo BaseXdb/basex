@@ -22,7 +22,7 @@ public class RESTConcurrencyTest extends HTTPTest {
   /** REST identifier. */
   private static final String REST = "rest";
   /** Root path. */
-  protected static final String ROOT = "http://" + Text.LOCALHOST + ":9998/" + REST + '/';
+  private static final String ROOT = "http://" + Text.LOCALHOST + ":9998/" + REST + '/';
   /** Client count. */
   private static final int CLIENTS = 10;
   /** Runs per client. */
@@ -30,7 +30,7 @@ public class RESTConcurrencyTest extends HTTPTest {
   /** Control client sessions. */
   private final Client[] clients = new Client[CLIENTS];
   /** Failed flag. */
-  protected static boolean failed;
+  private static boolean failed;
 
   // INITIALIZERS =============================================================
 
@@ -62,7 +62,7 @@ public class RESTConcurrencyTest extends HTTPTest {
   }
 
   /** Client class. */
-  static class Client extends Thread {
+  private static class Client extends Thread {
     @Override
     public void run() {
       try {

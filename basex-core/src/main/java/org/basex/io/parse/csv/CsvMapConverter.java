@@ -40,12 +40,12 @@ public final class CsvMapConverter extends CsvConverter {
   }
 
   @Override
-  public void header(final byte[] string) throws QueryIOException {
+  public void header(final byte[] string) {
     headers.add(string);
   }
 
   @Override
-  public void record() throws QueryIOException {
+  public void record() {
     record = new ValueBuilder();
     if(!headers.isEmpty()) record.add(Map.EMPTY);
     records.add(record);

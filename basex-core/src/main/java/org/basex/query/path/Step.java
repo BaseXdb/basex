@@ -197,11 +197,6 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public VarUsage count(final Var v) {
-    return super.count(v);
-  }
-
-  @Override
   public Expr inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
     // leaf flag indicates that a context node can be replaced by a text() step

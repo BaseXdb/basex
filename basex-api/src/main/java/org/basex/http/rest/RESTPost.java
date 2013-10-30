@@ -25,7 +25,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class RESTPost {
+final class RESTPost {
   /** Private constructor. */
   private RESTPost() { }
 

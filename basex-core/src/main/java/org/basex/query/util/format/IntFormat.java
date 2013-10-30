@@ -40,7 +40,7 @@ public final class IntFormat extends FormatParser {
           if(!tp.more()) INVORDINAL.thrw(info, mod);
           final int cp = tp.next();
           if(cp != '-') ord.add(cp);
-        };
+        }
       }
       ordinal = ord.finish();
     }
