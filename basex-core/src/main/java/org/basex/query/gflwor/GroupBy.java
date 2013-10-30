@@ -351,11 +351,10 @@ public final class GroupBy extends GFLWOR.Clause {
 
     @Override
     public String toString() {
-      final StringBuilder sb = new StringBuilder().append(var).append(' ').append(ASSIGN);
-      sb.append(' ').append(expr);
-      if(coll != null) sb.append(' ').append(COLLATION).append(" \"").
-        append(coll.uri()).append('"');
-      return sb.toString();
+      final TokenBuilder tb = new TokenBuilder().add(var.toString()).add(' ').add(ASSIGN);
+      tb.add(' ').add(expr.toString());
+      if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');
+      return tb.toString();
     }
 
     @Override
