@@ -316,13 +316,9 @@ public class Options implements Iterable<Option<?>> {
    * it will be added as free option.
    * @param name name of option
    * @param val value
-   * @param <V> enumeration value
-   * @param <O> options
    * @throws BaseXException database exception
    */
-  public synchronized <O extends Options, V extends Enum<V>> void assign(final String name,
-      final String val) throws BaseXException {
-
+  public synchronized void assign(final String name, final String val) throws BaseXException {
     if(options.isEmpty()) {
       free.put(name, val);
     } else {
@@ -345,8 +341,7 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized String error(final String name) {
     final String sim = similar(name);
-    return Util.info(sim != null ? Text.UNKNOWN_OPT_SIMILAR_X_X :
-      Text.UNKNOWN_OPTION_X, name, sim);
+    return Util.info(sim != null ? Text.UNKNOWN_OPT_SIMILAR_X_X : Text.UNKNOWN_OPTION_X, name, sim);
   }
 
   /**
@@ -466,7 +461,7 @@ public class Options implements Iterable<Option<?>> {
       if(obj instanceof Option) opts.add((Option<?>) obj);
     }
     return opts.toArray(new Option[opts.size()]);
-  };
+  }
 
   /**
    * Returns a list of allowed keys.
@@ -509,10 +504,8 @@ public class Options implements Iterable<Option<?>> {
    * Reads the configuration file and initializes the options.
    * The file is located in the project home directory.
    * @param opts options file
-   * @param <O> options
-   * @param <V> enumeration
    */
-  private synchronized <O extends Options, V extends Enum<V>> void read(final IOFile opts) {
+  private synchronized void read(final IOFile opts) {
     file = opts;
     final StringList read = new StringList();
     final StringList errs = new StringList();
@@ -594,15 +587,13 @@ public class Options implements Iterable<Option<?>> {
 
   /**
    * Assigns the specified name and value.
-   * @param <O> options
-   * @param <V> enumeration
    * @param name name of option
    * @param val value of option
    * @param num number (optional)
    * @throws BaseXException database exception
    */
-  private synchronized <O extends Options, V extends Enum<V>> void assign(
-      final String name, final String val, final int num) throws BaseXException {
+  private synchronized void assign(final String name, final String val, final int num)
+      throws BaseXException {
 
     final Option<?> option = options.get(name);
     if(option == null) {
@@ -625,14 +616,12 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof StringOption) {
       put(option, val);
     } else if(option instanceof EnumOption) {
-      @SuppressWarnings("unchecked")
-      final EnumOption<V> eo = (EnumOption<V>) option;
-      final V v = eo.get(val);
+      final EnumOption<?> eo = (EnumOption<?>) option;
+      final Object v = eo.get(val);
       if(v == null) throw new BaseXException(allowed(option, (Object[]) eo.values()));
       put(option, v);
     } else if(option instanceof OptionsOption) {
-      @SuppressWarnings("unchecked")
-      final O o = ((OptionsOption<O>) option).newInstance();
+      final Options o = ((OptionsOption<?>) option).newInstance();
       o.parse(val);
       put(option, o);
     } else if(option instanceof NumbersOption) {
