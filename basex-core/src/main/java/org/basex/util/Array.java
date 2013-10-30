@@ -232,7 +232,7 @@ public final class Array {
    * @param a first position
    * @param b second position
    */
-  public static void swap(final int[] arr, final int a, final int b) {
+  private static void swap(final int[] arr, final int a, final int b) {
     final int c = arr[a];
     arr[a] = arr[b];
     arr[b] = c;

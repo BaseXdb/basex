@@ -28,7 +28,7 @@ public class SeqTypeTest {
 
     for(int i = 0; i < occs.length; i++)
       for(int j = 0; j < occs.length; j++)
-        assertSame("(" + i + ", " + j + ")", table[i][j], occs[i].intersect(occs[j]));
+        assertSame("(" + i + ", " + j + ')', table[i][j], occs[i].intersect(occs[j]));
   }
 
   /** Tests for {@link Occ#union(Occ)}. */
@@ -44,20 +44,20 @@ public class SeqTypeTest {
 
     for(int i = 0; i < occs.length; i++)
       for(int j = 0; j < occs.length; j++)
-        assertSame("(" + i + ", " + j + ")", table[i][j], occs[i].union(occs[j]));
+        assertSame("(" + i + ", " + j + ')', table[i][j], occs[i].union(occs[j]));
   }
 
   /** Tests for {@link Occ#instanceOf(Occ)}. */
   @Test public void occInstanceOfTest() {
     final Occ[] occs = { ZERO, ZERO_ONE, ONE, ZERO_MORE, ONE_MORE };
-    final int bits = 0x014F90E1;
 
-    assertTrue(Occ.ONE.instanceOf(Occ.ZERO_MORE));
-    assertFalse(Occ.ZERO_MORE.instanceOf(Occ.ONE));
+    assertTrue(Occ.ONE.instanceOf(ZERO_MORE));
+    assertFalse(Occ.ZERO_MORE.instanceOf(ONE));
+    final int bits = 0x014F90E1;
     for(int i = 0; i < occs.length; i++) {
       for(int j = 0; j < occs.length; j++) {
         final boolean inst = (bits >>> 5 * j + i & 1) != 0;
-        assertEquals("(" + i + ", " + j + ")", inst, occs[i].instanceOf(occs[j]));
+        assertEquals("(" + i + ", " + j + ')', inst, occs[i].instanceOf(occs[j]));
       }
     }
   }
@@ -178,7 +178,7 @@ public class SeqTypeTest {
         // map(xs:integer, xs:integer)
         m4 = MapType.get(AtomType.ITR, ITR).seqType();
 
-    intersect(SeqType.get(AtomType.ITEM, 0), ITEM, null);
+    intersect(get(AtomType.ITEM, 0), ITEM, null);
     intersect(ATT, ATT, ATT);
     intersect(ATT, NOD, ATT);
     intersect(ATT, ELM, null);

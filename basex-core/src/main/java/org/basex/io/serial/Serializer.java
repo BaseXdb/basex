@@ -38,7 +38,7 @@ public abstract class Serializer {
   /** Current element name. */
   protected byte[] tag;
   /** Undeclare prefixes. */
-  protected boolean undecl;
+  boolean undecl;
   /** Indentation flag. */
   protected boolean indent;
 
@@ -144,7 +144,7 @@ public abstract class Serializer {
    * @param name element name
    * @throws IOException I/O exception
    */
-  protected final void startElement(final byte[] name) throws IOException {
+  final void startElement(final byte[] name) throws IOException {
     finishElement();
     nstack.push(nspaces.size());
     opening = true;
@@ -156,7 +156,7 @@ public abstract class Serializer {
    * Closes an element.
    * @throws IOException I/O exception
    */
-  protected final void closeElement() throws IOException {
+  final void closeElement() throws IOException {
     nspaces.size(nstack.pop());
     if(opening) {
       finishEmpty();
@@ -175,7 +175,7 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void finishText(final byte[] value, final FTPos ftp) throws IOException {
+  void finishText(final byte[] value, final FTPos ftp) throws IOException {
     text(value);
   }
   /**
@@ -183,7 +183,7 @@ public abstract class Serializer {
    * @param pref namespace prefix
    * @return URI if found, {@code null} otherwise
    */
-  protected final byte[] nsUri(final byte[] pref) {
+  final byte[] nsUri(final byte[] pref) {
     for(int n = nspaces.size() - 1; n >= 0; n--) {
       if(eq(nspaces.name(n), pref)) return nspaces.value(n);
     }
@@ -211,14 +211,14 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void openResult() throws IOException { }
+  void openResult() throws IOException { }
 
   /**
    * Closes a result.
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void closeResult() throws IOException { }
+  void closeResult() throws IOException { }
 
   /**
    * Opens a document.
@@ -226,14 +226,14 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void openDoc(final byte[] name) throws IOException { }
+  void openDoc(final byte[] name) throws IOException { }
 
   /**
    * Closes a document.
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void closeDoc() throws IOException { }
+  void closeDoc() throws IOException { }
 
   /**
    * Serializes an attribute.
@@ -365,7 +365,7 @@ public abstract class Serializer {
     if(k == Data.ATTR) SERATTR.thrwIO(node);
 
     boolean doc = false;
-    final TokenSet nsp = data.nspaces.size() != 0 ? new TokenSet() : null;
+    final TokenSet nsp = data.nspaces.size() == 0 ? null : new TokenSet();
     final IntList pars = new IntList();
     final BoolList indt = new BoolList();
 
@@ -392,46 +392,48 @@ public abstract class Serializer {
         else text(data.text(p++, true));
       } else if(k == Data.COMM) {
         comment(data.text(p++, true));
-      } else if(k == Data.PI) {
-        pi(data.name(p, k), data.atom(p++));
       } else {
-        // add element node
-        final byte[] name = data.name(p, k);
-        startElement(name);
+        if(k == Data.PI) {
+          pi(data.name(p, Data.PI), data.atom(p++));
+        } else {
+          // add element node
+          final byte[] name = data.name(p, k);
+          startElement(name);
 
-        // add namespace definitions
-        if(nsp != null) {
-          // add namespaces from database
-          nsp.clear();
-          int pp = p;
+          // add namespace definitions
+          if(nsp != null) {
+            // add namespaces from database
+            nsp.clear();
+            int pp = p;
 
-          // check namespace of current element
-          final byte[] u = data.nspaces.uri(data.uri(p, k));
-          namespace(prefix(name), u == null ? EMPTY : u);
+            // check namespace of current element
+            final byte[] u = data.nspaces.uri(data.uri(p, k));
+            namespace(prefix(name), u == null ? EMPTY : u);
 
-          do {
-            final Atts ns = data.ns(pp);
-            for(int n = 0; n < ns.size(); ++n) {
-              final byte[] pref = ns.name(n);
-              if(nsp.add(pref)) namespace(pref, ns.value(n));
-            }
-            // check ancestors only on top level
-            if(level != 0) break;
+            do {
+              final Atts ns = data.ns(pp);
+              for(int n = 0; n < ns.size(); ++n) {
+                final byte[] pref = ns.name(n);
+                if(nsp.add(pref)) namespace(pref, ns.value(n));
+              }
+              // check ancestors only on top level
+              if(level != 0) break;
 
-            pp = data.parent(pp, data.kind(pp));
-          } while(pp >= 0 && data.kind(pp) == Data.ELEM);
+              pp = data.parent(pp, data.kind(pp));
+            } while(pp >= 0 && data.kind(pp) == Data.ELEM);
+          }
+
+          // serialize attributes
+          indt.push(indent);
+          final int as = p + data.attSize(p, k);
+          while(++p != as) {
+            final byte[] n = data.name(p, Data.ATTR);
+            final byte[] v = data.text(p, false);
+            attribute(n, v);
+            if(eq(n, XML_SPACE)) indent &= eq(v, DataText.DEFAULT);
+          }
+          pars.push(r);
         }
-
-        // serialize attributes
-        indt.push(indent);
-        final int as = p + data.attSize(p, k);
-        while(++p != as) {
-          final byte[] n = data.name(p, Data.ATTR);
-          final byte[] v = data.text(p, false);
-          attribute(n, v);
-          if(eq(n, XML_SPACE)) indent &= eq(v, DataText.DEFAULT);
-        }
-        pars.push(r);
       }
     }
 

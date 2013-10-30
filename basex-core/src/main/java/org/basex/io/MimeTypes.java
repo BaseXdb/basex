@@ -21,9 +21,9 @@ public final class MimeTypes {
   public static final String CONTENT_TYPE = "Content-Type";
 
   /** Text type. */
-  public static final String TEXT = "text/";
+  private static final String TEXT = "text/";
   /** Multipart type. */
-  public static final String MULTIPART = "multipart/";
+  private static final String MULTIPART = "multipart/";
 
   /** Media type: multipart/form-data. */
   public static final String MULTIPART_FORM_DATA = "multipart/form-data";
@@ -39,7 +39,7 @@ public final class MimeTypes {
   /** Media type: application/xml. */
   public static final String APP_XML = "application/xml";
   /** Media type: application/xml-external-parsed-entity. */
-  public static final String APP_XML_EXTERNAL = "application/xml-external-parsed-entity";
+  private static final String APP_XML_EXTERNAL = "application/xml-external-parsed-entity";
   /** Media type: application/x-www-form-urlencoded. */
   public static final String APP_FORM_URLENCODED = "application/x-www-form-urlencoded";
 
@@ -50,12 +50,12 @@ public final class MimeTypes {
   /** Media type: text/plain. */
   public static final String TEXT_PLAIN = "text/plain";
   /** Media type: text/xml. */
-  public static final String TEXT_XML = "text/xml";
+  private static final String TEXT_XML = "text/xml";
   /** XML media type. */
-  public static final String TEXT_XML_EXT = "text/xml-external-parsed-entity";
+  private static final String TEXT_XML_EXT = "text/xml-external-parsed-entity";
 
   /** XML media types' suffix. */
-  public static final String XML_SUFFIX = "+xml";
+  private static final String XML_SUFFIX = "+xml";
 
   /** Private constructor. */
   private MimeTypes() { }
@@ -117,8 +117,8 @@ public final class MimeTypes {
     final String[] t = type.split("/", 2);
     final String[] p = pattern.split("/", 2);
     return t.length == 2 && p.length == 2 &&
-        (p[0].equals("*") || p[0].equals(t[0])) &&
-        (p[1].equals("*") || p[1].equals(t[1]));
+        ("*".equals(p[0]) || p[0].equals(t[0])) &&
+        ("*".equals(p[1]) || p[1].equals(t[1]));
   }
 
   /** Hash map containing all assignments. */

@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public class IntSet extends ASet {
   /** Hashed keys. */
-  protected int[] keys;
+  int[] keys;
 
   /**
    * Default constructor.
@@ -45,7 +45,7 @@ public class IntSet extends ASet {
    * @param key key to be added
    * @return unique id of stored key (larger than zero)
    */
-  public final int put(final int key) {
+  final int put(final int key) {
     final int i = index(key);
     return Math.abs(i);
   }
@@ -64,7 +64,7 @@ public class IntSet extends ASet {
    * @param key key to be looked up
    * @return id, or {@code 0} if key does not exist
    */
-  public final int id(final int key) {
+  final int id(final int key) {
     final int p = key & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) if(key == keys[id]) return id;
     return 0;
@@ -87,7 +87,7 @@ public class IntSet extends ASet {
    * @param key key
    * @return deleted key or 0
    */
-  public int delete(final int key) {
+  int delete(final int key) {
     final int b = key & bucket.length - 1;
     for(int p = 0, i = bucket[b]; i != 0; p = i, i = next[i]) {
       if(key != keys[i]) continue;

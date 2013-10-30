@@ -45,10 +45,10 @@ public final class NewlineInput extends TextInput {
   @Override
   public int read() throws IOException {
     int n = next;
-    if(n != -2) {
-      next = -2;
-    } else {
+    if(n == -2) {
       n = super.read();
+    } else {
+      next = -2;
     }
     if(n != '\r') return n;
     n = super.read();

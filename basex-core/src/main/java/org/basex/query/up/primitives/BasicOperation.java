@@ -18,7 +18,7 @@ public abstract class BasicOperation extends Operation
     implements Comparable<BasicOperation>  {
 
   /** Basic Operation types. Carried out in the given order. */
-  public static enum TYPE {
+  public enum TYPE {
     /** DBAdd.      */ DBADD,
     /** DBStore.    */ DBSTORE,
     /** DBRename.   */ DBRENAME,
@@ -39,7 +39,7 @@ public abstract class BasicOperation extends Operation
    * @param d target data reference
    * @param ii input info
    */
-  public BasicOperation(final TYPE t, final Data d, final InputInfo ii) {
+  BasicOperation(final TYPE t, final Data d, final InputInfo ii) {
     super(d, ii);
     type = t;
   }

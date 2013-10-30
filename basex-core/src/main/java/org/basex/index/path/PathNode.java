@@ -43,7 +43,7 @@ public final class PathNode {
    * @param k node kind
    * @param p parent node
    */
-  PathNode(final int n, final byte k, final PathNode p) {
+  private PathNode(final int n, final byte k, final PathNode p) {
     this(n, k, p, 1);
   }
 
@@ -54,7 +54,7 @@ public final class PathNode {
    * @param p parent node
    * @param c counter
    */
-  PathNode(final int n, final byte k, final PathNode p, final int c) {
+  private PathNode(final int n, final byte k, final PathNode p, final int c) {
     ch = new PathNode[0];
     name = (short) n;
     kind = k;

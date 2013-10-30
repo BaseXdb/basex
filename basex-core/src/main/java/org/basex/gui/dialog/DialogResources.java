@@ -26,19 +26,19 @@ import org.basex.gui.layout.TreeNode;
  */
 public class DialogResources extends BaseXBack {
   /** Search text field. */
-  final BaseXTextField filterText;
+  private final BaseXTextField filterText;
   /** Database/root node. */
-  final TreeFolder root;
+  private final TreeFolder root;
   /** Dialog reference. */
-  final BaseXDialog dialog;
+  private final BaseXDialog dialog;
   /** Resource tree. */
-  final BaseXTree tree;
+  private final BaseXTree tree;
   /** Filter button. */
-  final BaseXButton filter;
+  private final BaseXButton filter;
   /** Clear button. */
-  final BaseXButton clear;
+  private final BaseXButton clear;
   /** Avoids superfluous filtering steps. */
-  boolean filtered;
+  private boolean filtered;
 
   /**
    * Constructor.

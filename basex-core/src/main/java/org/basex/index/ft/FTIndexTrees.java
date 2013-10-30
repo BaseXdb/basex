@@ -10,7 +10,7 @@ package org.basex.index.ft;
  */
 final class FTIndexTrees {
   /** For each key length, an extra tree is created. */
-  final FTIndexTree[] trees;
+  private final FTIndexTree[] trees;
   /** Pointer on current tree. */
   private int ctree;
 

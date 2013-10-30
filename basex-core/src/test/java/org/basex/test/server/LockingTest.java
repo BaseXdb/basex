@@ -93,9 +93,9 @@ public final class LockingTest extends SandboxTest {
   }
 
   /** Latch for synchronizing threads inside lock. */
-  public static CountDownLatch sync;
+  private static CountDownLatch sync;
   /** Latch for testing parallelism. */
-  public static CountDownLatch test;
+  private static CountDownLatch test;
 
   /**
    * Handle thread synchronization so both threads/queries have to be inside their locks

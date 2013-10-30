@@ -186,7 +186,7 @@ public final class Thesaurus {
    * @throws QueryException query exception
    */
   void find(final InputInfo ii, final TokenList list, final byte[] ft) throws QueryException {
-    if(nodes.size() == 0) init(ii);
+    if(nodes.isEmpty()) init(ii);
     find(list, nodes.get(ft), 1);
   }
 

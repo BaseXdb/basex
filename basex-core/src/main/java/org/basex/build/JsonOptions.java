@@ -25,7 +25,7 @@ public class JsonOptions extends Options {
       new EnumOption<JsonFormat>("format", JsonFormat.DIRECT);
 
   /** JSON specs. */
-  public static enum JsonSpec {
+  public enum JsonSpec {
     /** Parse the input according to RFC 4627.           */ RFC4627("RFC4627"),
     /** Parse the input being as compatible as possible. */ LIBERAL("liberal"),
     /** Parse the input according to ECMA-262.           */ ECMA_262("ECMA-262");
@@ -37,7 +37,7 @@ public class JsonOptions extends Options {
      * Constructor.
      * @param str description
      */
-    private JsonSpec(final String str) {
+    JsonSpec(final String str) {
       string = str;
     }
 
@@ -48,7 +48,7 @@ public class JsonOptions extends Options {
   }
 
   /** JSON formats. */
-  public static enum JsonFormat {
+  public enum JsonFormat {
     /** Direct.        */ DIRECT,
     /** Attributes.    */ ATTRIBUTES,
     /** JsonML.        */ JSONML,

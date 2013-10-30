@@ -25,7 +25,7 @@ public final class BoolList extends ElementList {
    * Constructor, specifying an initial internal array size.
    * @param capacity initial array capacity
    */
-  public BoolList(final int capacity) {
+  private BoolList(final int capacity) {
     list = new boolean[capacity];
   }
 

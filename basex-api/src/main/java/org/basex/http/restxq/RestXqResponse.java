@@ -50,9 +50,6 @@ final class RestXqResponse {
    * @throws Exception exception (including unexpected ones)
    */
   void create() throws Exception {
-    String redirect = null, forward = null;
-    RestXqRespBuilder resp = null;
-
     // bind variables
     final StaticFunc uf = function.function;
     final Expr[] args = new Expr[uf.args.length];
@@ -65,8 +62,10 @@ final class RestXqResponse {
     // assign main module and http context and register process
     query.mainModule(mm);
     query.http(http);
-
     query.context.register(query);
+
+    String redirect = null, forward = null;
+    RestXqRespBuilder resp = null;
     try {
       // compile and evaluate query
       query.compile();

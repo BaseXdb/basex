@@ -63,7 +63,7 @@ public final class TokenObjMap<E> extends TokenSet {
     for(final byte[] key : this) {
       if(!tb.isEmpty()) tb.add(", ");
       if(key != null) {
-        Object val = values[id(key)];
+        final Object val = values[id(key)];
         tb.add('{').add(key).add(',').add(val == null ? "null" :  val.toString()).add('}');
       }
     }

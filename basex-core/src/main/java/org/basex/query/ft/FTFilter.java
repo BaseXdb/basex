@@ -16,14 +16,14 @@ import org.basex.util.ft.*;
  */
 public abstract class FTFilter extends FTExpr {
   /** Optional unit. */
-  protected final FTUnit unit;
+  final FTUnit unit;
 
   /**
    * Constructor.
    * @param ii input info
    * @param e expression
    */
-  protected FTFilter(final InputInfo ii, final FTExpr e) {
+  FTFilter(final InputInfo ii, final FTExpr e) {
     this(ii, e, FTUnit.WORDS);
   }
 
@@ -33,7 +33,7 @@ public abstract class FTFilter extends FTExpr {
    * @param e expression
    * @param u unit
    */
-  protected FTFilter(final InputInfo ii, final FTExpr e, final FTUnit u) {
+  FTFilter(final InputInfo ii, final FTExpr e, final FTUnit u) {
     super(ii, e);
     unit = u;
   }

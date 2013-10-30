@@ -15,14 +15,14 @@ import org.basex.util.*;
  */
 public abstract class FuncCall extends Arr {
   /** Tail-call flag. */
-  protected boolean tailCall;
+  boolean tailCall;
 
   /**
    * Constructor.
    * @param ii input info
    * @param e sub-expressions
    */
-  protected FuncCall(final InputInfo ii, final Expr[] e) {
+  FuncCall(final InputInfo ii, final Expr[] e) {
     super(ii, e);
   }
 
@@ -91,11 +91,10 @@ public abstract class FuncCall extends Arr {
       // non-tail-calls have to catch the continuations and resume from there
       XQFunction func = fun;
       Value[] args = arg;
-      for(;;) {
+      while(true) {
         try {
-          return itm ? func.invItem(ctx, ii, args)
-                     : func.invValue(ctx, ii, args);
-        } catch(final Continuation c) {
+          return itm ? func.invItem(ctx, ii, args) : func.invValue(ctx, ii, args);
+        } catch (final Continuation c) {
           func = c.func;
           args = c.args;
           ctx.tailCalls = calls;

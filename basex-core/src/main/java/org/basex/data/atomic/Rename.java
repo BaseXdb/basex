@@ -11,11 +11,11 @@ import org.basex.util.*;
  */
 final class Rename extends BasicUpdate {
   /** Kind of updated node. */
-  final int targetkind;
+  private final int targetkind;
   /** The new name of the node. */
-  final byte[] name;
+  private final byte[] name;
   /** Name URI. */
-  final byte[] uri;
+  private final byte[] uri;
 
   /**
    * Constructor.

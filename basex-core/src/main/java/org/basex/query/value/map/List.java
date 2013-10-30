@@ -92,13 +92,13 @@ final class List extends TrieNode {
     final TrieNode[] ch = new TrieNode[KIDS];
     final int a = key(h, l), b = key(hash, l);
     final int used;
-    if(a != b) {
+    if(a == b) {
+      ch[a] = insert(h, k, v, l + 1, ii);
+      used = 1 << a;
+    } else {
       ch[a] = new Leaf(h, k, v);
       ch[b] = this;
       used = 1 << a | 1 << b;
-    } else {
-      ch[a] = insert(h, k, v, l + 1, ii);
-      used = 1 << a;
     }
     // we definitely inserted one value
     return new Branch(ch, used, size + 1);

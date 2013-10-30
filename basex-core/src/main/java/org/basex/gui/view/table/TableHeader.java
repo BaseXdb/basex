@@ -24,13 +24,13 @@ import org.basex.gui.view.table.TableData.TableCol;
  */
 final class TableHeader extends BaseXPanel {
   /** View reference. */
-  final TableView view;
+  private final TableView view;
   /** Table Data. */
-  final TableData tdata;
+  private final TableData tdata;
   /** Temporary Input Box. */
-  TableInput box;
+  private TableInput box;
   /** Current input column. */
-  int inputCol = -1;
+  private int inputCol = -1;
 
   /** Header flag. */
   private boolean header;
@@ -85,13 +85,13 @@ final class TableHeader extends BaseXPanel {
     }
 
     final int fsz = fontSize;
-    final int bs = BaseXBar.SIZE;
     int w = getWidth();
     final int h = getHeight();
     final int hh = h >> 1;
     g.setColor(color2);
     g.drawLine(0, h - 1, w, h - 1);
 
+    final int bs = BaseXBar.SIZE;
     w -= bs;
     double x = 0;
     final int nc = tdata.cols.length;
@@ -240,9 +240,7 @@ final class TableHeader extends BaseXPanel {
   public void mouseReleased(final MouseEvent e) {
     if(tdata.rows == null) return;
 
-    if(!SwingUtilities.isLeftMouseButton(e)) {
-      chooseCols(e);
-    } else {
+    if(SwingUtilities.isLeftMouseButton(e)) {
       if(clickCol == -1) return;
       // header
       if(header(e.getY())) {
@@ -268,6 +266,8 @@ final class TableHeader extends BaseXPanel {
           view.query();
         }
       }
+    } else {
+      chooseCols(e);
     }
     clickCol = -1;
     view.repaint();

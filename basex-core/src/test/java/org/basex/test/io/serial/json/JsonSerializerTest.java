@@ -11,6 +11,7 @@ import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.test.*;
+import org.basex.util.Util;
 import org.junit.*;
 
 /**
@@ -171,7 +172,7 @@ public final class JsonSerializerTest extends SandboxTest {
       final JsonSpec spec) {
     try {
       final String actual = serialize(query, format, spec);
-      assertEquals("\n[E] " + expected + "\n[F] " + actual + "\n", expected, actual);
+      assertEquals("\n[E] " + expected + "\n[F] " + actual + '\n', expected, actual);
     } catch(final Exception ex) {
       fail(ex.toString());
     }
@@ -199,7 +200,7 @@ public final class JsonSerializerTest extends SandboxTest {
     } catch(final QueryIOException ex) {
       assertEquals(Err.BXJS_SERIAL, ex.getCause().err());
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
       fail(ex.toString());
     }
   }
@@ -212,7 +213,7 @@ public final class JsonSerializerTest extends SandboxTest {
    * @return result
    * @throws Exception exception
    */
-  private String serialize(final String qu, final JsonFormat format, final JsonSpec spec)
+  private static String serialize(final String qu, final JsonFormat format, final JsonSpec spec)
       throws Exception {
 
     final QueryProcessor qp = new QueryProcessor(qu, context);

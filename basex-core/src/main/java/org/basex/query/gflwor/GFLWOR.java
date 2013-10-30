@@ -26,7 +26,7 @@ import org.basex.util.hash.*;
  */
 public final class GFLWOR extends ParseExpr {
   /** Return expression. */
-  Expr ret;
+  private Expr ret;
   /** FLWOR clauses. */
   private final LinkedList<Clause> clauses;
 
@@ -43,7 +43,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Iter iter(final QueryContext ctx) {
     // Start evaluator, doing nothing, once.
     Eval e = new Eval() {
       /** First-evaluation flag. */
@@ -107,7 +107,7 @@ public final class GFLWOR extends ParseExpr {
         final Where wh = (Where) c;
         if(wh.pred instanceof And) {
           iter.remove();
-          for(final Expr e : ((And) wh.pred).expr) iter.add(new Where(e, wh.info));
+          for(final Expr e : ((Arr) wh.pred).expr) iter.add(new Where(e, wh.info));
         }
       }
     }
@@ -452,7 +452,7 @@ public final class GFLWOR extends ParseExpr {
           wh.pred = Bln.get(wh.pred.ebv(ctx, wh.info).bool(wh.info));
 
         // predicate is always false: no results possible
-        if(!((Bln) wh.pred).bool(null)) break;
+        if(!((Item) wh.pred).bool(null)) break;
 
         // condition is always true
         clauses.remove(i--);
@@ -728,7 +728,7 @@ public final class GFLWOR extends ParseExpr {
      * @param ii input info
      * @param vs declared variables
      */
-    protected Clause(final InputInfo ii, final Var... vs) {
+    Clause(final InputInfo ii, final Var... vs) {
       super(ii);
       vars = vs;
     }
@@ -783,7 +783,7 @@ public final class GFLWOR extends ParseExpr {
     }
 
     @Override
-    public abstract GFLWOR.Clause copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
+    public abstract Clause copy(QueryContext ctx, VarScope scp, IntObjMap<Var> vs);
 
     /**
      * Checks if the given clause can be slided over this clause.

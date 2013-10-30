@@ -97,7 +97,7 @@ public final class CsvParserTest extends SandboxTest {
    */
   @Test
   public void sep() throws Exception {
-    CsvParserOptions copts = new CsvParserOptions();
+    final CsvParserOptions copts = new CsvParserOptions();
     copts.set(CsvOptions.SEPARATOR, "tab");
     copts.set(CsvOptions.HEADER, true);
     new Set(MainOptions.CSVPARSER, copts).execute(context);

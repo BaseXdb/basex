@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
  */
 public final class RangeAccess extends IndexAccess {
   /** Index type. */
-  final NumericRange ind;
+  private final NumericRange ind;
 
   /**
    * Constructor.

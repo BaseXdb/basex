@@ -141,37 +141,35 @@ public final class DigitalSignature {
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
 
       final PrivateKey pk;
-      final PublicKey puk;
       final KeyInfo ki;
 
       // dealing with given certificate details to initialize the keystore
       if(ce != null) {
-        String ksTY = null;
-        String ksPW = null;
-        String kAlias = null;
-        String pkPW = null;
-        String ksURI = null;
 
         final Document ceDOM = toDOMNode(ce);
-        if(!ceDOM.getDocumentElement().getNodeName().
-            equals("digital-certificate"))
+        if(!"digital-certificate".equals(ceDOM.getDocumentElement().getNodeName()))
           CX_INVNM.thrw(info, ceDOM);
         final NodeList ceChildren = ceDOM.getDocumentElement().getChildNodes();
         final int s = ceChildren.getLength();
         int ci = 0;
         // iterate child axis to retrieve keystore setup
+        String ksURI = null;
+        String pkPW = null;
+        String kAlias = null;
+        String ksPW = null;
+        String ksTY = null;
         while(ci < s) {
           final Node cn = ceChildren.item(ci++);
           final String name = cn.getNodeName();
-          if(name.equals("keystore-type"))
+          if("keystore-type".equals(name))
             ksTY = cn.getTextContent();
-          else if(name.equals("keystore-password"))
+          else if("keystore-password".equals(name))
             ksPW = cn.getTextContent();
-          else if(name.equals("key-alias"))
+          else if("key-alias".equals(name))
             kAlias = cn.getTextContent();
-          else if(name.equals("private-key-password"))
+          else if("private-key-password".equals(name))
             pkPW = cn.getTextContent();
-          else if(name.equals("keystore-uri"))
+          else if("keystore-uri".equals(name))
             ksURI = cn.getTextContent();
         }
 
@@ -188,7 +186,7 @@ public final class DigitalSignature {
         final X509Certificate x509ce = (X509Certificate)
             ks.getCertificate(kAlias);
         if(x509ce == null) CX_ALINV.thrw(info, kAlias);
-        puk = x509ce.getPublicKey();
+        final PublicKey puk = x509ce.getPublicKey();
         final KeyInfoFactory kifactory = fac.getKeyInfoFactory();
         final KeyValue keyValue = kifactory.newKeyValue(puk);
         final Vector<XMLStructure> kiCont = new Vector<XMLStructure>();

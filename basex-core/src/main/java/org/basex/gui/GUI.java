@@ -68,11 +68,11 @@ public final class GUI extends AGUI {
   public final BaseXBack nav;
 
   /** Content panel, containing all views. */
-  final ViewContainer views;
+  private final ViewContainer views;
   /** History button. */
-  final BaseXButton hist;
+  private final BaseXButton hist;
   /** Current input Mode. */
-  final BaseXCombo mode;
+  private final BaseXCombo mode;
 
   /** Text view. */
   private final TextView text;
@@ -97,7 +97,7 @@ public final class GUI extends AGUI {
   private int threadID;
 
   /** Password reader. */
-  public static final PasswordReader READER = new PasswordReader() {
+  private static final PasswordReader READER = new PasswordReader() {
     @Override
     public String password() {
       final DialogPass dp = new DialogPass();
@@ -106,7 +106,7 @@ public final class GUI extends AGUI {
   };
 
   /** Info listener. */
-  public final InfoListener infoListener = new InfoListener() {
+  private final InfoListener infoListener = new InfoListener() {
     @Override
     public void info(final String inf) {
       info.setInfo(inf, null, true, false);
@@ -538,16 +538,16 @@ public final class GUI extends AGUI {
    */
   public void updateControl(final JComponent comp, final boolean show, final String layout) {
     if(comp == status) {
-      if(!show) top.remove(comp);
-      else top.add(comp, layout);
+      if(show) top.add(comp, layout);
+      else top.remove(comp);
     } else if(comp == menu) {
       if(!show) menuHeight = menu.getHeight();
       final int s = show ? menuHeight : 0;
       BaseXLayout.setHeight(menu, s);
       menu.setSize(menu.getWidth(), s);
     } else { // buttons, input
-      if(!show) control.remove(comp);
-      else control.add(comp, layout);
+      if(show) control.add(comp, layout);
+      else control.remove(comp);
     }
     setContentBorder();
     (fullscr == null ? getRootPane() : fullscr).validate();

@@ -24,7 +24,7 @@ public class LocalQuery extends Query {
    * @param ctx database context
    * @param o output stream to write query output
    */
-  protected LocalQuery(final String q, final Context ctx, final OutputStream o) {
+  LocalQuery(final String q, final Context ctx, final OutputStream o) {
     ql = new QueryListener(q, ctx);
     out = o;
   }

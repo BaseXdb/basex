@@ -66,7 +66,7 @@ public final class BaseXDSlider extends BaseXPanel {
     min = mn;
     max = mx;
     // choose logarithmic scaling for larger ranges
-    log = Math.log(totMax) - Math.log(totMin) > 5 && totMax - totMin > 100;
+    log = StrictMath.log(totMax) - StrictMath.log(totMin) > 5 && totMax - totMin > 100;
     mode(Fill.NONE).setFocusable(true);
 
     BaseXLayout.setHeight(this, getFont().getSize() + 9);
@@ -263,7 +263,7 @@ public final class BaseXDSlider extends BaseXPanel {
    * @return new value
    */
   double encode(final double v) {
-    return log ? Math.log(v + 1) : v;
+    return log ? StrictMath.log(v + 1) : v;
   }
 
   /**
@@ -272,7 +272,7 @@ public final class BaseXDSlider extends BaseXPanel {
    * @return new value
    */
   private double decode(final double v) {
-    return log ? Math.exp(v) - 1 : v;
+    return log ? StrictMath.exp(v) - 1 : v;
   }
 
   /**

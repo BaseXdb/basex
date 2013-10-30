@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public final class DialogMessage extends BaseXDialog {
   /** Ok/yes button. */
-  final BaseXButton yes;
+  private final BaseXButton yes;
 
   /** This flag indicates if the dialog was canceled. */
   private boolean canceled = true;

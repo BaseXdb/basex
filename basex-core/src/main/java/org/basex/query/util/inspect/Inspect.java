@@ -26,19 +26,19 @@ import org.basex.util.list.*;
  */
 public abstract class Inspect {
   /** Query context. */
-  protected final QueryContext ctx;
+  final QueryContext ctx;
   /** Input info. */
-  protected final InputInfo info;
+  final InputInfo info;
 
   /** Parsed main module. */
-  protected StaticScope module;
+  StaticScope module;
 
   /**
    * Constructor.
    * @param qc query context
    * @param ii input info
    */
-  protected Inspect(final QueryContext qc, final InputInfo ii) {
+  Inspect(final QueryContext qc, final InputInfo ii) {
     ctx = qc;
     info = ii;
   }
@@ -57,7 +57,7 @@ public abstract class Inspect {
    * @return query parser
    * @throws QueryException query exception
    */
-  public final QueryParser parseQuery(final IO io) throws QueryException {
+  final QueryParser parseQuery(final IO io) throws QueryException {
     if(!io.exists()) WHICHRES.thrw(info, io);
 
     final QueryContext qc = new QueryContext(ctx.context);
@@ -81,7 +81,7 @@ public abstract class Inspect {
    * @param tags map with tags
    * @param parent parent element
    */
-  protected final void comment(final TokenObjMap<TokenList> tags, final FElem parent) {
+  final void comment(final TokenObjMap<TokenList> tags, final FElem parent) {
     for(final byte[] key : tags) {
       for(final byte[] value : tags.get(key)) {
         add(value, ctx.context, tag(key, parent));
@@ -96,7 +96,7 @@ public abstract class Inspect {
    * @param uri include uri
    * @throws QueryException query exception
    */
-  protected final void annotation(final Ann ann, final FElem parent, final boolean uri)
+  final void annotation(final Ann ann, final FElem parent, final boolean uri)
       throws QueryException {
 
     final int as = ann.size();

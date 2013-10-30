@@ -100,7 +100,7 @@ public final class FNNode extends StandardFunc {
    * @param node node to start from
    * @return resulting iterator
    */
-  private Str path(final ANode node) {
+  private static Str path(final ANode node) {
     ANode n = node;
     final TokenList tl = new TokenList();
     while(n.parent() != null) {

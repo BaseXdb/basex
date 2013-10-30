@@ -40,7 +40,7 @@ public final class Set extends AGet {
     final String name = args[0].toUpperCase(Locale.ENGLISH), val = args[1];
     // check if the option is a global, read-only option
     if(context.user.has(Perm.ADMIN) && goptions.option(name) != null)
-      return error(Text.GLOBAL_OPTION_X, name);
+      return error(GLOBAL_OPTION_X, name);
 
     final Option<?> opt = options.option(name);
     try {

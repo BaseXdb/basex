@@ -25,7 +25,7 @@ public final class Retrieve extends ACreate {
   }
 
   @Override
-  protected boolean run() throws IOException {
+  protected boolean run() {
     final String path = MetaData.normPath(args[0]);
     if(path == null) return error(NAME_INVALID_X, args[0]);
 

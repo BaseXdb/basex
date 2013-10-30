@@ -11,7 +11,7 @@ import javax.swing.*;
  */
 public abstract class GUICode {
   /** Counter. */
-  int counter;
+  private int counter;
 
   /**
    * Code to be run.

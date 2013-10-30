@@ -146,7 +146,7 @@ public final class Nodes implements Result {
    * @param p pre value
    */
   public void toggle(final int p) {
-    final int[] n = new int[] { p };
+    final int[] n = { p };
     set(contains(p) ? except(pres, n) : union(pres, n));
   }
 

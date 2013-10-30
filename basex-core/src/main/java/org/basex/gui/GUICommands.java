@@ -827,7 +827,7 @@ public enum GUICommands implements GUICmd {
    * @param no disallowed node types
    * @return result of check
    */
-  static boolean updatable(final Nodes n, final int... no) {
+  private static boolean updatable(final Nodes n, final int... no) {
     if(n == null || (no.length == 0 ? n.size() < 1 : n.size() != 1)) return false;
     final int k = n.data.kind(n.pres[0]);
     for(final int i : no) if(k == i) return false;
@@ -839,7 +839,7 @@ public enum GUICommands implements GUICmd {
    * @param s string to encode
    * @return quoted string
    */
-  static String quote(final String s) {
+  private static String quote(final String s) {
     return '"' + s.replaceAll("\"", "&quot;") + '"';
   }
 
@@ -849,7 +849,7 @@ public enum GUICommands implements GUICmd {
    * @param i offset
    * @return function string
    */
-  static String openPre(final Nodes n, final int i) {
+  private static String openPre(final Nodes n, final int i) {
     return Function._DB_OPEN_PRE.get(null, Str.get(n.data.meta.name),
         Int.get(n.pres[i])).toString();
   }

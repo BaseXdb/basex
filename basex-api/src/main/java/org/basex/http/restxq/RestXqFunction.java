@@ -157,7 +157,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
           errorParams.add(param(value, name, declared));
         } else {
           // method annotations
-          final HTTPMethod m = HTTPMethod.get(string(local));
+          final HTTPMethod m = get(string(local));
           if(m == null) error(info, ANN_UNKNOWN, "%", name.string());
           if(!value.isEmpty()) {
             // remember post/put variable
@@ -316,7 +316,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @return exception
    * @throws QueryException query exception
    */
-  QueryException error(final InputInfo info, final String msg, final Object... ext)
+  private static QueryException error(final InputInfo info, final String msg, final Object... ext)
       throws QueryException {
     throw new QueryException(info, Err.BASX_RESTXQ, Util.info(msg, ext));
   }
@@ -446,9 +446,8 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
    * @throws QueryException HTTP exception
    */
   private String toString(final Value value, final QNm name) throws QueryException {
-    if(!(value instanceof Str))
-      error(function.info, ANN_STRING, "%", name.string(), value);
-    return ((Str) value).toJava();
+    if(value instanceof Str) return ((Str) value).toJava();
+    throw error(function.info, ANN_STRING, "%", name.string(), value);
   }
 
   /**
@@ -501,7 +500,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
     // name of parameter
     final String err = toString(value.itemAt(0), name);
     QNm code = null;
-    if(!err.equals("*")) {
+    if(!"*".equals(err)) {
       final byte[] c = token(err);
       if(!XMLToken.isQName(c)) error(INV_CODE, c);
       code = new QNm(c, function.sc);
@@ -561,7 +560,7 @@ final class RestXqFunction implements Comparable<RestXqFunction> {
       final String[] parts = nv.split("=", 2);
       if(parts.length < 2) continue;
       try {
-        pars.put(parts[0], Str.get(URLDecoder.decode(parts[1], Token.UTF8)));
+        pars.put(parts[0], Str.get(URLDecoder.decode(parts[1], UTF8)));
       } catch(final Exception ex) {
         Util.notexpected(ex);
       }

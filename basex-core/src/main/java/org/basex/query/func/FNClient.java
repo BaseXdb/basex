@@ -11,7 +11,6 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -26,7 +25,7 @@ import org.basex.util.*;
  */
 public final class FNClient extends StandardFunc {
   /** Query pattern. */
-  static final Pattern QUERYPAT = Pattern.compile("\\[(.*?)\\] (.*)", Pattern.MULTILINE);
+  private static final Pattern QUERYPAT = Pattern.compile("\\[(.*?)\\] (.*)", Pattern.MULTILINE);
 
   /**
    * Constructor.
@@ -154,7 +153,7 @@ public final class FNClient extends StandardFunc {
     } catch(final BaseXException ex) {
       final Matcher m = QUERYPAT.matcher(ex.getMessage());
       if(m.find()) {
-        Err.thrw(m.group(1), info, m.group(2));
+        thrw(m.group(1), info, m.group(2));
         throw new QueryException(info, new QNm(m.group(1)), m.group(2));
       }
       throw BXCL_QUERY.thrw(info, ex);

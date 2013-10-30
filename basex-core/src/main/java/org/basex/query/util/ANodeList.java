@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  */
 public final class ANodeList extends ElementList implements Iterable<ANode> {
   /** Element container. */
-  ANode[] list;
+  private ANode[] list;
 
   /**
    * Constructor.

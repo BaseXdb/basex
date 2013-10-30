@@ -174,7 +174,7 @@ public final class CreateDB extends ACreate {
    * @return new database instance
    * @throws IOException I/O exception
    */
-  public static synchronized MemData mainMem(final Parser parser, final Context ctx)
+  private static synchronized MemData mainMem(final Parser parser, final Context ctx)
       throws IOException {
 
     if(ctx.user.has(Perm.CREATE)) return MemBuilder.build(parser);
@@ -211,12 +211,12 @@ public final class CreateDB extends ACreate {
       throw new BaseXException(RES_NOT_FOUND_X, source);
 
     // default: create a main memory instance
-    if(!ctx.options.get(MainOptions.FORCECREATE)) return CreateDB.mainMem(source, ctx);
+    if(!ctx.options.get(MainOptions.FORCECREATE)) return mainMem(source, ctx);
 
     // otherwise, create a persistent database instance
     final String nm = source.dbname();
     final DirParser dp = new DirParser(source, ctx.options, ctx.globalopts.dbpath(nm));
-    return CreateDB.create(nm, dp, ctx);
+    return create(nm, dp, ctx);
   }
 
   @Override

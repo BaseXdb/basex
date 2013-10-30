@@ -11,7 +11,7 @@ import org.basex.gui.layout.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class GUIToolBar extends JToolBar {
+final class GUIToolBar extends JToolBar {
   /** Toolbar commands. */
   private final GUICmd[] cmd;
   /** Reference to main window. */
@@ -22,7 +22,7 @@ public final class GUIToolBar extends JToolBar {
    * @param tb toolbar commands
    * @param main reference to the main window
    */
-  public GUIToolBar(final GUICmd[] tb, final GUI main) {
+  GUIToolBar(final GUICmd[] tb, final GUI main) {
     setFloatable(false);
     cmd = tb;
     gui = main;
@@ -43,7 +43,7 @@ public final class GUIToolBar extends JToolBar {
    */
   void refresh() {
     for(int b = 0; b < cmd.length; ++b) {
-      if(cmd[b] != null) cmd[b].refresh(gui, (BaseXButton) getComponent(b));
+      if(cmd[b] != null) cmd[b].refresh(gui, (AbstractButton) getComponent(b));
     }
   }
 }

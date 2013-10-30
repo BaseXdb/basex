@@ -25,11 +25,11 @@ import org.basex.util.list.*;
  */
 public final class DialogProps extends BaseXDialog {
   /** Index types. */
-  static final String[] HELP = {
+  private static final String[] HELP = {
     "", "", H_PATH_INDEX, H_TEXT_INDEX, H_ATTR_INDEX, ""
   };
   /** Index types. */
-  static final IndexType[] TYPES = {
+  private static final IndexType[] TYPES = {
     IndexType.TAG, IndexType.ATTNAME, IndexType.PATH,
     IndexType.TEXT, IndexType.ATTRIBUTE, IndexType.FULLTEXT
   };
@@ -39,23 +39,23 @@ public final class DialogProps extends BaseXDialog {
   };
 
   /** Full-text tab. */
-  final BaseXBack tabFT;
+  private final BaseXBack tabFT;
   /** Name tab. */
-  final BaseXBack tabNames;
+  private final BaseXBack tabNames;
   /** Name tab. */
-  final BaseXBack tabPath;
+  private final BaseXBack tabPath;
   /** Name tab. */
-  final BaseXBack tabValues;
+  private final BaseXBack tabValues;
   /** Contains the panels that are currently being updated. */
-  final IntList updated = new IntList();
+  private final IntList updated = new IntList();
   /** Tabbed pane. */
-  final BaseXTabs tabs;
+  private final BaseXTabs tabs;
   /** Resource panel. */
   final DialogResources resources;
   /** Add panel. */
   final DialogAdd add;
   /** Index information. */
-  final Editor[] infos = new Editor[LABELS.length];
+  private final Editor[] infos = new Editor[LABELS.length];
 
   /** Index labels. */
   private final BaseXLabel[] labels = new BaseXLabel[LABELS.length];
@@ -254,8 +254,8 @@ public final class DialogProps extends BaseXDialog {
         }
       }
       // full-text options
-      final int f = 5;
       tabFT.removeAll();
+      final int f = 5;
       panels[f].removeAll();
       add(f, tabFT, val[f] ? null : ft);
       panels[f].revalidate();

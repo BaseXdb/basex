@@ -8,11 +8,11 @@ package org.basex.query.regex;
  */
 public class Quantifier extends RegExp {
   /** Minimum occurrence. */
-  public final int min;
+  private final int min;
   /** Maximum occurrence, {@code -1} for infinity. */
-  public final int max;
+  private final int max;
   /** Reluctance flag. */
-  public final boolean lazy;
+  private final boolean lazy;
 
   /**
    * Constructor.

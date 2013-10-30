@@ -16,7 +16,7 @@ import org.basex.util.*;
  */
 public class LocalSession extends Session {
   /** Database context. */
-  protected final Context ctx;
+  private final Context ctx;
 
   /**
    * Default constructor.
@@ -46,8 +46,8 @@ public class LocalSession extends Session {
    * @param output output stream
    * @throws LoginException login exception
    */
-  public LocalSession(final Context context, final String user, final String pass,
-      final OutputStream output) throws LoginException {
+  private LocalSession(final Context context, final String user, final String pass,
+                       final OutputStream output) throws LoginException {
 
     this(context, output);
     ctx.user = ctx.users.get(user);

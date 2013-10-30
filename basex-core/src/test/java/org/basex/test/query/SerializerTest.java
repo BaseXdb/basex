@@ -24,7 +24,7 @@ public final class SerializerTest extends AdvancedQueryTest {
     query(option + "<html/>", "<html></html>");
     final String[] empties = { "area", "base", "br", "col", "embed", "hr", "img", "input",
         "link", "meta", "basefont", "frame", "isindex", "param" };
-    for(final String e : empties) query(option + "<" + e + "/>", "<" + e + " />");
+    for(final String e : empties) query(option + '<' + e + "/>", '<' + e + " />");
   }
 
   /** Test: method=html. */
@@ -34,7 +34,7 @@ public final class SerializerTest extends AdvancedQueryTest {
     query(option + "<html/>", "<html></html>");
     final String[] empties = { "area", "base", "br", "col", "embed", "hr", "img", "input",
         "link", "meta", "basefont", "frame", "isindex", "param" };
-    for(final String e : empties) query(option + "<" + e + "/>", "<" + e + ">");
+    for(final String e : empties) query(option + '<' + e + "/>", '<' + e + '>');
 
     query(option + "<html><script>&lt;</script></html>",
         "<html><script><</script></html>");
@@ -56,7 +56,7 @@ public final class SerializerTest extends AdvancedQueryTest {
     final String[] empties = { "area", "base", "br", "col", "command", "embed", "hr",
         "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr" };
     for(final String e : empties) {
-      query(option + "<" + e + "/>", "<!DOCTYPE html><" + e + ">");
+      query(option + '<' + e + "/>", "<!DOCTYPE html><" + e + '>');
     }
     query(option + "<a>&#x90;</a>", "<!DOCTYPE html><a>&#x90;</a>");
   }

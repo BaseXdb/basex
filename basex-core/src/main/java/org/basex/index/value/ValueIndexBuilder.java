@@ -227,7 +227,7 @@ public final class ValueIndexBuilder extends IndexBuilder {
   }
 
   @Override
-  public void abort() {
+  protected void abort() {
     data.meta.drop((text ? DATATXT : DATAATV) + ".+");
     if(text) data.meta.textindex = false;
     else data.meta.attrindex = false;

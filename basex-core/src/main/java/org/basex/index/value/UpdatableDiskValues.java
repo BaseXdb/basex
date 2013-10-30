@@ -77,7 +77,7 @@ public final class UpdatableDiskValues extends DiskValues {
       final byte[] key = nkeys.get(j);
 
       final int in = -(1 + get(key, 0, i + 1));
-      if(in < 0) Util.notexpected("Key should not exist: '" + string(key) + "'");
+      if(in < 0) Util.notexpected("Key should not exist: '" + string(key) + '\'');
 
       // shift all bigger keys to the right
       while(i >= in) {
@@ -135,7 +135,7 @@ public final class UpdatableDiskValues extends DiskValues {
     for(final byte[] key : allkeys) {
       p = get(key, ++p, s);
       if(p < 0) Util.notexpected("Tried to delete ids " + m.get(key) +
-          " of non-existing index key: '" + string(key) + "'");
+          " of non-existing index key: '" + string(key) + '\'');
       else if(deleteIds(p, key, m.get(key).sort().toArray()) == 0) empty.add(p);
     }
 
@@ -204,7 +204,7 @@ public final class UpdatableDiskValues extends DiskValues {
     // delete the id from the old key
     final int p = get(o);
     if(p >= 0) {
-      final int[] tmp = new int[] { id};
+      final int[] tmp = { id};
       if(deleteIds(p, o, tmp) == 0) {
         // the old key remains empty: delete it
         cache.delete(o);

@@ -3,7 +3,7 @@ package org.basex.util;
 import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
-import java.util.jar.*;
+import java.util.zip.*;
 
 /**
  * Custom class loader for loading jar files. This class is needed because JDK
@@ -38,7 +38,7 @@ public final class JarLoader extends URLClassLoader {
         try {
           final Field jar = jl.getClass().getDeclaredField("jar");
           jar.setAccessible(true);
-          ((JarFile) jar.get(jl)).close();
+          ((ZipFile) jar.get(jl)).close();
         } catch(final Throwable th) {
           Util.errln(th);
         }

@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
  * Abstract value.
  *
  * This class also implements the {@link Iterable} interface, which is why all of its
- * values can also be retrieved via enhanced for (for-each) loops. The default
+ * values can also be retrieved via enhanced for(for-each) loops. The default
  * {@link #iter()} method will provide better performance.
  *
  * @author BaseX Team 2005-13, BSD License
@@ -39,7 +39,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * Constructor.
    * @param t data type
    */
-  public Value(final Type t) {
+  protected Value(final Type t) {
     type = t;
   }
 

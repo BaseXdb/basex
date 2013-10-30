@@ -56,11 +56,11 @@ public class Editor extends BaseXPanel {
   /** Undo history. */
   public transient History hist;
   /** Renderer reference. */
-  final Renderer rend;
+  private final Renderer rend;
   /** Scrollbar reference. */
-  final BaseXBar scroll;
+  private final BaseXBar scroll;
   /** Editable flag. */
-  final boolean editable;
+  private final boolean editable;
   /** Search bar. */
   private SearchBar search;
   /** Link listener. */
@@ -178,7 +178,7 @@ public class Editor extends BaseXPanel {
 
     // new text is different...
     if(!eq) text.text(Arrays.copyOf(t, ns));
-    if(hist != null) hist.store(t.length != ns ? Arrays.copyOf(t, ns) : t, pc, 0);
+    if(hist != null) hist.store(t.length == ns ? t : Arrays.copyOf(t, ns), pc, 0);
     componentResized(null);
   }
 
@@ -262,7 +262,7 @@ public class Editor extends BaseXPanel {
   }
 
   /** Thread counter. */
-  int errorID;
+  private int errorID;
 
   /**
    * Removes the error marker.
@@ -634,11 +634,11 @@ public class Editor extends BaseXPanel {
 
     text.setCaret();
     final byte[] tmp = text.text();
-    if(txt != tmp) {
+    if(txt == tmp) {
+      showCursor(down ? 2 : 0);
+    } else {
       hist.store(tmp, pc, text.getCaret());
       calcCode.invokeLater(down);
-    } else {
-      showCursor(down ? 2 : 0);
     }
   }
 
@@ -774,7 +774,7 @@ public class Editor extends BaseXPanel {
    * Returns the clipboard text.
    * @return text
    */
-  static String clip() {
+  private static String clip() {
     // copy selection to clipboard
     final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
     final Transferable tr = clip.getContents(null);

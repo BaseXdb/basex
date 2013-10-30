@@ -24,9 +24,10 @@ import org.junit.rules.*;
  */
 public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
   /** Expected exception. */
-  @Rule public ExpectedException thrown = ExpectedException.none();
+  @Rule
+  public final ExpectedException thrown = ExpectedException.none();
   /** Test document. */
-  final String testDocument =
+  private static final String TESTDOCUMENT =
       "<n1>" +
           "<n2><n3/></n2>" +
           "<n4><n5><n6/></n5></n4>" +
@@ -210,7 +211,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
   @Test
   public void comparatorTest() {
     // JUST ADD NEW SCENARIOS TO THE END OF THE DOCUMENT
-    final Data d = data(testDocument);
+    final Data d = data(TESTDOCUMENT);
 
     // ****** Tests on single target node T and on the single descendant of T
     //(A=B, A=B, A=B, A>B)
@@ -284,7 +285,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
    */
   @Test
   public void shiftInsertIntoAsFirst() {
-    final Data d = data(testDocument);
+    final Data d = data(TESTDOCUMENT);
     compare(new UpdatePrimitive[] {
        new InsertIntoAsFirst(22, d, null, null),
        new DeleteNode(23, d, null),
@@ -296,7 +297,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
    */
   @Test
   public void compareOnSingleNode() {
-    final Data d = data(testDocument);
+    final Data d = data(TESTDOCUMENT);
     compare(new UpdatePrimitive[] {
         new InsertAfter(10, d, null, null),
         new InsertInto(10, d, null, null),
@@ -315,7 +316,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
    */
   @Test
   public void compareOnSiblings() {
-    final Data d = data(testDocument);
+    final Data d = data(TESTDOCUMENT);
     compare(new UpdatePrimitive[] {
         new InsertAfter(8, d, null, null),
         new InsertInto(8, d, null, null),
@@ -343,7 +344,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
    */
   @Test
   public void compareComplexRelationships() {
-    final Data d = data(testDocument);
+    final Data d = data(TESTDOCUMENT);
     compare(new UpdatePrimitive[] {
         // 25
         new InsertAfter(18, d, null, null),
@@ -419,7 +420,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
    */
   @Test
   public void compareSiblingsComplex() {
-    final Data d = data(testDocument);
+    final Data d = data(TESTDOCUMENT);
     compare(new UpdatePrimitive[] {
         // node 28
         new InsertAfter(28, d, null, null),
@@ -450,7 +451,7 @@ public class UpdatePrimitiveComparatorTest extends AdvancedQueryTest {
    */
   @Test
   public void compareSiblingsSimple() {
-    final Data d = data(testDocument);
+    final Data d = data(TESTDOCUMENT);
     compare(new UpdatePrimitive[] {
         new InsertInto(28, d, null, null),
         new InsertInto(26, d, null, null),

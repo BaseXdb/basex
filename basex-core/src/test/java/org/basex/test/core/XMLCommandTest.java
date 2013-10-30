@@ -156,7 +156,7 @@ public class XMLCommandTest extends SandboxTest {
    * Assumes that this command is successful.
    * @param xml command
    */
-  static void ok(final String xml) {
+  private static void ok(final String xml) {
     try {
       new CommandParser(xml, context).parse();
     } catch(final QueryException ex) {
@@ -168,10 +168,10 @@ public class XMLCommandTest extends SandboxTest {
    * Assumes that this command fails.
    * @param xml command
    */
-  static void no(final String xml) {
+  private static void no(final String xml) {
     try {
       new CommandParser(xml, context).parse();
-      fail("\"" + xml + "\" was supposed to fail.");
+      fail('"' + xml + "\" was supposed to fail.");
     } catch(final QueryException ex) {
       /* expected */
     }

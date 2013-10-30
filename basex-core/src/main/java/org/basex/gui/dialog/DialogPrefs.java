@@ -30,11 +30,11 @@ public final class DialogPrefs extends BaseXDialog {
   private static final String[][] LANGS = Lang.parse();
 
   /** Directory path. */
-  final BaseXTextField path;
+  private final BaseXTextField path;
   /** Number of hits. */
-  final BaseXSlider limit;
+  private final BaseXSlider limit;
   /** Label for number of hits. */
-  final BaseXLabel label;
+  private final BaseXLabel label;
 
   /** Language label. */
   private final BaseXLabel creds;

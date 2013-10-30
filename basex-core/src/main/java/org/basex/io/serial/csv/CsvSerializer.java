@@ -15,11 +15,11 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public abstract class CsvSerializer extends OutputSerializer {
+abstract class CsvSerializer extends OutputSerializer {
   /** CSV options. */
-  protected final CsvOptions copts;
+  final CsvOptions copts;
   /** Separator. */
-  protected final int separator;
+  private final int separator;
 
   /**
    * Constructor.
@@ -27,7 +27,7 @@ public abstract class CsvSerializer extends OutputSerializer {
    * @param opts serialization parameters
    * @throws IOException I/O exception
    */
-  public CsvSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
+  CsvSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
     super(os, opts);
     copts = opts.get(SerializerOptions.CSV);
     separator = copts.separator();

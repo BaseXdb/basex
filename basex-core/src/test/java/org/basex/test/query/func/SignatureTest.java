@@ -32,7 +32,7 @@ public class SignatureTest extends AdvancedQueryTest {
    * @param def function definition
    * types are supported.
    */
-  protected static void check(final Function def) {
+  private static void check(final Function def) {
     final String desc = def.toString();
     final String name = desc.replaceAll("\\(.*", "");
 

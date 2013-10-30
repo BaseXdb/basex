@@ -82,7 +82,7 @@ public abstract class QueryTest extends SandboxTest {
           } else {
             types.add(Util.className(val));
           }
-          s = val.size() != 1 ? "#" + val.size() : "";
+          s = val.size() == 1 ? "" : "#" + val.size();
           sb.append("\n[F" + s + "] '" + val + "', " + types +
             details() + '\n');
           ++fail;

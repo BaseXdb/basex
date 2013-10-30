@@ -57,7 +57,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  protected void finishOpen() throws IOException {
+  protected void finishOpen() {
   }
 
   @Override

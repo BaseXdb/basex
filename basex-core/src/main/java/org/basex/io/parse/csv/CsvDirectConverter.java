@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class CsvDirectConverter extends CsvConverter {
+final class CsvDirectConverter extends CsvConverter {
   /** CSV token. */
   private static final byte[] CSV = token("csv");
   /** CSV token. */
@@ -43,8 +43,7 @@ public final class CsvDirectConverter extends CsvConverter {
    * Constructor.
    * @param opts CSV options
    */
-  public CsvDirectConverter(final CsvParserOptions opts) {
-    super(opts);
+  CsvDirectConverter(final CsvParserOptions opts) {
     lax = opts.get(CsvOptions.LAX);
     atts = opts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
   }

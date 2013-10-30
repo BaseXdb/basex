@@ -83,6 +83,6 @@ public final class Open extends Command {
    * @return error message
    */
   public static String dbnf(final String name) {
-    return Util.info(Text.DB_NOT_FOUND_X, name);
+    return Util.info(DB_NOT_FOUND_X, name);
   }
 }

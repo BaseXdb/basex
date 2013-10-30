@@ -54,7 +54,7 @@ public final class FuncOptions {
    * @throws QueryException query exception
    */
   public void parse(final Item it, final Options options) throws QueryException {
-    parse(it, options, Err.INVALIDOPT);
+    parse(it, options, INVALIDOPT);
   }
 
   /**
@@ -64,7 +64,7 @@ public final class FuncOptions {
    * @param error raise error if parameter is unknown
    * @throws QueryException query exception
    */
-  public void parse(final Item item, final Options options, final Err error) throws QueryException {
+  void parse(final Item item, final Options options, final Err error) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     if(item != null) {
       try {
@@ -123,7 +123,7 @@ public final class FuncOptions {
    * @param node node
    * @return result of check
    */
-  private boolean hasElements(final ANode node) {
+  private static boolean hasElements(final ANode node) {
     for(final ANode n : node.children()) {
       if(n.type == NodeType.ELM) return true;
     }
@@ -152,7 +152,7 @@ public final class FuncOptions {
    */
   public static SerializerOptions serializer(final Item it, final SerializerOptions sopts,
       final InputInfo info) throws QueryException {
-    new FuncOptions(Q_SPARAM, info).parse(it, sopts, Err.SEROPT);
+    new FuncOptions(Q_SPARAM, info).parse(it, sopts, SEROPT);
     return sopts;
   }
 }

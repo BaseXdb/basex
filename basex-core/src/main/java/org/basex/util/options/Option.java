@@ -16,7 +16,7 @@ public abstract class Option<O> {
    * Constructor without default value.
    * @param n name
    */
-  protected Option(final String n) {
+  Option(final String n) {
     name = n;
   }
 

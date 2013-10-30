@@ -148,20 +148,20 @@ public final class XMLToken {
     final byte[] name = lax ? trim(nm) : nm;
     if(name.length == 0) return UNDERSCORE;
 
-    for(int i = 0, cp; i < name.length; i += cl(name, i)) {
-      cp = cp(name, i);
-      if(cp == '_' || !(i == 0 ? XMLToken.isNCStartChar(cp) : XMLToken.isNCChar(cp))) {
+    for(int i = 0; i < name.length; i += cl(name, i)) {
+      int cp = cp(name, i);
+      if(cp == '_' || !(i == 0 ? isNCStartChar(cp) : isNCChar(cp))) {
         final TokenBuilder tb = new TokenBuilder(name.length << 1).add(name, 0, i);
         for(int j = i; j < name.length; j += cl(name, j)) {
           cp = cp(name, j);
           if(lax) {
-            final boolean nc = XMLToken.isNCChar(cp);
+            final boolean nc = isNCChar(cp);
             // prefix invalid start chars (numbers, dashes, dots) with underscore
-            if(j == 0 && nc && !XMLToken.isNCStartChar(cp)) tb.add('_');
+            if(j == 0 && nc && !isNCStartChar(cp)) tb.add('_');
             tb.add(nc ? cp : '_');
           } else if(cp == '_') {
             tb.add('_').add('_');
-          } else if(j == 0 ? XMLToken.isNCStartChar(cp) : XMLToken.isNCChar(cp)) {
+          } else if(j == 0 ? isNCStartChar(cp) : isNCChar(cp)) {
             tb.add(cp);
           } else if(cp < 0x10000) {
             addEsc(tb, cp);

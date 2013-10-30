@@ -61,14 +61,14 @@ public final class FTIndex implements Index {
    * on the first token with this length. */
   private final DataAccess inX;
   /** Index storing each token, its data size and pointer on the data. */
-  final DataAccess inY;
+  private final DataAccess inY;
   /** Storing pre and pos values for each token. */
-  final DataAccess inZ;
+  private final DataAccess inZ;
 
   /** Cache for number of hits and data reference per token. */
-  final IndexCache cache = new IndexCache();
+  private final IndexCache cache = new IndexCache();
   /** Token positions. */
-  final int[] tp;
+  private final int[] tp;
 
   /**
    * Constructor, initializing the index structure.

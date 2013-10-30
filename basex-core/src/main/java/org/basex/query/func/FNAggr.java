@@ -62,7 +62,7 @@ public final class FNAggr extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx) {
     // skip non-deterministic and variable expressions
     final Expr e = expr[0];
     if(e.has(Flag.NDT) || e instanceof VarRef) return this;
@@ -94,7 +94,6 @@ public final class FNAggr extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item sum(final Iter iter, final Item it, final boolean avg) throws QueryException {
-
     Item rs = it.type.isUntyped() ? Dbl.get(it.string(info), info) : it;
     final boolean n = rs instanceof ANum;
     final boolean dtd = !n && rs.type == AtomType.DTD;

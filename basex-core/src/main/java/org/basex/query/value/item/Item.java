@@ -24,7 +24,7 @@ public abstract class Item extends Value {
   /** Undefined item. */
   public static final int UNDEF = Integer.MIN_VALUE;
   /** Score value. {@code null} reference takes less memory on 32bit than a double. */
-  public Double score;
+  protected Double score;
 
   /**
    * Constructor.
@@ -246,7 +246,7 @@ public abstract class Item extends Value {
    * @return never
    * @throws QueryException query exception
    */
-  protected final QueryException castErr(final Object val, final InputInfo ii)
+  final QueryException castErr(final Object val, final InputInfo ii)
       throws QueryException {
     return FUNCAST.thrw(ii, type, val);
   }

@@ -16,17 +16,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class CsvConverter {
-  /** CSV options. */
-  protected final CsvParserOptions copts;
-
-  /**
-   * Constructor.
-   * @param opts CSV options
-   */
-  protected CsvConverter(final CsvParserOptions opts) {
-    copts = opts;
-  }
-
   /**
    * Converts the specified input to an XQuery item.
    * @param input input
@@ -52,13 +41,13 @@ public abstract class CsvConverter {
   }
 
   /**
-   * Returns a {@link CsvConverter} for the given configuration.
+   * Returns a  for the given configuration.
    * @param copts options
    * @return a CSV converter
    */
   private static CsvConverter get(final CsvParserOptions copts) {
     switch(copts.get(CsvOptions.FORMAT)) {
-      case MAP: return new CsvMapConverter(copts);
+      case MAP: return new CsvMapConverter();
       default:  return new CsvDirectConverter(copts);
     }
   }

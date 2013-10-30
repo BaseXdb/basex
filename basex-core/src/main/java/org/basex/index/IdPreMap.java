@@ -221,7 +221,7 @@ public class IdPreMap {
       endIndex = removeStart;
       remove(removeStart, removeEnd);
     } else {
-      inc = 0 < startIndex ? incs[startIndex - 1] : 0;
+      inc = startIndex > 0 ? incs[startIndex - 1] : 0;
       oid = id;
       endIndex = startIndex;
     }

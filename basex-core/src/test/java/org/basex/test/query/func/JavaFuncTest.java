@@ -80,8 +80,7 @@ public class JavaFuncTest extends AdvancedQueryTest {
   /** Tests ambiguous function signatures. */
   @Test
   public void ambiguousSignature() {
-    error("import module namespace n='java:java.lang.StringBuilder'; n:append('x')",
-        Err.JAVAAMBIG);
+    error("import module namespace n='java:java.lang.StringBuilder'; n:append('x')", Err.JAVAAMBIG);
   }
 
   /** Ensure that items cannot be cast to Java. */

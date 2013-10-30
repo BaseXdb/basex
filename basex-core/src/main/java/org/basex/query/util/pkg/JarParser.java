@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Rositsa Shadura
  */
-public final class JarParser {
+final class JarParser {
   /** Context. */
   private final Context context;
   /** Input info. */
@@ -30,7 +30,7 @@ public final class JarParser {
    * @param ctx database context
    * @param ii input info
    */
-  public JarParser(final Context ctx, final InputInfo ii) {
+  JarParser(final Context ctx, final InputInfo ii) {
     context = ctx;
     info = ii;
   }

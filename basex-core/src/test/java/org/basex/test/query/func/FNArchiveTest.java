@@ -138,7 +138,7 @@ public final class FNArchiveTest extends AdvancedQueryTest {
     // extract all entries
     query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
           "let $b := " + _ARCHIVE_ENTRIES.args("$a") +
-          "return count(" + _ARCHIVE_EXTRACT_BINARY.args("$a", "$b") + ")", 5);
+          "return count(" + _ARCHIVE_EXTRACT_BINARY.args("$a", "$b") + ')', 5);
     // extract single entry
     query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
           "let $b := " + _ARCHIVE_EXTRACT_BINARY.args("$a", "test/input.xml") +
@@ -212,7 +212,7 @@ public final class FNArchiveTest extends AdvancedQueryTest {
 
     query("let $a := " + _ARCHIVE_ENTRIES.args(
       _FILE_READ_BINARY.args(ZIP)) + "/string() " +
-      "let $f := " + _FILE_LIST.args(tmp, "true()") + "[" +
+      "let $f := " + _FILE_LIST.args(tmp, "true()") + '[' +
       _FILE_IS_FILE.args(" '" + tmp + "/'||.") + "] ! replace(., '\\\\', '/') " +
       "return (every $e in $a satisfies $e = $f) and (every $e in $f satisfies $e =$ a)",
       "true");

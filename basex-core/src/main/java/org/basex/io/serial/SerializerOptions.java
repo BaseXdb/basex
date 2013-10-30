@@ -78,7 +78,7 @@ public final class SerializerOptions extends Options {
   /** Specific serialization parameter: newline. */
   public static final EnumOption<Newline> NEWLINE =
       new EnumOption<Newline>("newline",
-      Prop.NL.equals("\r") ? Newline.CR : Prop.NL.equals("\n") ? Newline.NL : Newline.CRNL);
+        "\r".equals(Prop.NL) ? Newline.CR : "\n".equals(Prop.NL) ? Newline.NL : Newline.CRNL);
   /** Specific serialization parameter: formatting. */
   public static final EnumOption<YesNo> FORMAT =
       new EnumOption<YesNo>("format", YesNo.YES);

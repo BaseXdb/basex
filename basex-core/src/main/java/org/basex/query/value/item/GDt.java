@@ -94,8 +94,7 @@ public final class GDt extends ADate {
   }
 
   @Override
-  public void timeZone(final DTDur tz, final boolean d, final InputInfo ii)
-      throws QueryException {
+  public void timeZone(final DTDur tz, final boolean d, final InputInfo ii) {
     Util.notexpected();
   }
 
@@ -108,11 +107,11 @@ public final class GDt extends ADate {
   @Override
   public byte[] string(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
-    if(yea != Long.MAX_VALUE) {
+    if(yea == Long.MAX_VALUE) {
+      tb.add('-');
+    } else {
       if(yea <= 0) tb.add('-');
       prefix(tb, Math.abs(yea()), 4);
-    } else {
-      tb.add('-');
     }
     if(mon >= 0 || day >= 0) tb.add('-');
     if(mon >= 0) prefix(tb, mon + 1, 2);

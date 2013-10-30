@@ -49,8 +49,8 @@ public final class FNInfo extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
-    if(sig == Function.TRACE) type = expr[0].type();
+  protected Expr opt(final QueryContext ctx) {
+    if(sig == TRACE) type = expr[0].type();
     return this;
   }
 

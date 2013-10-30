@@ -382,7 +382,7 @@ public final class Namespaces {
    * @return reference, or {@code 0}
    */
   public int uri(final byte[] uri) {
-    return uri.length != 0 ? uris.id(uri) : 0;
+    return uri.length == 0 ? 0 : uris.id(uri);
   }
 
   /**

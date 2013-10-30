@@ -83,9 +83,11 @@ public class NodeTest extends Test {
       final boolean both = ext != null && o.ext != null;
       final Type e = ext == null ? o.ext : o.ext == null ? ext : ext.intersect(o.ext);
       return both && e == null ? null : new NodeTest(nt, n, e, strip || o.strip);
-    } else if(other instanceof KindTest) {
+    }
+    if(other instanceof KindTest) {
       return type.instanceOf(other.type) ? this : null;
-    } else if(other instanceof NameTest) {
+    }
+    if(other instanceof NameTest) {
       throw Util.notexpected(other);
     }
 

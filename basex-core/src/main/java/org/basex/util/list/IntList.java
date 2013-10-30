@@ -285,9 +285,8 @@ public class IntList extends ElementList {
       s(b++, c--, t);
     }
 
-    int k;
     final int n = s + e;
-    k = Math.min(a - s, b - a);
+    int k = Math.min(a - s, b - a);
     s(s, b - k, k, t);
     k = Math.min(d - c, n - d - 1);
     s(b, n - k, k, t);
@@ -347,9 +346,8 @@ public class IntList extends ElementList {
       s(b++, c--, t);
     }
 
-    int k;
     final int n = s + e;
-    k = Math.min(a - s, b - a);
+    int k = Math.min(a - s, b - a);
     s(s, b - k, k, t);
     k = Math.min(d - c, n - d - 1);
     s(b, n - k, k, t);
@@ -409,9 +407,8 @@ public class IntList extends ElementList {
       s(b++, c--, t);
     }
 
-    int k;
     final int n = s + e;
-    k = Math.min(a - s, b - a);
+    int k = Math.min(a - s, b - a);
     s(s, b - k, k, t);
     k = Math.min(d - c, n - d - 1);
     s(b, n - k, k, t);

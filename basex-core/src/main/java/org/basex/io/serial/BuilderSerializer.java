@@ -45,7 +45,7 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected final void atomic(final Item b) throws IOException {
+  protected final void atomic(final Item b) {
     Util.notexpected();
   }
 
@@ -74,7 +74,7 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  protected final void attribute(final byte[] n, final byte[] v) throws IOException {
+  protected final void attribute(final byte[] n, final byte[] v) {
     if(startsWith(n, XMLNS)) {
       if(n.length == 5) {
         nsp.add(EMPTY, v);

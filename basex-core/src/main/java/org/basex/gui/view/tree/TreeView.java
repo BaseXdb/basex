@@ -334,7 +334,7 @@ public final class TreeView extends View implements TreeConstants {
     if(markedImage != null) {
       final int h = markedImage.getHeight();
       final int w = markedImage.getWidth();
-      if(y >= h || 0 > y || x >= w || 0 > x) return false;
+      if(y >= h || y < 0 || x >= w || x < 0) return false;
       final Color markc = new Color(markedImage.getRGB(x, y));
       return markc.getRed() > 0 && markc.getBlue() == 0 && markc.getGreen()
       == 0;
@@ -679,7 +679,7 @@ public final class TreeView extends View implements TreeConstants {
     }
 
     // draw parent node connection
-    if(px > -1 && MIN_NODE_DIST_CONN <= levelDistance) drawParentConnection(g, lv, r, px, rc);
+    if(px > -1 && levelDistance >= MIN_NODE_DIST_CONN) drawParentConnection(g, lv, r, px, rc);
 
     // if there are ancestors draw them
     if(!root) {
@@ -805,9 +805,8 @@ public final class TreeView extends View implements TreeConstants {
 
     int lvv = lv;
     int cen = parc;
-    int i;
 
-    for(i = 1; i < subt.length && tr.bigRect(sub, rn, lvv); ++i) {
+    for(int i = 1; i < subt.length && tr.bigRect(sub, rn, lvv); ++i) {
       final TreeBorder bos = sub.treeBorder(rn, lvv);
       final TreeBorder bo = subt[i];
 
@@ -820,7 +819,7 @@ public final class TreeView extends View implements TreeConstants {
       final int dt = r.x + (int) (r.w * eni);
       final int ww = Math.max(dt - df, 2);
 
-      if(MIN_NODE_DIST_CONN <= levelDistance) drawDescendantsConn(g, lvv,
+      if(levelDistance >= MIN_NODE_DIST_CONN) drawDescendantsConn(g, lvv,
           new TreeRect(df, ww), cen, t);
       cen = (2 * df + ww) / 2;
       switch(t) {
@@ -1157,18 +1156,18 @@ public final class TreeView extends View implements TreeConstants {
   public void mouseDragged(final MouseEvent e) {
     if(gui.updating || e.isShiftDown()) return;
 
-    if(!selection) {
+    if(selection) {
+      final int x = e.getX();
+      final int y = e.getY();
+      selectRect.w = x - selectRect.x;
+      selectRect.h = y - selectRect.y;
+    } else {
       selection = true;
       selectRect = new ViewRect();
       selectRect.x = e.getX();
       selectRect.y = e.getY();
       selectRect.h = 1;
       selectRect.w = 1;
-    } else {
-      final int x = e.getX();
-      final int y = e.getY();
-      selectRect.w = x - selectRect.x;
-      selectRect.h = y - selectRect.y;
     }
     markSelectedNodes();
     repaint();

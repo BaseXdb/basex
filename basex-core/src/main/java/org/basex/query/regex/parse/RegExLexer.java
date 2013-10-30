@@ -18,11 +18,11 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
   private static final Token EOF_TOKEN = new Token(EOF);
 
   /** The input string. */
-  final byte[] input;
+  private final byte[] input;
   /** Input position. */
-  int pos;
+  private int pos;
   /** Start-of-line marks, beginning with the second one. {@code null} if only one. */
-  final IntList lines;
+  private final IntList lines;
 
   /** Number of nested character classes. */
   private int state;
@@ -31,7 +31,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
   /** Token builder. */
   private final TokenBuilder tb = new TokenBuilder();
   /** Token's payload. */
-  Object payload;
+  private Object payload;
   /** Skip whitespace. */
   private final boolean skipWs;
 
@@ -158,7 +158,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
         final int nxt = next();
         if(nxt != '{') throw error(p, nxt);
         for(int cp = next(); cp != '}'; cp = next())
-          if(cp == -1) throw error(tb.toString(), cp);
+          if(cp == -1) throw error(tb.toString(), -1);
         final String in = tb.toString().substring(3, tb.size() - 1);
         final Matcher m = CAT_REGEX.matcher(in);
         if(!m.matches()) throw error("{", nxt);
@@ -283,7 +283,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
      * @param start start of the token
      * @param img image string
      */
-    public RegExToken(final int k, final int start, final String img) {
+    RegExToken(final int k, final int start, final String img) {
       kind = k;
       image = img;
       final int[] lc = lineCol(start);

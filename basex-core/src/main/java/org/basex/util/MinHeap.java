@@ -55,9 +55,9 @@ public final class MinHeap<K, V> {
   public V removeMin() {
     final V val = minValue();
     swap(0, --size);
-    int pos = 0, sm;
+    int pos = 0;
     while(pos < size / 2) {
-      sm = 2 * pos + 1;
+      int sm = 2 * pos + 1;
       if(sm < size - 1 && compare(sm + 1, sm) < 0) sm++;
       if(compare(pos, sm) <= 0) break;
       swap(pos, sm);
@@ -71,7 +71,7 @@ public final class MinHeap<K, V> {
    * @return value of the smallest key
    */
   @SuppressWarnings("unchecked")
-  public V minValue() {
+  V minValue() {
     return (V) vals[1];
   }
 

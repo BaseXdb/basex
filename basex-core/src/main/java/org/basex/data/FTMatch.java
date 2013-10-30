@@ -88,7 +88,7 @@ public final class FTMatch extends ElementList implements Iterable<FTStringMatch
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final FTStringMatch s : this) {
-      sb.append(sb.length() != 0 ? ", " : "").append(s);
+      sb.append(sb.length() == 0 ? "" : ", ").append(s);
     }
     return Util.className(this) + ' ' + sb;
   }

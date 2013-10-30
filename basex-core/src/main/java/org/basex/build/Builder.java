@@ -282,7 +282,7 @@ public abstract class Builder extends Proc {
     for(int nx = 0; nx < nl; nx++) ns.add(nsp.name(nx), nsp.value(nx), meta.size);
 
     // get and store element references
-    final int dis = level != 0 ? pre - pstack.get(level - 1) : 1;
+    final int dis = level == 0 ? 1 : pre - pstack.get(level - 1);
     final int as = att.size();
     int u = ns.uri(name, true);
     if(u == 0 && indexOf(name, ':') != -1 && !eq(prefix(name), XML))

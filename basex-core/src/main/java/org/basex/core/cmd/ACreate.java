@@ -27,7 +27,7 @@ public abstract class ACreate extends Command {
    * Protected constructor, specifying command arguments.
    * @param arg arguments
    */
-  protected ACreate(final String... arg) {
+  ACreate(final String... arg) {
     this(Perm.CREATE, false, arg);
     newData = true;
   }
@@ -38,7 +38,7 @@ public abstract class ACreate extends Command {
    * @param d requires opened database
    * @param arg arguments
    */
-  protected ACreate(final Perm p, final boolean d, final String... arg) {
+  ACreate(final Perm p, final boolean d, final String... arg) {
     super(p, d, arg);
   }
 
@@ -49,7 +49,7 @@ public abstract class ACreate extends Command {
    * @return IO reference
    * @throws IOException I/O exception
    */
-  protected IO sourceToIO(final String name) throws IOException {
+  IO sourceToIO(final String name) throws IOException {
     IO io = null;
     if(args[1] != null && !args[1].isEmpty()) {
       io = IO.get(args[1]);
@@ -84,7 +84,7 @@ public abstract class ACreate extends Command {
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  protected static void create(final IndexType index, final Data data, final ACreate cmd)
+  static void create(final IndexType index, final Data data, final ACreate cmd)
       throws IOException {
 
     if(data.inMemory()) return;
@@ -106,7 +106,7 @@ public abstract class ACreate extends Command {
    * @param data data reference
    * @return success of operation
    */
-  protected static boolean drop(final IndexType index, final Data data) {
+  static boolean drop(final IndexType index, final Data data) {
     String pat = null;
     switch(index) {
       case TEXT:

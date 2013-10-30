@@ -45,10 +45,9 @@ class RESTQuery extends RESTCmd {
    * @throws IOException I/O exception
    */
   void query(final String path) throws IOException {
-    final XQuery xq;
     int c = 0;
     while(!(cmds.get(c) instanceof XQuery)) run(cmds.get(c++));
-    xq = (XQuery) cmds.get(c);
+    final XQuery xq = (XQuery) cmds.get(c);
 
     // create query instance
     if(value != null) xq.bind(null, value, NodeType.DOC.toString());

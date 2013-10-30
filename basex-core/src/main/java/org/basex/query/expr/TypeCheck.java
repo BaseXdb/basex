@@ -92,7 +92,7 @@ public final class TypeCheck extends Single {
 
   @Override
   public String toString() {
-    return "((: " + type + ", " + promote + " :) " + expr.toString() + ")";
+    return "((: " + type + ", " + promote + " :) " + expr.toString() + ')';
   }
 
   /**

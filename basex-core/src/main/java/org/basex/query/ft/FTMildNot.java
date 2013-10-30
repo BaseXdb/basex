@@ -70,7 +70,7 @@ public final class FTMildNot extends FTExpr {
    * @param it2 second item
    * @return specified item
    */
-  static FTNode mildnot(final FTNode it1, final FTNode it2) {
+  private static FTNode mildnot(final FTNode it1, final FTNode it2) {
     it1.all = mildnot(it1.all, it2.all);
     return it1;
   }

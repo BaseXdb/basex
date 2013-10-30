@@ -30,7 +30,7 @@ public final class QueryStack {
     final int nsl = sl + size;
     if(nsl > stack.length) {
       int len = stack.length;
-      do len *= 2; while(nsl > len);
+      do len <<= 1; while(nsl > len);
       final Value[] nst = new Value[len];
       System.arraycopy(stack, 0, nst, 0, sl);
       stack = nst;

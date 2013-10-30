@@ -50,7 +50,7 @@ public final class FTTest extends QueryTest {
       "</fttest>";
 
   /** Test queries. */
-  public static final Object[][] QUERIES = new Object[][] {
+  public static final Object[][] QUERIES = {
       { "Simple 1", bool(true), "'a' contains text 'a'" },
       { "Simple 2", bool(true), "'a b' contains text 'b'" },
       { "Simple 3", bool(false), "'abc' contains text 'b'" },

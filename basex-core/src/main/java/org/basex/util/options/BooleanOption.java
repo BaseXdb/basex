@@ -8,7 +8,7 @@ package org.basex.util.options;
  */
 public final class BooleanOption extends Option<Boolean> {
   /** Default value. */
-  public final Boolean value;
+  private final Boolean value;
 
   /**
    * Default constructor.

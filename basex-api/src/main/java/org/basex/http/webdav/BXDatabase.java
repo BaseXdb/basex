@@ -33,7 +33,7 @@ public final class BXDatabase extends BXFolder {
   }
 
   @Override
-  protected void rename(final String n) throws IOException {
+  void rename(final String n) throws IOException {
     service.renameDb(meta.db, n);
   }
 

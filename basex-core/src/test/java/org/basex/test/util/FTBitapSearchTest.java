@@ -87,7 +87,7 @@ public final class FTBitapSearchTest {
   }
 
   /** Test data. */
-  private static final TestData[] TESTS = new TestData[] {
+  private static final TestData[] TESTS = {
       new TestData(
           new String[] { "token1", "token1", "token2", "token3", "token4",
               "token1", "token2", "token3", "token3" },

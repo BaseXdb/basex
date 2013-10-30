@@ -12,9 +12,9 @@ import org.basex.util.*;
  */
 final class UpdateValue extends BasicUpdate {
   /** Target node kind. */
-  final int targetkind;
+  private final int targetkind;
   /** New value for target node. */
-  final byte[] value;
+  private final byte[] value;
 
   /**
    * Constructor.

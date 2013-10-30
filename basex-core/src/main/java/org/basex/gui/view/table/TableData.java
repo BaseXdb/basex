@@ -278,7 +278,7 @@ final class TableData {
     int k = data.kind(p);
     while(p != -1 && (k != Data.ELEM || data.name(p) != root)) {
       p = data.parent(p, k);
-      k = p != -1 ? data.kind(p) : 0;
+      k = p == -1 ? 0 : data.kind(p);
     }
     return p;
   }

@@ -37,15 +37,15 @@ public abstract class XMLDBBaseTest {
   static final String DOC3 = "third.xml";
 
   /** Context. */
-  private static Context context = new Context();
+  private static final Context CONTEXT = new Context();
 
   /**
    * Create XMLDB database.
    * @throws BaseXException exception during database create
    */
   static void createDB() throws BaseXException {
-    new CreateDB(COLL, DOCPATH + DOC1).execute(context);
-    new Close().execute(context);
+    new CreateDB(COLL, DOCPATH + DOC1).execute(CONTEXT);
+    new Close().execute(CONTEXT);
   }
 
   /**
@@ -53,7 +53,7 @@ public abstract class XMLDBBaseTest {
    * @throws BaseXException exception during database drop
    */
   static void dropDB() throws BaseXException {
-    new DropDB(COLL).execute(context);
+    new DropDB(COLL).execute(CONTEXT);
   }
 
   /**

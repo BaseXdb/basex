@@ -52,7 +52,7 @@ public final class FNZipTest extends AdvancedQueryTest {
   @Test
   public void binaryEntry() {
     query(_ZIP_BINARY_ENTRY.args(ZIP, ENTRY1));
-    contains("xs:hexBinary(" + _ZIP_BINARY_ENTRY.args(ZIP, ENTRY1) + ")", "610A61626F");
+    contains("xs:hexBinary(" + _ZIP_BINARY_ENTRY.args(ZIP, ENTRY1) + ')', "610A61626F");
 
     error(_ZIP_BINARY_ENTRY.args("abc", "xyz"), Err.ZIP_NOTFOUND);
     error(_ZIP_BINARY_ENTRY.args(ZIP, ""), Err.ZIP_NOTFOUND);

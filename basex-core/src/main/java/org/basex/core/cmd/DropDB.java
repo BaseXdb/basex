@@ -68,7 +68,7 @@ public final class DropDB extends ACreate {
    * @param path database path
    * @return success of operation
    */
-  public static synchronized boolean drop(final IOFile path) {
+  private static synchronized boolean drop(final IOFile path) {
     return path.exists() && path.delete();
   }
 

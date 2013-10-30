@@ -36,7 +36,7 @@ public final class Put extends BasicOperation {
    * @param u location path URI
    */
   public Put(final InputInfo i, final int id, final Data d, final String u) {
-    super(BasicOperation.TYPE.FNPUT, d, i);
+    super(TYPE.FNPUT, d, i);
     nodeid = id;
     paths.add(u);
   }

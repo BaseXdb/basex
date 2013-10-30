@@ -37,7 +37,7 @@ final class BXServletResponse extends AbstractResponse {
    * Constructor.
    * @param r HTTP servlet response
    */
-  public BXServletResponse(final HttpServletResponse r) {
+  BXServletResponse(final HttpServletResponse r) {
     res = r;
     RESPONSE.set(r);
   }

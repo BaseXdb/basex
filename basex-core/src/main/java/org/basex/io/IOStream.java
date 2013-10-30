@@ -51,7 +51,7 @@ public final class IOStream extends IO {
   }
 
   @Override
-  public InputStream inputStream() throws IOException {
+  public InputStream inputStream() {
     return input;
   }
 }

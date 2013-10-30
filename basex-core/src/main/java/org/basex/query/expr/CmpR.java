@@ -172,7 +172,7 @@ public final class CmpR extends Single {
     final Step step;
     if(text) {
       step = st == 1 ? ic.step : path.step(st - 2);
-      if(!(step.test.mode == Mode.LN)) return null;
+      if(step.test.mode != Mode.LN) return null;
     } else {
       step = path.step(st - 1);
       if(!step.simple(Axis.ATTR, true)) return null;

@@ -37,7 +37,7 @@ public final class InlineFunc extends Single implements Scope {
   private final boolean updating;
 
   /** Map with requested function properties. */
-  private final EnumMap<Flag, Boolean> map = new EnumMap<Expr.Flag, Boolean>(Flag.class);
+  private final EnumMap<Flag, Boolean> map = new EnumMap<Flag, Boolean>(Flag.class);
   /** Static context. */
   private final StaticContext sc;
   /** Compilation flag. */

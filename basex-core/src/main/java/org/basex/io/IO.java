@@ -88,7 +88,7 @@ public abstract class IO {
   /** File path. The path uses forward slashes, no matter which OS is used. */
   String path;
   /** File name. */
-  String name;
+  private String name;
   /** File length. */
   long len = -1;
 
@@ -108,8 +108,8 @@ public abstract class IO {
     path = p;
     final String n = p.substring(p.lastIndexOf('/') + 1);
     // use current time if no name is given
-    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + IO.BASEXSUFFIX +
-                       IO.XMLSUFFIX : n;
+    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + BASEXSUFFIX +
+                       XMLSUFFIX : n;
   }
 
   /**
@@ -238,7 +238,7 @@ public abstract class IO {
    * @return resulting reference
    */
   public IO merge(final String in) {
-    return IO.get(in);
+    return get(in);
   }
 
   /**

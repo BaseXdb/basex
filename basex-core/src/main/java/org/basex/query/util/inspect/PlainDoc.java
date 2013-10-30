@@ -178,7 +178,7 @@ public final class PlainDoc extends Inspect {
    * @param elem element
    * @return element
    */
-  private FElem type(final SeqType st, final FElem elem) {
+  private static FElem type(final SeqType st, final FElem elem) {
     if(st != null) {
       elem.add("type", st.typeString());
       final String occ = st.occ.toString();

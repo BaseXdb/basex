@@ -218,7 +218,7 @@ public final class IndexOptimizeTest extends SandboxTest {
       // check if index is used
       qp = new QueryProcessor(plan + "/descendant-or-self::*" +
           "[self::" + Util.className(ValueAccess.class) +
-          "|self::" + Util.className(FTIndexAccess.class) + "]", context);
+          "|self::" + Util.className(FTIndexAccess.class) + ']', context);
       ao = qp.execute().serialize();
       assertFalse("No index used:\nQuery: " + query + "\nInfo: " + info +
           "\nPlan: " + plan, ao.toString().isEmpty());

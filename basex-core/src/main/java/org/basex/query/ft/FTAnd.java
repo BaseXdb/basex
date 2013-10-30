@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
  */
 public final class FTAnd extends FTExpr {
   /** Flags for negative operators. */
-  boolean[] neg;
+  private boolean[] neg;
 
   /**
    * Constructor.
@@ -111,7 +111,7 @@ public final class FTAnd extends FTExpr {
    * @param i1 first item
    * @param i2 second item
    */
-  static void and(final FTNode i1, final FTNode i2) {
+  private static void and(final FTNode i1, final FTNode i2) {
     final FTMatches all = new FTMatches((byte) Math.max(i1.all.pos, i2.all.pos));
     for(final FTMatch s1 : i1.all) {
       for(final FTMatch s2 : i2.all) {

@@ -216,7 +216,7 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int hash(final InputInfo ii) throws QueryException {
+  public int hash(final InputInfo ii) {
     return Token.hash(local());
   }
 

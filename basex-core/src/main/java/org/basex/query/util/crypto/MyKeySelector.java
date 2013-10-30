@@ -4,6 +4,7 @@ import java.security.*;
 import java.util.*;
 
 import javax.security.cert.*;
+import javax.security.cert.Certificate;
 import javax.xml.crypto.*;
 import javax.xml.crypto.dsig.*;
 import javax.xml.crypto.dsig.keyinfo.*;
@@ -64,7 +65,7 @@ class MyKeySelector extends KeySelector {
       } else if(s instanceof X509Data) {
         for(final Object d : ((X509Data) s).getContent())
           if(d instanceof X509Certificate)
-            pk = ((X509Certificate) d).getPublicKey();
+            pk = ((Certificate) d).getPublicKey();
       }
 
       if(pk != null) {

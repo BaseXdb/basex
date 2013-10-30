@@ -72,7 +72,7 @@ public final class FNMath extends StandardFunc {
   private static double power(final double b, final double e) {
     if(b == 1) return 1;
     if(b == -1) {
-      if(Double.isNaN(e)) return b;
+      if(Double.isNaN(e)) return -1;
       if(Double.isInfinite(e)) return 1;
     }
     return pow(b, e);

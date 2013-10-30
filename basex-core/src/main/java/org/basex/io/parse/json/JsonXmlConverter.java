@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public abstract class JsonXmlConverter extends JsonConverter {
+abstract class JsonXmlConverter extends JsonConverter {
   /** Map from element name to a pair of all its nodes and the collective node type. */
   private final TokenObjMap<TypeCache> names = new TokenObjMap<TypeCache>();
   /** Store types in root. */
@@ -24,13 +24,13 @@ public abstract class JsonXmlConverter extends JsonConverter {
   private final boolean strings;
 
   /** Current element. */
-  protected FElem elem;
+  FElem elem;
 
   /**
    * Constructor.
    * @param opts json options
    */
-  protected JsonXmlConverter(final JsonParserOptions opts) {
+  JsonXmlConverter(final JsonParserOptions opts) {
     super(opts);
     merge = jopts.get(JsonOptions.MERGE);
     strings = jopts.get(JsonOptions.STRINGS);
@@ -40,7 +40,7 @@ public abstract class JsonXmlConverter extends JsonConverter {
    * Returns the current element.
    * @return element
    */
-  protected FElem element() {
+  FElem element() {
     if(elem == null) elem = new FElem(JSON);
     return elem;
   }
@@ -75,7 +75,7 @@ public abstract class JsonXmlConverter extends JsonConverter {
    * @param name JSON name
    * @param type data type
    */
-  protected void addType(final FElem e, final byte[] name, final byte[] type) {
+  void addType(final FElem e, final byte[] name, final byte[] type) {
     // merge type information
     if(merge) {
       // check if name exists and contains no whitespaces
@@ -123,7 +123,7 @@ public abstract class JsonXmlConverter extends JsonConverter {
    * A simple container for all elements having the same name.
    * @author Leo Woerteler
    */
-  protected static final class TypeCache {
+  static final class TypeCache {
     /** Shared JSON type. */
     public final byte[] type;
     /** JSON name. */
@@ -139,7 +139,7 @@ public abstract class JsonXmlConverter extends JsonConverter {
      * @param tp JSON type
      * @param nd element
      */
-    public TypeCache(final byte[] nm, final byte[] tp, final FElem nd) {
+    TypeCache(final byte[] nm, final byte[] tp, final FElem nd) {
       name = nm;
       type = tp;
       vals[0] = nd;

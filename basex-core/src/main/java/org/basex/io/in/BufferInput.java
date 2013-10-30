@@ -14,15 +14,15 @@ import org.basex.util.list.*;
  */
 public class BufferInput extends InputStream {
   /** Byte buffer. */
-  protected final byte[] buffer;
+  final byte[] buffer;
   /** Current buffer position. */
-  protected int bpos;
+  int bpos;
   /** Current buffer size. */
-  protected int bsize;
+  int bsize;
   /** Total length of input to be processed ({@code -1} if unknown). */
-  protected long length;
+  long length;
   /** Input file. */
-  protected IO input;
+  private IO input;
 
   /** Reference to the data input stream. */
   private final InputStream in;
@@ -65,7 +65,7 @@ public class BufferInput extends InputStream {
    * Empty constructor with fixed input.
    * @param array array input
    */
-  protected BufferInput(final byte[] array) {
+  BufferInput(final byte[] array) {
     buffer = array;
     bsize = array.length;
     length = bsize;
@@ -85,7 +85,6 @@ public class BufferInput extends InputStream {
    * {@code -1} is returned if all bytes have been read.
    * @return next byte
    * @throws IOException I/O exception
-   * @see InputStream#read()
    */
   @Override
   public int read() throws IOException {
@@ -99,7 +98,7 @@ public class BufferInput extends InputStream {
    * @throws IOException I/O exception
    * @see InputStream#read()
    */
-  protected int readByte() throws IOException {
+  int readByte() throws IOException {
     final int blen = buffer.length;
     final byte[] buf = buffer;
     if(bpos >= bsize) {

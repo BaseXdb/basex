@@ -2,7 +2,6 @@ package org.basex.query.up.primitives;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 
@@ -40,5 +39,5 @@ public final class DBFlush extends BasicOperation {
   }
 
   @Override
-  public void prepare(final MemData tmp) throws QueryException { }
+  public void prepare(final MemData tmp) { }
 }

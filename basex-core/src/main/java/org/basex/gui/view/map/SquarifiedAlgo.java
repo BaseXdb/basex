@@ -24,17 +24,15 @@ final class SquarifiedAlgo extends MapAlgo {
     double hh = r.h;
 
     MapRects row = new MapRects();
-    int height;
-    int width;
     double weight = 0;
     double sumweight = 1;
-    double tmpratio;
     double rowratio = Double.MAX_VALUE;
 
     while(ni <= ne && xx + ww <= r.x + r.w && yy + hh <= r.y + r.h) {
+      double tmpratio;
       if(ww < hh) {
         weight += ml.weight[ni];
-        height = (int) (weight / sumweight * hh);
+        int height = (int) (weight / sumweight * hh);
         height = height > 0 ? height : 1;
 
         final MapRects tmp = new MapRects();
@@ -75,7 +73,7 @@ final class SquarifiedAlgo extends MapAlgo {
         }
       } else {
         weight += ml.weight[ni];
-        width = (int) (weight / sumweight * ww);
+        int width = (int) (weight / sumweight * ww);
         width = width > 0 ? width : 1;
         final MapRects tmp = new MapRects();
 

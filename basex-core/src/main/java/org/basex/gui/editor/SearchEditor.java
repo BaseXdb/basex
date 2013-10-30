@@ -16,7 +16,7 @@ import org.basex.gui.layout.*;
  */
 public final class SearchEditor extends BaseXBack {
   /** Search bar. */
-  final SearchBar search;
+  private final SearchBar search;
 
   /**
    * Constructor.

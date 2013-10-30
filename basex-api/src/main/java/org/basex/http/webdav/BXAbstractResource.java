@@ -341,9 +341,7 @@ public abstract class BXAbstractResource implements
     }
 
     @Override
-    public void characters(final char[] ch, final int start, final int length)
-        throws SAXException {
-
+    public void characters(final char[] ch, final int start, final int length) {
       final String v = String.valueOf(ch, start, length);
       if("token".equals(elementName))
         lockToken.tokenId = v;

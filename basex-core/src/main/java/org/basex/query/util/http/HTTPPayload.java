@@ -68,11 +68,11 @@ public final class HTTPPayload {
       throws IOException, QueryException {
 
     // error: use text/plain as content type
-    final String ct = error ? MimeTypes.TEXT_PLAIN :
+    final String ct = error ? TEXT_PLAIN :
       utype != null ? utype : contentType(ctype);
 
     final FElem body;
-    if(MimeTypes.isMultipart(ct)) {
+    if(isMultipart(ct)) {
       // multipart response
       final byte[] boundary = boundary(ctype);
       if(boundary == null) HC_REQ.thrw(info, "No separation boundary specified");
@@ -114,7 +114,7 @@ public final class HTTPPayload {
       final ByteList bl = new ByteList();
       for(int i; (i = bis.read()) != -1;) bl.add(i);
       // In case of XML, HTML or text content type, use supplied character set
-      if(MimeTypes.isXML(ctype) || MimeTypes.isText(ctype))
+      if(isXML(ctype) || isText(ctype))
         return new TextInput(new IOContent(bl.toArray())).encoding(ce).content();
 
       // In case of binary data, do not encode anything
@@ -180,7 +180,7 @@ public final class HTTPPayload {
 
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)
-    String ctype = MimeTypes.TEXT_PLAIN, enc = null;
+    String ctype = TEXT_PLAIN, enc = null;
 
     // extract headers
     for(byte[] l = line; l != null && l.length > 0;) {
@@ -335,7 +335,7 @@ public final class HTTPPayload {
 
     Value val = null;
     if(ctype != null) {
-      if(MimeTypes.isJSON(ctype)) {
+      if(isJSON(ctype)) {
         final JsonParserOptions jopts = new JsonParserOptions();
         if(eq(ctype, APP_JSONML)) jopts.set(JsonOptions.FORMAT, JsonFormat.JSONML);
         val = new DBNode(new JsonParser(in, opts, jopts));
@@ -346,11 +346,11 @@ public final class HTTPPayload {
       } else if(APP_FORM_URLENCODED.equals(ctype)) {
         final String enc = charset(ext);
         val = Str.get(URLDecoder.decode(string(in.read()), enc == null ? UTF8 : enc));
-      } else if(MimeTypes.isXML(ctype)) {
+      } else if(isXML(ctype)) {
         val = new DBNode(in, opts);
-      } else if(MimeTypes.isText(ctype)) {
+      } else if(isText(ctype)) {
         val = Str.get(new TextInput(in).content());
-      } else if(MimeTypes.isMultipart(ctype)) {
+      } else if(isMultipart(ctype)) {
         final HTTPPayload hp = new HTTPPayload(in.inputStream(), false, null, opts);
         hp.extractParts(concat(DASHES, hp.boundary(ext)), null);
         val = hp.payloads();
@@ -364,8 +364,8 @@ public final class HTTPPayload {
    * @param ctype value for "Content-type" header
    * @return result
    */
-  public static String contentType(final String ctype) {
-    if(ctype == null) return MimeTypes.APP_OCTET;
+  private static String contentType(final String ctype) {
+    if(ctype == null) return APP_OCTET;
     final int end = ctype.indexOf(';');
     return end == -1 ? ctype : ctype.substring(0, end);
   }

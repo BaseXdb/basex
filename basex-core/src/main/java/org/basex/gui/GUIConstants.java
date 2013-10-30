@@ -242,7 +242,7 @@ public final class GUIConstants {
   // FONTS ====================================================================
 
   /** Font of text area. */
-  public static final Font TFONT = UIManager.getFont("TextArea.font");
+  private static final Font TFONT = UIManager.getFont("TextArea.font");
   /** Large font. */
   public static Font lfont;
   /** Font. */

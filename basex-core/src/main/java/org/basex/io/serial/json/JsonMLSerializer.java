@@ -62,7 +62,7 @@ public final class JsonMLSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void namespace(final byte[] n, final byte[] v) throws IOException {
+  protected void namespace(final byte[] n, final byte[] v) {
   }
 
   @Override
@@ -91,10 +91,10 @@ public final class JsonMLSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void finishComment(final byte[] value) throws IOException { }
+  protected void finishComment(final byte[] value) { }
 
   @Override
-  protected void finishPi(final byte[] name, final byte[] value) throws IOException { }
+  protected void finishPi(final byte[] name, final byte[] value) { }
 
   @Override
   protected void atomic(final Item value) throws IOException {

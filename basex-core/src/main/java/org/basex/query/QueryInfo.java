@@ -66,7 +66,7 @@ public final class QueryInfo {
       tb.add(NL);
     }
     final IO io = qp.sc.baseIO();
-    final String name = io == null ? "" : " \"" + io.name() + "\"";
+    final String name = io == null ? "" : " \"" + io.name() + '"';
     tb.addExt(NL + QUERY_EXECUTED_X_X, name, Performance.getTime(total, runs));
     return tb.toString();
   }

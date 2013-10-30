@@ -26,19 +26,19 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public final class Window extends GFLWOR.Clause {
+public final class Window extends Clause {
   /** {@code sliding window} flag. */
-  final boolean sliding;
+  private final boolean sliding;
   /** The window variable. */
-  final Var var;
+  private final Var var;
   /** The sequence. */
-  Expr expr;
+  private Expr expr;
   /** The start condition. */
-  Condition start;
+  private Condition start;
   /** the {@code only} flag. */
-  final boolean only;
+  private final boolean only;
   /** The end condition, possibly {@code null}. */
-  Condition end;
+  private Condition end;
 
   /**
    * Constructor.
@@ -282,7 +282,7 @@ public final class Window extends GFLWOR.Clause {
   }
 
   @Override
-  public GFLWOR.Clause inline(final QueryContext ctx, final VarScope scp,
+  public Clause inline(final QueryContext ctx, final VarScope scp,
       final Var v, final Expr e) throws QueryException {
     final Expr ex = expr.inline(ctx, scp, v, e);
     final Condition st = start.inline(ctx, scp, v, e),
@@ -342,7 +342,7 @@ public final class Window extends GFLWOR.Clause {
 
   @Override
   long calcSize(final long cnt) {
-    return expr.size() == 0 ? 0 : -1;
+    return expr.isEmpty() ? 0 : -1;
   }
 
   @Override

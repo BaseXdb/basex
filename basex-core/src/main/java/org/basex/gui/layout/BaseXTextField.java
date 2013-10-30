@@ -20,11 +20,11 @@ public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
   public static final int DWIDTH = 350;
   /** History. */
-  BaseXHistory history;
+  private BaseXHistory history;
   /** Last input. */
-  String last = "";
+  private String last = "";
   /** History pointer. */
-  int hist;
+  private int hist;
 
   /**
    * Constructor.

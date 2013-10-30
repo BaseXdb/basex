@@ -117,7 +117,7 @@ public final class JsonStringConverter extends JsonConverter {
   }
 
   @Override
-  public void stringLit(final byte[] value) {
+  void stringLit(final byte[] value) {
     tb.addByte((byte) '"');
     for(int i = 0; i < value.length; i += Token.cl(value, i)) {
       final int cp = Token.cp(value, i);

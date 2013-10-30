@@ -16,9 +16,9 @@ import org.basex.util.*;
  */
 public class Execute extends Command {
   /** Commands to execute. */
-  protected final ArrayList<Command> list = new ArrayList<Command>();
+  final ArrayList<Command> list = new ArrayList<Command>();
   /** Error message. */
-  protected String error;
+  String error;
 
   /**
    * Default constructor.
@@ -70,7 +70,7 @@ public class Execute extends Command {
    * @param ctx database context
    * @return success flag
    */
-  protected boolean init(final Context ctx) {
+  boolean init(final Context ctx) {
     return init(args[0], ctx);
   }
 
@@ -80,7 +80,7 @@ public class Execute extends Command {
    * @param ctx database context
    * @return success flag
    */
-  protected final boolean init(final String input, final Context ctx) {
+  final boolean init(final String input, final Context ctx) {
     if(list.isEmpty() && error == null) {
       try {
         Collections.addAll(list, new CommandParser(input, ctx).parse());
@@ -97,7 +97,7 @@ public class Execute extends Command {
    * @param ctx database context
    */
   @SuppressWarnings("unused")
-  protected void finish(final Context ctx) {
+  void finish(final Context ctx) {
   }
 
   @Override

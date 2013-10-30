@@ -37,10 +37,7 @@ public final class Users {
     file = new IOFile(ctx.globalopts.dbpath(), perm);
     if(!file.exists()) file = new IOFile(Prop.HOME, perm);
 
-    if(!file.exists()) {
-      // define default admin user with all rights
-      list.add(new User(ADMIN, md5(ADMIN), Perm.ADMIN));
-    } else {
+    if(file.exists()) {
       DataInput in = null;
       try {
         in = new DataInput(file);
@@ -48,8 +45,13 @@ public final class Users {
       } catch(final IOException ex) {
         Util.errln(ex);
       } finally {
-        if(in != null) try { in.close(); } catch(final IOException ignored) { }
+        if(in != null) try {
+          in.close();
+        } catch (final IOException ignored) { }
       }
+    } else {
+      // define default admin user with all rights
+      list.add(new User(ADMIN, md5(ADMIN), Perm.ADMIN));
     }
   }
 

@@ -48,7 +48,7 @@ public abstract class ANum extends Item {
    * Returns a string representation of the value.
    * @return string value
    */
-  public abstract byte[] string();
+  protected abstract byte[] string();
 
   /**
    * Returns an integer (long) representation of the value.
@@ -66,7 +66,7 @@ public abstract class ANum extends Item {
    * Returns an float representation of the value.
    * @return float value
    */
-  public abstract float flt();
+  protected abstract float flt();
 
   @Override
   public Item test(final QueryContext ctx, final InputInfo ii) throws QueryException {

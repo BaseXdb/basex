@@ -13,7 +13,7 @@ import org.basex.query.value.node.*;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public final class JsonAttsConverter extends JsonXmlConverter {
+final class JsonAttsConverter extends JsonXmlConverter {
   /** Current name of a pair. */
   private byte[] name;
 
@@ -21,17 +21,17 @@ public final class JsonAttsConverter extends JsonXmlConverter {
    * Constructor.
    * @param opts json options
    */
-  public JsonAttsConverter(final JsonParserOptions opts) {
+  JsonAttsConverter(final JsonParserOptions opts) {
     super(opts);
   }
 
   @Override
-  public void openObject() {
+  void openObject() {
     addType(OBJECT);
   }
 
   @Override
-  public void openPair(final byte[] n) {
+  void openPair(final byte[] n) {
     final FElem e = new FElem(PAIR).add(NAME, n);
     elem.add(e);
     elem = e;
@@ -39,34 +39,34 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   }
 
   @Override
-  public void closePair() {
+  void closePair() {
     elem = (FElem) elem.parent();
   }
 
   @Override
-  public void closeObject() {
+  void closeObject() {
   }
 
   @Override
-  public void openArray() {
+  void openArray() {
     addType(ARRAY);
     name = null;
   }
 
   @Override
-  public void openItem() {
+  void openItem() {
     final FElem e = new FElem(ITEM);
     elem.add(e);
     elem = e;
   }
 
   @Override
-  public void closeItem() {
+  void closeItem() {
     elem = (FElem) elem.parent();
   }
 
   @Override
-  public void closeArray() {
+  void closeArray() {
   }
 
   @Override

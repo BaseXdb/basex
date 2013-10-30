@@ -111,7 +111,7 @@ public final class ViewContainer extends BaseXBack {
     g.drawImage(logo, (w - logo.getWidth(this)) / 2, y, this);
     if(w < 200 || h < 200) return;
 
-    g.setColor(GUIConstants.DGRAY);
+    g.setColor(DGRAY);
     g.setFont(lfont);
     BaseXLayout.drawCenter(g, VERSINFO + ' ' + Prop.VERSION, w, y + 20 + lh);
   }
@@ -352,14 +352,14 @@ public final class ViewContainer extends BaseXBack {
       while(st.hasMoreTokens()) {
         final String t = st.nextToken();
         if(Token.eq(t, "H", "V")) {
-          l[lvl + 1] = new ViewAlignment(t.equals("H"));
+          l[lvl + 1] = new ViewAlignment("H".equals(t));
           if(layout == null) {
             layout = l[0];
           } else {
             l[lvl].add(l[lvl + 1]);
           }
           ++lvl;
-        } else if(t.equals("-")) {
+        } else if("-".equals(t)) {
           --lvl;
         } else {
           final ViewPanel view = getView(t);

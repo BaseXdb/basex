@@ -127,13 +127,12 @@ public final class FTWords extends FTExpr {
           final FTLexer lex = new FTLexer(ftt.opt);
 
           // index iterator tree
-          FTIndexIterator ii;
           // number of distinct tokens
           int t = 0;
           // loop through unique tokens
           for(final byte[] k : unique(txt != null ? txt : tokens(ctx))) {
             lex.init(k);
-            ii = null;
+            FTIndexIterator ii = null;
             if(!lex.hasNext()) return null;
 
             int d = 0;

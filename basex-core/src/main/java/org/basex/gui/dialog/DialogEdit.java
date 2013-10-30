@@ -109,8 +109,8 @@ public final class DialogEdit extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
-    String msg = null;
     ok = kind != Data.TEXT || input3.getText().length != 0;
+    String msg = null;
     if(kind != Data.TEXT && kind != Data.COMM) {
       ok = XMLToken.isQName(token(input1.getText()));
       if(!ok && !input1.getText().isEmpty()) msg = Util.info(INVALID_X, NAME);

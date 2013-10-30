@@ -120,24 +120,22 @@ public final class FTIndexQueryTest extends SandboxTest {
  */
 class CreateDBRule implements MethodRule {
   /** Database context. */
-  final Context ctx;
+  private final Context ctx;
   /** Database name. */
-  final String db;
+  private final String db;
 
   /**
    * Constructor.
    * @param d database
    * @param c database context
    */
-  public CreateDBRule(final String d, final Context c) {
+  CreateDBRule(final String d, final Context c) {
     db = d;
     ctx = c;
   }
 
   @Override
-  public Statement apply(final Statement base, final FrameworkMethod method,
-      final Object target) {
-
+  public Statement apply(final Statement base, final FrameworkMethod method, final Object target) {
     return new Statement() {
       @Override
       public void evaluate() throws Throwable {

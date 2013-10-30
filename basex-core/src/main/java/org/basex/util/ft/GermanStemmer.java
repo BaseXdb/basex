@@ -52,10 +52,10 @@ final class GermanStemmer extends InternalStemmer {
     int ls = 0;
     int nx = tb.cp(0);
     for(int c = 0; c < s;) {
-      int sb = 0;
       int ch = nx;
       c += tb.cl(c);
       nx = c < s ? tb.cp(c) : 0;
+      int sb = 0;
       if(ch == ls) {
         ch = '*';
       } else if(ch == '\u00e4') {

@@ -210,7 +210,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public abstract Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) throws QueryException;
+                                 final Expr e) throws QueryException;
 
   /**
    * Inlines the given expression into all elements of the given array.
@@ -411,7 +411,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
+  protected Expr typeCheck(final TypeCheck tc, final QueryContext ctx, final VarScope scp)
       throws QueryException {
     return null;
   }

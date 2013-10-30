@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 class DialogAdd extends BaseXBack {
   /** Dialog reference. */
-  final DialogProps dialog;
+  private final DialogProps dialog;
   /** Target path. */
   final BaseXTextField target;
 
@@ -33,7 +33,7 @@ class DialogAdd extends BaseXBack {
    * Constructor.
    * @param d dialog reference
    */
-  public DialogAdd(final DialogProps d) {
+  DialogAdd(final DialogProps d) {
     dialog = d;
     setLayout(new BorderLayout());
 

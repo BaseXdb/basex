@@ -119,7 +119,7 @@ public final class FNProf extends StandardFunc {
    * @param msg message (can be {@code null})
    * @param ctx query context
    */
-  static void dump(final long min, final byte[] msg, final QueryContext ctx) {
+  private static void dump(final long min, final byte[] msg, final QueryContext ctx) {
     Performance.gc(2);
     final long max = Performance.memory();
     final long mb = Math.max(0, max - min);

@@ -22,7 +22,7 @@ public abstract class ContextModifier {
   /** Holds DBCreate primitives which are not associated with a database. */
   private final Map<String, DBCreate> dbCreates = new HashMap<String, DBCreate>();
   /** Temporary data reference, containing all XML fragments to be inserted. */
-  MemData tmp;
+  private MemData tmp;
 
   /**
    * Adds an update primitive to this context modifier.

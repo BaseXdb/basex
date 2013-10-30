@@ -31,7 +31,7 @@ public final class SwitchCase extends Arr {
   }
 
   @Override
-  public Expr compile(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public Expr compile(final QueryContext ctx, final VarScope scp) {
     // compile and simplify branches
     final int es = expr.length;
     for(int e = 0; e < es; e++) {
@@ -95,7 +95,7 @@ public final class SwitchCase extends Arr {
    * @param v variable to look for
    * @return number of occurrences
    */
-  protected VarUsage countCases(final Var v) {
+  VarUsage countCases(final Var v) {
     VarUsage all = VarUsage.NEVER;
     final int es = expr.length;
     for(int i = 1; i < es; i++)

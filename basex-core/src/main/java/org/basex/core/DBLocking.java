@@ -126,12 +126,12 @@ public final class DBLocking implements Locking {
     }
 
     // Global write lock if write StringList is not set
-    if(null == write) writeAll.writeLock().lock();
+    if(write == null) writeAll.writeLock().lock();
     else writeAll.readLock().lock();
 
     synchronized(globalLock) {
       // local write locking
-      if(null != write && !write.isEmpty()) {
+      if(write != null && !write.isEmpty()) {
         while(globalReaders > 0) {
           try {
             globalLock.wait();
@@ -142,7 +142,7 @@ public final class DBLocking implements Locking {
         localWriters++;
       }
       // global read locking
-      if(null == read) {
+      if(read == null) {
         while(localWriters > 0) {
           try {
             globalLock.wait();
@@ -156,14 +156,14 @@ public final class DBLocking implements Locking {
 
     // Local locking
     final StringList writeObjects;
-    if(null != write) {
+    if(write != null) {
       writeObjects = write.sort(true).unique();
       writeLocked.put(thread, writeObjects);
     } else {
       writeObjects = new StringList(0);
     }
     final StringList readObjects;
-    if(null != read) {
+    if(read != null) {
       readObjects = read.sort(true).unique();
       readLocked.put(thread, readObjects);
     } else {
@@ -182,7 +182,7 @@ public final class DBLocking implements Locking {
       } else
       // Read lock only if not global write locking; otherwise no lock downgrading from
       // global write lock is possible
-      if(null != write) {
+      if(write != null) {
         final String readObject = readObjects.get(r++);
         setLockUsed(readObject);
         getOrCreateLock(readObject).readLock().lock();
@@ -197,7 +197,7 @@ public final class DBLocking implements Locking {
   @Override
   public void downgrade(final StringList write) {
     final Long thread = Thread.currentThread().getId();
-    if(null == write)
+    if(write == null)
       throw new IllegalMonitorStateException("Cannot downgrade to global write lock.");
     write.sort(true).unique();
 
@@ -206,9 +206,9 @@ public final class DBLocking implements Locking {
     final StringList readObjects = readLocked.remove(thread);
     final StringList newWriteObjects = new StringList();
     StringList newReadObjects = new StringList();
-    if(null != readObjects) newReadObjects.add(readObjects);
+    if(readObjects != null) newReadObjects.add(readObjects);
 
-    if(null != writeObjects) {
+    if(writeObjects != null) {
       if(!writeObjects.containsAll(write)) throw new IllegalMonitorStateException(
           "Cannot downgrade write lock that has not been acquired.");
 
@@ -218,7 +218,7 @@ public final class DBLocking implements Locking {
           newWriteObjects.add(object);
         } else {
           final ReentrantReadWriteLock lock = getOrCreateLock(object);
-          assert 1 == lock.getWriteHoldCount() : "Unexpected write lock count: "
+          assert lock.getWriteHoldCount() == 1 : "Unexpected write lock count: "
               + lock.getWriteHoldCount();
           lock.readLock().lock();
           newReadObjects.add(object);
@@ -229,7 +229,7 @@ public final class DBLocking implements Locking {
 
     // Downgrade from global write lock to global read lock
     if(writeAll.writeLock().isHeldByCurrentThread()) {
-      for (final String object : write) {
+      for(final String object : write) {
         getOrCreateLock(object).writeLock().lock();
         setLockUsed(object);
       }
@@ -262,8 +262,7 @@ public final class DBLocking implements Locking {
 
     // Write back new locking lists
     writeLocked.put(thread, newWriteObjects);
-    if (null != newReadObjects)
-      readLocked.put(thread, newReadObjects);
+    if(newReadObjects != null) readLocked.put(thread, newReadObjects);
   }
 
   /**
@@ -275,7 +274,7 @@ public final class DBLocking implements Locking {
     ReentrantReadWriteLock lock;
     synchronized(locks) { // Make sure each object lock is a singleton
       lock = locks.get(object);
-      if(null == lock) { // Create lock if needed
+      if(lock == null) { // Create lock if needed
         lock = new ReentrantReadWriteLock(FAIR);
         locks.put(object, lock);
       }
@@ -288,9 +287,9 @@ public final class DBLocking implements Locking {
     // Release all write locks
     final Long thread = Thread.currentThread().getId();
     final StringList writeObjects = writeLocked.remove(thread);
-    if(null != writeObjects) for(final String object : writeObjects) {
+    if(writeObjects != null) for(final String object : writeObjects) {
       final ReentrantReadWriteLock lock = getOrCreateLock(object);
-      assert 1 == lock.getWriteHoldCount() : "Unexpected write lock count: "
+      assert lock.getWriteHoldCount() == 1 : "Unexpected write lock count: "
           + lock.getWriteHoldCount();
       lock.writeLock().unlock();
       unsetLockIfUnused(object);
@@ -298,7 +297,7 @@ public final class DBLocking implements Locking {
 
     // Release all read locks
     final StringList readObjects = readLocked.remove(thread);
-    if(!writeAll.isWriteLocked() && null != readObjects)
+    if(!writeAll.isWriteLocked() && readObjects != null)
       for(final String object : readObjects) {
         getOrCreateLock(object).readLock().unlock();
         unsetLockIfUnused(object);
@@ -306,11 +305,11 @@ public final class DBLocking implements Locking {
 
     // Release global locks
     (writeAll.isWriteLocked() ? writeAll.writeLock() : writeAll.readLock()).unlock();
-    if(null != writeObjects && !writeObjects.isEmpty()) synchronized(globalLock) {
+    if(writeObjects != null && !writeObjects.isEmpty()) synchronized(globalLock) {
       localWriters--;
       globalLock.notifyAll();
     }
-    if(null == readObjects) synchronized(globalLock) {
+    if(readObjects == null) synchronized(globalLock) {
       globalReaders--;
       globalLock.notifyAll();
     }
@@ -329,7 +328,7 @@ public final class DBLocking implements Locking {
   private void setLockUsed(final String lock) {
     synchronized(lockUsage) {
       Integer usage = lockUsage.get(lock);
-      if(null == usage) usage = 0;
+      if(usage == null) usage = 0;
       lockUsage.put(lock, ++usage);
     }
   }
@@ -341,12 +340,13 @@ public final class DBLocking implements Locking {
   private void unsetLockIfUnused(final String object) {
     synchronized(lockUsage) {
       Integer usage = lockUsage.get(object);
-      assert null != usage;
-      if (0 == --usage) {
+      assert usage != null;
+      if(--usage == 0) {
         locks.remove(object);
         lockUsage.remove(object);
-      } else
+      } else {
         lockUsage.put(object, usage);
+      }
     }
   }
 
@@ -356,14 +356,14 @@ public final class DBLocking implements Locking {
    */
   @Override
   public String toString() {
-    final String ind = "| ";
     final StringBuilder sb = new StringBuilder(NL);
     sb.append("Locking" + NL);
+    final String ind = "| ";
     sb.append(ind + "Transactions running: " + transactions + NL);
     sb.append(ind + "Transaction queue: " + queue + NL);
     sb.append(ind + "Held locks by object:" + NL);
-    for(final String object : locks.keySet())
-      sb.append(ind + ind + object + " -> " + locks.get(object) + NL);
+    for(final Map.Entry<String, ReentrantReadWriteLock> e : locks.entrySet())
+      sb.append(ind + ind + e.getKey() + " -> " + e.getValue() + NL);
     sb.append(ind + "Held write locks by transaction:" + NL);
     for(final Long thread : writeLocked.keySet())
       sb.append(ind + ind + thread + " -> " + writeLocked.get(thread) + NL);

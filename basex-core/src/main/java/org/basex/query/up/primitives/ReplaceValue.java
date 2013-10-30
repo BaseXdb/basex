@@ -31,7 +31,7 @@ import org.basex.util.*;
  */
 public final class ReplaceValue extends UpdatePrimitive {
   /** New value. */
-  public final byte[] value;
+  private final byte[] value;
   /** States if this primitive represents a replaceElementContent expression. */
   public final boolean rec;
 

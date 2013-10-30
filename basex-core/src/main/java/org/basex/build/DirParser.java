@@ -69,7 +69,7 @@ public final class DirParser extends Parser {
 
     filter = !source.isDir() && !source.isArchive() ? null :
       Pattern.compile(IOFile.regex(opts.get(MainOptions.CREATEFILTER)));
-    // choose binary storage if (disk-based) database path is known and
+    // choose binary storage if disk-based database path is known and
     // if raw parser or "add raw" option were chosen
     rawPath = path != null && (addRaw || rawParser) ? new IOFile(path, IO.RAW) : null;
   }

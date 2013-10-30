@@ -54,7 +54,8 @@ public class RESTConcurrencyTest extends HTTPTest {
     get("?command=create+db+" + REST + "+<a/>");
 
     // start and join concurrent clients
-    for(int i = 0; i < clients.length; i++) clients[i] = new Client();
+    final int cs = clients.length;
+    for(int i = 0; i < cs; i++) clients[i] = new Client();
     for(final Client c : clients) c.start();
     for(final Client c : clients) c.join();
 
@@ -70,9 +71,9 @@ public class RESTConcurrencyTest extends HTTPTest {
           final double rnd = Math.random();
           final boolean query = rnd < 1 / 3d;
           final boolean delete = rnd > 2 / 3d;
-          if(query) get("/" + REST + "?query=count(.)");
-          else if(delete) get("/" + REST + "?query=db:delete('rest','/')");
-          else get("/" + REST + "?query=db:add('rest',<a/>,'x')");
+          if(query) get('/' + REST + "?query=count(.)");
+          else if(delete) get('/' + REST + "?query=db:delete('rest','/')");
+          else get('/' + REST + "?query=db:add('rest',<a/>,'x')");
         }
       } catch(final IOException ex) {
         failed = true;

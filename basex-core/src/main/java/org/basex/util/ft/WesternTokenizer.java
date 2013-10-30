@@ -135,11 +135,10 @@ public final class WesternTokenizer extends Tokenizer {
     final int l = text.length;
     ++pos;
 
-    lp = cpos;
     // parse whitespaces
-    boolean sn = false;
+    lp = cpos;
     pa = false;
-    boolean bs = false;
+    boolean sn = false, bs = false;
     for(; cpos < l; cpos += cl(text, cpos)) {
       final int c = cp(text, cpos);
       if(wc && !bs) {
@@ -236,7 +235,8 @@ public final class WesternTokenizer extends Tokenizer {
         ++cpos;
         sc = true;
         break;
-      } else if(ftChar(c)) {
+      }
+      if(ftChar(c)) {
         break;
       }
       sc = true;
@@ -351,7 +351,7 @@ public final class WesternTokenizer extends Tokenizer {
   @Override
   int[][] info() {
     init();
-    final IntList[] il = new IntList[] { new IntList(), new IntList(),
+    final IntList[] il = { new IntList(), new IntList(),
         new IntList(), new IntList(), new IntList()};
     int lass = 0;
     int lasp = 0;

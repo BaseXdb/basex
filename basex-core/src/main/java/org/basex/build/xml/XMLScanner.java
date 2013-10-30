@@ -272,9 +272,9 @@ final class XMLScanner extends Proc {
     boolean wrong = false;
     int c = ch;
     do {
-      if(c == 0) error(ATTCLOSE, (char) c);
+      if(c == 0) error(ATTCLOSE, (char) 0);
       wrong |= c == '\'' || c == '"';
-      if(c == '<') error(wrong ? ATTCLOSE : ATTCHAR, (char) c);
+      if(c == '<') error(wrong ? ATTCLOSE : ATTCHAR, '<');
       if(c == 0x0A) c = ' ';
       if(c == '&') {
         // verify...
@@ -297,7 +297,14 @@ final class XMLScanner extends Proc {
     boolean f = true;
     int c = ch;
     while(c != 0) {
-      if(c != '<') {
+      if(c == '<') {
+        if(!f && !isCDATA()) {
+          text = false;
+          prev(1);
+          return;
+        }
+        cDATA();
+      } else {
         if(c == '&') {
           // scan entity
           final byte[] r = ref(true);
@@ -315,13 +322,6 @@ final class XMLScanner extends Proc {
           // add character to cached content
           token.add(c);
         }
-      } else {
-        if(!f && !isCDATA()) {
-          text = false;
-          prev(1);
-          return;
-        }
-        cDATA();
       }
       c = consume();
       f = false;
@@ -353,8 +353,8 @@ final class XMLScanner extends Proc {
    * @throws IOException I/O exception
    */
   private void cDATA() throws IOException {
-    int ch;
     while(true) {
+      int ch;
       while((ch = nextChar()) != ']') token.add(ch);
       if(consume(']')) {
         if(consume('>')) return;
@@ -476,9 +476,9 @@ final class XMLScanner extends Proc {
     // scans numeric entities
     if(consume('#')) { // [66]
       final TokenBuilder ent = new TokenBuilder();
-      int b = 10;
       int ch = nextChar();
       ent.add(ch);
+      int b = 10;
       if(ch == 'x') {
         b = 0x10;
         ent.add(ch = nextChar());
@@ -609,7 +609,8 @@ final class XMLScanner extends Proc {
    * @throws IOException I/O exception
    */
   private boolean consume(final byte[] tok) throws IOException {
-    for(int t = 0; t < tok.length; ++t) {
+    final int tl = tok.length;
+    for(int t = 0; t < tl; t++) {
       final int ch = consume();
       if(ch != tok[t]) {
         prev(t + 1);

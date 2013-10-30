@@ -27,7 +27,7 @@ public class CsvOptions extends Options {
       new BooleanOption("lax", true);
 
   /** CSV formats. */
-  public static enum CsvFormat {
+  public enum CsvFormat {
     /** Default.    */ DIRECT,
     /** Attributes. */ ATTRIBUTES,
     /** Map.        */ MAP;
@@ -39,7 +39,7 @@ public class CsvOptions extends Options {
   }
 
   /** CSV separators. */
-  public static enum CsvSep {
+  public enum CsvSep {
     /** Comma.     */ COMMA(','),
     /** Semicolon. */ SEMICOLON(';'),
     /** Colon.     */ COLON(':'),
@@ -53,7 +53,7 @@ public class CsvOptions extends Options {
      * Constructor.
      * @param sp separator character
      */
-    private CsvSep(final char sp) {
+    CsvSep(final char sp) {
       sep = sp;
     }
 
@@ -67,7 +67,7 @@ public class CsvOptions extends Options {
   public synchronized void assign(final String name, final String value) throws BaseXException {
     super.assign(name, value);
     // check if separator contains only one character
-    if(options.get(name) == CsvOptions.SEPARATOR && separator() == -1)
+    if(options.get(name) == SEPARATOR && separator() == -1)
       throw new BaseXException("Separator must be single character; '%' found", value);
   }
 

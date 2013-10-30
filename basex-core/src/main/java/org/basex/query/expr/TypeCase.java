@@ -25,7 +25,7 @@ public final class TypeCase extends Single {
   /** Variable. */
   final Var var;
   /** Matched sequence types. */
-  final SeqType[] types;
+  private final SeqType[] types;
 
   /**
    * Constructor.
@@ -68,7 +68,7 @@ public final class TypeCase extends Single {
 
   @Override
   public Expr inline(final QueryContext ctx, final VarScope scp, final Var v,
-      final Expr e) throws QueryException {
+      final Expr e) {
     try {
       return super.inline(ctx, scp, v, e);
     } catch(final QueryException qe) {
@@ -117,7 +117,7 @@ public final class TypeCase extends Single {
     if(types.length == 0) {
       e.add(planAttr(Token.token(DEFAULT), Token.TRUE));
     } else {
-      final byte[] or = new byte[] { ' ', '|', ' ' };
+      final byte[] or = { ' ', '|', ' ' };
       final ByteList bl = new ByteList();
       for(final SeqType t : types) {
         if(bl.size() > 0) bl.add(or);
@@ -143,7 +143,7 @@ public final class TypeCase extends Single {
         tb.add(' ').add(types[i].toString());
       }
     }
-    return tb.add(" " + RETURN + ' ' + expr).toString();
+    return tb.add(' ' + RETURN + ' ' + expr).toString();
   }
 
   @Override

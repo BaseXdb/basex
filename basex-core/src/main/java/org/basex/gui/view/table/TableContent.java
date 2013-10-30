@@ -60,7 +60,6 @@ final class TableContent extends BaseXBack {
     final Data data = context.data();
     final int focus = gui.context.focused;
     final int rfocus = tdata.getRoot(data, focus);
-    int mpos = 0;
 
     final int nCols = tdata.cols.length;
     final int nRows = tdata.rows.size();
@@ -75,6 +74,7 @@ final class TableContent extends BaseXBack {
     int l = scroll.pos() / rowH - 1;
     int posY = -scroll.pos() + l * rowH;
 
+    int mpos = 0;
     while(++l < nRows && marked != null) {
       // skip when all visible rows have been painted or if data has changed
       if(posY > h || l >= tdata.rows.size()) break;

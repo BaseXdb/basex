@@ -16,7 +16,7 @@ final class TreeRects implements TreeConstants {
   /** Saved rectangles. */
   private TreeRect[][][] rects;
   /** View. */
-  final View view;
+  private final View view;
   /** Displayed nods. */
   Nodes nodes;
 
@@ -177,7 +177,7 @@ final class TreeRects implements TreeConstants {
    * @return boolean
    */
   boolean bigRect(final TreeSubtree sub, final int rn, final int lv) {
-    return !(sub.levelSize(rn, lv) == rects[rn][lv].length);
+    return sub.levelSize(rn, lv) != rects[rn][lv].length;
   }
 
   /**

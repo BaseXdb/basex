@@ -1113,7 +1113,7 @@ public enum Err {
   UPATTELM2(XUTY, 22, "Insert target must be an element.");
 
   /** Cached enums (faster). */
-  public static final Err[] VALUES = values();
+  private static final Err[] VALUES = values();
 
   /** Error type. */
   public final ErrType type;
@@ -1271,8 +1271,8 @@ public enum Err {
    * @return exception or null
    * @throws QueryException query exception
    */
-  public static QueryException thrw(final String name, final InputInfo ii,
-      final String msg) throws QueryException {
+  public static QueryException thrw(final String name, final InputInfo ii, final String msg)
+      throws QueryException {
 
     for(final Err e : VALUES) {
       if(e.toString().equals(name)) throw new QueryException(ii, e.qname(), msg).err(e);

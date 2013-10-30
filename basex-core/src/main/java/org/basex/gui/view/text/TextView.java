@@ -31,7 +31,7 @@ import org.basex.util.*;
  */
 public final class TextView extends View {
   /** Search editor. */
-  final SearchEditor search;
+  private final SearchEditor search;
 
   /** Header string. */
   private final BaseXLabel label;
@@ -54,7 +54,7 @@ public final class TextView extends View {
     border(5).layout(new BorderLayout(0, 5));
 
     label = new BaseXLabel(RESULT, true, false);
-    label.setForeground(GUIConstants.GRAY);
+    label.setForeground(GRAY);
 
     home = BaseXButton.command(GUICommands.C_HOME, gui);
     home.setEnabled(false);
@@ -109,7 +109,7 @@ public final class TextView extends View {
 
   @Override
   public void refreshLayout() {
-    label.border(-6, 0, 0, 2).setFont(GUIConstants.lfont);
+    label.border(-6, 0, 0, 2).setFont(lfont);
     text.setFont(mfont);
     search.bar().refreshLayout();
   }

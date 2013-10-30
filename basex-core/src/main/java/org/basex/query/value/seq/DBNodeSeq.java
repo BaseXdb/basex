@@ -96,7 +96,7 @@ public final class DBNodeSeq extends NativeSeq {
    * @param c indicates if values include all document nodes of a database
    * @return resulting item or sequence
    */
-  public static Value get(final int[] v, final Data d, final Type t, final boolean c) {
+  private static Value get(final int[] v, final Data d, final Type t, final boolean c) {
     return v.length == 0 ? Empty.SEQ : v.length == 1 ? new DBNode(d, v[0]) :
       new DBNodeSeq(v, d, t, c);
   }

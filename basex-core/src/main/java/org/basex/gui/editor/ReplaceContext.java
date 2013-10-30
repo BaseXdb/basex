@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 final class ReplaceContext {
   /** Replace string. */
-  final String replace;
+  private final String replace;
   /** Text. */
   byte[] text;
 

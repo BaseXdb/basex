@@ -30,10 +30,10 @@ public final class DBDrop extends BasicOperation {
   }
 
   @Override
-  public void merge(final BasicOperation o) throws QueryException { }
+  public void merge(final BasicOperation o) { }
 
   @Override
-  public void prepare(final MemData tmp) throws QueryException { }
+  public void prepare(final MemData tmp) { }
 
   @Override
   public void apply() throws QueryException {

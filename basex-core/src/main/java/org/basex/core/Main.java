@@ -33,7 +33,7 @@ public abstract class Main {
   /** Separate serialized items with newlines. */
   protected boolean newline;
   /** Password reader. */
-  final PasswordReader pwReader = new PasswordReader() {
+  private final PasswordReader pwReader = new PasswordReader() {
     @Override
     public String password() {
       Util.out(PASSWORD + COLS);

@@ -1,6 +1,5 @@
 package org.basex.io.random;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
@@ -33,7 +32,7 @@ public final class TableMemAccess extends TableAccess {
   public void flush() { }
 
   @Override
-  public void close() throws IOException { }
+  public void close() { }
 
   @Override
   public boolean lock(final boolean lock) {

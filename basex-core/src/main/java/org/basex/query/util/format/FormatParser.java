@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public abstract class FormatParser extends FormatUtil {
   /** Input information. */
-  protected final InputInfo info;
+  final InputInfo info;
 
   /** Case. */
   Case cs;
@@ -35,7 +35,7 @@ public abstract class FormatParser extends FormatUtil {
    * Constructor for formatting integers.
    * @param ii input info
    */
-  protected FormatParser(final InputInfo ii) {
+  FormatParser(final InputInfo ii) {
     info = ii;
   }
 
@@ -47,14 +47,19 @@ public abstract class FormatParser extends FormatUtil {
    * @return presentation modifier
    * @throws QueryException query exception
    */
-  protected byte[] presentation(final byte[] pic, final byte[] def, final boolean date)
+  byte[] presentation(final byte[] pic, final byte[] def, final boolean date)
       throws QueryException {
 
     // find primary format
     final TokenParser tp = new TokenParser(pic);
     int ch = tp.next();
     // check single character
-    if(!tp.more()) {
+    if(tp.more()) {
+      // Word output (title case)
+      if(ch == 'W' && tp.consume('w')) return pic;
+      // Textual output (title case)
+      if(date && ch == 'N' && tp.consume('n')) return pic;
+    } else {
       // Latin, Greek and other alphabets
       if(sequence(ch) != null ||
         // Roman sequences (lower/upper case)
@@ -67,11 +72,6 @@ public abstract class FormatParser extends FormatUtil {
         ch == '\u2460' || ch == '\u2474' || ch == '\u2488' ||
         // Japanese numbering
         ch == KANJI[1]) return pic;
-    } else {
-      // Word output (title case)
-      if(ch == 'W' && tp.consume('w')) return pic;
-      // Textual output (title case)
-      if(date && ch == 'N' && tp.consume('n')) return pic;
     }
 
     // find digit of decimal-digit-pattern
@@ -112,7 +112,7 @@ public abstract class FormatParser extends FormatUtil {
    * Finishes format parsing.
    * @param pres presentation string
    */
-  protected void finish(final byte[] pres) {
+  void finish(final byte[] pres) {
     // skip correction of case if modifier has more than one codepoint (Ww)
     final int cp = ch(pres, 0);
     cs = cl(pres, 0) < pres.length || digit(cp) ? Case.STANDARD :

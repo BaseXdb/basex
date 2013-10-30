@@ -22,7 +22,7 @@ enum RESTSchema {
   private final Schema schema;
 
   /** Constructor. */
-  private RESTSchema() {
+  RESTSchema() {
     Schema s = null;
     try {
       s = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).

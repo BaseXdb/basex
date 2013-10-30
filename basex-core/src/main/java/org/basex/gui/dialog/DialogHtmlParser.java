@@ -24,7 +24,7 @@ final class DialogHtmlParser extends DialogParser {
   /** Parameters. */
   private final BaseXTextField options;
   /** User feedback. */
-  final BaseXLabel info;
+  private final BaseXLabel info;
 
   /**
    * Constructor.
@@ -81,7 +81,7 @@ final class DialogHtmlParser extends DialogParser {
    * @param opts serialization options
    * @return string
    */
-  private String tooltip(final HtmlOptions opts) {
+  private static String tooltip(final HtmlOptions opts) {
     final StringBuilder sb = new StringBuilder("<html><b>").append(PARAMETERS).append(":</b><br>");
     for(final Option<?> so : opts) {
       sb.append("\u2022 ").append(so).append("<br/>");

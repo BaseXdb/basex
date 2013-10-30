@@ -26,7 +26,7 @@ import org.basex.util.list.*;
  */
 public final class OptimizeAll extends ACreate {
   /** Current pre value. */
-  int pre;
+  private int pre;
   /** Data size. */
   private int size;
 

@@ -43,7 +43,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Atm cast(final Object o, final QueryContext ctx, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo ii) {
       return new Atm(o.toString());
     }
   },
@@ -57,7 +57,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Atm cast(final Object o, final QueryContext ctx, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo ii) {
       return new Atm(o.toString());
     }
   },
@@ -251,7 +251,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Dec cast(final Object o, final QueryContext ctx, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo ii) {
       return Dec.get(new BigDecimal(o.toString()));
     }
   },
@@ -629,7 +629,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Bln cast(final Object o, final QueryContext ctx, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo ii) {
       return o instanceof Boolean ? Bln.get((Boolean) o) :
         Bln.get(Boolean.parseBoolean(o.toString()));
     }
@@ -681,7 +681,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final QueryContext ctx, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo ii) {
       return Uri.uri(o.toString());
     }
   },
@@ -702,7 +702,7 @@ public enum AtomType implements Type {
     }
     @Override
     public QNm cast(final Object o, final QueryContext ctx, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo ii) {
       return o instanceof QName ? new QNm((QName) o) : new QNm(o.toString());
     }
   },
@@ -714,12 +714,12 @@ public enum AtomType implements Type {
   JAVA("java", ITEM, BASEXURI, true, true, true, Type.ID.JAVA) {
     @Override
     public Item cast(final Item it, final QueryContext ctx, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo ii) {
       return new Jav(it, ctx);
     }
     @Override
     public Item cast(final Object o, final QueryContext ctx, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo ii) {
       return new Jav(o, null);
     }
   };

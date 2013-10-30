@@ -26,7 +26,7 @@ import org.basex.util.*;
  */
 public abstract class AQuery extends Command {
   /** Query result. */
-  protected Result result;
+  Result result;
 
   /** Variables. */
   private final HashMap<String, String[]> vars = new HashMap<String, String[]>();
@@ -46,7 +46,7 @@ public abstract class AQuery extends Command {
    * @param d requires opened database
    * @param arg arguments
    */
-  protected AQuery(final Perm p, final boolean d, final String... arg) {
+  AQuery(final Perm p, final boolean d, final String... arg) {
     super(p, d, arg);
   }
 
@@ -55,7 +55,7 @@ public abstract class AQuery extends Command {
    * @param query query
    * @return success flag
    */
-  protected final boolean query(final String query) {
+  final boolean query(final String query) {
     final Performance p = new Performance();
     String err;
     if(qe != null) {
@@ -142,7 +142,7 @@ public abstract class AQuery extends Command {
    * @param qu query
    * @return result of check
    */
-  protected final boolean updating(final Context ctx, final String qu) {
+  final boolean updating(final Context ctx, final String qu) {
     try {
       final Performance p = new Performance();
       qp(qu, ctx).parse();
@@ -159,7 +159,7 @@ public abstract class AQuery extends Command {
   /**
    * Parses the XQuery and returns a node set.
    */
-  protected final void queryNodes() {
+  final void queryNodes() {
     try {
       result = qp(args[0], context).queryNodes();
       qp.close();
@@ -290,7 +290,7 @@ public abstract class AQuery extends Command {
 
   @Override
   public void databases(final LockResult lr) {
-    if(null == qp) {
+    if(qp == null) {
       lr.writeAll = true;
     } else {
       qp.databases(lr);

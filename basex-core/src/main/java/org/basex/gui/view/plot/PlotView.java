@@ -29,7 +29,7 @@ public final class PlotView extends View {
   /** Whitespace between captions. */
   static final int CAPTIONWHITESPACE = 10;
   /** Rotate factor. */
-  private static final double ROTATE = Math.sin(30);
+  private static final double ROTATE = StrictMath.sin(30);
   /** Plot margin: top, left, bottom, right margin. */
   private static final int[] MARGIN = new int[4];
   /** Maximum length of axis caption text. */
@@ -38,22 +38,22 @@ public final class PlotView extends View {
   private static final int CUTOFF = 10;
 
   /** X axis selector. */
-  final BaseXCombo xCombo;
+  private final BaseXCombo xCombo;
   /** Y axis selector. */
-  final BaseXCombo yCombo;
+  private final BaseXCombo yCombo;
   /** Item selector combo. */
-  final BaseXCombo itemCombo;
+  private final BaseXCombo itemCombo;
   /** Dot size in plot view. */
-  final BaseXSlider dots;
+  private final BaseXSlider dots;
 
   /** Data reference. */
-  PlotData plotData;
+  private PlotData plotData;
   /** Keeps track of changes in the plot. */
-  boolean plotChanged;
+  private boolean plotChanged;
   /** Indicates if global marked nodes should be drawn. */
-  boolean drawSubNodes;
+  private boolean drawSubNodes;
   /** Indicates if the buffered image for marked nodes has to be redrawn. */
-  boolean markingChanged;
+  private boolean markingChanged;
 
   /** Logarithmic display. */
   private final BaseXCheckBox xLog;
@@ -562,8 +562,6 @@ public final class PlotView extends View {
         return;
       }
 
-      int c = 0;
-
       // draw LOGARITHMIC SCALE
       if(axis.log) {
         int l;
@@ -597,7 +595,7 @@ public final class PlotView extends View {
         }
 
         // draw 0 label if necessary
-        if(0 >= axis.min && 0 <= axis.max)
+        if(axis.min <= 0 && axis.max >= 0)
           drawCaptionAndGrid(g, drawX, BaseXLayout.value(0), axis.calcPosition(0));
 
         // draw labels > 0
@@ -631,6 +629,7 @@ public final class PlotView extends View {
         // draw captions between min and max
         double d = axis.calcPosition(axis.startvalue);
         double f = axis.startvalue;
+        int c = 0;
         while(d < 1.0d - .25d / nrCaptions) {
           ++c;
           drawCaptionAndGrid(g, drawX, BaseXLayout.value(f), d);
@@ -704,8 +703,8 @@ public final class PlotView extends View {
    * @param imgW image width
    * @return buffered image
    */
-  private BufferedImage createCaptionImage(final Graphics g, final String caption, final boolean im,
-      final int imgW) {
+  private static BufferedImage createCaptionImage(final Graphics g, final String caption,
+      final boolean im, final int imgW) {
 
     final int textH = g.getFontMetrics().getHeight();
     final int fs = fontSize;
@@ -950,7 +949,7 @@ public final class PlotView extends View {
    * Returns a standardized size factor for painting the plot.
    * @return size value
    */
-  private int sizeFactor() {
+  private static int sizeFactor() {
     return Math.max(2, fontSize << 1);
   }
 

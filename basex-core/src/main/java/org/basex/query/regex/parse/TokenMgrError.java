@@ -109,7 +109,7 @@ public class TokenMgrError extends Error {
       final int col, final String after, final char curr) {
     return "Lexical error at line " + line + ", column " + col + ".  Encountered: " +
       (eof ? "<EOF> " : '"' + addEscapes(String.valueOf(curr)) + '"' +
-        " (" + (int) curr + "), ") + "after : \"" + addEscapes(after) + '"';
+        " (" + curr + "), ") + "after : \"" + addEscapes(after) + '"';
   }
 
   /**

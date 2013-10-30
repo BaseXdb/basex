@@ -270,10 +270,10 @@ public final class FNConvert extends StandardFunc {
   private byte[] stringToBinary(final QueryContext ctx) throws QueryException {
     final byte[] in = checkStr(expr[0], ctx);
     final String enc = encoding(1, BXCO_ENCODING, ctx);
-    if(enc == null || enc == Token.UTF8) return in;
+    if(enc == null || enc == UTF8) return in;
     try {
       final CharsetEncoder ce = Charset.forName(enc).newEncoder();
-      final CharBuffer cb = CharBuffer.wrap(Token.string(in));
+      final CharBuffer cb = CharBuffer.wrap(string(in));
       return ce.encode(cb).array();
     } catch(final CharacterCodingException ex) {
       throw BXCO_BASE64.thrw(info);
@@ -295,7 +295,7 @@ public final class FNConvert extends StandardFunc {
     final Iter ir = v.iter();
     final ByteList bl = new ByteList(Math.max(Array.CAPACITY, (int) v.size()));
     for(Item it; (it = ir.next()) != null;) {
-      bl.add((int) ((Int) checkType(it, AtomType.BYT)).itr());
+      bl.add((int) ((ANum) checkType(it, AtomType.BYT)).itr());
     }
     return bl.toArray();
   }

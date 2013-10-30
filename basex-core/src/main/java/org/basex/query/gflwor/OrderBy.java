@@ -25,9 +25,9 @@ import org.basex.util.hash.*;
  */
 public final class OrderBy extends GFLWOR.Clause {
   /** References to the variables to be sorted. */
-  VarRef[] refs;
+  private VarRef[] refs;
   /** Sort keys. */
-  final Key[] keys;
+  private final Key[] keys;
 
   /**
    * Constructor.
@@ -151,7 +151,7 @@ public final class OrderBy extends GFLWOR.Clause {
   }
 
   @Override
-  public OrderBy optimize(final QueryContext ctx, final VarScope scp) throws QueryException {
+  public OrderBy optimize(final QueryContext ctx, final VarScope scp) {
     return this;
   }
 

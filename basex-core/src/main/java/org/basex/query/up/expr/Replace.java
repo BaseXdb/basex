@@ -73,11 +73,11 @@ public final class Replace extends Update {
       if(par == null) UPNOPAR.thrw(info, i);
       if(tp == NodeType.ATT) {
         // replace attribute node
-        if(list.size() > 0) UPWRATTR.thrw(info);
-        list = checkNS(aList, par, ctx);
+        if(!list.isEmpty()) UPWRATTR.thrw(info);
+        list = checkNS(aList, par);
       } else {
         // replace non-attribute node
-        if(aList.size() > 0) UPWRELM.thrw(info);
+        if(!aList.isEmpty()) UPWRELM.thrw(info);
       }
       // conforms to specification: insertion sequence may be empty
       ctx.updates.add(new ReplaceNode(dbn.pre, dbn.data, info, list), ctx);

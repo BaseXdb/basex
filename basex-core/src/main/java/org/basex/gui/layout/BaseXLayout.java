@@ -116,7 +116,7 @@ public final class BaseXLayout {
     final String label = b.getText();
     for(int l = 0; l < label.length(); l++) {
       final char ch = Character.toLowerCase(label.charAt(l));
-      if(!Token.letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
+      if(!letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
         continue;
       b.setMnemonic(ch);
       mnem.append(ch);
@@ -178,7 +178,7 @@ public final class BaseXLayout {
         @Override
         public void keyPressed(final KeyEvent e) {
           final Object s = e.getSource();
-          if(s instanceof BaseXCombo && ((BaseXCombo) s).isPopupVisible()) return;
+          if(s instanceof BaseXCombo && ((JComboBox) s).isPopupVisible()) return;
 
           // do not key close dialog of button or editor is focused
           if(ENTER.is(e) && !(s instanceof BaseXButton || s instanceof Editor)) {

@@ -26,22 +26,22 @@ import org.basex.util.list.*;
  */
 public class DiskValues implements Index {
   /** ID references. */
-  protected final DataAccess idxr;
+  final DataAccess idxr;
   /** ID lists. */
-  protected final DataAccess idxl;
+  final DataAccess idxl;
   /** Value type (texts/attributes). */
-  protected final boolean text;
+  private final boolean text;
   /** Data reference. */
-  protected final Data data;
+  final Data data;
   /** Cached tokens. */
-  protected final IndexCache cache = new IndexCache();
+  final IndexCache cache = new IndexCache();
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  protected final IntObjMap<byte[]> ctext = new IntObjMap<byte[]>();
+  final IntObjMap<byte[]> ctext = new IntObjMap<byte[]>();
 
   /** Synchronization object. */
-  protected final Object monitor = new Object();
+  private final Object monitor = new Object();
   /** Number of current index entries. */
-  protected final AtomicInteger size = new AtomicInteger();
+  final AtomicInteger size = new AtomicInteger();
 
   /**
    * Constructor, initializing the index structure.
@@ -60,7 +60,7 @@ public class DiskValues implements Index {
    * @param pref file prefix
    * @throws IOException I/O Exception
    */
-  protected DiskValues(final Data d, final boolean txt, final String pref) throws IOException {
+  DiskValues(final Data d, final boolean txt, final String pref) throws IOException {
     data = d;
     text = txt;
     idxl = new DataAccess(d.meta.dbfile(pref + 'l'));
@@ -343,7 +343,7 @@ public class DiskValues implements Index {
    * @param tok index term
    * @return results
    */
-  protected final IndexIterator idRange(final NumericRange tok) {
+  final IndexIterator idRange(final NumericRange tok) {
     final double min = tok.min;
     final double max = tok.max;
 
@@ -383,7 +383,7 @@ public class DiskValues implements Index {
    * @param pres pre values
    * @return iterator
    */
-  protected static IndexIterator iter(final IntList pres) {
+  private static IndexIterator iter(final IntList pres) {
     return new IndexIterator() {
       final int s = pres.size();
       int p = -1;
@@ -410,7 +410,7 @@ public class DiskValues implements Index {
    * @param id id value
    * @return pre value
    */
-  protected int pre(final int id) {
+  int pre(final int id) {
     return id;
   }
 
@@ -420,7 +420,7 @@ public class DiskValues implements Index {
    * @param key token to be found
    * @return if the key is found: index of the key else: (-(insertion point) - 1)
    */
-  protected int get(final byte[] key) {
+  int get(final byte[] key) {
     return get(key, 0, size.get());
   }
 
@@ -432,7 +432,7 @@ public class DiskValues implements Index {
    * @param last end of the search interval (exclusive)
    * @return if the key is found: index of the key else: (-(insertion point) - 1)
    */
-  protected int get(final byte[] key, final int first, final int last) {
+  int get(final byte[] key, final int first, final int last) {
     int l = first, h = last - 1;
     synchronized(monitor) {
       while(l <= h) {

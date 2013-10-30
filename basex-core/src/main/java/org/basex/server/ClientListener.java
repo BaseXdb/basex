@@ -77,11 +77,11 @@ public final class ClientListener extends Thread {
   public void run() {
     if(!authenticate()) return;
 
-    ServerCmd sc;
-    String cmd;
     try {
       while(running) {
         command = null;
+        String cmd;
+        ServerCmd sc;
         try {
           final int b = in.read();
           if(b == -1) {

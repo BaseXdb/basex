@@ -60,7 +60,7 @@ public final class Unary extends Single {
       case DEC: return Dec.get(it.dec(info).negate());
       default:
         final long l = it.itr(info);
-        if(l == Long.MIN_VALUE) Err.RANGE.thrw(info, l);
+        if(l == Long.MIN_VALUE) Err.RANGE.thrw(info, it);
         return Int.get(-l);
     }
   }

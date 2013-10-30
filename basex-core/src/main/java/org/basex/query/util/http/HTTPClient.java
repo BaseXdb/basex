@@ -74,7 +74,7 @@ public final class HTTPClient {
         setConnectionProps(conn, r);
         setRequestHeaders(conn, r);
 
-        if(r.bodyContent.size() != 0 || r.parts.size() != 0) {
+        if(r.bodyContent.size() != 0 || !r.parts.isEmpty()) {
           setContentType(conn, r);
           setRequestContent(conn.getOutputStream(), r);
         }
@@ -116,7 +116,7 @@ public final class HTTPClient {
   private void setConnectionProps(final HttpURLConnection conn, final HTTPRequest r)
       throws ProtocolException, QueryException {
 
-    if(r.bodyContent != null || r.parts.size() != 0) conn.setDoOutput(true);
+    conn.setDoOutput(true);
     final String method = string(r.attrs.get(METHOD)).toUpperCase(Locale.ENGLISH);
     try {
       // set field via reflection to circumvent string check
@@ -265,7 +265,7 @@ public final class HTTPClient {
     for(int i = 0; i < payload.size(); i++) {
       final Item item = payload.get(i);
       if(item instanceof B64) {
-        out.write(((B64) item).toJava());
+        out.write(((Bin) item).toJava());
       } else {
         out.write(new B64(item.string(info)).toJava());
       }
@@ -285,7 +285,7 @@ public final class HTTPClient {
     for(int i = 0; i < payload.size(); i++) {
       final Item item = payload.get(i);
       if(item instanceof Hex) {
-        out.write(((Hex) item).toJava());
+        out.write(((Bin) item).toJava());
       } else {
         out.write(new Hex(item.string(info)).toJava());
       }

@@ -58,8 +58,8 @@ public abstract class Filter extends Preds {
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.has(Flag.FCS))
-        return ((AxisPath) root.copy(ctx,
-            scp)).addPreds(ctx, scp, preds).compile(ctx, scp);
+        return ((Path) root.copy(ctx,
+          scp)).addPreds(ctx, scp, preds).compile(ctx, scp);
 
       // optimize filter expressions
       ctx.value = null;
@@ -138,7 +138,7 @@ public abstract class Filter extends Preds {
       if(root.isEmpty()) return optPre(null, ctx);
       // convert filters without numeric predicates to axis paths
       if(root instanceof AxisPath && !super.has(Flag.FCS))
-        return ((AxisPath) root.copy(ctx, scp)).addPreds(ctx, scp, preds);
+        return ((Path) root.copy(ctx, scp)).addPreds(ctx, scp, preds);
 
       // no predicates.. return root; otherwise, do some advanced compilations
       return preds.length == 0 ? root : opt(ctx);

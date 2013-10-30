@@ -12,14 +12,14 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Christian Gruen
  */
-public final class ValueList extends ElementList {
+final class ValueList extends ElementList {
   /** List entries. */
   private Value[] list;
 
   /**
    * Default constructor.
    */
-  public ValueList() {
+  ValueList() {
     this(Array.CAPACITY);
   }
 

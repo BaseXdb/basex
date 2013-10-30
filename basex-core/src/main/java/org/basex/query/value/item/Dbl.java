@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class Dbl extends ANum {
   /** Value "NaN". */
-  public static final Dbl NAN = new Dbl(Double.NaN);
+  public static final Dbl NAN = new Dbl(NaN);
   /** Value "0". */
   private static final Dbl ZERO = new Dbl(0);
   /** Value "1". */
@@ -41,7 +41,7 @@ public final class Dbl extends ANum {
    * @return instance
    */
   public static Dbl get(final double d) {
-    return d == 0 && Double.doubleToRawLongBits(d) == 0 ? ZERO : d == 1 ? ONE :
+    return d == 0 && doubleToRawLongBits(d) == 0 ? ZERO : d == 1 ? ONE :
       isNaN(d) ? NAN : new Dbl(d);
   }
 
@@ -119,10 +119,10 @@ public final class Dbl extends ANum {
    */
   public static double parse(final byte[] val, final InputInfo ii) throws QueryException {
     try {
-      return Double.parseDouble(Token.string(val));
+      return parseDouble(Token.string(val));
     } catch(final NumberFormatException ex) {
-      if(Token.eq(Token.trim(val), Token.INF)) return Double.POSITIVE_INFINITY;
-      if(Token.eq(Token.trim(val), Token.NINF)) return Double.NEGATIVE_INFINITY;
+      if(Token.eq(Token.trim(val), Token.INF)) return POSITIVE_INFINITY;
+      if(Token.eq(Token.trim(val), Token.NINF)) return NEGATIVE_INFINITY;
       throw ZERO.castErr(val, ii);
     }
   }

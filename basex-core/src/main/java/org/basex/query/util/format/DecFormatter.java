@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  */
 public final class DecFormatter extends FormatUtil {
   /** Decimal-digit-family (mandatory-digit-sign). */
-  public final byte[] digits;
+  private final byte[] digits;
   /** Active characters. */
   private final byte[] active;
   /** Zero digit sign. */
@@ -169,12 +169,12 @@ public final class DecFormatter extends FormatUtil {
         } else if(ch == permille) {
           if(++pm > 1) return false;
         } else if(ch == optional) {
-          if(!frac) {
+          if(frac) {
+            opt2 = true;
+          } else {
             // integer part, and optional sign after digit?
             if(dg) return false;
             opt1 = true;
-          } else {
-            opt2 = true;
           }
         } else if(contains(digits, ch)) {
           // fractional part, and digit after optional sign?

@@ -23,7 +23,7 @@ import org.junit.rules.*;
 public final class AtomicUpdatesTest extends AdvancedQueryTest {
   /** Expected exception. */
   @Rule
-  public ExpectedException thrown = ExpectedException.none();
+  public final ExpectedException thrown = ExpectedException.none();
 
   /**
    * Basic test for tree-aware updates.
@@ -225,10 +225,10 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence04() {
     final AtomicUpdateCache l = atomics("<a><b/></a>");
-    l.addRename(2, Token.token("foo"), Token.EMPTY);
+    l.addRename(2, token("foo"), EMPTY);
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Multiple renames on node");
-    l.addRename(2, Token.token("foo2"), Token.EMPTY);
+    l.addRename(2, token("foo2"), EMPTY);
   }
 
   /**
@@ -237,10 +237,10 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
   @Test
   public void updateSequence05() {
     final AtomicUpdateCache l = atomics("<a><b/></a>");
-    l.addUpdateValue(2, Token.token("foo"));
+    l.addUpdateValue(2, token("foo"));
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Multiple updates on node");
-    l.addUpdateValue(2, Token.token("foo"));
+    l.addUpdateValue(2, token("foo"));
   }
 
   /**
@@ -273,7 +273,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    */
   @Test
   public void updateSequence08() {
-    AtomicUpdateCache l = atomics("<a><b/></a>");
+    final AtomicUpdateCache l = atomics("<a><b/></a>");
     final MemData m = new MemData(l.data);
     l.addDelete(2);
     thrown.expect(RuntimeException.class);
@@ -299,7 +299,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    */
   @Test
   public void updateSequence10() {
-    AtomicUpdateCache l = atomics("<a><b/></a>");
+    final AtomicUpdateCache l = atomics("<a><b/></a>");
     final MemData m = new MemData(l.data);
     l.addReplace(2, clipE(m, "<bb/>", false));
     thrown.expect(RuntimeException.class);
@@ -410,7 +410,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    * @param d reference
    * @param pairs PRE value pairs
    */
-  private void checkDistances(final Data d, final int[][] pairs) {
+  private static void checkDistances(final Data d, final int[][] pairs) {
     for(final int[] pair : pairs)
       if(d.parent(pair[0], d.kind(pair[0])) != pair[1]) fail("Wrong parent for pre="
           + pair[0]);
@@ -444,7 +444,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    * @param data reference
    * @param texts in the expected order of occurrence
    */
-  private void checkTextAdjacency(final Data data, final byte[][] texts) {
+  private static void checkTextAdjacency(final Data data, final byte[][] texts) {
     int i = 0;
     // find adjacent text nodes
     while(i + 1 < data.meta.size) {
@@ -474,7 +474,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    * @param text for text node
    * @return data instance with text node
    */
-  private DataClip clipT(final Data d, final String text) {
+  private static DataClip clipT(final Data d, final String text) {
     final int s = d.meta.size;
     d.text(s, s + 1, token(text), Data.TEXT);
     d.insert(s);
@@ -489,7 +489,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    * @param value for attribute node
    * @return data instance with text node
    */
-  private DataClip clipA(final Data d, final String name, final String value) {
+  private static DataClip clipA(final Data d, final String name, final String value) {
     final int s = d.meta.size;
     d.attr(s, s + 1, d.atnindex.index(token(name), null, false), token(value), -1, false);
     d.insert(s);
@@ -503,7 +503,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    * @param b add tree w/ size==2, if false add tree w/ size==1
    * @return insertion sequence data instance
    */
-  private DataClip clipE(final Data d, final String n, final boolean b) {
+  private static DataClip clipE(final Data d, final String n, final boolean b) {
     final int s = d.meta.size;
     d.elem(s + 1, d.tagindex.index(token(n), null, false), 1, b ? 2 : 1, 0, false);
     d.insert(s);
@@ -519,7 +519,7 @@ public final class AtomicUpdatesTest extends AdvancedQueryTest {
    * @param doc XML fragment string
    * @return atomic update list
    */
-  private AtomicUpdateCache atomics(final String doc) {
+  private static AtomicUpdateCache atomics(final String doc) {
     Data d = null;
     try {
       d = CreateDB.mainMem(new IOContent(doc), context);

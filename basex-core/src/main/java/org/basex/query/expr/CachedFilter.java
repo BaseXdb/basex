@@ -22,7 +22,7 @@ final class CachedFilter extends Filter {
    * @param r expression
    * @param p predicates
    */
-  public CachedFilter(final InputInfo ii, final Expr r, final Expr... p) {
+  CachedFilter(final InputInfo ii, final Expr r, final Expr... p) {
     super(ii, r, p);
   }
 

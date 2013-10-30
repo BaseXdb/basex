@@ -1,10 +1,12 @@
 package org.basex.util;
 
+import java.util.BitSet;
+
 import static java.lang.Long.*;
 
 /**
  * Bit array that grows when needed. The implementation is similar to
- * {@link java.util.BitSet}.
+ * {@link BitSet}.
  *
  * @author BaseX Team 2005-13, BSD License
  * @author Dimitar Popov
@@ -89,7 +91,7 @@ public final class BitArray {
   public int cardinality() {
     int sum = 0;
     final int inUse = size + WORD_SIZE - 1 >>> WORD_POWER;
-    for (int i = 0; i < inUse; i++) sum += bitCount(words[i]);
+    for(int i = 0; i < inUse; i++) sum += bitCount(words[i]);
     return sum;
   }
 
@@ -167,8 +169,8 @@ public final class BitArray {
     int wi = i >>> WORD_POWER;
     long word = words[wi] & WORD_MASK << i;
     while(true) {
-      if (word != 0) return (wi << WORD_POWER) + numberOfTrailingZeros(word);
-      if (++wi == inUse) return -1;
+      if(word != 0) return (wi << WORD_POWER) + numberOfTrailingZeros(word);
+      if(++wi == inUse) return -1;
       word = words[wi];
     }
   }

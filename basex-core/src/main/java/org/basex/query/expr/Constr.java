@@ -83,13 +83,7 @@ public final class Constr {
   private boolean add(final Item it) throws QueryException {
     if(it instanceof FItem) CONSFUNC.thrw(info, it);
 
-    if(!(it instanceof ANode)) {
-      // type: atomic value
-      if(more) text.add(' ');
-      text.add(it.string(info));
-      more = true;
-
-    } else {
+    if(it instanceof ANode) {
       // type: nodes
       ANode node = (ANode) it;
 
@@ -161,6 +155,12 @@ public final class Constr {
         children.add(node);
       }
       more = false;
+    } else {
+      // type: atomic value
+      if(more) text.add(' ');
+      text.add(it.string(info));
+      more = true;
+
     }
     return true;
   }

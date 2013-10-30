@@ -56,8 +56,7 @@ public final class ShowUsers extends Command {
   @Override
   public void databases(final LockResult lr) {
     lr.read.add(DBLocking.ADMIN);
-    if (null != args[0])
-      databases(lr.read, 0);
+    if(args[0] != null) databases(lr.read, 0);
   }
 
   @Override

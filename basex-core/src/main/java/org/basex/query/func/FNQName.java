@@ -46,7 +46,7 @@ public final class FNQName extends StandardFunc {
     final Item it = expr[0].item(ctx, info);
     final Item it2 = expr.length == 2 ? expr[1].item(ctx, info) : null;
     switch(sig) {
-      case RESOLVE_QNAME:            return resolveQName(ctx, it, it2);
+      case RESOLVE_QNAME:            return resolveQName(it, it2);
       case QNAME:                    return qName(it, it2);
       case LOCAL_NAME_FROM_QNAME:    return lnFromQName(ctx, it);
       case PREFIX_FROM_QNAME:        return prefixFromQName(ctx, it);
@@ -126,15 +126,12 @@ public final class FNQName extends StandardFunc {
 
   /**
    * Returns a new QName.
-   * @param ctx query context
    * @param it qname
    * @param it2 item
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Item resolveQName(final QueryContext ctx, final Item it,
-      final Item it2) throws QueryException {
-
+  private Item resolveQName(final Item it, final Item it2) throws QueryException {
     final ANode base = (ANode) checkType(it2, NodeType.ELM);
     if(it == null) return null;
 
@@ -143,7 +140,7 @@ public final class FNQName extends StandardFunc {
 
     final QNm nm = new QNm(name);
     final byte[] pref = nm.prefix();
-    final byte[] uri = base.uri(pref, ctx);
+    final byte[] uri = base.uri(pref);
     if(uri == null) NSDECL.thrw(info, pref);
     nm.uri(uri);
     return nm;

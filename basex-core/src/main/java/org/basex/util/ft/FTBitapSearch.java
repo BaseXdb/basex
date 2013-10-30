@@ -52,7 +52,7 @@ public final class FTBitapSearch {
     // skip empty needles:
     int count = -1;
     for(int i = 0; i < sorted.length; i++) {
-      if(n.get(i) != null && n.get(i).size() > 0) sorted[++count] = i;
+      if(n.get(i) != null && !n.get(i).isEmpty()) sorted[++count] = i;
     }
 
     masks = new BitSet[++count];

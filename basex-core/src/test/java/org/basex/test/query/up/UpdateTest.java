@@ -399,10 +399,10 @@ public final class UpdateTest extends AdvancedQueryTest {
    * @param statement1 update statement 1
    * @param statement2 update statement 2
    */
-  private void testBothSequences(final String doc, final String result, final String
-      statement1, final String statement2) {
-    query(transform(doc, statement1 + "," + statement2), result);
-    query(transform(doc, statement2 + "," + statement1), result);
+  private static void testBothSequences(final String doc, final String result, final String
+    statement1, final String statement2) {
+    query(transform(doc, statement1 + ',' + statement2), result);
+    query(transform(doc, statement2 + ',' + statement1), result);
   }
 
   /**
@@ -687,8 +687,8 @@ public final class UpdateTest extends AdvancedQueryTest {
    * @param result expected result
    * @param textCount expected number of text nodes in result
    */
-  protected static void checkTextNodeMerging(final String input, final String query,
-      final String result, final int textCount) {
+  private static void checkTextNodeMerging(final String input, final String query,
+                                           final String result, final int textCount) {
     query(transform(input, query), result);
     assertEquals(textCount,
         Integer.parseInt(query(transform(input, query, "count($input//text())"))));

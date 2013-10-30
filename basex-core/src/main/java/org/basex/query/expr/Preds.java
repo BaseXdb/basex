@@ -82,7 +82,7 @@ public abstract class Preds extends ParseExpr {
       } else if(pr instanceof And && !pr.has(Flag.FCS)) {
         // replace AND expression with predicates (don't swap position tests)
         ctx.compInfo(OPTPRED, pr);
-        final Expr[] and = ((And) pr).expr;
+        final Expr[] and = ((Arr) pr).expr;
         final int m = and.length - 1;
         final ExprList tmp = new ExprList(preds.length + m);
         for(final Expr e : Arrays.asList(preds).subList(0, p)) tmp.add(e);
@@ -127,13 +127,13 @@ public abstract class Preds extends ParseExpr {
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean preds(final Item it, final QueryContext ctx) throws QueryException {
+  protected boolean preds(final Item it, final QueryContext ctx) throws QueryException {
     if(preds.length == 0) return true;
 
     // set context item and position
-    Item i = null;
     final Value cv = ctx.value;
     try {
+      Item i = null;
       for(final Expr p : preds) {
         ctx.value = it;
         i = p.test(ctx, info);

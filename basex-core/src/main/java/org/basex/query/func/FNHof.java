@@ -71,7 +71,7 @@ public final class FNHof extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final QueryContext ctx) throws QueryException {
+  protected Expr opt(final QueryContext ctx) {
     return oneOf(sig, _HOF_ID, _HOF_CONST) ? expr[0] : this;
   }
 
@@ -224,9 +224,7 @@ public final class FNHof extends StandardFunc {
   private FItem withArity(final int p, final int a, final QueryContext ctx)
       throws QueryException {
     final Item f = checkItem(expr[p], ctx);
-    if(!(f instanceof FItem) || ((FItem) f).arity() != a)
-      Err.type(this, FuncType.arity(a), f);
-
+    if(!(f instanceof FItem) || ((XQFunction) f).arity() != a) Err.type(this, FuncType.arity(a), f);
     return (FItem) f;
   }
 }

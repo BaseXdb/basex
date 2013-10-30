@@ -13,11 +13,11 @@ import org.basex.query.*;
  */
 abstract class CmdParser {
   /** Suggest possible completions. */
-  protected boolean suggest;
+  boolean suggest;
   /** Single command flag. */
-  protected boolean single;
+  boolean single;
   /** Password reader. */
-  protected PasswordReader pwReader;
+  PasswordReader pwReader;
 
   /**
    * Attaches a password reader.

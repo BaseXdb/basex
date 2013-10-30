@@ -10,7 +10,7 @@ import org.basex.data.*;
  */
 final class InsertAttr extends StructuralUpdate {
   /** Insertion sequence. */
-  final DataClip insseq;
+  private final DataClip insseq;
 
   /**
    * Constructor.

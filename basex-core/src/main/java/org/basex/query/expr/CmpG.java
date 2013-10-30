@@ -48,17 +48,17 @@ public final class CmpG extends Cmp {
     /** General comparison: greater of equal. */
     GE(">=", OpV.GE) {
       @Override
-      public OpG swap() { return OpG.LE; }
+      public OpG swap() { return LE; }
       @Override
-      public OpG invert() { return OpG.LT; }
+      public OpG invert() { return LT; }
     },
 
     /** General comparison: greater. */
     GT(">", OpV.GT) {
       @Override
-      public OpG swap() { return OpG.LT; }
+      public OpG swap() { return LT; }
       @Override
-      public OpG invert() { return OpG.LE; }
+      public OpG invert() { return LE; }
     },
 
     /** General comparison: equal. */
@@ -74,7 +74,7 @@ public final class CmpG extends Cmp {
       @Override
       public OpG swap() { return OpG.NE; }
       @Override
-      public OpG invert() { return OpG.EQ; }
+      public OpG invert() { return EQ; }
     };
 
     /** Cached enums (faster). */
@@ -172,7 +172,7 @@ public final class CmpG extends Cmp {
     } else if(e1.isFunction(Function.POSITION)) {
       if(e2 instanceof RangeSeq && op.op == OpV.EQ) {
         // position() CMP range
-        final long p1 = ((RangeSeq) e2).itemAt(0).itr(info);
+        final long p1 = ((Value) e2).itemAt(0).itr(info);
         final long p2 = p1 + e2.size() - 1;
         e = Pos.get(p1, p2, info);
       } else {

@@ -32,7 +32,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   /** Updating flag. */
   public final boolean updating;
   /** Cast flag. */
-  boolean cast;
+  private boolean cast;
 
   /** Map with requested function properties. */
   private final EnumMap<Flag, Boolean> map = new EnumMap<Flag, Boolean>(Flag.class);
@@ -63,7 +63,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public void compile(final QueryContext ctx) throws QueryException {
+  public void compile(final QueryContext ctx) {
     if(compiled) return;
     compiling = compiled = true;
 
@@ -133,7 +133,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * Checks if this function calls itself recursively.
    * @return result of check
    */
-  public boolean selfRecursive() {
+  boolean selfRecursive() {
     return !expr.accept(new ASTVisitor() {
       @Override
       public boolean funcCall(final StaticFuncCall call) {
@@ -293,8 +293,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     }
 
     // copy the function body
-    final Expr cpy = expr.copy(ctx, scp, vs), rt = !cast ? cpy :
-      new TypeCheck(sc, info, cpy, declType, true).optimize(ctx, scp);
+    final Expr cpy = expr.copy(ctx, scp, vs), rt = cast ? new TypeCheck(sc, info, cpy, declType,
+        true).optimize(ctx, scp) : cpy;
 
     return cls == null ? rt : new GFLWOR(info, cls, rt).optimize(ctx, scp);
   }

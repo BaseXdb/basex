@@ -58,7 +58,7 @@ public abstract class Path extends ParseExpr {
     for(int p = 0; p < path.length; p++) {
       Expr e = path[p];
       if(e instanceof Context) {
-        e = Step.get(((Context) e).info, Axis.SELF, Test.NOD);
+        e = Step.get(((ParseExpr) e).info, Axis.SELF, Test.NOD);
       } else if(e instanceof Filter) {
         final Filter f = (Filter) e;
         if(f.root instanceof Context) {
@@ -68,8 +68,7 @@ public abstract class Path extends ParseExpr {
       axes &= e instanceof Step;
       path[p] = e;
     }
-    return axes ? new CachedPath(ii, r, path).finish(null) :
-      new MixedPath(ii, r, path);
+    return axes ? new CachedPath(ii, r, path).finish(null) : new MixedPath(ii, r, path);
   }
 
   @Override
@@ -333,7 +332,7 @@ public abstract class Path extends ParseExpr {
       final Expr[] stps = new Expr[ts + steps.length - s - 1];
       for(int t = 0; t < ts; ++t) {
         final Expr[] preds = t == ts - 1 ?
-            ((Step) steps[s]).preds : new Expr[0];
+            ((Preds) steps[s]).preds : new Expr[0];
         final QNm nm = qnm.get(ts - t - 1);
         final NameTest nt = nm == null ? new NameTest(false) :
           new NameTest(nm, Mode.LN, false, null);

@@ -78,8 +78,8 @@ public abstract class AxisPath extends Path {
 
     // merge two axis paths
     if(root instanceof AxisPath) {
-      Expr[] st = ((AxisPath) root).steps;
-      root = ((AxisPath) root).root;
+      Expr[] st = ((Path) root).steps;
+      root = ((Path) root).root;
       for(final Expr s : steps) st = Array.add(st, s);
       steps = st;
       // refresh root context
@@ -345,7 +345,7 @@ public abstract class AxisPath extends Path {
    * @return guess
    */
   public boolean cheap() {
-    if(!(root instanceof ANode) || ((ANode) root).type != NodeType.DOC) return false;
+    if(!(root instanceof ANode) || ((Value) root).type != NodeType.DOC) return false;
     final Axis[] expensive = { Axis.DESC, Axis.DESCORSELF, Axis.PREC, Axis.PRECSIBL,
         Axis.FOLL, Axis.FOLLSIBL };
     for(int i = 0; i < steps.length; i++) {

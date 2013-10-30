@@ -1108,7 +1108,7 @@ public enum Function {
   /** Return type. */
   final SeqType ret;
   /** Compiler flags. */
-  final EnumSet<Flag> flags;
+  private final EnumSet<Flag> flags;
 
   /** Function classes. */
   private final Class<? extends StandardFunc> func;
@@ -1149,14 +1149,14 @@ public enum Function {
 
     // count number of minimum and maximum arguments by analyzing the function string
     final int b = dsc.indexOf('[');
-    if(b != -1) {
+    if(b == -1) {
+      min = typ.length;
+      max = typ.length;
+    } else {
       int c = b + 1 < dsc.length() && dsc.charAt(b + 1) == ',' ? 1 : 0;
       for(int i = 0; i < b; i++) if(dsc.charAt(i) == ',') c++;
       min = c;
       max = dsc.contains("...") ? Integer.MAX_VALUE : typ.length;
-    } else {
-      min = typ.length;
-      max = typ.length;
     }
   }
 
@@ -1208,7 +1208,7 @@ public enum Function {
    */
   final FuncType type(final int arity) {
     final Ann ann = new Ann();
-    if(has(Flag.UPD)) ann.add(Ann.Q_UPDATING, Empty.SEQ, null);
+    if(has(UPD)) ann.add(Ann.Q_UPDATING, Empty.SEQ, null);
     final SeqType[] arg = new SeqType[arity];
     if(arity != 0 && max == Integer.MAX_VALUE) {
       System.arraycopy(args, 0, arg, 0, args.length);

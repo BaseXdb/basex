@@ -20,7 +20,7 @@ public abstract class NativeSeq extends Seq {
    * @param s number of items
    * @param t item type
    */
-  protected NativeSeq(final int s, final Type t) {
+  NativeSeq(final int s, final Type t) {
     super(s, t);
   }
 

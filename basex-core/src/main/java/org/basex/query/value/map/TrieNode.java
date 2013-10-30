@@ -50,12 +50,12 @@ abstract class TrieNode {
     @Override
     boolean hasType(final AtomType kt, final SeqType vt) { return true; }
     @Override
-    int hash(final InputInfo ii) throws QueryException { return 0; }
+    int hash(final InputInfo ii) { return 0; }
     @Override
     boolean deep(final InputInfo ii, final TrieNode o) { return this == o; }
     @Override
     public TrieNode insert(final int h, final Item k, final Value v,
-        final int l, final InputInfo i) throws QueryException {
+        final int l, final InputInfo i) {
       return new Leaf(h, k, v); }
     @Override
     StringBuilder toString(final StringBuilder sb) { return sb; }

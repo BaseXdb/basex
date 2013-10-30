@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  */
 public final class VarStack extends ElementList {
   /** Variable expressions. */
-  public Var[] vars;
+  private Var[] vars;
 
   /**
    * Default constructor.

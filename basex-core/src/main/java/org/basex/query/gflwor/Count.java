@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-13, BSD License
  * @author Leo Woerteler
  */
-public final class Count extends GFLWOR.Clause {
+public final class Count extends Clause {
   /** Count variable. */
   final Var count;
 

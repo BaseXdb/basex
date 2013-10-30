@@ -21,7 +21,7 @@ public abstract class Logical extends Arr {
    * @param ii input info
    * @param e expression list
    */
-  protected Logical(final InputInfo ii, final Expr[] e) {
+  Logical(final InputInfo ii, final Expr[] e) {
     super(ii, e);
     type = SeqType.BLN;
   }
@@ -34,10 +34,10 @@ public abstract class Logical extends Arr {
     final ExprList el = new ExprList(es);
     for(final Expr e : expr) {
       final Expr ex = e.compEbv(ctx);
-      if (ex.isValue()) {
+      if(ex.isValue()) {
         // atomic items can be pre-evaluated
         ctx.compInfo(OPTREMOVE, this, e);
-        if (ex.ebv(ctx, info).bool(info) ^ and) return Bln.get(!and);
+        if(ex.ebv(ctx, info).bool(info) ^ and) return Bln.get(!and);
       } else {
         el.add(ex);
       }
@@ -51,7 +51,7 @@ public abstract class Logical extends Arr {
    * Flattens nested logical expressions.
    * @param ctx query context
    */
-  protected final void compFlatten(final QueryContext ctx) {
+  final void compFlatten(final QueryContext ctx) {
     // flatten nested expressions
     final int es = expr.length;
     final ExprList tmp = new ExprList(es);
@@ -59,7 +59,7 @@ public abstract class Logical extends Arr {
     final boolean or = this instanceof Or;
     for(final Expr ex : expr) {
       if(and && ex instanceof And || or && ex instanceof Or) {
-        for(final Expr e : ((Logical) ex).expr) tmp.add(e);
+        for(final Expr e : ((Arr) ex).expr) tmp.add(e);
         ctx.compInfo(OPTFLAT, ex);
       } else {
         tmp.add(ex);

@@ -10,7 +10,6 @@ import org.basex.query.value.map.Map;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
-
 /**
  * <p>Provides a method for parsing a JSON string and converting it to an XQuery
  * item made of nested maps.
@@ -50,17 +49,17 @@ public final class JsonMapConverter extends JsonConverter {
   }
 
   @Override
-  public void openObject() {
+  void openObject() {
     stack.push(Map.EMPTY);
   }
 
   @Override
-  public void openPair(final byte[] key) {
+  void openPair(final byte[] key) {
     stack.push(Str.get(key));
   }
 
   @Override
-  public void closePair() throws QueryIOException {
+  void closePair() throws QueryIOException {
     final Value val = stack.pop();
     final Item key = (Item) stack.pop();
     final Map map = (Map) stack.pop();
@@ -71,24 +70,26 @@ public final class JsonMapConverter extends JsonConverter {
     }
   }
 
-  @Override public void closeObject() { }
+  @Override
+  void closeObject() { }
 
   @Override
-  public void openArray() {
+  void openArray() {
     stack.push(Map.EMPTY);
   }
 
   @Override
-  public void openItem() {
+  void openItem() {
     stack.push(Int.get(((Map) stack.peek()).mapSize() + 1));
   }
 
   @Override
-  public void closeItem() throws QueryIOException {
+  void closeItem() throws QueryIOException {
     closePair();
   }
 
-  @Override public void closeArray() { }
+  @Override
+  void closeArray() { }
 
   @Override
   public void openConstr(final byte[] name) {

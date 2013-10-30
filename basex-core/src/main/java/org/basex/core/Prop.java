@@ -98,8 +98,8 @@ public final class Prop {
     if(dir != null) return dir;
 
     // not found; check working directory for property file
-    final String home = IO.BASEXSUFFIX + "home";
     dir = System.getProperty("user.dir");
+    final String home = IO.BASEXSUFFIX + "home";
     File file = new File(dir, home);
     if(!file.exists()) file = new File(dir, IO.BASEXSUFFIX);
     if(file.exists()) return file.getParent();

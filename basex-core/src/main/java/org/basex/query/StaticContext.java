@@ -109,7 +109,7 @@ public final class StaticContext {
    * @param uri uri to be set
    */
   public void baseURI(final String uri) {
-    if(uri.length() == 0) {
+    if(uri.isEmpty()) {
       baseURI = Uri.EMPTY;
     } else {
       final IO io = IO.get(uri);

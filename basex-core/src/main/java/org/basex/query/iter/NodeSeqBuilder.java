@@ -243,9 +243,8 @@ public final class NodeSeqBuilder extends AxisIter {
       s(b++, c--);
     }
 
-    int k;
     final int n = s + e;
-    k = Math.min(a - s, b - a);
+    int k = Math.min(a - s, b - a);
     s(s, b - k, k);
     k = Math.min(d - c, n - d - 1);
     s(b, n - k, k);

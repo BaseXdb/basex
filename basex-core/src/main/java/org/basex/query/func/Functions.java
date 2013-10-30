@@ -66,7 +66,7 @@ public final class Functions extends TokenSet {
     // no constructor function found, or abstract type specified
     if(type != null && type != AtomType.NOT && type != AtomType.AAT) {
       if(arity == 1) return type;
-      (arity == 1 ? FUNCTYPESG : FUNCTYPEPL).thrw(ii, name.string(), arity, 1);
+      FUNCTYPEPL.thrw(ii, name.string(), arity, 1);
     }
 
     // include similar function name in error message
@@ -217,7 +217,7 @@ public final class Functions extends TokenSet {
     }
 
     // pre-defined functions
-    final StandardFunc fun = Functions.get().get(name, args, sc, ii);
+    final StandardFunc fun = get().get(name, args, sc, ii);
     if(fun != null) {
       if(!sc.xquery3() && fun.has(Flag.X30)) FUNC30.thrw(ii);
       if(fun.sig.has(Flag.UPD)) ctx.updating(true);

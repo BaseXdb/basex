@@ -142,7 +142,9 @@ public final class AtomicUpdateCache {
     }
 
     // prepare & optimize incoming update
-    if(!slack) {
+    if(slack) {
+      add(candidate, false);
+    } else {
       check(recent, candidate);
       if(treeAwareUpdates(recent, candidate)) return;
 
@@ -150,8 +152,7 @@ public final class AtomicUpdateCache {
       if(m != null) add(m, true);
       else add(candidate, false);
 
-    } else
-      add(candidate, false);
+    }
   }
 
   /**
@@ -206,7 +207,7 @@ public final class AtomicUpdateCache {
    * @param a first update in sequence
    * @param b second update in sequence
    */
-  public void check(final BasicUpdate a, final BasicUpdate b) {
+  static void check(final BasicUpdate a, final BasicUpdate b) {
     // check order of location PRE, must be strictly ordered low-to-high
     if(b.location < a.location)
       Util.notexpected("Invalid order at location " + a.location);
@@ -259,9 +260,9 @@ public final class AtomicUpdateCache {
       /* CASE 1: candidate operates on the subtree of T and appends a node to the end of
        * the subtree (target PRE may be equal)...
        * CASE 2: operates within subtree of T */
-      if((b.location <= fol && (b instanceof Insert || b instanceof InsertAttr) &&
-          b.parent >= pre && b.parent < fol) ||
-          (b.location < fol)) {
+      if(b.location <= fol && (b instanceof Insert || b instanceof InsertAttr) &&
+          b.parent >= pre && b.parent < fol ||
+        b.location < fol) {
         return true;
       }
     }
@@ -504,8 +505,8 @@ public final class AtomicUpdateCache {
     if(data.parent(a, Data.TEXT) != data.parent(b, Data.TEXT)) return null;
 
     // apply text node updates on the fly and throw them away
-    (UpdateValue.getInstance(data, a, Token.concat(data.text(a, true),
-        data.text(b, true)))).
+    UpdateValue.getInstance(data, a, Token.concat(data.text(a, true),
+        data.text(b, true))).
       apply(data);
     // deletes must be cached to add them front-to-back to atomic update list
     return Delete.getInstance(data, b);

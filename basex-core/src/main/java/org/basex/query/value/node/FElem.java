@@ -53,7 +53,7 @@ public final class FElem extends FNode {
    * @param uri namespace uri
    */
   public FElem(final byte[] local, final byte[] uri) {
-    this(Token.EMPTY, local, uri);
+    this(EMPTY, local, uri);
   }
 
   /**
@@ -63,7 +63,7 @@ public final class FElem extends FNode {
    * @param uri namespace uri
    */
   public FElem(final String local, final String uri) {
-    this(Token.EMPTY, Token.token(local), Token.token(uri));
+    this(EMPTY, token(local), token(uri));
   }
 
   /**
@@ -74,7 +74,7 @@ public final class FElem extends FNode {
    * @param uri namespace uri
    */
   public FElem(final String prefix, final String local, final String uri) {
-    this(Token.token(prefix), Token.token(local), Token.token(uri));
+    this(token(prefix), token(local), token(uri));
   }
 
   /**

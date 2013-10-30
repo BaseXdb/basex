@@ -351,8 +351,8 @@ public final class FNZip extends StandardFunc {
     final AxisIter ati = node.attributes();
     for(ANode at; (at = ati.next()) != null;) {
       final byte[] name = at.qname().string();
-      if(Token.eq(name, NAME, SRC)) continue;
-      sopts.assign(Token.string(name), Token.string(at.string()));
+      if(eq(name, NAME, SRC)) continue;
+      sopts.assign(string(name), string(at.string()));
     }
     return sopts;
   }

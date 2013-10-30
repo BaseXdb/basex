@@ -131,7 +131,7 @@ public final class FNStr extends StandardFunc {
         sb = checkEStr(expr[1], ctx);
         if(coll == null) {
           final int p = indexOf(ss, sb);
-          return p != -1 ? Str.get(substring(ss, 0, p)) : Str.ZERO;
+          return p == -1 ? Str.ZERO : Str.get(substring(ss, 0, p));
         }
         return Str.get(coll.before(ss, sb, info));
       default:

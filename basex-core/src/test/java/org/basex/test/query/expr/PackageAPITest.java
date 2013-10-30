@@ -380,7 +380,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * Checks if the specified package descriptor results in an error.
    * @param desc descriptor
    */
-  private void ok(final IO desc) {
+  private static void ok(final IO desc) {
     try {
       new PkgValidator(context.repo, null).check(
          new PkgParser(context.repo, null).parse(desc));
@@ -395,7 +395,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @param err expected error
    * @param exp information on expected error
    */
-  private void error(final IO desc, final Err err, final String exp) {
+  private static void error(final IO desc, final Err err, final String exp) {
     try {
       new PkgValidator(context.repo, null).check(
          new PkgParser(context.repo, null).parse(desc));

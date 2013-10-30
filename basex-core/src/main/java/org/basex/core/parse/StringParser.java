@@ -197,7 +197,6 @@ public final class StringParser extends CmdParser {
             return new ShowBackups();
           case EVENTS:
             return new ShowEvents();
-          default:
         }
         break;
       case GRANT:
@@ -214,10 +213,8 @@ public final class StringParser extends CmdParser {
             return new RepoDelete(string(cmd), new InputInfo(parser));
           case LIST:
             return new RepoList();
-          default:
         }
         break;
-      default:
     }
     throw Util.notexpected("command specified, but not implemented yet");
   }

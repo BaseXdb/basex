@@ -134,10 +134,10 @@ final class Renderer extends BaseXBack {
     final int hh = h;
     h = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
-    int col = 1;
-    int line = 1;
     init(g);
     boolean more = true;
+    int line = 1;
+    int col = 1;
     while(more(g)) {
       final int p = text.pos();
       while(text.more()) {
@@ -306,8 +306,9 @@ final class Renderer extends BaseXBack {
     if(y > 0 && y < h) {
       // mark selected text
       if(text.selectStart()) {
-        int xx = x, cw = 0;
+        int xx = x;
         while(!text.inSelect() && text.more()) xx += charW(g, text.next());
+        int cw = 0;
         while(text.inSelect() && text.more()) cw += charW(g, text.next());
         g.setColor(GUIConstants.color(3));
         g.fillRect(xx, y - fontH * 4 / 5, cw, fontH);
@@ -317,8 +318,8 @@ final class Renderer extends BaseXBack {
       // mark found text
       int xx = x;
       while(text.more() && text.searchStart()) {
-        int cw = 0;
         while(!text.inSearch() && text.more()) xx += charW(g, text.next());
+        int cw = 0;
         while(text.inSearch() && text.more()) cw += charW(g, text.next());
         g.setColor(GUIConstants.color2A);
         g.fillRect(xx, y - fontH * 4 / 5, cw, fontH);
@@ -403,7 +404,7 @@ final class Renderer extends BaseXBack {
    * @param g graphics reference
    */
   private void drawError(final Graphics g) {
-    final int ww = wordW != 0 ? wordW : charW(g, ' ');
+    final int ww = wordW == 0 ? charW(g, ' ') : wordW;
     final int s = Math.max(1, fontH / 8);
     g.setColor(GUIConstants.LRED);
     g.fillRect(x, y + 2, ww, s);
@@ -459,12 +460,12 @@ final class Renderer extends BaseXBack {
 
   /**
    * Selects the text at the specified position.
+   *
    * @param pos current text position
    * @param p mouse position
    * @param start states if selection has just been started
-   * @return {@code true} if mouse is placed over a link
    */
-  boolean select(final int pos, final Point p, final boolean start) {
+  void select(final int pos, final Point p, final boolean start) {
     if(start) text.noSelect();
     link(pos, p);
 
@@ -472,7 +473,6 @@ final class Renderer extends BaseXBack {
     else text.extendSelect();
     text.setCaret();
     repaint();
-    return link;
   }
 
   /**

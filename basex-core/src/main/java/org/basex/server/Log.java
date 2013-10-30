@@ -14,7 +14,7 @@ import org.basex.util.*;
  * This class writes daily log files to disk.
  * The log format has been updated in Version 7.4; it now has the following columns:
  * <ul>
- *   <li><b>Time</b>: timestamp (format: <code>xs:time</code>)</li>
+ *   <li><b>Time</b>: timestamp (format: {@code xs:time})</li>
  *   <li><b>Address</b>: host name and port of the requesting client</li>
  *   <li><b>User</b>: user name</li>
  *   <li><b>Type</b>: Type of logging message: REQUEST, OK or ERROR</li>
@@ -29,9 +29,9 @@ public final class Log {
   /** SERVER string. */
   public static final String SERVER = "SERVER";
   /** ERROR string. */
-  public static final String ERROR = "ERROR";
+  private static final String ERROR = "ERROR";
   /** REQUEST string. */
-  public static final String REQUEST = "REQUEST";
+  private static final String REQUEST = "REQUEST";
 
   /** Global options. */
   private final GlobalOptions gopts;
@@ -63,7 +63,7 @@ public final class Log {
   public synchronized void writeServer(final Object... str) {
     final Object[] tmp = new Object[str.length + 2];
     tmp[0] = SERVER;
-    tmp[1] = Text.ADMIN;
+    tmp[1] = ADMIN;
     System.arraycopy(str, 0, tmp, 2, str.length);
     write(tmp);
   }
@@ -98,7 +98,7 @@ public final class Log {
       final TokenBuilder tb = new TokenBuilder(DateTime.format(date, DateTime.TIME));
       for(final Object s : str) {
         tb.add('\t');
-        String st;
+        final String st;
         if(s == null) st = REQUEST;
         else if(s instanceof Boolean) st = (Boolean) s ? OK : ERROR;
         else if(s instanceof Throwable) st = Util.message((Throwable) s);

@@ -466,7 +466,7 @@ public abstract class Data {
     meta.update();
 
     if(kind == PI) {
-      updateText(pre, trim(concat(name, SPACE, atom(pre))), kind);
+      updateText(pre, trim(concat(name, SPACE, atom(pre))), PI);
     } else {
       // update/set namespace reference
       final int ouri = nspaces.uri(name, pre, this);
@@ -1069,9 +1069,7 @@ public abstract class Data {
    * Indicates if this data instance is in main memory or on disk.
    * @return result of check
    */
-  public final boolean inMemory() {
-    return this instanceof MemData;
-  }
+  public abstract boolean inMemory();
 
   /**
    * Returns a string representation of the specified table range. Can be called

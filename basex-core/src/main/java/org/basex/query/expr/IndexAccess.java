@@ -21,7 +21,7 @@ public abstract class IndexAccess extends Simple {
    * @param ic index context
    * @param ii input info
    */
-  protected IndexAccess(final IndexContext ic, final InputInfo ii) {
+  IndexAccess(final IndexContext ic, final InputInfo ii) {
     super(ii);
     ictx = ic;
     type = SeqType.NOD_ZM;
