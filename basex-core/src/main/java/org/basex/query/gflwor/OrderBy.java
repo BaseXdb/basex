@@ -271,12 +271,11 @@ public final class OrderBy extends GFLWOR.Clause {
 
     @Override
     public String toString() {
-      final StringBuilder sb = new StringBuilder(expr.toString());
-      if(desc) sb.append(' ').append(DESCENDING);
-      sb.append(' ').append(EMPTYORD).append(' ').append(least ? LEAST : GREATEST);
-      if(coll != null) sb.append(' ').append(COLLATION).append(" \"").
-        append(coll.uri()).append('"');
-      return sb.toString();
+      final TokenBuilder tb = new TokenBuilder(expr.toString());
+      if(desc) tb.add(' ').add(DESCENDING);
+      tb.add(' ').add(EMPTYORD).add(' ').add(least ? LEAST : GREATEST);
+      if(coll != null) tb.add(' ').add(COLLATION).add(" \"").add(coll.uri()).add('"');
+      return tb.toString();
     }
 
     @Override
