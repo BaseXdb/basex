@@ -5,13 +5,13 @@ import static org.basex.query.util.unit.Constants.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * XQuery Unit tests: Testing multiple modules.
@@ -41,12 +41,9 @@ public final class Suite {
    * @return resulting value
    * @throws QueryException query exception
    */
-  public Item test(final TokenList libs) throws QueryException {
+  public Item test(final ArrayList<IO> libs) throws QueryException {
     final FElem suites = new FElem(TESTSUITES);
-    for(final byte[] path : libs) {
-      final IO io = IO.get(string(path));
-      if(!io.exists()) WHICHRES.thrw(info, path);
-
+    for(final IO io : libs) {
       try {
         final QueryContext qc = new QueryContext(ctx.context);
         try {

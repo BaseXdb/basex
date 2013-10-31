@@ -1,8 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.util.Token.*;
-
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -78,7 +75,7 @@ public final class FNInspect extends StandardFunc {
    */
   private Item module(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    return new PlainDoc(ctx, info).parse(IO.get(string(checkStr(expr[0], ctx))));
+    return new PlainDoc(ctx, info).parse(checkPath(expr[0], ctx));
   }
 
   /**
@@ -89,7 +86,7 @@ public final class FNInspect extends StandardFunc {
    */
   private Item xqdoc(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    return new XQDoc(ctx, info).parse(IO.get(string(checkStr(expr[0], ctx))));
+    return new XQDoc(ctx, info).parse(checkPath(expr[0], ctx));
   }
 
   /**

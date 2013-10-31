@@ -117,11 +117,9 @@ public final class FNXQuery extends StandardFunc {
    */
   private ValueBuilder invoke(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    final String path = string(checkStr(expr[0], ctx));
-    final IO io = IO.get(path);
-    if(!io.exists()) WHICHRES.thrw(info, path);
+    final IO io = checkPath(expr[0], ctx);
     try {
-      return eval(ctx, io.read(), path);
+      return eval(ctx, io.read(), io.path());
     } catch(final IOException ex) {
       throw IOERR.thrw(info, ex);
     }

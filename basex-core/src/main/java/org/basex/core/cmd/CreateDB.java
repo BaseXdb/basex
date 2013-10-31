@@ -207,8 +207,7 @@ public final class CreateDB extends ACreate {
       throws IOException {
 
     // check if input is an existing file
-    if(!source.exists() || single && source.isDir())
-      throw new BaseXException(RES_NOT_FOUND_X, source);
+    if(single && source.isDir()) throw new BaseXException(RES_NOT_FOUND_X, source);
 
     // default: create a main memory instance
     if(!ctx.options.get(MainOptions.FORCECREATE)) return mainMem(source, ctx);

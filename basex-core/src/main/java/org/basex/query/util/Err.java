@@ -1,4 +1,3 @@
-
 package org.basex.query.util;
 
 import static org.basex.query.util.Err.ErrType.*;

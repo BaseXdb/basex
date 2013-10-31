@@ -101,10 +101,9 @@ public final class FNXslt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item transform(final QueryContext ctx, final boolean node) throws QueryException {
-
     checkCreate(ctx);
-    final IO in = read(checkItem(expr[0], ctx));
-    final IO xsl = read(checkItem(expr[1], ctx));
+    final IO in = read(expr[0], ctx);
+    final IO xsl = read(expr[1], ctx);
     final Options opts = checkOptions(2, Q_PARAMETERS, new Options(), ctx);
 
     final PrintStream tmp = System.err;
@@ -126,11 +125,13 @@ public final class FNXslt extends StandardFunc {
 
   /**
    * Returns an input reference (possibly cached) to the specified input.
-   * @param it item to be evaluated
+   * @param e expressio nto be evaluated
+   * @param ctx query context
    * @return item
    * @throws QueryException query exception
    */
-  private IO read(final Item it) throws QueryException {
+  private IO read(final Expr e, final QueryContext ctx) throws QueryException {
+    final Item it = checkItem(e, ctx);
     if(it.type.isNode()) {
       try {
         final IO io = new IOContent(it.serialize().toArray());
@@ -140,12 +141,8 @@ public final class FNXslt extends StandardFunc {
         ex.getCause(info);
       }
     }
-
     if(it.type.isStringOrUntyped()) {
-      final String path = string(it.string(info));
-      final IO io = IO.get(path);
-      if(!io.exists()) WHICHRES.thrw(info, path);
-      return io;
+      return checkPath(it, ctx);
     }
     throw STRNODTYPE.thrw(info, this, it.type);
   }

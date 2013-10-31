@@ -4,13 +4,13 @@ import static org.basex.query.util.Err.*;
 
 import java.util.*;
 
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.unit.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Unit functions.
@@ -91,9 +91,9 @@ public final class FNUnit extends StandardFunc {
    */
   private Item testUris(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    final TokenList tl = new TokenList();
+    final ArrayList<IO> inputs = new ArrayList<IO>();
     final Iter ir = ctx.iter(expr[0]);
-    for(Item it; (it = ir.next()) != null;) tl.add(checkStr(it));
-    return new Suite(ctx, info).test(tl);
+    for(Item it; (it = ir.next()) != null;) inputs.add(checkPath(it, ctx));
+    return new Suite(ctx, info).test(inputs);
   }
 }

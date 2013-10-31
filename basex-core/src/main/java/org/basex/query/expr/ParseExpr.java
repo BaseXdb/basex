@@ -198,7 +198,6 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final boolean checkBln(final Expr e, final QueryContext ctx) throws QueryException {
-
     final Item it = checkNoEmpty(e.item(ctx, info), AtomType.BLN);
     final Type ip = it.type;
     if(ip == AtomType.BLN || ip.isUntyped()) return it.bool(info);
@@ -214,7 +213,6 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final double checkDbl(final Expr e, final QueryContext ctx) throws QueryException {
-
     final Item it = checkNoEmpty(e.item(ctx, info), AtomType.DBL);
     if(it.type.isNumberOrUntyped()) return it.dbl(info);
     throw number(this, it);
@@ -378,7 +376,6 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Bin checkBinary(final Expr e, final QueryContext ctx) throws QueryException {
-
     final Item it = checkItem(e, ctx);
     if(it instanceof Bin) return (Bin) it;
     throw BINARYTYPE.thrw(info, it.type);
@@ -503,7 +500,6 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Data checkWrite(final Data data, final QueryContext ctx) throws QueryException {
-
     if(!ctx.context.perm(Perm.WRITE, data.meta)) BASX_PERM.thrw(info, Perm.WRITE);
     return data;
   }

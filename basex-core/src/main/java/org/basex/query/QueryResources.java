@@ -259,11 +259,11 @@ public final class QueryResources {
    * @return data reference
    * @throws QueryException query exception
    */
-  private Data create(final QueryInput input, final boolean single,
-      final IO baseIO, final InputInfo info) throws QueryException {
+  private Data create(final QueryInput input, final boolean single, final IO baseIO,
+      final InputInfo info) throws QueryException {
 
     try {
-      final Data d = createDB(input, single, baseIO, info);
+      final Data d = CreateDB.create(checkPath(input, baseIO, info), single, ctx.context);
       input.path = "";
       addData(d);
       return d;
@@ -273,27 +273,24 @@ public final class QueryResources {
   }
 
   /**
-   * Creates a new database instance.
+   * Returns a valid reference if a file is found in the specified path or the static base uri.
+   * Otherwise, returns an error.
    * @param input query input
-   * @param single expect single document
-   * @param baseIO base URI
+   * @param baseIO base IO
    * @param info input info
-   * @return data reference
+   * @return input source, or exception
    * @throws QueryException query exception
-   * @throws IOException I/O exception
    */
-  private Data createDB(final QueryInput input, final boolean single,
-      final IO baseIO, final InputInfo info) throws QueryException, IOException {
+  public static IO checkPath(final QueryInput input, final IO baseIO, final InputInfo info)
+      throws QueryException {
 
-    if(input.input.exists()) return CreateDB.create(input.input, single, ctx.context);
-
-    // try to create database with path relative to base uri
+    IO in = input.input;
+    if(in.exists()) return in;
     if(baseIO != null) {
-      final String in = baseIO.merge(input.original).path();
-      if(!in.equals(input.original))
-        return CreateDB.create(IO.get(in), single, ctx.context);
+      in = baseIO.merge(input.original);
+      if(!in.path().equals(input.original) && in.exists()) return in;
     }
-    throw WHICHRES.thrw(info, input.input);
+    throw WHICHRES.thrw(info, in);
   }
 
   /**

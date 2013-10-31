@@ -119,12 +119,9 @@ public final class FNValidate extends StandardFunc {
   private Value xsdInfo(final QueryContext ctx) throws QueryException {
     return process(new Validate() {
       @Override
-      void process(final ErrorHandler handler)
-          throws IOException, SAXException, QueryException {
-
+      void process(final ErrorHandler handler) throws IOException, SAXException, QueryException {
         final IO in = read(checkItem(expr[0], ctx), ctx, null);
-        final SchemaFactory sf = SchemaFactory.newInstance(
-            XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         final Schema schema;
         if(expr.length < 2) {
           // assume that schema declaration is included in document
@@ -133,7 +130,6 @@ public final class FNValidate extends StandardFunc {
           final Item it = checkItem(expr[1], ctx);
           // schema specified as string
           IO scio = read(it, ctx, null);
-          if(!scio.exists()) WHICHRES.thrw(info, scio);
           tmp = createTmp(scio);
           if(tmp != null) scio = tmp;
           schema = sf.newSchema(new URL(scio.url()));
@@ -193,12 +189,10 @@ public final class FNValidate extends StandardFunc {
         // integrate doctype declaration via serialization parameters
         if(expr.length > 1) {
           sp = new SerializerOptions();
-          final String dtd = string(checkStr(expr[1], ctx));
-          IO scio = IO.get(dtd);
-          if(!scio.exists()) WHICHRES.thrw(info, dtd);
-          tmp = createTmp(scio);
-          if(tmp != null) scio = tmp;
-          sp.set(SerializerOptions.DOCTYPE_SYSTEM, scio.url());
+          IO dtd = checkPath(expr[1], ctx);
+          tmp = createTmp(dtd);
+          if(tmp != null) dtd = tmp;
+          sp.set(SerializerOptions.DOCTYPE_SYSTEM, dtd.url());
         }
 
         final IO in = read(it, ctx, sp);
@@ -274,15 +268,13 @@ public final class FNValidate extends StandardFunc {
     }
 
     if(it.type.isStringOrUntyped()) {
-      final String path = string(it.string(info));
-      IO io = IO.get(path);
-      if(!io.exists()) WHICHRES.thrw(info, path);
+      IO io = checkPath(it, ctx);
       if(sopts != null) {
         // add doctype declaration if specified
         final ArrayOutput ao = new ArrayOutput();
         Serializer.get(ao, sopts).serialize(new DBNode(io, ctx.context.options));
         io = new IOContent(ao.toArray());
-        io.name(path);
+        io.name(io.path());
       }
       return io;
     }
